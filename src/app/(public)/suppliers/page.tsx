@@ -1,11 +1,37 @@
-import { PageHeader } from '@/components/ui/page-header';
+import { EditorialPublicPage } from '@/components/public/editorial-public-page';
 
 export default function SuppliersPage() {
   return (
-    <PageHeader
+    <EditorialPublicPage
       eyebrow="Поставщики"
-      title="Каталог поставщиков и сервисов"
-      description="Раздел будет подключен к базе и админке после модели Supplier и StorageService upload flow."
+      title="Поставщики, сервисы и полезные контакты"
+      description="Каталог компаний и специалистов, которые помогают барам закупать, запускать, обслуживать и развивать проекты."
+      routeLabel="/suppliers"
+      summary="Каталог поставщиков должен быть практичным B2B-разделом: с понятными категориями, контактами и проверенной информацией."
+      metrics={[
+        { value: 'B2B', label: 'прикладной каталог' },
+        { value: 'RU', label: 'локальный фокус' },
+        { value: 'Check', label: 'ручная модерация' }
+      ]}
+      rows={[
+        {
+          label: 'Категории',
+          title: 'Продукты, оборудование, сервисы',
+          description: 'Структура покрывает ключевые категории поставщиков и помогает быстро находить нужный тип партнера.'
+        },
+        {
+          label: 'Карточка',
+          title: 'Профиль поставщика',
+          description: 'Профиль включает описание, город, категории, контакты, логотип и статус публикации.'
+        },
+        {
+          label: 'Качество',
+          title: 'Проверка перед публикацией',
+          description: 'Публичный каталог должен показывать только проверенные записи, чтобы не превращаться в случайный список контактов.'
+        }
+      ]}
+      primaryLink={{ label: 'Добавить поставщика', href: '/contacts' }}
+      secondaryLink={{ label: 'Партнеры', href: '/partners' }}
     />
   );
 }

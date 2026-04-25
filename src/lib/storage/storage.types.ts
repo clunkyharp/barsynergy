@@ -21,8 +21,15 @@ export type UploadedFileResult = {
   uploadedById?: string;
 };
 
+export type DeleteFileInput =
+  | string
+  | {
+      fileKey: string;
+      bucket?: string;
+    };
+
 export interface StorageService {
   uploadFile(input: UploadFileInput): Promise<UploadedFileResult>;
-  deleteFile(fileKey: string): Promise<void>;
+  deleteFile(input: DeleteFileInput): Promise<void>;
   getPublicUrl(fileKey: string): string;
 }

@@ -1,11 +1,37 @@
-import { PageHeader } from '@/components/ui/page-header';
+import { EditorialPublicPage } from '@/components/public/editorial-public-page';
 
 export default function PartnersPage() {
   return (
-    <PageHeader
+    <EditorialPublicPage
       eyebrow="Партнеры"
-      title="Партнерские форматы и заявки"
-      description="В MVP партнерство работает через заявку и ручную обработку без онлайн-оплат."
+      title="Партнерские форматы для брендов, школ и заведений"
+      description="Раздел описывает форматы сотрудничества для брендов, школ и заведений и помогает быстро связаться с командой."
+      routeLabel="/partners"
+      summary="Партнерства помогают запускать совместные проекты, образовательные активности и коммуникации внутри отраслевого сообщества."
+      metrics={[
+        { value: '03', label: 'типа партнерств' },
+        { value: 'Direct', label: 'прямой контакт' },
+        { value: 'RU', label: 'локальный рынок' }
+      ]}
+      rows={[
+        {
+          label: 'Формат',
+          title: 'Образовательные партнерства',
+          description: 'Совместные лекции, интенсивы, дегустации и программы для специалистов и команд.'
+        },
+        {
+          label: 'Формат',
+          title: 'Информационные партнерства',
+          description: 'Материалы, события и отраслевые проекты, которые полезны аудитории BARSYNERGY.'
+        },
+        {
+          label: 'Формат',
+          title: 'Коммерческие заявки',
+          description: 'Специальные размещения и совместные кампании согласуются индивидуально по целям и формату взаимодействия.'
+        }
+      ]}
+      primaryLink={{ label: 'Обсудить партнерство', href: '/contacts' }}
+      secondaryLink={{ label: 'События', href: '/events' }}
     />
   );
 }

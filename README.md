@@ -23,7 +23,7 @@ The project uses a Russia-ready VPS architecture: Next.js, PostgreSQL, Prisma, D
 npm install
 cp .env.example .env
 docker compose up -d postgres
-npm run prisma:migrate:dev -- --name init_foundation
+npm run prisma:migrate:deploy
 npm run dev
 ```
 
@@ -64,6 +64,7 @@ Production-like stack:
 ```bash
 cp .env.production.example .env.production
 docker compose --env-file .env.production -f docker-compose.production.yml up -d --build
+docker compose --env-file .env.production -f docker-compose.production.yml exec app npm run prisma:migrate:deploy
 ```
 
 Production must use:
@@ -78,7 +79,7 @@ If production starts with `STORAGE_DRIVER=local`, env validation fails by design
 
 ```bash
 npm run prisma:generate
-npm run prisma:migrate:dev -- --name init_foundation
+npm run prisma:migrate:dev -- --name <migration_name>
 npm run prisma:migrate:deploy
 ```
 
@@ -92,6 +93,11 @@ Production releases go `dev -> validation -> prod` only after owner confirmation
 
 ## Documentation
 
+- [Project plan](docs/project-plan.md)
+- [AI agent workflow](docs/agent-workflow.md)
+- [Project audit workflow](docs/audit-workflow.md)
+- [Remediation plan](docs/remediation-plan.md)
+- [Phase plan](docs/phase-plan.md)
 - [Setup](docs/setup.md)
 - [Deploy](docs/deploy.md)
 - [Environment](docs/env.md)

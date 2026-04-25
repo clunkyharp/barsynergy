@@ -1,8 +1,21 @@
 import type { ReactNode } from 'react';
+import { redirect } from 'next/navigation';
 import { AdminHeader } from '@/components/layout/admin-header';
 import { AdminSidebar } from '@/components/layout/admin-sidebar';
+import { getCurrentUser } from '@/lib/auth/current-user';
+import { canAccessAdmin } from '@/lib/auth/permissions';
 
-export default function AdminLayout({ children }: { children: ReactNode }) {
+export default async function AdminLayout({ children }: { children: ReactNode }) {
+  const user = await getCurrentUser();
+
+  if (!user) {
+    redirect('/auth/login');
+  }
+
+  if (!canAccessAdmin(user.role)) {
+    redirect('/');
+  }
+
   return (
     <div className="min-h-screen border-t border-[var(--line)] bg-[var(--surface)]">
       <div className="container grid gap-6 py-6 lg:grid-cols-[260px_1fr]">

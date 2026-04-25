@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { SiteFooter } from '@/components/layout/site-footer';
 import { SiteHeader } from '@/components/layout/site-header';
+import { bodyFont } from '@/lib/fonts';
 import { getEnv } from '@/lib/validation/env';
 
 const env = getEnv();
@@ -32,7 +33,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="ru">
-      <body>
+      <body className={bodyFont.className}>
         <div className="site-shell">
           <SiteHeader />
           <main className="site-main">{children}</main>

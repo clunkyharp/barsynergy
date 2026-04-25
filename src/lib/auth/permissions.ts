@@ -1,9 +1,9 @@
-export type UserRole = 'user' | 'moderator' | 'admin';
+import { UserRole } from '@prisma/client';
 
 export function canAccessAdmin(role?: UserRole | null) {
-  return role === 'admin' || role === 'moderator';
+  return role === UserRole.ADMIN || role === UserRole.MODERATOR;
 }
 
 export function canManageUsers(role?: UserRole | null) {
-  return role === 'admin';
+  return role === UserRole.ADMIN;
 }
