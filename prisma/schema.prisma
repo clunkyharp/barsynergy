@@ -1,0 +1,150 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  USER      @map("user")
+  MODERATOR @map("moderator")
+  ADMIN     @map("admin")
+}
+
+enum UserStatus {
+  ACTIVE  @map("active")
+  BLOCKED @map("blocked")
+  PENDING @map("pending")
+}
+
+enum CategoryType {
+  ARTICLE  @map("article")
+  EVENT    @map("event")
+  COURSE   @map("course")
+  VACANCY  @map("vacancy")
+  SUPPLIER @map("supplier")
+  PARTNER  @map("partner")
+}
+
+enum StorageDriver {
+  LOCAL @map("local")
+  S3    @map("s3")
+}
+
+enum FileVisibility {
+  PUBLIC  @map("public")
+  PRIVATE @map("private")
+}
+
+model User {
+  id           String     @id @default(cuid())
+  email        String     @unique
+  passwordHash String
+  role         UserRole   @default(USER)
+  status       UserStatus @default(PENDING)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  profile       Profile?
+  sessions      Session[]
+  uploadedFiles UploadedFile[]
+
+  @@index([role])
+  @@index([status])
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  tokenHash String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model Profile {
+  id         String   @id @default(cuid())
+  userId     String   @unique
+  fullName   String?
+  cityId     String?
+  profession String?
+  company    String?
+  bio        String?
+  phone      String?
+  telegram   String?
+  website    String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  user User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  city City? @relation(fields: [cityId], references: [id], onDelete: SetNull)
+
+  @@index([cityId])
+}
+
+model City {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  region    String?
+  isActive  Boolean  @default(true)
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  profiles Profile[]
+
+  @@index([isActive, sortOrder])
+}
+
+model Category {
+  id        String       @id @default(cuid())
+  name      String
+  slug      String
+  type      CategoryType
+  isActive  Boolean      @default(true)
+  sortOrder Int          @default(0)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  @@unique([slug, type])
+  @@index([type, isActive, sortOrder])
+}
+
+model Tag {
+  id        String       @id @default(cuid())
+  name      String
+  slug      String
+  type      CategoryType
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  @@unique([slug, type])
+  @@index([type])
+}
+
+model UploadedFile {
+  id            String         @id @default(cuid())
+  storageDriver StorageDriver
+  bucket        String?
+  fileKey       String
+  originalName  String
+  mimeType      String
+  size          Int
+  visibility    FileVisibility
+  uploadedById  String?
+  createdAt     DateTime       @default(now())
+
+  uploadedBy User? @relation(fields: [uploadedById], references: [id], onDelete: SetNull)
+
+  @@index([fileKey])
+  @@index([uploadedById])
+  @@index([visibility])
+}

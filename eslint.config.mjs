@@ -1,0 +1,16 @@
+import js from '@eslint/js';
+import tseslint from 'typescript-eslint';
+
+export default tseslint.config(
+  js.configs.recommended,
+  ...tseslint.configs.recommended,
+  {
+    ignores: ['.astro/**', '.next/**', 'dist/**', 'node_modules/**', 'public/**', 'scripts/**/*.cjs']
+  },
+  {
+    files: ['src/**/*.{ts,tsx}', 'next.config.ts'],
+    rules: {
+      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }]
+    }
+  }
+);
