@@ -53,10 +53,10 @@ Done when:
 
 Current status:
 
-- Phase 0 foundation is implemented and currently backed by one migration (`20260425160217_init_foundation`);
+- Phase 0 foundation is implemented and backed by migration `20260425160217_init_foundation`;
 - public route structure for Phase 1 exists and the public surface is implemented at source level;
-- current Prisma entities are foundation-only: `User`, `Session`, `Profile`, `City`, `Category`, `Tag`, `UploadedFile`;
-- Phase 2+ entities (`Article`, `Event`, `Course`, `Vacancy`, `Supplier`, `Partner`, `Application`) are target scope, not current runtime schema yet.
+- current Prisma entities include foundation models plus Phase 2 content models: `Article`, `ArticleTag`, `Event`, `Course`, `Vacancy`, `Supplier`, `Partner`;
+- `Application` remains target scope for Phase 3.
 
 ## Phase 1: Public Website MVP
 
@@ -124,6 +124,13 @@ Done when:
 Implementation contract:
 
 - [Phase 2 content/admin mini-spec](phase-2-content-admin-spec.md)
+
+Current status:
+
+- Phase 2 Prisma models are implemented and backed by migration `20260427123417_phase2_content_models`;
+- the first admin CRUD slices are implemented for articles and events at `/admin/articles` and `/admin/events`;
+- admin CRUD for courses, vacancies, suppliers and partners remains to be implemented;
+- public read queries, upload routes and full publish/archive helpers remain to be implemented.
 
 ## Phase 3: Applications And Forms
 

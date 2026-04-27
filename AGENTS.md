@@ -35,6 +35,22 @@ Before meaningful project work, read the smallest relevant set of docs:
 
 Use `docs/project-plan.md` as the canonical product plan and `docs/phase-plan.md` as the implementation roadmap.
 
+## Documentation And Kanban Sync
+
+Every meaningful change must include a documentation sync decision before closeout.
+
+Always check whether the change affects:
+
+- `PROJECT_STATUS.md`;
+- `docs/phase-plan.md`;
+- `docs/project-plan.md`;
+- phase-specific docs under `docs/`;
+- the Obsidian Kanban board described in `docs/kanban-sync.md`.
+
+If code, schema, migration, UI, route behavior, validation results, active phase, next step, blocker or task status changed, update the relevant docs and the Kanban board in the same batch.
+
+If no docs or Kanban update is needed, state that explicitly in the closeout with the reason.
+
 ## Working Mode
 
 Lock one mode before non-trivial work:

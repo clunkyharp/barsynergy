@@ -211,7 +211,7 @@ Avoid:
 
 ## Core Database Entities
 
-Current runtime schema (Phase 0 foundation):
+Current runtime schema:
 
 - `User`;
 - `Session`;
@@ -220,15 +220,16 @@ Current runtime schema (Phase 0 foundation):
 - `Category`;
 - `Tag`;
 - `UploadedFile`.
-
-Target MVP entities by later phases:
-
 - `Article`;
+- `ArticleTag`;
 - `Event`;
 - `Course`;
 - `Vacancy`;
 - `Supplier`;
-- `Partner`;
+- `Partner`.
+
+Target MVP entities by later phases:
+
 - `Application`.
 
 Future monetization entities are documentation-only until the payment phase:

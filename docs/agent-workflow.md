@@ -17,6 +17,7 @@ The central agent must:
 - review subagent output before accepting it;
 - integrate changes only after local inspection;
 - run verification;
+- keep documentation and the Obsidian Kanban board synchronized with every meaningful project change;
 - report risks and validation gaps clearly;
 - prevent scope creep and repeated polishing.
 
@@ -132,7 +133,8 @@ Every meaningful batch closes with:
 - files changed;
 - validation;
 - git status;
-- Obsidian Kanban status update when task status, blocker, owner decision or active phase changed;
+- documentation sync result;
+- Obsidian Kanban status update, or an explicit note that no board update was needed;
 - risks;
 - out of scope;
 - stop polishing checkpoint;

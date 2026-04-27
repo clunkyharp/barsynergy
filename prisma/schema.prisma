@@ -38,6 +38,13 @@ enum FileVisibility {
   PRIVATE @map("private")
 }
 
+enum ContentStatus {
+  DRAFT     @map("draft")
+  REVIEW    @map("review")
+  PUBLISHED @map("published")
+  ARCHIVED  @map("archived")
+}
+
 model User {
   id           String     @id @default(cuid())
   email        String     @unique
@@ -47,9 +54,21 @@ model User {
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
 
-  profile       Profile?
-  sessions      Session[]
-  uploadedFiles UploadedFile[]
+  profile          Profile?
+  sessions         Session[]
+  uploadedFiles    UploadedFile[]
+  createdArticles  Article[]      @relation("ArticleCreatedBy")
+  updatedArticles  Article[]      @relation("ArticleUpdatedBy")
+  createdEvents    Event[]        @relation("EventCreatedBy")
+  updatedEvents    Event[]        @relation("EventUpdatedBy")
+  createdCourses   Course[]       @relation("CourseCreatedBy")
+  updatedCourses   Course[]       @relation("CourseUpdatedBy")
+  createdVacancies Vacancy[]      @relation("VacancyCreatedBy")
+  updatedVacancies Vacancy[]      @relation("VacancyUpdatedBy")
+  createdSuppliers Supplier[]     @relation("SupplierCreatedBy")
+  updatedSuppliers Supplier[]     @relation("SupplierUpdatedBy")
+  createdPartners  Partner[]      @relation("PartnerCreatedBy")
+  updatedPartners  Partner[]      @relation("PartnerUpdatedBy")
 
   @@index([role])
   @@index([status])
@@ -99,7 +118,12 @@ model City {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  profiles Profile[]
+  profiles  Profile[]
+  articles  Article[]
+  events    Event[]
+  courses   Course[]
+  vacancies Vacancy[]
+  suppliers Supplier[]
 
   @@index([isActive, sortOrder])
 }
@@ -114,6 +138,13 @@ model Category {
   createdAt DateTime     @default(now())
   updatedAt DateTime     @updatedAt
 
+  articles  Article[]
+  events    Event[]
+  courses   Course[]
+  vacancies Vacancy[]
+  suppliers Supplier[]
+  partners  Partner[]
+
   @@unique([slug, type])
   @@index([type, isActive, sortOrder])
 }
@@ -125,6 +156,8 @@ model Tag {
   type      CategoryType
   createdAt DateTime     @default(now())
   updatedAt DateTime     @updatedAt
+
+  articleTags ArticleTag[]
 
   @@unique([slug, type])
   @@index([type])
@@ -142,9 +175,238 @@ model UploadedFile {
   uploadedById  String?
   createdAt     DateTime       @default(now())
 
-  uploadedBy User? @relation(fields: [uploadedById], references: [id], onDelete: SetNull)
+  uploadedBy          User?      @relation(fields: [uploadedById], references: [id], onDelete: SetNull)
+  articleCoverImages  Article[]  @relation("ArticleCoverImage")
+  eventCoverImages    Event[]    @relation("EventCoverImage")
+  courseCoverImages   Course[]   @relation("CourseCoverImage")
+  vacancyCoverImages  Vacancy[]  @relation("VacancyCoverImage")
+  supplierCoverImages Supplier[] @relation("SupplierCoverImage")
+  partnerCoverImages  Partner[]  @relation("PartnerCoverImage")
 
   @@index([fileKey])
   @@index([uploadedById])
   @@index([visibility])
+}
+
+model Article {
+  id                 String        @id @default(cuid())
+  title              String
+  slug               String        @unique
+  summary            String
+  body               String
+  status             ContentStatus @default(DRAFT)
+  coverImageId       String?
+  cityId             String?
+  categoryId         String?
+  sortOrder          Int           @default(0)
+  publishedAt        DateTime?
+  archivedAt         DateTime?
+  createdById        String?
+  updatedById        String?
+  readingTimeMinutes Int?
+  authorName         String?
+  sourceLabel        String?
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+
+  coverImage UploadedFile? @relation("ArticleCoverImage", fields: [coverImageId], references: [id], onDelete: SetNull)
+  city       City?         @relation(fields: [cityId], references: [id], onDelete: SetNull)
+  category   Category?     @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  createdBy  User?         @relation("ArticleCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  updatedBy  User?         @relation("ArticleUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
+  tags       ArticleTag[]
+
+  @@index([status, publishedAt])
+  @@index([cityId, status])
+  @@index([categoryId, status])
+  @@index([sortOrder])
+}
+
+model ArticleTag {
+  articleId String
+  tagId     String
+  createdAt DateTime @default(now())
+
+  article Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  tag     Tag     @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([articleId, tagId])
+  @@index([tagId])
+}
+
+model Event {
+  id               String        @id @default(cuid())
+  title            String
+  slug             String        @unique
+  summary          String
+  status           ContentStatus @default(DRAFT)
+  coverImageId     String?
+  cityId           String?
+  categoryId       String?
+  sortOrder        Int           @default(0)
+  publishedAt      DateTime?
+  archivedAt       DateTime?
+  createdById      String?
+  updatedById      String?
+  startsAt         DateTime
+  endsAt           DateTime?
+  locationName     String?
+  address          String?
+  format           String?
+  capacity         Int?
+  registrationMode String?
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  coverImage UploadedFile? @relation("EventCoverImage", fields: [coverImageId], references: [id], onDelete: SetNull)
+  city       City?         @relation(fields: [cityId], references: [id], onDelete: SetNull)
+  category   Category?     @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  createdBy  User?         @relation("EventCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  updatedBy  User?         @relation("EventUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
+
+  @@index([status, publishedAt])
+  @@index([cityId, status])
+  @@index([categoryId, status])
+  @@index([startsAt])
+  @@index([sortOrder])
+}
+
+model Course {
+  id             String        @id @default(cuid())
+  title          String
+  slug           String        @unique
+  summary        String
+  status         ContentStatus @default(DRAFT)
+  coverImageId   String?
+  cityId         String?
+  categoryId     String?
+  sortOrder      Int           @default(0)
+  publishedAt    DateTime?
+  archivedAt     DateTime?
+  createdById    String?
+  updatedById    String?
+  format         String?
+  durationLabel  String?
+  level          String?
+  priceLabel     String?
+  instructorName String?
+  program        String
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  coverImage UploadedFile? @relation("CourseCoverImage", fields: [coverImageId], references: [id], onDelete: SetNull)
+  city       City?         @relation(fields: [cityId], references: [id], onDelete: SetNull)
+  category   Category?     @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  createdBy  User?         @relation("CourseCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  updatedBy  User?         @relation("CourseUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
+
+  @@index([status, publishedAt])
+  @@index([cityId, status])
+  @@index([categoryId, status])
+  @@index([sortOrder])
+}
+
+model Vacancy {
+  id              String        @id @default(cuid())
+  title           String
+  slug            String        @unique
+  summary         String
+  status          ContentStatus @default(DRAFT)
+  coverImageId    String?
+  cityId          String?
+  categoryId      String?
+  sortOrder       Int           @default(0)
+  publishedAt     DateTime?
+  archivedAt      DateTime?
+  createdById     String?
+  updatedById     String?
+  companyName     String
+  position        String
+  employmentType  String?
+  salaryLabel     String?
+  experienceLabel String?
+  contactMode     String?
+  description     String
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  coverImage UploadedFile? @relation("VacancyCoverImage", fields: [coverImageId], references: [id], onDelete: SetNull)
+  city       City?         @relation(fields: [cityId], references: [id], onDelete: SetNull)
+  category   Category?     @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  createdBy  User?         @relation("VacancyCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  updatedBy  User?         @relation("VacancyUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
+
+  @@index([status, publishedAt])
+  @@index([cityId, status])
+  @@index([categoryId, status])
+  @@index([sortOrder])
+}
+
+model Supplier {
+  id           String        @id @default(cuid())
+  title        String
+  slug         String        @unique
+  summary      String
+  status       ContentStatus @default(DRAFT)
+  coverImageId String?
+  cityId       String?
+  categoryId   String?
+  sortOrder    Int           @default(0)
+  publishedAt  DateTime?
+  archivedAt   DateTime?
+  createdById  String?
+  updatedById  String?
+  companyName  String
+  description  String
+  websiteUrl   String?
+  contactLabel String?
+  isVerified   Boolean       @default(false)
+  serviceArea  String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  coverImage UploadedFile? @relation("SupplierCoverImage", fields: [coverImageId], references: [id], onDelete: SetNull)
+  city       City?         @relation(fields: [cityId], references: [id], onDelete: SetNull)
+  category   Category?     @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  createdBy  User?         @relation("SupplierCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  updatedBy  User?         @relation("SupplierUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
+
+  @@index([status, publishedAt])
+  @@index([cityId, status])
+  @@index([categoryId, status])
+  @@index([isVerified, status])
+  @@index([sortOrder])
+}
+
+model Partner {
+  id           String        @id @default(cuid())
+  title        String
+  slug         String        @unique
+  summary      String
+  status       ContentStatus @default(DRAFT)
+  coverImageId String?
+  categoryId   String?
+  sortOrder    Int           @default(0)
+  publishedAt  DateTime?
+  archivedAt   DateTime?
+  createdById  String?
+  updatedById  String?
+  companyName  String
+  description  String
+  websiteUrl   String?
+  partnerType  String?
+  isFeatured   Boolean       @default(false)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  coverImage UploadedFile? @relation("PartnerCoverImage", fields: [coverImageId], references: [id], onDelete: SetNull)
+  category   Category?     @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  createdBy  User?         @relation("PartnerCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  updatedBy  User?         @relation("PartnerUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
+
+  @@index([status, publishedAt])
+  @@index([categoryId, status])
+  @@index([partnerType, status])
+  @@index([isFeatured, status])
+  @@index([sortOrder])
 }

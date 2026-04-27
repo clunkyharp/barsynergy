@@ -6,11 +6,11 @@ Last updated: 2026-04-27
 
 - Active branch: `dev`
 - Production branch: `prod`
-- Current work mode: `QA`
+- Current work mode: `IMPLEMENTATION`
 
 ## Current Phase
 
-Active phase: Phase 2 implementation readiness. Phase 1 public website MVP is complete for the current static public surface.
+Active phase: Phase 2 database and content admin implementation. Phase 1 public website MVP is complete for the current static public surface.
 
 Phase 0 is implemented as the technical foundation:
 
@@ -59,7 +59,7 @@ Phase 1 remaining caveat:
 
 ## Current Runtime Schema
 
-The current Prisma schema is still foundation-only:
+The current Prisma schema includes the foundation models:
 
 - `User`;
 - `Session`;
@@ -69,14 +69,67 @@ The current Prisma schema is still foundation-only:
 - `Tag`;
 - `UploadedFile`.
 
-Content and application models are planned for later phases.
+Phase 2 content models are now present in Prisma and backed by migration `20260427123417_phase2_content_models`:
+
+- `Article`;
+- `ArticleTag`;
+- `Event`;
+- `Course`;
+- `Vacancy`;
+- `Supplier`;
+- `Partner`.
+
+The `Application` model remains planned for Phase 3.
 
 ## Next Planned Work
 
-1. Implement Phase 2 Prisma models from `docs/phase-2-content-admin-spec.md`.
-2. Build Phase 2 admin CRUD by section.
+1. Extend Phase 2 admin CRUD from articles/events to courses, vacancies, suppliers and partners.
+2. Add public read queries for published content with pagination.
 3. Prepare the Phase 3 mini-spec for applications, consent and notifications.
 4. Keep production TLS, legal approval and production scheduler decisions as explicit blockers until owner input is available.
+
+## Phase 2 Database Update
+
+Completed on 2026-04-27:
+
+- `ContentStatus` enum added with draft, review, published and archived states.
+- Prisma models added for articles, events, courses, vacancies, suppliers and partners.
+- Article tags use an explicit join table.
+- Content models are related to existing city, category, tag, uploaded file and user records where applicable.
+- Public-query indexes were added for status, publish date, city, category, sort order and key filters.
+
+Validation:
+
+- `./node_modules/.bin/prisma validate`;
+- `./node_modules/.bin/prisma migrate status`;
+- `npm run typecheck`.
+
+## Phase 2 Admin Update
+
+Completed on 2026-04-27:
+
+- first article admin CRUD slice added at `/admin/articles`;
+- first event admin CRUD slice added at `/admin/events`;
+- admins and moderators can create articles and events;
+- article and event lists show latest records with taxonomy, status and updater;
+- publish and archive actions update publication status dates;
+- deleting is limited to non-published articles and events.
+- QA fixes keep existing `publishedAt` when archiving, validate article category/city references server-side and generate a unique slug when needed.
+- shared admin content utilities now centralize status labels, slug handling and publication date transitions.
+
+## Agent Workflow Update
+
+Completed on 2026-04-27:
+
+- project-local agent instructions now require a documentation and Kanban sync decision for every meaningful change;
+- `docs/agent-workflow.md` and `docs/kanban-sync.md` now require either updating the relevant docs/board or explicitly stating why no update was needed.
+
+Validation:
+
+- `./node_modules/.bin/prisma validate`;
+- `npm run typecheck`;
+- `npm run lint`;
+- `npm run build`.
 
 ## Architecture Readiness Update
 
@@ -120,7 +173,7 @@ Validation:
 Completed on 2026-04-27:
 
 - project docs, Phase 2 mini-spec, remediation plan and Obsidian Kanban were compared with current source files;
-- current runtime schema is still foundation-only, so Phase 2 database models remain the next implementation focus;
+- Phase 2 database models are now implemented, so admin CRUD is the next implementation focus;
 - admin section guards, storage boundary changes, upload size cap and session cleanup command are present in source and documented as completed safeguards;
 - remaining blockers are unchanged: TLS ownership, production scheduler, legal review and future payment decision.
 

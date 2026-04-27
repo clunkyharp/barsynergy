@@ -19,6 +19,8 @@ Use it as the short active view of project work. Keep detailed plans, audits and
 
 ## Sync Rule
 
+Every meaningful code, schema, migration, UI, route, validation, docs or planning change must include a sync decision.
+
 Update the Obsidian board when a batch changes any of these:
 
 - current active phase or focus;
@@ -26,6 +28,8 @@ Update the Obsidian board when a batch changes any of these:
 - blocker or owner decision;
 - validation result or verification gap;
 - next recommended implementation batch.
+
+If the board does not need a content change, record that in the closeout with the reason.
 
 Do not duplicate long notes into the board. Each card should stay short and point back to the repo document when details are needed.
 
@@ -35,6 +39,5 @@ Before closing a meaningful development, QA, docs or deployment batch:
 
 - check `git status --short --branch`;
 - update `PROJECT_STATUS.md` if the actual project state changed;
-- update the Obsidian board if task status changed;
+- update the Obsidian board if task status changed, or state why it did not need an update;
 - state validation results and remaining blockers in the final response.
-
