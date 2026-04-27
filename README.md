@@ -93,11 +93,17 @@ Production releases go `dev -> validation -> prod` only after owner confirmation
 
 ## Documentation
 
+- [Design system](DESIGN.md)
+- [Design tokens](design-tokens.json)
+- [Design consistency check](docs/design-consistency-check.md)
+- [Project status](PROJECT_STATUS.md)
 - [Project plan](docs/project-plan.md)
 - [AI agent workflow](docs/agent-workflow.md)
 - [Project audit workflow](docs/audit-workflow.md)
 - [Remediation plan](docs/remediation-plan.md)
 - [Phase plan](docs/phase-plan.md)
+- [Obsidian Kanban sync](docs/kanban-sync.md)
+- [Phase 2 content/admin mini-spec](docs/phase-2-content-admin-spec.md)
 - [Setup](docs/setup.md)
 - [Deploy](docs/deploy.md)
 - [Environment](docs/env.md)

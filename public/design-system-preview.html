@@ -1,0 +1,650 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>BARSYNERGY Design System Preview</title>
+    <style>
+      :root {
+        --background: #f4ebdb;
+        --surface: #faf4e8;
+        --surface-muted: #ece0ce;
+        --text: #16130f;
+        --muted: #5f564b;
+        --line: rgba(22, 19, 15, 0.22);
+        --accent: #992c26;
+        --accent-strong: #7b1f1a;
+        --graphite: #141412;
+        --success: #2f684f;
+        --warning: #9a661a;
+        --danger: #9f2f2f;
+        --container: min(1320px, calc(100vw - 32px));
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background: var(--background);
+        color: var(--text);
+        font-family: Manrope, Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        line-height: 1.5;
+        background-image:
+          linear-gradient(rgba(22, 19, 15, 0.035) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(22, 19, 15, 0.035) 1px, transparent 1px);
+        background-size: 96px 96px;
+      }
+
+      a {
+        color: inherit;
+      }
+
+      :focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 3px;
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        html {
+          scroll-behavior: auto;
+        }
+
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          scroll-behavior: auto !important;
+          transition-duration: 0.01ms !important;
+        }
+      }
+
+      .container {
+        width: var(--container);
+        margin-inline: auto;
+      }
+
+      .section {
+        border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+        padding: 48px 0;
+      }
+
+      .eyebrow {
+        margin: 0 0 12px;
+        color: var(--accent);
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+      }
+
+      .display {
+        margin: 0;
+        font-family: Oswald, "Arial Narrow", Impact, sans-serif;
+        font-size: clamp(42px, 8vw, 96px);
+        letter-spacing: 0;
+        line-height: 0.92;
+        text-transform: uppercase;
+      }
+
+      .section-title {
+        margin: 0;
+        font-family: Oswald, "Arial Narrow", Impact, sans-serif;
+        font-size: clamp(40px, 6vw, 72px);
+        letter-spacing: 0;
+        line-height: 0.92;
+        text-transform: uppercase;
+      }
+
+      .muted {
+        color: var(--muted);
+      }
+
+      .grid {
+        display: grid;
+        gap: 24px;
+      }
+
+      .two-col {
+        grid-template-columns: minmax(0, 0.72fr) minmax(0, 1.28fr);
+      }
+
+      .three-col {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .swatches {
+        display: grid;
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .swatch {
+        min-height: 118px;
+        border: 1px solid var(--line);
+        background: var(--surface);
+        padding: 12px;
+      }
+
+      .swatch-mark {
+        height: 52px;
+        border: 1px solid rgba(0, 0, 0, 0.18);
+        margin-bottom: 12px;
+      }
+
+      .swatch strong,
+      .token-row strong {
+        display: block;
+        font-size: 13px;
+      }
+
+      .swatch span,
+      .token-row span {
+        display: block;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .button-row,
+      .badge-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        align-items: center;
+      }
+
+      .button {
+        display: inline-flex;
+        min-height: 44px;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid transparent;
+        border-radius: 6px;
+        padding: 10px 20px;
+        font-size: 14px;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-decoration: none;
+        text-transform: uppercase;
+        transition: 160ms ease;
+      }
+
+      .button:active {
+        transform: translateY(1px);
+      }
+
+      .button-primary {
+        border-color: var(--accent);
+        background: var(--accent);
+        color: #fff;
+      }
+
+      .button-primary:hover {
+        background: var(--accent-strong);
+      }
+
+      .button-secondary {
+        border-color: var(--line);
+        background: transparent;
+        color: var(--text);
+      }
+
+      .button-secondary:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+      }
+
+      .button-ghost {
+        color: var(--muted);
+      }
+
+      .button-ghost:hover {
+        color: var(--accent);
+      }
+
+      .button-disabled {
+        opacity: 0.48;
+        pointer-events: none;
+      }
+
+      .button[aria-disabled="true"],
+      .button:disabled {
+        cursor: not-allowed;
+        opacity: 0.55;
+        pointer-events: none;
+      }
+
+      .button[aria-busy="true"] {
+        cursor: wait;
+      }
+
+      .spinner {
+        width: 16px;
+        height: 16px;
+        border: 2px solid currentColor;
+        border-right-color: transparent;
+        border-radius: 999px;
+        animation: spin 800ms linear infinite;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      .card {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+        padding: 24px;
+        box-shadow: 0 1px 2px rgba(20, 20, 18, 0.06);
+        transition: 160ms ease;
+      }
+
+      .card-interactive:hover,
+      .card-interactive:focus-within {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 2px rgba(153, 44, 38, 0.16);
+      }
+
+      .card-selected {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 2px rgba(153, 44, 38, 0.16);
+      }
+
+      .card-loading {
+        animation: pulse 1.5s ease-in-out infinite;
+      }
+
+      .card-error {
+        border-color: var(--danger);
+        background: rgba(159, 47, 47, 0.06);
+      }
+
+      @keyframes pulse {
+        50% {
+          opacity: 0.55;
+        }
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 4px 12px;
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .badge-success {
+        border-color: rgba(47, 104, 79, 0.35);
+        background: rgba(47, 104, 79, 0.1);
+        color: var(--success);
+      }
+
+      .badge-warning {
+        border-color: rgba(154, 102, 26, 0.35);
+        background: rgba(154, 102, 26, 0.1);
+        color: var(--warning);
+      }
+
+      .badge-danger {
+        border-color: rgba(159, 47, 47, 0.35);
+        background: rgba(159, 47, 47, 0.1);
+        color: var(--danger);
+      }
+
+      .field {
+        display: grid;
+        gap: 8px;
+      }
+
+      .field label {
+        font-size: 14px;
+        font-weight: 700;
+      }
+
+      .input,
+      .select,
+      .textarea {
+        width: 100%;
+        min-height: 44px;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        background: #fff;
+        color: var(--text);
+        font: inherit;
+        font-size: 14px;
+        padding: 0 12px;
+      }
+
+      .textarea {
+        min-height: 112px;
+        padding: 10px 12px;
+      }
+
+      .input:focus,
+      .select:focus,
+      .textarea:focus {
+        border-color: var(--accent);
+        outline: none;
+      }
+
+      .input:hover,
+      .select:hover,
+      .textarea:hover {
+        border-color: rgba(0, 0, 0, 0.35);
+      }
+
+      .input:disabled,
+      .select:disabled,
+      .textarea:disabled {
+        cursor: not-allowed;
+        background: var(--surface-muted);
+        color: var(--muted);
+        opacity: 0.7;
+      }
+
+      .input[aria-invalid="true"],
+      .select[aria-invalid="true"],
+      .textarea[aria-invalid="true"] {
+        border-color: var(--danger);
+      }
+
+      .checkbox-row {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        font-size: 14px;
+      }
+
+      .checkbox {
+        width: 16px;
+        height: 16px;
+        accent-color: var(--accent);
+      }
+
+      .checkbox:disabled {
+        cursor: not-allowed;
+        opacity: 0.5;
+      }
+
+      .checkbox[aria-invalid="true"] {
+        outline: 2px solid var(--danger);
+        outline-offset: 2px;
+      }
+
+      .field-error {
+        color: var(--danger);
+        font-size: 14px;
+      }
+
+      .editorial-row {
+        display: grid;
+        grid-template-columns: 0.22fr 0.5fr 0.78fr;
+        gap: 16px;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+        padding: 24px 0;
+      }
+
+      .editorial-row h3 {
+        margin: 0;
+        font-size: 20px;
+        line-height: 1.35;
+        text-transform: uppercase;
+      }
+
+      .editorial-row p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.7;
+      }
+
+      .band {
+        background: var(--graphite);
+        color: #fff;
+      }
+
+      .band .muted {
+        color: rgba(255, 255, 255, 0.72);
+      }
+
+      .token-row {
+        border-top: 1px solid var(--line);
+        padding: 12px 0;
+      }
+
+      @media (max-width: 900px) {
+        .two-col,
+        .three-col,
+        .editorial-row {
+          grid-template-columns: 1fr;
+        }
+
+        .swatches {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <section class="section">
+        <div class="container grid two-col">
+          <div>
+            <p class="eyebrow">Design system v0.1</p>
+            <h1 class="display">BARSYNERGY</h1>
+          </div>
+          <div>
+            <p class="muted">Статическая проверочная страница для цветов, типографики, компонентов, форм, состояний и редакционного ритма.</p>
+            <div class="button-row" style="margin-top: 24px;">
+              <a class="button button-primary" href="#components">Компоненты</a>
+              <a class="button button-secondary" href="#tokens">Токены</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="tokens">
+        <div class="container">
+          <p class="eyebrow">Color roles</p>
+          <div class="swatches">
+            <div class="swatch"><div class="swatch-mark" style="background: var(--background);"></div><strong>Background</strong><span>#f4ebdb</span></div>
+            <div class="swatch"><div class="swatch-mark" style="background: var(--surface);"></div><strong>Surface</strong><span>#faf4e8</span></div>
+            <div class="swatch"><div class="swatch-mark" style="background: var(--surface-muted);"></div><strong>Surface muted</strong><span>#ece0ce</span></div>
+            <div class="swatch"><div class="swatch-mark" style="background: var(--text);"></div><strong>Text</strong><span>#16130f</span></div>
+            <div class="swatch"><div class="swatch-mark" style="background: var(--muted);"></div><strong>Muted</strong><span>#5f564b</span></div>
+            <div class="swatch"><div class="swatch-mark" style="background: var(--accent);"></div><strong>Accent</strong><span>#992c26</span></div>
+            <div class="swatch"><div class="swatch-mark" style="background: var(--accent-strong);"></div><strong>Accent strong</strong><span>#7b1f1a</span></div>
+            <div class="swatch"><div class="swatch-mark" style="background: var(--graphite);"></div><strong>Graphite</strong><span>#141412</span></div>
+            <div class="swatch"><div class="swatch-mark" style="background: var(--success);"></div><strong>Success</strong><span>#2f684f</span></div>
+            <div class="swatch"><div class="swatch-mark" style="background: var(--warning);"></div><strong>Warning</strong><span>#9a661a</span></div>
+            <div class="swatch"><div class="swatch-mark" style="background: var(--danger);"></div><strong>Danger</strong><span>#9f2f2f</span></div>
+            <div class="swatch"><div class="swatch-mark" style="background: var(--line);"></div><strong>Line</strong><span>rgba(22,19,15,.22)</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="container grid two-col">
+          <div>
+            <p class="eyebrow">Typography</p>
+            <h2 class="section-title">Редакционная система</h2>
+          </div>
+          <div>
+            <div class="token-row"><strong>Display hero</strong><span>Oswald, uppercase, 34-96px, line-height .92</span></div>
+            <div class="token-row"><strong>Section title</strong><span>Oswald, uppercase, 52-72px</span></div>
+            <div class="token-row"><strong>Body</strong><span>Manrope, 16px, line-height 1.5-1.7</span></div>
+            <div class="token-row"><strong>Label</strong><span>Manrope, uppercase, 12-14px, tracked</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="components">
+        <div class="container grid two-col">
+          <div>
+            <p class="eyebrow">Components</p>
+            <h2 class="section-title">Кнопки и состояния</h2>
+          </div>
+          <div class="grid">
+            <div class="button-row">
+              <a class="button button-primary" href="#">Primary</a>
+              <a class="button button-secondary" href="#">Secondary</a>
+              <a class="button button-ghost" href="#">Ghost</a>
+              <button class="button button-primary" type="button" aria-busy="true"><span class="spinner" aria-hidden="true"></span>Сохранение</button>
+              <button class="button button-primary" type="button" disabled>Disabled</button>
+              <a class="button button-secondary" href="#" aria-disabled="true">Link disabled</a>
+            </div>
+            <div class="badge-row" style="margin-top: 24px;">
+              <span class="badge">Neutral</span>
+              <span class="badge badge-success">Success</span>
+              <span class="badge badge-warning">Warning</span>
+              <span class="badge badge-danger">Danger</span>
+            </div>
+            <div class="grid three-col" style="margin-top: 24px;">
+              <article class="card card-interactive">
+                <p class="eyebrow">Interactive</p>
+                <strong>Карточка с hover/focus</strong>
+                <p class="muted">Фокус появляется на вложенной ссылке.</p>
+                <a href="#">Открыть</a>
+              </article>
+              <article class="card card-selected" aria-selected="true">
+                <p class="eyebrow">Selected</p>
+                <strong>Выбранный вариант</strong>
+                <p class="muted">Используется для активной сущности.</p>
+              </article>
+              <article class="card card-loading" aria-busy="true">
+                <p class="eyebrow">Loading</p>
+                <strong>Загрузка данных</strong>
+                <p class="muted">Показывает ожидание без смены размера блока.</p>
+              </article>
+              <article class="card card-error">
+                <p class="eyebrow">Error</p>
+                <strong>Ошибка загрузки</strong>
+                <p class="muted">Состояние для неуспешного запроса.</p>
+              </article>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="container grid two-col">
+          <div>
+            <p class="eyebrow">Forms</p>
+            <h2 class="section-title">Поля и ошибки</h2>
+          </div>
+          <form class="card grid" action="#">
+            <div class="field">
+              <label for="name">Имя</label>
+              <input class="input" id="name" value="Алексей">
+            </div>
+            <div class="field">
+              <label for="name-disabled">Имя disabled</label>
+              <input class="input" id="name-disabled" value="Недоступно" disabled>
+            </div>
+            <div class="field">
+              <label for="format">Формат участия</label>
+              <select class="select" id="format">
+                <option>Интенсив</option>
+                <option>Событие</option>
+                <option>Партнерство</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="format-disabled">Формат disabled</label>
+              <select class="select" id="format-disabled" disabled>
+                <option>Событие</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="comment">Комментарий</label>
+              <textarea class="textarea" id="comment">Нужна программа для команды бара.</textarea>
+            </div>
+            <div class="field">
+              <label for="comment-disabled">Комментарий disabled</label>
+              <textarea class="textarea" id="comment-disabled" disabled>Поле закрыто.</textarea>
+            </div>
+            <div class="field">
+              <label for="email">Email</label>
+              <input class="input" id="email" aria-invalid="true" aria-describedby="email-error" value="mail">
+              <span class="field-error" id="email-error">Введите корректный email.</span>
+            </div>
+            <div class="field">
+              <label for="format-error">Формат с ошибкой</label>
+              <select class="select" id="format-error" aria-invalid="true" aria-describedby="format-error-text">
+                <option>Выберите формат</option>
+              </select>
+              <span class="field-error" id="format-error-text">Выберите доступный формат.</span>
+            </div>
+            <div class="field">
+              <label for="comment-error">Комментарий с ошибкой</label>
+              <textarea class="textarea" id="comment-error" aria-invalid="true" aria-describedby="comment-error-text">Коротко</textarea>
+              <span class="field-error" id="comment-error-text">Добавьте детали запроса.</span>
+            </div>
+            <label class="checkbox-row">
+              <input class="checkbox" type="checkbox" checked>
+              Согласие выбрано
+            </label>
+            <label class="checkbox-row">
+              <input class="checkbox" type="checkbox" disabled>
+              Согласие disabled
+            </label>
+            <label class="checkbox-row">
+              <input class="checkbox" type="checkbox" aria-invalid="true" aria-describedby="checkbox-error">
+              Согласие с ошибкой
+            </label>
+            <span class="field-error" id="checkbox-error">Подтвердите согласие.</span>
+          </form>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="container grid two-col">
+          <div>
+            <p class="eyebrow">Editorial rows</p>
+            <h2 class="section-title">Разделы</h2>
+          </div>
+          <div>
+            <article class="editorial-row">
+              <span class="eyebrow">01</span>
+              <h3>Образование</h3>
+              <p>Интенсивы, лекции и практические форматы для барных команд и специалистов.</p>
+            </article>
+            <article class="editorial-row">
+              <span class="eyebrow">02</span>
+              <h3>События</h3>
+              <p>Встречи, дегустации и отраслевые события с понятной региональной привязкой.</p>
+            </article>
+            <article class="editorial-row">
+              <span class="eyebrow">03</span>
+              <h3>Вакансии</h3>
+              <p>Компактные строки возможностей без перегруженной доски объявлений.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section band">
+        <div class="container grid three-col">
+          <div>
+            <p class="eyebrow" style="color: #fff;">Dark band</p>
+            <h2 class="section-title">Контраст</h2>
+          </div>
+          <p class="muted">Черные редакционные полосы используются для важных разделов, но не заменяют обычные карточки и формы.</p>
+          <div class="button-row">
+            <a class="button button-secondary" style="border-color: rgba(255,255,255,.5); color: #fff;" href="#">Действие</a>
+          </div>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

@@ -1,5 +1,8 @@
 import { AdminPlaceholderPage } from '@/components/admin/admin-placeholder-page';
+import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
 
-export default function AdminTagsPage() {
+export default async function AdminTagsPage() {
+  await requireAdminSectionAccess('tags');
+
   return <AdminPlaceholderPage title="Tags" description="Теги для знаний и будущих подборок." />;
 }

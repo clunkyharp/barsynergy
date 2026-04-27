@@ -2,12 +2,21 @@ import { mkdir, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { randomUUID } from 'node:crypto';
 import type { AppEnv } from '@/lib/validation/env';
-import type { DeleteFileInput, StorageService, UploadedFileResult, UploadFileInput } from './storage.types';
+import {
+  MAX_UPLOAD_FILE_SIZE_BYTES,
+  type DeleteFileInput,
+  type PublicFileReference,
+  type StorageService,
+  type UploadedFileResult,
+  type UploadFileInput
+} from './storage.types';
 
 export class LocalStorageService implements StorageService {
   constructor(private readonly env: AppEnv) {}
 
   async uploadFile(input: UploadFileInput): Promise<UploadedFileResult> {
+    this.assertUploadSize(input);
+
     const folder = this.normalizeFolder(input.folder ?? input.visibility);
     const extension = path.extname(input.originalName).toLowerCase();
     const fileKey = `${folder}/${randomUUID()}${extension}`;
@@ -33,8 +42,14 @@ export class LocalStorageService implements StorageService {
     await rm(absolutePath, { force: true });
   }
 
-  getPublicUrl(fileKey: string) {
-    return `/uploads/${fileKey}`;
+  getPublicUrl(input: PublicFileReference) {
+    return `/uploads/${input.fileKey}`;
+  }
+
+  private assertUploadSize(input: UploadFileInput) {
+    if (input.size > MAX_UPLOAD_FILE_SIZE_BYTES || input.buffer.byteLength > MAX_UPLOAD_FILE_SIZE_BYTES) {
+      throw new Error('File is too large for current upload limits');
+    }
   }
 
   private resolveUploadPath(fileKey: string) {

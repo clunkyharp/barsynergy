@@ -2,7 +2,14 @@ import { DeleteObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client
 import { randomUUID } from 'node:crypto';
 import path from 'node:path';
 import type { AppEnv } from '@/lib/validation/env';
-import type { DeleteFileInput, StorageService, UploadedFileResult, UploadFileInput } from './storage.types';
+import {
+  MAX_UPLOAD_FILE_SIZE_BYTES,
+  type DeleteFileInput,
+  type PublicFileReference,
+  type StorageService,
+  type UploadedFileResult,
+  type UploadFileInput
+} from './storage.types';
 
 export class S3StorageService implements StorageService {
   private readonly client: S3Client;
@@ -20,6 +27,8 @@ export class S3StorageService implements StorageService {
   }
 
   async uploadFile(input: UploadFileInput): Promise<UploadedFileResult> {
+    this.assertUploadSize(input);
+
     const bucket = input.visibility === 'public' ? this.env.S3_BUCKET_PUBLIC : this.env.S3_BUCKET_PRIVATE;
 
     if (!bucket) {
@@ -71,8 +80,20 @@ export class S3StorageService implements StorageService {
     );
   }
 
-  getPublicUrl(fileKey: string) {
-    return `${this.env.S3_ENDPOINT}/${this.env.S3_BUCKET_PUBLIC}/${fileKey}`;
+  getPublicUrl(input: PublicFileReference) {
+    const bucket = input.bucket ?? this.env.S3_BUCKET_PUBLIC;
+
+    if (!bucket) {
+      throw new Error('Missing S3 public bucket');
+    }
+
+    return `${this.env.S3_ENDPOINT}/${bucket}/${input.fileKey}`;
+  }
+
+  private assertUploadSize(input: UploadFileInput) {
+    if (input.size > MAX_UPLOAD_FILE_SIZE_BYTES || input.buffer.byteLength > MAX_UPLOAD_FILE_SIZE_BYTES) {
+      throw new Error('File is too large for current upload limits');
+    }
   }
 
   private normalizeFolder(folder: string) {

@@ -13,30 +13,64 @@ type CommonProps = {
   children: ReactNode;
   variant?: Variant;
   className?: string;
+  loading?: boolean;
+  loadingText?: string;
 };
 
 type ButtonProps = CommonProps & ButtonHTMLAttributes<HTMLButtonElement>;
-type LinkProps = CommonProps & AnchorHTMLAttributes<HTMLAnchorElement> & { href: string };
+type LinkProps = CommonProps &
+  AnchorHTMLAttributes<HTMLAnchorElement> & {
+    href: string;
+    disabled?: boolean;
+  };
+
+function LoadingMark() {
+  return (
+    <span
+      aria-hidden="true"
+      className="h-4 w-4 shrink-0 animate-spin rounded-full border-2 border-current border-r-transparent"
+    />
+  );
+}
 
 export function Button(props: ButtonProps | LinkProps) {
-  const { children, variant = 'primary', className, ...rest } = props;
+  const { children, variant = 'primary', className, loading = false, loadingText, ...rest } = props;
   const classes = cn(
-    'inline-flex min-h-11 items-center justify-center gap-2 rounded-md border px-5 py-2.5 text-sm font-semibold transition',
+    'inline-flex min-h-11 items-center justify-center gap-2 rounded-md border px-5 py-2.5 text-sm font-semibold transition active:translate-y-px disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-55 aria-disabled:pointer-events-none aria-disabled:cursor-not-allowed aria-disabled:opacity-55 aria-busy:cursor-wait',
     variants[variant],
     className
   );
+  const content = loading ? (
+    <>
+      <LoadingMark />
+      <span>{loadingText ?? children}</span>
+    </>
+  ) : (
+    children
+  );
 
   if ('href' in rest) {
+    const { disabled, ...linkRest } = rest;
+    const isDisabled = disabled || loading;
+
     return (
-      <a className={classes} {...rest}>
-        {children}
+      <a
+        {...linkRest}
+        aria-busy={loading || undefined}
+        aria-disabled={isDisabled || undefined}
+        className={classes}
+        tabIndex={isDisabled ? -1 : linkRest.tabIndex}
+      >
+        {content}
       </a>
     );
   }
 
+  const { disabled, ...buttonRest } = rest;
+
   return (
-    <button className={classes} {...rest}>
-      {children}
+    <button aria-busy={loading || undefined} className={classes} disabled={disabled || loading} {...buttonRest}>
+      {content}
     </button>
   );
 }

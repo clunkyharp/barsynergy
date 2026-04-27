@@ -28,9 +28,17 @@ Out of scope:
 
 The project is a clean Next.js fullstack foundation, but several surfaces look more production-ready than they are. The main risks are access control for `/admin`, incomplete deploy/TLS/migration contracts, storage path safety before uploads are exposed, unbounded session table growth, public copy that exposes internal phase language, and missing route-level UX states.
 
-## Key Findings
+Update on 2026-04-26:
 
-### P0 - Admin Routes Are Not Protected
+- admin pages now use section-level permission checks;
+- storage public URL generation now requires a public file reference;
+- upload size is capped before real upload routes are exposed;
+- Phase 2 content/admin mini-spec exists at `docs/phase-2-content-admin-spec.md`;
+- TLS ownership, production session cleanup scheduling and legal review remain blocked on owner/environment decisions.
+
+## Key Findings And Current Status
+
+### Closed - Admin Routes Were Not Protected
 
 - Problem: `/admin` routes render without checking session or role.
 - Impact: when CRUD or private data is added, this becomes broken access control.
@@ -38,7 +46,7 @@ The project is a clean Next.js fullstack foundation, but several surfaces look m
 - Dependencies: existing auth utilities.
 - Verification: unauthenticated request to `/admin` returns a `307` redirect to `/auth/login`; non-admin roles cannot render admin shell.
 
-### P0 - Production HTTPS/TLS Contract Is Incomplete
+### Open - Production HTTPS/TLS Contract Is Incomplete
 
 - Problem: production compose now exposes only `80`, and Nginx listens on `80`; TLS termination is expected outside this stack but the real host still needs confirmation.
 - Impact: production HTTPS depends on an external edge proxy or load balancer being configured correctly.
@@ -46,7 +54,7 @@ The project is a clean Next.js fullstack foundation, but several surfaces look m
 - Dependencies: hosting decision and certificate management.
 - Verification: deploy docs and Nginx/compose agree on where HTTPS is terminated; final host TLS check remains `Needs verification`.
 
-### P1 - Production Migration Flow Is Ambiguous
+### Closed - Production Migration Flow Was Ambiguous
 
 - Problem: docs tell operators to run Prisma migrations from the host, while production DB host usually resolves only inside Docker network.
 - Impact: migrations can fail or be skipped during deploy.
@@ -54,7 +62,7 @@ The project is a clean Next.js fullstack foundation, but several surfaces look m
 - Dependencies: production compose.
 - Verification: deploy runbook has a command that works inside the production network.
 
-### P1 - Session Lifecycle Is Incomplete
+### Partially closed - Session Lifecycle Needs Production Scheduling
 
 - Problem: expired sessions are checked at read time; a cleanup command exists, but production scheduling must be configured.
 - Impact: `Session` grows forever, increasing DB size and auth query cost.
@@ -62,7 +70,7 @@ The project is a clean Next.js fullstack foundation, but several surfaces look m
 - Dependencies: Prisma client and production scheduler/cron.
 - Verification: cleanup command deletes expired sessions and `docs/setup.md` documents the scheduling path; runtime DB verification remains environment-dependent.
 
-### P1 - Storage Local Path Handling Is Not Guarded
+### Closed - Storage Local Path Handling Was Not Guarded
 
 - Problem: local storage uses `path.join` with `folder` and `fileKey` inputs without a root containment check.
 - Impact: future upload/delete endpoints could introduce path traversal if user-controlled values reach storage.
@@ -70,7 +78,7 @@ The project is a clean Next.js fullstack foundation, but several surfaces look m
 - Dependencies: storage service.
 - Verification: path helper prevents traversal for upload and delete paths.
 
-### P1 - S3 Delete Does Not Use Stored Bucket
+### Closed - S3 Delete Did Not Use Stored Bucket
 
 - Problem: S3 delete attempts deletion from both public and private buckets by `fileKey`.
 - Impact: key collisions could delete the wrong object from the other bucket.
@@ -78,7 +86,7 @@ The project is a clean Next.js fullstack foundation, but several surfaces look m
 - Dependencies: storage type contract and future DB usage.
 - Verification: delete flow targets only the persisted file bucket.
 
-### P1 - `SESSION_SECRET` Is Required But Not Used For Session Token Hashing
+### Closed - `SESSION_SECRET` Was Required But Not Used For Session Token Hashing
 
 - Problem: tokens must be hashed with a secret-backed HMAC so production session validation is tied to `SESSION_SECRET`.
 - Impact: rotating `SESSION_SECRET` invalidates existing sessions, which is expected before real auth launch.
@@ -86,7 +94,7 @@ The project is a clean Next.js fullstack foundation, but several surfaces look m
 - Dependencies: auth implementation phase.
 - Verification: session hash function reads the validated secret, with a development fallback only outside production.
 
-### P2 - Public Copy Contains Internal Phase Language
+### Closed - Public Copy Contained Internal Phase Language
 
 - Problem: public pages mention `Phase`, `MVP`, placeholders and future implementation details.
 - Impact: external users see project management language instead of clear product value.
@@ -94,7 +102,7 @@ The project is a clean Next.js fullstack foundation, but several surfaces look m
 - Dependencies: public page content.
 - Verification: no public route contains internal phase placeholders except admin/auth development placeholders.
 
-### P2 - Mobile Menu Accessibility Is Incomplete
+### Closed - Mobile Menu Accessibility Was Incomplete
 
 - Problem: mobile menu has no `aria-controls`, does not close on `Esc`, and does not close on outside click.
 - Impact: keyboard and assistive-technology users get a weaker navigation experience.
@@ -102,7 +110,7 @@ The project is a clean Next.js fullstack foundation, but several surfaces look m
 - Dependencies: `MobileSiteMenu` client component.
 - Verification: keyboard close works and menu state remains predictable.
 
-### P2 - Public Heading Semantics Are Inconsistent
+### Closed - Public Heading Semantics Were Inconsistent
 
 - Problem: major section titles use `p` elements instead of semantic headings.
 - Impact: screen reader navigation and document outline are weaker.
@@ -110,7 +118,7 @@ The project is a clean Next.js fullstack foundation, but several surfaces look m
 - Dependencies: public page templates.
 - Verification: semantic headings exist for major page sections.
 
-### P2 - Route-Level UX States Are Missing
+### Closed - Route-Level UX States Were Missing
 
 - Problem: no shared `loading`, `error` or `not-found` UI exists for the App Router.
 - Impact: data-driven pages added later will fall back to default or inconsistent states.
@@ -118,7 +126,7 @@ The project is a clean Next.js fullstack foundation, but several surfaces look m
 - Dependencies: UI primitives.
 - Verification: routes have consistent fallback/error/not-found UI.
 
-### P2 - Documentation Does Not Fully Match Runtime Reality
+### Closed with ongoing maintenance - Documentation Did Not Fully Match Runtime Reality
 
 - Problem: docs disagree with actual Prisma schema, phase status, deploy commands and env examples.
 - Impact: future agents or developers may follow stale instructions.
@@ -126,35 +134,26 @@ The project is a clean Next.js fullstack foundation, but several surfaces look m
 - Dependencies: completed remediation changes.
 - Verification: README/docs/env/deploy/phase-plan describe current behavior.
 
-## Remediation Order
+## Remaining Remediation Order
 
-### Phase 1 - Critical Fixes
+### Phase 1 - Launch Blockers
 
-1. Protect `/admin` routes.
-2. Clarify production TLS ownership.
-3. Fix production migration instructions.
-4. Guard local storage paths.
+1. Clarify production TLS ownership.
+2. Configure one production scheduler for `npm run session:cleanup:expired`.
+3. Get owner/legal approval for legal texts before collecting personal data.
 
-### Phase 2 - Structural Fixes
+### Phase 2 - Content/Admin Implementation
 
-1. Add expired-session cleanup command.
-2. Tighten session hashing contract or mark compatibility decision before auth launch.
-3. Adjust S3 delete contract to exact bucket deletion.
-4. Add route-level fallback states.
+1. Add Phase 2 Prisma models from `docs/phase-2-content-admin-spec.md`.
+2. Add migrations and indexes for published content queries.
+3. Build admin CRUD one section at a time.
+4. Keep public queries published-only, paginated and bounded.
 
-### Phase 3 - UX/UI And Maintainability
+### Phase 3 - Documentation Maintenance
 
-1. Rewrite public copy that exposes internal implementation phases.
-2. Improve mobile menu accessibility.
-3. Improve semantic heading structure.
-4. Remove or replace suspicious unsupported utility classes.
-
-### Phase 4 - Documentation Alignment
-
-1. Update deploy/env/setup docs.
-2. Update phase status and current entity reality.
-3. Add README links to remediation/audit docs.
-4. Re-run lint, typecheck, build and targeted audit.
+1. Update `PROJECT_STATUS.md`, `docs/phase-plan.md` and Obsidian Kanban after each meaningful batch.
+2. Re-run lint, typecheck, build and Prisma validate after code changes.
+3. Re-run public screenshot QA after real content data is connected.
 
 ## Step-By-Step Implementation Plan
 
@@ -203,13 +202,13 @@ The project is a clean Next.js fullstack foundation, but several surfaces look m
 - Verification: docs commands match package scripts and compose files.
 - Done when: docs no longer contain known contradictory deploy/setup instructions.
 
-## Quick Wins
+## Completed Quick Wins
 
-- Add `aria-controls`, `Esc` close and outside-click close to mobile menu.
-- Use Prisma `UserRole` instead of a duplicated string union.
-- Add `src/app/loading.tsx`, `src/app/error.tsx` and `src/app/not-found.tsx`.
-- Replace public placeholder copy with visitor-facing copy.
-- Add a session cleanup script.
+- Added `aria-controls`, `Esc` close and outside-click close to mobile menu.
+- Used Prisma `UserRole` for admin permission checks.
+- Added `src/app/loading.tsx`, `src/app/error.tsx` and `src/app/not-found.tsx`.
+- Replaced public placeholder copy with visitor-facing copy.
+- Added a session cleanup script.
 
 ## Risks And Assumptions
 
@@ -220,4 +219,4 @@ The project is a clean Next.js fullstack foundation, but several surfaces look m
 
 ## Final Recommendation
 
-Close Phase 1 first before adding any CRUD or personal-data flows. Then complete Phase 2 and Phase 3 as a single stabilization batch, followed by documentation alignment and a control audit.
+Continue with Phase 2 database models and content/admin CRUD from the mini-spec. Do not add public personal-data forms, payments, LMS, subscriptions or public profiles until their planned phases and legal decisions are ready.

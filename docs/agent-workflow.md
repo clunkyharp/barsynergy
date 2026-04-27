@@ -132,6 +132,7 @@ Every meaningful batch closes with:
 - files changed;
 - validation;
 - git status;
+- Obsidian Kanban status update when task status, blocker, owner decision or active phase changed;
 - risks;
 - out of scope;
 - stop polishing checkpoint;
@@ -144,5 +145,7 @@ Future development must start from:
 1. `docs/project-plan.md`;
 2. `docs/agent-workflow.md`;
 3. `docs/phase-plan.md`;
-4. phase-specific docs or mini-specs;
-5. current git status.
+4. `PROJECT_STATUS.md`;
+5. phase-specific docs or mini-specs;
+6. `docs/kanban-sync.md`;
+7. current git status.

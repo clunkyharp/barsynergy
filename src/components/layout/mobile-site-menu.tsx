@@ -57,11 +57,15 @@ export function MobileSiteMenu({ navItems }: MobileSiteMenuProps) {
         aria-controls={menuId}
         aria-expanded={isOpen}
         aria-label={isOpen ? 'Закрыть меню' : 'Открыть меню'}
-        className="inline-flex h-12 w-12 items-center justify-center border border-[var(--graphite)] bg-[var(--graphite)] text-white transition hover:bg-black active:scale-[0.98]"
+        className="inline-flex h-12 w-12 items-center justify-center border border-[var(--graphite)] bg-[var(--graphite)] text-white transition-[background-color,border-color,transform] duration-300 ease-out hover:bg-black active:scale-[0.98]"
         onClick={() => setIsOpen((value) => !value)}
         type="button"
       >
-        {isOpen ? <X size={22} strokeWidth={2} /> : <Menu size={22} strokeWidth={2} />}
+        {isOpen ? (
+          <X className="transition-transform duration-300 ease-out" size={22} strokeWidth={2} />
+        ) : (
+          <Menu className="transition-transform duration-300 ease-out" size={22} strokeWidth={2} />
+        )}
       </button>
 
       {isOpen ? (
@@ -72,22 +76,31 @@ export function MobileSiteMenu({ navItems }: MobileSiteMenuProps) {
           <nav className="container grid py-4">
             {navItems.map((item) => (
               <a
-                className="flex min-h-12 items-center justify-between border-b border-black/12 text-sm font-semibold uppercase tracking-[0.06em] text-[var(--text)] transition hover:pl-2 hover:text-[var(--accent)]"
+                className="group flex min-h-12 items-center justify-between border-b border-black/12 text-sm font-semibold uppercase tracking-[0.06em] text-[var(--text)] transition-colors duration-300 ease-out hover:text-[var(--accent)] focus-visible:text-[var(--accent)]"
                 href={item.href}
                 key={item.href}
                 onClick={() => setIsOpen(false)}
               >
-                {item.label}
-                <ArrowUpRight size={17} strokeWidth={1.9} />
+                <span className="transition-transform duration-300 ease-out group-hover:translate-x-1 group-focus-visible:translate-x-1">
+                  {item.label}
+                </span>
+                <ArrowUpRight
+                  className="shrink-0 transition-transform duration-300 ease-out group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-focus-visible:-translate-y-0.5 group-focus-visible:translate-x-0.5"
+                  size={17}
+                  strokeWidth={1.9}
+                />
               </a>
             ))}
             <a
-              className="mt-4 inline-flex min-h-12 items-center justify-center gap-3 border border-[var(--graphite)] bg-[var(--graphite)] px-5 text-sm font-semibold uppercase tracking-[0.06em] text-white transition hover:bg-black"
+              className="group mt-4 inline-flex min-h-12 items-center justify-center gap-3 border border-[var(--graphite)] bg-[var(--graphite)] px-5 text-sm font-semibold uppercase tracking-[0.06em] text-white transition-[background-color,border-color,transform] duration-300 ease-out hover:bg-black active:scale-[0.99]"
               href="/contacts"
               onClick={() => setIsOpen(false)}
             >
               Присоединиться
-              <ArrowUpRight size={18} />
+              <ArrowUpRight
+                className="transition-transform duration-300 ease-out group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+                size={18}
+              />
             </a>
           </nav>
         </div>

@@ -139,7 +139,7 @@ Storage abstraction:
 interface StorageService {
   uploadFile(input): Promise<UploadedFile>
   deleteFile(input: string | { fileKey: string; bucket?: string }): Promise<void>
-  getPublicUrl(fileKey: string): string
+  getPublicUrl(input: { fileKey: string; bucket?: string; visibility: 'public' }): string
 }
 ```
 

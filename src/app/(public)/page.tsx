@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import { ArrowUpRight, Globe, MapPin, Sparkles, Users } from 'lucide-react';
+import { ArrowUpRight } from 'lucide-react';
 import { displayFont } from '@/lib/fonts';
 
 const manifesto = [
@@ -13,24 +13,24 @@ const manifesto = [
 
 const values = [
   {
-    title: 'Сообщество профессионалов по всему миру',
-    description: 'Бармены, менеджеры, владельцы и эксперты в одном профессиональном контуре.',
-    icon: Users
+    title: 'Сообщество профессионалов региона',
+    description: 'Бармены, менеджеры, владельцы и эксперты получают общий профессиональный контур.',
+    image: '/images/home/community-region.webp'
   },
   {
     title: 'Образовательные программы и живые интенсивы',
     description: 'Практические форматы для тех, кто усиливает навыки и систему работы.',
-    icon: Sparkles
+    image: '/images/home/professional-education.webp'
   },
   {
     title: 'Обмен идеями, опытом и вдохновением',
-    description: 'Материалы, события и профессиональный диалог без шумной витрины.',
-    icon: Globe
+    description: 'Материалы, события и профессиональный диалог без лишнего шума.',
+    image: '/images/home/ideas-exchange.webp'
   },
   {
     title: 'Поддержка роста проектов и карьеры',
     description: 'Вакансии, партнерства, поставщики и новые точки роста для индустрии.',
-    icon: ArrowUpRight
+    image: '/images/home/project-growth.webp'
   }
 ];
 
@@ -56,10 +56,30 @@ const programs = [
 ];
 
 const stats = [
-  { value: '12K+', label: 'участников сообщества', icon: Users },
-  { value: '60+', label: 'стран', icon: Globe },
-  { value: '300+', label: 'городов', icon: MapPin },
-  { value: '∞', label: 'возможностей для роста', icon: Sparkles }
+  {
+    value: 'СКФО',
+    label: 'региональный фокус',
+    image: '/images/community/community-region.webp',
+    imageAlt: 'Региональный фокус BARSYNERGY'
+  },
+  {
+    value: '09',
+    label: 'публичных разделов',
+    image: '/images/community/community-platform.webp',
+    imageAlt: 'Публичные разделы платформы'
+  },
+  {
+    value: '04',
+    label: 'основных направления',
+    image: '/images/community/community-directions.webp',
+    imageAlt: 'Основные направления сообщества'
+  },
+  {
+    value: '01',
+    label: 'контактный канал',
+    image: '/images/community/community-message.webp',
+    imageAlt: 'Контактный канал команды'
+  }
 ];
 
 const opportunities = [
@@ -77,7 +97,7 @@ const contentCards = [
   },
   {
     type: 'Интервью',
-    title: 'Разговор с командой легендарного бара',
+    title: 'Разговор с командой бара о сервисе',
     image: '/images/generated/content-interview.jpg'
   },
   {
@@ -92,39 +112,20 @@ const contentCards = [
   }
 ];
 
-const partners = ['MONIN', 'DIAGEO', 'Perrier', 'LYRE’S', 'BRANDEXCHANGE', 'human robot'];
-
-function HeroConnectionMark() {
-  return (
-    <svg
-      aria-hidden="true"
-      className="mx-auto mt-4 h-28 w-24 text-[var(--text)]"
-      viewBox="0 0 96 112"
-    >
-      <path d="M48 8V104" stroke="currentColor" strokeOpacity="0.22" />
-      <path d="M18 30H78M18 82H78" stroke="currentColor" strokeOpacity="0.22" />
-      <path d="M24 86L72 26" stroke="var(--accent)" strokeWidth="2" />
-      <rect height="28" width="28" fill="var(--accent)" opacity="0.94" x="34" y="16" />
-      <rect height="24" width="24" fill="var(--graphite)" x="20" y="68" />
-      <rect
-        height="24"
-        width="24"
-        fill="none"
-        stroke="currentColor"
-        strokeOpacity="0.38"
-        x="54"
-        y="68"
-      />
-      <circle cx="48" cy="56" fill="currentColor" r="4" />
-    </svg>
-  );
-}
+const platformSections = [
+  { label: 'Образование', href: '/education' },
+  { label: 'События', href: '/events' },
+  { label: 'Знания', href: '/articles' },
+  { label: 'Вакансии', href: '/vacancies' },
+  { label: 'Поставщики', href: '/suppliers' },
+  { label: 'Партнеры', href: '/partners' }
+];
 
 function EducationCircularMark() {
   return (
     <svg
       aria-label="Учись, обменивайся, вдохновляйся"
-      className="h-56 w-56 overflow-visible text-[var(--muted)]"
+      className="h-64 w-64 overflow-visible text-[var(--muted)]"
       role="img"
       viewBox="0 0 240 240"
     >
@@ -135,13 +136,14 @@ function EducationCircularMark() {
       <circle cx="120" cy="120" fill="var(--accent)" r="5" />
       <text
         fill="currentColor"
-        fontSize="11"
+        fontSize="15"
         fontWeight="700"
-        letterSpacing="0.16em"
+        letterSpacing="0.12em"
         lengthAdjust="spacing"
-        textLength="640"
+        textLength="666"
+        transform="rotate(-18 120 120)"
       >
-        <textPath href="#educationCircularTextPath">
+        <textPath href="#educationCircularTextPath" startOffset="0%" textAnchor="start">
           Учись • Обменивайся • Вдохновляйся • Учись • Обменивайся • Вдохновляйся •
         </textPath>
       </text>
@@ -160,54 +162,47 @@ export default function HomePage() {
               <span className="block">тренды.</span>
               <span className="block">Мы формируем</span>
               <span className="block text-[var(--accent)]">культуру</span>
-              <span className="block">гостеприимства.</span>
             </h1>
           </div>
 
-          <div className="mt-8 grid gap-6 xl:mt-0 xl:w-[54%] xl:grid-cols-[1fr_0.24fr]">
+          <div className="mt-8 xl:mt-0 xl:w-[54%]">
             <div className="flex min-h-[420px] min-w-0 flex-col justify-between border-l border-black/20 pl-7 pr-6">
               <div>
                 <p className={`${displayFont.className} display-face text-[44px] uppercase leading-none`}>BARSYNERGY</p>
                 <p className="mt-5 max-w-[18rem] text-[19px] leading-8 sm:max-w-[34rem]">
-                  Сообщество и образовательная платформа для профессионалов барной индустрии.
+                  Образовательная и профессиональная платформа для барной индустрии СКФО.
                 </p>
                 <p className="mt-7 max-w-[18rem] text-[18px] leading-8 text-[var(--muted)] sm:max-w-[34rem]">
-                  Мы объединяем людей, идеи и опыт, чтобы укреплять культуру, развивать бизнес и
-                  создавать будущее индустрии вместе.
+                  Мы объединяем людей, идеи и опыт, чтобы поддерживать образование, события,
+                  вакансии, партнерства и отраслевые контакты.
                 </p>
               </div>
 
               <div className="flex items-end justify-between gap-4">
                 <a
-                  className="inline-flex items-center gap-3 border-b border-[var(--text)] pb-2 text-sm font-semibold uppercase tracking-[0.06em]"
+                  className="inline-flex min-h-11 items-center gap-3 border-b border-[var(--text)] text-sm font-semibold uppercase tracking-[0.06em]"
                   href="/contacts"
                 >
-                  Стать частью движения
+                  Связаться с командой
                   <ArrowUpRight size={18} />
                 </a>
               </div>
-            </div>
-            <div className="hidden border-l border-black/20 pl-4 xl:flex xl:flex-col xl:justify-between">
-              <HeroConnectionMark />
-              <div className="space-y-3 text-xs uppercase tracking-[0.12em] text-[var(--muted)]">
-                <p>Сообщество</p>
-                <p>Знания</p>
-                <p>Развитие</p>
-                <p>Культура</p>
-              </div>
-              <p className="text-xs uppercase tracking-[0.12em]">Est. 2026</p>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="border-b border-black/20 bg-[var(--graphite)] text-white">
-        <div className="container overflow-x-auto py-5">
-          <div className="flex min-w-max items-center gap-8 text-sm font-semibold uppercase tracking-[0.06em]">
-            {manifesto.map((item, index) => (
-              <div className="flex items-center gap-8" key={item}>
-                <span>{item}</span>
-                {index < manifesto.length - 1 ? <span className="text-white/60">+</span> : null}
+      <section className="overflow-x-hidden border-b border-black/20 bg-[var(--graphite)] text-white">
+        <div className="marquee-viewport py-5">
+          <div className="marquee-track text-sm font-semibold uppercase tracking-[0.06em]">
+            {[0, 1, 2].map((group) => (
+              <div aria-hidden={group === 1} className="marquee-group" key={group}>
+                {manifesto.map((item) => (
+                  <div className="flex items-center gap-8" key={`${group}-${item}`}>
+                    <span>{item}</span>
+                    <span className="text-white/60">•</span>
+                  </div>
+                ))}
               </div>
             ))}
           </div>
@@ -224,29 +219,33 @@ export default function HomePage() {
 
           <div>
             <p className="max-w-xl text-lg leading-8">
-              BARSYNERGY — это пространство для тех, кто живет индустрией и хочет делать ее лучше.
+              BARSYNERGY — это пространство для тех, кто работает в барной индустрии и хочет развивать ее через знания, контакты и практические возможности.
             </p>
-            <div className="mt-10 grid gap-8 md:grid-cols-2">
-              {values.map((item) => {
-                const Icon = item.icon;
-                return (
-                  <div className="grid gap-3" key={item.title}>
-                    <div className="flex h-14 w-14 items-center justify-center rounded-full border border-black/25">
-                      <Icon size={24} strokeWidth={1.8} />
-                    </div>
-                    <div>
-                      <h3 className="text-base font-semibold">{item.title}</h3>
-                      <p className="mt-2 text-sm leading-6 text-[var(--muted)]">{item.description}</p>
-                    </div>
+            <div className="mt-10 grid gap-5 md:grid-cols-2">
+	              {values.map((item) => (
+	                <article className="overflow-hidden border border-black/20 bg-[var(--surface)]" key={item.title}>
+	                  <Image
+	                    src={item.image}
+	                    alt={item.title}
+	                    width={640}
+	                    height={640}
+	                    loading="lazy"
+	                    quality={72}
+	                    sizes="(min-width: 1280px) 18vw, (min-width: 768px) 42vw, calc(100vw - 32px)"
+	                    className="aspect-square w-full object-cover"
+	                  />
+                  <div className="border-t border-black/15 p-4">
+                    <h3 className="text-base font-semibold">{item.title}</h3>
+                    <p className="mt-2 text-sm leading-6 text-[var(--muted)]">{item.description}</p>
                   </div>
-                );
-              })}
+                </article>
+              ))}
             </div>
           </div>
 
           <div className="texture-panel min-h-[220px] overflow-hidden border border-black/20 bg-[var(--graphite)]">
             <div className="grid h-full grid-cols-2">
-              <div className="border-r border-white/10 bg-[url('/images/grain.svg')] opacity-70" />
+              <div className="border-r border-white/10 bg-[linear-gradient(135deg,rgba(255,255,255,0.1),rgba(255,255,255,0))] opacity-70" />
               <div className="relative bg-[var(--surface)]">
                 <div className="absolute inset-x-0 bottom-0 h-[55%] rounded-t-full bg-[var(--accent)] opacity-95" />
               </div>
@@ -264,7 +263,7 @@ export default function HomePage() {
               </h2>
             </div>
             <a
-              className="inline-flex w-fit items-center gap-3 border-b border-[var(--text)] pb-2 text-sm font-semibold uppercase tracking-[0.06em]"
+              className="inline-flex min-h-11 w-fit items-center gap-3 border-b border-[var(--text)] text-sm font-semibold uppercase tracking-[0.06em]"
               href="/education"
             >
               Смотреть все программы
@@ -272,23 +271,26 @@ export default function HomePage() {
             </a>
           </div>
 
-          <div className="grid gap-5 md:grid-cols-3">
+          <div className="grid items-stretch gap-5 md:grid-cols-3">
             {programs.map((item) => (
               <article
-                className={`group border border-black/20 ${item.tone === 'accent' ? 'bg-[var(--accent)] text-white' : 'bg-[var(--graphite)] text-white'}`}
+                className={`group flex h-full flex-col border border-black/20 ${item.tone === 'accent' ? 'bg-[var(--accent)] text-white' : 'bg-[var(--graphite)] text-white'}`}
                 key={item.title}
-              >
-                <Image
-                  src={item.image}
-                  alt={item.title}
-                  width={443}
-                  height={443}
-                  className={`aspect-[1.18] w-full object-cover ${item.tone === 'accent' ? 'opacity-[0.88]' : 'grayscale'}`}
-                />
-                <div className="p-5">
+	              >
+	                <Image
+	                  src={item.image}
+	                  alt={item.title}
+	                  width={443}
+	                  height={443}
+	                  loading="lazy"
+	                  quality={72}
+	                  sizes="(min-width: 768px) 28vw, calc(100vw - 32px)"
+	                  className={`aspect-[1.18] w-full object-cover ${item.tone === 'accent' ? 'opacity-[0.88]' : 'grayscale'}`}
+	                />
+                <div className="flex min-h-[210px] flex-1 flex-col p-5 md:min-h-[240px] xl:min-h-[260px]">
                   <h3 className={`${displayFont.className} display-face text-[36px] uppercase leading-none`}>{item.title}</h3>
                   <p className="mt-3 max-w-[17rem] text-sm leading-6 text-white/80">{item.description}</p>
-                  <div className="mt-5 flex justify-end">
+                  <div className="mt-auto flex justify-end pt-5">
                     <ArrowUpRight className="transition group-hover:-translate-y-0.5 group-hover:translate-x-0.5" size={22} />
                   </div>
                 </div>
@@ -303,35 +305,45 @@ export default function HomePage() {
       </section>
 
       <section className="editorial-grid border-b border-black/20 py-10 md:py-14" id="community">
-        <div className="container grid gap-8 xl:grid-cols-[0.76fr_1.24fr]">
+        <div className="container grid gap-10 xl:grid-cols-[0.58fr_1.42fr]">
           <div className="flex flex-col justify-between gap-6">
             <div>
               <h2 className={`${displayFont.className} display-tight text-[56px] md:text-[72px]`}>Сообщество</h2>
               <p className="mt-4 max-w-md text-sm leading-7 text-[var(--muted)]">
-                Тысячи профессионалов, баров и проектов в едином пространстве. Мы верим в силу
-                объединений и поддерживаем культуру открытого диалога.
+                Профессионалы, бары, школы и партнеры получают единую точку входа в образование,
+                события, вакансии и деловые контакты.
               </p>
             </div>
             <a
-              className="inline-flex w-fit items-center gap-3 border-b border-[var(--text)] pb-2 text-sm font-semibold uppercase tracking-[0.06em]"
+              className="inline-flex min-h-11 w-fit items-center gap-3 border-b border-[var(--text)] text-sm font-semibold uppercase tracking-[0.06em]"
               href="/contacts"
             >
-              Присоединиться к сообществу
+              Написать команде
               <ArrowUpRight size={18} />
             </a>
           </div>
 
-          <div className="grid gap-8 md:grid-cols-2 xl:grid-cols-4">
-            {stats.map((item) => {
-              const Icon = item.icon;
-              return (
-                <div key={item.label}>
-                  <Icon className="text-[var(--muted)]" size={28} strokeWidth={1.6} />
-                  <p className={`${displayFont.className} display-face mt-6 text-[72px] leading-none md:text-[88px]`}>{item.value}</p>
-                  <p className="mt-3 text-sm font-semibold uppercase tracking-[0.06em]">{item.label}</p>
+          <div className="grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-[1.2fr_repeat(3,0.86fr)]">
+            {stats.map((item) => (
+              <div className="min-w-0" key={item.label}>
+	                <div className="w-24 max-w-full overflow-hidden border border-black/16 bg-[var(--surface)] md:w-28 xl:w-32">
+	                  <Image
+	                    alt={item.imageAlt}
+	                    className="aspect-square w-full object-cover"
+	                    height={384}
+	                    loading="lazy"
+	                    quality={68}
+	                    sizes="(min-width: 1280px) 128px, (min-width: 768px) 112px, 96px"
+	                    src={item.image}
+	                    width={384}
+	                  />
                 </div>
-              );
-            })}
+                <p className={`${displayFont.className} display-face mt-5 text-[56px] leading-none md:text-[68px] 2xl:text-[78px]`}>
+                  {item.value}
+                </p>
+                <p className="mt-3 text-sm font-semibold uppercase tracking-[0.06em]">{item.label}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -347,7 +359,7 @@ export default function HomePage() {
               </p>
             </div>
             <a
-              className="inline-flex w-fit items-center gap-3 border-b border-white/70 pb-2 text-sm font-semibold uppercase tracking-[0.06em]"
+              className="inline-flex min-h-11 w-fit items-center gap-3 border-b border-white/70 text-sm font-semibold uppercase tracking-[0.06em]"
               href="/contacts"
             >
               Разместить возможность
@@ -366,7 +378,7 @@ export default function HomePage() {
 
           <div className="texture-panel hidden min-h-[320px] overflow-hidden bg-[var(--surface)] xl:block">
             <div className="absolute inset-y-0 left-0 w-1/3 bg-[var(--accent)] opacity-[0.92]" />
-            <div className="absolute inset-0 bg-[url('/images/grain.svg')] opacity-30" />
+            <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(20,20,18,0.08),transparent_58%)]" />
           </div>
         </div>
       </section>
@@ -378,7 +390,7 @@ export default function HomePage() {
               <h2 className={`${displayFont.className} display-tight text-[56px] md:text-[72px]`}>Знания и контент</h2>
             </div>
             <a
-              className="inline-flex w-fit items-center gap-3 border-b border-[var(--text)] pb-2 text-sm font-semibold uppercase tracking-[0.06em]"
+              className="inline-flex min-h-11 w-fit items-center gap-3 border-b border-[var(--text)] text-sm font-semibold uppercase tracking-[0.06em]"
               href="/articles"
             >
               Смотреть все материалы
@@ -387,15 +399,18 @@ export default function HomePage() {
           </div>
 
           <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-            {contentCards.map((item) => (
-              <article className="border border-black/20 bg-[var(--surface)]" key={item.title}>
-                <Image
-                  src={item.image}
-                  alt={item.title}
-                  width={443}
-                  height={443}
-                  className="aspect-[1.55] w-full object-cover grayscale"
-                />
+	            {contentCards.map((item) => (
+	              <article className="border border-black/20 bg-[var(--surface)]" key={item.title}>
+	                <Image
+	                  src={item.image}
+	                  alt={item.title}
+	                  width={443}
+	                  height={443}
+	                  loading="lazy"
+	                  quality={72}
+	                  sizes="(min-width: 1280px) 18vw, (min-width: 768px) 42vw, calc(100vw - 32px)"
+	                  className="aspect-[1.55] w-full object-cover grayscale"
+	                />
                 <div className="p-4">
                   <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">{item.type}</p>
                   <h3 className="mt-2 text-base font-semibold leading-6">{item.title}</h3>
@@ -409,12 +424,20 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="editorial-grid border-b border-black/20 py-8">
-        <div className="container grid gap-6 xl:grid-cols-[0.72fr_1.28fr] xl:items-center">
-          <h2 className={`${displayFont.className} display-tight text-[50px] md:text-[64px]`}>Партнеры и коллабораторы</h2>
-          <div className="flex flex-wrap items-center justify-start gap-x-10 gap-y-5 border-t border-black/20 pt-6 text-[22px] font-semibold uppercase tracking-[0.04em] md:justify-between xl:border-t-0 xl:pt-0">
-            {partners.map((partner) => (
-              <p className="whitespace-nowrap" key={partner}>{partner}</p>
+      <section className="editorial-grid border-b border-black/20">
+        <div className="container grid min-h-[240px] gap-8 py-10 xl:grid-cols-[0.72fr_1.28fr]">
+          <h2 className={`${displayFont.className} display-tight max-w-md self-start text-[50px] md:text-[64px]`}>
+            Направления платформы
+          </h2>
+          <div className="grid content-end gap-x-8 gap-y-7 border-t border-black/20 pt-8 text-left text-[22px] font-semibold uppercase tracking-[0.04em] md:grid-cols-3 xl:border-t-0 xl:pt-0">
+            {platformSections.map((section) => (
+              <a
+                className="inline-flex min-h-11 items-center whitespace-nowrap transition hover:text-[var(--accent)] focus-visible:text-[var(--accent)]"
+                href={section.href}
+                key={section.href}
+              >
+                {section.label}
+              </a>
             ))}
           </div>
         </div>

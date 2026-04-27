@@ -1,0 +1,196 @@
+{
+  "$schema": "https://tokens.studio/schemas/tokens.json",
+  "meta": {
+    "name": "BARSYNERGY Design Tokens",
+    "version": "0.1.0",
+    "status": "foundation",
+    "updated": "2026-04-26",
+    "sourceFiles": [
+      "DESIGN.md",
+      "src/app/globals.css",
+      "src/components/ui",
+      "src/components/public"
+    ]
+  },
+  "reference": {
+    "color": {
+      "ivory": { "value": "#f4ebdb", "type": "color" },
+      "cream": { "value": "#faf4e8", "type": "color" },
+      "sand": { "value": "#ece0ce", "type": "color" },
+      "ink": { "value": "#16130f", "type": "color" },
+      "graphite": { "value": "#141412", "type": "color" },
+      "clay": { "value": "#5f564b", "type": "color" },
+      "burgundy": { "value": "#992c26", "type": "color" },
+      "burgundyDark": { "value": "#7b1f1a", "type": "color" },
+      "green": { "value": "#2f684f", "type": "color" },
+      "ochre": { "value": "#9a661a", "type": "color" },
+      "red": { "value": "#9f2f2f", "type": "color" },
+      "white": { "value": "#ffffff", "type": "color" },
+      "lineInk22": { "value": "rgba(22, 19, 15, 0.22)", "type": "color" },
+      "lineBlack20": { "value": "rgba(0, 0, 0, 0.2)", "type": "color" }
+    },
+    "font": {
+      "body": { "value": "Manrope", "type": "fontFamily" },
+      "display": { "value": "Oswald", "type": "fontFamily" }
+    },
+    "size": {
+      "0": { "value": "0", "type": "dimension" },
+      "1": { "value": "4px", "type": "dimension" },
+      "2": { "value": "8px", "type": "dimension" },
+      "3": { "value": "12px", "type": "dimension" },
+      "4": { "value": "16px", "type": "dimension" },
+      "5": { "value": "20px", "type": "dimension" },
+      "6": { "value": "24px", "type": "dimension" },
+      "8": { "value": "32px", "type": "dimension" },
+      "10": { "value": "40px", "type": "dimension" },
+      "11": { "value": "44px", "type": "dimension" },
+      "12": { "value": "48px", "type": "dimension" },
+      "14": { "value": "56px", "type": "dimension" },
+      "16": { "value": "64px", "type": "dimension" },
+      "18": { "value": "72px", "type": "dimension" },
+      "24": { "value": "96px", "type": "dimension" }
+    }
+  },
+  "system": {
+    "color": {
+      "background": { "value": "{reference.color.ivory}", "type": "color" },
+      "surface": { "value": "{reference.color.cream}", "type": "color" },
+      "surfaceMuted": { "value": "{reference.color.sand}", "type": "color" },
+      "text": { "value": "{reference.color.ink}", "type": "color" },
+      "textMuted": { "value": "{reference.color.clay}", "type": "color" },
+      "border": { "value": "{reference.color.lineInk22}", "type": "color" },
+      "accent": { "value": "{reference.color.burgundy}", "type": "color" },
+      "accentHover": { "value": "{reference.color.burgundyDark}", "type": "color" },
+      "graphite": { "value": "{reference.color.graphite}", "type": "color" },
+      "success": { "value": "{reference.color.green}", "type": "color" },
+      "warning": { "value": "{reference.color.ochre}", "type": "color" },
+      "danger": { "value": "{reference.color.red}", "type": "color" },
+      "focus": { "value": "{reference.color.burgundy}", "type": "color" }
+    },
+    "typography": {
+      "body": {
+        "fontFamily": "{reference.font.body}",
+        "fontSize": "16px",
+        "fontWeight": "400",
+        "lineHeight": "1.5",
+        "letterSpacing": "0"
+      },
+      "bodyLarge": {
+        "fontFamily": "{reference.font.body}",
+        "fontSize": "18px",
+        "fontWeight": "400",
+        "lineHeight": "1.65",
+        "letterSpacing": "0"
+      },
+      "bodySmall": {
+        "fontFamily": "{reference.font.body}",
+        "fontSize": "14px",
+        "fontWeight": "400",
+        "lineHeight": "1.7",
+        "letterSpacing": "0"
+      },
+      "label": {
+        "fontFamily": "{reference.font.body}",
+        "fontSize": "12px",
+        "fontWeight": "700",
+        "lineHeight": "1.35",
+        "letterSpacing": "0.14em",
+        "textTransform": "uppercase"
+      },
+      "button": {
+        "fontFamily": "{reference.font.body}",
+        "fontSize": "14px",
+        "fontWeight": "700",
+        "lineHeight": "1.4",
+        "letterSpacing": "0.06em",
+        "textTransform": "uppercase"
+      },
+      "displayHero": {
+        "fontFamily": "{reference.font.display}",
+        "fontSizeMin": "34px",
+        "fontSizeMax": "96px",
+        "fontWeight": "700",
+        "lineHeight": "0.92",
+        "letterSpacing": "0",
+        "textTransform": "uppercase"
+      },
+      "displaySection": {
+        "fontFamily": "{reference.font.display}",
+        "fontSizeMin": "52px",
+        "fontSizeMax": "72px",
+        "fontWeight": "700",
+        "lineHeight": "0.92",
+        "letterSpacing": "0",
+        "textTransform": "uppercase"
+      }
+    },
+    "space": {
+      "fieldGap": { "value": "{reference.size.2}", "type": "dimension" },
+      "componentGap": { "value": "{reference.size.4}", "type": "dimension" },
+      "componentPadding": { "value": "{reference.size.5}", "type": "dimension" },
+      "cardPadding": { "value": "{reference.size.6}", "type": "dimension" },
+      "sectionPaddingMobile": { "value": "{reference.size.10}", "type": "dimension" },
+      "sectionPaddingDesktop": { "value": "{reference.size.14}", "type": "dimension" },
+      "pageHeaderPadding": { "value": "{reference.size.24}", "type": "dimension" },
+      "containerGutter": { "value": "{reference.size.4}", "type": "dimension" }
+    },
+    "radius": {
+      "control": { "value": "6px", "type": "borderRadius" },
+      "card": { "value": "8px", "type": "borderRadius" },
+      "badge": { "value": "999px", "type": "borderRadius" },
+      "editorial": { "value": "0", "type": "borderRadius" }
+    },
+    "shadow": {
+      "card": { "value": "0 1px 2px rgba(20, 20, 18, 0.06)", "type": "boxShadow" },
+      "overlay": { "value": "0 18px 36px rgba(20, 20, 18, 0.12)", "type": "boxShadow" }
+    },
+    "layout": {
+      "containerMaxWidth": { "value": "1320px", "type": "dimension" },
+      "containerWidth": { "value": "min(1320px, calc(100vw - 32px))", "type": "dimension" },
+      "touchTargetMinHeight": { "value": "44px", "type": "dimension" }
+    }
+  },
+  "component": {
+    "button": {
+      "heightMin": { "value": "{system.layout.touchTargetMinHeight}", "type": "dimension" },
+      "paddingX": { "value": "{reference.size.5}", "type": "dimension" },
+      "paddingY": { "value": "10px", "type": "dimension" },
+      "radius": { "value": "{system.radius.control}", "type": "borderRadius" },
+      "primaryBackground": { "value": "{system.color.accent}", "type": "color" },
+      "primaryBackgroundHover": { "value": "{system.color.accentHover}", "type": "color" },
+      "primaryText": { "value": "{reference.color.white}", "type": "color" },
+      "secondaryBorder": { "value": "{system.color.border}", "type": "color" },
+      "secondaryText": { "value": "{system.color.text}", "type": "color" },
+      "ghostText": { "value": "{system.color.textMuted}", "type": "color" }
+    },
+    "field": {
+      "heightMin": { "value": "{system.layout.touchTargetMinHeight}", "type": "dimension" },
+      "background": { "value": "{reference.color.white}", "type": "color" },
+      "border": { "value": "{system.color.border}", "type": "color" },
+      "borderFocus": { "value": "{system.color.accent}", "type": "color" },
+      "radius": { "value": "{system.radius.control}", "type": "borderRadius" },
+      "paddingX": { "value": "{reference.size.3}", "type": "dimension" },
+      "errorText": { "value": "{system.color.danger}", "type": "color" }
+    },
+    "card": {
+      "background": { "value": "{system.color.surface}", "type": "color" },
+      "border": { "value": "{system.color.border}", "type": "color" },
+      "radius": { "value": "{system.radius.card}", "type": "borderRadius" },
+      "shadow": { "value": "{system.shadow.card}", "type": "boxShadow" },
+      "padding": { "value": "{system.space.cardPadding}", "type": "dimension" }
+    },
+    "badge": {
+      "radius": { "value": "{system.radius.badge}", "type": "borderRadius" },
+      "border": { "value": "{system.color.border}", "type": "color" },
+      "text": { "value": "{system.color.textMuted}", "type": "color" },
+      "paddingX": { "value": "{reference.size.3}", "type": "dimension" },
+      "paddingY": { "value": "{reference.size.1}", "type": "dimension" }
+    },
+    "editorialSection": {
+      "border": { "value": "{reference.color.lineBlack20}", "type": "color" },
+      "paddingMobile": { "value": "{system.space.sectionPaddingMobile}", "type": "dimension" },
+      "paddingDesktop": { "value": "{system.space.sectionPaddingDesktop}", "type": "dimension" }
+    }
+  }
+}
+

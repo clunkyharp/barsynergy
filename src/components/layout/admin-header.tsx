@@ -7,7 +7,7 @@ export function AdminHeader() {
         <p className="text-sm font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">Admin foundation</p>
         <p className="mt-1 font-semibold">BARSYNERGY CMS shell</p>
       </div>
-      <Badge>Phase 0</Badge>
+      <Badge>Phase 2 readiness</Badge>
     </header>
   );
 }

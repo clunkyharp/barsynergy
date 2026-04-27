@@ -54,7 +54,7 @@ Done when:
 Current status:
 
 - Phase 0 foundation is implemented and currently backed by one migration (`20260425160217_init_foundation`);
-- public route structure for Phase 1 exists, but content/data integration remains in progress;
+- public route structure for Phase 1 exists and the public surface is implemented at source level;
 - current Prisma entities are foundation-only: `User`, `Session`, `Profile`, `City`, `Category`, `Tag`, `UploadedFile`;
 - Phase 2+ entities (`Article`, `Event`, `Course`, `Vacancy`, `Supplier`, `Partner`, `Application`) are target scope, not current runtime schema yet.
 
@@ -88,6 +88,16 @@ Done when:
 - pages are responsive;
 - pages are ready for real data connection.
 
+Current status:
+
+- public routes and legal pages are implemented;
+- shared header, footer and public page templates are implemented;
+- route-level loading, error and not-found states are implemented;
+- design-system foundation is documented in `DESIGN.md` and `design-tokens.json`;
+- lint, typecheck, build, Prisma validate, public route smoke and desktop/mobile homepage spot checks pass;
+- Phase 1 is complete for the current static public surface;
+- legal text still needs owner/legal review before personal-data collection.
+
 ## Phase 2: Database Models And Content Admin
 
 Goal:
@@ -110,6 +120,10 @@ Done when:
 - admin can create a vacancy;
 - admin can create a supplier;
 - public pages show only `published` content.
+
+Implementation contract:
+
+- [Phase 2 content/admin mini-spec](phase-2-content-admin-spec.md)
 
 ## Phase 3: Applications And Forms
 
