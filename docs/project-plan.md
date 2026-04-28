@@ -1,10 +1,10 @@
 # BARSYNERGY Project Plan
 
-This document is the canonical project brief for development. All future phases, mini-specs and implementation batches must follow it unless the project owner explicitly changes the direction.
+This is the project brief for development. Future phases, mini-specs and implementation batches must follow it unless the owner changes direction.
 
 ## Product
 
-BARSYNERGY is an industry online platform and educational community for bar-industry professionals in the North Caucasus Federal District.
+BARSYNERGY is an online platform for bar-industry education, events, vacancies, suppliers and partnerships in the North Caucasus Federal District.
 
 The product connects:
 
@@ -17,17 +17,17 @@ The product connects:
 - HoReCa specialists;
 - employers and partners.
 
-Core formula:
+Working formula:
 
 ```txt
-Education + community + industry opportunities + regional connection = BARSYNERGY
+Education + events + jobs + suppliers + partnerships + regional focus = BARSYNERGY
 ```
 
 ## Operating Mode
 
 Development is phased and MVP-first.
 
-The platform must be realistic for one developer working with AI agents. Do not build enterprise architecture, microservices, Kubernetes, complex roles, online payments, LMS, subscriptions or public profiles before the planned phase.
+The project must stay realistic for one developer working with AI agents. Do not build enterprise architecture, microservices, Kubernetes, complex roles, online payments, LMS, subscriptions or public profiles before their planned phase.
 
 Every non-trivial task must lock one mode:
 
@@ -162,8 +162,13 @@ MVP public routes:
 - vacancies;
 - suppliers;
 - partners;
+- general sponsors;
 - contacts;
 - legal pages.
+
+Planned catalog extension after the current Phase 1-4 foundation:
+
+- services at `/services`, implemented through the separate service-specialist catalog mini-spec.
 
 Legal routes:
 
@@ -232,6 +237,10 @@ Target MVP entities by later phases:
 
 - `Application`.
 
+Planned catalog extension entities:
+
+- `ServiceSpecialist`.
+
 Future monetization entities are documentation-only until the payment phase:
 
 - `Tariff`;
@@ -260,6 +269,10 @@ MVP forms:
 - corporate training application;
 - certificate order.
 
+Planned catalog-extension form:
+
+- service specialist submission.
+
 Every public form must include personal data consent and must not submit without it.
 
 Application statuses:
@@ -286,6 +299,14 @@ Vacancy MVP rule:
 - vacancy responses are not sent to employers automatically;
 - admin forwards an approved response to the employer and records the status as `forwarded_to_employer`;
 - reusable saved resumes and "my applications" belong to Phase 4 user profile scope.
+
+Service specialist catalog rule:
+
+- service specialists use a separate `ServiceSpecialist` catalog, not `Supplier`;
+- public entry into the catalog starts as `service_specialist_submission` in `Application`;
+- admins review the application and create the public card manually;
+- service contacts can be published only after explicit consent to publish selected public contact fields;
+- specialist personal cabinets are out of scope for the first services version.
 
 ## Accounts
 
@@ -322,6 +343,7 @@ Online payments require a separate mini-spec and legal review before implementat
 - [Remediation plan](remediation-plan.md)
 - [Phase 3 applications and vacancy flows mini-spec](phase-3-applications-spec.md)
 - [Business account mini-spec](business-account-spec.md)
+- [Services specialists mini-spec](services-specialists-spec.md)
 - [Project audit workflow](audit-workflow.md)
 
 ## Roadmap
@@ -338,7 +360,7 @@ Phase 4: auth and first business account.
 
 Later phase: general user profile and "my applications" for non-business users.
 
-Phase 5: filters, search and directory quality.
+Phase 5: service-specialist catalog extension, filters, search and directory quality.
 
 Phase 6: monetization without online payment.
 

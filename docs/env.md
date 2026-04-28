@@ -31,7 +31,7 @@ Production with `STORAGE_DRIVER=local` is invalid and must fail at startup.
 
 ## Public Application Forms
 
-`APPLICATION_FORMS_ENABLED` controls public forms that collect personal data.
+`APPLICATION_FORMS_ENABLED` controls public forms that collect personal data, including the public business-access request at `/auth/register`.
 
 - Local development can use `APPLICATION_FORMS_ENABLED=true`.
 - Production must keep `APPLICATION_FORMS_ENABLED=false` until owner/legal approval is complete.

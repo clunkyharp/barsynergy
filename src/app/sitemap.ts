@@ -10,6 +10,7 @@ const staticRoutes = [
   '/vacancies',
   '/suppliers',
   '/partners',
+  '/general-sponsors',
   '/contacts',
   '/legal/privacy',
   '/legal/personal-data-consent',

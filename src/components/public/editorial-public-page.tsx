@@ -41,8 +41,12 @@ export function EditorialPublicPage({
 }: EditorialPublicPageProps) {
   return (
     <div>
-      <section className="editorial-grid border-b border-black/20 py-10 md:py-14">
-        <div className="container grid gap-8 xl:grid-cols-[1.28fr_0.52fr] xl:items-end">
+      <section className="relative overflow-hidden editorial-grid border-b border-black/20 py-10 md:py-14">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_18%,rgba(153,44,38,0.08),transparent_18%),radial-gradient(circle_at_82%_26%,rgba(255,255,255,0.54),transparent_18%),radial-gradient(circle_at_74%_80%,rgba(20,20,18,0.05),transparent_24%)]"
+        />
+        <div className="container relative grid gap-8 xl:grid-cols-[1.28fr_0.52fr] xl:items-end">
           <div className="min-w-0">
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">{eyebrow}</p>
             <h1 className={`${displayFont.className} display-tight mt-3 max-w-5xl break-words text-[32px] sm:text-[44px] md:text-[64px] xl:text-[78px]`}>

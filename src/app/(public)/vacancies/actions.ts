@@ -24,6 +24,7 @@ import {
   hasHoneypotValue
 } from '@/lib/applications/public-submission-guards';
 import { prisma } from '@/lib/db/prisma';
+import { vacancyPositionValues } from '@/lib/vacancies/positions';
 
 const VACANCIES_PATH = '/vacancies';
 
@@ -33,7 +34,7 @@ const vacancySubmissionSchema = baseContactSchema
     companyName: z.string().trim().min(2).max(180),
     contactName: z.string().trim().min(2).max(160),
     cityId: z.string().trim().max(120).optional(),
-    position: z.string().trim().min(2).max(180),
+    position: z.enum(vacancyPositionValues),
     employmentType: z.string().trim().max(100).optional(),
     salaryLabel: z.string().trim().max(120).optional(),
     experienceLabel: z.string().trim().max(120).optional(),

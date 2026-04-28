@@ -75,7 +75,7 @@ export default async function AdminCoursesPage({ searchParams }: AdminCoursesPag
   return (
     <div className="space-y-8">
       <header>
-        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Admin / Courses</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Админка / Курсы</p>
         <h1 className="mt-2 text-3xl font-semibold">Курсы</h1>
         <p className="mt-2 max-w-2xl text-[var(--muted)]">
           Создание, публикация и архивация образовательных программ.
@@ -91,7 +91,7 @@ export default async function AdminCoursesPage({ searchParams }: AdminCoursesPag
           <FormField htmlFor="course-title" label="Название">
             <Input id="course-title" name="title" required minLength={2} maxLength={160} />
           </FormField>
-          <FormField htmlFor="course-slug" label="Slug">
+          <FormField htmlFor="course-slug" label="Адрес страницы">
             <Input id="course-slug" name="slug" maxLength={180} placeholder="Если пусто, будет создан из названия" />
           </FormField>
           <FormField htmlFor="course-categoryId" label="Категория">
@@ -249,7 +249,7 @@ export default async function AdminCoursesPage({ searchParams }: AdminCoursesPag
                             <FormField htmlFor={`course-title-${course.id}`} label="Название">
                               <Input id={`course-title-${course.id}`} name="title" required minLength={2} maxLength={160} defaultValue={course.title} />
                             </FormField>
-                            <FormField htmlFor={`course-slug-${course.id}`} label="Slug">
+                            <FormField htmlFor={`course-slug-${course.id}`} label="Адрес страницы">
                               <Input id={`course-slug-${course.id}`} name="slug" maxLength={180} defaultValue={course.slug} />
                             </FormField>
                             <FormField htmlFor={`course-category-${course.id}`} label="Категория">

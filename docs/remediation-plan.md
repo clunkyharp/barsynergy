@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This document consolidates the code review, security audit, memory/performance audit, UX/UI audit and documentation audit into one implementation plan.
+This document turns the code, security, performance, UX/UI and documentation audits into one implementation plan.
 
 ## Scope
 
@@ -26,7 +26,7 @@ Out of scope:
 
 ## Current State Summary
 
-The project is a clean Next.js fullstack foundation, but several surfaces look more production-ready than they are. The main risks are access control for `/admin`, incomplete deploy/TLS/migration contracts, storage path safety before uploads are exposed, unbounded session table growth, public copy that exposes internal phase language, and missing route-level UX states.
+The project has a clean Next.js foundation, but some areas look more finished than they are. The main risks are `/admin` access control, incomplete deploy/TLS/migration instructions, storage path safety before uploads are exposed, unbounded session table growth, public copy with internal phase language, and missing route-level UX states.
 
 Update on 2026-04-26:
 

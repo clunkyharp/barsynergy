@@ -4,5 +4,5 @@ import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
 export default async function AdminTagsPage() {
   await requireAdminSectionAccess('tags');
 
-  return <AdminPlaceholderPage title="Tags" description="Теги для знаний и будущих подборок." />;
+  return <AdminPlaceholderPage title="Теги" description="Теги для знаний и будущих подборок." />;
 }

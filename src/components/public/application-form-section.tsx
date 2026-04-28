@@ -46,9 +46,9 @@ export function HoneypotField({ id }: { id: string }) {
 
 export function ConsentCheckboxField({ children, disabled }: { children: React.ReactNode; disabled?: boolean }) {
   return (
-    <label className="flex items-start gap-3 text-sm leading-6 text-[var(--muted)]">
-      <Checkbox name="consent" required value="accepted" disabled={disabled} />
-      <span>{children}</span>
+    <label className="grid grid-cols-[1rem_minmax(0,1fr)] items-start gap-3.5 text-sm leading-6 text-[var(--muted)]">
+      <Checkbox className="mt-[0.3em]" name="consent" required value="accepted" disabled={disabled} />
+      <span className="min-w-0">{children}</span>
     </label>
   );
 }
@@ -64,8 +64,12 @@ export function PublicApplicationSection({
   disabledLink
 }: PublicApplicationSectionProps) {
   return (
-    <section className="border-b border-black/20 bg-[var(--surface)] py-10 md:py-14" id="applications">
-      <div className="container grid gap-8 xl:grid-cols-[0.58fr_1.42fr]">
+    <section className="relative overflow-hidden border-b border-black/20 bg-[var(--surface)] py-10 md:py-14" id="applications">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_24%,rgba(153,44,38,0.08),transparent_18%),radial-gradient(circle_at_78%_22%,rgba(255,255,255,0.62),transparent_20%),radial-gradient(circle_at_72%_82%,rgba(20,20,18,0.05),transparent_22%)]"
+      />
+      <div className="container relative grid gap-8 xl:grid-cols-[0.58fr_1.42fr]">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">{eyebrow}</p>
           <h2 className={`${displayFont.className} display-tight mt-3 text-[44px] md:text-[58px]`}>{title}</h2>

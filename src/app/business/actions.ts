@@ -1,0 +1,351 @@
+'use server';
+
+import { revalidatePath } from 'next/cache';
+import { redirect } from 'next/navigation';
+import { ApplicationStatus, ApplicationType, type Prisma } from '@prisma/client';
+import { z } from 'zod';
+import { getString, nullableString, optionalString } from '@/lib/admin/content-utils';
+import { PERSONAL_DATA_CONSENT_TEXT } from '@/lib/applications/public-form-helpers';
+import { requireBusinessAccountAccess } from '@/lib/auth/require-business-account';
+import { prisma } from '@/lib/db/prisma';
+import { vacancyPositionValues } from '@/lib/vacancies/positions';
+
+const BUSINESS_PATH = '/business';
+const BUSINESS_REQUESTS_PATH = '/business/requests';
+
+const businessApplicationTypes = [
+  ApplicationType.VACANCY_SUBMISSION,
+  ApplicationType.SUPPLIER_SUBMISSION,
+  ApplicationType.PARTNER_APPLICATION,
+  ApplicationType.CORPORATE_TRAINING_APPLICATION,
+  ApplicationType.CERTIFICATE_ORDER
+] as const;
+
+const businessProfileSchema = z.object({
+  companyName: z.string().trim().min(2).max(160),
+  contactPerson: z.string().trim().min(2).max(120),
+  cityId: z.string().trim().optional(),
+  phone: z.string().trim().max(80).optional(),
+  telegram: z.string().trim().max(80).optional(),
+  websiteUrl: z.string().trim().url().max(240).optional().or(z.literal('')),
+  description: z.string().trim().max(1000).optional()
+});
+
+const businessApplicationSchema = z.object({
+  applicationId: z.string().trim().optional(),
+  type: z.enum(businessApplicationTypes),
+  title: z.string().trim().min(2).max(180),
+  cityId: z.string().trim().optional(),
+  details: z.string().trim().min(10).max(4000),
+  position: z.enum(vacancyPositionValues).optional(),
+  employmentType: z.string().trim().max(100).optional(),
+  salaryLabel: z.string().trim().max(120).optional(),
+  experienceLabel: z.string().trim().max(120).optional(),
+  shortDescription: z.string().trim().max(500).optional(),
+  serviceArea: z.string().trim().max(160).optional(),
+  partnerType: z.string().trim().max(160).optional(),
+  teamSize: z.string().trim().max(80).optional(),
+  recipientName: z.string().trim().max(160).optional(),
+  amountLabel: z.string().trim().max(120).optional(),
+  consent: z.literal('accepted')
+}).refine((data) => data.type !== ApplicationType.VACANCY_SUBMISSION || Boolean(data.position), {
+  message: 'position is required for vacancy submission',
+  path: ['position']
+});
+
+const applicationIdSchema = z.object({
+  applicationId: z.string().trim().min(1)
+});
+
+function businessResultPath(path: string, result: { type: 'success' | 'error'; message: string }) {
+  const url = new URL(path, 'http://localhost');
+  url.searchParams.delete('success');
+  url.searchParams.delete('error');
+  url.searchParams.set(result.type, result.message);
+  return `${url.pathname}${url.search}`;
+}
+
+function redirectWithBusinessResult(path: string, result: { type: 'success' | 'error'; message: string }): never {
+  redirect(businessResultPath(path, result));
+}
+
+async function assertActiveCity(cityId?: string | null) {
+  if (!cityId) {
+    return null;
+  }
+
+  const city = await prisma.city.findFirst({
+    where: { id: cityId, isActive: true },
+    select: { id: true, name: true }
+  });
+
+  if (!city) {
+    throw new Error('city is invalid');
+  }
+
+  return city;
+}
+
+function getApplicationSubject(input: { type: ApplicationType; companyName: string; title: string }) {
+  if (input.type === ApplicationType.VACANCY_SUBMISSION) {
+    return `${input.companyName}: ${input.title}`;
+  }
+
+  if (input.type === ApplicationType.SUPPLIER_SUBMISSION) {
+    return `Поставщик: ${input.companyName}`;
+  }
+
+  if (input.type === ApplicationType.PARTNER_APPLICATION) {
+    return `Партнерство: ${input.companyName}`;
+  }
+
+  if (input.type === ApplicationType.CORPORATE_TRAINING_APPLICATION) {
+    return `Корпоративное обучение: ${input.companyName}`;
+  }
+
+  return `Заказ сертификата: ${input.companyName}`;
+}
+
+function buildPayload(input: z.infer<typeof businessApplicationSchema> & { companyName: string }): Prisma.InputJsonValue {
+  return {
+    source: 'business_cabinet',
+    companyName: input.companyName,
+    title: input.title,
+    position: input.position || null,
+    employmentType: input.employmentType || null,
+    salaryLabel: input.salaryLabel || null,
+    experienceLabel: input.experienceLabel || null,
+    shortDescription: input.shortDescription || input.title,
+    serviceArea: input.serviceArea || null,
+    partnerType: input.partnerType || null,
+    teamSize: input.teamSize || null,
+    recipientName: input.recipientName || null,
+    amountLabel: input.amountLabel || null
+  };
+}
+
+function getBusinessApplicationFormData(formData: FormData) {
+  return {
+    applicationId: optionalString(getString(formData, 'applicationId')),
+    type: getString(formData, 'type'),
+    title: getString(formData, 'title'),
+    cityId: optionalString(getString(formData, 'cityId')),
+    details: getString(formData, 'details'),
+    position: optionalString(getString(formData, 'position')),
+    employmentType: optionalString(getString(formData, 'employmentType')),
+    salaryLabel: optionalString(getString(formData, 'salaryLabel')),
+    experienceLabel: optionalString(getString(formData, 'experienceLabel')),
+    shortDescription: optionalString(getString(formData, 'shortDescription')),
+    serviceArea: optionalString(getString(formData, 'serviceArea')),
+    partnerType: optionalString(getString(formData, 'partnerType')),
+    teamSize: optionalString(getString(formData, 'teamSize')),
+    recipientName: optionalString(getString(formData, 'recipientName')),
+    amountLabel: optionalString(getString(formData, 'amountLabel')),
+    consent: getString(formData, 'consent')
+  };
+}
+
+export async function updateBusinessProfile(formData: FormData) {
+  let result: { type: 'success' | 'error'; message: string };
+
+  try {
+    const { businessAccount } = await requireBusinessAccountAccess();
+    const parsed = businessProfileSchema.parse({
+      companyName: getString(formData, 'companyName'),
+      contactPerson: getString(formData, 'contactPerson'),
+      cityId: optionalString(getString(formData, 'cityId')),
+      phone: optionalString(getString(formData, 'phone')),
+      telegram: optionalString(getString(formData, 'telegram')),
+      websiteUrl: getString(formData, 'websiteUrl'),
+      description: optionalString(getString(formData, 'description'))
+    });
+    const city = await assertActiveCity(parsed.cityId);
+
+    await prisma.businessAccount.update({
+      where: { id: businessAccount.id },
+      data: {
+        companyName: parsed.companyName,
+        contactPerson: parsed.contactPerson,
+        cityId: city?.id ?? null,
+        phone: nullableString(parsed.phone),
+        telegram: nullableString(parsed.telegram),
+        websiteUrl: nullableString(parsed.websiteUrl),
+        description: nullableString(parsed.description)
+      }
+    });
+
+    revalidatePath(BUSINESS_PATH);
+    revalidatePath(BUSINESS_REQUESTS_PATH);
+    result = { type: 'success', message: 'Профиль компании сохранен.' };
+  } catch {
+    result = { type: 'error', message: 'Не удалось сохранить профиль. Проверьте обязательные поля и сайт.' };
+  }
+
+  redirectWithBusinessResult(BUSINESS_PATH, result);
+}
+
+export async function createBusinessApplication(formData: FormData) {
+  let result: { type: 'success' | 'error'; message: string };
+
+  try {
+    const { user, businessAccount } = await requireBusinessAccountAccess();
+    const parsed = businessApplicationSchema.parse(getBusinessApplicationFormData(formData));
+    const city = await assertActiveCity(parsed.cityId);
+    const status = getString(formData, 'intent') === 'draft' ? ApplicationStatus.DRAFT : ApplicationStatus.NEW;
+
+    await prisma.application.create({
+      data: {
+        type: parsed.type,
+        status,
+        subject: getApplicationSubject({
+          type: parsed.type,
+          companyName: businessAccount.companyName,
+          title: parsed.title
+        }),
+        message: parsed.details,
+        name: businessAccount.contactPerson,
+        email: user.email,
+        phone: businessAccount.phone,
+        telegram: businessAccount.telegram,
+        cityId: city?.id ?? businessAccount.cityId,
+        businessAccountId: businessAccount.id,
+        payload: buildPayload({ ...parsed, companyName: businessAccount.companyName }),
+        consentAcceptedAt: new Date(),
+        consentText: PERSONAL_DATA_CONSENT_TEXT
+      }
+    });
+
+    revalidatePath(BUSINESS_PATH);
+    revalidatePath(BUSINESS_REQUESTS_PATH);
+    revalidatePath('/admin/applications');
+    result =
+      status === ApplicationStatus.DRAFT
+        ? { type: 'success', message: 'Черновик сохранен.' }
+        : { type: 'success', message: 'Заявка отправлена на проверку.' };
+  } catch {
+    result = { type: 'error', message: 'Не удалось сохранить заявку. Проверьте обязательные поля.' };
+  }
+
+  redirectWithBusinessResult(BUSINESS_REQUESTS_PATH, result);
+}
+
+export async function updateBusinessDraftApplication(formData: FormData) {
+  const parsedId = applicationIdSchema.safeParse({ applicationId: getString(formData, 'applicationId') });
+  const fallbackPath = parsedId.success ? `${BUSINESS_REQUESTS_PATH}/${parsedId.data.applicationId}` : BUSINESS_REQUESTS_PATH;
+  let result: { type: 'success' | 'error'; message: string };
+
+  try {
+    const { user, businessAccount } = await requireBusinessAccountAccess();
+    const parsed = businessApplicationSchema.parse(getBusinessApplicationFormData(formData));
+    const city = await assertActiveCity(parsed.cityId);
+    const existing = await prisma.application.findFirst({
+      where: {
+        id: parsed.applicationId,
+        businessAccountId: businessAccount.id,
+        status: ApplicationStatus.DRAFT
+      },
+      select: { id: true }
+    });
+
+    if (!existing) {
+      throw new Error('draft is invalid');
+    }
+
+    await prisma.application.update({
+      where: { id: existing.id },
+      data: {
+        type: parsed.type,
+        subject: getApplicationSubject({
+          type: parsed.type,
+          companyName: businessAccount.companyName,
+          title: parsed.title
+        }),
+        message: parsed.details,
+        name: businessAccount.contactPerson,
+        email: user.email,
+        phone: businessAccount.phone,
+        telegram: businessAccount.telegram,
+        cityId: city?.id ?? businessAccount.cityId,
+        payload: buildPayload({ ...parsed, companyName: businessAccount.companyName }),
+        consentAcceptedAt: new Date(),
+        consentText: PERSONAL_DATA_CONSENT_TEXT
+      }
+    });
+
+    revalidatePath(BUSINESS_PATH);
+    revalidatePath(BUSINESS_REQUESTS_PATH);
+    revalidatePath(fallbackPath);
+    result = { type: 'success', message: 'Черновик обновлен.' };
+  } catch {
+    result = { type: 'error', message: 'Не удалось обновить черновик. Проверьте обязательные поля.' };
+  }
+
+  redirectWithBusinessResult(fallbackPath, result);
+}
+
+export async function submitBusinessDraftApplication(formData: FormData) {
+  const parsed = applicationIdSchema.safeParse({ applicationId: getString(formData, 'applicationId') });
+  let result: { type: 'success' | 'error'; message: string };
+
+  try {
+    if (!parsed.success) {
+      throw new Error('application is invalid');
+    }
+
+    const { businessAccount } = await requireBusinessAccountAccess();
+    const update = await prisma.application.updateMany({
+      where: {
+        id: parsed.data.applicationId,
+        businessAccountId: businessAccount.id,
+        status: ApplicationStatus.DRAFT
+      },
+      data: { status: ApplicationStatus.NEW }
+    });
+
+    if (update.count !== 1) {
+      throw new Error('draft is invalid');
+    }
+
+    revalidatePath(BUSINESS_PATH);
+    revalidatePath(BUSINESS_REQUESTS_PATH);
+    revalidatePath('/admin/applications');
+    result = { type: 'success', message: 'Заявка отправлена на проверку.' };
+  } catch {
+    result = { type: 'error', message: 'Не удалось отправить черновик.' };
+  }
+
+  redirectWithBusinessResult(BUSINESS_REQUESTS_PATH, result);
+}
+
+export async function archiveBusinessDraftApplication(formData: FormData) {
+  const parsed = applicationIdSchema.safeParse({ applicationId: getString(formData, 'applicationId') });
+  let result: { type: 'success' | 'error'; message: string };
+
+  try {
+    if (!parsed.success) {
+      throw new Error('application is invalid');
+    }
+
+    const { businessAccount } = await requireBusinessAccountAccess();
+    const update = await prisma.application.updateMany({
+      where: {
+        id: parsed.data.applicationId,
+        businessAccountId: businessAccount.id,
+        status: ApplicationStatus.DRAFT
+      },
+      data: { status: ApplicationStatus.ARCHIVED }
+    });
+
+    if (update.count !== 1) {
+      throw new Error('draft is invalid');
+    }
+
+    revalidatePath(BUSINESS_PATH);
+    revalidatePath(BUSINESS_REQUESTS_PATH);
+    result = { type: 'success', message: 'Черновик архивирован.' };
+  } catch {
+    result = { type: 'error', message: 'Не удалось архивировать черновик.' };
+  }
+
+  redirectWithBusinessResult(BUSINESS_REQUESTS_PATH, result);
+}

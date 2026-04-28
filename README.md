@@ -1,8 +1,8 @@
 # BARSYNERGY
 
-BARSYNERGY is a fullstack web platform foundation for a professional bar-industry education and community product in the North Caucasus Federal District.
+BARSYNERGY is a fullstack Next.js project for bar-industry education, events, vacancies, suppliers and partnerships in the North Caucasus Federal District.
 
-The project uses a Russia-ready VPS architecture: Next.js, PostgreSQL, Prisma, Docker Compose, Nginx and S3-compatible Timeweb Cloud Object Storage for production files.
+The production target is a Russian VPS with PostgreSQL, Docker Compose, Nginx and S3-compatible Timeweb Cloud Object Storage.
 
 ## Stack
 
@@ -84,11 +84,13 @@ npm run prisma:migrate:dev -- --name <migration_name>
 npm run prisma:migrate:deploy
 ```
 
+Current schema includes the Phase 4 business-account MVP. Apply migrations before testing `/auth/register`, `/auth/login`, `/admin/users`, `/business` or `/business/requests`.
+
 ## Branches
 
-- `prod` — stable production branch.
-- `dev` — main development branch.
-- `feature/*` — only for large coherent features.
+- `prod`: stable production branch.
+- `dev`: main development branch.
+- `feature/*`: only for large coherent features.
 
 Production releases go `dev -> validation -> prod` only after owner confirmation.
 
@@ -107,6 +109,7 @@ Production releases go `dev -> validation -> prod` only after owner confirmation
 - [Phase 2 content/admin mini-spec](docs/phase-2-content-admin-spec.md)
 - [Phase 3 applications and vacancy flows mini-spec](docs/phase-3-applications-spec.md)
 - [Business account mini-spec](docs/business-account-spec.md)
+- [Services specialists mini-spec](docs/services-specialists-spec.md)
 - [Setup](docs/setup.md)
 - [Deploy](docs/deploy.md)
 - [Environment](docs/env.md)

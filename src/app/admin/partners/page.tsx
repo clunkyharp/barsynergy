@@ -69,7 +69,7 @@ export default async function AdminPartnersPage({ searchParams }: AdminPartnersP
   return (
     <div className="space-y-8">
       <header>
-        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Admin / Partners</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Админка / Партнеры</p>
         <h1 className="mt-2 text-3xl font-semibold">Партнеры</h1>
         <p className="mt-2 max-w-2xl text-[var(--muted)]">
           Создание, публикация и архивация партнеров для публичного раздела.
@@ -85,7 +85,7 @@ export default async function AdminPartnersPage({ searchParams }: AdminPartnersP
           <FormField htmlFor="partner-title" label="Заголовок">
             <Input id="partner-title" name="title" required minLength={2} maxLength={160} />
           </FormField>
-          <FormField htmlFor="partner-slug" label="Slug">
+          <FormField htmlFor="partner-slug" label="Адрес страницы">
             <Input id="partner-slug" name="slug" maxLength={180} placeholder="Если пусто, будет создан из заголовка" />
           </FormField>
           <FormField htmlFor="partner-companyName" label="Компания">
@@ -237,7 +237,7 @@ export default async function AdminPartnersPage({ searchParams }: AdminPartnersP
                                 defaultValue={partner.title}
                               />
                             </FormField>
-                            <FormField htmlFor={`partner-slug-${partner.id}`} label="Slug">
+                            <FormField htmlFor={`partner-slug-${partner.id}`} label="Адрес страницы">
                               <Input id={`partner-slug-${partner.id}`} name="slug" maxLength={180} defaultValue={partner.slug} />
                             </FormField>
                             <FormField htmlFor={`partner-company-${partner.id}`} label="Компания">

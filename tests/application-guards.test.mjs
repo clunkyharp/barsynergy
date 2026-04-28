@@ -131,7 +131,7 @@ test('vacancy submission applications can produce safe vacancy draft fields', ()
     consentAcceptedAt: new Date('2026-04-28T10:00:00.000Z'),
     payload: {
       companyName: 'Test Bar',
-      position: 'Bartender',
+      position: 'Бариста',
       employmentType: 'Full time',
       salaryLabel: '100000',
       experienceLabel: '2 years',
@@ -140,7 +140,7 @@ test('vacancy submission applications can produce safe vacancy draft fields', ()
   });
 
   assert.equal(draft.status, 'DRAFT');
-  assert.equal(draft.title, 'Bartender');
+  assert.equal(draft.title, 'Бариста');
   assert.equal(draft.companyName, 'Test Bar');
   assert.equal(draft.cityId, 'city-1');
   assert.match(draft.contactMode, /hr@example\.test/);

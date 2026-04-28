@@ -21,7 +21,7 @@ export function EducationApplicationForms({ enabled, result, utm, cities }: Publ
     <PublicApplicationSection
       eyebrow="Образование / Заявки"
       title="Запросы на обучение"
-      description="Через этот блок можно отправить интерес к программе, запросить корпоративное обучение или оформить ручной заказ сертификата."
+      description="Здесь можно оставить заявку на программу, корпоративное обучение или сертификат."
       enabled={enabled}
       result={result}
     >

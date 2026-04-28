@@ -1,5 +1,6 @@
 import { ApplicationType, ContentStatus } from '@prisma/client';
 import type { Prisma } from '@prisma/client';
+import { isVacancyPosition } from '../vacancies/positions.ts';
 
 type VacancySubmissionApplication = {
   type: ApplicationType;
@@ -52,7 +53,7 @@ export function getVacancyDraftFieldsFromApplication(application: VacancySubmiss
   const shortDescription = payloadString(application.payload, 'shortDescription');
   const description = application.message?.trim() || shortDescription;
 
-  if (!companyName || !position || !shortDescription || !description) {
+  if (!companyName || !position || !isVacancyPosition(position) || !shortDescription || !description) {
     throw new Error('vacancy draft requires complete vacancy payload');
   }
 

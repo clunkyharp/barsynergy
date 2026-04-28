@@ -124,9 +124,9 @@ export function statusTransitionDates(status: ContentStatus, currentPublishedAt:
   };
 }
 
-export function safeAdminRedirectPath(formData: FormData, fallbackPath: string) {
+export function safeAdminRedirectPath(formData: FormData, fallbackPath: string, allowedBasePaths: string[] = [fallbackPath]) {
   const value = getString(formData, 'redirectTo');
-  return value === fallbackPath || value.startsWith(`${fallbackPath}?`) ? value : fallbackPath;
+  return allowedBasePaths.some((basePath) => value === basePath || value.startsWith(`${basePath}?`)) ? value : fallbackPath;
 }
 
 export function adminActionResultPath(

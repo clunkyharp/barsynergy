@@ -26,3 +26,7 @@ export function getSessionCookieOptions() {
     maxAge: 60 * 60 * 24 * 30
   };
 }
+
+export function getSessionExpiresAt() {
+  return new Date(Date.now() + getSessionCookieOptions().maxAge * 1000);
+}

@@ -10,15 +10,15 @@ const env = getEnv();
 export const metadata: Metadata = {
   metadataBase: new URL(env.APP_URL),
   title: {
-    default: 'BARSYNERGY — профессиональная среда барной индустрии СКФО',
+    default: 'BARSYNERGY: профессиональная среда барной индустрии СКФО',
     template: '%s | BARSYNERGY'
   },
   description:
-    'BARSYNERGY объединяет образование, события, знания, вакансии, поставщиков и партнерские возможности для профессионалов барной индустрии СКФО.',
+    'BARSYNERGY собирает образование, события, статьи, вакансии, поставщиков и партнерские запросы для барной индустрии СКФО.',
   openGraph: {
     title: 'BARSYNERGY',
     description:
-      'Профессиональная онлайн-платформа и образовательное комьюнити для барной индустрии СКФО.',
+      'Обучение, события, вакансии и рабочие контакты для барной индустрии СКФО.',
     url: env.APP_URL,
     siteName: 'BARSYNERGY',
     images: [{ url: '/og-preview.svg', width: 1200, height: 630 }],

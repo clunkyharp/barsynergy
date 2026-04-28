@@ -2,6 +2,7 @@ import { ApplicationStatus, ApplicationType } from '@prisma/client';
 import { ZodError } from 'zod';
 
 export const applicationTypeValues = [
+  ApplicationType.BUSINESS_ACCOUNT_REQUEST,
   ApplicationType.COURSE_APPLICATION,
   ApplicationType.EVENT_APPLICATION,
   ApplicationType.VACANCY_SUBMISSION,
@@ -14,6 +15,7 @@ export const applicationTypeValues = [
 ] as const;
 
 export const applicationStatusValues = [
+  ApplicationStatus.DRAFT,
   ApplicationStatus.NEW,
   ApplicationStatus.IN_REVIEW,
   ApplicationStatus.CONTACTED,
@@ -27,6 +29,7 @@ export const applicationStatusValues = [
 ] as const;
 
 export const applicationTypeLabels: Record<ApplicationType, string> = {
+  [ApplicationType.BUSINESS_ACCOUNT_REQUEST]: 'Заявка на бизнес-доступ',
   [ApplicationType.COURSE_APPLICATION]: 'Заявка на курс',
   [ApplicationType.EVENT_APPLICATION]: 'Заявка на событие',
   [ApplicationType.VACANCY_SUBMISSION]: 'Размещение вакансии',
@@ -39,6 +42,7 @@ export const applicationTypeLabels: Record<ApplicationType, string> = {
 };
 
 export const applicationStatusLabels: Record<ApplicationStatus, string> = {
+  [ApplicationStatus.DRAFT]: 'Черновик',
   [ApplicationStatus.NEW]: 'Новая',
   [ApplicationStatus.IN_REVIEW]: 'На проверке',
   [ApplicationStatus.CONTACTED]: 'Связались',
@@ -55,6 +59,7 @@ export const applicationStatusBadgeVariants: Record<
   ApplicationStatus,
   'neutral' | 'success' | 'warning' | 'danger'
 > = {
+  [ApplicationStatus.DRAFT]: 'neutral',
   [ApplicationStatus.NEW]: 'warning',
   [ApplicationStatus.IN_REVIEW]: 'warning',
   [ApplicationStatus.CONTACTED]: 'neutral',

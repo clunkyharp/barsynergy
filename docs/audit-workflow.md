@@ -360,4 +360,4 @@ Use a separate gpt-5.3-codex subagent for each audit task.
 - Mark uncertainty explicitly.
 - Prefer concrete, low-risk recommendations.
 - Do not recommend full rewrites unless that is the only realistic option.
-- The result must be useful for actual project work, not only for reading.
+- The result must be useful for actual project work and should not be a read-only report.

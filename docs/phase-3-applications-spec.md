@@ -118,7 +118,7 @@ The public form should collect only what is needed to review and rewrite the vac
 - contact person;
 - employer contact email and/or phone/Telegram;
 - city;
-- position;
+- position from the fixed MVP list: `Бариста`, `Управляющий`, `Менеджер`;
 - employment type;
 - salary label;
 - experience label;

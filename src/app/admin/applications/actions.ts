@@ -34,6 +34,11 @@ const notesFormSchema = z.object({
   internalNotes: z.string().trim().max(4000).optional()
 });
 
+const businessNotesFormSchema = z.object({
+  applicationId: z.string().trim().min(1),
+  businessNotes: z.string().trim().max(2000).optional()
+});
+
 const vacancyDraftFormSchema = z.object({
   applicationId: z.string().trim().min(1)
 });
@@ -121,6 +126,37 @@ export async function updateApplicationInternalNotes(formData: FormData) {
     revalidatePath(ADMIN_APPLICATIONS_PATH);
     revalidatePath(applicationDetailPath(parsed.applicationId));
     result = { type: 'success', message: 'Внутренняя заметка сохранена.' };
+  } catch (error) {
+    result = { type: 'error', message: formatApplicationActionError(error) };
+  }
+
+  redirectWithAdminActionResult(redirectTo, result);
+}
+
+export async function updateApplicationBusinessNotes(formData: FormData) {
+  const fallbackPath = applicationDetailPath(getString(formData, 'applicationId'));
+  const redirectTo = safeAdminRedirectPath(formData, fallbackPath);
+  let result: { type: 'success' | 'error'; message: string };
+
+  try {
+    const parsed = businessNotesFormSchema.parse({
+      applicationId: getString(formData, 'applicationId'),
+      businessNotes: optionalString(getString(formData, 'businessNotes'))
+    });
+
+    await requireAdminSectionAccess('applications');
+    await prisma.application.update({
+      where: { id: parsed.applicationId },
+      data: {
+        businessNotes: parsed.businessNotes ?? null
+      }
+    });
+
+    revalidatePath(ADMIN_APPLICATIONS_PATH);
+    revalidatePath(applicationDetailPath(parsed.applicationId));
+    revalidatePath('/business');
+    revalidatePath('/business/requests');
+    result = { type: 'success', message: 'Комментарий для бизнеса сохранен.' };
   } catch (error) {
     result = { type: 'error', message: formatApplicationActionError(error) };
   }

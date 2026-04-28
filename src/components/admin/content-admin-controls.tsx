@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button';
+import { CoverImageInput } from '@/components/admin/cover-image-input';
 import { Card } from '@/components/ui/card';
 import type { AdminContentSearchParams } from '@/lib/admin/content-utils';
 import { firstParam } from '@/lib/admin/content-utils';
@@ -115,20 +116,14 @@ export function CoverImageField({ id, currentName }: CoverImageFieldProps) {
         Обложка
       </label>
       {currentName ? <p className="text-xs text-[var(--muted)]">Текущий файл: {currentName}</p> : null}
-      <input
-        accept="image/jpeg,image/png,image/webp,image/avif"
-        className="block w-full text-sm text-[var(--muted)] file:mr-4 file:min-h-11 file:rounded-md file:border file:border-[var(--line)] file:bg-white file:px-4 file:text-sm file:font-semibold file:text-[var(--text)] hover:file:border-[var(--accent)]"
-        id={id}
-        name="coverImage"
-        type="file"
-      />
+      <CoverImageInput id={id} />
       {currentName ? (
         <label className="flex items-center gap-2 text-sm text-[var(--muted)]">
           <input className="h-4 w-4 accent-[var(--accent)]" name="removeCoverImage" type="checkbox" value="true" />
           Удалить обложку без замены
         </label>
       ) : null}
-      <p className="text-xs text-[var(--muted)]">JPEG, PNG, WebP или AVIF до 8 MB.</p>
+      <p className="text-xs text-[var(--muted)]">JPEG, PNG, WebP или AVIF до 8 МБ.</p>
     </div>
   );
 }

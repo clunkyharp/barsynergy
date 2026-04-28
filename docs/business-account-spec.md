@@ -1,8 +1,8 @@
 # Business Account Mini-Spec
 
-Status: planned; owner decision captured on 2026-04-28.
+Status: MVP implementation complete; owner decision captured on 2026-04-28.
 
-This document records the account direction before implementation. It does not start code work.
+This document records the account direction and current Phase 4 implementation boundary.
 
 ## Owner Decision
 
@@ -96,6 +96,31 @@ Business cabinet is a later account layer over the application flow:
 - unauthenticated business can submit a request;
 - approved business can later log in and track or edit its own requests;
 - admin remains the publishing gate for vacancies, suppliers and partners.
+
+## Implemented MVP Scope
+
+Implemented on 2026-04-28:
+
+- `BusinessAccount` model with owner, company profile fields, status, city and linked applications;
+- `BusinessAccountStatus` enum: `pending`, `active`, `blocked`, `archived`;
+- `UserRole.BUSINESS`;
+- `ApplicationType.BUSINESS_ACCOUNT_REQUEST`;
+- optional `Application.businessAccountId`;
+- `ApplicationStatus.DRAFT`;
+- `Application.businessNotes` for admin comments visible to the business account;
+- `/auth/login` email/password session login;
+- `/auth/register` pending business-access request with a linked admin-review application;
+- `/admin/users` business access approval/blocking;
+- guarded `/business` cabinet for active business users;
+- company profile editing;
+- `/business/requests` request creation, draft saving and submission for vacancy placement with the fixed MVP positions `Бариста`, `Управляющий`, `Менеджер`, supplier placement, partner application, corporate training and certificate order;
+- `/business/requests/[applicationId]` own-request detail, draft editing, draft submission and draft archiving;
+- business request list/detail never exposes candidate personal data.
+
+Current limitations:
+
+- password reset and invite acceptance are not implemented yet;
+- production public business registration stays covered by the same personal-data/legal blocker as other public forms.
 
 ## Validation Expectations
 

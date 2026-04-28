@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 import { ApplicationStatus, ApplicationType } from '@prisma/client';
 import {
   createVacancyDraftFromApplication,
+  updateApplicationBusinessNotes,
   updateApplicationInternalNotes,
   updateApplicationStatus
 } from '@/app/admin/applications/actions';
@@ -84,7 +85,7 @@ export default async function AdminApplicationDetailPage({ params, searchParams 
   return (
     <div className="space-y-8">
       <header>
-        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Admin / Applications</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Админка / Заявки</p>
         <h1 className="mt-2 text-3xl font-semibold">{application.subject || applicationTypeLabels[application.type]}</h1>
         <p className="mt-2 max-w-2xl text-[var(--muted)]">
           {applicationTypeLabels[application.type]} / создана {dateTimeFormatter.format(application.createdAt)}
@@ -220,6 +221,26 @@ export default async function AdminApplicationDetailPage({ params, searchParams 
               )}
             </Card>
           ) : null}
+
+          <Card className="p-5">
+            <h2 className="text-lg font-semibold">Комментарий для бизнеса</h2>
+            <form action={updateApplicationBusinessNotes} className="mt-5 grid gap-4">
+              <HiddenRedirect value={currentPath} />
+              <input name="applicationId" type="hidden" value={application.id} />
+              <FormField htmlFor="businessNotes" label="Видимый комментарий">
+                <Textarea
+                  className="min-h-32"
+                  defaultValue={application.businessNotes ?? ''}
+                  id="businessNotes"
+                  maxLength={2000}
+                  name="businessNotes"
+                />
+              </FormField>
+              <Button type="submit" variant="secondary">
+                Сохранить комментарий
+              </Button>
+            </form>
+          </Card>
 
           <Card className="p-5">
             <h2 className="text-lg font-semibold">Внутренняя заметка</h2>

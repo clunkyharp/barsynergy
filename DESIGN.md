@@ -1,6 +1,6 @@
 # BARSYNERGY Design System
 
-This file is the working design-system contract for BARSYNERGY.
+This file defines the current design-system contract for BARSYNERGY.
 
 It documents the current source of truth in code and sets rules for new UI work. Keep it aligned with:
 
@@ -20,7 +20,7 @@ Do not introduce a third-party component library as the main UI system. The proj
 
 ## Design Direction
 
-BARSYNERGY uses a strict editorial visual language for a bar-industry education and community platform.
+BARSYNERGY uses a strict editorial visual language for bar-industry education, events, vacancies, suppliers and partnerships.
 
 Use:
 
@@ -46,12 +46,12 @@ Avoid:
 
 ## Design Principles
 
-Use these principles before choosing a component, layout or content pattern.
+Use these rules before choosing a component, layout or content pattern.
 
-1. Industry-first, not nightlife-first. The interface must represent professional education, community and work opportunities, not generic bar entertainment.
+1. Industry-first, not nightlife-first. The interface must represent education, events, jobs and business requests, not generic bar entertainment.
 2. Editorial structure over decoration. Use typography, grid, spacing, dividers and real content blocks as the main visual tools.
 3. Dense but readable. Pages may contain many routes, listings and metadata, but each block must remain scannable on mobile and desktop.
-4. Regional specificity. City, format, category, date and role labels are part of the product value. Do not hide them behind vague marketing copy.
+4. Regional detail. City, format, category, date and role labels are useful product data. Do not hide them behind vague marketing copy.
 5. Real content over placeholders. Prefer concrete section labels, examples and empty states that match the planned content model.
 6. Conservative interaction. Motion, hover effects and image treatment should support navigation and reading, not compete with content.
 7. Internal system first. Reuse local tokens, primitives and public-page patterns before adding a new one-off style.
@@ -106,7 +106,7 @@ Recommended order:
 1. Editorial hero with the BARSYNERGY name, a short product statement and route-level entry points.
 2. Compact section map for education, events, articles, vacancies, suppliers and partners.
 3. Featured rows for near-term or newest content once real data is connected.
-4. Community/context block explaining the regional industry focus.
+4. Context block explaining the regional industry focus.
 5. Partner/supplier or employer entry point.
 6. Contact or application CTA only when the next action is clear.
 

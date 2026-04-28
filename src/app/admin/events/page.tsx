@@ -86,7 +86,7 @@ export default async function AdminEventsPage({ searchParams }: AdminEventsPageP
   return (
     <div className="space-y-8">
       <header>
-        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Admin / Events</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Админка / События</p>
         <h1 className="mt-2 text-3xl font-semibold">События</h1>
         <p className="mt-2 max-w-2xl text-[var(--muted)]">
           Создание, публикация и архивация событий для публичного календаря.
@@ -102,7 +102,7 @@ export default async function AdminEventsPage({ searchParams }: AdminEventsPageP
           <FormField htmlFor="event-title" label="Название">
             <Input id="event-title" name="title" required minLength={2} maxLength={160} />
           </FormField>
-          <FormField htmlFor="event-slug" label="Slug">
+          <FormField htmlFor="event-slug" label="Адрес страницы">
             <Input id="event-slug" name="slug" maxLength={180} placeholder="Если пусто, будет создан из названия" />
           </FormField>
           <FormField htmlFor="event-startsAt" label="Начало">
@@ -259,7 +259,7 @@ export default async function AdminEventsPage({ searchParams }: AdminEventsPageP
                             <FormField htmlFor={`event-title-${event.id}`} label="Название">
                               <Input id={`event-title-${event.id}`} name="title" required minLength={2} maxLength={160} defaultValue={event.title} />
                             </FormField>
-                            <FormField htmlFor={`event-slug-${event.id}`} label="Slug">
+                            <FormField htmlFor={`event-slug-${event.id}`} label="Адрес страницы">
                               <Input id={`event-slug-${event.id}`} name="slug" maxLength={180} defaultValue={event.slug} />
                             </FormField>
                             <FormField htmlFor={`event-startsAt-${event.id}`} label="Начало">

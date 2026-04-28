@@ -7,6 +7,7 @@ import { Select } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { displayFont } from '@/lib/fonts';
 import type { VacancyApplicationFormOptions } from '@/lib/public/content';
+import { vacancyPositionValues } from '@/lib/vacancies/positions';
 
 type VacancyApplicationFormsProps = {
   enabled: boolean;
@@ -120,7 +121,14 @@ export function VacancyApplicationForms({ enabled, options, result, utm }: Vacan
                   </FormField>
                 </div>
                 <FormField htmlFor="position" label="Позиция">
-                  <Input id="position" name="position" required maxLength={180} minLength={2} />
+                  <Select id="position" name="position" required defaultValue="">
+                    <option value="">Выберите позицию</option>
+                    {vacancyPositionValues.map((position) => (
+                      <option key={position} value={position}>
+                        {position}
+                      </option>
+                    ))}
+                  </Select>
                 </FormField>
                 <div className="grid gap-4 sm:grid-cols-2">
                   <FormField htmlFor="employmentType" label="Формат">
@@ -139,8 +147,8 @@ export function VacancyApplicationForms({ enabled, options, result, utm }: Vacan
                 <FormField htmlFor="details" label="Детали для редакции">
                   <Textarea id="details" name="details" required className="min-h-36" maxLength={4000} minLength={20} />
                 </FormField>
-                <label className="flex items-start gap-3 text-sm leading-6 text-[var(--muted)]">
-                  <Checkbox name="consent" required value="accepted" />
+                <label className="grid grid-cols-[1rem_minmax(0,1fr)] items-start gap-3 text-sm leading-6 text-[var(--muted)]">
+                  <Checkbox className="mt-[0.3em]" name="consent" required value="accepted" />
                   <span>
                     Согласен на обработку персональных данных для обработки заявки. Текст{' '}
                     <a
@@ -232,8 +240,8 @@ export function VacancyApplicationForms({ enabled, options, result, utm }: Vacan
                     disabled={!hasVacancies}
                   />
                 </FormField>
-                <label className="flex items-start gap-3 text-sm leading-6 text-[var(--muted)]">
-                  <Checkbox name="consent" required value="accepted" disabled={!hasVacancies} />
+                <label className="grid grid-cols-[1rem_minmax(0,1fr)] items-start gap-3 text-sm leading-6 text-[var(--muted)]">
+                  <Checkbox className="mt-[0.3em]" name="consent" required value="accepted" disabled={!hasVacancies} />
                   <span>
                     Согласен на обработку данных и передачу отклика работодателю после проверки BARSYNERGY. Текст{' '}
                     <a

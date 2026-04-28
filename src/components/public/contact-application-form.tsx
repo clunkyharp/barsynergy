@@ -17,7 +17,7 @@ export function ContactApplicationForm({ enabled, result, utm, cities }: PublicA
     <PublicApplicationSection
       eyebrow="Контакты / Сообщение"
       title="Отправить сообщение команде"
-      description="Общий входящий канал для вопросов по образованию, событиям, партнерству, поставщикам и другим рабочим темам."
+      description="Форма для вопросов по обучению, событиям, партнерству, поставщикам и другим рабочим темам."
       enabled={enabled}
       result={result}
       disabledDescription="До утверждения юридических текстов персональные формы закрыты. Для связи используйте прямой email команды."

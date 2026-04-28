@@ -2,10 +2,10 @@
 
 ## Branches
 
-- `prod` — stable production branch.
-- `dev` — main development branch.
-- `feature/*` — large coherent features only.
-- `fix/*` — critical production fixes only.
+- `prod`: stable production branch.
+- `dev`: main development branch.
+- `feature/*`: large coherent features only.
+- `fix/*`: critical production fixes only.
 
 ## Flow
 

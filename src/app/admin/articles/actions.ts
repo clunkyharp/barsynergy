@@ -21,12 +21,13 @@ import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
 import { prisma } from '@/lib/db/prisma';
 
 const ADMIN_ARTICLES_PATH = '/admin/articles';
+const ARTICLE_BODY_MAX_LENGTH = 20_000;
 
 const articleFormSchema = z.object({
   title: z.string().trim().min(2).max(160),
   slug: z.string().trim().max(180).optional(),
   summary: z.string().trim().min(10).max(500),
-  body: z.string().trim().min(20),
+  body: z.string().trim().min(20).max(ARTICLE_BODY_MAX_LENGTH),
   status: z.enum(contentStatusValues).default(ContentStatus.DRAFT),
   categoryId: z.string().trim().optional(),
   cityId: z.string().trim().optional(),
@@ -157,7 +158,9 @@ export async function createArticle(formData: FormData) {
 }
 
 export async function updateArticle(formData: FormData) {
-  const redirectTo = safeAdminRedirectPath(formData, ADMIN_ARTICLES_PATH);
+  const articleId = getString(formData, 'articleId');
+  const fallbackPath = articleId ? `${ADMIN_ARTICLES_PATH}/${articleId}` : ADMIN_ARTICLES_PATH;
+  const redirectTo = safeAdminRedirectPath(formData, fallbackPath, [ADMIN_ARTICLES_PATH, fallbackPath]);
   let result: { type: 'success' | 'error'; message: string };
   let uploadedCoverImageId: string | null = null;
   let previousCoverImageId: string | null = null;
@@ -234,6 +237,7 @@ export async function updateArticle(formData: FormData) {
     }
 
     revalidatePath(ADMIN_ARTICLES_PATH);
+    revalidatePath(`${ADMIN_ARTICLES_PATH}/${parsed.articleId}`);
     result = { type: 'success', message: 'Статья обновлена.' };
   } catch (error) {
     await deleteUploadedFileIfUnused(uploadedCoverImageId);

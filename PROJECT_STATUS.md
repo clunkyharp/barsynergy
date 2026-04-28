@@ -1,6 +1,6 @@
 # BARSYNERGY Project Status
 
-Last updated: 2026-04-28
+Last updated: 2026-04-29
 
 ## Current Branch
 
@@ -10,12 +10,14 @@ Last updated: 2026-04-28
 
 ## Current Phase
 
-Active phase: Phase 3 applications/forms is implemented for the current MVP contract. Phase 1 public website MVP is complete. Phase 2 content/admin scope is implemented and runtime-verified for admin create flows, public published-only reads, upload boundary, pagination and publish/archive behavior. Phase 3 now covers the unified `Application` foundation, all planned public form types, admin application list/detail review, guarded manual employer-forwarding status metadata, draft vacancy creation from vacancy placement requests, private resume upload/download handling and optional SMTP/Telegram notifications when approved env config is present. Public personal-data forms remain disabled by default in production until `APPLICATION_FORMS_ENABLED=true` is explicitly set after legal approval. Business-account direction is captured in `docs/business-account-spec.md`.
+Active phase: Phase 4 auth and first business account is implemented for the current MVP contract. Phase 1 public website MVP is complete. Phase 2 content/admin work is implemented and runtime-verified for admin create flows, published-only public reads, upload boundaries, pagination and publish/archive behavior. Phase 3 covers the unified `Application` model, public forms, admin review, guarded employer-forwarding metadata, draft vacancy creation, private resume upload/download and optional SMTP/Telegram notifications when approved env config is present. Phase 4 covers email/password login, logout, approved business accounts, admin approval/blocking, editable business profile, business request drafts/submission/tracking and business-visible admin comments. Public personal-data forms remain disabled by default in production until `APPLICATION_FORMS_ENABLED=true` is explicitly set after legal approval.
 
-Current local follow-up in progress on `dev`:
+Current local follow-up completed on `dev`:
 
-- article full editing is being moved from the `/admin/articles` table to a dedicated `/admin/articles/[articleId]` screen so long article bodies are not rendered inside the list view;
+- article full editing has been moved from the `/admin/articles` table to a dedicated `/admin/articles/[articleId]` screen so long article bodies are not rendered inside the list view;
 - public application throttling now has a dedicated cleanup command: `npm run application:cleanup:throttles`.
+- Phase 4 business-account MVP is implemented at source level: email/password login, logout, business-access request, admin approval/blocking, guarded `/business` cabinet, editable company profile and business request drafts/submission/tracking.
+- public UI polish from browser review is applied: homepage feature illustrations use generated vector compositions instead of framed raster images, education/event cards are wider and shorter, community stats and site-section navigation are denser, the global background uses a softer grain/ambient treatment, and form consent checkboxes/focus states are aligned and neutral.
 
 Phase 0 is implemented as the technical foundation:
 
@@ -41,12 +43,14 @@ Phase 1 public surface is implemented and smoke-verified:
 - vacancies;
 - suppliers;
 - partners;
+- general sponsors;
 - contacts;
 - legal pages;
 - shared header and footer;
 - route-level loading, error and not-found states;
 - responsive public-page layout patterns;
-- editorial design-system foundation.
+- editorial design-system foundation;
+- separate `/general-sponsors` screen with visible homepage and navigation entry points.
 
 Completed Phase 1 validation:
 
@@ -94,12 +98,72 @@ Phase 3 public submission throttling is backed by migration `20260428123000_phas
 
 - `ApplicationSubmissionThrottle`.
 
+Phase 4 business-account foundation is backed by migration `20260428153000_phase4_business_account_foundation`:
+
+- `BusinessAccount`;
+- `BusinessAccountStatus`;
+- `UserRole.BUSINESS`;
+- `ApplicationType.BUSINESS_ACCOUNT_REQUEST`;
+- optional `Application.businessAccountId`.
+
+Phase 4 business request management is backed by migration `20260428170000_phase4_business_request_management`:
+
+- `ApplicationStatus.DRAFT`;
+- `Application.businessNotes`.
+
 ## Next Planned Work
 
-1. Start Phase 4 planning and implementation for the first business-only account/cabinet according to `docs/business-account-spec.md`.
+1. Start Phase 5 filters/search/directory-quality work, including the separate service-specialist catalog, only after owner confirms the Phase 4 result is acceptable.
 2. Keep legal approval as a blocker before enabling `APPLICATION_FORMS_ENABLED=true` in production.
 3. Configure production scheduler tasks for expired-session cleanup and public application throttle cleanup when production access is available.
 4. Keep production TLS as an explicit blocker until owner input is available.
+
+## Phase 4 Business Account Implementation Update
+
+Completed on 2026-04-28:
+
+- `BusinessAccount` model and `BusinessAccountStatus` enum added.
+- `UserRole.BUSINESS` added for approved business cabinet users.
+- `ApplicationType.BUSINESS_ACCOUNT_REQUEST` added and linked to `BusinessAccount` through `Application.businessAccountId`.
+- `/auth/login` now performs real email/password login with PostgreSQL sessions and httpOnly cookies.
+- `/auth/register` now creates a pending business-access request, pending business user, pending business account and linked admin-review application when public personal-data forms are enabled.
+- `/admin/users` now lists business users and lets admins open or block business access.
+- `/business` is guarded for active business users and lets businesses edit company profile data.
+- `/business/requests` lets active businesses create request drafts or submit requests for vacancy placement, supplier placement, partner application, corporate training and certificate order.
+- `/business/requests/[applicationId]` lets businesses view only their own requests, edit drafts, submit drafts for admin review or archive drafts.
+- admin application detail now has a business-visible comment field.
+- `/auth/login` supports logout redirects and pending/blocked access messages.
+
+Validation completed on 2026-04-29:
+
+- `./node_modules/.bin/prisma format`;
+- `./node_modules/.bin/prisma validate`;
+- `./node_modules/.bin/prisma generate`;
+- `npm run prisma:migrate:deploy`;
+- `npm test`;
+- `npm run typecheck`;
+- `npm run lint`;
+- `npm run build`.
+
+Remaining Phase 4 caveats:
+
+- password reset and email invite acceptance are deferred until production email is configured;
+- business users still cannot publish public content directly;
+- candidate personal data remains hidden from business accounts unless a future admin-forwarding view is explicitly implemented after legal/product approval.
+
+## Services Catalog Planning Update
+
+Completed on 2026-04-28:
+
+- owner direction captured: services are a separate module, not part of suppliers;
+- public route is planned as `/services`;
+- admin route is planned as `/admin/services`;
+- new catalog entity is planned as `ServiceSpecialist`;
+- public entry into the catalog must start as `Application(type = service_specialist_submission)`;
+- publication stays admin-moderated;
+- specialist personal cabinet is out of scope for the first version;
+- implementation is placed in Phase 5 so it does not interrupt the Phase 4 business-account plan;
+- implementation contract is documented in `docs/services-specialists-spec.md`.
 
 ## Business Account Planning Update
 
@@ -129,7 +193,7 @@ Completed on 2026-04-28:
 - Public `/vacancies` now includes two Phase 3 forms: vacancy placement request and vacancy response to a published vacancy.
 - Production rendering of these forms is gated by `APPLICATION_FORMS_ENABLED`; omitted production value disables them by default.
 - Public form actions include a honeypot and per-client rate limit backed by `ApplicationSubmissionThrottle`.
-- Vacancy placement creates `Application(type = vacancy_submission, status = new)` with consent and UTM capture.
+- Vacancy placement creates `Application(type = vacancy_submission, status = new)` with consent, UTM capture and the fixed MVP position list: `Бариста`, `Управляющий`, `Менеджер`.
 - Vacancy response creates `Application(type = vacancy_response, status = new)` linked only to a published vacancy and can store a private resume file or resume URL.
 - Public response form is disabled when no published vacancies exist.
 - Admin `/admin/applications` now shows a paginated, filterable queue without exposing full contact data in table rows.

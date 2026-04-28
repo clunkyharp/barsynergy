@@ -75,7 +75,7 @@ export default async function AdminSuppliersPage({ searchParams }: AdminSupplier
   return (
     <div className="space-y-8">
       <header>
-        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Admin / Suppliers</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Админка / Поставщики</p>
         <h1 className="mt-2 text-3xl font-semibold">Поставщики</h1>
         <p className="mt-2 max-w-2xl text-[var(--muted)]">
           Создание, публикация и архивация поставщиков для публичного каталога.
@@ -91,7 +91,7 @@ export default async function AdminSuppliersPage({ searchParams }: AdminSupplier
           <FormField htmlFor="supplier-title" label="Заголовок">
             <Input id="supplier-title" name="title" required minLength={2} maxLength={160} />
           </FormField>
-          <FormField htmlFor="supplier-slug" label="Slug">
+          <FormField htmlFor="supplier-slug" label="Адрес страницы">
             <Input id="supplier-slug" name="slug" maxLength={180} placeholder="Если пусто, будет создан из заголовка" />
           </FormField>
           <FormField htmlFor="supplier-companyName" label="Компания">
@@ -258,7 +258,7 @@ export default async function AdminSuppliersPage({ searchParams }: AdminSupplier
                                 defaultValue={supplier.title}
                               />
                             </FormField>
-                            <FormField htmlFor={`supplier-slug-${supplier.id}`} label="Slug">
+                            <FormField htmlFor={`supplier-slug-${supplier.id}`} label="Адрес страницы">
                               <Input id={`supplier-slug-${supplier.id}`} name="slug" maxLength={180} defaultValue={supplier.slug} />
                             </FormField>
                             <FormField htmlFor={`supplier-company-${supplier.id}`} label="Компания">

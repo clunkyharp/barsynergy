@@ -9,6 +9,7 @@ datasource db {
 
 enum UserRole {
   USER      @map("user")
+  BUSINESS  @map("business")
   MODERATOR @map("moderator")
   ADMIN     @map("admin")
 }
@@ -17,6 +18,13 @@ enum UserStatus {
   ACTIVE  @map("active")
   BLOCKED @map("blocked")
   PENDING @map("pending")
+}
+
+enum BusinessAccountStatus {
+  PENDING  @map("pending")
+  ACTIVE   @map("active")
+  BLOCKED  @map("blocked")
+  ARCHIVED @map("archived")
 }
 
 enum CategoryType {
@@ -46,6 +54,7 @@ enum ContentStatus {
 }
 
 enum ApplicationType {
+  BUSINESS_ACCOUNT_REQUEST       @map("business_account_request")
   COURSE_APPLICATION             @map("course_application")
   EVENT_APPLICATION              @map("event_application")
   VACANCY_SUBMISSION             @map("vacancy_submission")
@@ -58,6 +67,7 @@ enum ApplicationType {
 }
 
 enum ApplicationStatus {
+  DRAFT                 @map("draft")
   NEW                   @map("new")
   IN_REVIEW             @map("in_review")
   CONTACTED             @map("contacted")
@@ -81,20 +91,21 @@ model User {
 
   profile               Profile?
   sessions              Session[]
+  businessAccount       BusinessAccount?
   uploadedFiles         UploadedFile[]
-  createdArticles       Article[]      @relation("ArticleCreatedBy")
-  updatedArticles       Article[]      @relation("ArticleUpdatedBy")
-  createdEvents         Event[]        @relation("EventCreatedBy")
-  updatedEvents         Event[]        @relation("EventUpdatedBy")
-  createdCourses        Course[]       @relation("CourseCreatedBy")
-  updatedCourses        Course[]       @relation("CourseUpdatedBy")
-  createdVacancies      Vacancy[]      @relation("VacancyCreatedBy")
-  updatedVacancies      Vacancy[]      @relation("VacancyUpdatedBy")
-  createdSuppliers      Supplier[]     @relation("SupplierCreatedBy")
-  updatedSuppliers      Supplier[]     @relation("SupplierUpdatedBy")
-  createdPartners       Partner[]      @relation("PartnerCreatedBy")
-  updatedPartners       Partner[]      @relation("PartnerUpdatedBy")
-  forwardedApplications Application[]  @relation("ApplicationForwardedBy")
+  createdArticles       Article[]        @relation("ArticleCreatedBy")
+  updatedArticles       Article[]        @relation("ArticleUpdatedBy")
+  createdEvents         Event[]          @relation("EventCreatedBy")
+  updatedEvents         Event[]          @relation("EventUpdatedBy")
+  createdCourses        Course[]         @relation("CourseCreatedBy")
+  updatedCourses        Course[]         @relation("CourseUpdatedBy")
+  createdVacancies      Vacancy[]        @relation("VacancyCreatedBy")
+  updatedVacancies      Vacancy[]        @relation("VacancyUpdatedBy")
+  createdSuppliers      Supplier[]       @relation("SupplierCreatedBy")
+  updatedSuppliers      Supplier[]       @relation("SupplierUpdatedBy")
+  createdPartners       Partner[]        @relation("PartnerCreatedBy")
+  updatedPartners       Partner[]        @relation("PartnerUpdatedBy")
+  forwardedApplications Application[]    @relation("ApplicationForwardedBy")
 
   @@index([role])
   @@index([status])
@@ -134,6 +145,31 @@ model Profile {
   @@index([cityId])
 }
 
+model BusinessAccount {
+  id            String                @id @default(cuid())
+  ownerId       String                @unique
+  companyName   String
+  slug          String                @unique
+  status        BusinessAccountStatus @default(PENDING)
+  cityId        String?
+  contactPerson String?
+  phone         String?
+  telegram      String?
+  websiteUrl    String?
+  description   String?
+  adminNotes    String?
+  createdAt     DateTime              @default(now())
+  updatedAt     DateTime              @updatedAt
+
+  owner        User          @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  city         City?         @relation(fields: [cityId], references: [id], onDelete: SetNull)
+  applications Application[]
+
+  @@index([status, createdAt])
+  @@index([cityId, status])
+  @@index([companyName])
+}
+
 model City {
   id        String   @id @default(cuid())
   name      String
@@ -144,13 +180,14 @@ model City {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  profiles     Profile[]
-  articles     Article[]
-  events       Event[]
-  courses      Course[]
-  vacancies    Vacancy[]
-  suppliers    Supplier[]
-  applications Application[]
+  profiles         Profile[]
+  businessAccounts BusinessAccount[]
+  articles         Article[]
+  events           Event[]
+  courses          Course[]
+  vacancies        Vacancy[]
+  suppliers        Supplier[]
+  applications     Application[]
 
   @@index([isActive, sortOrder])
 }
@@ -452,6 +489,7 @@ model Application {
   telegram          String?
   cityId            String?
   vacancyId         String?
+  businessAccountId String?
   resumeFileId      String?
   payload           Json?
   consentAcceptedAt DateTime?
@@ -462,18 +500,21 @@ model Application {
   forwardedAt       DateTime?
   forwardedById     String?
   internalNotes     String?
+  businessNotes     String?
   createdAt         DateTime          @default(now())
   updatedAt         DateTime          @updatedAt
 
-  city        City?         @relation(fields: [cityId], references: [id], onDelete: SetNull)
-  vacancy     Vacancy?      @relation(fields: [vacancyId], references: [id], onDelete: SetNull)
-  resumeFile  UploadedFile? @relation("ApplicationResumeFile", fields: [resumeFileId], references: [id], onDelete: SetNull)
-  forwardedBy User?         @relation("ApplicationForwardedBy", fields: [forwardedById], references: [id], onDelete: SetNull)
+  city            City?            @relation(fields: [cityId], references: [id], onDelete: SetNull)
+  vacancy         Vacancy?         @relation(fields: [vacancyId], references: [id], onDelete: SetNull)
+  businessAccount BusinessAccount? @relation(fields: [businessAccountId], references: [id], onDelete: SetNull)
+  resumeFile      UploadedFile?    @relation("ApplicationResumeFile", fields: [resumeFileId], references: [id], onDelete: SetNull)
+  forwardedBy     User?            @relation("ApplicationForwardedBy", fields: [forwardedById], references: [id], onDelete: SetNull)
 
   @@index([type, status])
   @@index([status, createdAt])
   @@index([cityId, status])
   @@index([vacancyId, status])
+  @@index([businessAccountId, status])
   @@index([email])
   @@index([phone])
   @@index([createdAt])

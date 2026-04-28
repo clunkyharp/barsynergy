@@ -26,6 +26,7 @@ Docker exposes local PostgreSQL on `localhost:55432`.
 
 - Local uploads use `STORAGE_DRIVER=local` and `LOCAL_UPLOAD_DIR=./uploads`.
 - Local public application forms are enabled with `APPLICATION_FORMS_ENABLED=true`.
+- The public business-access request at `/auth/register` uses the same personal-data form gate.
 - `uploads/` is ignored by git.
 - New migration creation is a separate step during schema changes: `npm run prisma:migrate:dev -- --name <migration_name>`.
 - Expired sessions can be cleaned with `npm run session:cleanup:expired`. In production, schedule it with cron, systemd timer or the hosting scheduler after `DATABASE_URL` is available in the app environment.

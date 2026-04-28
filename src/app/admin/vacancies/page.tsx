@@ -26,6 +26,7 @@ import {
 } from '@/lib/admin/content-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
 import { prisma } from '@/lib/db/prisma';
+import { isVacancyPosition, vacancyPositionValues } from '@/lib/vacancies/positions';
 
 const ADMIN_VACANCIES_PATH = '/admin/vacancies';
 
@@ -75,7 +76,7 @@ export default async function AdminVacanciesPage({ searchParams }: AdminVacancie
   return (
     <div className="space-y-8">
       <header>
-        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Admin / Vacancies</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Админка / Вакансии</p>
         <h1 className="mt-2 text-3xl font-semibold">Вакансии</h1>
         <p className="mt-2 max-w-2xl text-[var(--muted)]">
           Создание, публикация и архивация вакансий для публичного раздела.
@@ -91,14 +92,21 @@ export default async function AdminVacanciesPage({ searchParams }: AdminVacancie
           <FormField htmlFor="vacancy-title" label="Заголовок">
             <Input id="vacancy-title" name="title" required minLength={2} maxLength={160} />
           </FormField>
-          <FormField htmlFor="vacancy-slug" label="Slug">
+          <FormField htmlFor="vacancy-slug" label="Адрес страницы">
             <Input id="vacancy-slug" name="slug" maxLength={180} placeholder="Если пусто, будет создан из заголовка" />
           </FormField>
           <FormField htmlFor="vacancy-companyName" label="Компания">
             <Input id="vacancy-companyName" name="companyName" required minLength={2} maxLength={180} />
           </FormField>
           <FormField htmlFor="vacancy-position" label="Позиция">
-            <Input id="vacancy-position" name="position" required minLength={2} maxLength={180} />
+            <Select id="vacancy-position" name="position" required defaultValue="">
+              <option value="">Выберите позицию</option>
+              {vacancyPositionValues.map((position) => (
+                <option key={position} value={position}>
+                  {position}
+                </option>
+              ))}
+            </Select>
           </FormField>
           <FormField htmlFor="vacancy-categoryId" label="Категория">
             <Select id="vacancy-categoryId" name="categoryId" defaultValue="">
@@ -260,7 +268,7 @@ export default async function AdminVacanciesPage({ searchParams }: AdminVacancie
                                 defaultValue={vacancy.title}
                               />
                             </FormField>
-                            <FormField htmlFor={`vacancy-slug-${vacancy.id}`} label="Slug">
+                            <FormField htmlFor={`vacancy-slug-${vacancy.id}`} label="Адрес страницы">
                               <Input id={`vacancy-slug-${vacancy.id}`} name="slug" maxLength={180} defaultValue={vacancy.slug} />
                             </FormField>
                             <FormField htmlFor={`vacancy-company-${vacancy.id}`} label="Компания">
@@ -274,14 +282,19 @@ export default async function AdminVacanciesPage({ searchParams }: AdminVacancie
                               />
                             </FormField>
                             <FormField htmlFor={`vacancy-position-${vacancy.id}`} label="Позиция">
-                              <Input
+                              <Select
                                 id={`vacancy-position-${vacancy.id}`}
                                 name="position"
                                 required
-                                minLength={2}
-                                maxLength={180}
-                                defaultValue={vacancy.position}
-                              />
+                                defaultValue={isVacancyPosition(vacancy.position) ? vacancy.position : ''}
+                              >
+                                <option value="">Выберите позицию</option>
+                                {vacancyPositionValues.map((position) => (
+                                  <option key={position} value={position}>
+                                    {position}
+                                  </option>
+                                ))}
+                              </Select>
                             </FormField>
                             <FormField htmlFor={`vacancy-category-${vacancy.id}`} label="Категория">
                               <Select id={`vacancy-category-${vacancy.id}`} name="categoryId" defaultValue={vacancy.categoryId ?? ''}>

@@ -4,5 +4,5 @@ import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
 export default async function AdminCategoriesPage() {
   await requireAdminSectionAccess('categories');
 
-  return <AdminPlaceholderPage title="Categories" description="Категории для статей, событий, курсов и каталогов." />;
+  return <AdminPlaceholderPage title="Категории" description="Категории для статей, событий, курсов и каталогов." />;
 }

@@ -78,10 +78,10 @@ export default async function AdminApplicationsPage({ searchParams }: AdminAppli
   return (
     <div className="space-y-8">
       <header>
-        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Admin / Applications</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Админка / Заявки</p>
         <h1 className="mt-2 text-3xl font-semibold">Заявки</h1>
         <p className="mt-2 max-w-2xl text-[var(--muted)]">
-          Единая очередь Phase 3 для публичных форм. Список скрывает контактные данные до появления детальной карточки.
+          Единая очередь третьей фазы для публичных форм. Список скрывает контактные данные до появления детальной карточки.
         </p>
       </header>
 

@@ -17,7 +17,7 @@ export function SupplierApplicationForm({ enabled, result, utm, cities }: Public
     <PublicApplicationSection
       eyebrow="Поставщики / Заявка"
       title="Подать поставщика на модерацию"
-      description="Форма для компаний и сервисов, которые хотят попасть в каталог после ручной проверки редакцией."
+      description="Форма для компаний и сервисов, которые хотят попасть в каталог после ручной проверки."
       enabled={enabled}
       result={result}
     >
