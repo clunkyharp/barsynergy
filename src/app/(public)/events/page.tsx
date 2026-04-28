@@ -1,13 +1,27 @@
 import { EditorialPublicPage } from '@/components/public/editorial-public-page';
+import { EventApplicationForm } from '@/components/public/event-application-form';
 import { PublishedContentSection } from '@/components/public/published-content-section';
+import { arePublicApplicationFormsEnabled } from '@/lib/applications/public-forms';
+import { getApplicationCityOptions } from '@/lib/applications/form-options';
+import {
+  getPublicApplicationResult,
+  getPublicApplicationUtm,
+  stripPublicApplicationResultParams
+} from '@/lib/applications/public-form-helpers';
 import { getPublishedEvents, type PublicContentSearchParams } from '@/lib/public/content';
+import { getEnv } from '@/lib/validation/env';
 
 type EventsPageProps = {
   searchParams?: Promise<PublicContentSearchParams>;
 };
 
 export default async function EventsPage({ searchParams }: EventsPageProps) {
-  const content = await getPublishedEvents((await searchParams) ?? {});
+  const params = (await searchParams) ?? {};
+  const [content, cities] = await Promise.all([
+    getPublishedEvents(stripPublicApplicationResultParams(params)),
+    getApplicationCityOptions()
+  ]);
+  const applicationFormsEnabled = arePublicApplicationFormsEnabled(getEnv());
 
   return (
     <>
@@ -47,6 +61,12 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
         emptyDescription="Опубликованные события появятся здесь после публикации через админку."
         emptyTitle="Пока нет опубликованных событий"
         title="Афиша"
+      />
+      <EventApplicationForm
+        enabled={applicationFormsEnabled}
+        result={getPublicApplicationResult(params)}
+        utm={getPublicApplicationUtm(params)}
+        cities={cities}
       />
     </>
   );

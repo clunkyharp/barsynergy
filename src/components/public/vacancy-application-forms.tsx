@@ -156,7 +156,12 @@ export function VacancyApplicationForms({ enabled, options, result, utm }: Vacan
               </div>
             </form>
 
-            <form action={submitVacancyResponseApplication} className="border border-black/20 bg-white p-5" id="vacancy-response">
+            <form
+              action={submitVacancyResponseApplication}
+              className="border border-black/20 bg-white p-5"
+              encType="multipart/form-data"
+              id="vacancy-response"
+            >
               <HiddenUtmFields utm={utm} />
               <HoneypotField id="vacancy-response-website" />
               <h3 className="text-lg font-semibold uppercase leading-7">Откликнуться на вакансию</h3>
@@ -217,6 +222,15 @@ export function VacancyApplicationForms({ enabled, options, result, utm }: Vacan
                 </FormField>
                 <FormField htmlFor="resumeUrl" label="Ссылка на резюме">
                   <Input id="resumeUrl" name="resumeUrl" maxLength={500} type="url" disabled={!hasVacancies} />
+                </FormField>
+                <FormField htmlFor="resumeFile" label="Файл резюме">
+                  <Input
+                    id="resumeFile"
+                    name="resumeFile"
+                    type="file"
+                    accept=".pdf,.doc,.docx,.rtf,.odt,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/rtf,text/rtf,application/vnd.oasis.opendocument.text"
+                    disabled={!hasVacancies}
+                  />
                 </FormField>
                 <label className="flex items-start gap-3 text-sm leading-6 text-[var(--muted)]">
                   <Checkbox name="consent" required value="accepted" disabled={!hasVacancies} />

@@ -1,13 +1,27 @@
 import { EditorialPublicPage } from '@/components/public/editorial-public-page';
 import { PublishedContentSection } from '@/components/public/published-content-section';
+import { SupplierApplicationForm } from '@/components/public/supplier-application-form';
+import { arePublicApplicationFormsEnabled } from '@/lib/applications/public-forms';
+import { getApplicationCityOptions } from '@/lib/applications/form-options';
+import {
+  getPublicApplicationResult,
+  getPublicApplicationUtm,
+  stripPublicApplicationResultParams
+} from '@/lib/applications/public-form-helpers';
 import { getPublishedSuppliers, type PublicContentSearchParams } from '@/lib/public/content';
+import { getEnv } from '@/lib/validation/env';
 
 type SuppliersPageProps = {
   searchParams?: Promise<PublicContentSearchParams>;
 };
 
 export default async function SuppliersPage({ searchParams }: SuppliersPageProps) {
-  const content = await getPublishedSuppliers((await searchParams) ?? {});
+  const params = (await searchParams) ?? {};
+  const [content, cities] = await Promise.all([
+    getPublishedSuppliers(stripPublicApplicationResultParams(params)),
+    getApplicationCityOptions()
+  ]);
+  const applicationFormsEnabled = arePublicApplicationFormsEnabled(getEnv());
 
   return (
     <>
@@ -47,6 +61,12 @@ export default async function SuppliersPage({ searchParams }: SuppliersPageProps
         emptyDescription="Опубликованные поставщики появятся здесь после публикации через админку."
         emptyTitle="Пока нет опубликованных поставщиков"
         title="Каталог"
+      />
+      <SupplierApplicationForm
+        enabled={applicationFormsEnabled}
+        result={getPublicApplicationResult(params)}
+        utm={getPublicApplicationUtm(params)}
+        cities={cities}
       />
     </>
   );

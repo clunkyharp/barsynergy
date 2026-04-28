@@ -167,6 +167,9 @@ export default async function AdminApplicationDetailPage({ params, searchParams 
               <p className="mt-2 text-[var(--muted)]">
                 {application.resumeFile.originalName} / {application.resumeFile.mimeType} / {application.resumeFile.size} bytes
               </p>
+              <Button className="mt-4" href={`${currentPath}/resume`} variant="secondary">
+                Скачать файл
+              </Button>
             </div>
           ) : null}
         </Card>

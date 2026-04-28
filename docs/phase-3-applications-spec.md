@@ -1,13 +1,13 @@
 # Phase 3 Applications And Vacancy Flows Mini-Spec
 
-Status: implementation started; owner decision captured on 2026-04-27; first vacancy application slice implemented on 2026-04-28.
+Status: implemented at source level on 2026-04-28; owner decision captured on 2026-04-27.
 
 This document freezes the Phase 3 application workflow before schema and form implementation starts.
 
 Implementation note:
 
-- The first implemented slice covers the unified `Application` schema, public `vacancy_submission` and `vacancy_response` forms on `/vacancies`, admin list/detail review, status changes, internal notes and manual `forwarded_to_employer` metadata.
-- It does not yet include remaining public forms, notifications, private resume file upload or the shortcut that turns a `vacancy_submission` application into a published `Vacancy`.
+- The final implementation covers the unified `Application` schema, all planned public form types, public `vacancy_submission` and `vacancy_response` forms on `/vacancies`, admin list/detail review, status changes, internal notes, manual `forwarded_to_employer` metadata, private resume upload plus admin-only download, optional SMTP user confirmations, optional Telegram admin notifications and the shortcut that turns a `vacancy_submission` application into a draft `Vacancy`.
+- Production form rendering still stays behind `APPLICATION_FORMS_ENABLED=false` until legal approval is complete.
 
 ## Goal
 
@@ -169,7 +169,7 @@ If resume files are implemented in Phase 3:
 - link files to the application through a dedicated field or relation;
 - delete or archive according to the future retention policy.
 
-If private file delivery is not ready, keep resume file upload out of the first slice and allow a resume URL plus message instead.
+The current implementation keeps both options: a private resume file upload and a fallback resume URL field.
 
 ## Employer Forwarding
 

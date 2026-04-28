@@ -29,6 +29,7 @@ Docker exposes local PostgreSQL on `localhost:55432`.
 - `uploads/` is ignored by git.
 - New migration creation is a separate step during schema changes: `npm run prisma:migrate:dev -- --name <migration_name>`.
 - Expired sessions can be cleaned with `npm run session:cleanup:expired`. In production, schedule it with cron, systemd timer or the hosting scheduler after `DATABASE_URL` is available in the app environment.
+- Public application throttle records can be cleaned with `npm run application:cleanup:throttles`. If public forms are enabled in production, schedule it together with session cleanup.
 - Real user data, dumps and secrets must not be committed.
 
 ## Related Docs

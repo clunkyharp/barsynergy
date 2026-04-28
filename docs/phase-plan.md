@@ -132,6 +132,7 @@ Current status:
 - public read queries are connected to articles, events, education, vacancies, suppliers and partners and return only `published` records with pagination that preserves active filters;
 - public content image upload route is implemented at `/admin/uploads/content-image`;
 - Phase 2 admin UX follow-up is implemented: edit forms, cover image upload slots, admin list pagination and admin action success/error states;
+- article full editing is moving to a dedicated `/admin/articles/[articleId]` screen so the list page does not render long article bodies inline;
 - final Phase 2 runtime/admin review passed on 2026-04-27 with authenticated Playwright create smoke for all content sections, cover-image upload smoke, public route smoke and article publish/archive public-visibility smoke;
 - Phase 2 is complete for the current MVP content/admin contract.
 
@@ -175,16 +176,20 @@ Implementation contract:
 Current status:
 
 - Phase 3 mini-spec is drafted;
-- first Phase 3 vacancy application slice is implemented;
+- Phase 3 implementation is complete for the current MVP contract;
 - `Application`, `ApplicationType` and `ApplicationStatus` are backed by migration `20260428102117_phase3_applications_foundation`;
 - public application throttling is backed by migration `20260428123000_phase3_application_guards`;
-- public `/vacancies` supports `vacancy_submission` and `vacancy_response` forms with consent and UTM capture;
+- stale public application throttle records can be cleaned with `npm run application:cleanup:throttles`;
+- public `/vacancies` supports `vacancy_submission` and `vacancy_response` forms with consent, UTM capture and private resume file upload;
+- public `/education`, `/events`, `/suppliers`, `/partners` and `/contacts` now write the remaining MVP request types into `Application`;
 - production public forms are disabled by default through `APPLICATION_FORMS_ENABLED`;
 - public forms include a honeypot and per-client rate limit;
 - admin `/admin/applications` supports list/detail review, status changes, internal notes and manual `forwarded_to_employer` metadata;
 - employer-forwarding status is guarded so only consented vacancy responses can be marked as forwarded;
 - admins can create a draft `Vacancy` from a `vacancy_submission` application and keep publication manual;
-- remaining Phase 3 forms, notifications and private resume uploads are not implemented yet;
+- admin-only private resume download is available at `/admin/applications/[applicationId]/resume`;
+- user confirmation emails are sent when `SMTP_*` is configured, and short Telegram admin notifications are sent when Telegram env config is present;
+- Phase 3 is complete at source level for the current MVP applications contract;
 - legal text still needs owner/legal review before personal-data forms are enabled in production.
 
 ## Phase 4: Auth And Business Account First

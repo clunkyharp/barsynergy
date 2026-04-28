@@ -1,13 +1,27 @@
 import { EditorialPublicPage } from '@/components/public/editorial-public-page';
+import { EducationApplicationForms } from '@/components/public/education-application-forms';
 import { PublishedContentSection } from '@/components/public/published-content-section';
+import { arePublicApplicationFormsEnabled } from '@/lib/applications/public-forms';
+import { getApplicationCityOptions } from '@/lib/applications/form-options';
+import {
+  getPublicApplicationResult,
+  getPublicApplicationUtm,
+  stripPublicApplicationResultParams
+} from '@/lib/applications/public-form-helpers';
 import { getPublishedCourses, type PublicContentSearchParams } from '@/lib/public/content';
+import { getEnv } from '@/lib/validation/env';
 
 type EducationPageProps = {
   searchParams?: Promise<PublicContentSearchParams>;
 };
 
 export default async function EducationPage({ searchParams }: EducationPageProps) {
-  const content = await getPublishedCourses((await searchParams) ?? {});
+  const params = (await searchParams) ?? {};
+  const [content, cities] = await Promise.all([
+    getPublishedCourses(stripPublicApplicationResultParams(params)),
+    getApplicationCityOptions()
+  ]);
+  const applicationFormsEnabled = arePublicApplicationFormsEnabled(getEnv());
 
   return (
     <>
@@ -47,6 +61,12 @@ export default async function EducationPage({ searchParams }: EducationPageProps
         emptyDescription="Опубликованные образовательные программы появятся здесь после публикации через админку."
         emptyTitle="Пока нет опубликованных курсов"
         title="Программы"
+      />
+      <EducationApplicationForms
+        enabled={applicationFormsEnabled}
+        result={getPublicApplicationResult(params)}
+        utm={getPublicApplicationUtm(params)}
+        cities={cities}
       />
     </>
   );

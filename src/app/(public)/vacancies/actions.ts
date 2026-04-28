@@ -1,8 +1,23 @@
 'use server';
 
 import { redirect } from 'next/navigation';
-import { ApplicationStatus, ApplicationType, ContentStatus } from '@prisma/client';
+import { ApplicationType, ContentStatus } from '@prisma/client';
 import { z } from 'zod';
+import { deleteUploadedFileIfUnused } from '@/lib/admin/content-utils';
+import { createPublicApplication } from '@/lib/applications/create-public-application';
+import {
+  assertActiveCity,
+  baseContactSchema,
+  formatPublicApplicationActionError,
+  getPublicApplicationResultPath,
+  getString,
+  nullableString,
+  optionalString,
+  PERSONAL_DATA_CONSENT_TEXT,
+  utmSchema,
+  VACANCY_RESPONSE_CONSENT_TEXT
+} from '@/lib/applications/public-form-helpers';
+import { uploadPrivateResumeFromFormData } from '@/lib/applications/private-resume-files';
 import {
   assertPublicApplicationFormsEnabled,
   assertPublicApplicationSubmissionAllowed,
@@ -11,78 +26,6 @@ import {
 import { prisma } from '@/lib/db/prisma';
 
 const VACANCIES_PATH = '/vacancies';
-const PERSONAL_DATA_CONSENT_TEXT =
-  'Согласие на обработку персональных данных для обработки заявки через BARSYNERGY.';
-const VACANCY_RESPONSE_CONSENT_TEXT =
-  'Согласие на обработку персональных данных и передачу отклика работодателю по выбранной вакансии после проверки BARSYNERGY.';
-
-function getString(formData: FormData, key: string) {
-  const value = formData.get(key);
-  return typeof value === 'string' ? value : '';
-}
-
-function optionalString(value: string) {
-  const trimmed = value.trim();
-  return trimmed.length > 0 ? trimmed : undefined;
-}
-
-function nullableString(value?: string) {
-  return value && value.length > 0 ? value : null;
-}
-
-function actionResultPath(result: { type: 'success' | 'error'; message: string }) {
-  const url = new URL(VACANCIES_PATH, 'http://localhost');
-  url.searchParams.set(result.type === 'success' ? 'applicationSuccess' : 'applicationError', result.message);
-  url.hash = 'applications';
-  return `${url.pathname}${url.search}${url.hash}`;
-}
-
-function redirectWithApplicationResult(result: { type: 'success' | 'error'; message: string }): never {
-  redirect(actionResultPath(result));
-}
-
-function formatApplicationActionError(error: unknown) {
-  if (error instanceof Error) {
-    if (error.message.includes('contact is required')) {
-      return 'Укажите хотя бы один контакт: email, телефон или Telegram.';
-    }
-
-    if (error.message.includes('city is invalid')) {
-      return 'Выбранный город недоступен.';
-    }
-
-    if (error.message.includes('vacancy is invalid')) {
-      return 'Выбранная вакансия недоступна для отклика.';
-    }
-
-    if (error.message.includes('application forms are disabled')) {
-      return 'Формы заявок временно закрыты.';
-    }
-
-    if (error.message.includes('application rate limit exceeded')) {
-      return 'Слишком много отправок за короткое время. Повторите попытку позже.';
-    }
-  }
-
-  if (error instanceof z.ZodError) {
-    return 'Проверьте обязательные поля и согласие на обработку данных.';
-  }
-
-  return 'Не удалось отправить заявку. Проверьте данные и повторите попытку.';
-}
-
-const baseContactSchema = z
-  .object({
-    email: z.string().trim().email().max(180).optional(),
-    phone: z.string().trim().max(80).optional(),
-    telegram: z.string().trim().max(80).optional()
-  });
-
-const utmSchema = z.object({
-  utmSource: z.string().trim().max(160).optional(),
-  utmMedium: z.string().trim().max(160).optional(),
-  utmCampaign: z.string().trim().max(160).optional()
-});
 
 const vacancySubmissionSchema = baseContactSchema
   .merge(utmSchema)
@@ -113,19 +56,8 @@ const vacancyResponseSchema = baseContactSchema
   })
   .refine((data) => data.email || data.phone || data.telegram, { message: 'contact is required' });
 
-async function assertActiveCity(cityId?: string) {
-  if (!cityId) {
-    return;
-  }
-
-  const city = await prisma.city.findFirst({
-    where: { id: cityId, isActive: true },
-    select: { id: true }
-  });
-
-  if (!city) {
-    throw new Error('city is invalid');
-  }
+function redirectWithApplicationResult(result: { type: 'success' | 'error'; message: string }): never {
+  redirect(getPublicApplicationResultPath(VACANCIES_PATH, result));
 }
 
 export async function submitVacancyPlacementApplication(formData: FormData) {
@@ -158,39 +90,37 @@ export async function submitVacancyPlacementApplication(formData: FormData) {
       utmCampaign: optionalString(getString(formData, 'utmCampaign'))
     });
 
-    await assertActiveCity(parsed.cityId);
+    const city = await assertActiveCity(parsed.cityId);
     await assertPublicApplicationSubmissionAllowed(ApplicationType.VACANCY_SUBMISSION);
-
-    await prisma.application.create({
-      data: {
-        type: ApplicationType.VACANCY_SUBMISSION,
-        status: ApplicationStatus.NEW,
-        subject: `${parsed.companyName}: ${parsed.position}`,
-        message: parsed.details,
-        name: parsed.contactName,
-        email: nullableString(parsed.email),
-        phone: nullableString(parsed.phone),
-        telegram: nullableString(parsed.telegram),
-        cityId: nullableString(parsed.cityId),
-        consentAcceptedAt: new Date(),
-        consentText: PERSONAL_DATA_CONSENT_TEXT,
-        utmSource: nullableString(parsed.utmSource),
-        utmMedium: nullableString(parsed.utmMedium),
-        utmCampaign: nullableString(parsed.utmCampaign),
-        payload: {
-          companyName: parsed.companyName,
-          position: parsed.position,
-          employmentType: parsed.employmentType ?? null,
-          salaryLabel: parsed.salaryLabel ?? null,
-          experienceLabel: parsed.experienceLabel ?? null,
-          shortDescription: parsed.shortDescription
-        }
+    await createPublicApplication({
+      type: ApplicationType.VACANCY_SUBMISSION,
+      subject: `${parsed.companyName}: ${parsed.position}`,
+      message: parsed.details,
+      name: parsed.contactName,
+      email: nullableString(parsed.email),
+      phone: nullableString(parsed.phone),
+      telegram: nullableString(parsed.telegram),
+      cityId: city?.id ?? null,
+      cityName: city?.name,
+      consentText: PERSONAL_DATA_CONSENT_TEXT,
+      utm: {
+        source: nullableString(parsed.utmSource),
+        medium: nullableString(parsed.utmMedium),
+        campaign: nullableString(parsed.utmCampaign)
+      },
+      payload: {
+        companyName: parsed.companyName,
+        position: parsed.position,
+        employmentType: parsed.employmentType ?? null,
+        salaryLabel: parsed.salaryLabel ?? null,
+        experienceLabel: parsed.experienceLabel ?? null,
+        shortDescription: parsed.shortDescription
       }
     });
 
     result = { type: 'success', message: 'Заявка на размещение вакансии отправлена.' };
   } catch (error) {
-    result = { type: 'error', message: formatApplicationActionError(error) };
+    result = { type: 'error', message: formatPublicApplicationActionError(error) };
   }
 
   redirectWithApplicationResult(result);
@@ -198,6 +128,7 @@ export async function submitVacancyPlacementApplication(formData: FormData) {
 
 export async function submitVacancyResponseApplication(formData: FormData) {
   let result: { type: 'success' | 'error'; message: string };
+  let uploadedResumeFileId: string | null = null;
 
   try {
     assertPublicApplicationFormsEnabled();
@@ -223,7 +154,7 @@ export async function submitVacancyResponseApplication(formData: FormData) {
       utmCampaign: optionalString(getString(formData, 'utmCampaign'))
     });
 
-    const [vacancy] = await Promise.all([
+    const [vacancy, city] = await Promise.all([
       prisma.vacancy.findFirst({
         where: { id: parsed.vacancyId, status: ContentStatus.PUBLISHED },
         select: { id: true, title: true, companyName: true }
@@ -236,35 +167,38 @@ export async function submitVacancyResponseApplication(formData: FormData) {
     }
 
     await assertPublicApplicationSubmissionAllowed(ApplicationType.VACANCY_RESPONSE);
+    const uploadedResume = await uploadPrivateResumeFromFormData(formData, 'resumeFile');
+    uploadedResumeFileId = uploadedResume?.id ?? null;
 
-    await prisma.application.create({
-      data: {
-        type: ApplicationType.VACANCY_RESPONSE,
-        status: ApplicationStatus.NEW,
-        subject: `Отклик: ${vacancy.title}`,
-        message: parsed.message,
-        name: parsed.candidateName,
-        email: nullableString(parsed.email),
-        phone: nullableString(parsed.phone),
-        telegram: nullableString(parsed.telegram),
-        cityId: nullableString(parsed.cityId),
-        vacancyId: vacancy.id,
-        consentAcceptedAt: new Date(),
-        consentText: VACANCY_RESPONSE_CONSENT_TEXT,
-        utmSource: nullableString(parsed.utmSource),
-        utmMedium: nullableString(parsed.utmMedium),
-        utmCampaign: nullableString(parsed.utmCampaign),
-        payload: {
-          roleSummary: parsed.roleSummary,
-          resumeUrl: parsed.resumeUrl ?? null,
-          employerCompanyName: vacancy.companyName
-        }
+    await createPublicApplication({
+      type: ApplicationType.VACANCY_RESPONSE,
+      subject: `Отклик: ${vacancy.title}`,
+      message: parsed.message,
+      name: parsed.candidateName,
+      email: nullableString(parsed.email),
+      phone: nullableString(parsed.phone),
+      telegram: nullableString(parsed.telegram),
+      cityId: city?.id ?? null,
+      cityName: city?.name,
+      vacancyId: vacancy.id,
+      resumeFileId: uploadedResume?.id ?? null,
+      consentText: VACANCY_RESPONSE_CONSENT_TEXT,
+      utm: {
+        source: nullableString(parsed.utmSource),
+        medium: nullableString(parsed.utmMedium),
+        campaign: nullableString(parsed.utmCampaign)
+      },
+      payload: {
+        roleSummary: parsed.roleSummary,
+        resumeUrl: parsed.resumeUrl ?? null,
+        employerCompanyName: vacancy.companyName
       }
     });
 
     result = { type: 'success', message: 'Отклик отправлен на проверку.' };
   } catch (error) {
-    result = { type: 'error', message: formatApplicationActionError(error) };
+    await deleteUploadedFileIfUnused(uploadedResumeFileId);
+    result = { type: 'error', message: formatPublicApplicationActionError(error) };
   }
 
   redirectWithApplicationResult(result);

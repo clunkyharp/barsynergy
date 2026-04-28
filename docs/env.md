@@ -37,6 +37,14 @@ Production with `STORAGE_DRIVER=local` is invalid and must fail at startup.
 - Production must keep `APPLICATION_FORMS_ENABLED=false` until owner/legal approval is complete.
 - If the variable is omitted, production disables these forms by default and non-production keeps them enabled.
 
+## Optional Notifications
+
+Public application notifications are optional and env-driven.
+
+- User confirmation emails are sent only when `SMTP_HOST`, `SMTP_PORT` and `SMTP_FROM` are configured. `SMTP_USER` and `SMTP_PASSWORD` are used when the SMTP server requires auth.
+- Short Telegram admin notifications are sent only when both `TELEGRAM_BOT_TOKEN` and `TELEGRAM_ADMIN_CHAT_ID` are configured.
+- Missing notification env must not block public form submission.
+
 ## Secret Hygiene
 
 Do not commit real `.env`, tokens, passwords, private keys, production configs, dumps or user files.
