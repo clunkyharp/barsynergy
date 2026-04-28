@@ -23,7 +23,7 @@ export default async function AdminPage() {
     <div>
       <h1 className="text-3xl font-semibold">Админка</h1>
       <p className="mt-2 max-w-2xl text-[var(--muted)]">
-        Phase 0 содержит только shell. CRUD, роли и защита страниц добавляются в следующих фазах.
+        Контентные разделы подключены в Phase 2. Очередь заявок подготовлена как первый срез Phase 3.
       </p>
       <div className="mt-8 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
         {modules.map((module) => (
@@ -35,8 +35,8 @@ export default async function AdminPage() {
       </div>
       <div className="mt-8">
         <EmptyState
-          title="Данные еще не подключены"
-          description="Модели контента и заявки появятся в Phase 2 и Phase 3."
+          title="Рабочие разделы подключаются по фазам"
+          description="Контент уже управляется через админку, заявки пока доступны как пустая очередь до подключения публичных форм."
           actionLabel="Перейти к разделам"
           actionHref="/admin/articles"
         />

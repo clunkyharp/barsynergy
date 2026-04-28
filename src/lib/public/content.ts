@@ -27,6 +27,19 @@ export type PublishedContentList = {
   params: PublicContentSearchParams;
 };
 
+export type VacancyApplicationFormOptions = {
+  cities: {
+    id: string;
+    name: string;
+  }[];
+  vacancies: {
+    id: string;
+    title: string;
+    companyName: string;
+    cityName?: string;
+  }[];
+};
+
 function firstParam(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] : value;
 }
@@ -288,6 +301,37 @@ export async function getPublishedVacancies(params: PublicContentSearchParams = 
       imageUrl: publicImageUrl(vacancy.coverImage)
     }))
   });
+}
+
+export async function getVacancyApplicationFormOptions(): Promise<VacancyApplicationFormOptions> {
+  const [cities, vacancies] = await Promise.all([
+    prisma.city.findMany({
+      where: { isActive: true },
+      orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
+      select: { id: true, name: true }
+    }),
+    prisma.vacancy.findMany({
+      where: { status: ContentStatus.PUBLISHED },
+      orderBy: [{ sortOrder: 'asc' }, { publishedAt: 'desc' }, { createdAt: 'desc' }],
+      take: 100,
+      select: {
+        id: true,
+        title: true,
+        companyName: true,
+        city: { select: { name: true } }
+      }
+    })
+  ]);
+
+  return {
+    cities,
+    vacancies: vacancies.map((vacancy) => ({
+      id: vacancy.id,
+      title: vacancy.title,
+      companyName: vacancy.companyName,
+      cityName: vacancy.city?.name
+    }))
+  };
 }
 
 export async function getPublishedSuppliers(params: PublicContentSearchParams = {}) {

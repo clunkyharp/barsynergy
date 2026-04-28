@@ -5,6 +5,7 @@ import { CategoryType, ContentStatus } from '@prisma/client';
 import { z } from 'zod';
 import {
   contentStatusValues,
+  deleteUploadedFileIfUnused,
   formatAdminActionError,
   getString,
   initialPublicationDates,
@@ -90,6 +91,7 @@ async function assertCourseRelations(input: { categoryId?: string; cityId?: stri
 export async function createCourse(formData: FormData) {
   const redirectTo = safeAdminRedirectPath(formData, ADMIN_COURSES_PATH);
   let result: { type: 'success' | 'error'; message: string };
+  let uploadedCoverImageId: string | null = null;
 
   try {
     const user = await requireAdminSectionAccess('courses');
@@ -120,7 +122,13 @@ export async function createCourse(formData: FormData) {
 
     const [uniqueSlug, coverImageId] = await Promise.all([
       getUniqueCourseSlug(slug),
-      resolveCoverImageId({ formData, userId: user.id })
+      resolveCoverImageId({
+        formData,
+        userId: user.id,
+        onUploadedImageId: (fileId) => {
+          uploadedCoverImageId = fileId;
+        }
+      })
     ]);
 
     await prisma.course.create({
@@ -147,6 +155,7 @@ export async function createCourse(formData: FormData) {
     revalidatePath(ADMIN_COURSES_PATH);
     result = { type: 'success', message: 'Курс создан.' };
   } catch (error) {
+    await deleteUploadedFileIfUnused(uploadedCoverImageId);
     result = { type: 'error', message: formatAdminActionError(error) };
   }
 
@@ -156,6 +165,8 @@ export async function createCourse(formData: FormData) {
 export async function updateCourse(formData: FormData) {
   const redirectTo = safeAdminRedirectPath(formData, ADMIN_COURSES_PATH);
   let result: { type: 'success' | 'error'; message: string };
+  let uploadedCoverImageId: string | null = null;
+  let previousCoverImageId: string | null = null;
 
   try {
     const user = await requireAdminSectionAccess('courses');
@@ -188,6 +199,7 @@ export async function updateCourse(formData: FormData) {
       where: { id: parsed.courseId },
       select: { coverImageId: true, publishedAt: true }
     });
+    previousCoverImageId = existingCourse.coverImageId;
 
     await assertCourseRelations({
       categoryId: parsed.categoryId,
@@ -199,7 +211,10 @@ export async function updateCourse(formData: FormData) {
       resolveCoverImageId({
         formData,
         userId: user.id,
-        currentCoverImageId: existingCourse.coverImageId
+        currentCoverImageId: existingCourse.coverImageId,
+        onUploadedImageId: (fileId) => {
+          uploadedCoverImageId = fileId;
+        }
       })
     ]);
 
@@ -224,9 +239,14 @@ export async function updateCourse(formData: FormData) {
       }
     });
 
+    if (previousCoverImageId !== coverImageId) {
+      await deleteUploadedFileIfUnused(previousCoverImageId);
+    }
+
     revalidatePath(ADMIN_COURSES_PATH);
     result = { type: 'success', message: 'Курс обновлен.' };
   } catch (error) {
+    await deleteUploadedFileIfUnused(uploadedCoverImageId);
     result = { type: 'error', message: formatAdminActionError(error) };
   }
 
@@ -279,12 +299,21 @@ export async function deleteCourseDraft(formData: FormData) {
       courseId: getString(formData, 'courseId')
     });
 
+    const deletedCourses = await prisma.course.findMany({
+      where: {
+        id: parsed.courseId,
+        status: { not: ContentStatus.PUBLISHED }
+      },
+      select: { coverImageId: true }
+    });
+
     await prisma.course.deleteMany({
       where: {
         id: parsed.courseId,
         status: { not: ContentStatus.PUBLISHED }
       }
     });
+    await Promise.all(deletedCourses.map((course) => deleteUploadedFileIfUnused(course.coverImageId)));
 
     revalidatePath(ADMIN_COURSES_PATH);
     result = { type: 'success', message: 'Черновик курса удален.' };

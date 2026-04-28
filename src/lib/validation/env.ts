@@ -2,6 +2,9 @@ import { z } from 'zod';
 
 const emptyToUndefined = (value: unknown) => (value === '' ? undefined : value);
 const optionalString = z.preprocess(emptyToUndefined, z.string().optional());
+const optionalBooleanFlag = z
+  .preprocess(emptyToUndefined, z.enum(['true', 'false']).optional())
+  .transform((value) => (value === undefined ? undefined : value === 'true'));
 
 const envSchema = z
   .object({
@@ -24,7 +27,8 @@ const envSchema = z
     SMTP_FROM: optionalString,
     TELEGRAM_BOT_TOKEN: optionalString,
     TELEGRAM_ADMIN_CHAT_ID: optionalString,
-    YANDEX_METRIKA_ID: optionalString
+    YANDEX_METRIKA_ID: optionalString,
+    APPLICATION_FORMS_ENABLED: optionalBooleanFlag
   })
   .superRefine((env, ctx) => {
     const isProductionBuild = process.env.NEXT_PHASE === 'phase-production-build' || process.env.npm_lifecycle_event === 'build';

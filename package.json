@@ -10,6 +10,7 @@
     "build": "./node_modules/.bin/prisma generate && ./node_modules/.bin/next build",
     "start": "./node_modules/.bin/next start",
     "lint": "./node_modules/.bin/eslint .",
+    "test": "node --test tests/*.test.mjs",
     "typecheck": "./node_modules/.bin/next typegen && ./node_modules/.bin/tsc --noEmit",
     "session:cleanup:expired": "node ./scripts/cleanup-expired-sessions.mjs",
     "prisma:generate": "./node_modules/.bin/prisma generate",

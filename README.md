@@ -39,6 +39,7 @@ Local PostgreSQL from Docker is exposed on `localhost:55432` to avoid conflicts 
 
 ```bash
 npm run lint
+npm test
 npm run typecheck
 npm run build
 npx prisma validate

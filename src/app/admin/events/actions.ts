@@ -5,6 +5,7 @@ import { CategoryType, ContentStatus } from '@prisma/client';
 import { z } from 'zod';
 import {
   contentStatusValues,
+  deleteUploadedFileIfUnused,
   formatAdminActionError,
   getString,
   initialPublicationDates,
@@ -91,6 +92,7 @@ async function assertEventRelations(input: { categoryId?: string; cityId?: strin
 export async function createEvent(formData: FormData) {
   const redirectTo = safeAdminRedirectPath(formData, ADMIN_EVENTS_PATH);
   let result: { type: 'success' | 'error'; message: string };
+  let uploadedCoverImageId: string | null = null;
 
   try {
     const user = await requireAdminSectionAccess('events');
@@ -126,7 +128,13 @@ export async function createEvent(formData: FormData) {
 
     const [uniqueSlug, coverImageId] = await Promise.all([
       getUniqueEventSlug(slug),
-      resolveCoverImageId({ formData, userId: user.id })
+      resolveCoverImageId({
+        formData,
+        userId: user.id,
+        onUploadedImageId: (fileId) => {
+          uploadedCoverImageId = fileId;
+        }
+      })
     ]);
 
     await prisma.event.create({
@@ -154,6 +162,7 @@ export async function createEvent(formData: FormData) {
     revalidatePath(ADMIN_EVENTS_PATH);
     result = { type: 'success', message: 'Событие создано.' };
   } catch (error) {
+    await deleteUploadedFileIfUnused(uploadedCoverImageId);
     result = { type: 'error', message: formatAdminActionError(error) };
   }
 
@@ -163,6 +172,8 @@ export async function createEvent(formData: FormData) {
 export async function updateEvent(formData: FormData) {
   const redirectTo = safeAdminRedirectPath(formData, ADMIN_EVENTS_PATH);
   let result: { type: 'success' | 'error'; message: string };
+  let uploadedCoverImageId: string | null = null;
+  let previousCoverImageId: string | null = null;
 
   try {
     const user = await requireAdminSectionAccess('events');
@@ -200,6 +211,7 @@ export async function updateEvent(formData: FormData) {
       where: { id: parsed.eventId },
       select: { coverImageId: true, publishedAt: true }
     });
+    previousCoverImageId = existingEvent.coverImageId;
 
     await assertEventRelations({
       categoryId: parsed.categoryId,
@@ -211,7 +223,10 @@ export async function updateEvent(formData: FormData) {
       resolveCoverImageId({
         formData,
         userId: user.id,
-        currentCoverImageId: existingEvent.coverImageId
+        currentCoverImageId: existingEvent.coverImageId,
+        onUploadedImageId: (fileId) => {
+          uploadedCoverImageId = fileId;
+        }
       })
     ]);
 
@@ -237,9 +252,14 @@ export async function updateEvent(formData: FormData) {
       }
     });
 
+    if (previousCoverImageId !== coverImageId) {
+      await deleteUploadedFileIfUnused(previousCoverImageId);
+    }
+
     revalidatePath(ADMIN_EVENTS_PATH);
     result = { type: 'success', message: 'Событие обновлено.' };
   } catch (error) {
+    await deleteUploadedFileIfUnused(uploadedCoverImageId);
     result = { type: 'error', message: formatAdminActionError(error) };
   }
 
@@ -292,12 +312,21 @@ export async function deleteEventDraft(formData: FormData) {
       eventId: getString(formData, 'eventId')
     });
 
+    const deletedEvents = await prisma.event.findMany({
+      where: {
+        id: parsed.eventId,
+        status: { not: ContentStatus.PUBLISHED }
+      },
+      select: { coverImageId: true }
+    });
+
     await prisma.event.deleteMany({
       where: {
         id: parsed.eventId,
         status: { not: ContentStatus.PUBLISHED }
       }
     });
+    await Promise.all(deletedEvents.map((event) => deleteUploadedFileIfUnused(event.coverImageId)));
 
     revalidatePath(ADMIN_EVENTS_PATH);
     result = { type: 'success', message: 'Черновик события удален.' };

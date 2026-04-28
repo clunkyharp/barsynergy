@@ -5,6 +5,7 @@ import { CategoryType, ContentStatus } from '@prisma/client';
 import { z } from 'zod';
 import {
   contentStatusValues,
+  deleteUploadedFileIfUnused,
   formatAdminActionError,
   getString,
   initialPublicationDates,
@@ -90,6 +91,7 @@ async function assertSupplierRelations(input: { categoryId?: string; cityId?: st
 export async function createSupplier(formData: FormData) {
   const redirectTo = safeAdminRedirectPath(formData, ADMIN_SUPPLIERS_PATH);
   let result: { type: 'success' | 'error'; message: string };
+  let uploadedCoverImageId: string | null = null;
 
   try {
     const user = await requireAdminSectionAccess('suppliers');
@@ -120,7 +122,13 @@ export async function createSupplier(formData: FormData) {
 
     const [uniqueSlug, coverImageId] = await Promise.all([
       getUniqueSupplierSlug(slug),
-      resolveCoverImageId({ formData, userId: user.id })
+      resolveCoverImageId({
+        formData,
+        userId: user.id,
+        onUploadedImageId: (fileId) => {
+          uploadedCoverImageId = fileId;
+        }
+      })
     ]);
 
     await prisma.supplier.create({
@@ -147,6 +155,7 @@ export async function createSupplier(formData: FormData) {
     revalidatePath(ADMIN_SUPPLIERS_PATH);
     result = { type: 'success', message: 'Поставщик создан.' };
   } catch (error) {
+    await deleteUploadedFileIfUnused(uploadedCoverImageId);
     result = { type: 'error', message: formatAdminActionError(error) };
   }
 
@@ -156,6 +165,8 @@ export async function createSupplier(formData: FormData) {
 export async function updateSupplier(formData: FormData) {
   const redirectTo = safeAdminRedirectPath(formData, ADMIN_SUPPLIERS_PATH);
   let result: { type: 'success' | 'error'; message: string };
+  let uploadedCoverImageId: string | null = null;
+  let previousCoverImageId: string | null = null;
 
   try {
     const user = await requireAdminSectionAccess('suppliers');
@@ -188,6 +199,7 @@ export async function updateSupplier(formData: FormData) {
       where: { id: parsed.supplierId },
       select: { coverImageId: true, publishedAt: true }
     });
+    previousCoverImageId = existingSupplier.coverImageId;
 
     await assertSupplierRelations({
       categoryId: parsed.categoryId,
@@ -199,7 +211,10 @@ export async function updateSupplier(formData: FormData) {
       resolveCoverImageId({
         formData,
         userId: user.id,
-        currentCoverImageId: existingSupplier.coverImageId
+        currentCoverImageId: existingSupplier.coverImageId,
+        onUploadedImageId: (fileId) => {
+          uploadedCoverImageId = fileId;
+        }
       })
     ]);
 
@@ -224,9 +239,14 @@ export async function updateSupplier(formData: FormData) {
       }
     });
 
+    if (previousCoverImageId !== coverImageId) {
+      await deleteUploadedFileIfUnused(previousCoverImageId);
+    }
+
     revalidatePath(ADMIN_SUPPLIERS_PATH);
     result = { type: 'success', message: 'Поставщик обновлен.' };
   } catch (error) {
+    await deleteUploadedFileIfUnused(uploadedCoverImageId);
     result = { type: 'error', message: formatAdminActionError(error) };
   }
 
@@ -279,12 +299,21 @@ export async function deleteSupplierDraft(formData: FormData) {
       supplierId: getString(formData, 'supplierId')
     });
 
+    const deletedSuppliers = await prisma.supplier.findMany({
+      where: {
+        id: parsed.supplierId,
+        status: { not: ContentStatus.PUBLISHED }
+      },
+      select: { coverImageId: true }
+    });
+
     await prisma.supplier.deleteMany({
       where: {
         id: parsed.supplierId,
         status: { not: ContentStatus.PUBLISHED }
       }
     });
+    await Promise.all(deletedSuppliers.map((supplier) => deleteUploadedFileIfUnused(supplier.coverImageId)));
 
     revalidatePath(ADMIN_SUPPLIERS_PATH);
     result = { type: 'success', message: 'Черновик поставщика удален.' };

@@ -45,6 +45,31 @@ enum ContentStatus {
   ARCHIVED  @map("archived")
 }
 
+enum ApplicationType {
+  COURSE_APPLICATION             @map("course_application")
+  EVENT_APPLICATION              @map("event_application")
+  VACANCY_SUBMISSION             @map("vacancy_submission")
+  VACANCY_RESPONSE               @map("vacancy_response")
+  SUPPLIER_SUBMISSION            @map("supplier_submission")
+  PARTNER_APPLICATION            @map("partner_application")
+  CONTACT_MESSAGE                @map("contact_message")
+  CORPORATE_TRAINING_APPLICATION @map("corporate_training_application")
+  CERTIFICATE_ORDER              @map("certificate_order")
+}
+
+enum ApplicationStatus {
+  NEW                   @map("new")
+  IN_REVIEW             @map("in_review")
+  CONTACTED             @map("contacted")
+  FORWARDED_TO_EMPLOYER @map("forwarded_to_employer")
+  PAYMENT_PENDING       @map("payment_pending")
+  PAID_MANUALLY         @map("paid_manually")
+  APPROVED              @map("approved")
+  REJECTED              @map("rejected")
+  COMPLETED             @map("completed")
+  ARCHIVED              @map("archived")
+}
+
 model User {
   id           String     @id @default(cuid())
   email        String     @unique
@@ -54,21 +79,22 @@ model User {
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
 
-  profile          Profile?
-  sessions         Session[]
-  uploadedFiles    UploadedFile[]
-  createdArticles  Article[]      @relation("ArticleCreatedBy")
-  updatedArticles  Article[]      @relation("ArticleUpdatedBy")
-  createdEvents    Event[]        @relation("EventCreatedBy")
-  updatedEvents    Event[]        @relation("EventUpdatedBy")
-  createdCourses   Course[]       @relation("CourseCreatedBy")
-  updatedCourses   Course[]       @relation("CourseUpdatedBy")
-  createdVacancies Vacancy[]      @relation("VacancyCreatedBy")
-  updatedVacancies Vacancy[]      @relation("VacancyUpdatedBy")
-  createdSuppliers Supplier[]     @relation("SupplierCreatedBy")
-  updatedSuppliers Supplier[]     @relation("SupplierUpdatedBy")
-  createdPartners  Partner[]      @relation("PartnerCreatedBy")
-  updatedPartners  Partner[]      @relation("PartnerUpdatedBy")
+  profile               Profile?
+  sessions              Session[]
+  uploadedFiles         UploadedFile[]
+  createdArticles       Article[]      @relation("ArticleCreatedBy")
+  updatedArticles       Article[]      @relation("ArticleUpdatedBy")
+  createdEvents         Event[]        @relation("EventCreatedBy")
+  updatedEvents         Event[]        @relation("EventUpdatedBy")
+  createdCourses        Course[]       @relation("CourseCreatedBy")
+  updatedCourses        Course[]       @relation("CourseUpdatedBy")
+  createdVacancies      Vacancy[]      @relation("VacancyCreatedBy")
+  updatedVacancies      Vacancy[]      @relation("VacancyUpdatedBy")
+  createdSuppliers      Supplier[]     @relation("SupplierCreatedBy")
+  updatedSuppliers      Supplier[]     @relation("SupplierUpdatedBy")
+  createdPartners       Partner[]      @relation("PartnerCreatedBy")
+  updatedPartners       Partner[]      @relation("PartnerUpdatedBy")
+  forwardedApplications Application[]  @relation("ApplicationForwardedBy")
 
   @@index([role])
   @@index([status])
@@ -118,12 +144,13 @@ model City {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  profiles  Profile[]
-  articles  Article[]
-  events    Event[]
-  courses   Course[]
-  vacancies Vacancy[]
-  suppliers Supplier[]
+  profiles     Profile[]
+  articles     Article[]
+  events       Event[]
+  courses      Course[]
+  vacancies    Vacancy[]
+  suppliers    Supplier[]
+  applications Application[]
 
   @@index([isActive, sortOrder])
 }
@@ -175,13 +202,14 @@ model UploadedFile {
   uploadedById  String?
   createdAt     DateTime       @default(now())
 
-  uploadedBy          User?      @relation(fields: [uploadedById], references: [id], onDelete: SetNull)
-  articleCoverImages  Article[]  @relation("ArticleCoverImage")
-  eventCoverImages    Event[]    @relation("EventCoverImage")
-  courseCoverImages   Course[]   @relation("CourseCoverImage")
-  vacancyCoverImages  Vacancy[]  @relation("VacancyCoverImage")
-  supplierCoverImages Supplier[] @relation("SupplierCoverImage")
-  partnerCoverImages  Partner[]  @relation("PartnerCoverImage")
+  uploadedBy          User?         @relation(fields: [uploadedById], references: [id], onDelete: SetNull)
+  articleCoverImages  Article[]     @relation("ArticleCoverImage")
+  eventCoverImages    Event[]       @relation("EventCoverImage")
+  courseCoverImages   Course[]      @relation("CourseCoverImage")
+  vacancyCoverImages  Vacancy[]     @relation("VacancyCoverImage")
+  supplierCoverImages Supplier[]    @relation("SupplierCoverImage")
+  partnerCoverImages  Partner[]     @relation("PartnerCoverImage")
+  resumeApplications  Application[] @relation("ApplicationResumeFile")
 
   @@index([fileKey])
   @@index([uploadedById])
@@ -330,11 +358,12 @@ model Vacancy {
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
 
-  coverImage UploadedFile? @relation("VacancyCoverImage", fields: [coverImageId], references: [id], onDelete: SetNull)
-  city       City?         @relation(fields: [cityId], references: [id], onDelete: SetNull)
-  category   Category?     @relation(fields: [categoryId], references: [id], onDelete: SetNull)
-  createdBy  User?         @relation("VacancyCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
-  updatedBy  User?         @relation("VacancyUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
+  coverImage   UploadedFile? @relation("VacancyCoverImage", fields: [coverImageId], references: [id], onDelete: SetNull)
+  city         City?         @relation(fields: [cityId], references: [id], onDelete: SetNull)
+  category     Category?     @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  createdBy    User?         @relation("VacancyCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  updatedBy    User?         @relation("VacancyUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
+  applications Application[]
 
   @@index([status, publishedAt])
   @@index([cityId, status])
@@ -409,4 +438,54 @@ model Partner {
   @@index([partnerType, status])
   @@index([isFeatured, status])
   @@index([sortOrder])
+}
+
+model Application {
+  id                String            @id @default(cuid())
+  type              ApplicationType
+  status            ApplicationStatus @default(NEW)
+  subject           String?
+  message           String?
+  name              String?
+  email             String?
+  phone             String?
+  telegram          String?
+  cityId            String?
+  vacancyId         String?
+  resumeFileId      String?
+  payload           Json?
+  consentAcceptedAt DateTime?
+  consentText       String?
+  utmSource         String?
+  utmMedium         String?
+  utmCampaign       String?
+  forwardedAt       DateTime?
+  forwardedById     String?
+  internalNotes     String?
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+
+  city        City?         @relation(fields: [cityId], references: [id], onDelete: SetNull)
+  vacancy     Vacancy?      @relation(fields: [vacancyId], references: [id], onDelete: SetNull)
+  resumeFile  UploadedFile? @relation("ApplicationResumeFile", fields: [resumeFileId], references: [id], onDelete: SetNull)
+  forwardedBy User?         @relation("ApplicationForwardedBy", fields: [forwardedById], references: [id], onDelete: SetNull)
+
+  @@index([type, status])
+  @@index([status, createdAt])
+  @@index([cityId, status])
+  @@index([vacancyId, status])
+  @@index([email])
+  @@index([phone])
+  @@index([createdAt])
+}
+
+model ApplicationSubmissionThrottle {
+  keyHash         String   @id
+  windowStartedAt DateTime
+  count           Int      @default(1)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([windowStartedAt])
+  @@index([updatedAt])
 }

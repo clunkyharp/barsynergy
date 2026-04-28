@@ -1,8 +1,13 @@
 # Phase 3 Applications And Vacancy Flows Mini-Spec
 
-Status: planned; owner decision captured on 2026-04-27.
+Status: implementation started; owner decision captured on 2026-04-27; first vacancy application slice implemented on 2026-04-28.
 
 This document freezes the Phase 3 application workflow before schema and form implementation starts.
+
+Implementation note:
+
+- The first implemented slice covers the unified `Application` schema, public `vacancy_submission` and `vacancy_response` forms on `/vacancies`, admin list/detail review, status changes, internal notes and manual `forwarded_to_employer` metadata.
+- It does not yet include remaining public forms, notifications, private resume file upload or the shortcut that turns a `vacancy_submission` application into a published `Vacancy`.
 
 ## Goal
 
@@ -228,6 +233,9 @@ The admin applications area needs:
 - Every public form with personal data must include an unchecked consent checkbox.
 - Vacancy response consent must explicitly mention transfer of candidate data to the employer for the selected vacancy.
 - Legal texts must be reviewed before forms collecting personal data are enabled in production.
+- Production must keep public application forms behind `APPLICATION_FORMS_ENABLED=false` until legal approval is complete.
+- Public application submissions must include at least a basic spam barrier: honeypot plus per-client rate limiting.
+- `forwarded_to_employer` is allowed only for `vacancy_response` applications linked to a published vacancy context with accepted consent.
 - Personal data and private files must stay on Russia-compatible infrastructure.
 - Google Forms, Airtable, Notion, foreign CRM and foreign file storage must not be used for applications.
 
@@ -237,6 +245,7 @@ Before Phase 3 is marked done:
 
 ```bash
 npm run lint
+npm test
 npm run typecheck
 npm run build
 ./node_modules/.bin/prisma validate
@@ -248,6 +257,10 @@ Additional expected checks:
 - invalid application payloads fail server validation;
 - vacancy responses are linked to published vacancies only;
 - vacancy responses are not auto-forwarded to employers;
+- production gate prevents personal-data form rendering unless explicitly enabled;
+- spam honeypot submissions do not create `Application` records;
+- repeated public submissions are rate-limited;
+- invalid employer-forwarding status transitions are rejected;
 - private resume files are not publicly reachable;
 - admin can review, reject and forward a vacancy response;
 - admin can turn a business vacancy request into a `Vacancy`;

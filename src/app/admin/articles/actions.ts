@@ -5,6 +5,7 @@ import { CategoryType, ContentStatus } from '@prisma/client';
 import { z } from 'zod';
 import {
   contentStatusValues,
+  deleteUploadedFileIfUnused,
   formatAdminActionError,
   getString,
   initialPublicationDates,
@@ -88,6 +89,7 @@ async function assertArticleRelations(input: { categoryId?: string; cityId?: str
 export async function createArticle(formData: FormData) {
   const redirectTo = safeAdminRedirectPath(formData, ADMIN_ARTICLES_PATH);
   let result: { type: 'success' | 'error'; message: string };
+  let uploadedCoverImageId: string | null = null;
 
   try {
     const user = await requireAdminSectionAccess('articles');
@@ -116,7 +118,13 @@ export async function createArticle(formData: FormData) {
 
     const [uniqueSlug, coverImageId] = await Promise.all([
       getUniqueArticleSlug(slug),
-      resolveCoverImageId({ formData, userId: user.id })
+      resolveCoverImageId({
+        formData,
+        userId: user.id,
+        onUploadedImageId: (fileId) => {
+          uploadedCoverImageId = fileId;
+        }
+      })
     ]);
 
     await prisma.article.create({
@@ -141,6 +149,7 @@ export async function createArticle(formData: FormData) {
     revalidatePath(ADMIN_ARTICLES_PATH);
     result = { type: 'success', message: 'Статья создана.' };
   } catch (error) {
+    await deleteUploadedFileIfUnused(uploadedCoverImageId);
     result = { type: 'error', message: formatAdminActionError(error) };
   }
 
@@ -150,6 +159,8 @@ export async function createArticle(formData: FormData) {
 export async function updateArticle(formData: FormData) {
   const redirectTo = safeAdminRedirectPath(formData, ADMIN_ARTICLES_PATH);
   let result: { type: 'success' | 'error'; message: string };
+  let uploadedCoverImageId: string | null = null;
+  let previousCoverImageId: string | null = null;
 
   try {
     const user = await requireAdminSectionAccess('articles');
@@ -180,6 +191,7 @@ export async function updateArticle(formData: FormData) {
       where: { id: parsed.articleId },
       select: { coverImageId: true, publishedAt: true }
     });
+    previousCoverImageId = existingArticle.coverImageId;
 
     await assertArticleRelations({
       categoryId: parsed.categoryId,
@@ -191,7 +203,10 @@ export async function updateArticle(formData: FormData) {
       resolveCoverImageId({
         formData,
         userId: user.id,
-        currentCoverImageId: existingArticle.coverImageId
+        currentCoverImageId: existingArticle.coverImageId,
+        onUploadedImageId: (fileId) => {
+          uploadedCoverImageId = fileId;
+        }
       })
     ]);
 
@@ -214,9 +229,14 @@ export async function updateArticle(formData: FormData) {
       }
     });
 
+    if (previousCoverImageId !== coverImageId) {
+      await deleteUploadedFileIfUnused(previousCoverImageId);
+    }
+
     revalidatePath(ADMIN_ARTICLES_PATH);
     result = { type: 'success', message: 'Статья обновлена.' };
   } catch (error) {
+    await deleteUploadedFileIfUnused(uploadedCoverImageId);
     result = { type: 'error', message: formatAdminActionError(error) };
   }
 
@@ -269,12 +289,21 @@ export async function deleteArticleDraft(formData: FormData) {
       articleId: getString(formData, 'articleId')
     });
 
+    const deletedArticles = await prisma.article.findMany({
+      where: {
+        id: parsed.articleId,
+        status: { not: ContentStatus.PUBLISHED }
+      },
+      select: { coverImageId: true }
+    });
+
     await prisma.article.deleteMany({
       where: {
         id: parsed.articleId,
         status: { not: ContentStatus.PUBLISHED }
       }
     });
+    await Promise.all(deletedArticles.map((article) => deleteUploadedFileIfUnused(article.coverImageId)));
 
     revalidatePath(ADMIN_ARTICLES_PATH);
     result = { type: 'success', message: 'Черновик статьи удален.' };

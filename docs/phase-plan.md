@@ -175,7 +175,15 @@ Implementation contract:
 Current status:
 
 - Phase 3 mini-spec is drafted;
-- implementation has not started;
+- first Phase 3 vacancy application slice is implemented;
+- `Application`, `ApplicationType` and `ApplicationStatus` are backed by migration `20260428102117_phase3_applications_foundation`;
+- public application throttling is backed by migration `20260428123000_phase3_application_guards`;
+- public `/vacancies` supports `vacancy_submission` and `vacancy_response` forms with consent and UTM capture;
+- production public forms are disabled by default through `APPLICATION_FORMS_ENABLED`;
+- public forms include a honeypot and per-client rate limit;
+- admin `/admin/applications` supports list/detail review, status changes, internal notes and manual `forwarded_to_employer` metadata;
+- employer-forwarding status is guarded so only consented vacancy responses can be marked as forwarded;
+- remaining Phase 3 forms, notifications, private resume uploads and create-vacancy-from-application workflow are not implemented yet;
 - legal text still needs owner/legal review before personal-data forms are enabled in production.
 
 ## Phase 4: Auth And Business Account First

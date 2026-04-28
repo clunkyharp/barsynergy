@@ -5,6 +5,7 @@ import { CategoryType, ContentStatus } from '@prisma/client';
 import { z } from 'zod';
 import {
   contentStatusValues,
+  deleteUploadedFileIfUnused,
   formatAdminActionError,
   getString,
   initialPublicationDates,
@@ -91,6 +92,7 @@ async function assertVacancyRelations(input: { categoryId?: string; cityId?: str
 export async function createVacancy(formData: FormData) {
   const redirectTo = safeAdminRedirectPath(formData, ADMIN_VACANCIES_PATH);
   let result: { type: 'success' | 'error'; message: string };
+  let uploadedCoverImageId: string | null = null;
 
   try {
     const user = await requireAdminSectionAccess('vacancies');
@@ -122,7 +124,13 @@ export async function createVacancy(formData: FormData) {
 
     const [uniqueSlug, coverImageId] = await Promise.all([
       getUniqueVacancySlug(slug),
-      resolveCoverImageId({ formData, userId: user.id })
+      resolveCoverImageId({
+        formData,
+        userId: user.id,
+        onUploadedImageId: (fileId) => {
+          uploadedCoverImageId = fileId;
+        }
+      })
     ]);
 
     await prisma.vacancy.create({
@@ -150,6 +158,7 @@ export async function createVacancy(formData: FormData) {
     revalidatePath(ADMIN_VACANCIES_PATH);
     result = { type: 'success', message: 'Вакансия создана.' };
   } catch (error) {
+    await deleteUploadedFileIfUnused(uploadedCoverImageId);
     result = { type: 'error', message: formatAdminActionError(error) };
   }
 
@@ -159,6 +168,8 @@ export async function createVacancy(formData: FormData) {
 export async function updateVacancy(formData: FormData) {
   const redirectTo = safeAdminRedirectPath(formData, ADMIN_VACANCIES_PATH);
   let result: { type: 'success' | 'error'; message: string };
+  let uploadedCoverImageId: string | null = null;
+  let previousCoverImageId: string | null = null;
 
   try {
     const user = await requireAdminSectionAccess('vacancies');
@@ -192,6 +203,7 @@ export async function updateVacancy(formData: FormData) {
       where: { id: parsed.vacancyId },
       select: { coverImageId: true, publishedAt: true }
     });
+    previousCoverImageId = existingVacancy.coverImageId;
 
     await assertVacancyRelations({
       categoryId: parsed.categoryId,
@@ -203,7 +215,10 @@ export async function updateVacancy(formData: FormData) {
       resolveCoverImageId({
         formData,
         userId: user.id,
-        currentCoverImageId: existingVacancy.coverImageId
+        currentCoverImageId: existingVacancy.coverImageId,
+        onUploadedImageId: (fileId) => {
+          uploadedCoverImageId = fileId;
+        }
       })
     ]);
 
@@ -229,9 +244,14 @@ export async function updateVacancy(formData: FormData) {
       }
     });
 
+    if (previousCoverImageId !== coverImageId) {
+      await deleteUploadedFileIfUnused(previousCoverImageId);
+    }
+
     revalidatePath(ADMIN_VACANCIES_PATH);
     result = { type: 'success', message: 'Вакансия обновлена.' };
   } catch (error) {
+    await deleteUploadedFileIfUnused(uploadedCoverImageId);
     result = { type: 'error', message: formatAdminActionError(error) };
   }
 
@@ -284,12 +304,21 @@ export async function deleteVacancyDraft(formData: FormData) {
       vacancyId: getString(formData, 'vacancyId')
     });
 
+    const deletedVacancies = await prisma.vacancy.findMany({
+      where: {
+        id: parsed.vacancyId,
+        status: { not: ContentStatus.PUBLISHED }
+      },
+      select: { coverImageId: true }
+    });
+
     await prisma.vacancy.deleteMany({
       where: {
         id: parsed.vacancyId,
         status: { not: ContentStatus.PUBLISHED }
       }
     });
+    await Promise.all(deletedVacancies.map((vacancy) => deleteUploadedFileIfUnused(vacancy.coverImageId)));
 
     revalidatePath(ADMIN_VACANCIES_PATH);
     result = { type: 'success', message: 'Черновик вакансии удален.' };

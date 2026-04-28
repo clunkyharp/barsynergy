@@ -17,6 +17,7 @@ DATABASE_URL=postgresql://barsynergy:<password>@postgres:5432/barsynergy
 STORAGE_DRIVER=s3
 S3_ENDPOINT=https://s3.twcstorage.ru
 S3_REGION=ru-1
+APPLICATION_FORMS_ENABLED=false
 POSTGRES_DB=barsynergy
 POSTGRES_USER=barsynergy
 POSTGRES_PASSWORD=<password>
@@ -27,6 +28,14 @@ POSTGRES_PASSWORD=<password>
 ## Storage Rule
 
 Production with `STORAGE_DRIVER=local` is invalid and must fail at startup.
+
+## Public Application Forms
+
+`APPLICATION_FORMS_ENABLED` controls public forms that collect personal data.
+
+- Local development can use `APPLICATION_FORMS_ENABLED=true`.
+- Production must keep `APPLICATION_FORMS_ENABLED=false` until owner/legal approval is complete.
+- If the variable is omitted, production disables these forms by default and non-production keeps them enabled.
 
 ## Secret Hygiene
 

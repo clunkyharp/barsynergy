@@ -5,6 +5,7 @@ import { CategoryType, ContentStatus } from '@prisma/client';
 import { z } from 'zod';
 import {
   contentStatusValues,
+  deleteUploadedFileIfUnused,
   formatAdminActionError,
   getString,
   initialPublicationDates,
@@ -76,6 +77,7 @@ async function assertPartnerRelations(input: { categoryId?: string }) {
 export async function createPartner(formData: FormData) {
   const redirectTo = safeAdminRedirectPath(formData, ADMIN_PARTNERS_PATH);
   let result: { type: 'success' | 'error'; message: string };
+  let uploadedCoverImageId: string | null = null;
 
   try {
     const user = await requireAdminSectionAccess('partners');
@@ -103,7 +105,13 @@ export async function createPartner(formData: FormData) {
 
     const [uniqueSlug, coverImageId] = await Promise.all([
       getUniquePartnerSlug(slug),
-      resolveCoverImageId({ formData, userId: user.id })
+      resolveCoverImageId({
+        formData,
+        userId: user.id,
+        onUploadedImageId: (fileId) => {
+          uploadedCoverImageId = fileId;
+        }
+      })
     ]);
 
     await prisma.partner.create({
@@ -128,6 +136,7 @@ export async function createPartner(formData: FormData) {
     revalidatePath(ADMIN_PARTNERS_PATH);
     result = { type: 'success', message: 'Партнер создан.' };
   } catch (error) {
+    await deleteUploadedFileIfUnused(uploadedCoverImageId);
     result = { type: 'error', message: formatAdminActionError(error) };
   }
 
@@ -137,6 +146,8 @@ export async function createPartner(formData: FormData) {
 export async function updatePartner(formData: FormData) {
   const redirectTo = safeAdminRedirectPath(formData, ADMIN_PARTNERS_PATH);
   let result: { type: 'success' | 'error'; message: string };
+  let uploadedCoverImageId: string | null = null;
+  let previousCoverImageId: string | null = null;
 
   try {
     const user = await requireAdminSectionAccess('partners');
@@ -167,6 +178,7 @@ export async function updatePartner(formData: FormData) {
       where: { id: parsed.partnerId },
       select: { coverImageId: true, publishedAt: true }
     });
+    previousCoverImageId = existingPartner.coverImageId;
 
     await assertPartnerRelations({
       categoryId: parsed.categoryId
@@ -177,7 +189,10 @@ export async function updatePartner(formData: FormData) {
       resolveCoverImageId({
         formData,
         userId: user.id,
-        currentCoverImageId: existingPartner.coverImageId
+        currentCoverImageId: existingPartner.coverImageId,
+        onUploadedImageId: (fileId) => {
+          uploadedCoverImageId = fileId;
+        }
       })
     ]);
 
@@ -200,9 +215,14 @@ export async function updatePartner(formData: FormData) {
       }
     });
 
+    if (previousCoverImageId !== coverImageId) {
+      await deleteUploadedFileIfUnused(previousCoverImageId);
+    }
+
     revalidatePath(ADMIN_PARTNERS_PATH);
     result = { type: 'success', message: 'Партнер обновлен.' };
   } catch (error) {
+    await deleteUploadedFileIfUnused(uploadedCoverImageId);
     result = { type: 'error', message: formatAdminActionError(error) };
   }
 
@@ -255,12 +275,21 @@ export async function deletePartnerDraft(formData: FormData) {
       partnerId: getString(formData, 'partnerId')
     });
 
+    const deletedPartners = await prisma.partner.findMany({
+      where: {
+        id: parsed.partnerId,
+        status: { not: ContentStatus.PUBLISHED }
+      },
+      select: { coverImageId: true }
+    });
+
     await prisma.partner.deleteMany({
       where: {
         id: parsed.partnerId,
         status: { not: ContentStatus.PUBLISHED }
       }
     });
+    await Promise.all(deletedPartners.map((partner) => deleteUploadedFileIfUnused(partner.coverImageId)));
 
     revalidatePath(ADMIN_PARTNERS_PATH);
     result = { type: 'success', message: 'Черновик партнера удален.' };

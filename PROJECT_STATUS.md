@@ -6,11 +6,11 @@ Last updated: 2026-04-28
 
 - Active branch: `dev`
 - Production branch: `prod`
-- Current work mode: `QA`
+- Current work mode: `IMPLEMENTATION`
 
 ## Current Phase
 
-Active phase: Phase 2 complete; Phase 3 readiness is next. Phase 1 public website MVP is complete. Phase 2 content/admin scope is implemented and runtime-verified for admin create flows, public published-only reads, upload boundary, pagination and publish/archive behavior. Phase 3 applications planning is drafted in `docs/phase-3-applications-spec.md`; business-account direction is captured in `docs/business-account-spec.md`; implementation has not started.
+Active phase: Phase 3 implementation has started. Phase 1 public website MVP is complete. Phase 2 content/admin scope is implemented and runtime-verified for admin create flows, public published-only reads, upload boundary, pagination and publish/archive behavior. The first Phase 3 vacancy application slice is implemented: `Application` schema foundation, `vacancy_submission`, `vacancy_response`, public vacancy forms, admin application list/detail, status processing and guarded manual employer-forwarding status metadata. Public personal-data forms are disabled by default in production until `APPLICATION_FORMS_ENABLED=true` is explicitly set. Business-account direction is captured in `docs/business-account-spec.md`.
 
 Phase 0 is implemented as the technical foundation:
 
@@ -79,13 +79,21 @@ Phase 2 content models are now present in Prisma and backed by migration `202604
 - `Supplier`;
 - `Partner`.
 
-The `Application` model remains planned for Phase 3.
+Phase 3 application models are now present in Prisma and backed by migration `20260428102117_phase3_applications_foundation`:
+
+- `Application`;
+- `ApplicationType`;
+- `ApplicationStatus`.
+
+Phase 3 public submission throttling is backed by migration `20260428123000_phase3_application_guards`:
+
+- `ApplicationSubmissionThrottle`.
 
 ## Next Planned Work
 
-1. Start a bounded Phase 3 implementation batch from `docs/phase-3-applications-spec.md` when the owner confirms the first slice.
+1. Continue Phase 3 with the next bounded applications slice: remaining public forms, create-vacancy-from-application workflow, notifications or private resume handling should be separate batches.
 2. Keep the first account/cabinet implementation business-only according to `docs/business-account-spec.md`.
-3. Keep legal approval as a blocker before enabling personal-data forms in production.
+3. Keep legal approval as a blocker before enabling `APPLICATION_FORMS_ENABLED=true` in production.
 4. Keep production TLS and production scheduler decisions as explicit blockers until owner input is available.
 
 ## Business Account Planning Update
@@ -106,6 +114,44 @@ Completed on 2026-04-27:
 - vacancy responses are planned as `vacancy_response`, linked to a published vacancy and reviewed by admin before employer transfer;
 - candidate resume data remains private application data in MVP, not a reusable public profile;
 - employer forwarding is an admin action and must not happen automatically before review and explicit candidate consent.
+
+## Phase 3 Vacancy Applications Implementation Update
+
+Completed on 2026-04-28:
+
+- `ApplicationType` and `ApplicationStatus` enums added.
+- `Application` model added with subject, message, contact fields, city/vacancy/resume relations, consent timestamp/text, UTM fields, forwarding metadata, internal notes and indexes.
+- Public `/vacancies` now includes two Phase 3 forms: vacancy placement request and vacancy response to a published vacancy.
+- Production rendering of these forms is gated by `APPLICATION_FORMS_ENABLED`; omitted production value disables them by default.
+- Public form actions include a honeypot and per-client rate limit backed by `ApplicationSubmissionThrottle`.
+- Vacancy placement creates `Application(type = vacancy_submission, status = new)` with consent and UTM capture.
+- Vacancy response creates `Application(type = vacancy_response, status = new)` linked only to a published vacancy.
+- Public response form is disabled when no published vacancies exist.
+- Admin `/admin/applications` now shows a paginated, filterable queue without exposing full contact data in table rows.
+- Admin `/admin/applications/[applicationId]` shows protected application detail, full private fields, payload, consent data, status controls and internal notes.
+- Marking an application as `forwarded_to_employer` is allowed only for consented vacancy responses and records `forwardedAt` and `forwardedById`; moving away from that status clears forwarding metadata.
+- Local public uploads under `STORAGE_DRIVER=local` are served through `/uploads/...` only when an `UploadedFile` record is public.
+- Replaced or failed admin cover uploads are cleaned up when no content record references the uploaded file.
+- Temporary browser-smoke data was created and cleaned up.
+
+Validation:
+
+- `./node_modules/.bin/prisma validate`;
+- `./node_modules/.bin/prisma migrate deploy`;
+- `npm test`;
+- `npm run typecheck`;
+- `npm run lint`;
+- `npm run build`;
+- authenticated HTTP smoke for `/admin/applications`;
+- Playwright browser smoke: public vacancy placement form created an application, public vacancy response form created an application, admin detail opened, status changed to `forwarded_to_employer` with forwarding metadata.
+
+Remaining Phase 3 gaps:
+
+- legal text still needs owner/legal review before `APPLICATION_FORMS_ENABLED=true` is allowed in production;
+- remaining application forms are not implemented yet;
+- private resume file upload is not implemented yet;
+- user confirmation notifications and Telegram/admin notifications are not implemented yet;
+- create-vacancy-from-application shortcut is not implemented yet.
 
 ## Phase 2 Database Update
 

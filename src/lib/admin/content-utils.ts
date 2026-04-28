@@ -247,10 +247,12 @@ export async function resolveCoverImageId(input: {
   formData: FormData;
   userId: string;
   currentCoverImageId?: string | null;
+  onUploadedImageId?: (fileId: string) => void;
 }) {
   const uploadedImage = await uploadPublicContentImageFromFormData(input.formData, 'coverImage', input.userId);
 
   if (uploadedImage) {
+    input.onUploadedImageId?.(uploadedImage.file.id);
     return uploadedImage.file.id;
   }
 
@@ -259,4 +261,52 @@ export async function resolveCoverImageId(input: {
   }
 
   return input.currentCoverImageId ?? null;
+}
+
+async function getUploadedFileReferenceCount(fileId: string) {
+  const [
+    articleCount,
+    eventCount,
+    courseCount,
+    vacancyCount,
+    supplierCount,
+    partnerCount,
+    resumeApplicationCount
+  ] = await Promise.all([
+    prisma.article.count({ where: { coverImageId: fileId } }),
+    prisma.event.count({ where: { coverImageId: fileId } }),
+    prisma.course.count({ where: { coverImageId: fileId } }),
+    prisma.vacancy.count({ where: { coverImageId: fileId } }),
+    prisma.supplier.count({ where: { coverImageId: fileId } }),
+    prisma.partner.count({ where: { coverImageId: fileId } }),
+    prisma.application.count({ where: { resumeFileId: fileId } })
+  ]);
+
+  return articleCount + eventCount + courseCount + vacancyCount + supplierCount + partnerCount + resumeApplicationCount;
+}
+
+export async function deleteUploadedFileIfUnused(fileId: string | null | undefined) {
+  if (!fileId) {
+    return;
+  }
+
+  const file = await prisma.uploadedFile.findUnique({
+    where: { id: fileId },
+    select: { id: true, fileKey: true, bucket: true }
+  });
+
+  if (!file || (await getUploadedFileReferenceCount(file.id)) > 0) {
+    return;
+  }
+
+  const { getStorageService } = await import('@/lib/storage/storage.service');
+  try {
+    await getStorageService().deleteFile({
+      fileKey: file.fileKey,
+      bucket: file.bucket ?? undefined
+    });
+    await prisma.uploadedFile.deleteMany({ where: { id: file.id } });
+  } catch (error) {
+    console.error('Failed to delete unused uploaded file.', error);
+  }
 }
