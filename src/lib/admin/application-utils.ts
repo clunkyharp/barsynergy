@@ -84,5 +84,9 @@ export function formatApplicationActionError(error: unknown) {
     return 'Передача работодателю доступна только для отклика на вакансию с зафиксированным согласием.';
   }
 
+  if (error instanceof Error && error.message.includes('vacancy draft')) {
+    return 'Черновик вакансии можно создать только из заявки на размещение вакансии с полными данными и согласием.';
+  }
+
   return 'Не удалось сохранить заявку. Проверьте данные и повторите попытку.';
 }

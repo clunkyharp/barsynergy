@@ -10,7 +10,7 @@ Last updated: 2026-04-28
 
 ## Current Phase
 
-Active phase: Phase 3 implementation has started. Phase 1 public website MVP is complete. Phase 2 content/admin scope is implemented and runtime-verified for admin create flows, public published-only reads, upload boundary, pagination and publish/archive behavior. The first Phase 3 vacancy application slice is implemented: `Application` schema foundation, `vacancy_submission`, `vacancy_response`, public vacancy forms, admin application list/detail, status processing and guarded manual employer-forwarding status metadata. Public personal-data forms are disabled by default in production until `APPLICATION_FORMS_ENABLED=true` is explicitly set. Business-account direction is captured in `docs/business-account-spec.md`.
+Active phase: Phase 3 implementation has started. Phase 1 public website MVP is complete. Phase 2 content/admin scope is implemented and runtime-verified for admin create flows, public published-only reads, upload boundary, pagination and publish/archive behavior. The first Phase 3 vacancy application slice is implemented: `Application` schema foundation, `vacancy_submission`, `vacancy_response`, public vacancy forms, admin application list/detail, status processing, guarded manual employer-forwarding status metadata and draft vacancy creation from vacancy placement requests. Public personal-data forms are disabled by default in production until `APPLICATION_FORMS_ENABLED=true` is explicitly set. Business-account direction is captured in `docs/business-account-spec.md`.
 
 Phase 0 is implemented as the technical foundation:
 
@@ -91,7 +91,7 @@ Phase 3 public submission throttling is backed by migration `20260428123000_phas
 
 ## Next Planned Work
 
-1. Continue Phase 3 with the next bounded applications slice: remaining public forms, create-vacancy-from-application workflow, notifications or private resume handling should be separate batches.
+1. Continue Phase 3 with the next bounded applications slice: remaining public forms, notifications or private resume handling should be separate batches.
 2. Keep the first account/cabinet implementation business-only according to `docs/business-account-spec.md`.
 3. Keep legal approval as a blocker before enabling `APPLICATION_FORMS_ENABLED=true` in production.
 4. Keep production TLS and production scheduler decisions as explicit blockers until owner input is available.
@@ -130,6 +130,7 @@ Completed on 2026-04-28:
 - Admin `/admin/applications` now shows a paginated, filterable queue without exposing full contact data in table rows.
 - Admin `/admin/applications/[applicationId]` shows protected application detail, full private fields, payload, consent data, status controls and internal notes.
 - Marking an application as `forwarded_to_employer` is allowed only for consented vacancy responses and records `forwardedAt` and `forwardedById`; moving away from that status clears forwarding metadata.
+- Admin can create a draft `Vacancy` from a `vacancy_submission` application; the application is linked to the draft and marked `approved`, while publication stays manual in `/admin/vacancies`.
 - Local public uploads under `STORAGE_DRIVER=local` are served through `/uploads/...` only when an `UploadedFile` record is public.
 - Replaced or failed admin cover uploads are cleaned up when no content record references the uploaded file.
 - Temporary browser-smoke data was created and cleaned up.
@@ -151,7 +152,6 @@ Remaining Phase 3 gaps:
 - remaining application forms are not implemented yet;
 - private resume file upload is not implemented yet;
 - user confirmation notifications and Telegram/admin notifications are not implemented yet;
-- create-vacancy-from-application shortcut is not implemented yet.
 
 ## Phase 2 Database Update
 

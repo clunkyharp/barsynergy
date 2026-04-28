@@ -1,6 +1,10 @@
 import { notFound } from 'next/navigation';
-import { ApplicationStatus } from '@prisma/client';
-import { updateApplicationInternalNotes, updateApplicationStatus } from '@/app/admin/applications/actions';
+import { ApplicationStatus, ApplicationType } from '@prisma/client';
+import {
+  createVacancyDraftFromApplication,
+  updateApplicationInternalNotes,
+  updateApplicationStatus
+} from '@/app/admin/applications/actions';
 import { AdminActionAlert, HiddenRedirect } from '@/components/admin/content-admin-controls';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -186,6 +190,33 @@ export default async function AdminApplicationDetailPage({ params, searchParams 
               <Button type="submit">Сохранить статус</Button>
             </form>
           </Card>
+
+          {application.type === ApplicationType.VACANCY_SUBMISSION ? (
+            <Card className="p-5">
+              <h2 className="text-lg font-semibold">Черновик вакансии</h2>
+              {application.vacancyId ? (
+                <div className="mt-4 grid gap-4 text-sm">
+                  <p className="text-[var(--muted)]">
+                    Вакансия уже связана с заявкой: {application.vacancy?.title ?? application.vacancyId}.
+                  </p>
+                  <Button href="/admin/vacancies" variant="secondary">
+                    Открыть вакансии
+                  </Button>
+                </div>
+              ) : (
+                <form action={createVacancyDraftFromApplication} className="mt-4 grid gap-4">
+                  <HiddenRedirect value={currentPath} />
+                  <input name="applicationId" type="hidden" value={application.id} />
+                  <p className="text-sm leading-6 text-[var(--muted)]">
+                    Создаст черновик вакансии из данных заявки. Публикация останется ручной в разделе вакансий.
+                  </p>
+                  <Button type="submit" variant="secondary">
+                    Создать черновик вакансии
+                  </Button>
+                </form>
+              )}
+            </Card>
+          ) : null}
 
           <Card className="p-5">
             <h2 className="text-lg font-semibold">Внутренняя заметка</h2>

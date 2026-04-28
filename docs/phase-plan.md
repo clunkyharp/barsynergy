@@ -183,7 +183,8 @@ Current status:
 - public forms include a honeypot and per-client rate limit;
 - admin `/admin/applications` supports list/detail review, status changes, internal notes and manual `forwarded_to_employer` metadata;
 - employer-forwarding status is guarded so only consented vacancy responses can be marked as forwarded;
-- remaining Phase 3 forms, notifications, private resume uploads and create-vacancy-from-application workflow are not implemented yet;
+- admins can create a draft `Vacancy` from a `vacancy_submission` application and keep publication manual;
+- remaining Phase 3 forms, notifications and private resume uploads are not implemented yet;
 - legal text still needs owner/legal review before personal-data forms are enabled in production.
 
 ## Phase 4: Auth And Business Account First

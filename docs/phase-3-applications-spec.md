@@ -263,5 +263,5 @@ Additional expected checks:
 - invalid employer-forwarding status transitions are rejected;
 - private resume files are not publicly reachable;
 - admin can review, reject and forward a vacancy response;
-- admin can turn a business vacancy request into a `Vacancy`;
+- admin can turn a business vacancy request into a draft `Vacancy` without automatic publication;
 - Telegram/admin notifications do not expose full personal data.
