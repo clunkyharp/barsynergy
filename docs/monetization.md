@@ -14,6 +14,10 @@ Use manual application processing for:
 - partner applications;
 - certificate orders.
 
+Vacancy placement starts as an application from a business. Admin review is required before a vacancy is published.
+
+The first private cabinet is planned for businesses only. General user profiles are deferred and remain a later product direction.
+
 ## Roadmap
 
 1. Applications without online payment.
@@ -22,6 +26,6 @@ Use manual application processing for:
 4. Partner packages.
 5. Online payments after legal and accounting review.
 6. Premium/subscription after regular audience appears.
-7. B2B cabinets after stable MVP.
+7. Business cabinet after the application flow is stable.
 
 Do not create payment tables before the payment phase.

@@ -1,6 +1,6 @@
 # Phase 2 Content And Admin Mini-Spec
 
-Status: ready for implementation planning.
+Status: implemented and final runtime/admin QA passed on 2026-04-27.
 
 This document freezes the Phase 2 contract before database and CRUD work starts.
 
@@ -298,4 +298,3 @@ Additional expected checks:
 - moderator cannot access users/taxonomy sections;
 - archive flow removes records from public lists;
 - image upload respects size and MIME limits.
-

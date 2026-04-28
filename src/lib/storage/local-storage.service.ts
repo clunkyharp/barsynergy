@@ -53,7 +53,7 @@ export class LocalStorageService implements StorageService {
   }
 
   private resolveUploadPath(fileKey: string) {
-    const uploadRoot = path.resolve(process.cwd(), this.env.LOCAL_UPLOAD_DIR);
+    const uploadRoot = path.resolve(this.env.LOCAL_UPLOAD_DIR);
     const absolutePath = path.resolve(uploadRoot, fileKey);
     const relativeToRoot = path.relative(uploadRoot, absolutePath);
 

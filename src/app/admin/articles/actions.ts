@@ -5,15 +5,21 @@ import { CategoryType, ContentStatus } from '@prisma/client';
 import { z } from 'zod';
 import {
   contentStatusValues,
+  formatAdminActionError,
   getString,
   initialPublicationDates,
   nullableString,
   optionalString,
+  redirectWithAdminActionResult,
+  resolveCoverImageId,
+  safeAdminRedirectPath,
   slugify,
   statusTransitionDates
 } from '@/lib/admin/content-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
 import { prisma } from '@/lib/db/prisma';
+
+const ADMIN_ARTICLES_PATH = '/admin/articles';
 
 const articleFormSchema = z.object({
   title: z.string().trim().min(2).max(160),
@@ -37,11 +43,16 @@ const deleteFormSchema = z.object({
   articleId: z.string().trim().min(1)
 });
 
-async function getUniqueArticleSlug(baseSlug: string) {
+async function getUniqueArticleSlug(baseSlug: string, excludeId?: string) {
   let candidate = baseSlug;
   let suffix = 2;
 
-  while (await prisma.article.findUnique({ where: { slug: candidate }, select: { id: true } })) {
+  while (
+    await prisma.article.findFirst({
+      where: { slug: candidate, id: excludeId ? { not: excludeId } : undefined },
+      select: { id: true }
+    })
+  ) {
     candidate = `${baseSlug}-${suffix}`;
     suffix += 1;
   }
@@ -75,91 +86,201 @@ async function assertArticleRelations(input: { categoryId?: string; cityId?: str
 }
 
 export async function createArticle(formData: FormData) {
-  const user = await requireAdminSectionAccess('articles');
-  const parsed = articleFormSchema.parse({
-    title: getString(formData, 'title'),
-    slug: optionalString(getString(formData, 'slug')),
-    summary: getString(formData, 'summary'),
-    body: getString(formData, 'body'),
-    status: getString(formData, 'status') || ContentStatus.DRAFT,
-    categoryId: optionalString(getString(formData, 'categoryId')),
-    cityId: optionalString(getString(formData, 'cityId')),
-    authorName: optionalString(getString(formData, 'authorName')),
-    sourceLabel: optionalString(getString(formData, 'sourceLabel')),
-    readingTimeMinutes: optionalString(getString(formData, 'readingTimeMinutes'))
-  });
-  const slug = slugify(parsed.slug ?? parsed.title);
+  const redirectTo = safeAdminRedirectPath(formData, ADMIN_ARTICLES_PATH);
+  let result: { type: 'success' | 'error'; message: string };
 
-  if (!slug) {
-    throw new Error('Article slug is required.');
+  try {
+    const user = await requireAdminSectionAccess('articles');
+    const parsed = articleFormSchema.parse({
+      title: getString(formData, 'title'),
+      slug: optionalString(getString(formData, 'slug')),
+      summary: getString(formData, 'summary'),
+      body: getString(formData, 'body'),
+      status: getString(formData, 'status') || ContentStatus.DRAFT,
+      categoryId: optionalString(getString(formData, 'categoryId')),
+      cityId: optionalString(getString(formData, 'cityId')),
+      authorName: optionalString(getString(formData, 'authorName')),
+      sourceLabel: optionalString(getString(formData, 'sourceLabel')),
+      readingTimeMinutes: optionalString(getString(formData, 'readingTimeMinutes'))
+    });
+    const slug = slugify(parsed.slug ?? parsed.title);
+
+    if (!slug) {
+      throw new Error('Article slug is required.');
+    }
+
+    await assertArticleRelations({
+      categoryId: parsed.categoryId,
+      cityId: parsed.cityId
+    });
+
+    const [uniqueSlug, coverImageId] = await Promise.all([
+      getUniqueArticleSlug(slug),
+      resolveCoverImageId({ formData, userId: user.id })
+    ]);
+
+    await prisma.article.create({
+      data: {
+        title: parsed.title,
+        slug: uniqueSlug,
+        summary: parsed.summary,
+        body: parsed.body,
+        status: parsed.status,
+        coverImageId,
+        categoryId: nullableString(parsed.categoryId),
+        cityId: nullableString(parsed.cityId),
+        authorName: nullableString(parsed.authorName),
+        sourceLabel: nullableString(parsed.sourceLabel),
+        readingTimeMinutes: parsed.readingTimeMinutes,
+        createdById: user.id,
+        updatedById: user.id,
+        ...initialPublicationDates(parsed.status)
+      }
+    });
+
+    revalidatePath(ADMIN_ARTICLES_PATH);
+    result = { type: 'success', message: 'Статья создана.' };
+  } catch (error) {
+    result = { type: 'error', message: formatAdminActionError(error) };
   }
 
-  await assertArticleRelations({
-    categoryId: parsed.categoryId,
-    cityId: parsed.cityId
-  });
+  redirectWithAdminActionResult(redirectTo, result);
+}
 
-  const uniqueSlug = await getUniqueArticleSlug(slug);
+export async function updateArticle(formData: FormData) {
+  const redirectTo = safeAdminRedirectPath(formData, ADMIN_ARTICLES_PATH);
+  let result: { type: 'success' | 'error'; message: string };
 
-  await prisma.article.create({
-    data: {
-      title: parsed.title,
-      slug: uniqueSlug,
-      summary: parsed.summary,
-      body: parsed.body,
-      status: parsed.status,
-      categoryId: nullableString(parsed.categoryId),
-      cityId: nullableString(parsed.cityId),
-      authorName: nullableString(parsed.authorName),
-      sourceLabel: nullableString(parsed.sourceLabel),
-      readingTimeMinutes: parsed.readingTimeMinutes,
-      createdById: user.id,
-      updatedById: user.id,
-      ...initialPublicationDates(parsed.status)
+  try {
+    const user = await requireAdminSectionAccess('articles');
+    const parsed = articleFormSchema
+      .extend({
+        articleId: z.string().trim().min(1)
+      })
+      .parse({
+        articleId: getString(formData, 'articleId'),
+        title: getString(formData, 'title'),
+        slug: optionalString(getString(formData, 'slug')),
+        summary: getString(formData, 'summary'),
+        body: getString(formData, 'body'),
+        status: getString(formData, 'status') || ContentStatus.DRAFT,
+        categoryId: optionalString(getString(formData, 'categoryId')),
+        cityId: optionalString(getString(formData, 'cityId')),
+        authorName: optionalString(getString(formData, 'authorName')),
+        sourceLabel: optionalString(getString(formData, 'sourceLabel')),
+        readingTimeMinutes: optionalString(getString(formData, 'readingTimeMinutes'))
+      });
+    const slug = slugify(parsed.slug ?? parsed.title);
+
+    if (!slug) {
+      throw new Error('Article slug is required.');
     }
-  });
 
-  revalidatePath('/admin/articles');
+    const existingArticle = await prisma.article.findUniqueOrThrow({
+      where: { id: parsed.articleId },
+      select: { coverImageId: true, publishedAt: true }
+    });
+
+    await assertArticleRelations({
+      categoryId: parsed.categoryId,
+      cityId: parsed.cityId
+    });
+
+    const [uniqueSlug, coverImageId] = await Promise.all([
+      getUniqueArticleSlug(slug, parsed.articleId),
+      resolveCoverImageId({
+        formData,
+        userId: user.id,
+        currentCoverImageId: existingArticle.coverImageId
+      })
+    ]);
+
+    await prisma.article.update({
+      where: { id: parsed.articleId },
+      data: {
+        title: parsed.title,
+        slug: uniqueSlug,
+        summary: parsed.summary,
+        body: parsed.body,
+        status: parsed.status,
+        coverImageId,
+        categoryId: nullableString(parsed.categoryId),
+        cityId: nullableString(parsed.cityId),
+        authorName: nullableString(parsed.authorName),
+        sourceLabel: nullableString(parsed.sourceLabel),
+        readingTimeMinutes: parsed.readingTimeMinutes,
+        updatedById: user.id,
+        ...statusTransitionDates(parsed.status, existingArticle.publishedAt)
+      }
+    });
+
+    revalidatePath(ADMIN_ARTICLES_PATH);
+    result = { type: 'success', message: 'Статья обновлена.' };
+  } catch (error) {
+    result = { type: 'error', message: formatAdminActionError(error) };
+  }
+
+  redirectWithAdminActionResult(redirectTo, result);
 }
 
 export async function updateArticleStatus(formData: FormData) {
-  const user = await requireAdminSectionAccess('articles');
-  const parsed = statusFormSchema.parse({
-    articleId: getString(formData, 'articleId'),
-    status: getString(formData, 'status')
-  });
+  const redirectTo = safeAdminRedirectPath(formData, ADMIN_ARTICLES_PATH);
+  let result: { type: 'success' | 'error'; message: string };
 
-  await prisma.$transaction(async (tx) => {
-    const article = await tx.article.findUniqueOrThrow({
-      where: { id: parsed.articleId },
-      select: { publishedAt: true }
+  try {
+    const user = await requireAdminSectionAccess('articles');
+    const parsed = statusFormSchema.parse({
+      articleId: getString(formData, 'articleId'),
+      status: getString(formData, 'status')
     });
 
-    await tx.article.update({
-      where: { id: parsed.articleId },
-      data: {
-        status: parsed.status,
-        updatedById: user.id,
-        ...statusTransitionDates(parsed.status, article.publishedAt)
-      }
-    });
-  });
+    await prisma.$transaction(async (tx) => {
+      const article = await tx.article.findUniqueOrThrow({
+        where: { id: parsed.articleId },
+        select: { publishedAt: true }
+      });
 
-  revalidatePath('/admin/articles');
+      await tx.article.update({
+        where: { id: parsed.articleId },
+        data: {
+          status: parsed.status,
+          updatedById: user.id,
+          ...statusTransitionDates(parsed.status, article.publishedAt)
+        }
+      });
+    });
+
+    revalidatePath(ADMIN_ARTICLES_PATH);
+    result = { type: 'success', message: 'Статус статьи обновлен.' };
+  } catch (error) {
+    result = { type: 'error', message: formatAdminActionError(error) };
+  }
+
+  redirectWithAdminActionResult(redirectTo, result);
 }
 
 export async function deleteArticleDraft(formData: FormData) {
-  await requireAdminSectionAccess('articles');
-  const parsed = deleteFormSchema.parse({
-    articleId: getString(formData, 'articleId')
-  });
+  const redirectTo = safeAdminRedirectPath(formData, ADMIN_ARTICLES_PATH);
+  let result: { type: 'success' | 'error'; message: string };
 
-  await prisma.article.deleteMany({
-    where: {
-      id: parsed.articleId,
-      status: { not: ContentStatus.PUBLISHED }
-    }
-  });
+  try {
+    await requireAdminSectionAccess('articles');
+    const parsed = deleteFormSchema.parse({
+      articleId: getString(formData, 'articleId')
+    });
 
-  revalidatePath('/admin/articles');
+    await prisma.article.deleteMany({
+      where: {
+        id: parsed.articleId,
+        status: { not: ContentStatus.PUBLISHED }
+      }
+    });
+
+    revalidatePath(ADMIN_ARTICLES_PATH);
+    result = { type: 'success', message: 'Черновик статьи удален.' };
+  } catch (error) {
+    result = { type: 'error', message: formatAdminActionError(error) };
+  }
+
+  redirectWithAdminActionResult(redirectTo, result);
 }

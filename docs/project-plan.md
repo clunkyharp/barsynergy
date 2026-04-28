@@ -268,6 +268,7 @@ Application statuses:
 new
 in_review
 contacted
+forwarded_to_employer
 payment_pending
 paid_manually
 approved
@@ -275,6 +276,30 @@ rejected
 completed
 archived
 ```
+
+Vacancy MVP rule:
+
+- business vacancy placement starts as `vacancy_submission`, not as direct public publishing;
+- admins review the business request and create or publish the `Vacancy` record manually;
+- candidate responses start as `vacancy_response` linked to a published vacancy;
+- candidate data and resumes are private application data, not public profile data;
+- vacancy responses are not sent to employers automatically;
+- admin forwards an approved response to the employer and records the status as `forwarded_to_employer`;
+- reusable saved resumes and "my applications" belong to Phase 4 user profile scope.
+
+## Accounts
+
+Owner decision on 2026-04-28:
+
+- the first private cabinet should be for businesses only;
+- candidate, student, community-member and general user profiles are not planned for the first account implementation;
+- general user profiles remain a future product direction and should not be removed from docs;
+- business account registration should start with an application or request, then admin approval, then login access;
+- business accounts must not publish vacancies or receive candidate personal data without admin review and candidate consent.
+
+Implementation contract:
+
+- [Business account mini-spec](business-account-spec.md)
 
 ## Monetization
 
@@ -295,6 +320,8 @@ Online payments require a separate mini-spec and legal review before implementat
 ## Related Docs
 
 - [Remediation plan](remediation-plan.md)
+- [Phase 3 applications and vacancy flows mini-spec](phase-3-applications-spec.md)
+- [Business account mini-spec](business-account-spec.md)
 - [Project audit workflow](audit-workflow.md)
 
 ## Roadmap
@@ -307,7 +334,9 @@ Phase 2: database models and content admin.
 
 Phase 3: applications and forms.
 
-Phase 4: auth and user profile.
+Phase 4: auth and first business account.
+
+Later phase: general user profile and "my applications" for non-business users.
 
 Phase 5: filters, search and directory quality.
 

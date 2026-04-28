@@ -160,6 +160,7 @@
         min-height: 44px;
         align-items: center;
         justify-content: center;
+        gap: 10px;
         border: 1px solid transparent;
         border-radius: 6px;
         padding: 10px 20px;
@@ -307,8 +308,11 @@
       }
 
       .field label {
-        font-size: 14px;
+        color: var(--muted);
+        font-size: 12px;
         font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
       }
 
       .input,
@@ -328,6 +332,7 @@
       .textarea {
         min-height: 112px;
         padding: 10px 12px;
+        resize: none;
       }
 
       .input:focus,
@@ -386,6 +391,88 @@
         font-size: 14px;
       }
 
+      .field-hint {
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .industry-form {
+        overflow: hidden;
+        border: 1px solid var(--line);
+        background: var(--surface);
+        box-shadow: 0 1px 2px rgba(20, 20, 18, 0.06);
+      }
+
+      .form-head {
+        display: grid;
+        gap: 8px;
+        background: var(--graphite);
+        color: #fff;
+        padding: 24px;
+      }
+
+      .form-head strong {
+        font-family: Oswald, "Arial Narrow", Impact, sans-serif;
+        font-size: clamp(28px, 4vw, 44px);
+        line-height: 0.95;
+        text-transform: uppercase;
+      }
+
+      .form-head p {
+        max-width: 640px;
+        margin: 0;
+        color: rgba(255, 255, 255, 0.72);
+      }
+
+      .form-head .eyebrow {
+        margin: 0;
+      }
+
+      .form-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .form-meta span {
+        border-right: 1px solid var(--line);
+        padding: 10px 14px;
+        color: var(--accent);
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .form-body {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 20px 16px;
+        padding: 24px;
+      }
+
+      .field-wide {
+        grid-column: 1 / -1;
+      }
+
+      .form-consent {
+        display: grid;
+        gap: 14px;
+        border-top: 1px solid var(--line);
+        padding: 20px 24px 24px;
+      }
+
+      .form-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        align-items: center;
+        justify-content: space-between;
+        border-top: 1px solid var(--line);
+        padding: 20px 24px;
+      }
+
       .editorial-row {
         display: grid;
         grid-template-columns: 0.22fr 0.5fr 0.78fr;
@@ -431,6 +518,10 @@
 
         .swatches {
           grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .form-body {
+          grid-template-columns: 1fr;
         }
       }
     </style>
@@ -542,67 +633,86 @@
             <p class="eyebrow">Forms</p>
             <h2 class="section-title">Поля и ошибки</h2>
           </div>
-          <form class="card grid" action="#">
-            <div class="field">
-              <label for="name">Имя</label>
-              <input class="input" id="name" value="Алексей">
+          <form class="industry-form" action="#">
+            <div class="form-head">
+              <p class="eyebrow" style="color: #fff;">Заявка</p>
+              <strong>Программа для барной команды</strong>
+              <p>Образец формы для будущих заявок: контакт, формат, город, детали запроса и обязательное согласие.</p>
             </div>
-            <div class="field">
-              <label for="name-disabled">Имя disabled</label>
-              <input class="input" id="name-disabled" value="Недоступно" disabled>
+            <div class="form-meta">
+              <span>СКФО</span>
+              <span>Обучение</span>
+              <span>Команда бара</span>
             </div>
-            <div class="field">
-              <label for="format">Формат участия</label>
-              <select class="select" id="format">
-                <option>Интенсив</option>
-                <option>Событие</option>
-                <option>Партнерство</option>
-              </select>
+            <div class="form-body">
+              <div class="field">
+                <label for="name">Контактное лицо</label>
+                <input class="input" id="name" value="Алексей">
+              </div>
+              <div class="field">
+                <label for="name-disabled">Номер заявки</label>
+                <input class="input" id="name-disabled" value="Создается автоматически" disabled>
+              </div>
+              <div class="field">
+                <label for="format">Формат участия</label>
+                <select class="select" id="format">
+                  <option>Командный интенсив</option>
+                  <option>Отраслевое событие</option>
+                  <option>Партнерская программа</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="format-disabled">Системная секция</label>
+                <select class="select" id="format-disabled" disabled>
+                  <option>Заявки на обучение</option>
+                </select>
+              </div>
+              <div class="field field-wide">
+                <label for="comment">Комментарий</label>
+                <textarea class="textarea" id="comment">Нужна программа для команды бара на 12 человек. Город - Ставрополь.</textarea>
+                <span class="field-hint">Укажите город, размер команды и удобный формат.</span>
+              </div>
+              <div class="field field-wide">
+                <label for="comment-disabled">Служебная заметка</label>
+                <textarea class="textarea" id="comment-disabled" disabled>Поле закрыто для публичной формы.</textarea>
+              </div>
+              <div class="field">
+                <label for="email">Email</label>
+                <input class="input" id="email" aria-invalid="true" aria-describedby="email-error" value="mail">
+                <span class="field-error" id="email-error">Введите корректный email.</span>
+              </div>
+              <div class="field">
+                <label for="format-error">Направление</label>
+                <select class="select" id="format-error" aria-invalid="true" aria-describedby="format-error-text">
+                  <option>Выберите направление</option>
+                </select>
+                <span class="field-error" id="format-error-text">Выберите доступное направление.</span>
+              </div>
+              <div class="field field-wide">
+                <label for="comment-error">Краткое описание</label>
+                <textarea class="textarea" id="comment-error" aria-invalid="true" aria-describedby="comment-error-text">Коротко</textarea>
+                <span class="field-error" id="comment-error-text">Добавьте детали запроса.</span>
+              </div>
             </div>
-            <div class="field">
-              <label for="format-disabled">Формат disabled</label>
-              <select class="select" id="format-disabled" disabled>
-                <option>Событие</option>
-              </select>
+            <div class="form-consent">
+              <label class="checkbox-row">
+                <input class="checkbox" type="checkbox" checked>
+                Согласие на обработку персональных данных выбрано
+              </label>
+              <label class="checkbox-row">
+                <input class="checkbox" type="checkbox" disabled>
+                Уведомление администратору недоступно
+              </label>
+              <label class="checkbox-row">
+                <input class="checkbox" type="checkbox" aria-invalid="true" aria-describedby="checkbox-error">
+                Подтверждаю согласие для отправки заявки
+              </label>
+              <span class="field-error" id="checkbox-error">Подтвердите согласие.</span>
             </div>
-            <div class="field">
-              <label for="comment">Комментарий</label>
-              <textarea class="textarea" id="comment">Нужна программа для команды бара.</textarea>
+            <div class="form-actions">
+              <button class="button button-primary" type="button">Отправить запрос</button>
+              <span class="field-hint">Публичная форма не отправляет данные в этом preview.</span>
             </div>
-            <div class="field">
-              <label for="comment-disabled">Комментарий disabled</label>
-              <textarea class="textarea" id="comment-disabled" disabled>Поле закрыто.</textarea>
-            </div>
-            <div class="field">
-              <label for="email">Email</label>
-              <input class="input" id="email" aria-invalid="true" aria-describedby="email-error" value="mail">
-              <span class="field-error" id="email-error">Введите корректный email.</span>
-            </div>
-            <div class="field">
-              <label for="format-error">Формат с ошибкой</label>
-              <select class="select" id="format-error" aria-invalid="true" aria-describedby="format-error-text">
-                <option>Выберите формат</option>
-              </select>
-              <span class="field-error" id="format-error-text">Выберите доступный формат.</span>
-            </div>
-            <div class="field">
-              <label for="comment-error">Комментарий с ошибкой</label>
-              <textarea class="textarea" id="comment-error" aria-invalid="true" aria-describedby="comment-error-text">Коротко</textarea>
-              <span class="field-error" id="comment-error-text">Добавьте детали запроса.</span>
-            </div>
-            <label class="checkbox-row">
-              <input class="checkbox" type="checkbox" checked>
-              Согласие выбрано
-            </label>
-            <label class="checkbox-row">
-              <input class="checkbox" type="checkbox" disabled>
-              Согласие disabled
-            </label>
-            <label class="checkbox-row">
-              <input class="checkbox" type="checkbox" aria-invalid="true" aria-describedby="checkbox-error">
-              Согласие с ошибкой
-            </label>
-            <span class="field-error" id="checkbox-error">Подтвердите согласие.</span>
           </form>
         </div>
       </section>

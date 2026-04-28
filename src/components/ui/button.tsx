@@ -36,7 +36,7 @@ function LoadingMark() {
 export function Button(props: ButtonProps | LinkProps) {
   const { children, variant = 'primary', className, loading = false, loadingText, ...rest } = props;
   const classes = cn(
-    'inline-flex min-h-11 items-center justify-center gap-2 rounded-md border px-5 py-2.5 text-sm font-semibold transition active:translate-y-px disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-55 aria-disabled:pointer-events-none aria-disabled:cursor-not-allowed aria-disabled:opacity-55 aria-busy:cursor-wait',
+    'inline-flex min-h-11 items-center justify-center gap-2.5 rounded-md border px-5 py-2.5 text-sm font-semibold transition active:translate-y-px disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-55 aria-disabled:pointer-events-none aria-disabled:cursor-not-allowed aria-disabled:opacity-55 aria-busy:cursor-wait',
     variants[variant],
     className
   );

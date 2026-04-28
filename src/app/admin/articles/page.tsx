@@ -1,5 +1,12 @@
+import { Fragment } from 'react';
 import { CategoryType, ContentStatus } from '@prisma/client';
-import { createArticle, deleteArticleDraft, updateArticleStatus } from '@/app/admin/articles/actions';
+import { createArticle, deleteArticleDraft, updateArticle, updateArticleStatus } from '@/app/admin/articles/actions';
+import {
+  AdminActionAlert,
+  AdminPagination,
+  CoverImageField,
+  HiddenRedirect
+} from '@/components/admin/content-admin-controls';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -8,9 +15,19 @@ import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { contentStatusBadgeVariants, contentStatusLabels } from '@/lib/admin/content-utils';
+import {
+  ADMIN_CONTENT_PAGE_SIZE,
+  contentStatusBadgeVariants,
+  contentStatusLabels,
+  getAdminCurrentPath,
+  getAdminPage,
+  getAdminTotalPages,
+  type AdminContentSearchParams
+} from '@/lib/admin/content-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
 import { prisma } from '@/lib/db/prisma';
+
+const ADMIN_ARTICLES_PATH = '/admin/articles';
 
 const dateFormatter = new Intl.DateTimeFormat('ru-RU', {
   day: '2-digit',
@@ -18,16 +35,27 @@ const dateFormatter = new Intl.DateTimeFormat('ru-RU', {
   year: 'numeric'
 });
 
-export default async function AdminArticlesPage() {
+type AdminArticlesPageProps = {
+  searchParams?: Promise<AdminContentSearchParams>;
+};
+
+export default async function AdminArticlesPage({ searchParams }: AdminArticlesPageProps) {
   await requireAdminSectionAccess('articles');
 
-  const [articles, categories, cities] = await Promise.all([
+  const params = (await searchParams) ?? {};
+  const page = getAdminPage(params);
+  const currentPath = getAdminCurrentPath(ADMIN_ARTICLES_PATH, params);
+
+  const [total, articles, categories, cities] = await Promise.all([
+    prisma.article.count(),
     prisma.article.findMany({
       orderBy: [{ createdAt: 'desc' }],
-      take: 50,
+      skip: (page - 1) * ADMIN_CONTENT_PAGE_SIZE,
+      take: ADMIN_CONTENT_PAGE_SIZE,
       include: {
         category: { select: { name: true } },
         city: { select: { name: true } },
+        coverImage: { select: { originalName: true } },
         updatedBy: { select: { email: true } }
       }
     }),
@@ -42,6 +70,7 @@ export default async function AdminArticlesPage() {
       select: { id: true, name: true }
     })
   ]);
+  const totalPages = getAdminTotalPages(total);
 
   return (
     <div className="space-y-8">
@@ -53,9 +82,12 @@ export default async function AdminArticlesPage() {
         </p>
       </header>
 
+      <AdminActionAlert params={params} />
+
       <Card className="p-5">
         <h2 className="text-lg font-semibold">Новая статья</h2>
         <form action={createArticle} className="mt-5 grid gap-5 lg:grid-cols-2">
+          <HiddenRedirect value={currentPath} />
           <FormField htmlFor="title" label="Заголовок">
             <Input id="title" name="title" required minLength={2} maxLength={160} />
           </FormField>
@@ -91,6 +123,7 @@ export default async function AdminArticlesPage() {
           <FormField htmlFor="readingTimeMinutes" label="Время чтения, минут">
             <Input id="readingTimeMinutes" name="readingTimeMinutes" min={1} max={240} type="number" />
           </FormField>
+          <CoverImageField id="article-coverImage" />
           <FormField htmlFor="status" label="Статус">
             <Select id="status" name="status" defaultValue={ContentStatus.DRAFT}>
               {Object.values(ContentStatus).map((status) => (
@@ -120,7 +153,7 @@ export default async function AdminArticlesPage() {
         <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <h2 className="text-lg font-semibold">Материалы</h2>
-            <p className="text-sm text-[var(--muted)]">Показаны последние 50 записей.</p>
+            <p className="text-sm text-[var(--muted)]">Всего записей: {total}.</p>
           </div>
         </div>
 
@@ -144,56 +177,170 @@ export default async function AdminArticlesPage() {
               </thead>
               <tbody>
                 {articles.map((article) => (
-                  <tr key={article.id} className="border-b border-[var(--line)] last:border-0">
-                    <td className="max-w-[320px] px-4 py-4 align-top">
-                      <div className="font-semibold">{article.title}</div>
-                      <div className="mt-1 truncate text-xs text-[var(--muted)]">/{article.slug}</div>
-                    </td>
-                    <td className="px-4 py-4 align-top text-[var(--muted)]">{article.category?.name ?? '-'}</td>
-                    <td className="px-4 py-4 align-top text-[var(--muted)]">{article.city?.name ?? '-'}</td>
-                    <td className="px-4 py-4 align-top">
-                      <Badge variant={contentStatusBadgeVariants[article.status]}>{contentStatusLabels[article.status]}</Badge>
-                    </td>
-                    <td className="px-4 py-4 align-top text-[var(--muted)]">
-                      <div>{dateFormatter.format(article.updatedAt)}</div>
-                      {article.updatedBy?.email ? <div className="mt-1 text-xs">{article.updatedBy.email}</div> : null}
-                    </td>
-                    <td className="px-4 py-4 align-top">
-                      <div className="flex flex-wrap gap-2">
-                        {article.status !== ContentStatus.PUBLISHED ? (
-                          <form action={updateArticleStatus}>
-                            <input name="articleId" type="hidden" value={article.id} />
-                            <input name="status" type="hidden" value={ContentStatus.PUBLISHED} />
-                            <Button className="min-h-9 px-3 py-1.5 text-xs" type="submit">
-                              Опубликовать
-                            </Button>
-                          </form>
+                  <Fragment key={article.id}>
+                    <tr className="border-b border-[var(--line)]">
+                      <td className="max-w-[320px] px-4 py-4 align-top">
+                        <div className="font-semibold">{article.title}</div>
+                        <div className="mt-1 truncate text-xs text-[var(--muted)]">/{article.slug}</div>
+                        {article.coverImage?.originalName ? (
+                          <div className="mt-1 text-xs text-[var(--muted)]">Обложка: {article.coverImage.originalName}</div>
                         ) : null}
-                        {article.status !== ContentStatus.ARCHIVED ? (
-                          <form action={updateArticleStatus}>
+                      </td>
+                      <td className="px-4 py-4 align-top text-[var(--muted)]">{article.category?.name ?? '-'}</td>
+                      <td className="px-4 py-4 align-top text-[var(--muted)]">{article.city?.name ?? '-'}</td>
+                      <td className="px-4 py-4 align-top">
+                        <Badge variant={contentStatusBadgeVariants[article.status]}>{contentStatusLabels[article.status]}</Badge>
+                      </td>
+                      <td className="px-4 py-4 align-top text-[var(--muted)]">
+                        <div>{dateFormatter.format(article.updatedAt)}</div>
+                        {article.updatedBy?.email ? <div className="mt-1 text-xs">{article.updatedBy.email}</div> : null}
+                      </td>
+                      <td className="px-4 py-4 align-top">
+                        <div className="flex flex-wrap gap-2">
+                          {article.status !== ContentStatus.PUBLISHED ? (
+                            <form action={updateArticleStatus}>
+                              <HiddenRedirect value={currentPath} />
+                              <input name="articleId" type="hidden" value={article.id} />
+                              <input name="status" type="hidden" value={ContentStatus.PUBLISHED} />
+                              <Button className="min-h-9 px-3 py-1.5 text-xs" type="submit">
+                                Опубликовать
+                              </Button>
+                            </form>
+                          ) : null}
+                          {article.status !== ContentStatus.ARCHIVED ? (
+                            <form action={updateArticleStatus}>
+                              <HiddenRedirect value={currentPath} />
+                              <input name="articleId" type="hidden" value={article.id} />
+                              <input name="status" type="hidden" value={ContentStatus.ARCHIVED} />
+                              <Button className="min-h-9 px-3 py-1.5 text-xs" type="submit" variant="secondary">
+                                В архив
+                              </Button>
+                            </form>
+                          ) : null}
+                          {article.status !== ContentStatus.PUBLISHED ? (
+                            <form action={deleteArticleDraft}>
+                              <HiddenRedirect value={currentPath} />
+                              <input name="articleId" type="hidden" value={article.id} />
+                              <Button className="min-h-9 px-3 py-1.5 text-xs" type="submit" variant="ghost">
+                                Удалить
+                              </Button>
+                            </form>
+                          ) : null}
+                        </div>
+                      </td>
+                    </tr>
+                    <tr className="border-b border-[var(--line)] last:border-0">
+                      <td className="bg-[var(--surface-muted)] px-4 py-4" colSpan={6}>
+                        <details>
+                          <summary className="cursor-pointer text-sm font-semibold">Редактировать запись</summary>
+                          <form action={updateArticle} className="mt-5 grid gap-5 lg:grid-cols-2">
+                            <HiddenRedirect value={currentPath} />
                             <input name="articleId" type="hidden" value={article.id} />
-                            <input name="status" type="hidden" value={ContentStatus.ARCHIVED} />
-                            <Button className="min-h-9 px-3 py-1.5 text-xs" type="submit" variant="secondary">
-                              В архив
-                            </Button>
+                            <FormField htmlFor={`article-title-${article.id}`} label="Заголовок">
+                              <Input
+                                id={`article-title-${article.id}`}
+                                name="title"
+                                required
+                                minLength={2}
+                                maxLength={160}
+                                defaultValue={article.title}
+                              />
+                            </FormField>
+                            <FormField htmlFor={`article-slug-${article.id}`} label="Slug">
+                              <Input id={`article-slug-${article.id}`} name="slug" maxLength={180} defaultValue={article.slug} />
+                            </FormField>
+                            <FormField htmlFor={`article-category-${article.id}`} label="Категория">
+                              <Select id={`article-category-${article.id}`} name="categoryId" defaultValue={article.categoryId ?? ''}>
+                                <option value="">Без категории</option>
+                                {categories.map((category) => (
+                                  <option key={category.id} value={category.id}>
+                                    {category.name}
+                                  </option>
+                                ))}
+                              </Select>
+                            </FormField>
+                            <FormField htmlFor={`article-city-${article.id}`} label="Город">
+                              <Select id={`article-city-${article.id}`} name="cityId" defaultValue={article.cityId ?? ''}>
+                                <option value="">Без города</option>
+                                {cities.map((city) => (
+                                  <option key={city.id} value={city.id}>
+                                    {city.name}
+                                  </option>
+                                ))}
+                              </Select>
+                            </FormField>
+                            <FormField htmlFor={`article-author-${article.id}`} label="Автор">
+                              <Input id={`article-author-${article.id}`} name="authorName" maxLength={120} defaultValue={article.authorName ?? ''} />
+                            </FormField>
+                            <FormField htmlFor={`article-source-${article.id}`} label="Источник">
+                              <Input id={`article-source-${article.id}`} name="sourceLabel" maxLength={160} defaultValue={article.sourceLabel ?? ''} />
+                            </FormField>
+                            <FormField htmlFor={`article-reading-${article.id}`} label="Время чтения, минут">
+                              <Input
+                                id={`article-reading-${article.id}`}
+                                name="readingTimeMinutes"
+                                min={1}
+                                max={240}
+                                type="number"
+                                defaultValue={article.readingTimeMinutes ?? ''}
+                              />
+                            </FormField>
+                            <CoverImageField id={`article-cover-${article.id}`} currentName={article.coverImage?.originalName} />
+                            <FormField htmlFor={`article-status-${article.id}`} label="Статус">
+                              <Select id={`article-status-${article.id}`} name="status" defaultValue={article.status}>
+                                {Object.values(ContentStatus).map((status) => (
+                                  <option key={status} value={status}>
+                                    {contentStatusLabels[status]}
+                                  </option>
+                                ))}
+                              </Select>
+                            </FormField>
+                            <div className="lg:col-span-2">
+                              <FormField htmlFor={`article-summary-${article.id}`} label="Краткое описание">
+                                <Textarea
+                                  id={`article-summary-${article.id}`}
+                                  name="summary"
+                                  required
+                                  minLength={10}
+                                  maxLength={500}
+                                  defaultValue={article.summary}
+                                />
+                              </FormField>
+                            </div>
+                            <div className="lg:col-span-2">
+                              <FormField htmlFor={`article-body-${article.id}`} label="Текст">
+                                <Textarea
+                                  id={`article-body-${article.id}`}
+                                  name="body"
+                                  required
+                                  minLength={20}
+                                  className="min-h-64"
+                                  defaultValue={article.body}
+                                />
+                              </FormField>
+                            </div>
+                            <div className="lg:col-span-2">
+                              <Button type="submit">Сохранить статью</Button>
+                            </div>
                           </form>
-                        ) : null}
-                        {article.status !== ContentStatus.PUBLISHED ? (
-                          <form action={deleteArticleDraft}>
-                            <input name="articleId" type="hidden" value={article.id} />
-                            <Button className="min-h-9 px-3 py-1.5 text-xs" type="submit" variant="ghost">
-                              Удалить
-                            </Button>
-                          </form>
-                        ) : null}
-                      </div>
-                    </td>
-                  </tr>
+                        </details>
+                      </td>
+                    </tr>
+                  </Fragment>
                 ))}
               </tbody>
             </table>
           </div>
         )}
+
+        <AdminPagination
+          basePath={ADMIN_ARTICLES_PATH}
+          page={page}
+          pageSize={ADMIN_CONTENT_PAGE_SIZE}
+          params={params}
+          total={total}
+          totalPages={totalPages}
+        />
       </section>
     </div>
   );

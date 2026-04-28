@@ -5,15 +5,21 @@ import { CategoryType, ContentStatus } from '@prisma/client';
 import { z } from 'zod';
 import {
   contentStatusValues,
+  formatAdminActionError,
   getString,
   initialPublicationDates,
   nullableString,
   optionalString,
+  redirectWithAdminActionResult,
+  resolveCoverImageId,
+  safeAdminRedirectPath,
   slugify,
   statusTransitionDates
 } from '@/lib/admin/content-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
 import { prisma } from '@/lib/db/prisma';
+
+const ADMIN_EVENTS_PATH = '/admin/events';
 
 const eventFormSchema = z.object({
   title: z.string().trim().min(2).max(160),
@@ -40,11 +46,16 @@ const deleteFormSchema = z.object({
   eventId: z.string().trim().min(1)
 });
 
-async function getUniqueEventSlug(baseSlug: string) {
+async function getUniqueEventSlug(baseSlug: string, excludeId?: string) {
   let candidate = baseSlug;
   let suffix = 2;
 
-  while (await prisma.event.findUnique({ where: { slug: candidate }, select: { id: true } })) {
+  while (
+    await prisma.event.findFirst({
+      where: { slug: candidate, id: excludeId ? { not: excludeId } : undefined },
+      select: { id: true }
+    })
+  ) {
     candidate = `${baseSlug}-${suffix}`;
     suffix += 1;
   }
@@ -78,101 +89,221 @@ async function assertEventRelations(input: { categoryId?: string; cityId?: strin
 }
 
 export async function createEvent(formData: FormData) {
-  const user = await requireAdminSectionAccess('events');
-  const parsed = eventFormSchema.parse({
-    title: getString(formData, 'title'),
-    slug: optionalString(getString(formData, 'slug')),
-    summary: getString(formData, 'summary'),
-    status: getString(formData, 'status') || ContentStatus.DRAFT,
-    categoryId: optionalString(getString(formData, 'categoryId')),
-    cityId: optionalString(getString(formData, 'cityId')),
-    startsAt: getString(formData, 'startsAt'),
-    endsAt: optionalString(getString(formData, 'endsAt')),
-    locationName: optionalString(getString(formData, 'locationName')),
-    address: optionalString(getString(formData, 'address')),
-    format: optionalString(getString(formData, 'format')),
-    capacity: optionalString(getString(formData, 'capacity')),
-    registrationMode: optionalString(getString(formData, 'registrationMode'))
-  });
-  const slug = slugify(parsed.slug ?? parsed.title);
+  const redirectTo = safeAdminRedirectPath(formData, ADMIN_EVENTS_PATH);
+  let result: { type: 'success' | 'error'; message: string };
 
-  if (!slug) {
-    throw new Error('Event slug is required.');
-  }
+  try {
+    const user = await requireAdminSectionAccess('events');
+    const parsed = eventFormSchema.parse({
+      title: getString(formData, 'title'),
+      slug: optionalString(getString(formData, 'slug')),
+      summary: getString(formData, 'summary'),
+      status: getString(formData, 'status') || ContentStatus.DRAFT,
+      categoryId: optionalString(getString(formData, 'categoryId')),
+      cityId: optionalString(getString(formData, 'cityId')),
+      startsAt: getString(formData, 'startsAt'),
+      endsAt: optionalString(getString(formData, 'endsAt')),
+      locationName: optionalString(getString(formData, 'locationName')),
+      address: optionalString(getString(formData, 'address')),
+      format: optionalString(getString(formData, 'format')),
+      capacity: optionalString(getString(formData, 'capacity')),
+      registrationMode: optionalString(getString(formData, 'registrationMode'))
+    });
+    const slug = slugify(parsed.slug ?? parsed.title);
 
-  if (parsed.endsAt && parsed.endsAt < parsed.startsAt) {
-    throw new Error('Event end date cannot be before start date.');
-  }
-
-  await assertEventRelations({
-    categoryId: parsed.categoryId,
-    cityId: parsed.cityId
-  });
-
-  const uniqueSlug = await getUniqueEventSlug(slug);
-
-  await prisma.event.create({
-    data: {
-      title: parsed.title,
-      slug: uniqueSlug,
-      summary: parsed.summary,
-      status: parsed.status,
-      categoryId: nullableString(parsed.categoryId),
-      cityId: nullableString(parsed.cityId),
-      startsAt: parsed.startsAt,
-      endsAt: parsed.endsAt ?? null,
-      locationName: nullableString(parsed.locationName),
-      address: nullableString(parsed.address),
-      format: nullableString(parsed.format),
-      capacity: parsed.capacity,
-      registrationMode: nullableString(parsed.registrationMode),
-      createdById: user.id,
-      updatedById: user.id,
-      ...initialPublicationDates(parsed.status)
+    if (!slug) {
+      throw new Error('Event slug is required.');
     }
-  });
 
-  revalidatePath('/admin/events');
+    if (parsed.endsAt && parsed.endsAt < parsed.startsAt) {
+      throw new Error('Event end date cannot be before start date.');
+    }
+
+    await assertEventRelations({
+      categoryId: parsed.categoryId,
+      cityId: parsed.cityId
+    });
+
+    const [uniqueSlug, coverImageId] = await Promise.all([
+      getUniqueEventSlug(slug),
+      resolveCoverImageId({ formData, userId: user.id })
+    ]);
+
+    await prisma.event.create({
+      data: {
+        title: parsed.title,
+        slug: uniqueSlug,
+        summary: parsed.summary,
+        status: parsed.status,
+        coverImageId,
+        categoryId: nullableString(parsed.categoryId),
+        cityId: nullableString(parsed.cityId),
+        startsAt: parsed.startsAt,
+        endsAt: parsed.endsAt ?? null,
+        locationName: nullableString(parsed.locationName),
+        address: nullableString(parsed.address),
+        format: nullableString(parsed.format),
+        capacity: parsed.capacity,
+        registrationMode: nullableString(parsed.registrationMode),
+        createdById: user.id,
+        updatedById: user.id,
+        ...initialPublicationDates(parsed.status)
+      }
+    });
+
+    revalidatePath(ADMIN_EVENTS_PATH);
+    result = { type: 'success', message: 'Событие создано.' };
+  } catch (error) {
+    result = { type: 'error', message: formatAdminActionError(error) };
+  }
+
+  redirectWithAdminActionResult(redirectTo, result);
+}
+
+export async function updateEvent(formData: FormData) {
+  const redirectTo = safeAdminRedirectPath(formData, ADMIN_EVENTS_PATH);
+  let result: { type: 'success' | 'error'; message: string };
+
+  try {
+    const user = await requireAdminSectionAccess('events');
+    const parsed = eventFormSchema
+      .extend({
+        eventId: z.string().trim().min(1)
+      })
+      .parse({
+        eventId: getString(formData, 'eventId'),
+        title: getString(formData, 'title'),
+        slug: optionalString(getString(formData, 'slug')),
+        summary: getString(formData, 'summary'),
+        status: getString(formData, 'status') || ContentStatus.DRAFT,
+        categoryId: optionalString(getString(formData, 'categoryId')),
+        cityId: optionalString(getString(formData, 'cityId')),
+        startsAt: getString(formData, 'startsAt'),
+        endsAt: optionalString(getString(formData, 'endsAt')),
+        locationName: optionalString(getString(formData, 'locationName')),
+        address: optionalString(getString(formData, 'address')),
+        format: optionalString(getString(formData, 'format')),
+        capacity: optionalString(getString(formData, 'capacity')),
+        registrationMode: optionalString(getString(formData, 'registrationMode'))
+      });
+    const slug = slugify(parsed.slug ?? parsed.title);
+
+    if (!slug) {
+      throw new Error('Event slug is required.');
+    }
+
+    if (parsed.endsAt && parsed.endsAt < parsed.startsAt) {
+      throw new Error('Event end date cannot be before start date.');
+    }
+
+    const existingEvent = await prisma.event.findUniqueOrThrow({
+      where: { id: parsed.eventId },
+      select: { coverImageId: true, publishedAt: true }
+    });
+
+    await assertEventRelations({
+      categoryId: parsed.categoryId,
+      cityId: parsed.cityId
+    });
+
+    const [uniqueSlug, coverImageId] = await Promise.all([
+      getUniqueEventSlug(slug, parsed.eventId),
+      resolveCoverImageId({
+        formData,
+        userId: user.id,
+        currentCoverImageId: existingEvent.coverImageId
+      })
+    ]);
+
+    await prisma.event.update({
+      where: { id: parsed.eventId },
+      data: {
+        title: parsed.title,
+        slug: uniqueSlug,
+        summary: parsed.summary,
+        status: parsed.status,
+        coverImageId,
+        categoryId: nullableString(parsed.categoryId),
+        cityId: nullableString(parsed.cityId),
+        startsAt: parsed.startsAt,
+        endsAt: parsed.endsAt ?? null,
+        locationName: nullableString(parsed.locationName),
+        address: nullableString(parsed.address),
+        format: nullableString(parsed.format),
+        capacity: parsed.capacity,
+        registrationMode: nullableString(parsed.registrationMode),
+        updatedById: user.id,
+        ...statusTransitionDates(parsed.status, existingEvent.publishedAt)
+      }
+    });
+
+    revalidatePath(ADMIN_EVENTS_PATH);
+    result = { type: 'success', message: 'Событие обновлено.' };
+  } catch (error) {
+    result = { type: 'error', message: formatAdminActionError(error) };
+  }
+
+  redirectWithAdminActionResult(redirectTo, result);
 }
 
 export async function updateEventStatus(formData: FormData) {
-  const user = await requireAdminSectionAccess('events');
-  const parsed = statusFormSchema.parse({
-    eventId: getString(formData, 'eventId'),
-    status: getString(formData, 'status')
-  });
+  const redirectTo = safeAdminRedirectPath(formData, ADMIN_EVENTS_PATH);
+  let result: { type: 'success' | 'error'; message: string };
 
-  await prisma.$transaction(async (tx) => {
-    const event = await tx.event.findUniqueOrThrow({
-      where: { id: parsed.eventId },
-      select: { publishedAt: true }
+  try {
+    const user = await requireAdminSectionAccess('events');
+    const parsed = statusFormSchema.parse({
+      eventId: getString(formData, 'eventId'),
+      status: getString(formData, 'status')
     });
 
-    await tx.event.update({
-      where: { id: parsed.eventId },
-      data: {
-        status: parsed.status,
-        updatedById: user.id,
-        ...statusTransitionDates(parsed.status, event.publishedAt)
-      }
-    });
-  });
+    await prisma.$transaction(async (tx) => {
+      const event = await tx.event.findUniqueOrThrow({
+        where: { id: parsed.eventId },
+        select: { publishedAt: true }
+      });
 
-  revalidatePath('/admin/events');
+      await tx.event.update({
+        where: { id: parsed.eventId },
+        data: {
+          status: parsed.status,
+          updatedById: user.id,
+          ...statusTransitionDates(parsed.status, event.publishedAt)
+        }
+      });
+    });
+
+    revalidatePath(ADMIN_EVENTS_PATH);
+    result = { type: 'success', message: 'Статус события обновлен.' };
+  } catch (error) {
+    result = { type: 'error', message: formatAdminActionError(error) };
+  }
+
+  redirectWithAdminActionResult(redirectTo, result);
 }
 
 export async function deleteEventDraft(formData: FormData) {
-  await requireAdminSectionAccess('events');
-  const parsed = deleteFormSchema.parse({
-    eventId: getString(formData, 'eventId')
-  });
+  const redirectTo = safeAdminRedirectPath(formData, ADMIN_EVENTS_PATH);
+  let result: { type: 'success' | 'error'; message: string };
 
-  await prisma.event.deleteMany({
-    where: {
-      id: parsed.eventId,
-      status: { not: ContentStatus.PUBLISHED }
-    }
-  });
+  try {
+    await requireAdminSectionAccess('events');
+    const parsed = deleteFormSchema.parse({
+      eventId: getString(formData, 'eventId')
+    });
 
-  revalidatePath('/admin/events');
+    await prisma.event.deleteMany({
+      where: {
+        id: parsed.eventId,
+        status: { not: ContentStatus.PUBLISHED }
+      }
+    });
+
+    revalidatePath(ADMIN_EVENTS_PATH);
+    result = { type: 'success', message: 'Черновик события удален.' };
+  } catch (error) {
+    result = { type: 'error', message: formatAdminActionError(error) };
+  }
+
+  redirectWithAdminActionResult(redirectTo, result);
 }

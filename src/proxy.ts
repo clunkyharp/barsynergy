@@ -6,6 +6,10 @@ export function proxy(request: NextRequest) {
   const token = request.cookies.get(SESSION_COOKIE_NAME)?.value;
 
   if (!token) {
+    if (request.nextUrl.pathname === '/admin/uploads/content-image') {
+      return NextResponse.json({ error: 'Unauthorized.' }, { status: 401 });
+    }
+
     return NextResponse.redirect(new URL('/auth/login', request.url));
   }
 

@@ -21,7 +21,7 @@ export function SiteHeader() {
             src="/brand/barsynergy-lockup.svg"
             alt="BARSYNERGY"
             width={178}
-            height={42}
+            height={47}
             className="h-auto w-[178px]"
             decoding="async"
             fetchPriority="high"

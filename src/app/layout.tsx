@@ -32,7 +32,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="ru">
+    <html data-scroll-behavior="smooth" lang="ru">
       <body className={bodyFont.className}>
         <div className="site-shell overflow-x-clip">
           <SiteHeader />

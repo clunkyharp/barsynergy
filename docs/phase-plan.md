@@ -128,9 +128,12 @@ Implementation contract:
 Current status:
 
 - Phase 2 Prisma models are implemented and backed by migration `20260427123417_phase2_content_models`;
-- the first admin CRUD slices are implemented for articles and events at `/admin/articles` and `/admin/events`;
-- admin CRUD for courses, vacancies, suppliers and partners remains to be implemented;
-- public read queries, upload routes and full publish/archive helpers remain to be implemented.
+- the first admin CRUD slices are implemented for articles, events, courses, vacancies, suppliers and partners at `/admin/articles`, `/admin/events`, `/admin/courses`, `/admin/vacancies`, `/admin/suppliers` and `/admin/partners`;
+- public read queries are connected to articles, events, education, vacancies, suppliers and partners and return only `published` records with pagination that preserves active filters;
+- public content image upload route is implemented at `/admin/uploads/content-image`;
+- Phase 2 admin UX follow-up is implemented: edit forms, cover image upload slots, admin list pagination and admin action success/error states;
+- final Phase 2 runtime/admin review passed on 2026-04-27 with authenticated Playwright create smoke for all content sections, cover-image upload smoke, public route smoke and article publish/archive public-visibility smoke;
+- Phase 2 is complete for the current MVP content/admin contract.
 
 ## Phase 3: Applications And Forms
 
@@ -142,6 +145,9 @@ In scope:
 
 - Application model;
 - public application forms;
+- vacancy submission request flow for businesses;
+- vacancy response flow for candidates;
+- private application/resume handling;
 - server validation;
 - personal data consent checkbox;
 - email notifications;
@@ -157,13 +163,26 @@ Done when:
 - admin sees it;
 - user receives confirmation;
 - admin receives notification;
+- business can submit a vacancy placement request for admin review;
+- candidate can respond to a published vacancy;
+- admin can forward a reviewed vacancy response to the employer;
 - application can be processed.
 
-## Phase 4: Auth And User Profile
+Implementation contract:
+
+- [Phase 3 applications and vacancy flows mini-spec](phase-3-applications-spec.md)
+
+Current status:
+
+- Phase 3 mini-spec is drafted;
+- implementation has not started;
+- legal text still needs owner/legal review before personal-data forms are enabled in production.
+
+## Phase 4: Auth And Business Account First
 
 Goal:
 
-Add registration and basic user cabinet.
+Add registration/login foundation and the first private cabinet for approved businesses.
 
 In scope:
 
@@ -171,19 +190,33 @@ In scope:
 - login;
 - logout;
 - PostgreSQL sessions;
-- roles `user`, `moderator`, `admin`;
-- user profile;
-- "my applications" page;
+- roles needed for business, moderator and admin access;
+- business account approval flow;
+- business company profile;
+- business request tracking;
+- business vacancy, supplier, partner and corporate-training request management;
 - admin route protection.
+
+First account decision:
+
+- only business gets a private cabinet in the first account implementation;
+- candidate, student, community-member and general user profiles are deferred;
+- user profiles and "my applications" remain planned for a later phase and should not be removed from the docs.
 
 Done when:
 
-- user can register;
-- user can log in;
-- user can log out;
-- user can edit profile;
-- user can see own applications;
+- approved business can receive or create account access;
+- business can log in;
+- business can log out;
+- business can edit its company profile;
+- business can see and manage its own placement/application requests;
+- business cannot publish public content directly;
+- business cannot see candidate personal data before admin forwarding and candidate consent;
 - admin pages are protected by roles.
+
+Implementation contract:
+
+- [Business account mini-spec](business-account-spec.md)
 
 ## Phase 5: Filters, Search And Directory Quality
 
@@ -273,4 +306,5 @@ Done when:
 ## Related Docs
 
 - [Remediation plan](remediation-plan.md)
+- [Phase 3 applications and vacancy flows mini-spec](phase-3-applications-spec.md)
 - [Project audit workflow](audit-workflow.md)

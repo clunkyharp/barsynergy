@@ -104,6 +104,8 @@ Production releases go `dev -> validation -> prod` only after owner confirmation
 - [Phase plan](docs/phase-plan.md)
 - [Obsidian Kanban sync](docs/kanban-sync.md)
 - [Phase 2 content/admin mini-spec](docs/phase-2-content-admin-spec.md)
+- [Phase 3 applications and vacancy flows mini-spec](docs/phase-3-applications-spec.md)
+- [Business account mini-spec](docs/business-account-spec.md)
 - [Setup](docs/setup.md)
 - [Deploy](docs/deploy.md)
 - [Environment](docs/env.md)

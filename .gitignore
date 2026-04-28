@@ -10,8 +10,8 @@ out
 !.env.production.example
 !.env.docker.example
 
-uploads
-backups
+/uploads
+/backups
 
 *.log
 npm-debug.log*

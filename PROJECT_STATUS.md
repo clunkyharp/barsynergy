@@ -1,16 +1,16 @@
 # BARSYNERGY Project Status
 
-Last updated: 2026-04-27
+Last updated: 2026-04-28
 
 ## Current Branch
 
 - Active branch: `dev`
 - Production branch: `prod`
-- Current work mode: `IMPLEMENTATION`
+- Current work mode: `QA`
 
 ## Current Phase
 
-Active phase: Phase 2 database and content admin implementation. Phase 1 public website MVP is complete for the current static public surface.
+Active phase: Phase 2 complete; Phase 3 readiness is next. Phase 1 public website MVP is complete. Phase 2 content/admin scope is implemented and runtime-verified for admin create flows, public published-only reads, upload boundary, pagination and publish/archive behavior. Phase 3 applications planning is drafted in `docs/phase-3-applications-spec.md`; business-account direction is captured in `docs/business-account-spec.md`; implementation has not started.
 
 Phase 0 is implemented as the technical foundation:
 
@@ -83,10 +83,29 @@ The `Application` model remains planned for Phase 3.
 
 ## Next Planned Work
 
-1. Extend Phase 2 admin CRUD from articles/events to courses, vacancies, suppliers and partners.
-2. Add public read queries for published content with pagination.
-3. Prepare the Phase 3 mini-spec for applications, consent and notifications.
-4. Keep production TLS, legal approval and production scheduler decisions as explicit blockers until owner input is available.
+1. Start a bounded Phase 3 implementation batch from `docs/phase-3-applications-spec.md` when the owner confirms the first slice.
+2. Keep the first account/cabinet implementation business-only according to `docs/business-account-spec.md`.
+3. Keep legal approval as a blocker before enabling personal-data forms in production.
+4. Keep production TLS and production scheduler decisions as explicit blockers until owner input is available.
+
+## Business Account Planning Update
+
+Completed on 2026-04-28:
+
+- owner decision captured: the first private cabinet is for businesses only;
+- candidate, student, community-member and general user profiles are deferred, but remain documented as a later product direction;
+- business registration direction is request/application first, admin approval second, login access third;
+- business cabinet capabilities are documented separately in `docs/business-account-spec.md`.
+
+## Phase 3 Applications Planning Update
+
+Completed on 2026-04-27:
+
+- Phase 3 mini-spec drafted for the unified `Application` model and public application forms;
+- vacancy placement is planned as `vacancy_submission`, where a business sends a request and admin publishes the final `Vacancy`;
+- vacancy responses are planned as `vacancy_response`, linked to a published vacancy and reviewed by admin before employer transfer;
+- candidate resume data remains private application data in MVP, not a reusable public profile;
+- employer forwarding is an admin action and must not happen automatically before review and explicit candidate consent.
 
 ## Phase 2 Database Update
 
@@ -110,12 +129,91 @@ Completed on 2026-04-27:
 
 - first article admin CRUD slice added at `/admin/articles`;
 - first event admin CRUD slice added at `/admin/events`;
-- admins and moderators can create articles and events;
-- article and event lists show latest records with taxonomy, status and updater;
+- first course admin CRUD slice added at `/admin/courses`;
+- first vacancy admin CRUD slice added at `/admin/vacancies`;
+- first supplier admin CRUD slice added at `/admin/suppliers`;
+- first partner admin CRUD slice added at `/admin/partners`;
+- admins and moderators can create articles, events, courses, vacancies, suppliers and partners;
+- article, event, course, vacancy, supplier and partner lists show latest records with taxonomy, status and updater;
 - publish and archive actions update publication status dates;
-- deleting is limited to non-published articles and events.
+- deleting is limited to non-published articles, events, courses, vacancies, suppliers and partners.
 - QA fixes keep existing `publishedAt` when archiving, validate article category/city references server-side and generate a unique slug when needed.
 - shared admin content utilities now centralize status labels, slug handling and publication date transitions.
+
+## Phase 2 Admin UX Follow-up Update
+
+Completed on 2026-04-27:
+
+- admin article, event, course, vacancy, supplier and partner lists now use page-based pagination instead of fixed `take: 50` lists;
+- each Phase 2 content section now has an inline edit form for existing records;
+- create and edit forms now include a public cover image upload slot wired through `StorageService` and `UploadedFile.visibility = public`;
+- admin actions now redirect back with success/error messages instead of surfacing raw validation exceptions;
+- upload handling is shared between the form actions and `/admin/uploads/content-image`;
+- `.gitignore` now ignores only root runtime `/uploads`, so `src/app/admin/uploads/content-image/route.ts` can be tracked.
+
+Validation:
+
+- `./node_modules/.bin/prisma validate`;
+- `npm run typecheck`;
+- `npm run lint`;
+- `npm run build`;
+- HTTP smoke: unauthenticated `POST /admin/uploads/content-image` returned JSON `401`.
+
+## Phase 2 Public Read / Upload Update
+
+Completed on 2026-04-27:
+
+- public pages for articles, events, education, vacancies, suppliers and partners now read only `published` records;
+- public lists use pagination with a default page size of 12 and maximum page size of 24;
+- public read helpers support basic query/filter parameters for search, taxonomy and entity-specific fields;
+- public list pagination preserves active query/filter parameters;
+- empty public lists render without throwing;
+- public content images are resolved only from `UploadedFile.visibility = public`;
+- `/admin/uploads/content-image` accepts authenticated admin/moderator public image uploads through `StorageService`;
+- upload route allowlists JPEG, PNG, WebP and AVIF and enforces `MAX_UPLOAD_FILE_SIZE_BYTES`.
+- unauthenticated upload requests return JSON `401`, and forbidden roles return JSON `403`.
+
+## Phase 2 Review Update
+
+Completed on 2026-04-27:
+
+- schema, admin CRUD slices, public reads, upload boundary, docs and Kanban were reviewed against `docs/phase-2-content-admin-spec.md`;
+- public read pagination now preserves active query/filter parameters;
+- upload API auth boundary now returns JSON `401/403` instead of an HTML redirect for the upload endpoint;
+- follow-up gaps were implemented at source level: edit forms, image upload slots, admin list pagination and admin action validation/error states.
+
+Validation:
+
+- `./node_modules/.bin/prisma validate`;
+- `npm run typecheck`;
+- `npm run lint`;
+- `npm run build`;
+- HTTP smoke: `/articles`, `/events`, `/education`, `/vacancies`, `/suppliers`, `/partners`, `/articles?q=test&page=2` returned `200`;
+- HTTP smoke: unauthenticated `POST /admin/uploads/content-image` returned JSON `401`.
+
+## Phase 2 Final QA Update
+
+Completed on 2026-04-27:
+
+- removed runtime warnings from Phase 2 admin forms by letting React Server Actions control form encoding automatically;
+- added the Next.js `data-scroll-behavior="smooth"` root attribute required by the existing global smooth-scroll CSS;
+- authenticated admin browser smoke created and cleaned up one article, event, course, vacancy, supplier and partner through real admin forms;
+- article cover upload through the admin form created a public `UploadedFile` and was cleaned up after verification;
+- publish/archive smoke confirmed a published article appears on `/articles` and disappears from the public list after archiving;
+- temporary smoke users, sessions, content records and upload files were cleaned up.
+
+Validation:
+
+- `./node_modules/.bin/prisma validate`;
+- `npm run typecheck`;
+- `npm run lint`;
+- `npm run build`;
+- HTTP smoke: `/`, `/articles`, `/events`, `/education`, `/vacancies`, `/suppliers`, `/partners`, `/articles?q=test&page=2` returned `200`;
+- unauthenticated `POST /admin/uploads/content-image` returned JSON `401`;
+- authenticated admin pages `/admin`, `/admin/articles`, `/admin/events`, `/admin/courses`, `/admin/vacancies`, `/admin/suppliers`, `/admin/partners` returned `200`;
+- authenticated `POST /admin/uploads/content-image` accepted PNG and returned a public file reference;
+- Playwright admin form smoke passed for all Phase 2 content sections;
+- Playwright publish/archive smoke passed for public article visibility.
 
 ## Agent Workflow Update
 

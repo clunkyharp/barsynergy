@@ -44,6 +44,119 @@ Avoid:
 - heavy animation;
 - fake dashboard styling.
 
+## Design Principles
+
+Use these principles before choosing a component, layout or content pattern.
+
+1. Industry-first, not nightlife-first. The interface must represent professional education, community and work opportunities, not generic bar entertainment.
+2. Editorial structure over decoration. Use typography, grid, spacing, dividers and real content blocks as the main visual tools.
+3. Dense but readable. Pages may contain many routes, listings and metadata, but each block must remain scannable on mobile and desktop.
+4. Regional specificity. City, format, category, date and role labels are part of the product value. Do not hide them behind vague marketing copy.
+5. Real content over placeholders. Prefer concrete section labels, examples and empty states that match the planned content model.
+6. Conservative interaction. Motion, hover effects and image treatment should support navigation and reading, not compete with content.
+7. Internal system first. Reuse local tokens, primitives and public-page patterns before adding a new one-off style.
+
+## Content / Copy Rules
+
+Public copy should be direct, concrete and useful for bar-industry professionals.
+
+Rules:
+
+- Write in Russian by default for public UI and user-facing states.
+- Use literal Russian labels: курс, мероприятие, вакансия, поставщик, партнер, статья, город, формат, дата, статус.
+- Avoid vague claims such as "лучшее сообщество", "новый уровень" or "уникальная экосистема" unless there is a concrete proof point nearby.
+- Keep headings short enough to wrap cleanly on mobile.
+- Put practical details in metadata rows: city, category, date, format, salary, contact path, publication status.
+- Use CTA labels that describe the action: "Смотреть курсы", "Открыть вакансии", "Связаться", "Предложить партнера".
+- Do not expose internal phase language, placeholder language or implementation notes on public pages.
+- Empty states should say what is missing and what the user can do next.
+- Error states should state what failed. Do not blame the user.
+- Legal and consent copy must stay plain and explicit, especially before collecting personal data.
+
+## Icon And Illustration Rules
+
+Icons and illustrations are supporting tools, not the visual identity.
+
+Rules:
+
+- Use icons only when they improve scanning or identify a repeated control/status.
+- Keep icons simple, single-color and aligned with the text baseline or control center.
+- Do not use cocktail, nightclub, neon, party or generic startup illustrations as default decoration.
+- Do not create decorative icon grids for public sections.
+- Prefer real content imagery for people, venues, education, events and partners when an image is needed.
+- Use collage-like image blocks only when the section has a real editorial role.
+- Illustrations must not replace product navigation, listings or real content rows.
+- Admin UI should use icons sparingly for actions and status only.
+
+## Homepage Composition
+
+The homepage is a multi-audience industry hub, not a single-offer landing page.
+
+Primary jobs to support:
+
+- find education;
+- find industry events;
+- read professional content;
+- find vacancies;
+- discover suppliers and partners;
+- understand what BARSYNERGY is.
+
+Recommended order:
+
+1. Editorial hero with the BARSYNERGY name, a short product statement and route-level entry points.
+2. Compact section map for education, events, articles, vacancies, suppliers and partners.
+3. Featured rows for near-term or newest content once real data is connected.
+4. Community/context block explaining the regional industry focus.
+5. Partner/supplier or employer entry point.
+6. Contact or application CTA only when the next action is clear.
+
+Rules:
+
+- Keep the first viewport tied to the actual platform structure.
+- Do not make the homepage a generic marketing hero with disconnected feature cards.
+- Education and operational utility should both be visible early.
+- Use route labels and city/category chips to show platform breadth.
+- Avoid implying live transactions, paid access or personal cabinets before those phases exist.
+- On mobile, section entry points must stay short, tappable and readable without horizontal scroll.
+
+## Public Content Models
+
+Public pages should present content through stable model patterns so future database-backed data does not break the design.
+
+| Model | Primary fields to expose | Preferred pattern |
+| --- | --- | --- |
+| Article | title, category, tags, author/source, published date, summary | Editorial row or article card |
+| Event | title, city, date, format, venue, summary | Event row with strong date/city metadata |
+| Course | title, format, city/online, level, date or enrollment state, summary | Education row/card with clear action |
+| Vacancy | role, city, venue/company, salary range if known, schedule, published date | Dense listing row |
+| Supplier | company, category, city/region, offer summary, contact path | Directory row |
+| Partner | company/project, category, collaboration type, city/region, summary | Directory/editorial row |
+| Legal page | document title, draft/final state, effective context, sections | Legal draft layout |
+
+Rules:
+
+- Model metadata should appear near the title, not buried at the end.
+- Listings must support missing optional fields without leaving visual holes.
+- Long names and Russian text must use `min-w-0`, wrapping and stable row spacing.
+- Public pages should show only published content when real queries are connected.
+- Draft, review and archived states belong in admin/product UI, not public listings.
+
+## Agent Implementation Rules
+
+Use these rules when changing UI or docs with an AI coding agent.
+
+Rules:
+
+- Read this file, `design-tokens.json`, `src/app/globals.css` and the relevant component/page before editing.
+- Preserve the internal UI kit. Do not add a third-party UI library for a single missing primitive.
+- Make the smallest component or page change that solves the current task.
+- If a repeated visual pattern appears for the third time, either reuse an existing primitive or document the new component gap.
+- Keep public pages editorial and admin pages compact.
+- Do not add new raw colors, font families, shadow systems or radius scales without updating this file and token sources.
+- Check desktop and mobile behavior for visible public UI changes.
+- For content-model changes, verify that empty, long-text and missing-field states remain readable.
+- After meaningful visual changes, decide whether `docs/design-consistency-check.md`, `PROJECT_STATUS.md` or the Obsidian Kanban board need a sync update.
+
 ## Foundations
 
 ### Color Roles
@@ -157,6 +270,7 @@ Rules:
 - Keep action labels short and literal.
 - Preserve `min-h-11` or larger for touch targets.
 - Use `loading` and optional `loadingText` for pending mutations; the component keeps the control disabled and layout stable.
+- Loading icons must keep visible spacing from the text.
 
 ### Form Controls
 
@@ -185,6 +299,7 @@ Rules:
 - Error text belongs under the control and should be linked with `FormField`.
 - Do not encode validation meaning by color alone.
 - Keep public application forms legally clear: consent checkboxes must be visible and literal.
+- Textareas must not be user-resizable; keep height controlled by the component or page layout.
 
 ### Badge
 

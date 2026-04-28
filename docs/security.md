@@ -9,6 +9,7 @@
 - Admin pages must be protected by role checks before real data is added.
 - Do not log passwords or full personal data.
 - Do not send full personal data to Telegram.
+- Do not automatically send vacancy responses or resume files to employers before admin review and explicit candidate consent.
 - Validate env with Zod.
 - Validate future form input with Zod on the server.
 - Validate uploads by mime type, extension, size, auth and permissions.
