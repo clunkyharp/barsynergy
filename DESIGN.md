@@ -286,7 +286,7 @@ States:
 
 | State | Rule |
 | --- | --- |
-| Default | White surface, line border, readable label |
+| Default | Layered light surface, soft inset highlight, readable label |
 | Hover | Optional; do not shift layout |
 | Focus | Accent border or global focus ring |
 | Error | `FormField.error` connects `aria-invalid` and visible `--danger` text |
@@ -296,10 +296,12 @@ States:
 Rules:
 
 - Always wrap labelled fields with `FormField` unless a form has a documented custom layout.
+- Refresh repeated form UX from the shared controls first, then add section-level shells and footers only where page composition needs more structure.
 - Error text belongs under the control and should be linked with `FormField`.
 - Do not encode validation meaning by color alone.
 - Keep public application forms legally clear: consent checkboxes must be visible and literal.
 - Textareas must not be user-resizable; keep height controlled by the component or page layout.
+- Repeated public/auth forms may use `editorial-form-shell` to add section hierarchy without changing validation or submission logic.
 
 ### Badge
 

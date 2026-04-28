@@ -76,16 +76,12 @@ export default async function BusinessRequestDetailPage({ params, searchParams }
 
   return (
     <div className="space-y-8">
-      <PageHeader
-        eyebrow={applicationTypeLabels[application.type]}
-        title={application.subject ?? applicationTypeLabels[application.type]}
-        description="Бизнес видит только свои заявки. Отправленные заявки редактирует администратор."
-      />
+      <PageHeader eyebrow={applicationTypeLabels[application.type]} title={application.subject ?? applicationTypeLabels[application.type]} />
       <AdminActionAlert params={query} />
       <div className="grid gap-6 xl:grid-cols-[1fr_0.75fr]">
         <Card className="p-5">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <h2 className="text-lg font-semibold">{canEdit ? 'Редактирование черновика' : 'Данные заявки'}</h2>
+            <h2 className="text-lg font-semibold">{canEdit ? 'Редактирование заявки' : 'Данные заявки'}</h2>
             <Badge variant={applicationStatusBadgeVariants[application.status]}>
               {applicationStatusLabels[application.status]}
             </Badge>
@@ -190,7 +186,7 @@ export default async function BusinessRequestDetailPage({ params, searchParams }
                 <Checkbox name="consent" value="accepted" required defaultChecked />
                 <span>Подтверждаю согласие на обработку данных заявки.</span>
               </label>
-              <Button type="submit">Сохранить черновик</Button>
+              <Button type="submit">Сохранить изменения</Button>
             </form>
           ) : (
             <dl className="mt-5 grid gap-4 text-sm">
@@ -220,24 +216,18 @@ export default async function BusinessRequestDetailPage({ params, searchParams }
                 <form action={submitBusinessDraftApplication}>
                   <input name="applicationId" type="hidden" value={application.id} />
                   <Button className="w-full" type="submit">
-                    Отправить на проверку
+                    Отправить заявку
                   </Button>
                 </form>
                 <form action={archiveBusinessDraftApplication}>
                   <input name="applicationId" type="hidden" value={application.id} />
                   <Button className="w-full" type="submit" variant="secondary">
-                    Архивировать черновик
+                    Убрать в архив
                   </Button>
                 </form>
               </div>
             </Card>
           ) : null}
-          <Card className="p-5">
-            <h2 className="text-lg font-semibold">Правила</h2>
-            <p className="mt-3 text-sm leading-6 text-[var(--muted)]">
-              Заявка после отправки попадает в админскую очередь. Публичная публикация и передача данных кандидатов остаются ручными.
-            </p>
-          </Card>
           <Button href="/business/requests" variant="ghost">
             Вернуться к заявкам
           </Button>

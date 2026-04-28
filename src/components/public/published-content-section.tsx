@@ -41,7 +41,7 @@ export function PublishedContentSection({ title, emptyTitle, emptyDescription, c
         <div>
           <h2 className={`${displayFont.className} display-tight text-[44px] md:text-[58px]`}>{title}</h2>
           <p className="mt-5 max-w-md text-sm leading-7 text-[var(--muted)]">
-            Опубликовано: {content.total}. Страница {content.page} из {content.totalPages}.
+            Найдено: {content.total}. Страница {content.page} из {content.totalPages}.
           </p>
         </div>
 

@@ -220,8 +220,8 @@ export async function createBusinessApplication(formData: FormData) {
     revalidatePath('/admin/applications');
     result =
       status === ApplicationStatus.DRAFT
-        ? { type: 'success', message: 'Черновик сохранен.' }
-        : { type: 'success', message: 'Заявка отправлена на проверку.' };
+        ? { type: 'success', message: 'Заявка сохранена.' }
+        : { type: 'success', message: 'Заявка отправлена.' };
   } catch {
     result = { type: 'error', message: 'Не удалось сохранить заявку. Проверьте обязательные поля.' };
   }
@@ -275,9 +275,9 @@ export async function updateBusinessDraftApplication(formData: FormData) {
     revalidatePath(BUSINESS_PATH);
     revalidatePath(BUSINESS_REQUESTS_PATH);
     revalidatePath(fallbackPath);
-    result = { type: 'success', message: 'Черновик обновлен.' };
+    result = { type: 'success', message: 'Заявка обновлена.' };
   } catch {
-    result = { type: 'error', message: 'Не удалось обновить черновик. Проверьте обязательные поля.' };
+    result = { type: 'error', message: 'Не удалось обновить заявку. Проверьте обязательные поля.' };
   }
 
   redirectWithBusinessResult(fallbackPath, result);
@@ -309,9 +309,9 @@ export async function submitBusinessDraftApplication(formData: FormData) {
     revalidatePath(BUSINESS_PATH);
     revalidatePath(BUSINESS_REQUESTS_PATH);
     revalidatePath('/admin/applications');
-    result = { type: 'success', message: 'Заявка отправлена на проверку.' };
+    result = { type: 'success', message: 'Заявка отправлена.' };
   } catch {
-    result = { type: 'error', message: 'Не удалось отправить черновик.' };
+    result = { type: 'error', message: 'Не удалось отправить заявку.' };
   }
 
   redirectWithBusinessResult(BUSINESS_REQUESTS_PATH, result);
@@ -342,9 +342,9 @@ export async function archiveBusinessDraftApplication(formData: FormData) {
 
     revalidatePath(BUSINESS_PATH);
     revalidatePath(BUSINESS_REQUESTS_PATH);
-    result = { type: 'success', message: 'Черновик архивирован.' };
+    result = { type: 'success', message: 'Заявка перенесена в архив.' };
   } catch {
-    result = { type: 'error', message: 'Не удалось архивировать черновик.' };
+    result = { type: 'error', message: 'Не удалось перенести заявку в архив.' };
   }
 
   redirectWithBusinessResult(BUSINESS_REQUESTS_PATH, result);

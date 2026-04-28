@@ -71,9 +71,6 @@ export default async function AdminPartnersPage({ searchParams }: AdminPartnersP
       <header>
         <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Админка / Партнеры</p>
         <h1 className="mt-2 text-3xl font-semibold">Партнеры</h1>
-        <p className="mt-2 max-w-2xl text-[var(--muted)]">
-          Создание, публикация и архивация партнеров для публичного раздела.
-        </p>
       </header>
 
       <AdminActionAlert params={params} />
@@ -146,10 +143,7 @@ export default async function AdminPartnersPage({ searchParams }: AdminPartnersP
         </div>
 
         {partners.length === 0 ? (
-          <EmptyState
-            title="Партнеров пока нет"
-            description="Создайте первого партнера, чтобы проверить рабочий процесс публикации."
-          />
+          <EmptyState title="Партнеров пока нет" />
         ) : (
           <div className="overflow-x-auto rounded-lg border border-[var(--line)] bg-[var(--surface)]">
             <table className="min-w-[980px] w-full border-collapse text-left text-sm">

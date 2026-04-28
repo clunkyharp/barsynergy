@@ -29,7 +29,7 @@ export default async function PartnersPage({ searchParams }: PartnersPageProps) 
         eyebrow="Партнеры"
         title="Партнерские форматы для брендов, школ и заведений"
         description="Форматы сотрудничества для брендов, школ и заведений: заявки, размещения, события и образовательные проекты."
-        summary="Партнерский запрос проходит через команду проекта. Формат, сроки и условия обсуждаются до публикации."
+        summary="Здесь можно обсудить совместные проекты, события, спецформаты и работу с аудиторией BARSYNERGY."
         metrics={[
           { value: '3', label: 'типа партнерств' },
           { value: 'Контакт', label: 'прямая связь' },
@@ -44,12 +44,12 @@ export default async function PartnersPage({ searchParams }: PartnersPageProps) 
           {
             label: 'Формат',
             title: 'Информационные партнерства',
-            description: 'Материалы, события и отраслевые проекты, которые проходят редакционную проверку перед публикацией.'
+            description: 'Совместные материалы, анонсы и события для профессиональной аудитории.'
           },
           {
             label: 'Формат',
-            title: 'Коммерческие заявки',
-            description: 'Специальные размещения согласуются отдельно: команда фиксирует цель, формат и правила публикации.'
+            title: 'Спецформаты',
+            description: 'Отдельные проекты для брендов и заведений: запуск, серия встреч, обучение или интеграция.'
           }
         ]}
         primaryLink={{ label: 'Обсудить партнерство', href: '/contacts' }}
@@ -58,8 +58,8 @@ export default async function PartnersPage({ searchParams }: PartnersPageProps) 
       <PublishedContentSection
         basePath="/partners"
         content={content}
-        emptyDescription="Опубликованные партнеры появятся здесь после публикации через админку."
-        emptyTitle="Пока нет опубликованных партнеров"
+        emptyDescription="Когда появятся новые партнеры, они отобразятся здесь."
+        emptyTitle="Партнеров пока нет"
         title="Партнеры"
       />
       <PartnerApplicationForm

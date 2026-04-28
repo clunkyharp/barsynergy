@@ -226,11 +226,15 @@ svg {
 .editorial-form-shell {
   position: relative;
   overflow: hidden;
-  border: 1px solid rgba(22, 19, 15, 0.18);
+  border: 1px solid rgba(22, 19, 15, 0.16);
+  border-radius: 1.75rem;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.92)),
-    radial-gradient(circle at top right, rgba(153, 44, 38, 0.08), transparent 30%);
-  box-shadow: 0 22px 60px rgba(22, 19, 15, 0.08);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0.94)),
+    radial-gradient(circle at top right, rgba(153, 44, 38, 0.1), transparent 32%),
+    radial-gradient(circle at bottom left, rgba(20, 20, 18, 0.04), transparent 28%);
+  box-shadow:
+    0 26px 80px rgba(22, 19, 15, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.74);
 }
 
 .editorial-form-shell::before {
@@ -241,6 +245,6 @@ svg {
     linear-gradient(rgba(22, 19, 15, 0.03) 1px, transparent 1px),
     linear-gradient(90deg, rgba(22, 19, 15, 0.03) 1px, transparent 1px);
   background-size: 56px 56px;
-  opacity: 0.55;
+  opacity: 0.45;
   pointer-events: none;
 }

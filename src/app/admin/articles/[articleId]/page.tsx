@@ -55,7 +55,6 @@ export default async function AdminArticleDetailPage({ params, searchParams }: A
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Админка / Статьи</p>
           <h1 className="mt-2 text-3xl font-semibold">{article.title}</h1>
-          <p className="mt-2 max-w-2xl text-[var(--muted)]">Полное редактирование статьи вынесено из списка, чтобы длинный текст не рендерился внутри таблицы.</p>
         </div>
         <Button href={ADMIN_ARTICLES_PATH} variant="ghost">
           Назад к списку

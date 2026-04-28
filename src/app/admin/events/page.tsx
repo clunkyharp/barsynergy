@@ -88,9 +88,6 @@ export default async function AdminEventsPage({ searchParams }: AdminEventsPageP
       <header>
         <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Админка / События</p>
         <h1 className="mt-2 text-3xl font-semibold">События</h1>
-        <p className="mt-2 max-w-2xl text-[var(--muted)]">
-          Создание, публикация и архивация событий для публичного календаря.
-        </p>
       </header>
 
       <AdminActionAlert params={params} />
@@ -174,10 +171,7 @@ export default async function AdminEventsPage({ searchParams }: AdminEventsPageP
         </div>
 
         {events.length === 0 ? (
-          <EmptyState
-            title="Событий пока нет"
-            description="Создайте первое событие, чтобы проверить рабочий процесс публикации."
-          />
+          <EmptyState title="Событий пока нет" />
         ) : (
           <div className="overflow-x-auto rounded-lg border border-[var(--line)] bg-[var(--surface)]">
             <table className="min-w-[1040px] w-full border-collapse text-left text-sm">

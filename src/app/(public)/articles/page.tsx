@@ -44,9 +44,9 @@ export default async function ArticlesPage({ searchParams }: ArticlesPageProps) 
       <PublishedContentSection
         basePath="/articles"
         content={content}
-        emptyDescription="Опубликованные материалы появятся здесь после публикации через админку."
-        emptyTitle="Пока нет опубликованных материалов"
-        title="Опубликовано"
+        emptyDescription="Когда появятся новые материалы, они отобразятся здесь."
+        emptyTitle="Материалов пока нет"
+        title="Материалы"
       />
     </>
   );

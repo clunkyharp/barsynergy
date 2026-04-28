@@ -77,9 +77,6 @@ export default async function AdminCoursesPage({ searchParams }: AdminCoursesPag
       <header>
         <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Админка / Курсы</p>
         <h1 className="mt-2 text-3xl font-semibold">Курсы</h1>
-        <p className="mt-2 max-w-2xl text-[var(--muted)]">
-          Создание, публикация и архивация образовательных программ.
-        </p>
       </header>
 
       <AdminActionAlert params={params} />
@@ -162,10 +159,7 @@ export default async function AdminCoursesPage({ searchParams }: AdminCoursesPag
         </div>
 
         {courses.length === 0 ? (
-          <EmptyState
-            title="Курсов пока нет"
-            description="Создайте первый курс, чтобы проверить рабочий процесс публикации."
-          />
+          <EmptyState title="Курсов пока нет" />
         ) : (
           <div className="overflow-x-auto rounded-lg border border-[var(--line)] bg-[var(--surface)]">
             <table className="min-w-[1040px] w-full border-collapse text-left text-sm">

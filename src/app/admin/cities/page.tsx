@@ -4,5 +4,5 @@ import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
 export default async function AdminCitiesPage() {
   await requireAdminSectionAccess('cities');
 
-  return <AdminPlaceholderPage title="Города" description="Города и региональная навигация." />;
+  return <AdminPlaceholderPage title="Города" />;
 }

@@ -58,8 +58,8 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
       <PublishedContentSection
         basePath="/events"
         content={content}
-        emptyDescription="Опубликованные события появятся здесь после публикации через админку."
-        emptyTitle="Пока нет опубликованных событий"
+        emptyDescription="Когда появятся новые события, они отобразятся здесь."
+        emptyTitle="Событий пока нет"
         title="Афиша"
       />
       <EventApplicationForm

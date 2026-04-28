@@ -127,7 +127,7 @@ export function PartnerApplicationForm({ enabled, result, utm, cities }: PublicA
               </div>
               <div className="md:col-span-2 flex flex-col gap-3 border-t border-black/10 pt-5 sm:flex-row sm:items-center sm:justify-between">
                 <p className="max-w-md text-xs leading-6 text-[var(--muted)]">
-                  После отправки команда BARSYNERGY просмотрит заявку и ответит по следующему шагу.
+                  После отправки мы свяжемся с вами и обсудим следующий шаг.
                 </p>
                 <Button type="submit">Отправить заявку</Button>
               </div>

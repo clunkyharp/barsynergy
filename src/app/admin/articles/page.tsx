@@ -82,9 +82,6 @@ export default async function AdminArticlesPage({ searchParams }: AdminArticlesP
       <header>
         <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Админка / Статьи</p>
         <h1 className="mt-2 text-3xl font-semibold">Статьи</h1>
-        <p className="mt-2 max-w-2xl text-[var(--muted)]">
-          Создание, публикация и архивация материалов для публичного раздела знаний.
-        </p>
       </header>
 
       <AdminActionAlert params={params} />
@@ -163,10 +160,7 @@ export default async function AdminArticlesPage({ searchParams }: AdminArticlesP
         </div>
 
         {articles.length === 0 ? (
-          <EmptyState
-            title="Статей пока нет"
-            description="Создайте первый материал, чтобы проверить рабочий процесс публикации."
-          />
+          <EmptyState title="Статей пока нет" />
         ) : (
           <div className="overflow-x-auto rounded-lg border border-[var(--line)] bg-[var(--surface)]">
             <table className="min-w-[980px] w-full border-collapse text-left text-sm">

@@ -34,18 +34,18 @@ export default async function VacanciesPage({ searchParams }: VacanciesPageProps
       <EditorialPublicPage
         eyebrow="Вакансии"
         title="Работа, стажировки и команды для заведений"
-        description="Раздел для вакансий, стажировок и командных запросов: заведения могут передать информацию через контактный канал."
-        summary="Заведения отправляют вакансии на проверку, а кандидаты откликаются на опубликованные позиции."
+        description="Вакансии, стажировки и предложения для команд в заведениях региона."
+        summary="Здесь можно посмотреть открытые роли, выбрать город и откликнуться на подходящую позицию."
         metrics={[
           { value: 'Работа', label: 'карьера в индустрии' },
           { value: 'Города', label: 'география ролей' },
-          { value: 'Проверка', label: 'ручная обработка' }
+          { value: 'Команды', label: 'запросы заведений' }
         ]}
         rows={[
           {
             label: 'Для бизнеса',
             title: 'Размещение вакансий',
-            description: 'Заведения передают вакансии через заявку, а команда публикует проверенные позиции.'
+            description: 'Расскажите о роли, графике, оплате и требованиях, чтобы быстрее собрать отклики.'
           },
           {
             label: 'Для людей',
@@ -53,9 +53,9 @@ export default async function VacanciesPage({ searchParams }: VacanciesPageProps
             description: 'Кандидаты ориентируются по городу, роли, формату и уровню позиции.'
           },
           {
-            label: 'Модерация',
-            title: 'Проверка перед публикацией',
-            description: 'В публичном разделе показываются только опубликованные вакансии.'
+            label: 'Навигация',
+            title: 'Города и форматы',
+            description: 'В списке можно быстро сориентироваться по городу, позиции и условиям.'
           }
         ]}
         primaryLink={{ label: 'Разместить вакансию', href: '#vacancy-submission' }}
@@ -64,8 +64,8 @@ export default async function VacanciesPage({ searchParams }: VacanciesPageProps
       <PublishedContentSection
         basePath="/vacancies"
         content={content}
-        emptyDescription="Опубликованные вакансии появятся здесь после публикации через админку."
-        emptyTitle="Пока нет опубликованных вакансий"
+        emptyDescription="Когда появятся новые вакансии, они отобразятся здесь."
+        emptyTitle="Вакансий пока нет"
         title="Актуальные позиции"
       />
       <VacancyApplicationForms

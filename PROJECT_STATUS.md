@@ -18,6 +18,9 @@ Current local follow-up completed on `dev`:
 - public application throttling now has a dedicated cleanup command: `npm run application:cleanup:throttles`.
 - Phase 4 business-account MVP is implemented at source level: email/password login, logout, business-access request, admin approval/blocking, guarded `/business` cabinet, editable company profile and business request drafts/submission/tracking.
 - public UI polish from browser review is applied: homepage feature illustrations use generated vector compositions instead of framed raster images, education/event cards are wider and shorter, community stats and site-section navigation are denser, the global background uses a softer grain/ambient treatment, and form consent checkboxes/focus states are aligned and neutral.
+- shared form UI is redesigned across public applications and auth screens: inputs, selects, textareas and checkboxes now use deeper editorial surfaces, stronger neutral focus states, explicit consent blocks and richer card shells with consistent action footers.
+- technical explanatory blocks were removed from admin and business screens where possible: phase/status helper paragraphs and service placeholders no longer render as pseudo-content, while forms and management actions remain unchanged.
+- public pages and forms were reworded away from internal workflow language: copy no longer leans on admin-phase, moderation, publication-pipeline or placeholder explanations where those texts were not useful user content.
 
 Phase 0 is implemented as the technical foundation:
 

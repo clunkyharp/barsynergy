@@ -49,7 +49,7 @@ export default async function EducationPage({ searchParams }: EducationPageProps
           {
             label: 'Формат',
             title: 'Корпоративное обучение',
-            description: 'Заявки от заведений и партнеров обрабатываются через контактный канал с ручной проверкой.'
+            description: 'Программы для команд заведений: сервис, бар, меню, продажи и внутреннее обучение.'
           }
         ]}
         primaryLink={{ label: 'Оставить запрос', href: '/contacts' }}
@@ -58,8 +58,8 @@ export default async function EducationPage({ searchParams }: EducationPageProps
       <PublishedContentSection
         basePath="/education"
         content={content}
-        emptyDescription="Опубликованные образовательные программы появятся здесь после публикации через админку."
-        emptyTitle="Пока нет опубликованных курсов"
+        emptyDescription="Когда появятся новые программы, они отобразятся здесь."
+        emptyTitle="Программ пока нет"
         title="Программы"
       />
       <EducationApplicationForms

@@ -28,12 +28,12 @@ export default async function SuppliersPage({ searchParams }: SuppliersPageProps
       <EditorialPublicPage
         eyebrow="Поставщики"
         title="Поставщики, сервисы и полезные контакты"
-        description="Каталог компаний и специалистов для закупок, запуска, обслуживания и технических задач заведений."
-        summary="Каталог поставщиков должен быть практичным B2B-разделом: с понятными категориями, контактами и проверенной информацией."
+        description="Каталог компаний и сервисов для закупок, запуска и повседневной работы заведений."
+        summary="Здесь собраны рабочие контакты, категории услуг и краткая информация о поставщиках."
         metrics={[
           { value: 'Каталог', label: 'прикладной b2b-раздел' },
           { value: 'СКФО', label: 'локальный фокус' },
-          { value: 'Проверка', label: 'ручная модерация' }
+          { value: 'Выбор', label: 'по рабочим задачам' }
         ]}
         rows={[
           {
@@ -44,12 +44,12 @@ export default async function SuppliersPage({ searchParams }: SuppliersPageProps
           {
             label: 'Карточка',
             title: 'Профиль поставщика',
-            description: 'Профиль включает описание, город, категории, контакты, логотип и статус публикации.'
+            description: 'Карточка включает описание, город, категории, контакты и основную информацию о компании.'
           },
           {
-            label: 'Качество',
-            title: 'Проверка перед публикацией',
-            description: 'Команда проверяет записи перед публикацией, чтобы каталог не превращался в случайный список контактов.'
+            label: 'Выбор',
+            title: 'Контакты по задаче',
+            description: 'Раздел помогает быстро найти поставщика под запуск, закупку, обслуживание или сервис.'
           }
         ]}
         primaryLink={{ label: 'Добавить поставщика', href: '/contacts' }}
@@ -58,8 +58,8 @@ export default async function SuppliersPage({ searchParams }: SuppliersPageProps
       <PublishedContentSection
         basePath="/suppliers"
         content={content}
-        emptyDescription="Опубликованные поставщики появятся здесь после публикации через админку."
-        emptyTitle="Пока нет опубликованных поставщиков"
+        emptyDescription="Когда появятся новые поставщики, они отобразятся здесь."
+        emptyTitle="Поставщиков пока нет"
         title="Каталог"
       />
       <SupplierApplicationForm

@@ -80,9 +80,6 @@ export default async function AdminApplicationsPage({ searchParams }: AdminAppli
       <header>
         <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Админка / Заявки</p>
         <h1 className="mt-2 text-3xl font-semibold">Заявки</h1>
-        <p className="mt-2 max-w-2xl text-[var(--muted)]">
-          Единая очередь третьей фазы для публичных форм. Список скрывает контактные данные до появления детальной карточки.
-        </p>
       </header>
 
       <Card className="p-5">
@@ -125,10 +122,7 @@ export default async function AdminApplicationsPage({ searchParams }: AdminAppli
         </div>
 
         {applications.length === 0 ? (
-          <EmptyState
-            title="Заявок пока нет"
-            description="После подключения публичных форм новые обращения будут появляться в этой очереди."
-          />
+          <EmptyState title="Заявок пока нет" />
         ) : (
           <div className="overflow-x-auto rounded-lg border border-[var(--line)] bg-[var(--surface)]">
             <table className="min-w-[1000px] w-full border-collapse text-left text-sm">

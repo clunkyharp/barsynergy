@@ -30,11 +30,7 @@ export default async function BusinessDashboardPage({ searchParams }: BusinessDa
 
   return (
     <div className="space-y-8">
-      <PageHeader
-        eyebrow="Компания"
-        title={businessAccount.companyName}
-        description="Профиль компании используется для заявок из кабинета. Публикация материалов остается через администратора."
-      />
+      <PageHeader eyebrow="Компания" title={businessAccount.companyName} />
       <AdminActionAlert params={params} />
       <section className="grid gap-4 md:grid-cols-[1fr_0.75fr]">
         <Card className="p-5">
@@ -91,9 +87,6 @@ export default async function BusinessDashboardPage({ searchParams }: BusinessDa
             <div className="mt-4">
               <Badge variant="success">Активен</Badge>
             </div>
-            <p className="mt-4 text-sm leading-6 text-[var(--muted)]">
-              Компания может создавать заявки, но не может публиковать вакансии, поставщиков или партнерские карточки напрямую.
-            </p>
           </Card>
           <Card className="p-5">
             <h2 className="text-lg font-semibold">Заявки</h2>

@@ -197,7 +197,7 @@ export default async function AdminApplicationDetailPage({ params, searchParams 
 
           {application.type === ApplicationType.VACANCY_SUBMISSION ? (
             <Card className="p-5">
-              <h2 className="text-lg font-semibold">Черновик вакансии</h2>
+              <h2 className="text-lg font-semibold">Вакансия из заявки</h2>
               {application.vacancyId ? (
                 <div className="mt-4 grid gap-4 text-sm">
                   <p className="text-[var(--muted)]">
@@ -211,11 +211,8 @@ export default async function AdminApplicationDetailPage({ params, searchParams 
                 <form action={createVacancyDraftFromApplication} className="mt-4 grid gap-4">
                   <HiddenRedirect value={currentPath} />
                   <input name="applicationId" type="hidden" value={application.id} />
-                  <p className="text-sm leading-6 text-[var(--muted)]">
-                    Создаст черновик вакансии из данных заявки. Публикация останется ручной в разделе вакансий.
-                  </p>
                   <Button type="submit" variant="secondary">
-                    Создать черновик вакансии
+                    Создать вакансию из заявки
                   </Button>
                 </form>
               )}

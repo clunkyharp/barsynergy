@@ -135,7 +135,7 @@ export async function submitVacancyResponseApplication(formData: FormData) {
     assertPublicApplicationFormsEnabled();
 
     if (hasHoneypotValue(getString(formData, 'website'))) {
-      result = { type: 'success', message: 'Отклик отправлен на проверку.' };
+      result = { type: 'success', message: 'Отклик отправлен.' };
       redirectWithApplicationResult(result);
     }
 
@@ -196,7 +196,7 @@ export async function submitVacancyResponseApplication(formData: FormData) {
       }
     });
 
-    result = { type: 'success', message: 'Отклик отправлен на проверку.' };
+    result = { type: 'success', message: 'Отклик отправлен.' };
   } catch (error) {
     await deleteUploadedFileIfUnused(uploadedResumeFileId);
     result = { type: 'error', message: formatPublicApplicationActionError(error) };

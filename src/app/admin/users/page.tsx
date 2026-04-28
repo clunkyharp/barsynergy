@@ -59,9 +59,6 @@ export default async function AdminUsersPage({ searchParams }: AdminUsersPagePro
       <header>
         <p className="text-sm font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">Админка</p>
         <h1 className="mt-2 text-3xl font-semibold">Бизнес-доступы</h1>
-        <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--muted)]">
-          Здесь администратор подтверждает или блокирует первый бизнес-кабинет. Обычные профили пользователей пока не входят в этот срез.
-        </p>
       </header>
       <AdminActionAlert params={params} />
       <section className="grid gap-4">

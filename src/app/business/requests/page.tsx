@@ -64,11 +64,7 @@ export default async function BusinessRequestsPage({ searchParams }: BusinessReq
 
   return (
     <div className="space-y-8">
-      <PageHeader
-        eyebrow="Бизнес-заявки"
-        title="Заявки компании"
-        description="Создавайте черновики или отправляйте заявки на проверку. Администратор остается точкой публикации."
-      />
+      <PageHeader eyebrow="Бизнес-заявки" title="Заявки компании" />
       <AdminActionAlert params={params} />
       <section className="grid gap-6 xl:grid-cols-[0.95fr_1.05fr]">
         <Card className="p-5">
@@ -144,10 +140,10 @@ export default async function BusinessRequestsPage({ searchParams }: BusinessReq
             </label>
             <div className="flex flex-col gap-3 sm:flex-row">
               <Button type="submit" name="intent" value="submit">
-                Отправить на проверку
+                Отправить заявку
               </Button>
               <Button type="submit" name="intent" value="draft" variant="secondary">
-                Сохранить черновик
+                Сохранить позже
               </Button>
             </div>
           </form>
