@@ -299,21 +299,34 @@ export async function deleteSupplierDraft(formData: FormData) {
       supplierId: getString(formData, 'supplierId')
     });
 
-    const deletedSuppliers = await prisma.supplier.findMany({
-      where: {
-        id: parsed.supplierId,
-        status: { not: ContentStatus.PUBLISHED }
-      },
-      select: { coverImageId: true }
+    const deletedSupplier = await prisma.$transaction(async (tx) => {
+      const supplier = await tx.supplier.findFirst({
+        where: {
+          id: parsed.supplierId,
+          status: { not: ContentStatus.PUBLISHED }
+        },
+        select: { coverImageId: true }
+      });
+
+      if (!supplier) {
+        throw new Error('draft is invalid');
+      }
+
+      const deletion = await tx.supplier.deleteMany({
+        where: {
+          id: parsed.supplierId,
+          status: { not: ContentStatus.PUBLISHED }
+        }
+      });
+
+      if (deletion.count !== 1) {
+        throw new Error('draft is invalid');
+      }
+
+      return supplier;
     });
 
-    await prisma.supplier.deleteMany({
-      where: {
-        id: parsed.supplierId,
-        status: { not: ContentStatus.PUBLISHED }
-      }
-    });
-    await Promise.all(deletedSuppliers.map((supplier) => deleteUploadedFileIfUnused(supplier.coverImageId)));
+    await deleteUploadedFileIfUnused(deletedSupplier.coverImageId);
 
     revalidatePath(ADMIN_SUPPLIERS_PATH);
     result = { type: 'success', message: 'Черновик поставщика удален.' };

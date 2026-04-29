@@ -299,21 +299,34 @@ export async function deleteCourseDraft(formData: FormData) {
       courseId: getString(formData, 'courseId')
     });
 
-    const deletedCourses = await prisma.course.findMany({
-      where: {
-        id: parsed.courseId,
-        status: { not: ContentStatus.PUBLISHED }
-      },
-      select: { coverImageId: true }
+    const deletedCourse = await prisma.$transaction(async (tx) => {
+      const course = await tx.course.findFirst({
+        where: {
+          id: parsed.courseId,
+          status: { not: ContentStatus.PUBLISHED }
+        },
+        select: { coverImageId: true }
+      });
+
+      if (!course) {
+        throw new Error('draft is invalid');
+      }
+
+      const deletion = await tx.course.deleteMany({
+        where: {
+          id: parsed.courseId,
+          status: { not: ContentStatus.PUBLISHED }
+        }
+      });
+
+      if (deletion.count !== 1) {
+        throw new Error('draft is invalid');
+      }
+
+      return course;
     });
 
-    await prisma.course.deleteMany({
-      where: {
-        id: parsed.courseId,
-        status: { not: ContentStatus.PUBLISHED }
-      }
-    });
-    await Promise.all(deletedCourses.map((course) => deleteUploadedFileIfUnused(course.coverImageId)));
+    await deleteUploadedFileIfUnused(deletedCourse.coverImageId);
 
     revalidatePath(ADMIN_COURSES_PATH);
     result = { type: 'success', message: 'Черновик курса удален.' };

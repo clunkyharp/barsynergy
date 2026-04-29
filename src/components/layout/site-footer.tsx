@@ -6,7 +6,14 @@ import { displayFont } from '@/lib/fonts';
 
 export function SiteFooter() {
   const pathname = usePathname();
-  const showContactCta = !pathname?.startsWith('/admin');
+  const isWorkspacePath =
+    pathname?.startsWith('/admin') || pathname?.startsWith('/business') || pathname?.startsWith('/auth');
+
+  if (isWorkspacePath) {
+    return null;
+  }
+
+  const showContactCta = true;
 
   return (
     <footer>

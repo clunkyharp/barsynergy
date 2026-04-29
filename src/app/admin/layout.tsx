@@ -18,7 +18,7 @@ export default async function AdminLayout({ children }: { children: ReactNode })
 
   return (
     <div className="min-h-screen border-t border-[var(--line)] bg-[var(--surface)]">
-      <div className="container grid gap-6 py-6 lg:grid-cols-[260px_1fr]">
+      <div className="container grid gap-6 py-8 lg:grid-cols-[300px_1fr]">
         <AdminSidebar role={user.role} />
         <div className="min-w-0">
           <AdminHeader />

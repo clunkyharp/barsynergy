@@ -293,21 +293,34 @@ export async function deleteArticleDraft(formData: FormData) {
       articleId: getString(formData, 'articleId')
     });
 
-    const deletedArticles = await prisma.article.findMany({
-      where: {
-        id: parsed.articleId,
-        status: { not: ContentStatus.PUBLISHED }
-      },
-      select: { coverImageId: true }
+    const deletedArticle = await prisma.$transaction(async (tx) => {
+      const article = await tx.article.findFirst({
+        where: {
+          id: parsed.articleId,
+          status: { not: ContentStatus.PUBLISHED }
+        },
+        select: { coverImageId: true }
+      });
+
+      if (!article) {
+        throw new Error('draft is invalid');
+      }
+
+      const deletion = await tx.article.deleteMany({
+        where: {
+          id: parsed.articleId,
+          status: { not: ContentStatus.PUBLISHED }
+        }
+      });
+
+      if (deletion.count !== 1) {
+        throw new Error('draft is invalid');
+      }
+
+      return article;
     });
 
-    await prisma.article.deleteMany({
-      where: {
-        id: parsed.articleId,
-        status: { not: ContentStatus.PUBLISHED }
-      }
-    });
-    await Promise.all(deletedArticles.map((article) => deleteUploadedFileIfUnused(article.coverImageId)));
+    await deleteUploadedFileIfUnused(deletedArticle.coverImageId);
 
     revalidatePath(ADMIN_ARTICLES_PATH);
     result = { type: 'success', message: 'Черновик статьи удален.' };

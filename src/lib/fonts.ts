@@ -1,7 +1,7 @@
-import { Manrope, Oswald } from 'next/font/google';
+import { Oswald, Outfit } from 'next/font/google';
 
-export const bodyFont = Manrope({
-  subsets: ['latin', 'cyrillic']
+export const bodyFont = Outfit({
+  subsets: ['latin', 'latin-ext']
 });
 
 export const displayFont = Oswald({

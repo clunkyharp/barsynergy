@@ -305,21 +305,34 @@ export async function deleteVacancyDraft(formData: FormData) {
       vacancyId: getString(formData, 'vacancyId')
     });
 
-    const deletedVacancies = await prisma.vacancy.findMany({
-      where: {
-        id: parsed.vacancyId,
-        status: { not: ContentStatus.PUBLISHED }
-      },
-      select: { coverImageId: true }
+    const deletedVacancy = await prisma.$transaction(async (tx) => {
+      const vacancy = await tx.vacancy.findFirst({
+        where: {
+          id: parsed.vacancyId,
+          status: { not: ContentStatus.PUBLISHED }
+        },
+        select: { coverImageId: true }
+      });
+
+      if (!vacancy) {
+        throw new Error('draft is invalid');
+      }
+
+      const deletion = await tx.vacancy.deleteMany({
+        where: {
+          id: parsed.vacancyId,
+          status: { not: ContentStatus.PUBLISHED }
+        }
+      });
+
+      if (deletion.count !== 1) {
+        throw new Error('draft is invalid');
+      }
+
+      return vacancy;
     });
 
-    await prisma.vacancy.deleteMany({
-      where: {
-        id: parsed.vacancyId,
-        status: { not: ContentStatus.PUBLISHED }
-      }
-    });
-    await Promise.all(deletedVacancies.map((vacancy) => deleteUploadedFileIfUnused(vacancy.coverImageId)));
+    await deleteUploadedFileIfUnused(deletedVacancy.coverImageId);
 
     revalidatePath(ADMIN_VACANCIES_PATH);
     result = { type: 'success', message: 'Черновик вакансии удален.' };

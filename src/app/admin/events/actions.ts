@@ -312,21 +312,34 @@ export async function deleteEventDraft(formData: FormData) {
       eventId: getString(formData, 'eventId')
     });
 
-    const deletedEvents = await prisma.event.findMany({
-      where: {
-        id: parsed.eventId,
-        status: { not: ContentStatus.PUBLISHED }
-      },
-      select: { coverImageId: true }
+    const deletedEvent = await prisma.$transaction(async (tx) => {
+      const event = await tx.event.findFirst({
+        where: {
+          id: parsed.eventId,
+          status: { not: ContentStatus.PUBLISHED }
+        },
+        select: { coverImageId: true }
+      });
+
+      if (!event) {
+        throw new Error('draft is invalid');
+      }
+
+      const deletion = await tx.event.deleteMany({
+        where: {
+          id: parsed.eventId,
+          status: { not: ContentStatus.PUBLISHED }
+        }
+      });
+
+      if (deletion.count !== 1) {
+        throw new Error('draft is invalid');
+      }
+
+      return event;
     });
 
-    await prisma.event.deleteMany({
-      where: {
-        id: parsed.eventId,
-        status: { not: ContentStatus.PUBLISHED }
-      }
-    });
-    await Promise.all(deletedEvents.map((event) => deleteUploadedFileIfUnused(event.coverImageId)));
+    await deleteUploadedFileIfUnused(deletedEvent.coverImageId);
 
     revalidatePath(ADMIN_EVENTS_PATH);
     result = { type: 'success', message: 'Черновик события удален.' };

@@ -1,15 +1,9 @@
-import { ApplicationType } from '@prisma/client';
-import { createBusinessApplication } from '@/app/business/actions';
 import { AdminActionAlert } from '@/components/admin/content-admin-controls';
+import { BusinessRequestForm } from '@/components/business/business-request-form';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Checkbox } from '@/components/ui/checkbox';
-import { FormField } from '@/components/ui/form-field';
-import { Input } from '@/components/ui/input';
 import { PageHeader } from '@/components/ui/page-header';
-import { Select } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
 import {
   applicationStatusBadgeVariants,
   applicationStatusLabels,
@@ -18,15 +12,6 @@ import {
 import type { AdminContentSearchParams } from '@/lib/admin/content-utils';
 import { requireBusinessAccountAccess } from '@/lib/auth/require-business-account';
 import { prisma } from '@/lib/db/prisma';
-import { vacancyPositionValues } from '@/lib/vacancies/positions';
-
-const requestTypes = [
-  ApplicationType.VACANCY_SUBMISSION,
-  ApplicationType.SUPPLIER_SUBMISSION,
-  ApplicationType.PARTNER_APPLICATION,
-  ApplicationType.CORPORATE_TRAINING_APPLICATION,
-  ApplicationType.CERTIFICATE_ORDER
-] as const;
 
 const dateFormatter = new Intl.DateTimeFormat('ru-RU', {
   day: '2-digit',
@@ -66,89 +51,8 @@ export default async function BusinessRequestsPage({ searchParams }: BusinessReq
     <div className="space-y-8">
       <PageHeader eyebrow="Бизнес-заявки" title="Заявки компании" />
       <AdminActionAlert params={params} />
-      <section className="grid gap-6 xl:grid-cols-[0.95fr_1.05fr]">
-        <Card className="p-5">
-          <h2 className="text-lg font-semibold">Новая заявка</h2>
-          <form action={createBusinessApplication} className="mt-5 grid gap-5">
-            <div className="grid gap-5 md:grid-cols-2">
-              <FormField htmlFor="type" label="Тип заявки">
-                <Select id="type" name="type" required defaultValue={ApplicationType.VACANCY_SUBMISSION}>
-                  {requestTypes.map((type) => (
-                    <option key={type} value={type}>
-                      {applicationTypeLabels[type]}
-                    </option>
-                  ))}
-                </Select>
-              </FormField>
-              <FormField htmlFor="title" label="Короткое название">
-                <Input id="title" name="title" required maxLength={180} />
-              </FormField>
-              <FormField htmlFor="cityId" label="Город">
-                <Select id="cityId" name="cityId" defaultValue={businessAccount.cityId ?? ''}>
-                  <option value="">Не выбран</option>
-                  {cities.map((city) => (
-                    <option key={city.id} value={city.id}>
-                      {city.name}
-                    </option>
-                  ))}
-                </Select>
-              </FormField>
-              <FormField htmlFor="position" label="Должность для вакансии">
-                <Select id="position" name="position" defaultValue="">
-                  <option value="">Не выбрана</option>
-                  {vacancyPositionValues.map((position) => (
-                    <option key={position} value={position}>
-                      {position}
-                    </option>
-                  ))}
-                </Select>
-              </FormField>
-              <FormField htmlFor="employmentType" label="Тип занятости">
-                <Input id="employmentType" name="employmentType" maxLength={100} />
-              </FormField>
-              <FormField htmlFor="salaryLabel" label="Зарплата">
-                <Input id="salaryLabel" name="salaryLabel" maxLength={120} />
-              </FormField>
-              <FormField htmlFor="experienceLabel" label="Опыт">
-                <Input id="experienceLabel" name="experienceLabel" maxLength={120} />
-              </FormField>
-              <FormField htmlFor="shortDescription" label="Краткое описание">
-                <Input id="shortDescription" name="shortDescription" maxLength={500} />
-              </FormField>
-              <FormField htmlFor="serviceArea" label="Зона поставки">
-                <Input id="serviceArea" name="serviceArea" maxLength={160} />
-              </FormField>
-              <FormField htmlFor="partnerType" label="Тип партнерства">
-                <Input id="partnerType" name="partnerType" maxLength={160} />
-              </FormField>
-              <FormField htmlFor="teamSize" label="Размер команды">
-                <Input id="teamSize" name="teamSize" maxLength={80} />
-              </FormField>
-              <FormField htmlFor="amountLabel" label="Сумма сертификата">
-                <Input id="amountLabel" name="amountLabel" maxLength={120} />
-              </FormField>
-              <FormField htmlFor="recipientName" label="Получатель сертификата">
-                <Input id="recipientName" name="recipientName" maxLength={160} />
-              </FormField>
-            </div>
-            <FormField htmlFor="details" label="Подробности">
-              <Textarea id="details" name="details" required maxLength={4000} rows={6} />
-            </FormField>
-            <label className="flex gap-3 text-sm leading-6">
-              <Checkbox name="consent" value="accepted" required />
-              <span>Подтверждаю согласие на обработку данных заявки.</span>
-            </label>
-            <div className="flex flex-col gap-3 sm:flex-row">
-              <Button type="submit" name="intent" value="submit">
-                Отправить заявку
-              </Button>
-              <Button type="submit" name="intent" value="draft" variant="secondary">
-                Сохранить позже
-              </Button>
-            </div>
-          </form>
-        </Card>
-
+      <section className="grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
+        <BusinessRequestForm cities={cities} defaultCityId={businessAccount.cityId} />
         <section>
           <h2 className="text-xl font-semibold">История заявок</h2>
           <div className="mt-4 grid gap-3">

@@ -26,6 +26,8 @@ Recommended order:
 5. UX/UI audit from screenshots or the live app.
 6. Documentation/remediation formatter.
 
+After any large code batch, broad remediation pass, or cross-module backend/auth/data-flow change, run at least the Code Review audit pass before calling the slice stable.
+
 Each audit pass must use its own bounded subagent on `gpt-5.3-codex` when subagent execution is available. The central agent remains responsible for scope, verification, integration, final prioritization and closeout.
 
 ## Universal Audit Header

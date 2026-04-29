@@ -2,24 +2,19 @@
 
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-import { ApplicationStatus, ApplicationType, type Prisma } from '@prisma/client';
+import { ApplicationStatus, ApplicationType } from '@prisma/client';
 import { z } from 'zod';
 import { getString, nullableString, optionalString } from '@/lib/admin/content-utils';
+import {
+  buildBusinessApplicationPayload,
+  parseBusinessApplicationInput
+} from '@/lib/applications/business-request';
 import { PERSONAL_DATA_CONSENT_TEXT } from '@/lib/applications/public-form-helpers';
 import { requireBusinessAccountAccess } from '@/lib/auth/require-business-account';
 import { prisma } from '@/lib/db/prisma';
-import { vacancyPositionValues } from '@/lib/vacancies/positions';
 
 const BUSINESS_PATH = '/business';
 const BUSINESS_REQUESTS_PATH = '/business/requests';
-
-const businessApplicationTypes = [
-  ApplicationType.VACANCY_SUBMISSION,
-  ApplicationType.SUPPLIER_SUBMISSION,
-  ApplicationType.PARTNER_APPLICATION,
-  ApplicationType.CORPORATE_TRAINING_APPLICATION,
-  ApplicationType.CERTIFICATE_ORDER
-] as const;
 
 const businessProfileSchema = z.object({
   companyName: z.string().trim().min(2).max(160),
@@ -29,28 +24,6 @@ const businessProfileSchema = z.object({
   telegram: z.string().trim().max(80).optional(),
   websiteUrl: z.string().trim().url().max(240).optional().or(z.literal('')),
   description: z.string().trim().max(1000).optional()
-});
-
-const businessApplicationSchema = z.object({
-  applicationId: z.string().trim().optional(),
-  type: z.enum(businessApplicationTypes),
-  title: z.string().trim().min(2).max(180),
-  cityId: z.string().trim().optional(),
-  details: z.string().trim().min(10).max(4000),
-  position: z.enum(vacancyPositionValues).optional(),
-  employmentType: z.string().trim().max(100).optional(),
-  salaryLabel: z.string().trim().max(120).optional(),
-  experienceLabel: z.string().trim().max(120).optional(),
-  shortDescription: z.string().trim().max(500).optional(),
-  serviceArea: z.string().trim().max(160).optional(),
-  partnerType: z.string().trim().max(160).optional(),
-  teamSize: z.string().trim().max(80).optional(),
-  recipientName: z.string().trim().max(160).optional(),
-  amountLabel: z.string().trim().max(120).optional(),
-  consent: z.literal('accepted')
-}).refine((data) => data.type !== ApplicationType.VACANCY_SUBMISSION || Boolean(data.position), {
-  message: 'position is required for vacancy submission',
-  path: ['position']
 });
 
 const applicationIdSchema = z.object({
@@ -104,24 +77,6 @@ function getApplicationSubject(input: { type: ApplicationType; companyName: stri
   }
 
   return `Заказ сертификата: ${input.companyName}`;
-}
-
-function buildPayload(input: z.infer<typeof businessApplicationSchema> & { companyName: string }): Prisma.InputJsonValue {
-  return {
-    source: 'business_cabinet',
-    companyName: input.companyName,
-    title: input.title,
-    position: input.position || null,
-    employmentType: input.employmentType || null,
-    salaryLabel: input.salaryLabel || null,
-    experienceLabel: input.experienceLabel || null,
-    shortDescription: input.shortDescription || input.title,
-    serviceArea: input.serviceArea || null,
-    partnerType: input.partnerType || null,
-    teamSize: input.teamSize || null,
-    recipientName: input.recipientName || null,
-    amountLabel: input.amountLabel || null
-  };
 }
 
 function getBusinessApplicationFormData(formData: FormData) {
@@ -189,7 +144,7 @@ export async function createBusinessApplication(formData: FormData) {
 
   try {
     const { user, businessAccount } = await requireBusinessAccountAccess();
-    const parsed = businessApplicationSchema.parse(getBusinessApplicationFormData(formData));
+    const parsed = parseBusinessApplicationInput(getBusinessApplicationFormData(formData));
     const city = await assertActiveCity(parsed.cityId);
     const status = getString(formData, 'intent') === 'draft' ? ApplicationStatus.DRAFT : ApplicationStatus.NEW;
 
@@ -209,7 +164,7 @@ export async function createBusinessApplication(formData: FormData) {
         telegram: businessAccount.telegram,
         cityId: city?.id ?? businessAccount.cityId,
         businessAccountId: businessAccount.id,
-        payload: buildPayload({ ...parsed, companyName: businessAccount.companyName }),
+        payload: buildBusinessApplicationPayload({ ...parsed, companyName: businessAccount.companyName }),
         consentAcceptedAt: new Date(),
         consentText: PERSONAL_DATA_CONSENT_TEXT
       }
@@ -236,7 +191,7 @@ export async function updateBusinessDraftApplication(formData: FormData) {
 
   try {
     const { user, businessAccount } = await requireBusinessAccountAccess();
-    const parsed = businessApplicationSchema.parse(getBusinessApplicationFormData(formData));
+    const parsed = parseBusinessApplicationInput(getBusinessApplicationFormData(formData));
     const city = await assertActiveCity(parsed.cityId);
     const existing = await prisma.application.findFirst({
       where: {
@@ -266,7 +221,7 @@ export async function updateBusinessDraftApplication(formData: FormData) {
         phone: businessAccount.phone,
         telegram: businessAccount.telegram,
         cityId: city?.id ?? businessAccount.cityId,
-        payload: buildPayload({ ...parsed, companyName: businessAccount.companyName }),
+        payload: buildBusinessApplicationPayload({ ...parsed, companyName: businessAccount.companyName }),
         consentAcceptedAt: new Date(),
         consentText: PERSONAL_DATA_CONSENT_TEXT
       }

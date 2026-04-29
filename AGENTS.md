@@ -60,6 +60,9 @@ Lock one mode before non-trivial work:
 - `QA` for verification, review, audit, or release readiness.
 
 For implementation batches, define goal, scope, out of scope, ownership, done criteria, and validation before editing.
+Treat a bare `continue by plan` / `продолжай по плану` request as under-specified. Before coding, restate the current phase or checkpoint, what is already done, exact in-scope work for this batch, out of scope, done condition, and validation path.
+After any large multi-file code change or structurally meaningful remediation batch, run a separate `QA` code review pass before considering the batch stable. That review must check architecture, reliability, maintainability, DX and predictable further development.
+For `QA` review work, label the intent explicitly: `discovery`, `control audit`, or `sign-off`.
 
 Keep changes minimal. Preserve existing architecture, naming, routing, styling, and file organization unless the task explicitly asks for refactoring.
 
@@ -70,6 +73,7 @@ Keep changes minimal. Preserve existing architecture, naming, routing, styling, 
 - Use `feature/*` only for large coherent features.
 - Use `fix/*` only for critical production fixes.
 - Small tasks can be done directly on `dev`.
+- Do not combine commit/checkpoint work with further implementation in the same batch. First classify the dirty tree and create the checkpoint, then open a separate implementation batch if more work is needed.
 - Do not push, deploy, merge to `prod`, delete broadly, or run destructive commands without explicit owner approval.
 - Always run `git status --short --branch` before file-changing work.
 - Do not revert unrelated user changes.
@@ -136,6 +140,7 @@ Run build and typecheck sequentially. Next.js type generation can make parallel 
 - Keep server data access, route handlers, and client components clearly separated.
 - Prefer existing components in `src/components/ui`, `src/components/layout`, and `src/components/public`.
 - Keep public UI responsive and check mobile behavior for visible page changes.
+- For small visible UI fixes, prefer concrete browser diff evidence, screenshot notes, page URL, and target element over a generic `поправь дизайн` prompt.
 - Use Prisma migrations for schema changes. Do not edit generated Prisma client files.
 - Keep validation close to boundaries using existing Zod/env patterns.
 - Do not introduce new libraries unless they are necessary and consistent with the stack.

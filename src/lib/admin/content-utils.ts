@@ -153,6 +153,10 @@ export function formatAdminActionError(error: unknown) {
   }
 
   if (error instanceof Error) {
+    if (error.message.includes('draft is invalid')) {
+      return 'Черновик не найден или уже недоступен для удаления.';
+    }
+
     if (error.message.includes('slug is required')) {
       return 'Укажите slug или заголовок, из которого можно создать slug.';
     }

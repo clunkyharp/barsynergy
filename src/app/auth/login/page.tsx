@@ -49,6 +49,15 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
               </li>
             </ul>
           </div>
+          <div className="mt-8 rounded-[1.25rem] border border-black/10 bg-[var(--surface)] px-4 py-4">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Нет доступа?</p>
+            <p className="mt-3 text-sm leading-6 text-[var(--muted)]">
+              Если вы представляете бизнес и хотите работать через кабинет, сначала отправьте заявку на доступ.
+            </p>
+            <Button className="mt-4 min-h-11 rounded-full px-5 tracking-[0.1em]" href="/auth/register" variant="secondary">
+              Запросить доступ
+            </Button>
+          </div>
         </section>
 
         <section className="editorial-form-shell overflow-hidden">
@@ -79,8 +88,8 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
                 <Button className="min-h-12 rounded-full px-6 tracking-[0.12em]" type="submit">
                   Войти
                 </Button>
-                <Button className="min-h-12 rounded-full px-6 tracking-[0.12em]" href="/" variant="secondary">
-                  На главную
+                <Button className="min-h-12 rounded-full px-6 tracking-[0.12em]" href="/auth/register" variant="secondary">
+                  Нужен доступ
                 </Button>
               </div>
             </form>

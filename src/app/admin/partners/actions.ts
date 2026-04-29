@@ -275,21 +275,34 @@ export async function deletePartnerDraft(formData: FormData) {
       partnerId: getString(formData, 'partnerId')
     });
 
-    const deletedPartners = await prisma.partner.findMany({
-      where: {
-        id: parsed.partnerId,
-        status: { not: ContentStatus.PUBLISHED }
-      },
-      select: { coverImageId: true }
+    const deletedPartner = await prisma.$transaction(async (tx) => {
+      const partner = await tx.partner.findFirst({
+        where: {
+          id: parsed.partnerId,
+          status: { not: ContentStatus.PUBLISHED }
+        },
+        select: { coverImageId: true }
+      });
+
+      if (!partner) {
+        throw new Error('draft is invalid');
+      }
+
+      const deletion = await tx.partner.deleteMany({
+        where: {
+          id: parsed.partnerId,
+          status: { not: ContentStatus.PUBLISHED }
+        }
+      });
+
+      if (deletion.count !== 1) {
+        throw new Error('draft is invalid');
+      }
+
+      return partner;
     });
 
-    await prisma.partner.deleteMany({
-      where: {
-        id: parsed.partnerId,
-        status: { not: ContentStatus.PUBLISHED }
-      }
-    });
-    await Promise.all(deletedPartners.map((partner) => deleteUploadedFileIfUnused(partner.coverImageId)));
+    await deleteUploadedFileIfUnused(deletedPartner.coverImageId);
 
     revalidatePath(ADMIN_PARTNERS_PATH);
     result = { type: 'success', message: 'Черновик партнера удален.' };

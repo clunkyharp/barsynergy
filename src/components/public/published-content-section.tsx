@@ -8,6 +8,11 @@ type PublishedContentSectionProps = {
   emptyDescription: string;
   content: PublishedContentList;
   basePath: string;
+  sectionId?: string;
+  emptyAction?: {
+    href: string;
+    label: string;
+  };
 };
 
 function pageHref(content: PublishedContentList, basePath: string, page: number) {
@@ -34,9 +39,17 @@ function pageHref(content: PublishedContentList, basePath: string, page: number)
   return query ? `${basePath}?${query}` : basePath;
 }
 
-export function PublishedContentSection({ title, emptyTitle, emptyDescription, content, basePath }: PublishedContentSectionProps) {
+export function PublishedContentSection({
+  title,
+  emptyTitle,
+  emptyDescription,
+  content,
+  basePath,
+  sectionId,
+  emptyAction
+}: PublishedContentSectionProps) {
   return (
-    <section className="editorial-grid border-b border-black/20 py-10 md:py-14">
+    <section className="editorial-grid border-b border-black/20 py-10 md:py-14" id={sectionId}>
       <div className="container grid gap-8 xl:grid-cols-[0.72fr_1.28fr]">
         <div>
           <h2 className={`${displayFont.className} display-tight text-[44px] md:text-[58px]`}>{title}</h2>
@@ -49,6 +62,11 @@ export function PublishedContentSection({ title, emptyTitle, emptyDescription, c
           <div className="border border-black/20 p-6">
             <h3 className="text-xl font-semibold uppercase leading-7">{emptyTitle}</h3>
             <p className="mt-3 max-w-2xl text-sm leading-7 text-[var(--muted)]">{emptyDescription}</p>
+            {emptyAction ? (
+              <Button className="mt-5 min-h-12 rounded-full px-6 tracking-[0.08em]" href={emptyAction.href}>
+                {emptyAction.label}
+              </Button>
+            ) : null}
           </div>
         ) : (
           <div>

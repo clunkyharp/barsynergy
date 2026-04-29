@@ -17,6 +17,7 @@ The central agent must:
 - review subagent output before accepting it;
 - integrate changes only after local inspection;
 - run verification;
+- run a dedicated `QA` review pass after every large code batch or cross-module remediation before treating the result as stable;
 - keep documentation and the Obsidian Kanban board synchronized with every meaningful project change;
 - report risks and validation gaps clearly;
 - prevent scope creep and repeated polishing.
