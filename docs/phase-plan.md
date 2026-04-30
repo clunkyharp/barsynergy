@@ -97,6 +97,9 @@ Current status:
 - route-level loading, error and not-found states are implemented;
 - design-system foundation is documented in `DESIGN.md` and `design-tokens.json`;
 - lint, typecheck, build, Prisma validate, public route smoke and desktop/mobile homepage spot checks pass;
+- the homepage has been rebuilt as a live CMS-fed front page with a new public shell, GSAP-driven narrative sections, stronger B2B routing and renewed desktop/mobile screenshot checks;
+- the main public routes now share normalized public primitives for typography, section headers, stat shells, filters, content meta chips and form action rows, while keeping demo/test data and section-specific information structure;
+- focused browser smoke is rerun for key public and auth routes, including shell-safety checks and corrected desktop navigation/contrast fixes on the vacancies surface;
 - Phase 1 is complete for the current static public surface;
 - legal text still needs owner/legal review before personal-data collection.
 
@@ -134,6 +137,7 @@ Current status:
 - public read queries are connected to articles, events, education, vacancies, suppliers and partners and return only `published` records with pagination that preserves active filters;
 - public content image upload route is implemented at `/admin/uploads/content-image`;
 - Phase 2 admin UX follow-up is implemented: edit forms, cover image upload slots, admin list pagination and admin action success/error states;
+- key admin screens now share a calmer global header and a unified intro pattern across dashboard-adjacent list and placeholder pages;
 - article full editing is implemented on a dedicated `/admin/articles/[articleId]` screen so the list page does not render long article bodies inline;
 - final Phase 2 runtime/admin review passed on 2026-04-27 with authenticated Playwright create smoke for all content sections, cover-image upload smoke, public route smoke and article publish/archive public-visibility smoke;
 - Phase 2 is complete for the current MVP content/admin contract.
@@ -244,6 +248,8 @@ Current status:
 - `/business` is guarded for active business users and supports company profile editing;
 - `/business/requests` supports business-owned drafts and submissions for vacancy placement, supplier placement, partner application, corporate training and certificate order;
 - `/business/requests/[applicationId]` lets businesses view only their own requests, edit drafts, submit drafts for review and archive drafts;
+- auth, business and specialist-profile screens have an additional shared-UI consistency pass: page headers, action rows, stat blocks, sidebars and helper panels are normalized around the internal UI kit without changing the Phase 4 business logic;
+- focused browser smoke is rerun for `/business` and `/business/requests` after activating local demo access for QA only;
 - admin application detail can store business-visible notes;
 - password reset and invite acceptance are deferred until production email is configured.
 

@@ -1,110 +1,107 @@
 'use client';
 
-import { useEffect, useId, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { ArrowUpRight, Menu, X } from 'lucide-react';
-
-type NavItem = {
-  label: string;
-  href: string;
-};
+import { accentFont, displayFont } from '@/lib/fonts';
+import { cn } from '@/lib/utils';
 
 type MobileSiteMenuProps = {
-  navItems: NavItem[];
+  navItems: Array<{
+    label: string;
+    href: string;
+  }>;
+  pathname?: string | null;
 };
 
-export function MobileSiteMenu({ navItems }: MobileSiteMenuProps) {
+export function MobileSiteMenu({ navItems, pathname }: MobileSiteMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const menuId = useId();
-  const rootRef = useRef<HTMLDivElement>(null);
+  const menuButtonClassName =
+    'inline-flex h-12 w-12 items-center justify-center rounded-full border border-[var(--graphite)] bg-[var(--graphite)] text-white shadow-[0_16px_34px_rgba(20,20,18,0.18)] transition hover:bg-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]';
+
+  useEffect(() => {
+    setIsOpen(false);
+  }, [pathname]);
 
   useEffect(() => {
     if (!isOpen) {
       return;
     }
 
-    function handleKeyDown(event: KeyboardEvent) {
+    const previousOverflow = document.body.style.overflow;
+
+    document.body.style.overflow = 'hidden';
+
+    const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         setIsOpen(false);
       }
-    }
-
-    function handlePointerDown(event: MouseEvent | TouchEvent) {
-      const target = event.target as Node | null;
-
-      if (!rootRef.current || !target) {
-        return;
-      }
-
-      if (!rootRef.current.contains(target)) {
-        setIsOpen(false);
-      }
-    }
+    };
 
     window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('mousedown', handlePointerDown);
-    window.addEventListener('touchstart', handlePointerDown);
 
     return () => {
+      document.body.style.overflow = previousOverflow;
       window.removeEventListener('keydown', handleKeyDown);
-      window.removeEventListener('mousedown', handlePointerDown);
-      window.removeEventListener('touchstart', handlePointerDown);
     };
   }, [isOpen]);
 
   return (
-    <div className="xl:hidden" ref={rootRef}>
+    <>
       <button
-        aria-controls={menuId}
         aria-expanded={isOpen}
         aria-label={isOpen ? 'Закрыть меню' : 'Открыть меню'}
-        className="inline-flex h-12 w-12 items-center justify-center border border-[var(--graphite)] bg-[var(--graphite)] text-white transition-[background-color,border-color,transform] duration-300 ease-out hover:bg-black active:scale-[0.98]"
-        onClick={() => setIsOpen((value) => !value)}
+        className={cn(menuButtonClassName, 'xl:hidden', isOpen && 'pointer-events-none opacity-0')}
+        onClick={() => setIsOpen((open) => !open)}
         type="button"
       >
-        {isOpen ? (
-          <X className="transition-transform duration-300 ease-out" size={22} strokeWidth={2} />
-        ) : (
-          <Menu className="transition-transform duration-300 ease-out" size={22} strokeWidth={2} />
-        )}
+        {isOpen ? <X size={22} /> : <Menu size={22} />}
       </button>
 
-      {isOpen ? (
-        <div
-          className="absolute inset-x-0 top-full border-b border-black/20 bg-[var(--surface)] shadow-[0_18px_36px_rgba(20,20,18,0.12)]"
-          id={menuId}
-        >
-          <nav className="container grid py-4">
-            {navItems.map((item) => (
-              <a
-                className="group flex min-h-12 items-center justify-between border-b border-black/12 text-sm font-semibold uppercase tracking-[0.06em] text-[var(--text)] transition-colors duration-300 ease-out hover:text-[var(--accent)] focus-visible:text-[var(--accent)]"
-                href={item.href}
-                key={item.href}
-                onClick={() => setIsOpen(false)}
-              >
-                <span className="transition-transform duration-300 ease-out group-hover:translate-x-1 group-focus-visible:translate-x-1">
-                  {item.label}
-                </span>
-                <ArrowUpRight
-                  className="shrink-0 transition-transform duration-300 ease-out group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-focus-visible:-translate-y-0.5 group-focus-visible:translate-x-0.5"
-                  size={17}
-                  strokeWidth={1.9}
-                />
-              </a>
-            ))}
-            <a
-              className="group mt-4 inline-flex min-h-12 items-center justify-center gap-3 border border-[var(--graphite)] bg-[var(--graphite)] px-5 text-sm font-semibold uppercase tracking-[0.06em] text-white transition-[background-color,border-color,transform] duration-300 ease-out hover:bg-black active:scale-[0.99]"
-              href="/contacts"
-              onClick={() => setIsOpen(false)}
-            >
-              Присоединиться
-              <ArrowUpRight
-                className="transition-transform duration-300 ease-out group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
-                size={18}
-              />
-            </a>
-          </nav>
-        </div>
-      ) : null}
-    </div>
+      {isOpen && typeof document !== 'undefined'
+        ? createPortal(
+            <div className="fixed inset-0 z-[1100] overflow-y-auto bg-[radial-gradient(circle_at_78%_8%,rgba(153,44,38,0.24),transparent_28rem),linear-gradient(135deg,#10100f_0%,#17120f_58%,#0d0d0c_100%)] text-white">
+              <div aria-hidden="true" className="absolute inset-0 bg-[url('/images/grain.svg')] opacity-18" />
+              <nav className="container relative grid min-h-[100dvh] content-start py-8">
+                <div className="flex items-start justify-between gap-4">
+                  <span className={cn(accentFont.className, 'pt-3 text-base uppercase tracking-[0.34em] text-white/72')}>BARSYNERGY</span>
+                  <button
+                    aria-label="Закрыть меню"
+                    className="sticky top-6 z-[1201] inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-white/18 bg-white/10 text-white shadow-[0_16px_34px_rgba(0,0,0,0.22)] backdrop-blur transition hover:bg-white/16 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                    onClick={() => setIsOpen(false)}
+                    type="button"
+                  >
+                    <X size={22} />
+                  </button>
+                </div>
+                <div className="mt-6 grid border-t border-white/14">
+                  {navItems.map((item) => (
+                    <a
+                      className="group/link grid min-h-20 grid-cols-[minmax(0,1fr)_auto] items-center gap-5 border-b border-white/14 text-white transition hover:bg-white/[0.04]"
+                      href={item.href}
+                      key={item.href}
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <span className={cn(displayFont.className, 'display-tight text-[34px] leading-none sm:text-[46px]')}>
+                        {item.label}
+                      </span>
+                      <ArrowUpRight className="text-white/72 transition group-hover/link:translate-x-1 group-hover/link:-translate-y-1 group-hover/link:text-white" size={24} />
+                    </a>
+                  ))}
+                </div>
+                <a
+                  className="mt-10 inline-flex min-h-14 w-fit items-center gap-3 rounded-full border border-white/18 px-6 text-sm font-semibold uppercase tracking-[0.1em] text-white transition hover:bg-white hover:text-[var(--graphite)]"
+                  href="/contacts"
+                  onClick={() => setIsOpen(false)}
+                >
+                  Написать команде
+                  <ArrowUpRight size={18} />
+                </a>
+              </nav>
+            </div>,
+            document.body
+          )
+        : null}
+    </>
   );
 }

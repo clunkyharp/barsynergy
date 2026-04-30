@@ -2,7 +2,7 @@
 
 import { ArrowUpRight } from 'lucide-react';
 import { usePathname } from 'next/navigation';
-import { displayFont } from '@/lib/fonts';
+import { accentFont, displayFont } from '@/lib/fonts';
 
 export function SiteFooter() {
   const pathname = usePathname();
@@ -18,47 +18,60 @@ export function SiteFooter() {
   return (
     <footer>
       {showContactCta ? (
-        <section className="border-t border-black/20 bg-[var(--accent)] text-white">
-          <div className="container grid min-h-[320px] gap-6 py-10 md:py-12 lg:grid-cols-[1.12fr_0.78fr_0.58fr] lg:items-stretch">
-            <h2 className={`${displayFont.className} display-tight text-5xl md:text-[88px]`}>
-              Есть запрос по барной индустрии?
+        <section className="border-t border-black/12 bg-[var(--graphite)] text-white">
+          <div className="container grid min-h-[320px] gap-8 py-14 md:py-18 lg:grid-cols-[1fr_0.9fr_0.62fr] lg:items-center">
+          <div>
+            <h2 className={`${displayFont.className} display-tight max-w-3xl text-[38px] md:text-[56px] xl:text-[64px]`}>
+              Обратная связь с командой BARSYNERGY
             </h2>
+            </div>
             <div className="flex h-full flex-col justify-end">
-              <p className="max-w-lg pb-1 text-base leading-7 text-white/88 md:text-lg md:leading-8">
-                Напишите команде BARSYNERGY: обучение, событие, вакансия, поставщик или партнерство.
+              <p className="max-w-lg pb-1 text-base leading-8 text-white/76 md:text-lg">
+                Напишите, если нужно добавить программу, событие, вакансию, поставщика, партнерство или спонсорский формат.
               </p>
             </div>
             <div className="flex h-full items-end lg:justify-end">
               <a
-                className="inline-flex min-h-16 w-full items-center justify-center gap-4 border border-white/50 px-8 text-base font-semibold uppercase tracking-[0.06em] text-white transition hover:border-white hover:bg-white hover:text-[var(--accent)] focus-visible:border-white focus-visible:bg-white focus-visible:text-[var(--accent)] active:translate-y-px sm:w-fit md:min-h-[72px] md:px-10"
+                className="inline-flex min-h-16 w-full items-center justify-center gap-4 rounded-full border border-white/22 px-8 text-base font-semibold uppercase tracking-[0.08em] text-white transition hover:border-white hover:bg-white hover:text-[var(--graphite)] focus-visible:border-white focus-visible:bg-white focus-visible:text-[var(--graphite)] active:translate-y-px sm:w-fit md:min-h-[72px] md:px-10"
                 href="/contacts"
               >
-                Написать
+                Связаться
                 <ArrowUpRight size={18} />
               </a>
             </div>
           </div>
         </section>
       ) : null}
-      <section className="border-t border-black/20 bg-[var(--graphite)] py-8 text-white">
-        <div className="container grid gap-8 md:grid-cols-[1fr_auto]">
+      <section className="border-t border-white/8 bg-black py-10 text-white">
+        <div className="container grid gap-8 md:grid-cols-[1fr_auto_auto]">
           <div>
-            <p className={`${displayFont.className} display-face text-2xl uppercase`}>BARSYNERGY</p>
-            <p className="mt-3 max-w-xl text-sm text-white/68">
+            <p className={`${accentFont.className} text-base uppercase tracking-[0.18em] text-white`}>BARSYNERGY</p>
+            <p className="mt-3 max-w-xl text-sm leading-7 text-white/62">
               Обучение, события, материалы и деловые контакты для барной индустрии СКФО.
             </p>
           </div>
-          <nav className="grid gap-2 text-sm text-white/72 md:justify-items-end md:text-right">
-            <a className="flex items-center py-1 transition hover:text-white" href="/legal/privacy">
+          <nav className="grid gap-0.5 text-sm leading-6 text-white/72 md:justify-items-end md:text-right">
+            <a className="flex items-center py-0.5 transition hover:text-white" href="/about">
+              О проекте
+            </a>
+            <a className="flex items-center py-0.5 transition hover:text-white" href="/partners">
+              Партнерства
+            </a>
+            <a className="flex items-center py-0.5 transition hover:text-white" href="/general-sponsors">
+              Спонсоры
+            </a>
+          </nav>
+          <nav className="grid gap-0.5 text-sm leading-6 text-white/72 md:justify-items-end md:text-right">
+            <a className="flex items-center py-0.5 transition hover:text-white" href="/legal/privacy">
               Политика конфиденциальности
             </a>
-            <a className="flex items-center py-1 transition hover:text-white" href="/legal/personal-data-consent">
+            <a className="flex items-center py-0.5 transition hover:text-white" href="/legal/personal-data-consent">
               Согласие на обработку ПДн
             </a>
-            <a className="flex items-center py-1 transition hover:text-white" href="/legal/terms">
+            <a className="flex items-center py-0.5 transition hover:text-white" href="/legal/terms">
               Условия использования
             </a>
-            <a className="flex items-center py-1 transition hover:text-white" href="/legal/cookies">
+            <a className="flex items-center py-0.5 transition hover:text-white" href="/legal/cookies">
               Куки и аналитика
             </a>
           </nav>

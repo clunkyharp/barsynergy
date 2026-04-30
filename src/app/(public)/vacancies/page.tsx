@@ -1,19 +1,16 @@
+import { CategoryType } from '@prisma/client';
 import { ArrowUpRight } from 'lucide-react';
+import { PublicActionRow, PublicBodyText, PublicDisplayTitle, PublicEyebrow } from '@/components/public/public-primitives';
 import { PublishedContentSection } from '@/components/public/published-content-section';
-import { VacancyApplicationForms } from '@/components/public/vacancy-application-forms';
+import { PublicFilters } from '@/components/public/public-filters';
 import { Button } from '@/components/ui/button';
-import { arePublicApplicationFormsEnabled } from '@/lib/applications/public-forms';
-import { getPublishedVacancies, getVacancyApplicationFormOptions, type PublicContentSearchParams } from '@/lib/public/content';
-import { displayFont } from '@/lib/fonts';
-import { getEnv } from '@/lib/validation/env';
+import { StatCard } from '@/components/ui/stat-card';
+import { getPublishedVacancies, type PublicContentSearchParams } from '@/lib/public/content';
+import { getPublicCategoryOptions, getPublicCityFilterOptions, getVacancyFilterOptions } from '@/lib/public/filter-options';
 
 type VacanciesPageProps = {
   searchParams?: Promise<PublicContentSearchParams>;
 };
-
-function firstParam(value: string | string[] | undefined) {
-  return Array.isArray(value) ? value[0] : value;
-}
 
 function stripApplicationResultParams(params: PublicContentSearchParams) {
   return Object.fromEntries(
@@ -23,15 +20,14 @@ function stripApplicationResultParams(params: PublicContentSearchParams) {
 
 export default async function VacanciesPage({ searchParams }: VacanciesPageProps) {
   const params = (await searchParams) ?? {};
-  const [content, applicationFormOptions] = await Promise.all([
+  const [content, categories, cities, filterOptions] = await Promise.all([
     getPublishedVacancies(stripApplicationResultParams(params)),
-    getVacancyApplicationFormOptions()
+    getPublicCategoryOptions(CategoryType.VACANCY),
+    getPublicCityFilterOptions(),
+    getVacancyFilterOptions()
   ]);
-  const applicationSuccess = firstParam(params.applicationSuccess);
-  const applicationError = firstParam(params.applicationError);
-  const applicationFormsEnabled = arePublicApplicationFormsEnabled(getEnv());
   const vacancyCount = content.total;
-  const hasVacancies = applicationFormOptions.vacancies.length > 0;
+  const hasVacancies = vacancyCount > 0;
 
   return (
     <>
@@ -42,72 +38,55 @@ export default async function VacanciesPage({ searchParams }: VacanciesPageProps
         />
         <div className="container relative grid gap-6 xl:grid-cols-[1.12fr_0.88fr] xl:items-end">
           <div className="min-w-0">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Вакансии</p>
-            <h1 className={`${displayFont.className} display-tight mt-3 max-w-6xl text-[clamp(2.7rem,5vw,5.5rem)]`}>
-              Открытые роли и заявки без лишних шагов
-            </h1>
-            <p className="mt-5 max-w-2xl text-base leading-7 text-[var(--muted)]">
-              Экран разделён по задачам. Кандидатам нужен список опубликованных позиций и прямой отклик, заведениям —
-              короткая заявка на размещение без лишних шагов.
-            </p>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+            <PublicEyebrow>Вакансии</PublicEyebrow>
+            <PublicDisplayTitle as="h1" className="mt-3" size="hero">
+              Работа для баров, кофеен и команд Северного Кавказа
+            </PublicDisplayTitle>
+            <PublicBodyText className="mt-5 max-w-2xl" size="md">
+              Здесь собраны опубликованные вакансии, отклики по открытым ролям и отправка новых позиций от заведений.
+            </PublicBodyText>
+            <PublicActionRow className="flex-col gap-3 sm:flex-row">
               <Button className="min-h-12 rounded-full px-6 tracking-[0.08em]" href="#vacancy-list">
                 Смотреть позиции
                 <ArrowUpRight size={18} />
               </Button>
-              <Button className="min-h-12 rounded-full px-6 tracking-[0.08em]" href="#vacancy-forms" variant="secondary">
-                Перейти к форме
+              <Button className="min-h-12 px-6 tracking-[0.08em]" href="/contacts" variant="secondary">
+                Связаться
               </Button>
-            </div>
+            </PublicActionRow>
           </div>
-          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-1">
-            <div className="rounded-[1.5rem] border border-black/10 bg-white/80 p-5 backdrop-blur">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">Сейчас в разделе</p>
-              <p className="mt-3 text-4xl font-semibold tracking-[-0.05em]">{vacancyCount}</p>
-              <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
-                {hasVacancies
-                  ? 'Опубликованные роли доступны сразу в списке ниже, без лишнего вступительного контента.'
-                  : 'Новых ролей пока нет, но заявка на размещение вакансии уже доступна.'}
-              </p>
-            </div>
-            <div className="rounded-[1.5rem] border border-black/10 bg-[var(--graphite)] p-5 text-white">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-white/60">Маршрут</p>
-              <div className="mt-3 grid gap-2 text-sm font-semibold sm:grid-cols-3 xl:grid-cols-1">
-                <span>1. Список</span>
-                <span>2. Сценарий</span>
-                <span>3. Отправка</span>
-              </div>
-              <p className="mt-2 text-sm leading-6 text-white/72">
-                Основное действие начинается сразу: сначала список ролей, затем нужная форма.
-              </p>
-            </div>
+          <div className="grid gap-3">
+            <StatCard
+              className="backdrop-blur"
+              description={
+                hasVacancies
+                  ? 'опубликованные вакансии'
+                  : 'открытых вакансий сейчас нет'
+              }
+              label="Вакансии"
+              value={vacancyCount}
+              valueClassName="text-4xl font-semibold tracking-[-0.05em]"
+            />
           </div>
         </div>
       </section>
       <PublishedContentSection
         basePath="/vacancies"
         content={content}
-        emptyAction={{ href: '#vacancy-submission', label: 'Разместить вакансию' }}
-        emptyDescription="Пока опубликованных позиций нет. Если вы нанимаете, отправьте вакансию сразу ниже. Если ищете работу, вернитесь позже или оставьте контакт через раздел связи."
+        emptyAction={{ href: '/contacts', label: 'Связаться' }}
+        emptyDescription="Сейчас опубликованных позиций нет. Новые вакансии появятся после публикации командой."
         emptyTitle="Вакансий пока нет"
+        filters={
+          <PublicFilters
+            categories={categories}
+            cities={cities}
+            embedded
+            extraFilters={[{ name: 'employmentType', label: 'Все форматы', options: filterOptions.employmentTypes }]}
+            placeholder="Поиск по роли, компании или описанию..."
+          />
+        }
         sectionId="vacancy-list"
         title="Актуальные позиции"
-      />
-      <VacancyApplicationForms
-        enabled={applicationFormsEnabled}
-        options={applicationFormOptions}
-        result={
-          applicationError
-            ? { type: 'error', message: applicationError }
-            : applicationSuccess
-              ? { type: 'success', message: applicationSuccess }
-              : undefined
-        }
-        utm={{
-          source: firstParam(params.utm_source),
-          medium: firstParam(params.utm_medium),
-          campaign: firstParam(params.utm_campaign)
-        }}
       />
     </>
   );

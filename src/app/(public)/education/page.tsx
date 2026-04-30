@@ -1,15 +1,11 @@
+import { Suspense } from 'react';
+import { CategoryType } from '@prisma/client';
 import { EditorialPublicPage } from '@/components/public/editorial-public-page';
-import { EducationApplicationForms } from '@/components/public/education-application-forms';
 import { PublishedContentSection } from '@/components/public/published-content-section';
-import { arePublicApplicationFormsEnabled } from '@/lib/applications/public-forms';
-import { getApplicationCityOptions } from '@/lib/applications/form-options';
-import {
-  getPublicApplicationResult,
-  getPublicApplicationUtm,
-  stripPublicApplicationResultParams
-} from '@/lib/applications/public-form-helpers';
+import { PublicFeaturedContent } from '@/components/public/public-featured-content';
+import { PublicFilters } from '@/components/public/public-filters';
 import { getPublishedCourses, type PublicContentSearchParams } from '@/lib/public/content';
-import { getEnv } from '@/lib/validation/env';
+import { getCourseFilterOptions, getPublicCategoryOptions, getPublicCityFilterOptions } from '@/lib/public/filter-options';
 
 type EducationPageProps = {
   searchParams?: Promise<PublicContentSearchParams>;
@@ -17,11 +13,13 @@ type EducationPageProps = {
 
 export default async function EducationPage({ searchParams }: EducationPageProps) {
   const params = (await searchParams) ?? {};
-  const [content, cities] = await Promise.all([
-    getPublishedCourses(stripPublicApplicationResultParams(params)),
-    getApplicationCityOptions()
+  const [content, filterCities, categories, filterOptions] = await Promise.all([
+    getPublishedCourses(params),
+    getPublicCityFilterOptions(),
+    getPublicCategoryOptions(CategoryType.COURSE),
+    getCourseFilterOptions()
   ]);
-  const applicationFormsEnabled = arePublicApplicationFormsEnabled(getEnv());
+  const featuredItem = content.page === 1 ? content.items[0] : undefined;
 
   return (
     <>
@@ -52,21 +50,35 @@ export default async function EducationPage({ searchParams }: EducationPageProps
             description: 'Программы для команд заведений: сервис, бар, меню, продажи и внутреннее обучение.'
           }
         ]}
-        primaryLink={{ label: 'Оставить запрос', href: '/contacts' }}
+        primaryLink={{ label: 'Смотреть программы', href: '#education-list' }}
         secondaryLink={{ label: 'События', href: '/events' }}
+      />
+      <Suspense fallback={<div className="container py-6">Загрузка фильтров...</div>}>
+        <PublicFilters
+          categories={categories}
+          cities={filterCities}
+          extraFilters={[
+            { name: 'format', label: 'Все форматы', options: filterOptions.formats },
+            { name: 'level', label: 'Все уровни', options: filterOptions.levels }
+          ]}
+        />
+      </Suspense>
+      <PublicFeaturedContent
+        actionLabel="Открыть программу"
+        basePath="/education"
+        description="Курс с форматом, уровнем, городом и кнопкой перехода к подробностям."
+        eyebrow="Рекомендуем"
+        item={featuredItem}
+        title="Программа в фокусе"
       />
       <PublishedContentSection
         basePath="/education"
         content={content}
         emptyDescription="Когда появятся новые программы, они отобразятся здесь."
         emptyTitle="Программ пока нет"
+        excludedItemIds={featuredItem ? [featuredItem.id] : []}
+        sectionId="education-list"
         title="Программы"
-      />
-      <EducationApplicationForms
-        enabled={applicationFormsEnabled}
-        result={getPublicApplicationResult(params)}
-        utm={getPublicApplicationUtm(params)}
-        cities={cities}
       />
     </>
   );

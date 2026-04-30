@@ -9,15 +9,42 @@
         --background: #f4ebdb;
         --surface: #faf4e8;
         --surface-muted: #ece0ce;
+        --surface-elevated: rgba(255, 255, 255, 0.9);
+        --surface-inverse: #141412;
         --text: #16130f;
         --muted: #5f564b;
         --line: rgba(22, 19, 15, 0.22);
+        --border-subtle: rgba(22, 19, 15, 0.1);
+        --border-default: rgba(22, 19, 15, 0.16);
+        --border-strong: rgba(22, 19, 15, 0.3);
+        --border-inverse: rgba(255, 255, 255, 0.22);
         --accent: #992c26;
         --accent-strong: #7b1f1a;
         --graphite: #141412;
         --success: #2f684f;
         --warning: #9a661a;
         --danger: #9f2f2f;
+        --success-bg: rgba(47, 104, 79, 0.08);
+        --success-border: rgba(47, 104, 79, 0.32);
+        --warning-bg: rgba(154, 102, 26, 0.09);
+        --warning-border: rgba(154, 102, 26, 0.34);
+        --danger-bg: rgba(159, 47, 47, 0.08);
+        --danger-border: rgba(159, 47, 47, 0.34);
+        --focus-ring: rgba(20, 20, 18, 0.1);
+        --selected-bg: rgba(20, 20, 18, 0.96);
+        --selected-border: #141412;
+        --field-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(255, 255, 255, 0.78));
+        --field-bg-hover: #fff;
+        --field-bg-disabled: #ece0ce;
+        --radius-sm: 0.4rem;
+        --radius-md: 1rem;
+        --radius-lg: 1.15rem;
+        --radius-xl: 1.75rem;
+        --radius-pill: 999px;
+        --shadow-card: 0 1px 2px rgba(20, 20, 18, 0.06);
+        --shadow-panel: 0 26px 80px rgba(22, 19, 15, 0.08);
+        --shadow-overlay: 0 18px 36px rgba(20, 20, 18, 0.12);
+        --shadow-focus: 0 0 0 3px rgba(20, 20, 18, 0.1);
         --container: min(1320px, calc(100vw - 32px));
       }
 
@@ -29,36 +56,22 @@
         margin: 0;
         background: var(--background);
         color: var(--text);
-        font-family: Manrope, Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        font-family: Geist, Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
         line-height: 1.5;
         background-image:
-          linear-gradient(rgba(22, 19, 15, 0.035) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(22, 19, 15, 0.035) 1px, transparent 1px);
-        background-size: 96px 96px;
+          url("/images/grain.svg"),
+          radial-gradient(circle at 15% 8%, rgba(255, 255, 255, 0.82), transparent 28%),
+          radial-gradient(circle at 82% 14%, rgba(153, 44, 38, 0.12), transparent 22%);
       }
 
       a {
         color: inherit;
+        text-decoration: none;
       }
 
       :focus-visible {
-        outline: 2px solid var(--accent);
-        outline-offset: 3px;
-      }
-
-      @media (prefers-reduced-motion: reduce) {
-        html {
-          scroll-behavior: auto;
-        }
-
-        *,
-        *::before,
-        *::after {
-          animation-duration: 0.01ms !important;
-          animation-iteration-count: 1 !important;
-          scroll-behavior: auto !important;
-          transition-duration: 0.01ms !important;
-        }
+        outline: 1px solid var(--accent);
+        outline-offset: 2px;
       }
 
       .container {
@@ -67,8 +80,8 @@
       }
 
       .section {
-        border-bottom: 1px solid rgba(0, 0, 0, 0.2);
         padding: 48px 0;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.2);
       }
 
       .eyebrow {
@@ -84,18 +97,16 @@
         margin: 0;
         font-family: Oswald, "Arial Narrow", Impact, sans-serif;
         font-size: clamp(42px, 8vw, 96px);
-        letter-spacing: 0;
         line-height: 0.92;
         text-transform: uppercase;
       }
 
-      .section-title {
+      .product-title {
         margin: 0;
-        font-family: Oswald, "Arial Narrow", Impact, sans-serif;
-        font-size: clamp(40px, 6vw, 72px);
-        letter-spacing: 0;
-        line-height: 0.92;
-        text-transform: uppercase;
+        font-size: clamp(28px, 4vw, 56px);
+        font-weight: 600;
+        letter-spacing: -0.05em;
+        line-height: 1.02;
       }
 
       .muted {
@@ -115,40 +126,45 @@
         grid-template-columns: repeat(3, minmax(0, 1fr));
       }
 
+      .token-grid,
       .swatches {
         display: grid;
-        grid-template-columns: repeat(6, minmax(0, 1fr));
         gap: 12px;
       }
 
-      .swatch {
-        min-height: 118px;
-        border: 1px solid var(--line);
+      .token-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .swatches {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+
+      .token,
+      .swatch,
+      .panel,
+      .card {
+        border: 1px solid var(--border-default);
+        border-radius: var(--radius-lg);
         background: var(--surface);
-        padding: 12px;
+        box-shadow: var(--shadow-card);
+      }
+
+      .token,
+      .swatch,
+      .panel,
+      .card {
+        padding: 16px;
       }
 
       .swatch-mark {
-        height: 52px;
-        border: 1px solid rgba(0, 0, 0, 0.18);
+        height: 56px;
         margin-bottom: 12px;
-      }
-
-      .swatch strong,
-      .token-row strong {
-        display: block;
-        font-size: 13px;
-      }
-
-      .swatch span,
-      .token-row span {
-        display: block;
-        color: var(--muted);
-        font-size: 12px;
+        border: 1px solid rgba(0, 0, 0, 0.12);
       }
 
       .button-row,
-      .badge-row {
+      .chip-row {
         display: flex;
         flex-wrap: wrap;
         gap: 12px;
@@ -157,370 +173,200 @@
 
       .button {
         display: inline-flex;
-        min-height: 44px;
         align-items: center;
         justify-content: center;
         gap: 10px;
+        min-height: 44px;
         border: 1px solid transparent;
-        border-radius: 6px;
+        border-radius: var(--radius-md);
         padding: 10px 20px;
         font-size: 14px;
         font-weight: 700;
-        letter-spacing: 0.06em;
-        text-decoration: none;
+        letter-spacing: 0.08em;
         text-transform: uppercase;
         transition: 160ms ease;
-      }
-
-      .button:active {
-        transform: translateY(1px);
       }
 
       .button-primary {
         border-color: var(--accent);
         background: var(--accent);
-        color: #fff;
-      }
-
-      .button-primary:hover {
-        background: var(--accent-strong);
+        color: white;
       }
 
       .button-secondary {
-        border-color: var(--line);
-        background: transparent;
-        color: var(--text);
-      }
-
-      .button-secondary:hover {
-        border-color: var(--accent);
-        color: var(--accent);
+        border-color: var(--border-default);
       }
 
       .button-ghost {
         color: var(--muted);
       }
 
-      .button-ghost:hover {
-        color: var(--accent);
-      }
-
-      .button-disabled {
-        opacity: 0.48;
-        pointer-events: none;
-      }
-
-      .button[aria-disabled="true"],
-      .button:disabled {
-        cursor: not-allowed;
-        opacity: 0.55;
-        pointer-events: none;
-      }
-
-      .button[aria-busy="true"] {
-        cursor: wait;
-      }
-
-      .spinner {
-        width: 16px;
-        height: 16px;
-        border: 2px solid currentColor;
-        border-right-color: transparent;
-        border-radius: 999px;
-        animation: spin 800ms linear infinite;
-      }
-
-      @keyframes spin {
-        to {
-          transform: rotate(360deg);
-        }
-      }
-
-      .card {
-        border: 1px solid var(--line);
-        border-radius: 8px;
-        background: var(--surface);
-        padding: 24px;
-        box-shadow: 0 1px 2px rgba(20, 20, 18, 0.06);
-        transition: 160ms ease;
-      }
-
-      .card-interactive:hover,
-      .card-interactive:focus-within {
-        border-color: var(--accent);
-        box-shadow: 0 0 0 2px rgba(153, 44, 38, 0.16);
-      }
-
-      .card-selected {
-        border-color: var(--accent);
-        box-shadow: 0 0 0 2px rgba(153, 44, 38, 0.16);
-      }
-
-      .card-loading {
-        animation: pulse 1.5s ease-in-out infinite;
-      }
-
-      .card-error {
+      .button-destructive {
         border-color: var(--danger);
-        background: rgba(159, 47, 47, 0.06);
+        background: var(--danger);
+        color: white;
       }
 
-      @keyframes pulse {
-        50% {
-          opacity: 0.55;
-        }
+      .button-inverse {
+        border-color: var(--border-inverse);
+        background: var(--surface-inverse);
+        color: white;
       }
 
-      .badge {
+      .chip {
         display: inline-flex;
         align-items: center;
-        border: 1px solid var(--line);
-        border-radius: 999px;
+        border: 1px solid var(--border-default);
+        border-radius: var(--radius-pill);
         padding: 4px 12px;
-        color: var(--muted);
         font-size: 12px;
         font-weight: 700;
         letter-spacing: 0.08em;
         text-transform: uppercase;
       }
 
-      .badge-success {
-        border-color: rgba(47, 104, 79, 0.35);
-        background: rgba(47, 104, 79, 0.1);
+      .chip-success {
+        border-color: var(--success-border);
+        background: var(--success-bg);
         color: var(--success);
       }
 
-      .badge-warning {
-        border-color: rgba(154, 102, 26, 0.35);
-        background: rgba(154, 102, 26, 0.1);
+      .chip-warning {
+        border-color: var(--warning-border);
+        background: var(--warning-bg);
         color: var(--warning);
       }
 
-      .badge-danger {
-        border-color: rgba(159, 47, 47, 0.35);
-        background: rgba(159, 47, 47, 0.1);
+      .chip-danger {
+        border-color: var(--danger-border);
+        background: var(--danger-bg);
         color: var(--danger);
+      }
+
+      .chip-selected {
+        border-color: var(--selected-border);
+        background: var(--selected-bg);
+        color: white;
       }
 
       .field {
         display: grid;
-        gap: 8px;
+        gap: 10px;
       }
 
       .field label {
-        color: var(--muted);
         font-size: 12px;
         font-weight: 700;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+
+      .control {
+        min-height: 48px;
+        width: 100%;
+        border: 1px solid var(--border-default);
+        border-radius: var(--radius-md);
+        background: var(--field-bg);
+        padding: 0 16px;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
+      }
+
+      textarea.control {
+        min-height: 136px;
+        padding: 14px 16px;
+        resize: none;
+      }
+
+      .alert {
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--border-default);
+        padding: 16px;
+      }
+
+      .alert-success {
+        border-color: var(--success-border);
+        background: var(--success-bg);
+        color: var(--success);
+      }
+
+      .alert-warning {
+        border-color: var(--warning-border);
+        background: var(--warning-bg);
+        color: var(--warning);
+      }
+
+      .alert-error {
+        border-color: var(--danger-border);
+        background: var(--danger-bg);
+        color: var(--danger);
+      }
+
+      .segmented {
+        display: grid;
+        gap: 12px;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .choice {
+        border: 1px solid var(--border-subtle);
+        border-radius: 1.35rem;
+        background: var(--surface);
+        padding: 16px;
+      }
+
+      .choice-selected {
+        border-color: var(--selected-border);
+        background: var(--selected-bg);
+        color: white;
+      }
+
+      .choice-selected .muted {
+        color: rgba(255, 255, 255, 0.72);
+      }
+
+      .editorial-shell {
+        position: relative;
+        overflow: hidden;
+        border: 1px solid var(--border-default);
+        border-radius: var(--radius-xl);
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0.94)),
+          radial-gradient(circle at top right, rgba(153, 44, 38, 0.1), transparent 32%),
+          radial-gradient(circle at bottom left, rgba(20, 20, 18, 0.04), transparent 28%);
+        box-shadow: var(--shadow-panel);
+        padding: 24px;
+      }
+
+      table {
+        width: 100%;
+        min-width: 840px;
+        border-collapse: collapse;
+        text-align: left;
+        font-size: 14px;
+      }
+
+      thead {
+        background: var(--surface-muted);
+        color: var(--muted);
+        font-size: 12px;
         letter-spacing: 0.08em;
         text-transform: uppercase;
       }
 
-      .input,
-      .select,
-      .textarea {
-        width: 100%;
-        min-height: 44px;
-        border: 1px solid var(--line);
-        border-radius: 6px;
-        background: #fff;
-        color: var(--text);
-        font: inherit;
-        font-size: 14px;
-        padding: 0 12px;
-      }
-
-      .textarea {
-        min-height: 112px;
-        padding: 10px 12px;
-        resize: none;
-      }
-
-      .input:focus,
-      .select:focus,
-      .textarea:focus {
-        border-color: var(--accent);
-        outline: none;
-      }
-
-      .input:hover,
-      .select:hover,
-      .textarea:hover {
-        border-color: rgba(0, 0, 0, 0.35);
-      }
-
-      .input:disabled,
-      .select:disabled,
-      .textarea:disabled {
-        cursor: not-allowed;
-        background: var(--surface-muted);
-        color: var(--muted);
-        opacity: 0.7;
-      }
-
-      .input[aria-invalid="true"],
-      .select[aria-invalid="true"],
-      .textarea[aria-invalid="true"] {
-        border-color: var(--danger);
-      }
-
-      .checkbox-row {
-        display: flex;
-        gap: 10px;
-        align-items: center;
-        font-size: 14px;
-      }
-
-      .checkbox {
-        width: 16px;
-        height: 16px;
-        accent-color: var(--accent);
-      }
-
-      .checkbox:disabled {
-        cursor: not-allowed;
-        opacity: 0.5;
-      }
-
-      .checkbox[aria-invalid="true"] {
-        outline: 2px solid var(--danger);
-        outline-offset: 2px;
-      }
-
-      .field-error {
-        color: var(--danger);
-        font-size: 14px;
-      }
-
-      .field-hint {
-        color: var(--muted);
-        font-size: 12px;
-      }
-
-      .industry-form {
-        overflow: hidden;
-        border: 1px solid var(--line);
-        background: var(--surface);
-        box-shadow: 0 1px 2px rgba(20, 20, 18, 0.06);
-      }
-
-      .form-head {
-        display: grid;
-        gap: 8px;
-        background: var(--graphite);
-        color: #fff;
-        padding: 24px;
-      }
-
-      .form-head strong {
-        font-family: Oswald, "Arial Narrow", Impact, sans-serif;
-        font-size: clamp(28px, 4vw, 44px);
-        line-height: 0.95;
-        text-transform: uppercase;
-      }
-
-      .form-head p {
-        max-width: 640px;
-        margin: 0;
-        color: rgba(255, 255, 255, 0.72);
-      }
-
-      .form-head .eyebrow {
-        margin: 0;
-      }
-
-      .form-meta {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0;
+      th,
+      td {
+        padding: 12px 16px;
         border-bottom: 1px solid var(--line);
+        vertical-align: top;
       }
 
-      .form-meta span {
-        border-right: 1px solid var(--line);
-        padding: 10px 14px;
-        color: var(--accent);
-        font-size: 12px;
-        font-weight: 700;
-        letter-spacing: 0.12em;
-        text-transform: uppercase;
-      }
-
-      .form-body {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 20px 16px;
-        padding: 24px;
-      }
-
-      .field-wide {
-        grid-column: 1 / -1;
-      }
-
-      .form-consent {
-        display: grid;
-        gap: 14px;
-        border-top: 1px solid var(--line);
-        padding: 20px 24px 24px;
-      }
-
-      .form-actions {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 12px;
-        align-items: center;
-        justify-content: space-between;
-        border-top: 1px solid var(--line);
-        padding: 20px 24px;
-      }
-
-      .editorial-row {
-        display: grid;
-        grid-template-columns: 0.22fr 0.5fr 0.78fr;
-        gap: 16px;
-        border-bottom: 1px solid rgba(0, 0, 0, 0.2);
-        padding: 24px 0;
-      }
-
-      .editorial-row h3 {
-        margin: 0;
-        font-size: 20px;
-        line-height: 1.35;
-        text-transform: uppercase;
-      }
-
-      .editorial-row p {
-        margin: 0;
-        color: var(--muted);
-        font-size: 14px;
-        line-height: 1.7;
-      }
-
-      .band {
-        background: var(--graphite);
-        color: #fff;
-      }
-
-      .band .muted {
-        color: rgba(255, 255, 255, 0.72);
-      }
-
-      .token-row {
-        border-top: 1px solid var(--line);
-        padding: 12px 0;
-      }
-
-      @media (max-width: 900px) {
+      @media (max-width: 960px) {
         .two-col,
         .three-col,
-        .editorial-row {
-          grid-template-columns: 1fr;
-        }
-
-        .swatches {
-          grid-template-columns: repeat(2, minmax(0, 1fr));
-        }
-
-        .form-body {
+        .token-grid,
+        .swatches,
+        .segmented {
           grid-template-columns: 1fr;
         }
       }
@@ -531,97 +377,72 @@
       <section class="section">
         <div class="container grid two-col">
           <div>
-            <p class="eyebrow">Design system v0.1</p>
-            <h1 class="display">BARSYNERGY</h1>
+            <p class="eyebrow">BARSYNERGY / Preview</p>
+            <h1 class="display">Stabilized tokens and primitives</h1>
           </div>
           <div>
-            <p class="muted">Статическая проверочная страница для цветов, типографики, компонентов, форм, состояний и редакционного ритма.</p>
-            <div class="button-row" style="margin-top: 24px;">
-              <a class="button button-primary" href="#components">Компоненты</a>
-              <a class="button button-secondary" href="#tokens">Токены</a>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="section" id="tokens">
-        <div class="container">
-          <p class="eyebrow">Color roles</p>
-          <div class="swatches">
-            <div class="swatch"><div class="swatch-mark" style="background: var(--background);"></div><strong>Background</strong><span>#f4ebdb</span></div>
-            <div class="swatch"><div class="swatch-mark" style="background: var(--surface);"></div><strong>Surface</strong><span>#faf4e8</span></div>
-            <div class="swatch"><div class="swatch-mark" style="background: var(--surface-muted);"></div><strong>Surface muted</strong><span>#ece0ce</span></div>
-            <div class="swatch"><div class="swatch-mark" style="background: var(--text);"></div><strong>Text</strong><span>#16130f</span></div>
-            <div class="swatch"><div class="swatch-mark" style="background: var(--muted);"></div><strong>Muted</strong><span>#5f564b</span></div>
-            <div class="swatch"><div class="swatch-mark" style="background: var(--accent);"></div><strong>Accent</strong><span>#992c26</span></div>
-            <div class="swatch"><div class="swatch-mark" style="background: var(--accent-strong);"></div><strong>Accent strong</strong><span>#7b1f1a</span></div>
-            <div class="swatch"><div class="swatch-mark" style="background: var(--graphite);"></div><strong>Graphite</strong><span>#141412</span></div>
-            <div class="swatch"><div class="swatch-mark" style="background: var(--success);"></div><strong>Success</strong><span>#2f684f</span></div>
-            <div class="swatch"><div class="swatch-mark" style="background: var(--warning);"></div><strong>Warning</strong><span>#9a661a</span></div>
-            <div class="swatch"><div class="swatch-mark" style="background: var(--danger);"></div><strong>Danger</strong><span>#9f2f2f</span></div>
-            <div class="swatch"><div class="swatch-mark" style="background: var(--line);"></div><strong>Line</strong><span>rgba(22,19,15,.22)</span></div>
+            <p class="product-title">Source of truth now starts from runtime.</p>
+            <p class="muted">
+              This preview mirrors the active contract in <code>src/lib/fonts.ts</code>, <code>src/app/globals.css</code>,
+              <code>src/components/ui</code> and <code>design-tokens.json</code>.
+            </p>
           </div>
         </div>
       </section>
 
       <section class="section">
-        <div class="container grid two-col">
+        <div class="container grid">
           <div>
-            <p class="eyebrow">Typography</p>
-            <h2 class="section-title">Редакционная система</h2>
+            <p class="eyebrow">Foundation</p>
+            <h2 class="product-title">Color, typography, radius, elevation</h2>
           </div>
-          <div>
-            <div class="token-row"><strong>Display hero</strong><span>Oswald, uppercase, 34-96px, line-height .92</span></div>
-            <div class="token-row"><strong>Section title</strong><span>Oswald, uppercase, 52-72px</span></div>
-            <div class="token-row"><strong>Body</strong><span>Manrope, 16px, line-height 1.5-1.7</span></div>
-            <div class="token-row"><strong>Label</strong><span>Manrope, uppercase, 12-14px, tracked</span></div>
+          <div class="swatches">
+            <div class="swatch"><div class="swatch-mark" style="background: var(--background)"></div><strong>background</strong><span>#f4ebdb</span></div>
+            <div class="swatch"><div class="swatch-mark" style="background: var(--surface)"></div><strong>surface-base</strong><span>#faf4e8</span></div>
+            <div class="swatch"><div class="swatch-mark" style="background: var(--surface-muted)"></div><strong>surface-muted</strong><span>#ece0ce</span></div>
+            <div class="swatch"><div class="swatch-mark" style="background: var(--accent)"></div><strong>accent</strong><span>#992c26</span></div>
+            <div class="swatch"><div class="swatch-mark" style="background: var(--graphite)"></div><strong>surface-inverse</strong><span>#141412</span></div>
+            <div class="swatch"><div class="swatch-mark" style="background: var(--success-bg)"></div><strong>success-bg</strong><span>status surface</span></div>
+            <div class="swatch"><div class="swatch-mark" style="background: var(--warning-bg)"></div><strong>warning-bg</strong><span>status surface</span></div>
+            <div class="swatch"><div class="swatch-mark" style="background: var(--danger-bg)"></div><strong>danger-bg</strong><span>status surface</span></div>
+          </div>
+          <div class="token-grid">
+            <div class="token"><strong>font-body</strong><span>Geist, product/auth/admin body and headings</span></div>
+            <div class="token"><strong>font-display</strong><span>Oswald, editorial public display only</span></div>
+            <div class="token"><strong>font-accent</strong><span>Outfit, brand marks and short Latin accent labels</span></div>
+            <div class="token"><strong>radius-md / radius-lg / radius-xl</strong><span>field and button / panel and card / large editorial shell</span></div>
+            <div class="token"><strong>shadow-card / shadow-panel / shadow-overlay</strong><span>compact surface / raised shell / overlay</span></div>
           </div>
         </div>
       </section>
 
-      <section class="section" id="components">
-        <div class="container grid two-col">
-          <div>
-            <p class="eyebrow">Components</p>
-            <h2 class="section-title">Кнопки и состояния</h2>
-          </div>
-          <div class="grid">
+      <section class="section">
+        <div class="container grid three-col">
+          <div class="card">
+            <p class="eyebrow">Actions</p>
             <div class="button-row">
               <a class="button button-primary" href="#">Primary</a>
               <a class="button button-secondary" href="#">Secondary</a>
               <a class="button button-ghost" href="#">Ghost</a>
-              <button class="button button-primary" type="button" aria-busy="true"><span class="spinner" aria-hidden="true"></span>Сохранение</button>
-              <button class="button button-primary" type="button" disabled>Disabled</button>
-              <a class="button button-secondary" href="#" aria-disabled="true">Link disabled</a>
+              <a class="button button-destructive" href="#">Delete</a>
+              <a class="button button-inverse" href="#">Inverse</a>
             </div>
-            <div class="badge-row" style="margin-top: 24px;">
-              <span class="badge">Neutral</span>
-              <span class="badge badge-success">Success</span>
-              <span class="badge badge-warning">Warning</span>
-              <span class="badge badge-danger">Danger</span>
+          </div>
+          <div class="card">
+            <p class="eyebrow">Status and meta</p>
+            <div class="chip-row">
+              <span class="chip">Neutral</span>
+              <span class="chip chip-success">Success</span>
+              <span class="chip chip-warning">Warning</span>
+              <span class="chip chip-danger">Danger</span>
+              <span class="chip chip-selected">Selected</span>
             </div>
-            <div class="grid three-col" style="margin-top: 24px;">
-              <article class="card card-interactive">
-                <p class="eyebrow">Interactive</p>
-                <strong>Карточка с hover/focus</strong>
-                <p class="muted">Фокус появляется на вложенной ссылке.</p>
-                <a href="#">Открыть</a>
-              </article>
-              <article class="card card-selected" aria-selected="true">
-                <p class="eyebrow">Selected</p>
-                <strong>Выбранный вариант</strong>
-                <p class="muted">Используется для активной сущности.</p>
-              </article>
-              <article class="card card-loading" aria-busy="true">
-                <p class="eyebrow">Loading</p>
-                <strong>Загрузка данных</strong>
-                <p class="muted">Показывает ожидание без смены размера блока.</p>
-              </article>
-              <article class="card card-error">
-                <p class="eyebrow">Error</p>
-                <strong>Ошибка загрузки</strong>
-                <p class="muted">Состояние для неуспешного запроса.</p>
-              </article>
+          </div>
+          <div class="card">
+            <p class="eyebrow">Panel</p>
+            <div class="panel">
+              <strong>Inset panel</strong>
+              <p class="muted">Use for helper notes, internal stats and smaller grouped surfaces inside larger shells.</p>
             </div>
           </div>
         </div>
@@ -629,129 +450,89 @@
 
       <section class="section">
         <div class="container grid two-col">
-          <div>
+          <div class="editorial-shell">
             <p class="eyebrow">Forms</p>
-            <h2 class="section-title">Поля и ошибки</h2>
+            <h2 class="product-title">Shared field contract</h2>
+            <div class="grid" style="margin-top: 20px;">
+              <div class="field">
+                <label for="preview-name">Имя</label>
+                <input class="control" id="preview-name" placeholder="Введите имя">
+              </div>
+              <div class="field">
+                <label for="preview-type">Формат</label>
+                <select class="control" id="preview-type">
+                  <option>Выберите формат</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="preview-text">Подробности</label>
+                <textarea class="control" id="preview-text" placeholder="Опишите задачу"></textarea>
+              </div>
+            </div>
           </div>
-          <form class="industry-form" action="#">
-            <div class="form-head">
-              <p class="eyebrow" style="color: #fff;">Заявка</p>
-              <strong>Программа для барной команды</strong>
-              <p>Образец формы для будущих заявок: контакт, формат, город, детали запроса и обязательное согласие.</p>
-            </div>
-            <div class="form-meta">
-              <span>СКФО</span>
-              <span>Обучение</span>
-              <span>Команда бара</span>
-            </div>
-            <div class="form-body">
-              <div class="field">
-                <label for="name">Контактное лицо</label>
-                <input class="input" id="name" value="Алексей">
-              </div>
-              <div class="field">
-                <label for="name-disabled">Номер заявки</label>
-                <input class="input" id="name-disabled" value="Создается автоматически" disabled>
-              </div>
-              <div class="field">
-                <label for="format">Формат участия</label>
-                <select class="select" id="format">
-                  <option>Командный интенсив</option>
-                  <option>Отраслевое событие</option>
-                  <option>Партнерская программа</option>
-                </select>
-              </div>
-              <div class="field">
-                <label for="format-disabled">Системная секция</label>
-                <select class="select" id="format-disabled" disabled>
-                  <option>Заявки на обучение</option>
-                </select>
-              </div>
-              <div class="field field-wide">
-                <label for="comment">Комментарий</label>
-                <textarea class="textarea" id="comment">Нужна программа для команды бара на 12 человек. Город - Ставрополь.</textarea>
-                <span class="field-hint">Укажите город, размер команды и удобный формат.</span>
-              </div>
-              <div class="field field-wide">
-                <label for="comment-disabled">Служебная заметка</label>
-                <textarea class="textarea" id="comment-disabled" disabled>Поле закрыто для публичной формы.</textarea>
-              </div>
-              <div class="field">
-                <label for="email">Email</label>
-                <input class="input" id="email" aria-invalid="true" aria-describedby="email-error" value="mail">
-                <span class="field-error" id="email-error">Введите корректный email.</span>
-              </div>
-              <div class="field">
-                <label for="format-error">Направление</label>
-                <select class="select" id="format-error" aria-invalid="true" aria-describedby="format-error-text">
-                  <option>Выберите направление</option>
-                </select>
-                <span class="field-error" id="format-error-text">Выберите доступное направление.</span>
-              </div>
-              <div class="field field-wide">
-                <label for="comment-error">Краткое описание</label>
-                <textarea class="textarea" id="comment-error" aria-invalid="true" aria-describedby="comment-error-text">Коротко</textarea>
-                <span class="field-error" id="comment-error-text">Добавьте детали запроса.</span>
-              </div>
-            </div>
-            <div class="form-consent">
-              <label class="checkbox-row">
-                <input class="checkbox" type="checkbox" checked>
-                Согласие на обработку персональных данных выбрано
-              </label>
-              <label class="checkbox-row">
-                <input class="checkbox" type="checkbox" disabled>
-                Уведомление администратору недоступно
-              </label>
-              <label class="checkbox-row">
-                <input class="checkbox" type="checkbox" aria-invalid="true" aria-describedby="checkbox-error">
-                Подтверждаю согласие для отправки заявки
-              </label>
-              <span class="field-error" id="checkbox-error">Подтвердите согласие.</span>
-            </div>
-            <div class="form-actions">
-              <button class="button button-primary" type="button">Отправить запрос</button>
-              <span class="field-hint">Публичная форма не отправляет данные в этом preview.</span>
-            </div>
-          </form>
+          <div class="grid">
+            <div class="alert alert-success">Уведомление `success`: действие завершено и не требует отдельного локального shell.</div>
+            <div class="alert alert-warning">Уведомление `warning`: сценарий доступен, но требует внимания.</div>
+            <div class="alert alert-error">Уведомление `error`: ошибка должна быть текстовой и структурной, не только цветовой.</div>
+          </div>
         </div>
       </section>
 
       <section class="section">
-        <div class="container grid two-col">
+        <div class="container grid">
           <div>
-            <p class="eyebrow">Editorial rows</p>
-            <h2 class="section-title">Разделы</h2>
+            <p class="eyebrow">Selection</p>
+            <h2 class="product-title">Segmented control</h2>
           </div>
-          <div>
-            <article class="editorial-row">
-              <span class="eyebrow">01</span>
-              <h3>Образование</h3>
-              <p>Интенсивы, лекции и практические форматы для барных команд и специалистов.</p>
-            </article>
-            <article class="editorial-row">
-              <span class="eyebrow">02</span>
-              <h3>События</h3>
-              <p>Встречи, дегустации и отраслевые события с понятной региональной привязкой.</p>
-            </article>
-            <article class="editorial-row">
-              <span class="eyebrow">03</span>
-              <h3>Вакансии</h3>
-              <p>Компактные строки возможностей без перегруженной доски объявлений.</p>
-            </article>
+          <div class="segmented">
+            <div class="choice choice-selected">
+              <p class="eyebrow" style="margin-bottom: 8px; color: rgba(255, 255, 255, 0.72);">Для кандидатов</p>
+              <strong>Откликнуться на вакансию</strong>
+              <p class="muted">Выберите открытую роль и отправьте контактный отклик.</p>
+            </div>
+            <div class="choice">
+              <p class="eyebrow" style="margin-bottom: 8px;">Для заведений</p>
+              <strong>Разместить вакансию</strong>
+              <p class="muted">Отправьте роль, условия и детали для проверки и публикации.</p>
+            </div>
           </div>
         </div>
       </section>
 
-      <section class="section band">
-        <div class="container grid three-col">
+      <section class="section">
+        <div class="container grid">
           <div>
-            <p class="eyebrow" style="color: #fff;">Dark band</p>
-            <h2 class="section-title">Контраст</h2>
+            <p class="eyebrow">Workspace Product</p>
+            <h2 class="product-title">Admin table shell</h2>
           </div>
-          <p class="muted">Черные редакционные полосы используются для важных разделов, но не заменяют обычные карточки и формы.</p>
-          <div class="button-row">
-            <a class="button button-secondary" style="border-color: rgba(255,255,255,.5); color: #fff;" href="#">Действие</a>
+          <div class="card" style="overflow-x: auto;">
+            <table>
+              <thead>
+                <tr>
+                  <th>Вакансия</th>
+                  <th>Компания</th>
+                  <th>Город</th>
+                  <th>Статус</th>
+                  <th>Обновлено</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Старший бариста</strong><br><span class="muted">/senior-barista</span></td>
+                  <td>Кофейня на Литейном</td>
+                  <td>Санкт-Петербург</td>
+                  <td><span class="chip chip-success">Published</span></td>
+                  <td>29.04.2026</td>
+                </tr>
+                <tr>
+                  <td><strong>Менеджер смены</strong><br><span class="muted">/shift-manager</span></td>
+                  <td>Бар с кухней</td>
+                  <td>Москва</td>
+                  <td><span class="chip chip-warning">Review</span></td>
+                  <td>28.04.2026</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </section>

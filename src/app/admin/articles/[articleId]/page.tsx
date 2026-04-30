@@ -12,6 +12,8 @@ import { contentStatusLabels, type AdminContentSearchParams } from '@/lib/admin/
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
 import { prisma } from '@/lib/db/prisma';
 
+export const dynamic = 'force-dynamic';
+
 const ADMIN_ARTICLES_PATH = '/admin/articles';
 const ARTICLE_BODY_MAX_LENGTH = 20_000;
 

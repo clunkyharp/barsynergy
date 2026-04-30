@@ -1,6 +1,10 @@
+import type { ReactNode } from 'react';
+import { PublicBodyText, PublicDisplayTitle } from '@/components/public/public-primitives';
 import { Button } from '@/components/ui/button';
+import { EditorialListRow } from '@/components/ui/editorial-list-row';
+import { MetaChip } from '@/components/ui/meta-chip';
+import { Panel } from '@/components/ui/panel';
 import type { PublishedContentList } from '@/lib/public/content';
-import { displayFont } from '@/lib/fonts';
 
 type PublishedContentSectionProps = {
   title: string;
@@ -9,10 +13,12 @@ type PublishedContentSectionProps = {
   content: PublishedContentList;
   basePath: string;
   sectionId?: string;
+  excludedItemIds?: string[];
   emptyAction?: {
     href: string;
     label: string;
   };
+  filters?: ReactNode;
 };
 
 function pageHref(content: PublishedContentList, basePath: string, page: number) {
@@ -39,6 +45,10 @@ function pageHref(content: PublishedContentList, basePath: string, page: number)
   return query ? `${basePath}?${query}` : basePath;
 }
 
+function detailHref(basePath: string, slug: string) {
+  return `${basePath}/${slug}`;
+}
+
 export function PublishedContentSection({
   title,
   emptyTitle,
@@ -46,53 +56,73 @@ export function PublishedContentSection({
   content,
   basePath,
   sectionId,
-  emptyAction
+  excludedItemIds = [],
+  emptyAction,
+  filters
 }: PublishedContentSectionProps) {
+  const visibleItems = content.items.filter((item) => !excludedItemIds.includes(item.id));
+
   return (
     <section className="editorial-grid border-b border-black/20 py-10 md:py-14" id={sectionId}>
       <div className="container grid gap-8 xl:grid-cols-[0.72fr_1.28fr]">
         <div>
-          <h2 className={`${displayFont.className} display-tight text-[44px] md:text-[58px]`}>{title}</h2>
-          <p className="mt-5 max-w-md text-sm leading-7 text-[var(--muted)]">
+          <PublicDisplayTitle>{title}</PublicDisplayTitle>
+          <PublicBodyText className="mt-5 max-w-md">
             Найдено: {content.total}. Страница {content.page} из {content.totalPages}.
-          </p>
+          </PublicBodyText>
+          {filters ? <div className="mt-6">{filters}</div> : null}
         </div>
 
         {content.items.length === 0 ? (
-          <div className="border border-black/20 p-6">
+          <Panel className="space-y-4" padding="lg">
             <h3 className="text-xl font-semibold uppercase leading-7">{emptyTitle}</h3>
-            <p className="mt-3 max-w-2xl text-sm leading-7 text-[var(--muted)]">{emptyDescription}</p>
+            <PublicBodyText className="max-w-2xl">{emptyDescription}</PublicBodyText>
             {emptyAction ? (
-              <Button className="mt-5 min-h-12 rounded-full px-6 tracking-[0.08em]" href={emptyAction.href}>
+              <Button className="min-h-12 rounded-full px-6 tracking-[0.08em]" href={emptyAction.href}>
                 {emptyAction.label}
               </Button>
             ) : null}
-          </div>
+          </Panel>
+        ) : visibleItems.length === 0 ? (
+          <Panel className="space-y-4" padding="lg">
+            <h3 className="text-xl font-semibold uppercase leading-7">Других записей пока нет</h3>
+            <PublicBodyText className="max-w-2xl">
+              Главная рекомендация показана выше. Когда в разделе появятся новые записи по этим условиям, они отобразятся в списке.
+            </PublicBodyText>
+          </Panel>
         ) : (
           <div>
             <div className="border-t border-black/20">
-              {content.items.map((item) => (
-                <article className="grid gap-4 border-b border-black/20 py-6 md:grid-cols-[0.26fr_0.52fr_0.72fr]" key={item.id}>
-                  <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--accent)]">{item.label ?? 'Запись'}</p>
-                    {item.imageUrl ? (
+              {visibleItems.map((item) => (
+                <EditorialListRow
+                  actionLabel="Подробнее"
+                  columns="content"
+                  description={item.summary}
+                  href={detailHref(basePath, item.slug)}
+                  key={item.id}
+                  label={item.label ?? 'Запись'}
+                  media={
+                    item.imageUrl ? (
                       <div
                         aria-hidden="true"
-                        className="mt-4 aspect-[4/3] border border-black/20 bg-cover bg-center"
+                        className="aspect-[4/3] overflow-hidden rounded-[var(--radius-lg)] border border-black/20 bg-cover bg-center"
                         style={{ backgroundImage: `url("${item.imageUrl}")` }}
                       />
-                    ) : null}
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-semibold uppercase leading-7">{item.title}</h3>
-                    {item.meta.length > 0 ? (
-                      <p className="mt-3 text-xs font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">
-                        {item.meta.join(' / ')}
-                      </p>
-                    ) : null}
-                  </div>
-                  <p className="max-w-2xl text-sm leading-7 text-[var(--muted)]">{item.summary}</p>
-                </article>
+                    ) : null
+                  }
+                  meta={
+                    item.meta.length > 0 ? (
+                      <div className="mt-1 flex flex-wrap gap-2">
+                        {item.meta.map((entry) => (
+                          <MetaChip key={entry} variant="filter">
+                            {entry}
+                          </MetaChip>
+                        ))}
+                      </div>
+                    ) : null
+                  }
+                  title={item.title}
+                />
               ))}
             </div>
 

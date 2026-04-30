@@ -1,6 +1,5 @@
 import { submitContactMessage } from '@/app/(public)/contacts/actions';
 import {
-  ConsentCheckboxField,
   HiddenUtmFields,
   HoneypotField,
   PublicApplicationSection,
@@ -9,8 +8,10 @@ import {
   type PublicApplicationFormProps
 } from '@/components/public/application-form-section';
 import { Button } from '@/components/ui/button';
+import { ConsentField } from '@/components/ui/consent-field';
 import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
+import { InlineLink } from '@/components/ui/inline-link';
 import { Select } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 
@@ -29,7 +30,7 @@ export function ContactApplicationForm({ enabled, result, utm, cities }: PublicA
         <HiddenUtmFields utm={utm} />
         <HoneypotField id="contact-message-website" />
         <PublicFormShellHeader
-          eyebrow="Форма связи"
+          eyebrow="Рабочий запрос"
           title="Контактное сообщение"
           description="Для вопросов по обучению, событиям, партнерству и другим рабочим темам."
         />
@@ -66,13 +67,11 @@ export function ContactApplicationForm({ enabled, result, utm, cities }: PublicA
               </FormField>
             </div>
             <div className="md:col-span-2">
-              <ConsentCheckboxField>
+              <ConsentField>
                 Согласен на обработку персональных данных для обработки сообщения. Текст{' '}
-                <a className="font-semibold text-[var(--accent)] underline-offset-4 hover:underline" href="/legal/personal-data-consent">
-                  согласия
-                </a>
+                <InlineLink href="/legal/personal-data-consent">согласия</InlineLink>
                 .
-              </ConsentCheckboxField>
+              </ConsentField>
             </div>
           </div>
           <PublicFormShellFooter note="Если нужна быстрая обратная связь, укажите удобный канал связи прямо в заявке.">

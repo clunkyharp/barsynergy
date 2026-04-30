@@ -36,7 +36,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <body className={bodyFont.className}>
         <div className="site-shell overflow-x-clip">
           <SiteHeader />
-          <main className="site-main">{children}</main>
+          <main className="site-main overflow-x-hidden w-full max-w-full">{children}</main>
           <SiteFooter />
         </div>
       </body>

@@ -7,7 +7,7 @@ export const PUBLIC_CONTENT_MAX_PAGE_SIZE = 24;
 
 export type PublicContentSearchParams = Record<string, string | string[] | undefined>;
 
-type PublishedContentItem = {
+export type PublishedContentItem = {
   id: string;
   title: string;
   slug: string;

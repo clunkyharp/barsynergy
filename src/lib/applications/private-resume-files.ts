@@ -11,15 +11,16 @@ export async function uploadPrivateResumeFromFormData(formData: FormData, key: s
     return undefined;
   }
 
-  if (!isAllowedPrivateResumeUpload({ mimeType: file.type, originalName: file.name })) {
-    throw new Error('unsupported private resume file');
-  }
-
   if (file.size > MAX_UPLOAD_FILE_SIZE_BYTES) {
     throw new Error('private resume file is too large');
   }
 
   const buffer = Buffer.from(await file.arrayBuffer());
+
+  if (!isAllowedPrivateResumeUpload({ mimeType: file.type, originalName: file.name, buffer })) {
+    throw new Error('unsupported private resume file');
+  }
+
   const upload = await getStorageService().uploadFile({
     buffer,
     originalName: file.name,

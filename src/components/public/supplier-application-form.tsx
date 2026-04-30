@@ -1,6 +1,5 @@
 import { submitSupplierApplication } from '@/app/(public)/suppliers/actions';
 import {
-  ConsentCheckboxField,
   HiddenUtmFields,
   HoneypotField,
   PublicApplicationSection,
@@ -9,8 +8,10 @@ import {
   type PublicApplicationFormProps
 } from '@/components/public/application-form-section';
 import { Button } from '@/components/ui/button';
+import { ConsentField } from '@/components/ui/consent-field';
 import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
+import { InlineLink } from '@/components/ui/inline-link';
 import { Select } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 
@@ -18,8 +19,8 @@ export function SupplierApplicationForm({ enabled, result, utm, cities }: Public
   return (
     <PublicApplicationSection
       eyebrow="Поставщики / Заявка"
-      title="Добавить поставщика"
-      description="Оставьте информацию о компании, сервисе или продукте, чтобы команда могла с вами связаться."
+      title="Подать заявку в каталог"
+      description="Оставьте данные компании, продукта или сервиса. Мы свяжемся с вами по указанному контакту."
       enabled={enabled}
       result={result}
     >
@@ -27,9 +28,9 @@ export function SupplierApplicationForm({ enabled, result, utm, cities }: Public
         <HiddenUtmFields utm={utm} />
         <HoneypotField id="supplier-application-website" />
         <PublicFormShellHeader
-          eyebrow="Форма поставщика"
+          eyebrow="Компания и поставка"
           title="Заявка поставщика"
-          description="Для компаний и сервисов, которые хотят попасть в каталог после проверки редакцией."
+          description="Компания, контакты и короткое описание предложения."
         />
         <div className="relative p-5 md:p-6">
           <div className="grid gap-4 md:grid-cols-2">
@@ -70,16 +71,14 @@ export function SupplierApplicationForm({ enabled, result, utm, cities }: Public
               </FormField>
             </div>
             <div className="md:col-span-2">
-              <ConsentCheckboxField>
+              <ConsentField>
                 Согласен на обработку персональных данных для обработки заявки. Текст{' '}
-                <a className="font-semibold text-[var(--accent)] underline-offset-4 hover:underline" href="/legal/personal-data-consent">
-                  согласия
-                </a>
+                <InlineLink href="/legal/personal-data-consent">согласия</InlineLink>
                 .
-              </ConsentCheckboxField>
+              </ConsentField>
             </div>
           </div>
-          <PublicFormShellFooter note="Чем конкретнее вы опишете продукт, сервис и регион работы, тем быстрее команда обработает заявку.">
+          <PublicFormShellFooter>
             <Button className="min-h-12 rounded-full px-6 tracking-[0.12em] sm:self-start" type="submit">
               Отправить заявку
             </Button>

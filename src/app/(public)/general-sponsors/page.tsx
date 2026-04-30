@@ -1,30 +1,54 @@
 import { ArrowUpRight } from 'lucide-react';
 import { EditorialPublicPage } from '@/components/public/editorial-public-page';
-import { displayFont } from '@/lib/fonts';
+import { PublicBodyText, PublicDisplayTitle, PublicEyebrow } from '@/components/public/public-primitives';
+import { EditorialAction } from '@/components/ui/editorial-action';
+import { Panel } from '@/components/ui/panel';
+import { StatCard } from '@/components/ui/stat-card';
 
 const visibilityRows = [
   {
-    label: '01',
-    title: 'Главная страница',
-    description: 'С главной страницы ведет отдельная ссылка на генеральных спонсоров.'
+    label: 'Видимость',
+    title: 'Статус на сайте и в ключевых разделах',
+    description: 'Приоритетное присутствие на главных точках входа, в сезонных подборках и рядом с важными публикациями.'
   },
   {
-    label: '02',
-    title: 'Навигация сайта',
-    description: 'Раздел доступен из верхнего меню и списка основных публичных разделов.'
+    label: 'События',
+    title: 'События, обучение и спецпроекты',
+    description: 'Интеграции в программы, дегустации, лекции, интенсивы и другие форматы работы с профессиональной аудиторией.'
   },
   {
-    label: '03',
-    title: 'Партнерские материалы',
-    description: 'Спонсор может быть связан с событиями, образовательными программами и спецпроектами.'
+    label: 'Контент',
+    title: 'Контент и долгий отраслевой контакт',
+    description: 'Совместные материалы, спецвыпуски и работа с рынком не в одну дату, а на несколько циклов вперед.'
   }
 ];
 
 const sponsorFormats = [
-  'Статус генерального спонсора проекта',
-  'Приоритетное упоминание в публичных разделах',
-  'Совместные образовательные и отраслевые проекты',
-  'Отдельная коммуникация с командой BARSYNERGY'
+  'Отдельный пакет присутствия под бренд, сезон и задачу',
+  'Интеграции в события, лекции, дегустации и профессиональные встречи',
+  'Совместные материалы, подборки и редакционные проекты',
+  'Прямая рабочая коммуникация с командой BARSYNERGY'
+];
+
+const sponsorShowcase = [
+  {
+    name: 'Aroma Trade South',
+    city: 'Ставрополь',
+    focus: 'ингредиенты и расходники',
+    note: 'Поставки для ежедневной работы заведений, гостевые смены и совместные образовательные форматы.'
+  },
+  {
+    name: 'Montelibero',
+    city: 'Пятигорск',
+    focus: 'бренд и дистрибуция напитков',
+    note: 'Дегустации, спецпроекты, работа с бар-менеджерами и видимость в сезонных подборках.'
+  },
+  {
+    name: 'Linea Service',
+    city: 'КМВ',
+    focus: 'оборудование и сервис',
+    note: 'Оснащение, запуск новых точек, поддержка проектов и интеграции в рабочие материалы платформы.'
+  }
 ];
 
 export default function GeneralSponsorsPage() {
@@ -32,54 +56,82 @@ export default function GeneralSponsorsPage() {
     <>
       <EditorialPublicPage
         eyebrow="Генеральные спонсоры"
-        title="Генеральные спонсоры BARSYNERGY"
-        description="Отдельная страница для компаний, которые поддерживают проект и хотят быть видны на сайте."
-        summary="У спонсора есть отдельное место на сайте, ссылка с главной страницы и прямой формат связи с командой."
+        title="Генеральное спонсорство BARSYNERGY"
+        description="Формат для брендов и компаний, которым нужен заметный и долгий контакт с профессиональной аудиторией региона."
+        summary="Работаем с брендами, дистрибьюторами, производителями и сервисами, которым важны отраслевые проекты, обучение и прямое присутствие в локальной среде."
+        summaryHeading="Кому подходит"
         metrics={[
-          { value: '01', label: 'отдельный экран' },
-          { value: 'Главная', label: 'заметный вход' },
-          { value: 'СКФО', label: 'отраслевой фокус' }
+          { value: 'СКФО', label: 'региональный фокус' },
+          { value: 'События', label: 'живые интеграции' },
+          { value: 'Контент', label: 'долгая видимость' }
         ]}
         rows={[
           {
-            label: 'Позиция',
-            title: 'Не обычный партнерский список',
-            description: 'Этот раздел отделяет генеральных спонсоров от обычного партнерского каталога.'
+            label: 'Брендам',
+            title: 'Присутствие в отраслевой среде',
+            description: 'Для брендов, которым важно системно работать с барной аудиторией, а не ограничиваться разовым выходом.'
           },
           {
-            label: 'Аудитория',
-            title: 'Бары, бренды, школы и сервисы',
-            description: 'Формат подходит компаниям, которым нужны отраслевые контакты, образовательные проекты и присутствие в регионе.'
+            label: 'Дистрибьюторам',
+            title: 'Связка с рынком и командами',
+            description: 'Для компаний, которым нужны прямые точки касания с заведениями, управляющими, барменами и преподавателями.'
           },
           {
-            label: 'Старт',
-            title: 'Сначала заявка и обсуждение',
-            description: 'Мы обсуждаем задачи бренда, формат участия и точки присутствия на сайте.'
+            label: 'Производителям',
+            title: 'Форматы под задачу бренда',
+            description: 'Для производителей и сервисов, которым нужны образовательные, событийные или контентные интеграции в регионе.'
           }
         ]}
+        rowsHeading="Основные направления"
         primaryLink={{ label: 'Обсудить спонсорство', href: '/contacts' }}
         secondaryLink={{ label: 'Партнеры', href: '/partners' }}
       />
 
+      <section className="editorial-grid border-b border-black/20 py-10 md:py-14">
+        <div className="container grid gap-8 xl:grid-cols-[0.72fr_1.28fr]">
+          <div>
+            <PublicDisplayTitle>Примеры профилей</PublicDisplayTitle>
+            <PublicBodyText className="mt-5 max-w-md">
+              Так может выглядеть блок генеральных спонсоров на живом сайте: с понятной специализацией и коротким контекстом.
+            </PublicBodyText>
+          </div>
+          <div className="grid gap-4 md:grid-cols-3">
+            {sponsorShowcase.map((sponsor) => (
+              <Panel className="flex h-full flex-col justify-between bg-white/70" key={sponsor.name} padding="md">
+                <div>
+                  <PublicEyebrow>{sponsor.city}</PublicEyebrow>
+                  <h3 className="mt-3 text-2xl font-semibold uppercase leading-8">{sponsor.name}</h3>
+                  <p className="mt-3 text-sm font-semibold uppercase tracking-[0.06em] text-[var(--muted)]">{sponsor.focus}</p>
+                </div>
+                <PublicBodyText className="mt-5">{sponsor.note}</PublicBodyText>
+              </Panel>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section className="border-b border-black/20 bg-[var(--graphite)] py-10 text-white md:py-14">
         <div className="container grid gap-8 xl:grid-cols-[0.72fr_1.28fr]">
           <div>
-            <h2 className={`${displayFont.className} display-tight text-[44px] md:text-[58px]`}>
-              Где это видно
-            </h2>
-            <p className="mt-5 max-w-md text-sm leading-7 text-white/70">
-              Страница не спрятана внутри каталога партнеров. У нее есть отдельный адрес и несколько входов с публичных страниц.
-            </p>
+            <PublicDisplayTitle className="text-white">Что входит</PublicDisplayTitle>
+            <PublicBodyText className="mt-5 max-w-md" tone="inverse">
+              Состав собираем под бренд, сезон и рабочую задачу. Ниже базовые точки, вокруг которых строится пакет.
+            </PublicBodyText>
           </div>
-          <div className="grid gap-0 border border-white/16 md:grid-cols-3">
+          <div className="grid gap-4 md:grid-cols-3">
             {visibilityRows.map((row) => (
-              <article className="border-b border-white/16 p-5 md:border-b-0 md:border-r md:last:border-r-0" key={row.title}>
-                <p className={`${displayFont.className} display-face text-4xl leading-none text-[var(--accent)]`}>
-                  {row.label}
-                </p>
-                <h3 className="mt-5 text-lg font-semibold uppercase leading-7">{row.title}</h3>
-                <p className="mt-3 text-sm leading-6 text-white/70">{row.description}</p>
-              </article>
+              <StatCard
+                className="h-full border-white/16 bg-[#181817] text-white"
+                description={row.description}
+                descriptionClassName="text-white/76"
+                key={row.title}
+                label={row.label}
+                labelClassName="text-[#f1b6ad]"
+                tone="inverse"
+                value={row.title}
+                valueClassName="text-lg font-semibold uppercase leading-7 tracking-[0.02em] text-white"
+                style={{ backgroundColor: '#181817', borderColor: 'rgba(255,255,255,0.16)', color: '#ffffff' }}
+              />
             ))}
           </div>
         </div>
@@ -89,25 +141,20 @@ export default function GeneralSponsorsPage() {
         <div className="container grid gap-8 xl:grid-cols-[0.72fr_1.28fr]">
           <div className="flex flex-col justify-between gap-8">
             <div>
-              <h2 className={`${displayFont.className} display-tight text-[44px] md:text-[58px]`}>
-                Формат участия
-              </h2>
-              <p className="mt-5 max-w-md text-sm leading-7 text-[var(--muted)]">
-                Формат подбирается под задачи бренда: заметность на сайте, участие в проектах и совместные инициативы.
-              </p>
+              <PublicDisplayTitle>Формат работы</PublicDisplayTitle>
+              <PublicBodyText className="mt-5 max-w-md">
+                Обсуждаем задачу бренда, собираем точки присутствия и согласуем рабочий план без лишней упаковки.
+              </PublicBodyText>
             </div>
-            <a
-              className="editorial-link inline-flex min-h-11 w-fit items-center gap-3 border-b border-[var(--text)] text-sm font-semibold uppercase tracking-[0.06em]"
-              href="/contacts"
-            >
-              Связаться с командой
+            <EditorialAction href="/contacts">
+              Обсудить формат
               <ArrowUpRight size={18} />
-            </a>
+            </EditorialAction>
           </div>
           <div className="border-t border-black/20">
             {sponsorFormats.map((item, index) => (
               <div className="grid gap-4 border-b border-black/20 py-5 md:grid-cols-[0.18fr_1fr]" key={item}>
-                <p className={`${displayFont.className} display-face text-3xl leading-none text-[var(--accent)]`}>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">
                   {String(index + 1).padStart(2, '0')}
                 </p>
                 <p className="text-xl font-semibold uppercase leading-7">{item}</p>

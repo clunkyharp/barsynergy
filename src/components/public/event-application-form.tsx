@@ -1,6 +1,5 @@
 import { submitEventApplication } from '@/app/(public)/events/actions';
 import {
-  ConsentCheckboxField,
   HiddenUtmFields,
   HoneypotField,
   PublicApplicationSection,
@@ -9,8 +8,10 @@ import {
   type PublicApplicationFormProps
 } from '@/components/public/application-form-section';
 import { Button } from '@/components/ui/button';
+import { ConsentField } from '@/components/ui/consent-field';
 import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
+import { InlineLink } from '@/components/ui/inline-link';
 import { Select } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 
@@ -27,7 +28,7 @@ export function EventApplicationForm({ enabled, result, utm, cities }: PublicApp
         <HiddenUtmFields utm={utm} />
         <HoneypotField id="event-application-website" />
         <PublicFormShellHeader
-          eyebrow="Форма события"
+          eyebrow="Участие и предложение"
           title="Заявка на событие"
           description="Для участия, предложения темы, коллаборации или нового формата в календаре."
         />
@@ -64,13 +65,11 @@ export function EventApplicationForm({ enabled, result, utm, cities }: PublicApp
               </FormField>
             </div>
             <div className="md:col-span-2">
-              <ConsentCheckboxField>
+              <ConsentField>
                 Согласен на обработку персональных данных для обработки заявки. Текст{' '}
-                <a className="font-semibold text-[var(--accent)] underline-offset-4 hover:underline" href="/legal/personal-data-consent">
-                  согласия
-                </a>
+                <InlineLink href="/legal/personal-data-consent">согласия</InlineLink>
                 .
-              </ConsentCheckboxField>
+              </ConsentField>
             </div>
           </div>
           <PublicFormShellFooter note="Если предлагаете свой формат, опишите площадку, тему и ожидаемый состав участников.">

@@ -7,11 +7,11 @@ import {
   updateApplicationStatus
 } from '@/app/admin/applications/actions';
 import { AdminActionAlert, HiddenRedirect } from '@/components/admin/content-admin-controls';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { FormField } from '@/components/ui/form-field';
 import { Select } from '@/components/ui/select';
+import { StatusBadge } from '@/components/ui/status-badge';
 import { Textarea } from '@/components/ui/textarea';
 import {
   applicationStatusBadgeVariants,
@@ -22,6 +22,8 @@ import {
 import type { AdminContentSearchParams } from '@/lib/admin/content-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
 import { prisma } from '@/lib/db/prisma';
+
+export const dynamic = 'force-dynamic';
 
 const ADMIN_APPLICATIONS_PATH = '/admin/applications';
 
@@ -98,9 +100,7 @@ export default async function AdminApplicationDetailPage({ params, searchParams 
         <Card className="p-5">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <h2 className="text-lg font-semibold">Данные заявки</h2>
-            <Badge variant={applicationStatusBadgeVariants[application.status]}>
-              {applicationStatusLabels[application.status]}
-            </Badge>
+            <StatusBadge variant={applicationStatusBadgeVariants[application.status]}>{applicationStatusLabels[application.status]}</StatusBadge>
           </div>
 
           <dl className="mt-5 grid gap-4 text-sm sm:grid-cols-2">

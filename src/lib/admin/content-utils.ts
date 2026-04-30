@@ -2,13 +2,12 @@ import { redirect } from 'next/navigation';
 import { ContentStatus, FileVisibility, StorageDriver } from '@prisma/client';
 import { ZodError } from 'zod';
 import { prisma } from '@/lib/db/prisma';
+import { isAllowedPublicImageUpload } from '@/lib/storage/file-signatures';
 import { MAX_UPLOAD_FILE_SIZE_BYTES } from '@/lib/storage/storage.types';
 
 export type AdminContentSearchParams = Record<string, string | string[] | undefined>;
 
 export const ADMIN_CONTENT_PAGE_SIZE = 12;
-
-const ALLOWED_PUBLIC_IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/avif']);
 
 export const contentStatusValues = [
   ContentStatus.DRAFT,
@@ -24,9 +23,9 @@ export const contentStatusLabels: Record<ContentStatus, string> = {
   [ContentStatus.ARCHIVED]: 'Архив'
 };
 
-export const contentStatusBadgeVariants: Record<ContentStatus, 'neutral' | 'success' | 'warning' | 'danger'> = {
+export const contentStatusBadgeVariants: Record<ContentStatus, 'neutral' | 'success' | 'warning' | 'danger' | 'pending'> = {
   [ContentStatus.DRAFT]: 'neutral',
-  [ContentStatus.REVIEW]: 'warning',
+  [ContentStatus.REVIEW]: 'pending',
   [ContentStatus.PUBLISHED]: 'success',
   [ContentStatus.ARCHIVED]: 'danger'
 };
@@ -192,15 +191,16 @@ export async function uploadPublicContentImageFromFormData(formData: FormData, k
     return undefined;
   }
 
-  if (!ALLOWED_PUBLIC_IMAGE_TYPES.has(file.type)) {
-    throw new Error('Unsupported image type.');
-  }
-
   if (file.size > MAX_UPLOAD_FILE_SIZE_BYTES) {
     throw new Error('File is too large.');
   }
 
   const buffer = Buffer.from(await file.arrayBuffer());
+
+  if (!isAllowedPublicImageUpload({ mimeType: file.type, originalName: file.name, buffer })) {
+    throw new Error('Unsupported image type.');
+  }
+
   const { getStorageService } = await import('@/lib/storage/storage.service');
   const storageService = getStorageService();
   const upload = await storageService.uploadFile({

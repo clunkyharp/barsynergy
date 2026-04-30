@@ -1,7 +1,21 @@
 import type { NextConfig } from 'next';
 
+const tunnelOrigins = [
+  '*.ngrok-free.app',
+  '*.ngrok.app',
+  '*.ngrok.io',
+  '*.trycloudflare.com',
+  '*.loca.lt',
+  '*.localhost.run'
+];
+
 const nextConfig: NextConfig = {
-  allowedDevOrigins: ['*.ngrok-free.app', '*.ngrok.app', '*.ngrok.io'],
+  allowedDevOrigins: tunnelOrigins,
+  experimental: {
+    serverActions: {
+      allowedOrigins: tunnelOrigins
+    }
+  },
   output: 'standalone',
   poweredByHeader: false,
   reactStrictMode: true,

@@ -1,9 +1,9 @@
 import { AdminActionAlert } from '@/components/admin/content-admin-controls';
 import { BusinessRequestForm } from '@/components/business/business-request-form';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import { PageHeader } from '@/components/ui/page-header';
+import { Panel } from '@/components/ui/panel';
+import { StatusBadge } from '@/components/ui/status-badge';
 import {
   applicationStatusBadgeVariants,
   applicationStatusLabels,
@@ -54,11 +54,14 @@ export default async function BusinessRequestsPage({ searchParams }: BusinessReq
       <section className="grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
         <BusinessRequestForm cities={cities} defaultCityId={businessAccount.cityId} />
         <section>
-          <h2 className="text-xl font-semibold">История заявок</h2>
+          <div className="border-b border-[var(--line)] pb-4">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">История</p>
+            <h2 className="mt-3 text-xl font-semibold">История заявок</h2>
+          </div>
           <div className="mt-4 grid gap-3">
             {applications.length > 0 ? (
               applications.map((application) => (
-                <Card className="p-4" key={application.id}>
+                <Panel className="p-4" key={application.id} tone="elevated">
                   <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
                     <div>
                       <p className="text-sm text-[var(--muted)]">{applicationTypeLabels[application.type]}</p>
@@ -69,18 +72,16 @@ export default async function BusinessRequestsPage({ searchParams }: BusinessReq
                       ) : null}
                     </div>
                     <div className="flex shrink-0 flex-col gap-2">
-                      <Badge variant={applicationStatusBadgeVariants[application.status]}>
-                        {applicationStatusLabels[application.status]}
-                      </Badge>
+                      <StatusBadge variant={applicationStatusBadgeVariants[application.status]}>{applicationStatusLabels[application.status]}</StatusBadge>
                       <Button href={`/business/requests/${application.id}`} variant="secondary">
                         Открыть
                       </Button>
                     </div>
                   </div>
-                </Card>
+                </Panel>
               ))
             ) : (
-              <Card className="p-5 text-sm text-[var(--muted)]">У компании пока нет заявок.</Card>
+              <Panel className="p-5 text-sm text-[var(--muted)]" tone="elevated">У компании пока нет заявок.</Panel>
             )}
           </div>
         </section>

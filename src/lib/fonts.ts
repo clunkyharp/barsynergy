@@ -1,9 +1,16 @@
-import { Oswald, Outfit } from 'next/font/google';
+import { Manrope, Roboto_Condensed } from 'next/font/google';
 
-export const bodyFont = Outfit({
-  subsets: ['latin', 'latin-ext']
+export const bodyFont = Manrope({
+  subsets: ['latin', 'cyrillic'],
+  display: 'swap'
 });
 
-export const displayFont = Oswald({
-  subsets: ['latin', 'cyrillic']
+export const displayFont = Roboto_Condensed({
+  subsets: ['latin', 'cyrillic'],
+  display: 'swap'
+});
+
+export const accentFont = Manrope({
+  subsets: ['latin', 'cyrillic'],
+  display: 'swap'
 });

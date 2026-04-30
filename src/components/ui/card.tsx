@@ -14,11 +14,11 @@ export function Card({ className, interactive = false, selected = false, loading
       aria-busy={loading || undefined}
       aria-selected={selected || undefined}
       className={cn(
-        'rounded-lg border border-[var(--line)] bg-[var(--surface)] shadow-sm transition',
+        'rounded-[var(--radius-lg)] border border-[var(--line)] bg-[var(--surface)] shadow-[var(--shadow-card)] transition',
         interactive && 'hover:border-[var(--accent)] focus-within:border-[var(--accent)] focus-within:ring-2 focus-within:ring-[var(--accent)]/20',
         selected && 'border-[var(--accent)] ring-2 ring-[var(--accent)]/20',
         loading && 'animate-pulse',
-        error && 'border-[var(--danger)] bg-[var(--danger)]/5',
+        error && 'border-[var(--danger-border)] bg-[var(--danger-bg)]',
         className
       )}
       {...props}

@@ -1,15 +1,10 @@
+import { Suspense } from 'react';
+import { CategoryType } from '@prisma/client';
 import { EditorialPublicPage } from '@/components/public/editorial-public-page';
-import { EventApplicationForm } from '@/components/public/event-application-form';
 import { PublishedContentSection } from '@/components/public/published-content-section';
-import { arePublicApplicationFormsEnabled } from '@/lib/applications/public-forms';
-import { getApplicationCityOptions } from '@/lib/applications/form-options';
-import {
-  getPublicApplicationResult,
-  getPublicApplicationUtm,
-  stripPublicApplicationResultParams
-} from '@/lib/applications/public-form-helpers';
+import { PublicFilters } from '@/components/public/public-filters';
 import { getPublishedEvents, type PublicContentSearchParams } from '@/lib/public/content';
-import { getEnv } from '@/lib/validation/env';
+import { getEventFilterOptions, getPublicCategoryOptions, getPublicCityFilterOptions } from '@/lib/public/filter-options';
 
 type EventsPageProps = {
   searchParams?: Promise<PublicContentSearchParams>;
@@ -17,12 +12,12 @@ type EventsPageProps = {
 
 export default async function EventsPage({ searchParams }: EventsPageProps) {
   const params = (await searchParams) ?? {};
-  const [content, cities] = await Promise.all([
-    getPublishedEvents(stripPublicApplicationResultParams(params)),
-    getApplicationCityOptions()
+  const [content, filterCities, categories, filterOptions] = await Promise.all([
+    getPublishedEvents(params),
+    getPublicCityFilterOptions(),
+    getPublicCategoryOptions(CategoryType.EVENT),
+    getEventFilterOptions()
   ]);
-  const applicationFormsEnabled = arePublicApplicationFormsEnabled(getEnv());
-
   return (
     <>
       <EditorialPublicPage
@@ -52,22 +47,37 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
             description: 'Форматы для школ, брендов и заведений с персональной координацией по каждому запросу.'
           }
         ]}
-        primaryLink={{ label: 'Предложить событие', href: '/contacts' }}
+        primaryLink={{ label: 'Смотреть афишу', href: '#events-list' }}
         secondaryLink={{ label: 'Партнерство', href: '/partners' }}
       />
-      <PublishedContentSection
-        basePath="/events"
-        content={content}
-        emptyDescription="Когда появятся новые события, они отобразятся здесь."
-        emptyTitle="Событий пока нет"
-        title="Афиша"
-      />
-      <EventApplicationForm
-        enabled={applicationFormsEnabled}
-        result={getPublicApplicationResult(params)}
-        utm={getPublicApplicationUtm(params)}
-        cities={cities}
-      />
+      <Suspense fallback={<div className="container py-6">Загрузка фильтров...</div>}>
+        <PublishedContentSection
+          basePath="/events"
+          content={content}
+          emptyDescription="Когда появятся новые события, они отобразятся здесь."
+          emptyTitle="Событий пока нет"
+          filters={
+            <PublicFilters
+              categories={categories}
+              cities={filterCities}
+              embedded
+              extraFilters={[
+                { name: 'format', label: 'Все форматы', options: filterOptions.formats },
+                {
+                  name: 'period',
+                  label: 'Все даты',
+                  options: [
+                    { value: 'upcoming', label: 'Предстоящие' },
+                    { value: 'past', label: 'Прошедшие' }
+                  ]
+                }
+              ]}
+            />
+          }
+          sectionId="events-list"
+          title="Афиша"
+        />
+      </Suspense>
     </>
   );
 }

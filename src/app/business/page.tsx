@@ -1,13 +1,15 @@
 import { ApplicationStatus } from '@prisma/client';
 import { updateBusinessProfile } from '@/app/business/actions';
 import { AdminActionAlert } from '@/components/admin/content-admin-controls';
-import { Badge } from '@/components/ui/badge';
+import { ActionRow } from '@/components/ui/action-row';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
+import { Panel } from '@/components/ui/panel';
 import { PageHeader } from '@/components/ui/page-header';
 import { Select } from '@/components/ui/select';
+import { StatCard } from '@/components/ui/stat-card';
+import { StatusBadge } from '@/components/ui/status-badge';
 import { Textarea } from '@/components/ui/textarea';
 import { applicationStatusLabels } from '@/lib/admin/application-utils';
 import type { AdminContentSearchParams } from '@/lib/admin/content-utils';
@@ -49,12 +51,12 @@ export default async function BusinessDashboardPage({ searchParams }: BusinessDa
       <PageHeader eyebrow="Компания" title={businessAccount.companyName} />
       <AdminActionAlert params={params} />
       <section className="grid gap-4 xl:grid-cols-[minmax(0,1.1fr)_minmax(320px,0.9fr)]">
-        <Card className="overflow-hidden p-0">
+        <Panel className="overflow-hidden p-0" tone="elevated">
           <div className="border-b border-black/10 px-5 py-5 md:px-6">
             <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Компания</p>
             <h2 className="mt-3 text-2xl font-semibold tracking-[-0.03em]">Профиль компании</h2>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--muted)]">
-              Заполненный профиль нужен, чтобы новые заявки сразу попадали в работу без уточняющих вопросов от команды.
+              Заполненный профиль помогает быстрее отправлять новые заявки и не повторять одни и те же данные.
             </p>
           </div>
           <div className="p-5 md:p-6">
@@ -102,42 +104,38 @@ export default async function BusinessDashboardPage({ searchParams }: BusinessDa
                   defaultValue={businessAccount.description ?? ''}
                 />
               </FormField>
-              <Button className="rounded-full" type="submit">Сохранить профиль</Button>
+              <ActionRow className="border-t-0 pt-0">
+                <Button className="rounded-full" type="submit">Сохранить профиль</Button>
+              </ActionRow>
             </form>
           </div>
-        </Card>
+        </Panel>
         <div className="space-y-4">
-          <Card className="p-5">
+          <Panel padding="md" tone="elevated">
             <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Статус</p>
             <h2 className="mt-3 text-xl font-semibold">Текущий доступ</h2>
             <div className="mt-4 flex items-center gap-3">
-              <Badge variant="success">Активен</Badge>
+              <StatusBadge variant="success">Активен</StatusBadge>
               <span className="text-sm text-[var(--muted)]">Компания может создавать и отслеживать заявки.</span>
             </div>
-          </Card>
-          <Card className="p-5">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Следующий шаг</p>
-            <h2 className="mt-3 text-xl font-semibold">Рабочая очередь</h2>
+          </Panel>
+          <Panel padding="md" tone="elevated">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Заявки</p>
+            <h2 className="mt-3 text-xl font-semibold">По вашей компании</h2>
             <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-1">
-              <div className="rounded-2xl border border-black/10 bg-[var(--surface)] px-4 py-4">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">Всего заявок</p>
-                <p className="mt-2 text-3xl font-semibold tracking-[-0.04em]">{requestCount}</p>
-              </div>
-              <div className="rounded-2xl border border-black/10 bg-[var(--surface)] px-4 py-4">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">В работе</p>
-                <p className="mt-2 text-3xl font-semibold tracking-[-0.04em]">{activeRequestCount}</p>
-              </div>
+              <StatCard label="Всего заявок" value={requestCount} />
+              <StatCard label="В работе" value={activeRequestCount} />
             </div>
             <Button className="mt-5 w-full rounded-full" href="/business/requests" variant="secondary">
               Открыть заявки
             </Button>
-          </Card>
-          <Card className="p-5">
+          </Panel>
+          <Panel padding="md" tone="elevated">
             <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Последние обновления</p>
             <div className="mt-4 grid gap-3">
               {latestApplications.length > 0 ? (
                 latestApplications.map((application) => (
-                  <div className="rounded-2xl border border-black/10 bg-[var(--surface)] px-4 py-4" key={application.id}>
+                  <Panel key={application.id} padding="sm">
                     <p className="text-sm font-semibold">{application.subject ?? 'Заявка без названия'}</p>
                     <p className="mt-1 text-sm text-[var(--muted)]">Статус: {applicationStatusLabels[application.status]}</p>
                     {application.businessNotes ? (
@@ -145,15 +143,15 @@ export default async function BusinessDashboardPage({ searchParams }: BusinessDa
                     ) : (
                       <p className="mt-3 text-sm leading-6 text-[var(--muted)]">Комментариев для бизнеса пока нет.</p>
                     )}
-                  </div>
+                  </Panel>
                 ))
               ) : (
-                <p className="rounded-2xl border border-black/10 bg-[var(--surface)] px-4 py-4 text-sm leading-6 text-[var(--muted)]">
-                  Пока нет обновлений. Создайте первую заявку, чтобы запустить рабочий сценарий.
-                </p>
+                <Panel className="text-sm leading-6 text-[var(--muted)]" padding="sm">
+                  Пока нет обновлений. Когда появится первая заявка, здесь будет история изменений и комментарии.
+                </Panel>
               )}
             </div>
-          </Card>
+          </Panel>
         </div>
       </section>
     </div>

@@ -1,14 +1,18 @@
 import { submitPartnerApplication } from '@/app/(public)/partners/actions';
 import {
-  ConsentCheckboxField,
   HiddenUtmFields,
   HoneypotField,
+  PublicFormShellFooter,
   PublicApplicationSection,
   type PublicApplicationFormProps
 } from '@/components/public/application-form-section';
+import { PublicBodyText, PublicDisplayTitle, PublicEyebrow } from '@/components/public/public-primitives';
 import { Button } from '@/components/ui/button';
+import { ConsentField } from '@/components/ui/consent-field';
 import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
+import { InlineLink } from '@/components/ui/inline-link';
+import { MetaChip } from '@/components/ui/meta-chip';
 import { Select } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 
@@ -39,27 +43,24 @@ export function PartnerApplicationForm({ enabled, result, utm, cities }: PublicA
         <HoneypotField id="partner-application-website" />
         <div className="relative grid lg:grid-cols-[0.42fr_0.58fr]">
           <div className="relative border-b border-white/10 bg-[var(--graphite)] px-5 py-6 text-white md:px-6 md:py-7 lg:border-b-0 lg:border-r lg:border-white/10">
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-white/56">Партнерская заявка</p>
-            <h3 className="mt-3 text-2xl font-semibold uppercase leading-8 md:text-[30px] md:leading-9">
+            <PublicEyebrow tone="inverse">Совместный проект</PublicEyebrow>
+            <PublicDisplayTitle as="h3" className="mt-3 text-white" size="card">
               Формат для брендов, школ и заведений
-            </h3>
-            <p className="mt-4 max-w-md text-sm leading-7 text-white/72">
+            </PublicDisplayTitle>
+            <PublicBodyText className="mt-4 max-w-md" tone="inverse">
               Опишите идею коротко и по делу. Команда начнет обсуждение с этой заявки.
-            </p>
+            </PublicBodyText>
 
             <div className="mt-6 flex flex-wrap gap-2">
               {highlights.map((item) => (
-                <span
-                  className="border border-white/16 bg-white/5 px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-white/80"
-                  key={item}
-                >
+                <MetaChip className="px-3 py-2 text-white/80" key={item} variant="inverse">
                   {item}
-                </span>
+                </MetaChip>
               ))}
             </div>
 
             <div className="mt-8 border-t border-white/10 pt-5">
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-white/50">Что подготовить</p>
+              <PublicEyebrow tone="inverse">Что подготовить</PublicEyebrow>
               <ul className="mt-4 space-y-3 text-sm leading-6 text-white/74">
                 {preparationNotes.map((item) => (
                   <li className="flex gap-3" key={item}>
@@ -117,20 +118,15 @@ export function PartnerApplicationForm({ enabled, result, utm, cities }: PublicA
                 </FormField>
               </div>
               <div className="md:col-span-2 border-t border-black/10 pt-1">
-                <ConsentCheckboxField>
+                <ConsentField>
                   Согласен на обработку персональных данных для обработки заявки. Текст{' '}
-                  <a className="font-semibold text-[var(--accent)] underline-offset-4 hover:underline" href="/legal/personal-data-consent">
-                    согласия
-                  </a>
+                  <InlineLink href="/legal/personal-data-consent">согласия</InlineLink>
                   .
-                </ConsentCheckboxField>
+                </ConsentField>
               </div>
-              <div className="md:col-span-2 flex flex-col gap-3 border-t border-black/10 pt-5 sm:flex-row sm:items-center sm:justify-between">
-                <p className="max-w-md text-xs leading-6 text-[var(--muted)]">
-                  После отправки мы свяжемся с вами и обсудим следующий шаг.
-                </p>
+              <PublicFormShellFooter className="md:col-span-2" note="После отправки мы свяжемся с вами и обсудим следующий шаг.">
                 <Button type="submit">Отправить заявку</Button>
-              </div>
+              </PublicFormShellFooter>
             </div>
           </div>
         </div>

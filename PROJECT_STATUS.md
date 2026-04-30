@@ -1,6 +1,6 @@
 # BARSYNERGY Project Status
 
-Last updated: 2026-04-29
+Last updated: 2026-04-30
 
 ## Current Branch
 
@@ -14,6 +14,7 @@ Active phase: Phase 4 auth and first business account is implemented for the cur
 
 Current local follow-up completed on `dev`:
 
+- the design-system stabilization batch is completed locally: runtime font drift is fixed, semantic foundation tokens are expanded, and shared UI primitives now cover fields, checkbox rows, consent blocks, notices, segmented selectors, helper panels, status badges, editorial/public links, reusable list rows and admin CRUD tables;
 - article full editing has been moved from the `/admin/articles` table to a dedicated `/admin/articles/[articleId]` screen so long article bodies are not rendered inside the list view;
 - public application throttling now has a dedicated cleanup command: `npm run application:cleanup:throttles`.
 - Phase 4 business-account MVP is implemented at source level: email/password login, logout, business-access request, admin approval/blocking, guarded `/business` cabinet, editable company profile and business request drafts/submission/tracking.
@@ -22,9 +23,18 @@ Current local follow-up completed on `dev`:
 - business cabinet request validation now uses request-type-specific server-side schemas and payload shaping instead of one weak shared schema for all request types;
 - admin draft deletion for articles, events, courses, vacancies, suppliers and partners now fails closed when the target draft is missing or already unavailable, instead of returning a false success state;
 - public UI polish from browser review is applied: homepage feature illustrations use generated vector compositions instead of framed raster images, education/event cards are wider and shorter, community stats and site-section navigation are denser, the global background uses a softer grain/ambient treatment, and form consent checkboxes/focus states are aligned and neutral.
+- public homepage redesign batch is now applied locally: `/` has been rebuilt around live CMS-fed education/event/article/vacancy/supplier highlights, a new premium public shell, GSAP-driven narrative sections, a stronger B2B route for partners/sponsors and a shorter hero headline validated again on desktop/mobile after layout changes.
+- public consistency batch is now applied locally across the main public screens: repeated public typography, section headers, filters, stat shells, content meta chips and form action rows are normalized around shared primitives, and the design-system docs/tokens now follow the runtime `Geist + Oswald + Outfit` contract instead of the older `Manrope` docs state.
 - shared form UI is redesigned across public applications and auth screens: inputs, selects, textareas and checkboxes now use deeper editorial surfaces, stronger neutral focus states, explicit consent blocks and richer card shells with consistent action footers.
+- auth, business and specialist-profile screens now sit closer to the same shared shell contract: `PageHeader`, action rows, panel usage, stat blocks and sidebar labels are normalized without changing the underlying account or application logic.
+- focused Playwright smoke is now rerun for key public, auth, admin and business routes: route responses, `h1`, shell visibility and horizontal overflow are rechecked, the duplicated desktop `Кабинет` nav item is removed, and the low-contrast vacancies scenario card is fixed.
+- admin consistency pass is now applied on the main workspace screens: the global admin header is calmer, key admin sections use one shared intro pattern, and placeholder taxonomy screens no longer fall back to an isolated header style.
 - technical explanatory blocks were removed from admin and business screens where possible: phase/status helper paragraphs and service placeholders no longer render as pseudo-content, while forms and management actions remain unchanged.
 - public pages and forms were reworded away from internal workflow language: copy no longer leans on admin-phase, moderation, publication-pipeline or placeholder explanations where those texts were not useful user content.
+- demo content for client-facing screen review is now available through `npm run demo:seed:screens`, and the current local database is already populated with realistic mock vacancies, suppliers, applications, draft content and pending business-access examples for admin, vacancies, suppliers and general-sponsor review.
+- auth, business-access and vacancy-request screens were cleaned further: `/auth/login`, `/auth/register`, `/business` and the business/public vacancy request forms now focus on the next user step instead of legal-process, moderation or queue-heavy explanations.
+- security remediation batch is applied locally: login and business-access registration now use persistent per-email/per-IP throttling, unknown-email login performs a dummy bcrypt comparison, upload validation checks file signatures, S3 uploads request AES256 server-side encryption, Nginx overwrites inbound forwarding headers and emits a baseline CSP.
+- public mobile/tunnel interaction hardening is applied locally: decorative homepage overlays no longer capture taps above the hero/header area, the public header sits on a stronger interaction layer, and external tunnel origins are now allowlisted for dev assets and Server Actions so menu/form checks are less likely to fail during ngrok-like mobile review.
 
 Phase 0 is implemented as the technical foundation:
 
@@ -58,6 +68,7 @@ Phase 1 public surface is implemented and smoke-verified:
 - responsive public-page layout patterns;
 - editorial design-system foundation;
 - separate `/general-sponsors` screen with visible homepage and navigation entry points.
+- redesigned live-data homepage with GSAP motion and updated public shell.
 
 Completed Phase 1 validation:
 
@@ -67,7 +78,9 @@ Completed Phase 1 validation:
 - `./node_modules/.bin/prisma validate`;
 - HTTP smoke for all public routes;
 - desktop and mobile homepage screenshot spot check with Playwright;
+- desktop/mobile shell safety check confirms the public header/footer stay hidden on `/auth/*`;
 - mobile menu open and `Esc` close check.
+- focused browser smoke for public, auth, admin and business key routes with updated screenshot review on `/vacancies` and `/admin/articles`.
 
 Phase 1 remaining caveat:
 
@@ -117,6 +130,10 @@ Phase 4 business request management is backed by migration `20260428170000_phase
 
 - `ApplicationStatus.DRAFT`;
 - `Application.businessNotes`.
+
+Auth attempt throttling is backed by migration `20260430120000_auth_attempt_throttle`:
+
+- `AuthAttemptThrottle`.
 
 ## Next Planned Work
 

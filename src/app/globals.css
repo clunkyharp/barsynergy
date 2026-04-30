@@ -1,18 +1,55 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f4ebdb;
-  --surface: #faf4e8;
-  --surface-muted: #ece0ce;
+  --background: #eee5d6;
+  --surface: #f7f0e4;
+  --surface-muted: #e4d7c3;
+  --surface-elevated: rgba(255, 255, 255, 0.9);
+  --surface-inverse: #141412;
   --text: #16130f;
   --muted: #5f564b;
   --line: rgba(22, 19, 15, 0.22);
+  --border-subtle: rgba(22, 19, 15, 0.1);
+  --border-default: rgba(22, 19, 15, 0.16);
+  --border-strong: rgba(22, 19, 15, 0.3);
+  --border-inverse: rgba(255, 255, 255, 0.22);
   --accent: #992c26;
   --accent-strong: #7b1f1a;
   --graphite: #141412;
   --success: #2f684f;
   --warning: #9a661a;
   --danger: #9f2f2f;
+  --field-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(255, 255, 255, 0.78));
+  --field-bg-hover: #ffffff;
+  --field-bg-disabled: var(--surface-muted);
+  --success-bg: rgba(47, 104, 79, 0.08);
+  --success-border: rgba(47, 104, 79, 0.32);
+  --success-text: #2f684f;
+  --warning-bg: rgba(154, 102, 26, 0.09);
+  --warning-border: rgba(154, 102, 26, 0.34);
+  --warning-text: #9a661a;
+  --danger-bg: rgba(159, 47, 47, 0.08);
+  --danger-border: rgba(159, 47, 47, 0.34);
+  --danger-text: #9f2f2f;
+  --focus-ring: rgba(20, 20, 18, 0.1);
+  --focus-ring-danger: rgba(159, 47, 47, 0.12);
+  --selected-bg: rgba(20, 20, 18, 0.96);
+  --selected-border: #141412;
+  --pending-bg: rgba(95, 86, 75, 0.08);
+  --skeleton-fill: rgba(22, 19, 15, 0.08);
+  --radius-none: 0;
+  --radius-sm: 0.4rem;
+  --radius-md: 1rem;
+  --radius-lg: 1.15rem;
+  --radius-xl: 1.75rem;
+  --radius-pill: 999px;
+  --shadow-none: none;
+  --shadow-card: 0 1px 2px rgba(20, 20, 18, 0.06);
+  --shadow-panel: 0 26px 80px rgba(22, 19, 15, 0.08);
+  --shadow-overlay: 0 18px 36px rgba(20, 20, 18, 0.12);
+  --shadow-focus: 0 0 0 3px rgba(20, 20, 18, 0.1);
+  --divider-public: rgba(0, 0, 0, 0.2);
+  --divider-product: rgba(22, 19, 15, 0.12);
 }
 
 * {
@@ -46,11 +83,12 @@ body {
   line-height: 1.5;
   background-image:
     url("/images/grain.svg"),
-    radial-gradient(circle at 13% 8%, rgba(255, 255, 255, 0.82), transparent 28%),
-    radial-gradient(circle at 82% 12%, rgba(153, 44, 38, 0.13), transparent 22%),
-    radial-gradient(circle at 74% 68%, rgba(20, 20, 18, 0.075), transparent 24%),
-    linear-gradient(116deg, rgba(250, 244, 232, 0.98) 0%, rgba(241, 231, 213, 0.96) 47%, rgba(250, 244, 232, 0.98) 100%);
-  background-size: 180px 180px, auto, auto, auto, auto;
+    radial-gradient(circle at 14% 8%, rgba(255, 255, 255, 0.94), transparent 24rem),
+    radial-gradient(circle at 88% 10%, rgba(153, 44, 38, 0.1), transparent 25rem),
+    radial-gradient(circle at 68% 72%, rgba(24, 21, 17, 0.1), transparent 30rem),
+    linear-gradient(135deg, #f6f0e7 0%, #e8ddca 52%, #f3eadf 100%);
+  background-size: 190px 190px, auto, auto, auto, auto;
+  overflow-x: hidden;
 }
 
 a {
@@ -84,6 +122,9 @@ svg {
 
 .site-main {
   flex: 1;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 .container {
@@ -151,7 +192,8 @@ svg {
 .display-tight {
   letter-spacing: 0;
   text-transform: uppercase;
-  line-height: 0.92;
+  line-height: 1;
+  overflow-wrap: anywhere;
 }
 
 .editorial-grid {
@@ -226,15 +268,13 @@ svg {
 .editorial-form-shell {
   position: relative;
   overflow: hidden;
-  border: 1px solid rgba(22, 19, 15, 0.16);
-  border-radius: 1.75rem;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-xl);
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0.94)),
     radial-gradient(circle at top right, rgba(153, 44, 38, 0.1), transparent 32%),
     radial-gradient(circle at bottom left, rgba(20, 20, 18, 0.04), transparent 28%);
-  box-shadow:
-    0 26px 80px rgba(22, 19, 15, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.74);
+  box-shadow: var(--shadow-panel), inset 0 1px 0 rgba(255, 255, 255, 0.74);
 }
 
 .editorial-form-shell::before {
@@ -247,4 +287,140 @@ svg {
   background-size: 56px 56px;
   opacity: 0.45;
   pointer-events: none;
+}
+
+.field-base {
+  min-height: 3rem;
+  width: 100%;
+  cursor: text;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--field-bg);
+  color: var(--text);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.56),
+    0 10px 24px rgba(22, 19, 15, 0.03),
+    inset 0 1px 0 rgba(255, 255, 255, 0.78);
+  outline: none;
+  transition:
+    border-color 160ms ease,
+    background 160ms ease,
+    box-shadow 160ms ease,
+    color 160ms ease;
+}
+
+.field-base::placeholder {
+  color: rgba(95, 86, 75, 0.82);
+}
+
+.field-base:hover {
+  border-color: rgba(22, 19, 15, 0.34);
+  background: linear-gradient(180deg, #fff, rgba(255, 255, 255, 0.88));
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.6),
+    0 12px 28px rgba(22, 19, 15, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.82);
+}
+
+.field-base:focus,
+.field-base:focus-visible,
+.field-base:active {
+  border-color: var(--graphite);
+  background: var(--field-bg-hover);
+  box-shadow:
+    0 0 0 3px var(--focus-ring),
+    0 16px 32px rgba(22, 19, 15, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.88);
+}
+
+.field-base[aria-invalid="true"] {
+  border-color: var(--danger-border);
+  background: var(--field-bg-hover);
+  box-shadow: 0 0 0 3px var(--focus-ring-danger);
+}
+
+.field-base:disabled {
+  cursor: not-allowed;
+  border-color: var(--border-subtle);
+  background: var(--field-bg-disabled);
+  color: var(--muted);
+  box-shadow: none;
+  opacity: 0.7;
+}
+
+.consent-field {
+  display: grid;
+  grid-template-columns: 1.25rem minmax(0, 1fr);
+  align-items: start;
+  gap: 0.875rem;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.6);
+  padding: 1rem;
+  color: var(--muted);
+}
+
+.inset-panel {
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-card);
+}
+
+.inline-alert {
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-default);
+  padding: 1rem;
+}
+
+.inline-alert[data-tone="success"] {
+  border-color: var(--success-border);
+  background: var(--success-bg);
+  color: var(--success-text);
+}
+
+.inline-alert[data-tone="warning"] {
+  border-color: var(--warning-border);
+  background: var(--warning-bg);
+  color: var(--warning-text);
+}
+
+.inline-alert[data-tone="error"],
+.inline-alert[data-tone="destructive"] {
+  border-color: var(--danger-border);
+  background: var(--danger-bg);
+  color: var(--danger-text);
+}
+
+.inline-alert[data-tone="info"],
+.inline-alert[data-tone="neutral"] {
+  border-color: var(--border-default);
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--text);
+}
+
+.choice-card {
+  border: 1px solid var(--border-subtle);
+  border-radius: 1.35rem;
+  background: var(--surface);
+  transition:
+    border-color 160ms ease,
+    background-color 160ms ease,
+    color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.choice-card:hover {
+  border-color: var(--accent);
+  background: var(--field-bg-hover);
+}
+
+.choice-card[data-selected="true"] {
+  border-color: var(--selected-border);
+  background: var(--selected-bg);
+  color: white;
+}
+
+.choice-card[data-selected="true"] .choice-card-muted {
+  color: rgba(255, 255, 255, 0.72);
 }

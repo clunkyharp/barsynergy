@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { submitVacancyPlacementApplication, submitVacancyResponseApplication } from '@/app/(public)/vacancies/actions';
 import {
-  ConsentCheckboxField,
   HiddenUtmFields,
   HoneypotField,
   PublicApplicationSection,
@@ -11,13 +10,16 @@ import {
   PublicFormShellHeader
 } from '@/components/public/application-form-section';
 import { Button } from '@/components/ui/button';
+import { ConsentField } from '@/components/ui/consent-field';
+import { EditorialShell } from '@/components/ui/editorial-shell';
 import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
+import { InlineLink } from '@/components/ui/inline-link';
 import { Select } from '@/components/ui/select';
+import { SegmentedControl } from '@/components/ui/segmented-control';
 import { Textarea } from '@/components/ui/textarea';
 import type { VacancyApplicationFormOptions } from '@/lib/public/content';
 import { vacancyPositionValues } from '@/lib/vacancies/positions';
-import { cn } from '@/lib/utils';
 
 type VacancyApplicationFormsProps = {
   enabled: boolean;
@@ -40,52 +42,31 @@ export function VacancyApplicationForms({ enabled, options, result, utm }: Vacan
   return (
     <PublicApplicationSection
       eyebrow="Вакансии / Заявки"
-      title="Выберите сценарий"
-      description="Для заведений здесь есть отправка вакансии, для кандидатов — отдельный сценарий отклика только по опубликованным ролям."
+      title="Отклик и размещение"
+      description="Кандидаты могут откликнуться на открытую роль, а заведения отправить новую вакансию на сайт."
       enabled={enabled}
       result={result}
     >
       <div className="grid gap-6" id="vacancy-forms">
-        <div className="grid gap-3 md:grid-cols-2">
-          <button
-            className={cn(
-              'rounded-[1.35rem] border px-4 py-4 text-left transition',
-              mode === 'response'
-                ? 'border-[var(--graphite)] bg-[var(--graphite)] text-white'
-                : 'border-black/10 bg-white hover:border-[var(--accent)] hover:bg-[var(--surface)]'
-            )}
-            onClick={() => {
-              if (hasVacancies) {
-                setMode('response');
-              }
-            }}
-            type="button"
-          >
-            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] opacity-70">Для кандидатов</p>
-            <p className="mt-2 text-base font-semibold leading-6">Откликнуться на вакансию</p>
-            <p className={cn('mt-2 text-sm leading-6', mode === 'response' ? 'text-white/72' : 'text-[var(--muted)]')}>
-              {hasVacancies
-                ? 'Выберите открытую роль, добавьте контакт и короткий рассказ о вашем опыте.'
-                : 'Отклик откроется автоматически, когда в списке появится хотя бы одна опубликованная вакансия.'}
-            </p>
-          </button>
-          <button
-            className={cn(
-              'rounded-[1.35rem] border px-4 py-4 text-left transition',
-              mode === 'submission'
-                ? 'border-[var(--graphite)] bg-[var(--graphite)] text-white'
-                : 'border-black/10 bg-white hover:border-[var(--accent)] hover:bg-[var(--surface)]'
-            )}
-            onClick={() => setMode('submission')}
-            type="button"
-          >
-            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] opacity-70">Для заведений</p>
-            <p className="mt-2 text-base font-semibold leading-6">Разместить вакансию</p>
-            <p className={cn('mt-2 text-sm leading-6', mode === 'submission' ? 'text-white/72' : 'text-[var(--muted)]')}>
-              Отправьте роль, условия и детали. Заявка уйдёт на проверку и публикацию без лишних полей.
-            </p>
-          </button>
-        </div>
+        <SegmentedControl
+          items={[
+            {
+              value: 'response',
+              eyebrow: 'Для кандидатов',
+              label: 'Откликнуться на вакансию',
+              description: hasVacancies ? 'Открытые роли из списка ниже.' : 'Форма откроется, когда в разделе появятся новые позиции.',
+              disabled: !hasVacancies
+            },
+            {
+              value: 'submission',
+              eyebrow: 'Для заведений',
+              label: 'Разместить вакансию',
+              description: 'Компания, роль, условия и контакт для связи.'
+            }
+          ]}
+          onChange={setMode}
+          value={mode}
+        />
 
         {mode === 'response' ? (
           hasVacancies ? (
@@ -94,8 +75,8 @@ export function VacancyApplicationForms({ enabled, options, result, utm }: Vacan
               <HoneypotField id="vacancy-response-website" />
               <PublicFormShellHeader
                 eyebrow="Для кандидатов"
-                title="Отклик на опубликованную вакансию"
-                description="Сначала выберите роль из списка, затем оставьте контакт и короткое сообщение для работодателя."
+                title="Отклик на вакансию"
+                description="Выбранная роль, контакт и короткое сообщение работодателю."
               />
               <div className="relative p-5 md:p-6">
                 <div className="grid gap-4">
@@ -157,37 +138,34 @@ export function VacancyApplicationForms({ enabled, options, result, utm }: Vacan
                       accept=".pdf,.doc,.docx,.rtf,.odt,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/rtf,text/rtf,application/vnd.oasis.opendocument.text"
                     />
                   </FormField>
-                  <ConsentCheckboxField>
+                  <ConsentField>
                     Согласен на обработку данных и передачу отклика работодателю. Текст{' '}
-                    <a className="font-semibold text-[var(--accent)] underline-offset-4 hover:underline" href="/legal/personal-data-consent">
-                      согласия
-                    </a>
-                    .
-                  </ConsentCheckboxField>
+                    <InlineLink href="/legal/personal-data-consent">согласия</InlineLink>.
+                  </ConsentField>
                 </div>
-                <PublicFormShellFooter note="Отклик отправляется только по опубликованной роли и сразу попадает в рабочую очередь на проверку.">
-                  <Button className="min-h-12 rounded-full px-6 tracking-[0.12em] sm:self-start" type="submit">
+                <PublicFormShellFooter>
+                  <Button className="rounded-full sm:self-start" size="lg" type="submit">
                     Отправить отклик
                   </Button>
                 </PublicFormShellFooter>
               </div>
             </form>
           ) : (
-            <div className="editorial-form-shell p-5 md:p-6">
+            <EditorialShell className="p-5 md:p-6">
               <h3 className="text-xl font-semibold uppercase leading-7">Пока нет открытых вакансий</h3>
               <p className="mt-3 max-w-2xl text-sm leading-7 text-[var(--muted)]">
-                Как только в разделе появится опубликованная роль, здесь откроется форма отклика. Пока можно следить за
-                разделом или написать команде напрямую.
+                Как только в разделе появятся новые позиции, здесь откроется отклик. Пока можно следить за разделом или
+                написать команде напрямую.
               </p>
               <div className="mt-5 flex flex-col gap-3 sm:flex-row">
-                <Button className="rounded-full px-6 tracking-[0.08em]" href="#vacancy-list" variant="secondary">
+                <Button className="rounded-full" href="#vacancy-list" size="lg" variant="secondary">
                   Смотреть раздел
                 </Button>
-                <Button className="rounded-full px-6 tracking-[0.08em]" href="/contacts">
+                <Button className="rounded-full" href="/contacts" size="lg">
                   Написать команде
                 </Button>
               </div>
-            </div>
+            </EditorialShell>
           )
         ) : (
           <form action={submitVacancyPlacementApplication} className="editorial-form-shell overflow-hidden" id="vacancy-submission">
@@ -196,7 +174,7 @@ export function VacancyApplicationForms({ enabled, options, result, utm }: Vacan
           <PublicFormShellHeader
             eyebrow="Для заведений"
             title="Разместить вакансию"
-            description="Для заведений и компаний, которым нужно отправить позицию на проверку и публикацию."
+            description="Компания, роль, формат работы и условия для размещения на сайте."
           />
           <div className="relative p-5 md:p-6">
             <div className="grid gap-4">
@@ -256,16 +234,13 @@ export function VacancyApplicationForms({ enabled, options, result, utm }: Vacan
               <FormField htmlFor="details" label="Детали вакансии">
                 <Textarea id="details" name="details" required className="min-h-40" maxLength={4000} minLength={20} />
               </FormField>
-              <ConsentCheckboxField>
+              <ConsentField>
                 Согласен на обработку персональных данных для обработки заявки. Текст{' '}
-                <a className="font-semibold text-[var(--accent)] underline-offset-4 hover:underline" href="/legal/personal-data-consent">
-                  согласия
-                </a>
-                .
-              </ConsentCheckboxField>
+                <InlineLink href="/legal/personal-data-consent">согласия</InlineLink>.
+              </ConsentField>
             </div>
-            <PublicFormShellFooter note="Чем точнее вы заполните описание, формат и зарплату, тем быстрее вакансия пройдет модерацию.">
-              <Button className="min-h-12 rounded-full px-6 tracking-[0.12em] sm:self-start" type="submit">
+            <PublicFormShellFooter>
+              <Button className="rounded-full sm:self-start" size="lg" type="submit">
                 Отправить вакансию
               </Button>
             </PublicFormShellFooter>

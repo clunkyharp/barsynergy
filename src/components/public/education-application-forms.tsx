@@ -4,7 +4,6 @@ import {
   submitCourseApplication
 } from '@/app/(public)/education/actions';
 import {
-  ConsentCheckboxField,
   HiddenUtmFields,
   HoneypotField,
   PublicApplicationSection,
@@ -13,8 +12,10 @@ import {
   type PublicApplicationFormProps
 } from '@/components/public/application-form-section';
 import { Button } from '@/components/ui/button';
+import { ConsentField } from '@/components/ui/consent-field';
 import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
+import { InlineLink } from '@/components/ui/inline-link';
 import { Select } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 
@@ -32,7 +33,7 @@ export function EducationApplicationForms({ enabled, result, utm, cities }: Publ
           <HiddenUtmFields utm={utm} />
           <HoneypotField id="course-application-website" />
           <PublicFormShellHeader
-            eyebrow="Форма 01"
+            eyebrow="Индивидуальный запрос"
             title="Заявка на программу"
             description="Для индивидуального обучения, подбора темы или записи на ближайший поток."
           />
@@ -70,13 +71,11 @@ export function EducationApplicationForms({ enabled, result, utm, cities }: Publ
               <FormField htmlFor="courseGoals" label="Комментарий">
                 <Textarea id="courseGoals" name="goals" required className="min-h-36" maxLength={3000} minLength={10} />
               </FormField>
-              <ConsentCheckboxField>
+              <ConsentField>
                 Согласен на обработку персональных данных для обработки заявки. Текст{' '}
-                <a className="font-semibold text-[var(--accent)] underline-offset-4 hover:underline" href="/legal/personal-data-consent">
-                  согласия
-                </a>
+                <InlineLink href="/legal/personal-data-consent">согласия</InlineLink>
                 .
-              </ConsentCheckboxField>
+              </ConsentField>
             </div>
             <PublicFormShellFooter note="Используйте форму, если хотите обсудить программу или подобрать тему под свой запрос.">
               <Button className="min-h-12 rounded-full px-6 tracking-[0.12em] sm:self-start" type="submit">
@@ -90,7 +89,7 @@ export function EducationApplicationForms({ enabled, result, utm, cities }: Publ
           <HiddenUtmFields utm={utm} />
           <HoneypotField id="corporate-training-website" />
           <PublicFormShellHeader
-            eyebrow="Форма 02"
+            eyebrow="Командный формат"
             title="Корпоративное обучение"
             description="Для заведений и команд, которым нужен обучающий формат под конкретную задачу."
           />
@@ -131,13 +130,11 @@ export function EducationApplicationForms({ enabled, result, utm, cities }: Publ
               <FormField htmlFor="trainingRequest" label="Запрос">
                 <Textarea id="trainingRequest" name="requestDetails" required className="min-h-36" maxLength={4000} minLength={20} />
               </FormField>
-              <ConsentCheckboxField>
+              <ConsentField>
                 Согласен на обработку персональных данных для обработки заявки. Текст{' '}
-                <a className="font-semibold text-[var(--accent)] underline-offset-4 hover:underline" href="/legal/personal-data-consent">
-                  согласия
-                </a>
+                <InlineLink href="/legal/personal-data-consent">согласия</InlineLink>
                 .
-              </ConsentCheckboxField>
+              </ConsentField>
             </div>
             <PublicFormShellFooter note="Подходит для обучения команды, запуска новой карты или внутреннего интенсива.">
               <Button className="min-h-12 rounded-full px-6 tracking-[0.12em] sm:self-start" type="submit">
@@ -151,7 +148,7 @@ export function EducationApplicationForms({ enabled, result, utm, cities }: Publ
           <HiddenUtmFields utm={utm} />
           <HoneypotField id="certificate-order-website" />
           <PublicFormShellHeader
-            eyebrow="Форма 03"
+            eyebrow="Подарочный формат"
             title="Заказ сертификата"
             description="Для подарочного сертификата, номинала или персонального комментария к заказу."
           />
@@ -189,13 +186,11 @@ export function EducationApplicationForms({ enabled, result, utm, cities }: Publ
                 <Textarea id="certificateMessage" name="message" required className="min-h-36" maxLength={3000} minLength={10} />
               </FormField>
               <div className="md:col-span-2">
-                <ConsentCheckboxField>
+                <ConsentField>
                   Согласен на обработку персональных данных для обработки заявки. Текст{' '}
-                  <a className="font-semibold text-[var(--accent)] underline-offset-4 hover:underline" href="/legal/personal-data-consent">
-                    согласия
-                  </a>
+                  <InlineLink href="/legal/personal-data-consent">согласия</InlineLink>
                   .
-                </ConsentCheckboxField>
+                </ConsentField>
               </div>
             </div>
             <PublicFormShellFooter

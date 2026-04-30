@@ -1,463 +1,452 @@
 # BARSYNERGY Design System
 
-This file defines the current design-system contract for BARSYNERGY.
-
-It documents the current source of truth in code and sets rules for new UI work. Keep it aligned with:
-
-- `design-tokens.json`
-- `src/app/globals.css`
-- `src/components/ui`
-- `src/components/public`
-- `public/design-system-preview.html`
+This document is the working UI contract for BARSYNERGY. It exists to keep runtime code, tokens and future screens aligned.
 
 ## Status
 
-Current status: v0.1 foundation.
+Current status: `v0.2 stabilization`.
 
-The project has a usable internal UI kit and an editorial public-page system. It is not a separate package. The source of truth is still local project code.
+The project already has a stable editorial public language and a usable product/admin layer. The current goal is not redesign. The goal is to stop UI drift and make future implementation predictable across public, auth and workspace screens.
 
-Do not introduce a third-party component library as the main UI system. The project plan keeps an internal UI kit as the default and allows shadcn/ui only as a reference for basic component patterns.
+## Source Of Truth
+
+Use this order when rules conflict:
+
+1. `src/lib/fonts.ts`
+2. `src/app/globals.css`
+3. `src/components/ui`
+4. `design-tokens.json`
+5. `public/design-system-preview.html`
+6. this file
+
+Rules:
+
+- Runtime code wins over outdated documentation.
+- `design-tokens.json` must describe the current runtime contract, not an aspirational one.
+- New repeated UI belongs in `src/components/ui` before it spreads through pages.
+- Do not introduce a third-party UI kit as the main design-system layer.
 
 ## Design Direction
 
-BARSYNERGY uses a strict editorial visual language for bar-industry education, events, vacancies, suppliers and partnerships.
-
-Use:
+BARSYNERGY keeps one visual identity across the product:
 
 - warm ivory and cream surfaces;
-- dark graphite text;
+- dark graphite typography;
 - muted burgundy accent;
-- thin divider lines;
-- modular editorial grids;
-- compact rows and cards;
-- route labels, city chips, directory rows and event rows;
-- black editorial bands where contrast or section weight is needed;
-- restrained collage-like image blocks.
+- thin dividers;
+- editorial grids on public surfaces;
+- compact, readable product density for admin and business flows.
 
 Avoid:
 
-- neon;
-- nightclub cliches;
+- neon or nightlife cliches;
 - generic startup gradients;
 - decorative 3D;
-- WebGL;
-- heavy animation;
-- fake dashboard styling.
+- gratuitous glassmorphism;
+- uncontrolled shadow stacks;
+- page-specific CTA or form styling without a shared primitive.
 
 ## Design Principles
 
-Use these rules before choosing a component, layout or content pattern.
+1. Editorial structure over decoration. Typography, dividers, grid and content hierarchy do the main visual work.
+2. Product clarity over novelty. Auth, admin and business screens must stay operational and predictable.
+3. Same meaning, same primitive. Repeated job means repeated component or explicit documented variant.
+4. Body-first hierarchy. Product UI starts from readable body text, not from hero type.
+5. Conservative motion. Hover, focus and loading states may reinforce hierarchy, but must not steal attention from content.
+6. Stable implementation over one-off polish. If a choice will be repeated, encode it as a token, primitive or variant.
 
-1. Industry-first, not nightlife-first. The interface must represent education, events, jobs and business requests, not generic bar entertainment.
-2. Editorial structure over decoration. Use typography, grid, spacing, dividers and real content blocks as the main visual tools.
-3. Dense but readable. Pages may contain many routes, listings and metadata, but each block must remain scannable on mobile and desktop.
-4. Regional detail. City, format, category, date and role labels are useful product data. Do not hide them behind vague marketing copy.
-5. Real content over placeholders. Prefer concrete section labels, examples and empty states that match the planned content model.
-6. Conservative interaction. Motion, hover effects and image treatment should support navigation and reading, not compete with content.
-7. Internal system first. Reuse local tokens, primitives and public-page patterns before adding a new one-off style.
+## Typography Roles
 
-## Content / Copy Rules
+Runtime fonts:
 
-Public copy should be direct, concrete and useful for bar-industry professionals.
-
-Rules:
-
-- Write in Russian by default for public UI and user-facing states.
-- Use literal Russian labels: курс, мероприятие, вакансия, поставщик, партнер, статья, город, формат, дата, статус.
-- Avoid vague claims such as "лучшее сообщество", "новый уровень" or "уникальная экосистема" unless there is a concrete proof point nearby.
-- Keep headings short enough to wrap cleanly on mobile.
-- Put practical details in metadata rows: city, category, date, format, salary, contact path, publication status.
-- Use CTA labels that describe the action: "Смотреть курсы", "Открыть вакансии", "Связаться", "Предложить партнера".
-- Do not expose internal phase language, placeholder language or implementation notes on public pages.
-- Empty states should say what is missing and what the user can do next.
-- Error states should state what failed. Do not blame the user.
-- Legal and consent copy must stay plain and explicit, especially before collecting personal data.
-
-## Icon And Illustration Rules
-
-Icons and illustrations are supporting tools, not the visual identity.
+- body: `Geist`
+- display: `Oswald`
+- accent: `Outfit`
 
 Rules:
 
-- Use icons only when they improve scanning or identify a repeated control/status.
-- Keep icons simple, single-color and aligned with the text baseline or control center.
-- Do not use cocktail, nightclub, neon, party or generic startup illustrations as default decoration.
-- Do not create decorative icon grids for public sections.
-- Prefer real content imagery for people, venues, education, events and partners when an image is needed.
-- Use collage-like image blocks only when the section has a real editorial role.
-- Illustrations must not replace product navigation, listings or real content rows.
-- Admin UI should use icons sparingly for actions and status only.
+- `Oswald` is for editorial display roles only.
+- `Geist` is the default body and product/workspace font.
+- `Outfit` is limited to brand marks and short Latin labels such as `BARSYNERGY`.
+- Russian helper labels and long Russian copy must stay on `Geist`, not on the accent font.
+- Long Russian text stays in body typography.
+- Do not use display sizing for dense product workflows.
 
-## Homepage Composition
-
-The homepage is a multi-audience industry hub, not a single-offer landing page.
-
-Primary jobs to support:
-
-- find education;
-- find industry events;
-- read professional content;
-- find vacancies;
-- discover suppliers and partners;
-- understand what BARSYNERGY is.
-
-Recommended order:
-
-1. Editorial hero with the BARSYNERGY name, a short product statement and route-level entry points.
-2. Compact section map for education, events, articles, vacancies, suppliers and partners.
-3. Featured rows for near-term or newest content once real data is connected.
-4. Context block explaining the regional industry focus.
-5. Partner/supplier or employer entry point.
-6. Contact or application CTA only when the next action is clear.
-
-Rules:
-
-- Keep the first viewport tied to the actual platform structure.
-- Do not make the homepage a generic marketing hero with disconnected feature cards.
-- Education and operational utility should both be visible early.
-- Use route labels and city/category chips to show platform breadth.
-- Avoid implying live transactions, paid access or personal cabinets before those phases exist.
-- On mobile, section entry points must stay short, tappable and readable without horizontal scroll.
-
-## Public Content Models
-
-Public pages should present content through stable model patterns so future database-backed data does not break the design.
-
-| Model | Primary fields to expose | Preferred pattern |
-| --- | --- | --- |
-| Article | title, category, tags, author/source, published date, summary | Editorial row or article card |
-| Event | title, city, date, format, venue, summary | Event row with strong date/city metadata |
-| Course | title, format, city/online, level, date or enrollment state, summary | Education row/card with clear action |
-| Vacancy | role, city, venue/company, salary range if known, schedule, published date | Dense listing row |
-| Supplier | company, category, city/region, offer summary, contact path | Directory row |
-| Partner | company/project, category, collaboration type, city/region, summary | Directory/editorial row |
-| Legal page | document title, draft/final state, effective context, sections | Legal draft layout |
-
-Rules:
-
-- Model metadata should appear near the title, not buried at the end.
-- Listings must support missing optional fields without leaving visual holes.
-- Long names and Russian text must use `min-w-0`, wrapping and stable row spacing.
-- Public pages should show only published content when real queries are connected.
-- Draft, review and archived states belong in admin/product UI, not public listings.
-
-## Agent Implementation Rules
-
-Use these rules when changing UI or docs with an AI coding agent.
-
-Rules:
-
-- Read this file, `design-tokens.json`, `src/app/globals.css` and the relevant component/page before editing.
-- Preserve the internal UI kit. Do not add a third-party UI library for a single missing primitive.
-- Make the smallest component or page change that solves the current task.
-- If a repeated visual pattern appears for the third time, either reuse an existing primitive or document the new component gap.
-- Keep public pages editorial and admin pages compact.
-- Do not add new raw colors, font families, shadow systems or radius scales without updating this file and token sources.
-- Check desktop and mobile behavior for visible public UI changes.
-- For content-model changes, verify that empty, long-text and missing-field states remain readable.
-- After meaningful visual changes, decide whether `docs/design-consistency-check.md`, `PROJECT_STATUS.md` or the Obsidian Kanban board need a sync update.
-
-## Foundations
-
-### Color Roles
-
-Use semantic roles in code. Raw hex values belong in `design-tokens.json` and `src/app/globals.css`.
-
-| Role | CSS variable | Current value | Usage |
+| Role | Token | Allowed surfaces | Typical use |
 | --- | --- | --- | --- |
-| Background | `--background` | `#f4ebdb` | Page background |
-| Surface | `--surface` | `#faf4e8` | Cards, panels, calm blocks |
-| Surface muted | `--surface-muted` | `#ece0ce` | Secondary admin hover/background |
-| Text | `--text` | `#16130f` | Main text |
-| Muted text | `--muted` | `#5f564b` | Supporting copy and labels |
-| Line | `--line` | `rgba(22, 19, 15, 0.22)` | Default borders and dividers |
-| Accent | `--accent` | `#992c26` | Primary accent and strong labels |
-| Accent strong | `--accent-strong` | `#7b1f1a` | Primary hover state |
-| Graphite | `--graphite` | `#141412` | Dark bands and graphite buttons |
-| Success | `--success` | `#2f684f` | Positive state |
-| Warning | `--warning` | `#9a661a` | Warning state |
-| Danger | `--danger` | `#9f2f2f` | Error/destructive state |
+| Public H1 | `text-h1-public` | `public-editorial` | Home hero, main route hero |
+| Public H2 | `text-h2-public` | `public-editorial` | Section titles |
+| Product H1 | `text-h1-product` | `auth-acquisition`, `workspace-product` | Page titles, large auth titles |
+| Product H2 | `text-h2-product` | `auth-acquisition`, `workspace-product` | Section titles, panel titles |
+| Body | `text-body` | all | Main copy |
+| Body small | `text-body-sm` | all | metadata, helper text, dense rows |
+| Caption | `text-caption` | all | short support text |
+| Label | `text-label` | all | field labels, eyebrows, metadata labels |
+| Button | `text-button` | all interactive surfaces | buttons and strong action labels |
 
-### Typography
+## Color Roles
 
-Current fonts:
+Use semantic roles, not raw color names, in component APIs.
 
-- body: Manrope;
-- display: Oswald.
+| Role | CSS variable | Use |
+| --- | --- | --- |
+| Background | `--background` | page background |
+| Surface base | `--surface` | main cards, shells, rows |
+| Surface muted | `--surface-muted` | table headers, muted blocks |
+| Surface elevated | `--surface-elevated` | inner panels, overlays, raised shells |
+| Surface inverse | `--surface-inverse` | graphite/inverse actions and selected cards |
+| Text primary | `--text` | primary text |
+| Text secondary | `--muted` | helper text, metadata |
+| Accent | `--accent` | primary accent |
+| Accent hover | `--accent-strong` | primary hover |
+| Success | `--success` | positive state |
+| Warning | `--warning` | warning state |
+| Danger | `--danger` | destructive/error state |
+| Focus ring | `--focus-ring` | neutral focus emphasis |
+| Focus ring danger | `--focus-ring-danger` | invalid/error focus |
+
+Status surfaces:
+
+- success: `--success-bg`, `--success-border`, `--success-text`
+- warning: `--warning-bg`, `--warning-border`, `--warning-text`
+- error/destructive: `--danger-bg`, `--danger-border`, `--danger-text`
+
+Field surfaces:
+
+- `--field-bg`
+- `--field-bg-hover`
+- `--field-bg-disabled`
+
+Selection/loading surfaces:
+
+- `--selected-bg`
+- `--selected-border`
+- `--pending-bg`
+- `--skeleton-fill`
+
+## Spacing Rules
+
+Spacing tokens express relationship, not arbitrary numbers.
+
+| Token | Meaning | Typical use |
+| --- | --- | --- |
+| `space-field` | tight | label to control, small grouped metadata |
+| `space-card` | component interior | card content, grouped panel body |
+| `space-panel` | compact supporting shell | inset blocks, helper panels |
+| `space-action-row` | action grouping | footer actions, toolbar actions |
+| `space-sidebar` | sidebar rhythm | nav groups, reminders |
+| `space-section-product` | product page rhythm | auth, admin, business sections |
+| `space-section-public` | public section rhythm | landing/editorial sections |
 
 Rules:
 
-- Use body text first. Do not derive form labels, nav text or rows from hero type.
-- Use Oswald only for editorial display headings, large counters and brand-like labels.
-- Keep letter spacing at `0` for display helpers unless a compact uppercase label needs explicit tracking.
-- Keep long Russian text in Manrope with readable line height.
+- tight spacing means semantic relationship;
+- large spacing means unrelated or higher-level sections;
+- do not introduce new spacing values for repeated UI roles without updating tokens.
 
-Core roles:
+## Radius Scale
 
-| Role | Typical class pattern | Usage |
-| --- | --- | --- |
-| Display hero | `display-tight`, Oswald, `34px-96px` | Public page hero titles |
-| Display section | `display-tight`, Oswald, `52px-72px` | Public section headings |
-| Body | Manrope, `text-base`, `leading-7` | Public copy |
-| Small body | Manrope, `text-sm`, `leading-6/7` | Cards, rows, legal text |
-| Label | `text-xs/text-sm`, uppercase, tracking | Eyebrows, route labels, metadata |
-| Button | `text-sm`, semibold, uppercase | Primary and secondary actions |
+Allowed shared scale:
 
-### Spacing
-
-Use Tailwind spacing, but keep repeated roles stable.
-
-| Role | Value | Usage |
-| --- | --- | --- |
-| Tight | `8px` / `space-y-2` | Label-control grouping |
-| Component | `16px-24px` | Card padding, row internals |
-| Section | `40px-56px` | Public section vertical padding |
-| Large section | `64px-96px` | Non-editorial page headers |
-| Container gutter | `16px` each side | `.container` on mobile |
-
-### Radius And Shadow
-
-- Default interactive radius: `rounded-md`.
-- Default card radius: `rounded-lg`.
-- Editorial public cards may use square corners when strict grid composition is needed.
-- Avoid large pill shapes except badges/chips.
-- Use shadows only for overlays, dropdowns and admin cards. Editorial public surfaces should rely mostly on borders.
-
-### Layout
-
-Use `.container` as the default page width wrapper.
-
-Current container:
-
-```css
-width: min(1320px, calc(100vw - 32px));
-margin-inline: auto;
-```
-
-Public editorial sections should use:
-
-- `editorial-grid`;
-- top/bottom thin dividers;
-- two-column or three-column grids on desktop;
-- stacked blocks on mobile;
-- explicit `min-w-0` for text columns with long Russian titles.
-
-Admin/product surfaces should use:
-
-- quieter cards;
-- smaller headings;
-- denser vertical rhythm;
-- predictable sidebar/content split.
-
-## Components
-
-### Button
-
-Source: `src/components/ui/button.tsx`
-
-Variants:
-
-| Variant | Usage | Default | Hover | Disabled / Loading |
-| --- | --- | --- | --- | --- |
-| `primary` | Main product/admin action | Accent fill, white text | Accent strong | Component-level disabled opacity and loading spinner |
-| `secondary` | Secondary action | Transparent, line border | Accent border/text | Component-level disabled opacity and loading spinner |
-| `ghost` | Low-priority action | Transparent muted text | Accent text | Component-level disabled opacity and loading spinner |
+- `radius-none`
+- `radius-sm`
+- `radius-md`
+- `radius-lg`
+- `radius-xl`
+- `radius-pill`
 
 Rules:
 
-- Use `Button` for product/admin actions.
-- Public editorial CTA links can use local composition only when their square editorial style is required.
-- Keep action labels short and literal.
-- Preserve `min-h-11` or larger for touch targets.
-- Use `loading` and optional `loadingText` for pending mutations; the component keeps the control disabled and layout stable.
-- Loading icons must keep visible spacing from the text.
+- `radius-md` is the default field and button radius.
+- `radius-lg` is the default inner panel/card radius.
+- `radius-xl` is for larger editorial shells and selectable cards.
+- `radius-pill` is for chips and round CTA treatments only.
+- New repeated `rounded-[...]` values are not allowed without token promotion.
 
-### Form Controls
+## Elevation And Border Rules
 
-Sources:
+Shadows:
 
+- `shadow-none`
+- `shadow-card`
+- `shadow-panel`
+- `shadow-overlay`
+- `shadow-focus`
+
+Borders and dividers:
+
+- `border-subtle`
+- `border-default`
+- `border-strong`
+- `border-inverse`
+- `divider-public`
+- `divider-product`
+
+Rules:
+
+- editorial public surfaces should mostly rely on dividers and layout, not heavy shadow;
+- product/helper panels may use `shadow-card`;
+- overlays and raised shells use `shadow-panel` or `shadow-overlay`;
+- repeated `border-black/10`, `border-black/15`, `border-black/20`, `border-black/30`, `border-white/16`, `border-white/50` should be mapped to semantic border roles.
+
+## State Matrix
+
+Every reusable interactive primitive should define relevant states before page-level polish.
+
+| State | Required contract |
+| --- | --- |
+| Default | stable size and readable contrast |
+| Hover | no layout shift; usually border/background emphasis |
+| Active | minor pressed feedback only |
+| Focus-visible | visible, neutral and keyboard-usable |
+| Disabled | muted + non-interactive + readable |
+| Loading | stable layout, no control jump |
+| Selected | explicit background/border change, not color alone |
+| Expanded | visible relationship between trigger and content |
+| Pending | status preserved without looking like success |
+| Optimistic | same structural shell as pending until confirmed |
+| Skeleton | muted placeholder surface, stable dimensions |
+| Empty | literal message and next action |
+| Success | explicit text + structured notice |
+| Warning | explicit text + structured notice |
+| Error | explicit text + structured notice |
+| Destructive | visually distinct from neutral actions |
+
+## Layout Template Modes
+
+### `public-editorial`
+
+Use for:
+
+- home
+- vacancies
+- public content pages
+- landing/editorial sections
+
+Rules:
+
+- display typography allowed;
+- thin public dividers;
+- warm cream background;
+- editorial grid;
+- stronger brand expression.
+
+### `auth-acquisition`
+
+Use for:
+
+- login
+- register
+- password reset
+- onboarding-like request screens
+
+Rules:
+
+- connected to editorial brand, but form-first;
+- consistent auth shell and helper panel;
+- less decorative than public surface;
+- product clarity is more important than hero styling.
+
+### `workspace-product`
+
+Use for:
+
+- admin
+- business cabinet
+- CRUD screens
+- tables
+- product workflows
+
+Rules:
+
+- body-first typography;
+- denser, more utilitarian layout;
+- stable sidebar/content split;
+- reusable table/list/form panels;
+- no public hero type.
+
+## Core Components
+
+### Actions
+
+Source files:
+
+- `src/components/ui/button.tsx`
+- `src/components/ui/editorial-action.tsx`
+- `src/components/ui/inline-link.tsx`
+- `src/components/ui/nav-link.tsx`
+
+Rules:
+
+- `Button` is for product and operational actions.
+- `EditorialAction` is for branded editorial CTA treatments.
+- `InlineLink` is for inline legal/help text links.
+- `NavLink` is for product/sidebar navigation.
+- Do not build new repeated CTA styles inline inside pages.
+
+`Button` variants:
+
+- `primary`
+- `secondary`
+- `ghost`
+- `destructive`
+- `inverse`
+
+`Button` sizes:
+
+- `sm`
+- `md`
+- `lg`
+
+### Fields
+
+Source files:
+
+- `src/components/ui/field-styles.ts`
 - `src/components/ui/input.tsx`
 - `src/components/ui/select.tsx`
 - `src/components/ui/textarea.tsx`
-- `src/components/ui/checkbox.tsx`
 - `src/components/ui/form-field.tsx`
-
-States:
-
-| State | Rule |
-| --- | --- |
-| Default | Layered light surface, soft inset highlight, readable label |
-| Hover | Optional; do not shift layout |
-| Focus | Accent border or global focus ring |
-| Error | `FormField.error` connects `aria-invalid` and visible `--danger` text |
-| Disabled | Native disabled plus muted background, cursor and opacity |
-| Required | Use explicit copy near the field, not color alone |
+- `src/components/ui/checkbox-field.tsx`
+- `src/components/ui/consent-field.tsx`
 
 Rules:
 
-- Always wrap labelled fields with `FormField` unless a form has a documented custom layout.
-- Refresh repeated form UX from the shared controls first, then add section-level shells and footers only where page composition needs more structure.
-- Error text belongs under the control and should be linked with `FormField`.
-- Do not encode validation meaning by color alone.
-- Keep public application forms legally clear: consent checkboxes must be visible and literal.
-- Textareas must not be user-resizable; keep height controlled by the component or page layout.
-- Repeated public/auth forms may use `editorial-form-shell` to add section hierarchy without changing validation or submission logic.
+- `Input`, `Select` and `Textarea` share one field base contract.
+- Labels and errors should go through `FormField`.
+- `CheckboxField` is the generic checkbox + label primitive.
+- Consent blocks should use `ConsentField` or a thin wrapper over it.
+- Repeated field styling must not be redefined in page-local className chains.
 
-### Badge
+### Alerts / Notices
 
-Source: `src/components/ui/badge.tsx`
+Source: `src/components/ui/inline-alert.tsx`
 
-Use for status, category, route and compact metadata labels.
+Variants:
 
-Rules:
+- `info`
+- `success`
+- `warning`
+- `error`
+- `destructive`
+- `neutral`
 
-- Keep badge text short.
-- Use uppercase labels for editorial metadata.
-- Do not use badges as buttons unless the component is extended with button/link semantics.
+Rule:
 
-### Card
+- New success/warning/error helper boxes must use `InlineAlert`.
 
-Source: `src/components/ui/card.tsx`
+### Panels And Shells
 
-Use for admin/product grouped content, empty states and repeated compact items.
+Source files:
 
-Rules:
-
-- Do not nest cards inside cards.
-- Do not use cards as full page sections.
-- Public editorial rows can use borders without `Card` when the row layout is the visual system.
-
-### Empty, Loading And Error States
-
-Sources:
-
-- `src/components/ui/empty-state.tsx`
-- `src/components/ui/loading-state.tsx`
-- `src/components/ui/error-state.tsx`
+- `src/components/ui/panel.tsx`
+- `src/components/ui/editorial-shell.tsx`
+- `src/components/ui/stat-card.tsx`
+- `src/components/ui/card.tsx`
+- `src/components/layout/admin-header.tsx`
+- `src/components/layout/admin-sidebar.tsx`
+- `src/components/layout/business-sidebar.tsx`
 
 Rules:
 
-- Preserve the surrounding layout size as much as possible.
-- Use literal Russian labels.
-- Error text must state what failed, not blame the user.
+- `Card` stays the generic grouped-content container.
+- `Panel` is for inset/helper/stat sub-blocks inside larger surfaces.
+- `EditorialShell` is for large public/auth shells that use the branded layered surface.
+- `StatCard` is the preferred compact metric shell when the same pattern repeats.
+- workspace headers and sidebars should compose from `Panel`, `NavLink`, `MetaChip` and `StatCard` before inventing one-off shells.
 
-### Public Editorial Page
+### Selection
 
-Source: `src/components/public/editorial-public-page.tsx`
-
-Use for simple public sections with:
-
-- hero title;
-- summary;
-- metric strip;
-- rows;
-- primary and optional secondary CTA.
+Source: `src/components/ui/segmented-control.tsx`
 
 Rules:
 
-- Use this component for repeated public information pages unless the page needs unique homepage composition.
-- Keep row titles compact and uppercase.
-- Keep row descriptions body-sized.
-- Avoid new one-off section systems unless a page genuinely needs different content structure.
+- multi-mode screen switches must use `SegmentedControl`;
+- selection must be semantic via `aria-pressed` or tabs, not visual only;
+- selected and disabled states must be explicit.
 
-### Legal Draft Page
+### Tables
 
-Source: `src/components/public/legal-draft-page.tsx`
+Source files:
 
-Use for legal pages that are not final lawyer-approved text.
-
-Rules:
-
-- Keep the legal draft warning visible.
-- Use plain language.
-- Do not mix marketing CTAs into legal content.
-
-## Component State Matrix
-
-| Component | Default | Hover | Focus | Active | Disabled | Loading | Error | Selected/Expanded |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Button | Yes | Yes | Global ring | Pressed offset | Encoded in component | Encoded in component | N/A | N/A |
-| Link CTA | Yes | Yes | Global ring | Native | N/A | N/A | N/A | N/A |
-| Input | Yes | Border emphasis | Accent border + ring | N/A | Encoded in component | N/A | `aria-invalid` via `FormField.error` | N/A |
-| Select | Yes | Border emphasis | Accent border + ring | N/A | Encoded in component | N/A | `aria-invalid` via `FormField.error` | Native |
-| Textarea | Yes | Border emphasis | Accent border + ring | N/A | Encoded in component | N/A | `aria-invalid` via `FormField.error` | N/A |
-| Checkbox | Yes | Native | Global ring | Native | Encoded in component | N/A | `aria-invalid` outline | Checked |
-| Badge | Yes | N/A | N/A | N/A | N/A | N/A | Semantic variants | N/A |
-| Card | Yes | If `interactive` | If `interactive` | N/A | N/A | `loading` pulse | `error` variant | `selected` variant |
-| Mobile menu | Closed | Button hover | Global ring | Native | N/A | N/A | N/A | Expanded |
-
-Remaining gap to close later:
-
-- Repeated public CTA links should be promoted to a shared `EditorialLink` if they continue to spread.
-
-## Public Layout Rules
-
-Use public page sections in this order when applicable:
-
-1. Hero or route header.
-2. Context or summary.
-3. Rows/cards for the section's real content.
-4. CTA only when the next user action is clear.
+- `src/components/ui/admin-table.tsx`
+- `src/components/ui/data-table.tsx`
+- `src/components/ui/editorial-list-row.tsx`
 
 Rules:
 
-- Keep the first viewport focused on the actual section content, not generic marketing text.
-- Use image assets only when they show the product, people, context or content type.
-- Keep CTA placement stable: hero side rail or section footer, not scattered in every block.
-- Keep mobile titles breakable with `break-words` and `min-w-0`.
+- new admin CRUD tables start from `AdminTableFrame` + `AdminTable`;
+- `DataTable` is the generic alias for the same shared table contract;
+- page-local raw table shells should not be duplicated;
+- document either overflow strategy or mobile stack strategy per table family.
+- public/editorial repeating rows should use `EditorialListRow` instead of local grid copies.
 
-## Admin Layout Rules
+### Chips And Status
 
-Admin pages use compact product UI, not editorial hero composition.
+Source files:
+
+- `src/components/ui/status-badge.tsx`
+- `src/components/ui/meta-chip.tsx`
+- legacy compatibility: `src/components/ui/badge.tsx`
 
 Rules:
 
-- Use smaller headings.
-- Use cards for module summaries and form sections.
-- Use table/list rows for future CRUD data.
-- Keep actions near the object they affect.
-- Do not use public display typography for dense admin workflows.
+- use `StatusBadge` for workflow state;
+- use `MetaChip` for filtering or lightweight metadata;
+- `Badge` remains a compatibility alias only; new status UI should import `StatusBadge` directly;
+- do not mix “status” and “filter” meaning in one visual variant without a reason.
 
 ## Accessibility Rules
 
-- Preserve visible focus with `:focus-visible`.
-- Use native controls before custom controls.
-- Keep touch targets at least `44px` high.
-- Do not rely on color alone for errors, status or selection.
-- Check contrast before adding new accent fills.
-- Keep links and buttons semantically correct.
+- Keep visible `:focus-visible` on every interactive path.
+- Minimum target height is `44px`.
+- Do not encode important state by color alone.
+- Error feedback must stay textual and structurally visible.
+- Use native controls where possible.
+- Keep segmented choice, tables and consent flows keyboard-usable.
+- Check long Russian labels and headings on mobile before sign-off.
 
-## Assets
+## Tailwind Arbitrary Value Policy
 
-Brand assets live in `public/brand`.
+Allowed:
 
-Generated/supporting public images live in `public/images/generated`.
+- one-off responsive layout values;
+- rare alignment fixes with clear local scope;
+- values that are truly unique to a single editorial composition.
 
-Rules:
+Not allowed for repeated UI:
 
-- Use the official lockup in header/footer contexts.
-- Do not recolor SVG brand assets locally unless a new asset is added deliberately.
-- Do not add stock-like decorative images without a specific content role.
+- repeated colors;
+- repeated shadows;
+- repeated radiuses;
+- repeated border opacity values;
+- repeated field shells;
+- repeated CTA shells;
+- repeated notice shells.
 
-## Preview
+Rule:
 
-Open:
+- if an arbitrary value appears repeatedly in more than one surface or primitive family, promote it into a token, shared class or reusable component.
 
-```txt
-public/design-system-preview.html
-```
+## Local Variant Rule
 
-The preview is static and has no build dependency. Use it to inspect token roles, component variants, form states, editorial rows and layout rhythm.
+Do not create a new local variant unless:
+
+1. the surface has a genuinely different job;
+2. the existing primitive cannot express that difference through a documented variant;
+3. the new exception is documented in this file or in the component matrix.
+
+If the same exception appears for the third time, it becomes a shared primitive or a formal variant.
 
 ## Validation Checklist
 
-Before merging visual changes:
+Before closing a meaningful UI batch:
 
-- Typography roles still match this file.
-- New colors are added as semantic roles, not one-off raw hex values.
-- Repeated buttons, fields, cards and rows use shared primitives or a documented variant.
-- Mobile text wraps without overlap.
-- Focus states remain visible.
-- Public pages still follow the editorial grid rhythm.
-- Admin pages stay compact and product-oriented.
-- Run the smallest useful code check for the changed files.
+- runtime fonts match `src/lib/fonts.ts`;
+- `design-tokens.json` matches implemented tokens;
+- repeated fields use the shared field contract;
+- repeated notices use `InlineAlert`;
+- repeated mode selectors use `SegmentedControl`;
+- repeated product tables use `AdminTable`;
+- desktop and mobile hierarchy remain readable;
+- docs describe the implemented state, not a future intention.

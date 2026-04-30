@@ -44,7 +44,8 @@ export class S3StorageService implements StorageService {
         Bucket: bucket,
         Key: fileKey,
         Body: input.buffer,
-        ContentType: input.mimeType
+        ContentType: input.mimeType,
+        ServerSideEncryption: 'AES256'
       })
     );
 

@@ -57,14 +57,14 @@ export const applicationStatusLabels: Record<ApplicationStatus, string> = {
 
 export const applicationStatusBadgeVariants: Record<
   ApplicationStatus,
-  'neutral' | 'success' | 'warning' | 'danger'
+  'neutral' | 'success' | 'warning' | 'danger' | 'pending'
 > = {
   [ApplicationStatus.DRAFT]: 'neutral',
-  [ApplicationStatus.NEW]: 'warning',
-  [ApplicationStatus.IN_REVIEW]: 'warning',
+  [ApplicationStatus.NEW]: 'pending',
+  [ApplicationStatus.IN_REVIEW]: 'pending',
   [ApplicationStatus.CONTACTED]: 'neutral',
   [ApplicationStatus.FORWARDED_TO_EMPLOYER]: 'success',
-  [ApplicationStatus.PAYMENT_PENDING]: 'warning',
+  [ApplicationStatus.PAYMENT_PENDING]: 'pending',
   [ApplicationStatus.PAID_MANUALLY]: 'success',
   [ApplicationStatus.APPROVED]: 'success',
   [ApplicationStatus.REJECTED]: 'danger',

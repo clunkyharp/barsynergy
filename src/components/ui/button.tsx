@@ -1,17 +1,27 @@
 import type { AnchorHTMLAttributes, ButtonHTMLAttributes, ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 
-type Variant = 'primary' | 'secondary' | 'ghost';
+type Variant = 'primary' | 'secondary' | 'ghost' | 'destructive' | 'inverse';
+type Size = 'sm' | 'md' | 'lg';
 
 const variants: Record<Variant, string> = {
   primary: 'border-[var(--accent)] bg-[var(--accent)] text-white hover:bg-[var(--accent-strong)]',
-  secondary: 'border-[var(--line)] bg-transparent text-[var(--text)] hover:border-[var(--accent)] hover:text-[var(--accent)]',
-  ghost: 'border-transparent bg-transparent text-[var(--muted)] hover:text-[var(--accent)]'
+  secondary: 'border-[var(--border-default)] bg-transparent text-[var(--text)] hover:border-[var(--accent)] hover:text-[var(--accent)]',
+  ghost: 'border-transparent bg-transparent text-[var(--muted)] hover:text-[var(--accent)]',
+  destructive: 'border-[var(--danger)] bg-[var(--danger)] text-white hover:bg-[#842726]',
+  inverse: 'border-[var(--border-inverse)] bg-[var(--surface-inverse)] text-white hover:bg-black'
+};
+
+const sizes: Record<Size, string> = {
+  sm: 'min-h-9 px-3 py-1.5 text-xs tracking-[0.08em]',
+  md: 'min-h-11 px-5 py-2.5 text-sm tracking-[0.08em]',
+  lg: 'min-h-12 px-6 py-3 text-sm tracking-[0.12em]'
 };
 
 type CommonProps = {
   children: ReactNode;
   variant?: Variant;
+  size?: Size;
   className?: string;
   loading?: boolean;
   loadingText?: string;
@@ -34,10 +44,11 @@ function LoadingMark() {
 }
 
 export function Button(props: ButtonProps | LinkProps) {
-  const { children, variant = 'primary', className, loading = false, loadingText, ...rest } = props;
+  const { children, variant = 'primary', size = 'md', className, loading = false, loadingText, ...rest } = props;
   const classes = cn(
-    'inline-flex min-h-11 items-center justify-center gap-2.5 rounded-md border px-5 py-2.5 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--background)] active:translate-y-px disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-55 aria-disabled:pointer-events-none aria-disabled:cursor-not-allowed aria-disabled:opacity-55 aria-busy:cursor-wait',
+    'inline-flex items-center justify-center gap-2.5 whitespace-nowrap rounded-full border text-center font-semibold transition focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--background)] active:translate-y-px disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-55 aria-disabled:pointer-events-none aria-disabled:cursor-not-allowed aria-disabled:opacity-55 aria-busy:cursor-wait',
     variants[variant],
+    sizes[size],
     className
   );
   const content = loading ? (

@@ -3,16 +3,18 @@
 import { useMemo, useState } from 'react';
 import { ApplicationType } from '@prisma/client';
 import { createBusinessApplication } from '@/app/business/actions';
+import { ActionRow } from '@/components/ui/action-row';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Checkbox } from '@/components/ui/checkbox';
+import { ConsentField } from '@/components/ui/consent-field';
 import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
+import { Panel } from '@/components/ui/panel';
 import { Select } from '@/components/ui/select';
+import { SegmentedControl } from '@/components/ui/segmented-control';
 import { Textarea } from '@/components/ui/textarea';
 import { applicationTypeLabels } from '@/lib/admin/application-utils';
 import { vacancyPositionValues } from '@/lib/vacancies/positions';
-import { cn } from '@/lib/utils';
 
 type CityOption = {
   id: string;
@@ -48,7 +50,7 @@ const requestCards = [
   {
     type: ApplicationType.CERTIFICATE_ORDER,
     title: applicationTypeLabels[ApplicationType.CERTIFICATE_ORDER],
-    description: 'Сертификат, сумма, получатель и рабочий сценарий использования.'
+    description: 'Сертификат, сумма, получатель и как его планируют использовать.'
   }
 ] as const;
 
@@ -56,24 +58,24 @@ type BusinessRequestCardType = (typeof requestCards)[number]['type'];
 
 const typeNotes: Record<BusinessRequestCardType, { title: string; helper: string }> = {
   [ApplicationType.VACANCY_SUBMISSION]: {
-    title: 'Нужны данные по роли',
-    helper: 'Покажем только поля, которые нужны для публикации вакансии и первичного отбора.'
+    title: 'Что понадобится',
+    helper: 'Укажите роль, условия и краткое описание вакансии.'
   },
   [ApplicationType.SUPPLIER_SUBMISSION]: {
-    title: 'Нужны данные по поставке',
-    helper: 'Оставьте описание поставщика, географию работы и короткую суть предложения.'
+    title: 'Что понадобится',
+    helper: 'Опишите продукт, регион работы и главное предложение.'
   },
   [ApplicationType.PARTNER_APPLICATION]: {
-    title: 'Нужен формат партнерства',
-    helper: 'Соберите задачу, тип сотрудничества и краткое описание формата.'
+    title: 'Что понадобится',
+    helper: 'Коротко опишите формат сотрудничества и задачу.'
   },
   [ApplicationType.CORPORATE_TRAINING_APPLICATION]: {
-    title: 'Нужен запрос на обучение',
-    helper: 'Команда, задача и детали формата важнее длинного общего описания.'
+    title: 'Что понадобится',
+    helper: 'Укажите состав команды, задачу и удобный формат обучения.'
   },
   [ApplicationType.CERTIFICATE_ORDER]: {
-    title: 'Нужны параметры сертификата',
-    helper: 'Сумма, получатель и сценарий использования позволят быстрее взять заявку в работу.'
+    title: 'Что понадобится',
+    helper: 'Укажите сумму, получателя и пожелания по сертификату.'
   }
 };
 
@@ -85,7 +87,7 @@ export function BusinessRequestForm({ cities, defaultCityId }: BusinessRequestFo
     <Card className="overflow-hidden p-0">
       <div className="border-b border-black/10 px-5 py-5 md:px-6">
         <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Новая заявка</p>
-        <h2 className="mt-3 text-2xl font-semibold tracking-[-0.03em]">Сначала выберите рабочий сценарий</h2>
+        <h2 className="mt-3 text-2xl font-semibold tracking-[-0.03em]">Выберите тип заявки</h2>
         <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--muted)]">
           Форма покажет только те поля, которые нужны для выбранного типа заявки.
         </p>
@@ -93,32 +95,22 @@ export function BusinessRequestForm({ cities, defaultCityId }: BusinessRequestFo
       <form action={createBusinessApplication} className="grid gap-6 p-5 md:p-6">
         <input name="type" type="hidden" value={selectedType} />
 
-        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-          {requestCards.map((card) => (
-            <button
-              className={cn(
-                'rounded-[1.35rem] border px-4 py-4 text-left transition',
-                selectedType === card.type
-                  ? 'border-[var(--graphite)] bg-[var(--graphite)] text-white'
-                  : 'border-black/10 bg-[var(--surface)] hover:border-[var(--accent)] hover:bg-white'
-              )}
-              key={card.type}
-              onClick={() => setSelectedType(card.type)}
-              type="button"
-            >
-              <p className="text-[11px] font-semibold uppercase tracking-[0.14em] opacity-70">Тип заявки</p>
-              <p className="mt-2 text-base font-semibold leading-6">{card.title}</p>
-              <p className={cn('mt-2 text-sm leading-6', selectedType === card.type ? 'text-white/72' : 'text-[var(--muted)]')}>
-                {card.description}
-              </p>
-            </button>
-          ))}
-        </div>
+        <SegmentedControl
+          className="md:grid-cols-2 xl:grid-cols-3"
+          items={requestCards.map((card) => ({
+            value: card.type,
+            eyebrow: 'Тип заявки',
+            label: card.title,
+            description: card.description
+          }))}
+          onChange={setSelectedType}
+          value={selectedType}
+        />
 
-        <div className="rounded-[1.35rem] border border-black/10 bg-[var(--surface)] px-4 py-4 text-sm leading-6 text-[var(--muted)]">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--accent)]">{note.title}</p>
+        <Panel className="text-sm leading-6 text-[var(--muted)]" padding="sm">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">{note.title}</p>
           <p className="mt-2">{note.helper}</p>
-        </div>
+        </Panel>
 
         <div className="grid gap-5 md:grid-cols-2">
           <FormField htmlFor="title" label="Короткое название">
@@ -211,19 +203,16 @@ export function BusinessRequestForm({ cities, defaultCityId }: BusinessRequestFo
           <Textarea id="details" name="details" className="min-h-40" required maxLength={4000} rows={6} />
         </FormField>
 
-        <label className="grid grid-cols-[1.25rem_minmax(0,1fr)] items-start gap-3.5 rounded-[1.15rem] border border-black/10 bg-[rgba(255,255,255,0.6)] px-4 py-4 text-sm leading-6 text-[var(--muted)]">
-          <Checkbox name="consent" required value="accepted" />
-          <span>Подтверждаю согласие на обработку данных заявки.</span>
-        </label>
+        <ConsentField>Подтверждаю согласие на обработку данных заявки.</ConsentField>
 
-        <div className="flex flex-col gap-3 border-t border-black/10 pt-5 sm:flex-row">
-          <Button className="rounded-full" type="submit" name="intent" value="submit">
+        <ActionRow>
+          <Button className="rounded-full" size="lg" type="submit" name="intent" value="submit">
             Отправить заявку
           </Button>
-          <Button className="rounded-full" type="submit" name="intent" value="draft" variant="secondary">
+          <Button className="rounded-full" size="lg" type="submit" name="intent" value="draft" variant="secondary">
             Сохранить позже
           </Button>
-        </div>
+        </ActionRow>
       </form>
     </Card>
   );

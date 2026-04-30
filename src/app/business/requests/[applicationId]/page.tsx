@@ -6,14 +6,15 @@ import {
   updateBusinessDraftApplication
 } from '@/app/business/actions';
 import { AdminActionAlert } from '@/components/admin/content-admin-controls';
-import { Badge } from '@/components/ui/badge';
+import { ActionRow } from '@/components/ui/action-row';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Checkbox } from '@/components/ui/checkbox';
+import { CheckboxField } from '@/components/ui/checkbox-field';
 import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
 import { PageHeader } from '@/components/ui/page-header';
+import { Panel } from '@/components/ui/panel';
 import { Select } from '@/components/ui/select';
+import { StatusBadge } from '@/components/ui/status-badge';
 import { Textarea } from '@/components/ui/textarea';
 import {
   applicationStatusBadgeVariants,
@@ -79,12 +80,10 @@ export default async function BusinessRequestDetailPage({ params, searchParams }
       <PageHeader eyebrow={applicationTypeLabels[application.type]} title={application.subject ?? applicationTypeLabels[application.type]} />
       <AdminActionAlert params={query} />
       <div className="grid gap-6 xl:grid-cols-[1fr_0.75fr]">
-        <Card className="p-5">
+        <Panel padding="md" tone="elevated">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <h2 className="text-lg font-semibold">{canEdit ? 'Редактирование заявки' : 'Данные заявки'}</h2>
-            <Badge variant={applicationStatusBadgeVariants[application.status]}>
-              {applicationStatusLabels[application.status]}
-            </Badge>
+            <StatusBadge variant={applicationStatusBadgeVariants[application.status]}>{applicationStatusLabels[application.status]}</StatusBadge>
           </div>
 
           {canEdit ? (
@@ -182,11 +181,12 @@ export default async function BusinessRequestDetailPage({ params, searchParams }
               <FormField htmlFor="details" label="Подробности">
                 <Textarea id="details" name="details" required maxLength={4000} rows={6} defaultValue={application.message ?? ''} />
               </FormField>
-              <label className="flex gap-3 text-sm leading-6">
-                <Checkbox name="consent" value="accepted" required defaultChecked />
-                <span>Подтверждаю согласие на обработку данных заявки.</span>
-              </label>
-              <Button type="submit">Сохранить изменения</Button>
+              <CheckboxField defaultChecked name="consent" required value="accepted">
+                Подтверждаю согласие на обработку данных заявки.
+              </CheckboxField>
+              <ActionRow className="border-t-0 pt-0">
+                <Button type="submit">Сохранить изменения</Button>
+              </ActionRow>
             </form>
           ) : (
             <dl className="mt-5 grid gap-4 text-sm">
@@ -206,11 +206,11 @@ export default async function BusinessRequestDetailPage({ params, searchParams }
               ) : null}
             </dl>
           )}
-        </Card>
+        </Panel>
 
         <div className="space-y-4">
           {canEdit ? (
-            <Card className="p-5">
+            <Panel padding="md" tone="elevated">
               <h2 className="text-lg font-semibold">Действия</h2>
               <div className="mt-5 grid gap-3">
                 <form action={submitBusinessDraftApplication}>
@@ -226,7 +226,7 @@ export default async function BusinessRequestDetailPage({ params, searchParams }
                   </Button>
                 </form>
               </div>
-            </Card>
+            </Panel>
           ) : null}
           <Button href="/business/requests" variant="ghost">
             Вернуться к заявкам

@@ -1,15 +1,9 @@
+import { CategoryType } from '@prisma/client';
 import { EditorialPublicPage } from '@/components/public/editorial-public-page';
-import { PartnerApplicationForm } from '@/components/public/partner-application-form';
 import { PublishedContentSection } from '@/components/public/published-content-section';
-import { arePublicApplicationFormsEnabled } from '@/lib/applications/public-forms';
-import { getApplicationCityOptions } from '@/lib/applications/form-options';
-import {
-  getPublicApplicationResult,
-  getPublicApplicationUtm,
-  stripPublicApplicationResultParams
-} from '@/lib/applications/public-form-helpers';
+import { PublicFilters } from '@/components/public/public-filters';
 import { getPublishedPartners, type PublicContentSearchParams } from '@/lib/public/content';
-import { getEnv } from '@/lib/validation/env';
+import { getPartnerFilterOptions, getPublicCategoryOptions } from '@/lib/public/filter-options';
 
 type PartnersPageProps = {
   searchParams?: Promise<PublicContentSearchParams>;
@@ -17,11 +11,11 @@ type PartnersPageProps = {
 
 export default async function PartnersPage({ searchParams }: PartnersPageProps) {
   const params = (await searchParams) ?? {};
-  const [content, cities] = await Promise.all([
-    getPublishedPartners(stripPublicApplicationResultParams(params)),
-    getApplicationCityOptions()
+  const [content, categories, filterOptions] = await Promise.all([
+    getPublishedPartners(params),
+    getPublicCategoryOptions(CategoryType.PARTNER),
+    getPartnerFilterOptions()
   ]);
-  const applicationFormsEnabled = arePublicApplicationFormsEnabled(getEnv());
 
   return (
     <>
@@ -52,7 +46,7 @@ export default async function PartnersPage({ searchParams }: PartnersPageProps) 
             description: 'Отдельные проекты для брендов и заведений: запуск, серия встреч, обучение или интеграция.'
           }
         ]}
-        primaryLink={{ label: 'Обсудить партнерство', href: '/contacts' }}
+        primaryLink={{ label: 'Смотреть партнеров', href: '#partners-list' }}
         secondaryLink={{ label: 'События', href: '/events' }}
       />
       <PublishedContentSection
@@ -60,13 +54,19 @@ export default async function PartnersPage({ searchParams }: PartnersPageProps) 
         content={content}
         emptyDescription="Когда появятся новые партнеры, они отобразятся здесь."
         emptyTitle="Партнеров пока нет"
+        filters={
+          <PublicFilters
+            categories={categories}
+            embedded
+            extraFilters={[
+              { name: 'partnerType', label: 'Все форматы', options: filterOptions.partnerTypes },
+              { name: 'featured', label: 'Все статусы', options: [{ value: 'true', label: 'Только в подборке' }] }
+            ]}
+            placeholder="Поиск по партнеру, формату или описанию..."
+          />
+        }
+        sectionId="partners-list"
         title="Партнеры"
-      />
-      <PartnerApplicationForm
-        enabled={applicationFormsEnabled}
-        result={getPublicApplicationResult(params)}
-        utm={getPublicApplicationUtm(params)}
-        cities={cities}
       />
     </>
   );

@@ -1,8 +1,12 @@
 import { createBusinessAccountRequestAction } from '@/app/auth/actions';
+import { ActionRow } from '@/components/ui/action-row';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
+import { ConsentField } from '@/components/ui/consent-field';
 import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
+import { InlineAlert } from '@/components/ui/inline-alert';
+import { InlineLink } from '@/components/ui/inline-link';
+import { Panel } from '@/components/ui/panel';
 import { Select } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { arePublicApplicationFormsEnabled } from '@/lib/applications/public-forms';
@@ -12,7 +16,8 @@ import { getEnv } from '@/lib/validation/env';
 const errorMessages: Record<string, string> = {
   invalid: 'Проверьте обязательные поля, email, сайт и пароль от 8 символов.',
   exists: 'Пользователь с таким email уже существует.',
-  disabled: 'Публичные формы с персональными данными отключены до юридического подтверждения.'
+  disabled: 'Форма заявок сейчас недоступна. Для подключения используйте контакты команды.',
+  'rate-limited': 'Слишком много заявок за короткое время. Повторите позже.'
 };
 
 type RegisterPageProps = {
@@ -43,7 +48,7 @@ export default async function RegisterPage({ searchParams }: RegisterPageProps) 
           <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Бизнес-аккаунт</p>
           <h1 className="mt-4 text-4xl font-semibold leading-tight md:text-5xl">Запросить доступ</h1>
           <p className="mt-4 max-w-md text-base leading-7 text-[var(--muted)]">
-            Доступ открывается после проверки администратором. Форма нужна для первой заявки и связи по компании.
+            Оставьте данные компании, чтобы команда могла связаться с вами и открыть доступ к кабинету.
           </p>
           <div className="mt-8 border-t border-black/10 pt-5">
             <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Что указать</p>
@@ -63,30 +68,29 @@ export default async function RegisterPage({ searchParams }: RegisterPageProps) 
         <section className="editorial-form-shell overflow-hidden">
           {!formsEnabled ? (
             <div className="p-5 md:p-6">
-              <div className="rounded-[1.5rem] border border-[var(--warning)]/30 bg-[linear-gradient(180deg,rgba(255,255,255,0.92),rgba(255,255,255,0.72))] p-6 md:p-7">
+              <Panel className="border-[var(--warning-border)] bg-[linear-gradient(180deg,rgba(255,255,255,0.92),rgba(255,255,255,0.72))] p-6 md:p-7" padding="lg">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--warning)]">Доступ временно закрыт</p>
                 <h2 className="mt-4 text-3xl font-semibold leading-tight md:text-4xl">Форма заявок сейчас недоступна</h2>
                 <p className="mt-4 max-w-2xl text-sm leading-7 text-[var(--muted)]">
-                  Юридическое подтверждение для персональных данных еще не завершено. Пока что не показываем интерактивную форму, чтобы
-                  пользователь не попадал в тупик с заблокированными полями.
+                  Сейчас новые заявки через эту форму не принимаются. Если доступ нужен уже сейчас, напишите команде напрямую.
                 </p>
                 <div className="mt-6 grid gap-3 md:grid-cols-2">
-                  <div className="rounded-[1.25rem] border border-black/10 bg-white/70 px-4 py-4 text-sm leading-6 text-[var(--muted)]">
-                    Если нужно обсудить подключение заранее, используйте рабочий контакт команды.
-                  </div>
-                  <div className="rounded-[1.25rem] border border-black/10 bg-white/70 px-4 py-4 text-sm leading-6 text-[var(--muted)]">
-                    Как только юридический контур будет готов, форма снова откроется и сохранит этот же сценарий доступа.
-                  </div>
+                  <Panel className="bg-white/70 text-sm leading-6 text-[var(--muted)]" padding="sm">
+                    Для связи и обсуждения подключения используйте страницу контактов.
+                  </Panel>
+                  <Panel className="bg-white/70 text-sm leading-6 text-[var(--muted)]" padding="sm">
+                    Когда форма снова откроется, заявку можно будет оставить на этой же странице.
+                  </Panel>
                 </div>
-                <div className="mt-7 flex flex-col gap-3 sm:flex-row">
-                  <Button className="min-h-12 rounded-full px-6 tracking-[0.12em]" href="/contacts">
+                <ActionRow className="mt-7 border-t-0 pt-0">
+                  <Button className="rounded-full" href="/contacts" size="lg">
                     Связаться с командой
                   </Button>
-                  <Button className="min-h-12 rounded-full px-6 tracking-[0.12em]" href="/auth/login" variant="secondary">
+                  <Button className="rounded-full" href="/auth/login" size="lg" variant="secondary">
                     Уже есть доступ
                   </Button>
-                </div>
-              </div>
+                </ActionRow>
+              </Panel>
             </div>
           ) : (
             <>
@@ -94,14 +98,14 @@ export default async function RegisterPage({ searchParams }: RegisterPageProps) 
                 <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Заявка на доступ</p>
                 <h2 className="mt-3 text-2xl font-semibold uppercase leading-8">Данные компании</h2>
                 <p className="mt-3 max-w-xl text-sm leading-7 text-[var(--muted)]">
-                  После проверки администратор откроет доступ к кабинету и заявкам бизнеса.
+                  После проверки вы получите доступ к кабинету компании и своим заявкам.
                 </p>
               </div>
               <div className="p-5 md:p-6">
                 {error && errorMessages[error] ? (
-                  <p className="mb-5 rounded-[1.15rem] border border-[var(--danger)] bg-[var(--danger)]/5 px-4 py-4 text-sm leading-6 text-[var(--danger)]">
+                  <InlineAlert className="mb-5" tone="error">
                     {errorMessages[error]}
-                  </p>
+                  </InlineAlert>
                 ) : null}
                 <form action={createBusinessAccountRequestAction} className="grid gap-5">
                   <div className="grid gap-5 md:grid-cols-2">
@@ -140,29 +144,25 @@ export default async function RegisterPage({ searchParams }: RegisterPageProps) 
                   <FormField htmlFor="description" label="Кратко о компании и запросе">
                     <Textarea id="description" name="description" className="min-h-40" maxLength={1000} rows={5} />
                   </FormField>
-                  <label className="grid grid-cols-[1.25rem_minmax(0,1fr)] items-start gap-3.5 rounded-[1.15rem] border border-black/10 bg-[rgba(255,255,255,0.6)] px-4 py-4 text-sm leading-6 text-[var(--muted)]">
-                    <Checkbox name="consent" required />
+                  <ConsentField>
                     <span>
                       Согласен на обработку персональных данных для рассмотрения заявки. Текст согласия доступен на странице{' '}
-                      <a className="font-semibold text-[var(--accent)] underline underline-offset-4" href="/legal/personal-data-consent">
-                        согласия на обработку ПДн
-                      </a>
-                      .
+                      <InlineLink href="/legal/personal-data-consent">согласия на обработку ПДн</InlineLink>.
                     </span>
-                  </label>
-                  <div className="flex flex-col gap-3 border-t border-black/10 pt-5 sm:flex-row sm:items-center sm:justify-between">
+                  </ConsentField>
+                  <ActionRow align="between">
                     <p className="max-w-md text-xs leading-6 text-[var(--muted)]">
-                      После проверки доступ откроют вручную. Используйте email, который потом останется основным для кабинета.
+                      Используйте email, который потом будете использовать для входа в кабинет.
                     </p>
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-                      <Button className="min-h-12 rounded-full px-6 tracking-[0.12em]" type="submit">
+                      <Button className="rounded-full" size="lg" type="submit">
                         Отправить заявку
                       </Button>
-                      <Button className="min-h-12 rounded-full px-6 tracking-[0.12em]" href="/auth/login" variant="secondary">
+                      <Button className="rounded-full" href="/auth/login" size="lg" variant="secondary">
                         Уже есть доступ
                       </Button>
                     </div>
-                  </div>
+                  </ActionRow>
                 </form>
               </div>
             </>

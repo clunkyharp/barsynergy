@@ -1,6 +1,7 @@
+import { PublicBodyText, PublicDisplayTitle, PublicEyebrow } from '@/components/public/public-primitives';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { displayFont } from '@/lib/fonts';
+import { EditorialShell } from '@/components/ui/editorial-shell';
+import { InlineAlert } from '@/components/ui/inline-alert';
 import type { ApplicationCityOption } from '@/lib/applications/form-options';
 import type { PublicApplicationResult, PublicApplicationUtm } from '@/lib/applications/public-form-helpers';
 import { cn } from '@/lib/utils';
@@ -45,20 +46,6 @@ export function HoneypotField({ id }: { id: string }) {
   );
 }
 
-export function ConsentCheckboxField({ children, disabled }: { children: React.ReactNode; disabled?: boolean }) {
-  return (
-    <label
-      className={cn(
-        'grid grid-cols-[1.25rem_minmax(0,1fr)] items-start gap-3.5 rounded-[1.15rem] border border-black/10 bg-[rgba(255,255,255,0.6)] px-4 py-4 text-sm leading-6 text-[var(--muted)]',
-        disabled && 'opacity-70'
-      )}
-    >
-      <Checkbox name="consent" required value="accepted" disabled={disabled} />
-      <span className="min-w-0">{children}</span>
-    </label>
-  );
-}
-
 export function PublicFormShellHeader({
   eyebrow,
   title,
@@ -74,13 +61,13 @@ export function PublicFormShellHeader({
 
   return (
     <div
-      className={cn(
-        'relative border-b px-5 py-5 md:px-6 md:py-6',
-        isDark
-          ? 'border-white/10 bg-[var(--graphite)] text-white'
-          : 'border-black/10 bg-[linear-gradient(135deg,rgba(255,255,255,0.86),rgba(255,255,255,0.58))]'
-      )}
-    >
+        className={cn(
+          'relative border-b px-5 py-5 md:px-6 md:py-6',
+          isDark
+            ? 'border-white/10 bg-[var(--graphite)] text-white'
+            : 'border-[var(--divider-product)] bg-[linear-gradient(135deg,rgba(255,255,255,0.86),rgba(255,255,255,0.58))]'
+        )}
+      >
       <div
         aria-hidden="true"
         className={cn(
@@ -88,25 +75,17 @@ export function PublicFormShellHeader({
           isDark ? 'bg-white/18' : 'bg-white/90'
         )}
       />
-      <p
-        className={cn(
-          'text-[11px] font-semibold uppercase tracking-[0.16em]',
-          isDark ? 'text-white/54' : 'text-[var(--accent)]'
-        )}
-      >
-        {eyebrow}
-      </p>
-      <h3
-        className={cn(
-          'mt-3 text-xl font-semibold uppercase leading-7 md:text-2xl md:leading-8',
-          isDark ? 'text-white' : 'text-[var(--text)]'
-        )}
+      <PublicEyebrow tone={isDark ? 'inverse' : 'accent'}>{eyebrow}</PublicEyebrow>
+      <PublicDisplayTitle
+        as="h3"
+        className={cn('mt-3', isDark ? 'text-white' : 'text-[var(--text)]')}
+        size="card"
       >
         {title}
-      </h3>
-      <p className={cn('mt-3 max-w-xl text-sm leading-7', isDark ? 'text-white/72' : 'text-[var(--muted)]')}>
+      </PublicDisplayTitle>
+      <PublicBodyText className="mt-3 max-w-xl" tone={isDark ? 'inverse' : 'muted'}>
         {description}
-      </p>
+      </PublicBodyText>
     </div>
   );
 }
@@ -143,11 +122,6 @@ export function PublicApplicationSection({
   disabledDescription,
   disabledLink
 }: PublicApplicationSectionProps) {
-  const sectionNotes = [
-    'Достаточно одного рабочего контакта: email, телефон или Telegram.',
-    'Поля с описанием лучше заполнять конкретно: задача, формат, сроки.'
-  ];
-
   return (
     <section className="relative overflow-hidden border-b border-black/20 bg-[var(--surface)] py-14 md:py-18" id="applications">
       <div
@@ -156,45 +130,28 @@ export function PublicApplicationSection({
       />
       <div className="container relative grid gap-6 xl:grid-cols-[0.64fr_1.36fr] xl:items-start">
         <div className="xl:sticky xl:top-24">
-          <div className="editorial-form-shell p-6 md:p-8">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">{eyebrow}</p>
-            <h2 className={`${displayFont.className} display-tight mt-4 max-w-4xl text-[44px] md:text-[58px]`}>{title}</h2>
-            <p className="mt-5 max-w-md text-sm leading-7 text-[var(--muted)]">{description}</p>
-            <div className="mt-8 border-t border-black/10 pt-5">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Перед отправкой</p>
-              <ul className="mt-4 grid gap-3 text-sm leading-6 text-[var(--muted)]">
-                {sectionNotes.map((item) => (
-                  <li className="grid grid-cols-[0.5rem_minmax(0,1fr)] items-start gap-3" key={item}>
-                    <span className="mt-2 h-2 w-2 rounded-full bg-[var(--accent)]" />
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
+          <EditorialShell className="p-6 md:p-8">
+            <PublicEyebrow>{eyebrow}</PublicEyebrow>
+            <PublicDisplayTitle className="mt-4 max-w-4xl">{title}</PublicDisplayTitle>
+            <PublicBodyText className="mt-5 max-w-md">{description}</PublicBodyText>
             {result ? (
-              <div
-                className={
-                  result.type === 'error'
-                    ? 'mt-8 rounded-[1.15rem] border border-[var(--danger)] bg-[var(--danger)]/5 px-4 py-4 text-sm leading-6 text-[var(--danger)]'
-                    : 'mt-8 rounded-[1.15rem] border border-[var(--success)] bg-[var(--success)]/5 px-4 py-4 text-sm leading-6 text-[var(--success)]'
-                }
-              >
+              <InlineAlert className="mt-8" tone={result.type === 'error' ? 'error' : 'success'}>
                 {result.message}
-              </div>
+              </InlineAlert>
             ) : null}
-          </div>
+          </EditorialShell>
         </div>
 
         {!enabled ? (
-          <div className="editorial-form-shell p-5 md:p-6">
+          <EditorialShell className="p-5 md:p-6">
             <h3 className="text-lg font-semibold uppercase leading-7">Заявки временно закрыты</h3>
             <p className="mt-3 text-sm leading-7 text-[var(--muted)]">
               {disabledDescription ?? 'Форма сейчас недоступна. Для связи используйте раздел контактов.'}
             </p>
-            <Button className="mt-6 min-h-12 rounded-full px-6 tracking-[0.12em] sm:self-start" href={disabledLink?.href ?? '/contacts'} variant="secondary">
+            <Button className="mt-6 rounded-full sm:self-start" href={disabledLink?.href ?? '/contacts'} size="lg" variant="secondary">
               {disabledLink?.label ?? 'Перейти в контакты'}
             </Button>
-          </div>
+          </EditorialShell>
         ) : (
           children
         )}

@@ -1,12 +1,15 @@
 import { BusinessAccountStatus, UserRole, UserStatus } from '@prisma/client';
 import { updateBusinessUserAccess } from '@/app/admin/users/actions';
 import { AdminActionAlert, HiddenRedirect } from '@/components/admin/content-admin-controls';
-import { Badge } from '@/components/ui/badge';
+import { AdminPageIntro } from '@/components/admin/admin-page-intro';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { StatusBadge, type StatusBadgeVariant } from '@/components/ui/status-badge';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
 import { prisma } from '@/lib/db/prisma';
 import type { AdminContentSearchParams } from '@/lib/admin/content-utils';
+
+export const dynamic = 'force-dynamic';
 
 const ADMIN_USERS_PATH = '/admin/users';
 
@@ -21,6 +24,19 @@ const businessStatusLabels: Record<BusinessAccountStatus, string> = {
   [BusinessAccountStatus.ACTIVE]: 'Активен',
   [BusinessAccountStatus.BLOCKED]: 'Заблокирован',
   [BusinessAccountStatus.ARCHIVED]: 'Архив'
+};
+
+const userStatusVariants: Record<UserStatus, StatusBadgeVariant> = {
+  [UserStatus.ACTIVE]: 'success',
+  [UserStatus.BLOCKED]: 'danger',
+  [UserStatus.PENDING]: 'pending'
+};
+
+const businessStatusVariants: Record<BusinessAccountStatus, StatusBadgeVariant> = {
+  [BusinessAccountStatus.PENDING]: 'pending',
+  [BusinessAccountStatus.ACTIVE]: 'success',
+  [BusinessAccountStatus.BLOCKED]: 'danger',
+  [BusinessAccountStatus.ARCHIVED]: 'neutral'
 };
 
 type AdminUsersPageProps = {
@@ -56,10 +72,11 @@ export default async function AdminUsersPage({ searchParams }: AdminUsersPagePro
 
   return (
     <div className="space-y-8">
-      <header>
-        <p className="text-sm font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">Админка</p>
-        <h1 className="mt-2 text-3xl font-semibold">Бизнес-доступы</h1>
-      </header>
+      <AdminPageIntro
+        description="Проверка статуса бизнес-аккаунтов и ручное открытие или блокировка доступа к рабочему кабинету."
+        eyebrow="Админка / Пользователи"
+        title="Бизнес-доступы"
+      />
       <AdminActionAlert params={params} />
       <section className="grid gap-4">
         {users.length > 0 ? (
@@ -72,10 +89,8 @@ export default async function AdminUsersPage({ searchParams }: AdminUsersPagePro
                   <div>
                     <div className="flex flex-wrap items-center gap-2">
                       <h2 className="text-lg font-semibold">{account?.companyName ?? user.email}</h2>
-                      <Badge variant={user.status === UserStatus.ACTIVE ? 'success' : user.status === UserStatus.BLOCKED ? 'danger' : 'warning'}>
-                        {userStatusLabels[user.status]}
-                      </Badge>
-                      {account ? <Badge>{businessStatusLabels[account.status]}</Badge> : null}
+                      <StatusBadge variant={userStatusVariants[user.status]}>{userStatusLabels[user.status]}</StatusBadge>
+                      {account ? <StatusBadge variant={businessStatusVariants[account.status]}>{businessStatusLabels[account.status]}</StatusBadge> : null}
                     </div>
                     <dl className="mt-4 grid gap-2 text-sm text-[var(--muted)] md:grid-cols-2">
                       <div>

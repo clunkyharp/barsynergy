@@ -1,10 +1,20 @@
 import { AdminPagination } from '@/components/admin/content-admin-controls';
-import { Badge } from '@/components/ui/badge';
+import { AdminPageIntro } from '@/components/admin/admin-page-intro';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import {
+  DataTable,
+  DataTableBody,
+  DataTableCell,
+  DataTableFrame,
+  DataTableHead,
+  DataTableHeaderCell,
+  DataTableRow
+} from '@/components/ui/data-table';
 import { EmptyState } from '@/components/ui/empty-state';
 import { FormField } from '@/components/ui/form-field';
 import { Select } from '@/components/ui/select';
+import { StatusBadge } from '@/components/ui/status-badge';
 import {
   applicationStatusBadgeVariants,
   applicationStatusLabels,
@@ -23,6 +33,8 @@ import {
 } from '@/lib/admin/content-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
 import { prisma } from '@/lib/db/prisma';
+
+export const dynamic = 'force-dynamic';
 
 const ADMIN_APPLICATIONS_PATH = '/admin/applications';
 
@@ -77,10 +89,11 @@ export default async function AdminApplicationsPage({ searchParams }: AdminAppli
 
   return (
     <div className="space-y-8">
-      <header>
-        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Админка / Заявки</p>
-        <h1 className="mt-2 text-3xl font-semibold">Заявки</h1>
-      </header>
+      <AdminPageIntro
+        description="Очередь входящих форм, фильтрация по типу и контроль приватных полей до открытия записи."
+        eyebrow="Админка / Заявки"
+        title="Заявки"
+      />
 
       <Card className="p-5">
         <form className="grid gap-4 md:grid-cols-[1fr_1fr_auto]" method="get">
@@ -124,19 +137,19 @@ export default async function AdminApplicationsPage({ searchParams }: AdminAppli
         {applications.length === 0 ? (
           <EmptyState title="Заявок пока нет" />
         ) : (
-          <div className="overflow-x-auto rounded-lg border border-[var(--line)] bg-[var(--surface)]">
-            <table className="min-w-[1000px] w-full border-collapse text-left text-sm">
-              <thead className="border-b border-[var(--line)] bg-[var(--surface-muted)] text-xs uppercase tracking-[0.08em] text-[var(--muted)]">
+          <DataTableFrame>
+            <DataTable minWidth={1000}>
+              <DataTableHead>
                 <tr>
-                  <th className="px-4 py-3 font-semibold">Заявка</th>
-                  <th className="px-4 py-3 font-semibold">Статус</th>
-                  <th className="px-4 py-3 font-semibold">Связи</th>
-                  <th className="px-4 py-3 font-semibold">Приватные поля</th>
-                  <th className="px-4 py-3 font-semibold">Создана</th>
-                  <th className="px-4 py-3 font-semibold">Действия</th>
+                  <DataTableHeaderCell>Заявка</DataTableHeaderCell>
+                  <DataTableHeaderCell>Статус</DataTableHeaderCell>
+                  <DataTableHeaderCell>Связи</DataTableHeaderCell>
+                  <DataTableHeaderCell>Приватные поля</DataTableHeaderCell>
+                  <DataTableHeaderCell>Создана</DataTableHeaderCell>
+                  <DataTableHeaderCell>Действия</DataTableHeaderCell>
                 </tr>
-              </thead>
-              <tbody>
+              </DataTableHead>
+              <DataTableBody>
                 {applications.map((application) => {
                   const privateFlags = [
                     application.email ? 'email' : null,
@@ -147,43 +160,43 @@ export default async function AdminApplicationsPage({ searchParams }: AdminAppli
                   ].filter(Boolean);
 
                   return (
-                    <tr className="border-b border-[var(--line)] last:border-0" key={application.id}>
-                      <td className="max-w-[320px] px-4 py-4 align-top">
+                    <DataTableRow key={application.id}>
+                      <DataTableCell className="max-w-[320px]">
                         <div className="font-semibold">
                           {application.subject?.trim() || applicationTypeLabels[application.type]}
                         </div>
                         <div className="mt-1 text-xs text-[var(--muted)]">{applicationTypeLabels[application.type]}</div>
-                      </td>
-                      <td className="px-4 py-4 align-top">
-                        <Badge variant={applicationStatusBadgeVariants[application.status]}>
+                      </DataTableCell>
+                      <DataTableCell>
+                        <StatusBadge variant={applicationStatusBadgeVariants[application.status]}>
                           {applicationStatusLabels[application.status]}
-                        </Badge>
-                      </td>
-                      <td className="px-4 py-4 align-top text-[var(--muted)]">
+                        </StatusBadge>
+                      </DataTableCell>
+                      <DataTableCell className="text-[var(--muted)]">
                         <div>{application.city?.name ?? 'Город не указан'}</div>
                         {application.vacancy ? (
                           <div className="mt-1 text-xs">
                             Вакансия: {application.vacancy.title} /{application.vacancy.slug}
                           </div>
                         ) : null}
-                      </td>
-                      <td className="px-4 py-4 align-top text-[var(--muted)]">
+                      </DataTableCell>
+                      <DataTableCell className="text-[var(--muted)]">
                         {privateFlags.length > 0 ? privateFlags.join(', ') : 'Не зафиксированы'}
-                      </td>
-                      <td className="px-4 py-4 align-top text-[var(--muted)]">
+                      </DataTableCell>
+                      <DataTableCell className="text-[var(--muted)]">
                         {dateTimeFormatter.format(application.createdAt)}
-                      </td>
-                      <td className="px-4 py-4 align-top">
+                      </DataTableCell>
+                      <DataTableCell>
                         <Button className="min-h-9 px-3 py-1.5 text-xs" href={`/admin/applications/${application.id}`} variant="secondary">
                           Открыть
                         </Button>
-                      </td>
-                    </tr>
+                      </DataTableCell>
+                    </DataTableRow>
                   );
                 })}
-              </tbody>
-            </table>
-          </div>
+              </DataTableBody>
+            </DataTable>
+          </DataTableFrame>
         )}
 
         <AdminPagination

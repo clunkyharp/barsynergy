@@ -6,7 +6,8 @@ import { ApplicationStatus, ApplicationType, BusinessAccountStatus, UserRole, Us
 import { z } from 'zod';
 import { getString, nullableString, optionalString, slugify } from '@/lib/admin/content-utils';
 import { arePublicApplicationFormsEnabled } from '@/lib/applications/public-forms';
-import { hashPassword, verifyPassword } from '@/lib/auth/password';
+import { AuthRateLimitError, assertAuthAttemptAllowed } from '@/lib/auth/auth-rate-limit';
+import { hashPassword, verifyPassword, verifyPasswordAgainstDummyHash } from '@/lib/auth/password';
 import {
   SESSION_COOKIE_NAME,
   createSessionToken,
@@ -54,6 +55,10 @@ function getPostLoginPath(role: UserRole) {
     return '/business';
   }
 
+  if (role === UserRole.USER) {
+    return '/profile';
+  }
+
   return '/';
 }
 
@@ -80,12 +85,27 @@ export async function loginAction(formData: FormData) {
     redirectWithAuthResult('/auth/login', { type: 'error', code: 'invalid' });
   }
 
+  try {
+    await assertAuthAttemptAllowed({ action: 'login', email: parsed.data.email });
+  } catch (error) {
+    if (error instanceof AuthRateLimitError) {
+      redirectWithAuthResult('/auth/login', { type: 'error', code: 'rate-limited' });
+    }
+
+    throw error;
+  }
+
   const user = await prisma.user.findUnique({
     where: { email: parsed.data.email },
     select: { id: true, email: true, passwordHash: true, role: true, status: true }
   });
 
-  if (!user || !(await verifyPassword(parsed.data.password, user.passwordHash))) {
+  if (!user) {
+    await verifyPasswordAgainstDummyHash(parsed.data.password);
+    redirectWithAuthResult('/auth/login', { type: 'error', code: 'invalid' });
+  }
+
+  if (!(await verifyPassword(parsed.data.password, user.passwordHash))) {
     redirectWithAuthResult('/auth/login', { type: 'error', code: 'invalid' });
   }
 
@@ -146,6 +166,16 @@ export async function createBusinessAccountRequestAction(formData: FormData) {
 
   if (!parsed.success) {
     redirectWithAuthResult('/auth/register', { type: 'error', code: 'invalid' });
+  }
+
+  try {
+    await assertAuthAttemptAllowed({ action: 'register', email: parsed.data.email });
+  } catch (error) {
+    if (error instanceof AuthRateLimitError) {
+      redirectWithAuthResult('/auth/register', { type: 'error', code: 'rate-limited' });
+    }
+
+    throw error;
   }
 
   const existingUser = await prisma.user.findUnique({

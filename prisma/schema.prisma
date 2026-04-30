@@ -530,3 +530,14 @@ model ApplicationSubmissionThrottle {
   @@index([windowStartedAt])
   @@index([updatedAt])
 }
+
+model AuthAttemptThrottle {
+  keyHash         String   @id
+  windowStartedAt DateTime
+  count           Int      @default(1)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([windowStartedAt])
+  @@index([updatedAt])
+}

@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { CoverImageInput } from '@/components/admin/cover-image-input';
-import { Card } from '@/components/ui/card';
+import { InlineAlert } from '@/components/ui/inline-alert';
 import type { AdminContentSearchParams } from '@/lib/admin/content-utils';
 import { firstParam } from '@/lib/admin/content-utils';
 
@@ -67,15 +67,9 @@ export function AdminActionAlert({ params }: AdminActionAlertProps) {
   }
 
   return (
-    <Card
-      className={
-        error
-          ? 'border-[var(--danger)] bg-[var(--danger)]/5 p-4 text-sm text-[var(--danger)]'
-          : 'border-[var(--success)] bg-[var(--success)]/5 p-4 text-sm text-[var(--success)]'
-      }
-    >
+    <InlineAlert tone={error ? 'error' : 'success'}>
       {error ?? success}
-    </Card>
+    </InlineAlert>
   );
 }
 
