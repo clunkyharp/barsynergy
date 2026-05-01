@@ -2,6 +2,7 @@ import type { NextConfig } from 'next';
 
 const tunnelOrigins = [
   '*.ngrok-free.app',
+  '*.ngrok-free.dev',
   '*.ngrok.app',
   '*.ngrok.io',
   '*.trycloudflare.com',
@@ -9,12 +10,18 @@ const tunnelOrigins = [
   '*.localhost.run'
 ];
 
+const shouldAllowTunnelServerActions = process.env.NODE_ENV === 'development';
+
 const nextConfig: NextConfig = {
   allowedDevOrigins: tunnelOrigins,
   experimental: {
-    serverActions: {
-      allowedOrigins: tunnelOrigins
-    }
+    ...(shouldAllowTunnelServerActions
+      ? {
+          serverActions: {
+            allowedOrigins: tunnelOrigins
+          }
+        }
+      : {})
   },
   output: 'standalone',
   poweredByHeader: false,

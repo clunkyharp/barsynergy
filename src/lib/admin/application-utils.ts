@@ -93,5 +93,25 @@ export function formatApplicationActionError(error: unknown) {
     return 'Черновик вакансии можно создать только из заявки на размещение вакансии с полными данными и согласием.';
   }
 
+  if (error instanceof Error && error.message.includes('business access request is invalid')) {
+    return 'Ссылка доступа доступна только для заявок на бизнес-подключение.';
+  }
+
+  if (error instanceof Error && error.message.includes('business access email is missing')) {
+    return 'В заявке не указан email для подготовки доступа.';
+  }
+
+  if (error instanceof Error && error.message.includes('business access role conflict')) {
+    return 'Этот email уже привязан к другому типу аккаунта. Проверьте заявку вручную.';
+  }
+
+  if (error instanceof Error && error.message.includes('business access already active')) {
+    return 'Доступ для этого email уже активирован.';
+  }
+
+  if (error instanceof Error && error.message.includes('business access is blocked')) {
+    return 'Для этого доступа установлен блок. Снимите блокировку перед новой активацией.';
+  }
+
   return 'Не удалось сохранить заявку. Проверьте данные и повторите попытку.';
 }

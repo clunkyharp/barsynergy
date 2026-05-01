@@ -8,10 +8,13 @@ type EditorialListRowProps = HTMLAttributes<HTMLElement> & {
   description: ReactNode;
   media?: ReactNode;
   meta?: ReactNode;
+  subtitle?: ReactNode;
+  labelMeta?: ReactNode;
   columns?: 'default' | 'content';
   as?: 'article' | 'div';
   href?: string;
   actionLabel?: string;
+  variant?: 'default' | 'opportunity';
 };
 
 export function EditorialListRow({
@@ -20,47 +23,89 @@ export function EditorialListRow({
   columns = 'default',
   description,
   label,
+  labelMeta,
   media,
   meta,
+  subtitle,
   title,
   href,
   actionLabel = 'Открыть',
+  variant = 'default',
   ...props
 }: EditorialListRowProps) {
   const Component = as;
-  const content = (
+  const defaultContent = (
     <>
-      <div>
-        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">{label}</p>
+      <div className="min-w-0">
+        <div>{label}</div>
+        {labelMeta ? <div className="mt-3">{labelMeta}</div> : null}
         {media ? <div className="mt-4">{media}</div> : null}
       </div>
-      <div>
-        <h3 className="text-xl font-semibold uppercase leading-7">{title}</h3>
+      <div className="min-w-0">
+        <h3 className="text-xl font-semibold uppercase leading-7 transition-colors duration-300 group-hover:text-[var(--accent)]">{title}</h3>
+        {subtitle ? <p className="mt-2 text-sm leading-6 text-[var(--muted)]">{subtitle}</p> : null}
         {meta ? <div className="mt-3">{meta}</div> : null}
+      </div>
+      <div className="flex min-w-0 flex-col justify-between gap-4">
+        <div className="max-w-2xl text-sm leading-7 text-[var(--muted)]">{description}</div>
         {href ? (
-          <div className="mt-4 inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">
+          <div className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">
             <span>{actionLabel}</span>
-            <ArrowUpRight size={16} />
+            <ArrowUpRight className="transition-transform duration-300 group-hover:translate-x-1" size={16} />
           </div>
         ) : null}
       </div>
-      <div className="max-w-2xl text-sm leading-7 text-[var(--muted)]">{description}</div>
+    </>
+  );
+
+  const opportunityContent = (
+    <>
+      <div className="min-w-0">
+        <div>{label}</div>
+        {labelMeta ? <div className="mt-3">{labelMeta}</div> : null}
+        <div className="mt-4">
+          <h3 className="text-[1.35rem] font-semibold uppercase leading-[1.15] tracking-[-0.02em] transition-colors duration-300 group-hover:text-[var(--accent)] md:text-[1.55rem]">
+            {title}
+          </h3>
+          {subtitle ? (
+            <p className="mt-2 text-[12px] font-semibold uppercase tracking-[0.12em] text-[var(--muted)]">{subtitle}</p>
+          ) : null}
+          {meta ? <div className="mt-4">{meta}</div> : null}
+        </div>
+      </div>
+      <div className="flex min-w-0 flex-col justify-between gap-4 border-t border-black/10 pt-4 lg:border-l lg:border-t-0 lg:pl-7 lg:pt-0">
+        <div className="max-w-[34rem] text-sm leading-7 text-[var(--muted)]">{description}</div>
+        {href ? (
+          <div className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">
+            <span>{actionLabel}</span>
+            <ArrowUpRight className="transition-transform duration-300 group-hover:translate-x-1" size={16} />
+          </div>
+        ) : null}
+      </div>
     </>
   );
 
   if (href) {
     return (
-      <article className="border-b border-black/20" {...props}>
+      <article
+        className={cn(
+          variant === 'opportunity'
+            ? 'mb-4 rounded-[28px] border border-black/10 bg-[color-mix(in_oklab,var(--surface),white_20%)] px-4 shadow-[0_12px_34px_rgba(20,20,18,0.035)] transition-colors duration-300 hover:border-black/16'
+            : 'border-b border-black/10 transition-colors duration-300 hover:border-black/20',
+          className
+        )}
+        {...props}
+      >
         <a
           className={cn(
-            'group grid gap-4 py-6 transition-colors hover:bg-black/[0.02] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] focus-visible:ring-inset',
-            columns === 'default' && 'md:grid-cols-[0.22fr_0.5fr_0.78fr]',
-            columns === 'content' && 'md:grid-cols-[0.26fr_0.52fr_0.72fr]',
-            className
+            'group -mx-2 grid gap-5 rounded-[var(--radius-xl)] px-2 py-6 transition-colors duration-300 hover:bg-[rgba(247,240,232,0.88)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] focus-visible:ring-inset md:py-7',
+            variant === 'default' && columns === 'default' && 'md:grid-cols-[0.24fr_0.5fr_0.7fr]',
+            variant === 'default' && columns === 'content' && 'md:grid-cols-[0.26fr_0.52fr_0.72fr]',
+            variant === 'opportunity' && 'px-4 lg:grid-cols-[minmax(0,1.08fr)_minmax(18rem,0.66fr)]'
           )}
           href={href}
         >
-          {content}
+          {variant === 'opportunity' ? opportunityContent : defaultContent}
         </a>
       </article>
     );
@@ -69,14 +114,15 @@ export function EditorialListRow({
   return (
     <Component
       className={cn(
-        'grid gap-4 border-b border-black/20 py-6',
-        columns === 'default' && 'md:grid-cols-[0.22fr_0.5fr_0.78fr]',
-        columns === 'content' && 'md:grid-cols-[0.26fr_0.52fr_0.72fr]',
+        'grid gap-5 border-b border-black/10 py-6 md:py-7',
+        variant === 'default' && columns === 'default' && 'md:grid-cols-[0.24fr_0.5fr_0.7fr]',
+        variant === 'default' && columns === 'content' && 'md:grid-cols-[0.26fr_0.52fr_0.72fr]',
+        variant === 'opportunity' && 'lg:grid-cols-[minmax(0,1.08fr)_minmax(18rem,0.66fr)]',
         className
       )}
       {...props}
     >
-      {content}
+      {variant === 'opportunity' ? opportunityContent : defaultContent}
     </Component>
   );
 }

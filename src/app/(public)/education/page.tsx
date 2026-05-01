@@ -4,6 +4,7 @@ import { EditorialPublicPage } from '@/components/public/editorial-public-page';
 import { PublishedContentSection } from '@/components/public/published-content-section';
 import { PublicFeaturedContent } from '@/components/public/public-featured-content';
 import { PublicFilters } from '@/components/public/public-filters';
+import { Button } from '@/components/ui/button';
 import { getPublishedCourses, type PublicContentSearchParams } from '@/lib/public/content';
 import { getCourseFilterOptions, getPublicCategoryOptions, getPublicCityFilterOptions } from '@/lib/public/filter-options';
 
@@ -26,8 +27,8 @@ export default async function EducationPage({ searchParams }: EducationPageProps
       <EditorialPublicPage
         eyebrow="Образование"
         title="Программы, интенсивы и практические занятия"
-        description="Раздел собирает образовательные форматы для специалистов и команд: от коротких мастер-классов до корпоративного обучения."
-        summary="Здесь можно выбрать формат обучения: очные занятия, онлайн-материалы или корпоративную программу для команды."
+        description="Обучение для специалистов и команд: от мастер-классов до корпоративных программ."
+        summary="Можно выбрать очные занятия, материалы для самостоятельной работы или обучение под команду."
         metrics={[
           { value: '3', label: 'формата обучения' },
           { value: 'СКФО', label: 'региональный фокус' },
@@ -37,23 +38,31 @@ export default async function EducationPage({ searchParams }: EducationPageProps
           {
             label: 'Формат',
             title: 'Интенсивы и мастер-классы',
-            description: 'Короткие очные события для практики, дегустаций, командной работы и знакомства с экспертами.'
+            description: 'Короткие очные занятия для практики, дегустаций и работы в команде.'
           },
           {
             label: 'Формат',
             title: 'Онлайн-лекции и материалы',
-            description: 'Материалы для самостоятельного изучения и повторения базовых тем.'
+            description: 'Материалы для самостоятельного обучения и повторения базы.'
           },
           {
             label: 'Формат',
             title: 'Корпоративное обучение',
-            description: 'Программы для команд заведений: сервис, бар, меню, продажи и внутреннее обучение.'
+            description: 'Программы для команд: сервис, бар, меню, продажи и внутренняя подготовка.'
           }
         ]}
         primaryLink={{ label: 'Смотреть программы', href: '#education-list' }}
-        secondaryLink={{ label: 'События', href: '/events' }}
+        secondaryLink={{ label: 'Предложить формат', href: '/contacts' }}
       />
-      <Suspense fallback={<div className="container py-6">Загрузка фильтров...</div>}>
+      <Suspense
+        fallback={
+          <section className="border-b border-black/10 bg-[var(--surface-muted)] py-6">
+            <div className="container">
+              <div aria-hidden="true" className="h-14 animate-pulse rounded-[var(--radius-lg)] bg-black/6" />
+            </div>
+          </section>
+        }
+      >
         <PublicFilters
           categories={categories}
           cities={filterCities}
@@ -66,7 +75,6 @@ export default async function EducationPage({ searchParams }: EducationPageProps
       <PublicFeaturedContent
         actionLabel="Открыть программу"
         basePath="/education"
-        description="Курс с форматом, уровнем, городом и кнопкой перехода к подробностям."
         eyebrow="Рекомендуем"
         item={featuredItem}
         title="Программа в фокусе"
@@ -74,12 +82,52 @@ export default async function EducationPage({ searchParams }: EducationPageProps
       <PublishedContentSection
         basePath="/education"
         content={content}
-        emptyDescription="Когда появятся новые программы, они отобразятся здесь."
+        countLabel="Программ в списке"
+        emptyDescription="Список пока пуст. Можно сразу написать, какое обучение вам нужно."
+        emptyActions={[
+          { href: '/contacts?topic=education-program', label: 'Предложить программу' },
+          { href: '/contacts?topic=education-launch', label: 'Получить уведомление о запуске', variant: 'secondary' },
+          { href: '/contacts', label: 'Связаться с командой', variant: 'secondary' }
+        ]}
         emptyTitle="Программ пока нет"
         excludedItemIds={featuredItem ? [featuredItem.id] : []}
         sectionId="education-list"
         title="Программы"
       />
+      {content.total === 0 ? (
+        <section className="editorial-grid border-b border-black/20 py-10 md:py-14">
+          <div className="container grid gap-4 md:grid-cols-3">
+            {[
+              {
+                label: 'Интенсив',
+                title: 'Сервис и коммуникация с гостем',
+                meta: 'Ставрополь / offline / базовый уровень'
+              },
+              {
+                label: 'Корпоративная программа',
+                title: 'Запуск барной карты для команды',
+                meta: 'По запросу / offline + консультация'
+              },
+              {
+                label: 'Онлайн-материал',
+                title: 'Основы сезонного меню',
+                meta: 'Бесплатный вводный материал'
+              }
+            ].map((item) => (
+              <article className="rounded-[var(--radius-xl)] border border-black/12 bg-[var(--surface)] p-6" key={item.title}>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--accent)]">{item.label}</p>
+                <h3 className="mt-3 text-xl font-semibold leading-7">{item.title}</h3>
+                <p className="mt-4 text-sm leading-6 text-[var(--muted)]">{item.meta}</p>
+              </article>
+            ))}
+          </div>
+          <div className="container mt-6">
+            <Button className="rounded-full px-6" href="/contacts?topic=education-program" variant="secondary">
+              Обсудить образовательный формат
+            </Button>
+          </div>
+        </section>
+      ) : null}
     </>
   );
 }

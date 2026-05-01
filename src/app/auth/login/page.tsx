@@ -8,13 +8,14 @@ import { Panel } from '@/components/ui/panel';
 
 const errorMessages: Record<string, string> = {
   invalid: 'Неверный email или пароль.',
-  pending: 'Заявка еще рассматривается. Когда доступ откроют, вы сможете войти по этим данным.',
+  pending: 'Заявка ещё на проверке или доступ к кабинету пока не открыт.',
   blocked: 'Доступ заблокирован. Свяжитесь с командой BARSYNERGY.',
+  failed: 'Не удалось выполнить действие прямо сейчас. Повторите попытку позже.',
   'rate-limited': 'Слишком много попыток входа. Повторите позже.'
 };
 
 const successMessages: Record<string, string> = {
-  'business-request-created': 'Заявка отправлена. Когда доступ будет готов, вы сможете войти по этому email.',
+  'business-request-created': 'Заявку получили. После проверки напишем, как открыть доступ.',
   'logged-out': 'Вы вышли из аккаунта.'
 };
 
@@ -38,26 +39,13 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
           <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Аккаунт</p>
           <h1 className="mt-4 text-4xl font-semibold leading-tight md:text-5xl">Вход</h1>
           <p className="mt-4 max-w-md text-base leading-7 text-[var(--muted)]">
-            Для тех, у кого уже открыт доступ к кабинету компании, профилю специалиста или рабочему разделу.
+            Если у вас уже есть доступ к кабинету компании, профилю специалиста или рабочему разделу, войдите здесь.
           </p>
-          <div className="mt-8 border-t border-black/10 pt-5">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Что понадобится</p>
-            <ul className="mt-4 grid gap-3 text-sm leading-6 text-[var(--muted)]">
-              <li className="grid grid-cols-[0.5rem_minmax(0,1fr)] gap-3">
-                <span className="mt-2 h-2 w-2 rounded-full bg-[var(--accent)]" />
-                <span>Рабочий email, который уже привязан к вашему доступу.</span>
-              </li>
-              <li className="grid grid-cols-[0.5rem_minmax(0,1fr)] gap-3">
-                <span className="mt-2 h-2 w-2 rounded-full bg-[var(--accent)]" />
-                <span>Активный доступ к вашему разделу: профиль специалиста, кабинет компании или рабочая админ-зона.</span>
-              </li>
-            </ul>
-          </div>
           <Panel className="mt-8" padding="sm">
             <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Нет доступа?</p>
             <p className="mt-3 text-sm leading-6 text-[var(--muted)]">
-              Если вы представляете бизнес и хотите работать через кабинет компании, сначала отправьте заявку на доступ. Отдельная
-              регистрация специалистов пока не открыта.
+              Если вы представляете бизнес, сначала оставьте заявку на доступ. После проверки команда откроет кабинет. Отдельная
+              регистрация специалистов пока закрыта.
             </p>
             <Button className="mt-4 rounded-full" href="/auth/register" variant="secondary">
               Запросить доступ
@@ -68,9 +56,9 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
         <section className="editorial-form-shell overflow-hidden">
           <div className="border-b border-black/10 bg-[linear-gradient(135deg,rgba(255,255,255,0.86),rgba(255,255,255,0.58))] px-5 py-5 md:px-6 md:py-6">
             <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Авторизация</p>
-            <h2 className="mt-3 text-2xl font-semibold uppercase leading-8">Введите данные</h2>
+            <h2 className="mt-3 text-2xl font-semibold uppercase leading-8">Войдите в аккаунт</h2>
             <p className="mt-3 max-w-xl text-sm leading-7 text-[var(--muted)]">
-              Если доступ уже открыт, используйте email и пароль, которые привязаны к вашему разделу.
+              Используйте email и пароль, к которым привязан ваш доступ.
             </p>
           </div>
           <div className="p-5 md:p-6">

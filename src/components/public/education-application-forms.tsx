@@ -23,8 +23,8 @@ export function EducationApplicationForms({ enabled, result, utm, cities }: Publ
   return (
     <PublicApplicationSection
       eyebrow="Образование / Заявки"
-      title="Запросы на обучение"
-      description="Здесь можно оставить заявку на программу, корпоративное обучение или сертификат."
+      title="Заявки на обучение"
+      description="Можно записаться на программу, запросить обучение для команды или заказать сертификат."
       enabled={enabled}
       result={result}
     >
@@ -35,7 +35,7 @@ export function EducationApplicationForms({ enabled, result, utm, cities }: Publ
           <PublicFormShellHeader
             eyebrow="Индивидуальный запрос"
             title="Заявка на программу"
-            description="Для индивидуального обучения, подбора темы или записи на ближайший поток."
+            description="Если хотите подобрать тему, формат или ближайший поток."
           />
           <div className="relative p-5 md:p-6">
             <div className="grid gap-4">
@@ -72,12 +72,12 @@ export function EducationApplicationForms({ enabled, result, utm, cities }: Publ
                 <Textarea id="courseGoals" name="goals" required className="min-h-36" maxLength={3000} minLength={10} />
               </FormField>
               <ConsentField>
-                Согласен на обработку персональных данных для обработки заявки. Текст{' '}
+                Даю согласие на обработку персональных данных для этой заявки. Полный текст{' '}
                 <InlineLink href="/legal/personal-data-consent">согласия</InlineLink>
                 .
               </ConsentField>
             </div>
-            <PublicFormShellFooter note="Используйте форму, если хотите обсудить программу или подобрать тему под свой запрос.">
+            <PublicFormShellFooter note="Подойдёт, если хотите записаться или подобрать программу под свою задачу.">
               <Button className="min-h-12 rounded-full px-6 tracking-[0.12em] sm:self-start" type="submit">
                 Отправить заявку
               </Button>
@@ -91,7 +91,7 @@ export function EducationApplicationForms({ enabled, result, utm, cities }: Publ
           <PublicFormShellHeader
             eyebrow="Командный формат"
             title="Корпоративное обучение"
-            description="Для заведений и команд, которым нужен обучающий формат под конкретную задачу."
+            description="Для заведений и команд, которым нужно обучение под конкретную задачу."
           />
           <div className="relative p-5 md:p-6">
             <div className="grid gap-4">
@@ -131,12 +131,12 @@ export function EducationApplicationForms({ enabled, result, utm, cities }: Publ
                 <Textarea id="trainingRequest" name="requestDetails" required className="min-h-36" maxLength={4000} minLength={20} />
               </FormField>
               <ConsentField>
-                Согласен на обработку персональных данных для обработки заявки. Текст{' '}
+                Даю согласие на обработку персональных данных для этой заявки. Полный текст{' '}
                 <InlineLink href="/legal/personal-data-consent">согласия</InlineLink>
                 .
               </ConsentField>
             </div>
-            <PublicFormShellFooter note="Подходит для обучения команды, запуска новой карты или внутреннего интенсива.">
+            <PublicFormShellFooter note="Подойдёт для обучения команды, запуска новой карты или внутреннего интенсива.">
               <Button className="min-h-12 rounded-full px-6 tracking-[0.12em] sm:self-start" type="submit">
                 Отправить запрос
               </Button>
@@ -150,7 +150,7 @@ export function EducationApplicationForms({ enabled, result, utm, cities }: Publ
           <PublicFormShellHeader
             eyebrow="Подарочный формат"
             title="Заказ сертификата"
-            description="Для подарочного сертификата, номинала или персонального комментария к заказу."
+            description="Если нужен подарочный сертификат или сертификат для команды."
           />
           <div className="relative p-5 md:p-6">
             <div className="grid gap-4 md:grid-cols-2">
@@ -187,7 +187,7 @@ export function EducationApplicationForms({ enabled, result, utm, cities }: Publ
               </FormField>
               <div className="md:col-span-2">
                 <ConsentField>
-                  Согласен на обработку персональных данных для обработки заявки. Текст{' '}
+                  Даю согласие на обработку персональных данных для этой заявки. Полный текст{' '}
                   <InlineLink href="/legal/personal-data-consent">согласия</InlineLink>
                   .
                 </ConsentField>
@@ -195,7 +195,7 @@ export function EducationApplicationForms({ enabled, result, utm, cities }: Publ
             </div>
             <PublicFormShellFooter
               className="md:items-center"
-              note="Если нужен корпоративный сертификат или нестандартный формат, укажите это в комментарии."
+              note="Если нужен корпоративный сертификат или нестандартный формат, напишите об этом в комментарии."
             >
               <Button className="min-h-12 rounded-full px-6 tracking-[0.12em] sm:self-start" type="submit">
                 Отправить заказ

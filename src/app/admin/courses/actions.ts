@@ -4,8 +4,10 @@ import { revalidatePath } from 'next/cache';
 import { CategoryType, ContentStatus } from '@prisma/client';
 import { z } from 'zod';
 import {
+  assertActiveContentRelations,
   contentStatusValues,
   deleteUploadedFileIfUnused,
+  findUniqueSlug,
   formatAdminActionError,
   getString,
   initialPublicationDates,
@@ -46,48 +48,6 @@ const deleteFormSchema = z.object({
   courseId: z.string().trim().min(1)
 });
 
-async function getUniqueCourseSlug(baseSlug: string, excludeId?: string) {
-  let candidate = baseSlug;
-  let suffix = 2;
-
-  while (
-    await prisma.course.findFirst({
-      where: { slug: candidate, id: excludeId ? { not: excludeId } : undefined },
-      select: { id: true }
-    })
-  ) {
-    candidate = `${baseSlug}-${suffix}`;
-    suffix += 1;
-  }
-
-  return candidate;
-}
-
-async function assertCourseRelations(input: { categoryId?: string; cityId?: string }) {
-  const [category, city] = await Promise.all([
-    input.categoryId
-      ? prisma.category.findFirst({
-          where: { id: input.categoryId, type: CategoryType.COURSE, isActive: true },
-          select: { id: true }
-        })
-      : null,
-    input.cityId
-      ? prisma.city.findFirst({
-          where: { id: input.cityId, isActive: true },
-          select: { id: true }
-        })
-      : null
-  ]);
-
-  if (input.categoryId && !category) {
-    throw new Error('Course category is invalid.');
-  }
-
-  if (input.cityId && !city) {
-    throw new Error('Course city is invalid.');
-  }
-}
-
 export async function createCourse(formData: FormData) {
   const redirectTo = safeAdminRedirectPath(formData, ADMIN_COURSES_PATH);
   let result: { type: 'success' | 'error'; message: string };
@@ -115,13 +75,22 @@ export async function createCourse(formData: FormData) {
       throw new Error('Course slug is required.');
     }
 
-    await assertCourseRelations({
+    await assertActiveContentRelations({
+      entityName: 'Course',
       categoryId: parsed.categoryId,
+      categoryType: CategoryType.COURSE,
       cityId: parsed.cityId
     });
 
     const [uniqueSlug, coverImageId] = await Promise.all([
-      getUniqueCourseSlug(slug),
+      findUniqueSlug(slug, async (candidate) =>
+        Boolean(
+          await prisma.course.findFirst({
+            where: { slug: candidate },
+            select: { id: true }
+          })
+        )
+      ),
       resolveCoverImageId({
         formData,
         userId: user.id,
@@ -201,13 +170,22 @@ export async function updateCourse(formData: FormData) {
     });
     previousCoverImageId = existingCourse.coverImageId;
 
-    await assertCourseRelations({
+    await assertActiveContentRelations({
+      entityName: 'Course',
       categoryId: parsed.categoryId,
+      categoryType: CategoryType.COURSE,
       cityId: parsed.cityId
     });
 
     const [uniqueSlug, coverImageId] = await Promise.all([
-      getUniqueCourseSlug(slug, parsed.courseId),
+      findUniqueSlug(slug, async (candidate) =>
+        Boolean(
+          await prisma.course.findFirst({
+            where: { slug: candidate, id: { not: parsed.courseId } },
+            select: { id: true }
+          })
+        )
+      ),
       resolveCoverImageId({
         formData,
         userId: user.id,

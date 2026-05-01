@@ -6,6 +6,7 @@ import {
   hasHoneypotValue
 } from '@/lib/applications/submission-guard-utils';
 import { prisma } from '@/lib/db/prisma';
+import { consumeThrottleWindowAtomically } from '@/lib/security/throttle-window';
 import { getEnv } from '@/lib/validation/env';
 import { arePublicApplicationFormsEnabled } from '@/lib/applications/public-forms';
 
@@ -31,27 +32,16 @@ export async function assertPublicApplicationSubmissionAllowed(applicationType: 
   const windowBoundary = new Date(now.getTime() - THROTTLE_WINDOW_MS);
 
   await prisma.$transaction(async (tx) => {
-    const existing = await tx.applicationSubmissionThrottle.findUnique({
-      where: { keyHash },
-      select: { count: true, windowStartedAt: true }
+    const slot = await consumeThrottleWindowAtomically(tx, {
+      table: 'applicationSubmission',
+      keyHash,
+      maxAttempts: THROTTLE_MAX_SUBMISSIONS,
+      now,
+      windowBoundary
     });
 
-    if (!existing || existing.windowStartedAt <= windowBoundary) {
-      await tx.applicationSubmissionThrottle.upsert({
-        where: { keyHash },
-        create: { keyHash, count: 1, windowStartedAt: now },
-        update: { count: 1, windowStartedAt: now }
-      });
-      return;
-    }
-
-    if (existing.count >= THROTTLE_MAX_SUBMISSIONS) {
+    if (!slot) {
       throw new Error('application rate limit exceeded');
     }
-
-    await tx.applicationSubmissionThrottle.update({
-      where: { keyHash },
-      data: { count: { increment: 1 } }
-    });
   });
 }

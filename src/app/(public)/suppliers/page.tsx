@@ -22,8 +22,8 @@ export default async function SuppliersPage({ searchParams }: SuppliersPageProps
       <EditorialPublicPage
         eyebrow="Поставщики"
         title="Поставщики, сервисы и полезные контакты"
-        description="Каталог компаний и сервисов для закупок, запуска и ежедневной работы баров, кофеен и ресторанных команд."
-        summary="Собираем производителей, дистрибьюторов, сервисные команды и локальные контакты, которые реально полезны в работе."
+        description="Каталог компаний и сервисов для закупок, запуска и повседневной работы баров, кофеен и ресторанных команд."
+        summary="Здесь собраны производители, дистрибьюторы, сервисные команды и локальные контакты, которые правда помогают в работе."
         summaryHeading="В фокусе"
         metrics={[
           { value: 'СКФО', label: 'региональный фокус' },
@@ -54,7 +54,7 @@ export default async function SuppliersPage({ searchParams }: SuppliersPageProps
       <PublishedContentSection
         basePath="/suppliers"
         content={content}
-        emptyDescription="Сейчас каталог пуст. Новые компании и сервисы появятся после публикации командой."
+        emptyDescription="Сейчас каталог пуст. Новые компании и сервисы появятся после публикации."
         emptyTitle="Поставщиков пока нет"
         filters={
           <PublicFilters

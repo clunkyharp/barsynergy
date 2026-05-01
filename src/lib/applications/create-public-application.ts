@@ -1,6 +1,7 @@
 import { ApplicationStatus, ApplicationType, type Prisma } from '@prisma/client';
 import { applicationTypeLabels } from '@/lib/admin/application-utils';
 import { prisma } from '@/lib/db/prisma';
+import { dispatchApplicationCreatedNotification } from '@/lib/notifications/application-notification-dispatch';
 import { notifyOnApplicationCreated } from '@/lib/notifications/application-notifications';
 
 type CreatePublicApplicationInput = {
@@ -55,13 +56,15 @@ export async function createPublicApplication(input: CreatePublicApplicationInpu
     }
   });
 
-  await notifyOnApplicationCreated({
+  dispatchApplicationCreatedNotification({
     applicationId: application.id,
     applicationTypeLabel: applicationTypeLabels[input.type],
     subject: application.subject ?? applicationTypeLabels[input.type],
     cityName: input.cityName ?? undefined,
     userName: application.name ?? undefined,
     userEmail: application.email ?? undefined
+  }, {
+    notify: notifyOnApplicationCreated
   });
 
   return application;

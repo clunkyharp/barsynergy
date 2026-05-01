@@ -7,6 +7,12 @@ export const PUBLIC_CONTENT_MAX_PAGE_SIZE = 24;
 
 export type PublicContentSearchParams = Record<string, string | string[] | undefined>;
 
+export type PublishedContentMetaGroup = {
+  label?: string;
+  value: string;
+  tone?: 'default' | 'accent' | 'muted';
+};
+
 export type PublishedContentItem = {
   id: string;
   title: string;
@@ -15,6 +21,11 @@ export type PublishedContentItem = {
   label?: string;
   meta: string[];
   imageUrl?: string;
+  kind?: 'default' | 'vacancy';
+  subtitle?: string;
+  metaGroups?: PublishedContentMetaGroup[];
+  statusLabel?: string;
+  updatedLabel?: string;
 };
 
 export type PublishedContentList = {
@@ -120,6 +131,33 @@ function textSearch(query?: string) {
     : {};
 }
 
+const relativeTimeFormatter = new Intl.RelativeTimeFormat('ru-RU', { numeric: 'auto' });
+
+function formatUpdatedLabel(date: Date) {
+  const diffMs = date.getTime() - Date.now();
+  const hourMs = 1000 * 60 * 60;
+  const dayMs = hourMs * 24;
+  const weekMs = dayMs * 7;
+  const monthMs = dayMs * 30;
+
+  if (Math.abs(diffMs) < dayMs) {
+    const hours = Math.round(diffMs / hourMs) || -1;
+    return `обновлено ${relativeTimeFormatter.format(hours, 'hour')}`;
+  }
+
+  if (Math.abs(diffMs) < weekMs) {
+    const days = Math.round(diffMs / dayMs);
+    return `обновлено ${relativeTimeFormatter.format(days, 'day')}`;
+  }
+
+  if (Math.abs(diffMs) < monthMs) {
+    const weeks = Math.round(diffMs / weekMs);
+    return `обновлено ${relativeTimeFormatter.format(weeks, 'week')}`;
+  }
+
+  return `обновлено ${date.toLocaleDateString('ru-RU')}`;
+}
+
 export async function getPublishedArticles(params: PublicContentSearchParams = {}) {
   const page = getPage(params);
   const pageSize = getPageSize(params);
@@ -206,7 +244,7 @@ export async function getPublishedEvents(params: PublicContentSearchParams = {})
       slug: event.slug,
       summary: event.summary,
       label: event.category?.name,
-      meta: [event.city?.name, event.format, event.startsAt.toLocaleDateString('ru-RU')].filter(Boolean) as string[],
+      meta: [event.city?.name, event.locationName, event.format, event.startsAt.toLocaleDateString('ru-RU')].filter(Boolean) as string[],
       imageUrl: publicImageUrl(event.coverImage)
     }))
   });
@@ -296,8 +334,18 @@ export async function getPublishedVacancies(params: PublicContentSearchParams = 
       title: vacancy.title,
       slug: vacancy.slug,
       summary: vacancy.summary,
+      kind: 'vacancy',
       label: vacancy.category?.name,
+      subtitle: vacancy.companyName,
       meta: [vacancy.city?.name, vacancy.companyName, vacancy.employmentType, vacancy.salaryLabel].filter(Boolean) as string[],
+      metaGroups: [
+        vacancy.city?.name ? { label: 'Город', value: vacancy.city.name } : undefined,
+        vacancy.companyName ? { label: 'Компания', value: vacancy.companyName } : undefined,
+        vacancy.employmentType ? { label: 'Формат', value: vacancy.employmentType } : undefined,
+        vacancy.salaryLabel ? { label: 'Оплата', value: vacancy.salaryLabel, tone: 'accent' } : undefined
+      ].filter(Boolean) as PublishedContentMetaGroup[],
+      statusLabel: 'Открыта',
+      updatedLabel: formatUpdatedLabel(vacancy.publishedAt ?? vacancy.createdAt),
       imageUrl: publicImageUrl(vacancy.coverImage)
     }))
   });

@@ -4,16 +4,8 @@ import {
   hasSmtpNotificationConfig,
   hasTelegramAdminNotificationConfig
 } from '@/lib/notifications/application-notification-format';
+import type { ApplicationNotificationInput } from '@/lib/notifications/application-notification-dispatch';
 import { getEnv, type AppEnv } from '@/lib/validation/env';
-
-type ApplicationNotificationInput = {
-  applicationId: string;
-  applicationTypeLabel: string;
-  subject: string;
-  cityName?: string;
-  userName?: string;
-  userEmail?: string;
-};
 
 let smtpTransporter: nodemailer.Transporter | null = null;
 
@@ -55,17 +47,17 @@ async function sendUserConfirmationEmail(env: AppEnv, input: ApplicationNotifica
   await transporter.sendMail({
     from: env.SMTP_FROM,
     to: input.userEmail,
-    subject: 'BARSYNERGY: заявка получена',
+    subject: 'BARSYNERGY: мы получили вашу заявку',
     text: [
       greeting,
       '',
-      'Мы получили вашу заявку на сайте BARSYNERGY.',
+      'Мы получили вашу заявку на BARSYNERGY.',
       `Тип: ${input.applicationTypeLabel}.`,
       `Тема: ${input.subject}.`,
       '',
-      'Команда обработает обращение вручную и свяжется с вами при необходимости.',
+      'Если понадобятся уточнения, команда свяжется с вами отдельно.',
       '',
-      'Это автоматическое подтверждение получения заявки.'
+      'Это автоматическое письмо-подтверждение.'
     ].join('\n')
   });
 }

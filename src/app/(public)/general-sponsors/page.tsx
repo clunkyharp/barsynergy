@@ -1,7 +1,9 @@
+import Link from 'next/link';
 import { ArrowUpRight } from 'lucide-react';
 import { EditorialPublicPage } from '@/components/public/editorial-public-page';
 import { PublicBodyText, PublicDisplayTitle, PublicEyebrow } from '@/components/public/public-primitives';
 import { EditorialAction } from '@/components/ui/editorial-action';
+import { MetaChip } from '@/components/ui/meta-chip';
 import { Panel } from '@/components/ui/panel';
 import { StatCard } from '@/components/ui/stat-card';
 
@@ -32,22 +34,31 @@ const sponsorFormats = [
 
 const sponsorShowcase = [
   {
-    name: 'Aroma Trade South',
+    name: 'AROMA TRADE SOUTH',
     city: 'Ставрополь',
-    focus: 'ингредиенты и расходники',
-    note: 'Поставки для ежедневной работы заведений, гостевые смены и совместные образовательные форматы.'
+    status: 'Поставщик',
+    focus: 'Ингредиенты и расходники',
+    note: 'Поставки для ежедневной работы заведений, гостевых смен и образовательных форматов для команд.',
+    badges: ['Генеральный партнёр', 'HoReCa'],
+    href: '/partners'
   },
   {
-    name: 'Montelibero',
+    name: 'MONTELIBERO',
     city: 'Пятигорск',
-    focus: 'бренд и дистрибуция напитков',
-    note: 'Дегустации, спецпроекты, работа с бар-менеджерами и видимость в сезонных подборках.'
+    status: 'Бренд',
+    focus: 'Бренд и дистрибуция напитков',
+    note: 'Дегустации, спецпроекты и работа с бар-менеджерами, которым важны новые линейки и сезонные запуски.',
+    badges: ['Дистрибуция', 'Спецпроекты'],
+    href: '/partners'
   },
   {
-    name: 'Linea Service',
+    name: 'LINEA SERVICE',
     city: 'КМВ',
-    focus: 'оборудование и сервис',
-    note: 'Оснащение, запуск новых точек, поддержка проектов и интеграции в рабочие материалы платформы.'
+    status: 'Сервис',
+    focus: 'Оборудование и сервис',
+    note: 'Оснащение, запуск новых точек и поддержка проектов, где важны стабильная техника и сервисное сопровождение.',
+    badges: ['Оборудование', 'Поддержка'],
+    href: '/partners'
   }
 ];
 
@@ -56,9 +67,9 @@ export default function GeneralSponsorsPage() {
     <>
       <EditorialPublicPage
         eyebrow="Генеральные спонсоры"
-        title="Генеральное спонсорство BARSYNERGY"
-        description="Формат для брендов и компаний, которым нужен заметный и долгий контакт с профессиональной аудиторией региона."
-        summary="Работаем с брендами, дистрибьюторами, производителями и сервисами, которым важны отраслевые проекты, обучение и прямое присутствие в локальной среде."
+        title="Генеральные спонсоры BARSYNERGY"
+        description="Формат для брендов и компаний, которым важно регулярно работать с профессиональной аудиторией региона."
+        summary="Подходит брендам, дистрибьюторам, производителям и сервисам, которым нужны события, обучение и заметное присутствие в локальной среде."
         summaryHeading="Кому подходит"
         metrics={[
           { value: 'СКФО', label: 'региональный фокус' },
@@ -89,22 +100,61 @@ export default function GeneralSponsorsPage() {
 
       <section className="editorial-grid border-b border-black/20 py-10 md:py-14">
         <div className="container grid gap-8 xl:grid-cols-[0.72fr_1.28fr]">
-          <div>
-            <PublicDisplayTitle>Примеры профилей</PublicDisplayTitle>
-            <PublicBodyText className="mt-5 max-w-md">
-              Так может выглядеть блок генеральных спонсоров на живом сайте: с понятной специализацией и коротким контекстом.
-            </PublicBodyText>
+          <div className="flex flex-col justify-between gap-8">
+            <div>
+              <PublicEyebrow>Партнёрский каталог</PublicEyebrow>
+              <PublicDisplayTitle className="mt-3">Примеры профилей</PublicDisplayTitle>
+            </div>
+            <div className="max-w-md border-l border-[rgba(191,168,143,0.45)] pl-4">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">
+                Каталог для брендов, поставщиков и сервисов
+              </p>
+              <EditorialAction className="mt-4" href="/partners">
+                Смотреть каталог партнёров
+                <ArrowUpRight size={18} />
+              </EditorialAction>
+            </div>
           </div>
-          <div className="grid gap-4 md:grid-cols-3">
+          <div className="grid grid-flow-dense gap-4 md:grid-cols-2 xl:grid-cols-3">
             {sponsorShowcase.map((sponsor) => (
-              <Panel className="flex h-full flex-col justify-between bg-white/70" key={sponsor.name} padding="md">
-                <div>
-                  <PublicEyebrow>{sponsor.city}</PublicEyebrow>
-                  <h3 className="mt-3 text-2xl font-semibold uppercase leading-8">{sponsor.name}</h3>
-                  <p className="mt-3 text-sm font-semibold uppercase tracking-[0.06em] text-[var(--muted)]">{sponsor.focus}</p>
-                </div>
-                <PublicBodyText className="mt-5">{sponsor.note}</PublicBodyText>
-              </Panel>
+              <Link className="block h-full rounded-[var(--radius-xl)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]" href={sponsor.href} key={sponsor.name}>
+                <Panel
+                  className="flex h-full min-h-[320px] flex-col justify-between overflow-hidden border-[rgba(191,168,143,0.34)] bg-[color-mix(in_oklab,var(--surface),white_28%)]"
+                  padding="lg"
+                >
+                  <div>
+                    <div className="flex flex-wrap items-center justify-between gap-3 border-b border-black/10 pb-4">
+                      <PublicEyebrow>{sponsor.city}</PublicEyebrow>
+                      <MetaChip className="border-[var(--accent)]/28 px-2.5 py-1 text-[10px] tracking-[0.14em] text-[var(--text)]">
+                        {sponsor.status}
+                      </MetaChip>
+                    </div>
+                    <h3 className="mt-5 text-[26px] font-semibold uppercase leading-8 text-[var(--text)]">
+                      {sponsor.name}
+                    </h3>
+                    <p className="mt-3 text-sm font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">
+                      {sponsor.focus}
+                    </p>
+                    <PublicBodyText className="mt-5 pr-2">{sponsor.note}</PublicBodyText>
+                  </div>
+                  <div className="mt-8 border-t border-black/10 pt-4">
+                    <div className="flex flex-wrap gap-2">
+                      {sponsor.badges.map((badge) => (
+                        <MetaChip
+                          className="border-[rgba(191,168,143,0.55)] bg-transparent px-2.5 py-1 text-[10px] tracking-[0.14em] text-[var(--muted)]"
+                          key={badge}
+                        >
+                          {badge}
+                        </MetaChip>
+                      ))}
+                    </div>
+                    <div className="mt-5 inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.08em] text-[var(--text)]">
+                      <span>Профиль партнёра</span>
+                      <ArrowUpRight size={16} />
+                    </div>
+                  </div>
+                </Panel>
+              </Link>
             ))}
           </div>
         </div>
@@ -115,7 +165,7 @@ export default function GeneralSponsorsPage() {
           <div>
             <PublicDisplayTitle className="text-white">Что входит</PublicDisplayTitle>
             <PublicBodyText className="mt-5 max-w-md" tone="inverse">
-              Состав собираем под бренд, сезон и рабочую задачу. Ниже базовые точки, вокруг которых строится пакет.
+              Состав подбираем под бренд, сезон и задачу. Ниже базовые точки, из которых обычно собирается пакет.
             </PublicBodyText>
           </div>
           <div className="grid gap-4 md:grid-cols-3">
@@ -143,7 +193,7 @@ export default function GeneralSponsorsPage() {
             <div>
               <PublicDisplayTitle>Формат работы</PublicDisplayTitle>
               <PublicBodyText className="mt-5 max-w-md">
-                Обсуждаем задачу бренда, собираем точки присутствия и согласуем рабочий план без лишней упаковки.
+                Сначала обсуждаем задачу бренда, потом собираем точки присутствия и согласуем понятный рабочий план.
               </PublicBodyText>
             </div>
             <EditorialAction href="/contacts">

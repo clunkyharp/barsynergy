@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { ApplicationStatus, ApplicationType } from '@prisma/client';
 import { z } from 'zod';
+import { hasErrorMessage, resolveServerActionError } from '@/lib/actions/server-action-errors';
 import { getString, nullableString, optionalString } from '@/lib/admin/content-utils';
 import {
   buildBusinessApplicationPayload,
@@ -100,6 +101,51 @@ function getBusinessApplicationFormData(formData: FormData) {
   };
 }
 
+function resolveBusinessActionError(
+  action: string,
+  error: unknown,
+  messages: {
+    zod: string;
+    fallback: string;
+    city?: string;
+    draft?: string;
+    application?: string;
+  }
+) {
+  return resolveServerActionError({
+    action,
+    error,
+    zodMessage: messages.zod,
+    known: [
+      ...(messages.city
+        ? [
+            {
+              matches: (candidate: Error) => hasErrorMessage(candidate, 'city is invalid'),
+              message: messages.city
+            }
+          ]
+        : []),
+      ...(messages.draft
+        ? [
+            {
+              matches: (candidate: Error) => hasErrorMessage(candidate, 'draft is invalid'),
+              message: messages.draft
+            }
+          ]
+        : []),
+      ...(messages.application
+        ? [
+            {
+              matches: (candidate: Error) => hasErrorMessage(candidate, 'application is invalid'),
+              message: messages.application
+            }
+          ]
+        : [])
+    ],
+    fallbackMessage: messages.fallback
+  });
+}
+
 export async function updateBusinessProfile(formData: FormData) {
   let result: { type: 'success' | 'error'; message: string };
 
@@ -131,9 +177,16 @@ export async function updateBusinessProfile(formData: FormData) {
 
     revalidatePath(BUSINESS_PATH);
     revalidatePath(BUSINESS_REQUESTS_PATH);
-    result = { type: 'success', message: 'Профиль компании сохранен.' };
-  } catch {
-    result = { type: 'error', message: 'Не удалось сохранить профиль. Проверьте обязательные поля и сайт.' };
+    result = { type: 'success', message: 'Профиль компании сохранён.' };
+  } catch (error) {
+    result = {
+      type: 'error',
+      message: resolveBusinessActionError('business:update-profile', error, {
+        zod: 'Не удалось сохранить профиль. Проверьте обязательные поля и сайт.',
+        city: 'Этот город сейчас недоступен для выбора.',
+        fallback: 'Не удалось сохранить профиль. Попробуйте позже.'
+      })
+    };
   }
 
   redirectWithBusinessResult(BUSINESS_PATH, result);
@@ -175,10 +228,17 @@ export async function createBusinessApplication(formData: FormData) {
     revalidatePath('/admin/applications');
     result =
       status === ApplicationStatus.DRAFT
-        ? { type: 'success', message: 'Заявка сохранена.' }
+        ? { type: 'success', message: 'Черновик сохранён.' }
         : { type: 'success', message: 'Заявка отправлена.' };
-  } catch {
-    result = { type: 'error', message: 'Не удалось сохранить заявку. Проверьте обязательные поля.' };
+  } catch (error) {
+    result = {
+      type: 'error',
+      message: resolveBusinessActionError('business:create-application', error, {
+        zod: 'Не удалось сохранить заявку. Проверьте обязательные поля.',
+        city: 'Этот город сейчас недоступен для выбора.',
+        fallback: 'Не удалось сохранить заявку. Попробуйте позже.'
+      })
+    };
   }
 
   redirectWithBusinessResult(BUSINESS_REQUESTS_PATH, result);
@@ -230,9 +290,17 @@ export async function updateBusinessDraftApplication(formData: FormData) {
     revalidatePath(BUSINESS_PATH);
     revalidatePath(BUSINESS_REQUESTS_PATH);
     revalidatePath(fallbackPath);
-    result = { type: 'success', message: 'Заявка обновлена.' };
-  } catch {
-    result = { type: 'error', message: 'Не удалось обновить заявку. Проверьте обязательные поля.' };
+    result = { type: 'success', message: 'Черновик обновлён.' };
+  } catch (error) {
+    result = {
+      type: 'error',
+      message: resolveBusinessActionError('business:update-draft', error, {
+        zod: 'Не удалось обновить заявку. Проверьте обязательные поля.',
+        city: 'Этот город сейчас недоступен для выбора.',
+        draft: 'Черновик не найден или уже недоступен.',
+        fallback: 'Не удалось обновить заявку. Попробуйте позже.'
+      })
+    };
   }
 
   redirectWithBusinessResult(fallbackPath, result);
@@ -265,8 +333,16 @@ export async function submitBusinessDraftApplication(formData: FormData) {
     revalidatePath(BUSINESS_REQUESTS_PATH);
     revalidatePath('/admin/applications');
     result = { type: 'success', message: 'Заявка отправлена.' };
-  } catch {
-    result = { type: 'error', message: 'Не удалось отправить заявку.' };
+  } catch (error) {
+    result = {
+      type: 'error',
+      message: resolveBusinessActionError('business:submit-draft', error, {
+        application: 'Заявка не найдена или уже недоступна.',
+        draft: 'Черновик не найден или уже недоступен.',
+        zod: 'Не удалось отправить заявку.',
+        fallback: 'Не удалось отправить заявку. Попробуйте позже.'
+      })
+    };
   }
 
   redirectWithBusinessResult(BUSINESS_REQUESTS_PATH, result);
@@ -298,8 +374,16 @@ export async function archiveBusinessDraftApplication(formData: FormData) {
     revalidatePath(BUSINESS_PATH);
     revalidatePath(BUSINESS_REQUESTS_PATH);
     result = { type: 'success', message: 'Заявка перенесена в архив.' };
-  } catch {
-    result = { type: 'error', message: 'Не удалось перенести заявку в архив.' };
+  } catch (error) {
+    result = {
+      type: 'error',
+      message: resolveBusinessActionError('business:archive-draft', error, {
+        application: 'Заявка не найдена или уже недоступна.',
+        draft: 'Черновик не найден или уже недоступен.',
+        zod: 'Не удалось перенести заявку в архив.',
+        fallback: 'Не удалось перенести заявку в архив. Попробуйте позже.'
+      })
+    };
   }
 
   redirectWithBusinessResult(BUSINESS_REQUESTS_PATH, result);

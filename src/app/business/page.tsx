@@ -56,7 +56,7 @@ export default async function BusinessDashboardPage({ searchParams }: BusinessDa
             <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Компания</p>
             <h2 className="mt-3 text-2xl font-semibold tracking-[-0.03em]">Профиль компании</h2>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--muted)]">
-              Заполненный профиль помогает быстрее отправлять новые заявки и не повторять одни и те же данные.
+              Заполненный профиль экономит время: не придётся каждый раз вводить одни и те же данные.
             </p>
           </div>
           <div className="p-5 md:p-6">
@@ -116,7 +116,7 @@ export default async function BusinessDashboardPage({ searchParams }: BusinessDa
             <h2 className="mt-3 text-xl font-semibold">Текущий доступ</h2>
             <div className="mt-4 flex items-center gap-3">
               <StatusBadge variant="success">Активен</StatusBadge>
-              <span className="text-sm text-[var(--muted)]">Компания может создавать и отслеживать заявки.</span>
+              <span className="text-sm text-[var(--muted)]">Можно создавать заявки и следить за их статусом.</span>
             </div>
           </Panel>
           <Panel padding="md" tone="elevated">
@@ -141,13 +141,13 @@ export default async function BusinessDashboardPage({ searchParams }: BusinessDa
                     {application.businessNotes ? (
                       <p className="mt-3 text-sm leading-6 text-[var(--muted)]">{application.businessNotes}</p>
                     ) : (
-                      <p className="mt-3 text-sm leading-6 text-[var(--muted)]">Комментариев для бизнеса пока нет.</p>
+                      <p className="mt-3 text-sm leading-6 text-[var(--muted)]">Комментариев пока нет.</p>
                     )}
                   </Panel>
                 ))
               ) : (
                 <Panel className="text-sm leading-6 text-[var(--muted)]" padding="sm">
-                  Пока нет обновлений. Когда появится первая заявка, здесь будет история изменений и комментарии.
+                  Пока здесь пусто. Когда появятся заявки, здесь будут статусы и комментарии.
                 </Panel>
               )}
             </div>

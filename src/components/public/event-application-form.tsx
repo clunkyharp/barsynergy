@@ -19,8 +19,8 @@ export function EventApplicationForm({ enabled, result, utm, cities }: PublicApp
   return (
     <PublicApplicationSection
       eyebrow="События / Заявка"
-      title="Запрос на участие или предложение события"
-      description="Оставьте заявку на участие в событии или кратко опишите формат, который хотите предложить команде."
+      title="Участие в событии или своё предложение"
+      description="Можно записаться на событие или предложить свой формат."
       enabled={enabled}
       result={result}
     >
@@ -30,7 +30,7 @@ export function EventApplicationForm({ enabled, result, utm, cities }: PublicApp
         <PublicFormShellHeader
           eyebrow="Участие и предложение"
           title="Заявка на событие"
-          description="Для участия, предложения темы, коллаборации или нового формата в календаре."
+          description="Для участия, новой темы, коллаборации или события в календаре."
         />
         <div className="relative p-5 md:p-6">
           <div className="grid gap-4 md:grid-cols-2">
@@ -66,13 +66,13 @@ export function EventApplicationForm({ enabled, result, utm, cities }: PublicApp
             </div>
             <div className="md:col-span-2">
               <ConsentField>
-                Согласен на обработку персональных данных для обработки заявки. Текст{' '}
+                Даю согласие на обработку персональных данных для этой заявки. Полный текст{' '}
                 <InlineLink href="/legal/personal-data-consent">согласия</InlineLink>
                 .
               </ConsentField>
             </div>
           </div>
-          <PublicFormShellFooter note="Если предлагаете свой формат, опишите площадку, тему и ожидаемый состав участников.">
+          <PublicFormShellFooter note="Если предлагаете своё событие, напишите, где оно пройдёт, о чём будет и кто придёт.">
             <Button className="min-h-12 rounded-full px-6 tracking-[0.12em] sm:self-start" type="submit">
               Отправить заявку
             </Button>

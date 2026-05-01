@@ -4,7 +4,6 @@ import { PublicActionRow, PublicBodyText, PublicDisplayTitle, PublicEyebrow } fr
 import { PublishedContentSection } from '@/components/public/published-content-section';
 import { PublicFilters } from '@/components/public/public-filters';
 import { Button } from '@/components/ui/button';
-import { StatCard } from '@/components/ui/stat-card';
 import { getPublishedVacancies, type PublicContentSearchParams } from '@/lib/public/content';
 import { getPublicCategoryOptions, getPublicCityFilterOptions, getVacancyFilterOptions } from '@/lib/public/filter-options';
 
@@ -26,8 +25,6 @@ export default async function VacanciesPage({ searchParams }: VacanciesPageProps
     getPublicCityFilterOptions(),
     getVacancyFilterOptions()
   ]);
-  const vacancyCount = content.total;
-  const hasVacancies = vacancyCount > 0;
 
   return (
     <>
@@ -36,45 +33,35 @@ export default async function VacanciesPage({ searchParams }: VacanciesPageProps
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_20%,rgba(153,44,38,0.1),transparent_18%),radial-gradient(circle_at_82%_22%,rgba(255,255,255,0.62),transparent_18%),radial-gradient(circle_at_76%_84%,rgba(20,20,18,0.06),transparent_24%)]"
         />
-        <div className="container relative grid gap-6 xl:grid-cols-[1.12fr_0.88fr] xl:items-end">
-          <div className="min-w-0">
+        <div className="container relative">
+          <div className="min-w-0 max-w-5xl">
             <PublicEyebrow>Вакансии</PublicEyebrow>
             <PublicDisplayTitle as="h1" className="mt-3" size="hero">
               Работа для баров, кофеен и команд Северного Кавказа
             </PublicDisplayTitle>
             <PublicBodyText className="mt-5 max-w-2xl" size="md">
-              Здесь собраны опубликованные вакансии, отклики по открытым ролям и отправка новых позиций от заведений.
+              Здесь собраны открытые вакансии для баров, кофеен и команд региона. Можно откликнуться на роль или отправить свою вакансию на публикацию.
             </PublicBodyText>
             <PublicActionRow className="flex-col gap-3 sm:flex-row">
               <Button className="min-h-12 rounded-full px-6 tracking-[0.08em]" href="#vacancy-list">
                 Смотреть позиции
                 <ArrowUpRight size={18} />
               </Button>
-              <Button className="min-h-12 px-6 tracking-[0.08em]" href="/contacts" variant="secondary">
-                Связаться
+              <Button className="min-h-12 px-6 tracking-[0.08em]" href="/contacts?topic=vacancy-placement" variant="secondary">
+                Разместить вакансию
               </Button>
             </PublicActionRow>
-          </div>
-          <div className="grid gap-3">
-            <StatCard
-              className="backdrop-blur"
-              description={
-                hasVacancies
-                  ? 'опубликованные вакансии'
-                  : 'открытых вакансий сейчас нет'
-              }
-              label="Вакансии"
-              value={vacancyCount}
-              valueClassName="text-4xl font-semibold tracking-[-0.05em]"
-            />
           </div>
         </div>
       </section>
       <PublishedContentSection
         basePath="/vacancies"
         content={content}
-        emptyAction={{ href: '/contacts', label: 'Связаться' }}
-        emptyDescription="Сейчас опубликованных позиций нет. Новые вакансии появятся после публикации командой."
+        emptyActions={[
+          { href: '/contacts?topic=vacancy-placement', label: 'Разместить вакансию' },
+          { href: '/contacts', label: 'Связаться с командой', variant: 'secondary' }
+        ]}
+        emptyDescription="Сейчас открытых вакансий нет. Если ищете сотрудника, можно сразу отправить свою вакансию."
         emptyTitle="Вакансий пока нет"
         filters={
           <PublicFilters
@@ -86,7 +73,11 @@ export default async function VacanciesPage({ searchParams }: VacanciesPageProps
           />
         }
         sectionId="vacancy-list"
-        title="Актуальные позиции"
+        listAction={{ href: '/contacts?topic=vacancy-placement', label: 'Разместить вакансию', variant: 'ghost' }}
+        listLabel="Вакансии индустрии"
+        rowVariant="opportunity"
+        sortLabel="Сначала новые"
+        title="Открытые вакансии"
       />
     </>
   );

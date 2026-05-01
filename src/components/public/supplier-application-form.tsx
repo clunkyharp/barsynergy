@@ -20,7 +20,7 @@ export function SupplierApplicationForm({ enabled, result, utm, cities }: Public
     <PublicApplicationSection
       eyebrow="Поставщики / Заявка"
       title="Подать заявку в каталог"
-      description="Оставьте данные компании, продукта или сервиса. Мы свяжемся с вами по указанному контакту."
+      description="Оставьте данные компании и коротко расскажите, что вы поставляете."
       enabled={enabled}
       result={result}
     >
@@ -30,7 +30,7 @@ export function SupplierApplicationForm({ enabled, result, utm, cities }: Public
         <PublicFormShellHeader
           eyebrow="Компания и поставка"
           title="Заявка поставщика"
-          description="Компания, контакты и короткое описание предложения."
+          description="Компания, контакты и короткое описание того, с чем вы работаете."
         />
         <div className="relative p-5 md:p-6">
           <div className="grid gap-4 md:grid-cols-2">
@@ -72,7 +72,7 @@ export function SupplierApplicationForm({ enabled, result, utm, cities }: Public
             </div>
             <div className="md:col-span-2">
               <ConsentField>
-                Согласен на обработку персональных данных для обработки заявки. Текст{' '}
+                Даю согласие на обработку персональных данных для этой заявки. Полный текст{' '}
                 <InlineLink href="/legal/personal-data-consent">согласия</InlineLink>
                 .
               </ConsentField>

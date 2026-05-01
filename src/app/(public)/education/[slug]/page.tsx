@@ -35,7 +35,6 @@ export default async function CourseDetailPage({ params }: CourseDetailPageProps
       />
       <PublicRelatedContentSection
         basePath="/education"
-        description="Другие программы помогают сравнить формат, уровень и следующий шаг до отправки заявки."
         items={relatedItems}
         title="Другие программы"
       />

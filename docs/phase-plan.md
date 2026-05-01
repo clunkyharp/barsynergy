@@ -244,14 +244,16 @@ Current status:
 - `ApplicationStatus.DRAFT` and `Application.businessNotes` are backed by migration `20260428170000_phase4_business_request_management`;
 - `/auth/login` performs email/password login through PostgreSQL sessions and httpOnly cookies;
 - `/auth/register` creates a pending business-access request and linked application for admin review when public personal-data forms are enabled;
-- `/admin/users` can open or block business access;
+- `/admin/applications/[applicationId]` can prepare a one-time activation link for a reviewed business-access request;
+- `/auth/activate` lets the business owner set a password and finish the first activation from that one-time link;
+- `/admin/users` can block business access and reopen already prepared accounts;
 - `/business` is guarded for active business users and supports company profile editing;
 - `/business/requests` supports business-owned drafts and submissions for vacancy placement, supplier placement, partner application, corporate training and certificate order;
 - `/business/requests/[applicationId]` lets businesses view only their own requests, edit drafts, submit drafts for review and archive drafts;
 - auth, business and specialist-profile screens have an additional shared-UI consistency pass: page headers, action rows, stat blocks, sidebars and helper panels are normalized around the internal UI kit without changing the Phase 4 business logic;
 - focused browser smoke is rerun for `/business` and `/business/requests` after activating local demo access for QA only;
 - admin application detail can store business-visible notes;
-- password reset and invite acceptance are deferred until production email is configured.
+- email-based password reset is deferred until production email is configured, but one-time admin-prepared activation links are implemented for the current Phase 4 flow.
 
 ## Phase 5: Filters, Search And Directory Quality
 

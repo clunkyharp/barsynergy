@@ -7,12 +7,12 @@ import { createPublicApplication } from '@/lib/applications/create-public-applic
 import {
   assertActiveCity,
   baseContactSchema,
-  formatPublicApplicationActionError,
   getPublicApplicationResultPath,
   getString,
   nullableString,
   optionalString,
   PERSONAL_DATA_CONSENT_TEXT,
+  resolvePublicApplicationActionError,
   utmSchema
 } from '@/lib/applications/public-form-helpers';
 import {
@@ -45,7 +45,7 @@ export async function submitEventApplication(formData: FormData) {
     assertPublicApplicationFormsEnabled();
 
     if (hasHoneypotValue(getString(formData, 'website'))) {
-      result = { type: 'success', message: 'Заявка на событие отправлена.' };
+      result = { type: 'success', message: 'Заявку на событие получили.' };
       redirectWithEventsResult(result);
     }
 
@@ -86,9 +86,9 @@ export async function submitEventApplication(formData: FormData) {
       }
     });
 
-    result = { type: 'success', message: 'Заявка на событие отправлена.' };
+    result = { type: 'success', message: 'Заявку на событие получили.' };
   } catch (error) {
-    result = { type: 'error', message: formatPublicApplicationActionError(error) };
+    result = { type: 'error', message: resolvePublicApplicationActionError('public:event-application', error) };
   }
 
   redirectWithEventsResult(result);

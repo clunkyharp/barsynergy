@@ -7,12 +7,12 @@ import { createPublicApplication } from '@/lib/applications/create-public-applic
 import {
   assertActiveCity,
   baseContactSchema,
-  formatPublicApplicationActionError,
   getPublicApplicationResultPath,
   getString,
   nullableString,
   optionalString,
   PERSONAL_DATA_CONSENT_TEXT,
+  resolvePublicApplicationActionError,
   utmSchema
 } from '@/lib/applications/public-form-helpers';
 import {
@@ -69,7 +69,7 @@ export async function submitCourseApplication(formData: FormData) {
     assertPublicApplicationFormsEnabled();
 
     if (hasHoneypotValue(getString(formData, 'website'))) {
-      result = { type: 'success', message: 'Заявка на программу отправлена.' };
+      result = { type: 'success', message: 'Заявку на программу получили.' };
       redirectWithEducationResult(result);
     }
 
@@ -110,9 +110,9 @@ export async function submitCourseApplication(formData: FormData) {
       }
     });
 
-    result = { type: 'success', message: 'Заявка на программу отправлена.' };
+    result = { type: 'success', message: 'Заявку на программу получили.' };
   } catch (error) {
-    result = { type: 'error', message: formatPublicApplicationActionError(error) };
+    result = { type: 'error', message: resolvePublicApplicationActionError('public:course-application', error) };
   }
 
   redirectWithEducationResult(result);
@@ -125,7 +125,7 @@ export async function submitCorporateTrainingApplication(formData: FormData) {
     assertPublicApplicationFormsEnabled();
 
     if (hasHoneypotValue(getString(formData, 'website'))) {
-      result = { type: 'success', message: 'Запрос на корпоративное обучение отправлен.' };
+      result = { type: 'success', message: 'Запрос на корпоративное обучение получили.' };
       redirectWithEducationResult(result);
     }
 
@@ -168,9 +168,9 @@ export async function submitCorporateTrainingApplication(formData: FormData) {
       }
     });
 
-    result = { type: 'success', message: 'Запрос на корпоративное обучение отправлен.' };
+    result = { type: 'success', message: 'Запрос на корпоративное обучение получили.' };
   } catch (error) {
-    result = { type: 'error', message: formatPublicApplicationActionError(error) };
+    result = { type: 'error', message: resolvePublicApplicationActionError('public:corporate-training', error) };
   }
 
   redirectWithEducationResult(result);
@@ -183,7 +183,7 @@ export async function submitCertificateOrderApplication(formData: FormData) {
     assertPublicApplicationFormsEnabled();
 
     if (hasHoneypotValue(getString(formData, 'website'))) {
-      result = { type: 'success', message: 'Заказ сертификата отправлен.' };
+      result = { type: 'success', message: 'Заказ сертификата получили.' };
       redirectWithEducationResult(result);
     }
 
@@ -226,9 +226,9 @@ export async function submitCertificateOrderApplication(formData: FormData) {
       }
     });
 
-    result = { type: 'success', message: 'Заказ сертификата отправлен.' };
+    result = { type: 'success', message: 'Заказ сертификата получили.' };
   } catch (error) {
-    result = { type: 'error', message: formatPublicApplicationActionError(error) };
+    result = { type: 'error', message: resolvePublicApplicationActionError('public:certificate-order', error) };
   }
 
   redirectWithEducationResult(result);

@@ -10,7 +10,7 @@ type PublicFeaturedContentProps = {
   basePath: string;
   eyebrow: string;
   title: string;
-  description: string;
+  description?: string;
   actionLabel?: string;
 };
 
@@ -36,7 +36,7 @@ export function PublicFeaturedContent({
         <div>
           <PublicEyebrow>{eyebrow}</PublicEyebrow>
           <PublicDisplayTitle className="mt-4">{title}</PublicDisplayTitle>
-          <PublicBodyText className="mt-5 max-w-md">{description}</PublicBodyText>
+          {description ? <PublicBodyText className="mt-5 max-w-md">{description}</PublicBodyText> : null}
         </div>
 
         <Panel className="grid gap-0 overflow-hidden p-0 md:grid-cols-[0.72fr_1.28fr]" padding="md" tone="elevated">

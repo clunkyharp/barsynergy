@@ -4,8 +4,10 @@ import { revalidatePath } from 'next/cache';
 import { CategoryType, ContentStatus } from '@prisma/client';
 import { z } from 'zod';
 import {
+  assertActiveContentRelations,
   contentStatusValues,
   deleteUploadedFileIfUnused,
+  findUniqueSlug,
   formatAdminActionError,
   getString,
   initialPublicationDates,
@@ -48,48 +50,6 @@ const deleteFormSchema = z.object({
   vacancyId: z.string().trim().min(1)
 });
 
-async function getUniqueVacancySlug(baseSlug: string, excludeId?: string) {
-  let candidate = baseSlug;
-  let suffix = 2;
-
-  while (
-    await prisma.vacancy.findFirst({
-      where: { slug: candidate, id: excludeId ? { not: excludeId } : undefined },
-      select: { id: true }
-    })
-  ) {
-    candidate = `${baseSlug}-${suffix}`;
-    suffix += 1;
-  }
-
-  return candidate;
-}
-
-async function assertVacancyRelations(input: { categoryId?: string; cityId?: string }) {
-  const [category, city] = await Promise.all([
-    input.categoryId
-      ? prisma.category.findFirst({
-          where: { id: input.categoryId, type: CategoryType.VACANCY, isActive: true },
-          select: { id: true }
-        })
-      : null,
-    input.cityId
-      ? prisma.city.findFirst({
-          where: { id: input.cityId, isActive: true },
-          select: { id: true }
-        })
-      : null
-  ]);
-
-  if (input.categoryId && !category) {
-    throw new Error('Vacancy category is invalid.');
-  }
-
-  if (input.cityId && !city) {
-    throw new Error('Vacancy city is invalid.');
-  }
-}
-
 export async function createVacancy(formData: FormData) {
   const redirectTo = safeAdminRedirectPath(formData, ADMIN_VACANCIES_PATH);
   let result: { type: 'success' | 'error'; message: string };
@@ -118,13 +78,22 @@ export async function createVacancy(formData: FormData) {
       throw new Error('Vacancy slug is required.');
     }
 
-    await assertVacancyRelations({
+    await assertActiveContentRelations({
+      entityName: 'Vacancy',
       categoryId: parsed.categoryId,
+      categoryType: CategoryType.VACANCY,
       cityId: parsed.cityId
     });
 
     const [uniqueSlug, coverImageId] = await Promise.all([
-      getUniqueVacancySlug(slug),
+      findUniqueSlug(slug, async (candidate) =>
+        Boolean(
+          await prisma.vacancy.findFirst({
+            where: { slug: candidate },
+            select: { id: true }
+          })
+        )
+      ),
       resolveCoverImageId({
         formData,
         userId: user.id,
@@ -206,13 +175,22 @@ export async function updateVacancy(formData: FormData) {
     });
     previousCoverImageId = existingVacancy.coverImageId;
 
-    await assertVacancyRelations({
+    await assertActiveContentRelations({
+      entityName: 'Vacancy',
       categoryId: parsed.categoryId,
+      categoryType: CategoryType.VACANCY,
       cityId: parsed.cityId
     });
 
     const [uniqueSlug, coverImageId] = await Promise.all([
-      getUniqueVacancySlug(slug, parsed.vacancyId),
+      findUniqueSlug(slug, async (candidate) =>
+        Boolean(
+          await prisma.vacancy.findFirst({
+            where: { slug: candidate, id: { not: parsed.vacancyId } },
+            select: { id: true }
+          })
+        )
+      ),
       resolveCoverImageId({
         formData,
         userId: user.id,

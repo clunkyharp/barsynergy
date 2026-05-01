@@ -182,7 +182,7 @@ export default async function BusinessRequestDetailPage({ params, searchParams }
                 <Textarea id="details" name="details" required maxLength={4000} rows={6} defaultValue={application.message ?? ''} />
               </FormField>
               <CheckboxField defaultChecked name="consent" required value="accepted">
-                Подтверждаю согласие на обработку данных заявки.
+                Даю согласие на обработку данных заявки.
               </CheckboxField>
               <ActionRow className="border-t-0 pt-0">
                 <Button type="submit">Сохранить изменения</Button>
@@ -216,13 +216,13 @@ export default async function BusinessRequestDetailPage({ params, searchParams }
                 <form action={submitBusinessDraftApplication}>
                   <input name="applicationId" type="hidden" value={application.id} />
                   <Button className="w-full" type="submit">
-                    Отправить заявку
+                    Отправить на проверку
                   </Button>
                 </form>
                 <form action={archiveBusinessDraftApplication}>
                   <input name="applicationId" type="hidden" value={application.id} />
                   <Button className="w-full" type="submit" variant="secondary">
-                    Убрать в архив
+                    Перенести в архив
                   </Button>
                 </form>
               </div>

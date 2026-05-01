@@ -1,6 +1,6 @@
 # BARSYNERGY Project Status
 
-Last updated: 2026-04-30
+Last updated: 2026-05-01
 
 ## Current Branch
 
@@ -10,7 +10,7 @@ Last updated: 2026-04-30
 
 ## Current Phase
 
-Active phase: Phase 4 auth and first business account is implemented for the current MVP contract. Phase 1 public website MVP is complete. Phase 2 content/admin work is implemented and runtime-verified for admin create flows, published-only public reads, upload boundaries, pagination and publish/archive behavior. Phase 3 covers the unified `Application` model, public forms, admin review, guarded employer-forwarding metadata, draft vacancy creation, private resume upload/download and optional SMTP/Telegram notifications when approved env config is present. Phase 4 covers email/password login, logout, approved business accounts, admin approval/blocking, editable business profile, business request drafts/submission/tracking and business-visible admin comments. Public personal-data forms remain disabled by default in production until `APPLICATION_FORMS_ENABLED=true` is explicitly set after legal approval.
+Active phase: Phase 4 auth and first business account is implemented for the current MVP contract. Phase 1 public website MVP is complete. Phase 2 content/admin work is implemented and runtime-verified for admin create flows, published-only public reads, upload boundaries, pagination and publish/archive behavior. Phase 3 covers the unified `Application` model, public forms, admin review, guarded employer-forwarding metadata, draft vacancy creation, private resume upload/download and optional SMTP/Telegram notifications when approved env config is present. Phase 4 covers email/password login, logout, reviewed business-access requests, admin-prepared one-time activation links, approved business accounts, blocking/reopening, editable business profile, business request drafts/submission/tracking and business-visible admin comments. Public personal-data forms remain disabled by default in production until `APPLICATION_FORMS_ENABLED=true` is explicitly set after legal approval.
 
 Current local follow-up completed on `dev`:
 
@@ -23,18 +23,27 @@ Current local follow-up completed on `dev`:
 - business cabinet request validation now uses request-type-specific server-side schemas and payload shaping instead of one weak shared schema for all request types;
 - admin draft deletion for articles, events, courses, vacancies, suppliers and partners now fails closed when the target draft is missing or already unavailable, instead of returning a false success state;
 - public UI polish from browser review is applied: homepage feature illustrations use generated vector compositions instead of framed raster images, education/event cards are wider and shorter, community stats and site-section navigation are denser, the global background uses a softer grain/ambient treatment, and form consent checkboxes/focus states are aligned and neutral.
+- homepage spotlight cards are tightened into a denser editorial pattern: desaturated/grain-treated media, controlled featured-material typography, integrated metadata rows, calmer footer CTA blocks and a direct featured-article link replace the looser promo-style card structure.
+- the `/general-sponsors` profile showcase is refined into a directory-style partner block: the left column now explains the catalog purpose, while sponsor cards expose city, role, specialization, metadata chips and a clearer partner-profile CTA instead of placeholder-style text panels.
 - public homepage redesign batch is now applied locally: `/` has been rebuilt around live CMS-fed education/event/article/vacancy/supplier highlights, a new premium public shell, GSAP-driven narrative sections, a stronger B2B route for partners/sponsors and a shorter hero headline validated again on desktop/mobile after layout changes.
 - public consistency batch is now applied locally across the main public screens: repeated public typography, section headers, filters, stat shells, content meta chips and form action rows are normalized around shared primitives, and the design-system docs/tokens now follow the runtime `Geist + Oswald + Outfit` contract instead of the older `Manrope` docs state.
+- public listing sections that use the shared filter/list pattern are refined locally: the left filter rail is denser and sticky on desktop, embedded filters now support active chips/reset/mobile toggle, shared rows have calmer editorial hover states, and `/vacancies` now renders as a clearer opportunity board with company, format, pay and freshness metadata that can be scanned quickly.
+- focused browser-comment stabilization is applied locally on `/vacancies`, `/general-sponsors` and `/`: the top vacancy stat panel is removed, page-position metadata now sits under the list, vacancy rows have a clearer surface against the page background, sponsor showcase cards no longer show the red top stripe or hover motion, homepage audience counters are removed, and the spotlight section heading is shortened to `Актуальное`.
 - shared form UI is redesigned across public applications and auth screens: inputs, selects, textareas and checkboxes now use deeper editorial surfaces, stronger neutral focus states, explicit consent blocks and richer card shells with consistent action footers.
 - auth, business and specialist-profile screens now sit closer to the same shared shell contract: `PageHeader`, action rows, panel usage, stat blocks and sidebar labels are normalized without changing the underlying account or application logic.
 - focused Playwright smoke is now rerun for key public, auth, admin and business routes: route responses, `h1`, shell visibility and horizontal overflow are rechecked, the duplicated desktop `Кабинет` nav item is removed, and the low-contrast vacancies scenario card is fixed.
 - admin consistency pass is now applied on the main workspace screens: the global admin header is calmer, key admin sections use one shared intro pattern, and placeholder taxonomy screens no longer fall back to an isolated header style.
 - technical explanatory blocks were removed from admin and business screens where possible: phase/status helper paragraphs and service placeholders no longer render as pseudo-content, while forms and management actions remain unchanged.
 - public pages and forms were reworded away from internal workflow language: copy no longer leans on admin-phase, moderation, publication-pipeline or placeholder explanations where those texts were not useful user content.
+- public public-facing helper sections are trimmed further: featured/related content blocks no longer explain their own layout, while `/auth/login`, `/business/requests` and `/general-sponsors` now show action-oriented content without meta-descriptions of the page itself.
 - demo content for client-facing screen review is now available through `npm run demo:seed:screens`, and the current local database is already populated with realistic mock vacancies, suppliers, applications, draft content and pending business-access examples for admin, vacancies, suppliers and general-sponsor review.
 - auth, business-access and vacancy-request screens were cleaned further: `/auth/login`, `/auth/register`, `/business` and the business/public vacancy request forms now focus on the next user step instead of legal-process, moderation or queue-heavy explanations.
 - security remediation batch is applied locally: login and business-access registration now use persistent per-email/per-IP throttling, unknown-email login performs a dummy bcrypt comparison, upload validation checks file signatures, S3 uploads request AES256 server-side encryption, Nginx overwrites inbound forwarding headers and emits a baseline CSP.
+- business-access activation remediation is applied locally: `/auth/register` stays request-only, admin application review can now prepare a one-time `/auth/activate` link, and the business owner sets the first password directly instead of receiving a pre-created password-bearing account.
+- trusted ingress remediation is applied locally: production docs and Nginx now use one supported external-edge contract, and request identity resolves the first forwarded client IP instead of depending on an overwritten proxy hop.
 - public mobile/tunnel interaction hardening is applied locally: decorative homepage overlays no longer capture taps above the hero/header area, the public header sits on a stronger interaction layer, and external tunnel origins are now allowlisted for dev assets and Server Actions so menu/form checks are less likely to fail during ngrok-like mobile review.
+- public trust cleanup is applied locally: the root loading screen no longer exposes a visible technical message, public filter fallbacks now use visual skeletons, education and partners got controlled empty states with clearer CTA paths, the homepage hero now routes into broader platform actions instead of a dead education-first CTA, and the contacts form uses a fixed topic selector instead of a free-text field.
+- local review/demo content is cleaned for public screens: the garbage published vacancy is removed from the current database, the event demo summaries are normalized, and city options are now taken from the same active database list across public filters and the contact form instead of diverging hardcoded values.
 
 Phase 0 is implemented as the technical foundation:
 
@@ -140,7 +149,7 @@ Auth attempt throttling is backed by migration `20260430120000_auth_attempt_thro
 1. Start Phase 5 filters/search/directory-quality work, including the separate service-specialist catalog, only after owner confirms the Phase 4 result is acceptable.
 2. Keep legal approval as a blocker before enabling `APPLICATION_FORMS_ENABLED=true` in production.
 3. Configure production scheduler tasks for expired-session cleanup and public application throttle cleanup when production access is available.
-4. Keep production TLS as an explicit blocker until owner input is available.
+4. Verify the trusted external edge on the real production host before security sign-off.
 
 ## Phase 4 Business Account Implementation Update
 
@@ -150,8 +159,10 @@ Completed on 2026-04-28:
 - `UserRole.BUSINESS` added for approved business cabinet users.
 - `ApplicationType.BUSINESS_ACCOUNT_REQUEST` added and linked to `BusinessAccount` through `Application.businessAccountId`.
 - `/auth/login` now performs real email/password login with PostgreSQL sessions and httpOnly cookies.
-- `/auth/register` now creates a pending business-access request, pending business user, pending business account and linked admin-review application when public personal-data forms are enabled.
-- `/admin/users` now lists business users and lets admins open or block business access.
+- `/auth/register` now creates only a pending business-access request and linked admin-review application when public personal-data forms are enabled.
+- `/admin/applications/[applicationId]` now lets admins prepare a one-time activation link for a reviewed business-access request.
+- `/auth/activate` now lets the business owner set the first password and finish activation from that one-time link.
+- `/admin/users` now lists business users and lets admins block access or reopen already prepared accounts.
 - `/business` is guarded for active business users and lets businesses edit company profile data.
 - `/business/requests` lets active businesses create request drafts or submit requests for vacancy placement, supplier placement, partner application, corporate training and certificate order.
 - `/business/requests/[applicationId]` lets businesses view only their own requests, edit drafts, submit drafts for admin review or archive drafts.
@@ -171,7 +182,7 @@ Validation completed on 2026-04-29:
 
 Remaining Phase 4 caveats:
 
-- password reset and email invite acceptance are deferred until production email is configured;
+- email-based password reset is deferred until production email is configured;
 - business users still cannot publish public content directly;
 - candidate personal data remains hidden from business accounts unless a future admin-forwarding view is explicitly implemented after legal/product approval.
 

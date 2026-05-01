@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { hasErrorMessage, resolveServerActionError } from '@/lib/actions/server-action-errors';
 import { prisma } from '@/lib/db/prisma';
 import type { PublicContentSearchParams } from '@/lib/public/content';
 
@@ -87,15 +88,15 @@ export function getPublicApplicationResultPath(
 export function formatPublicApplicationActionError(error: unknown) {
   if (error instanceof Error) {
     if (error.message.includes('contact is required')) {
-      return 'Укажите хотя бы один контакт: email, телефон или Telegram.';
+      return 'Укажите хотя бы один способ связи: email, телефон или Telegram.';
     }
 
     if (error.message.includes('city is invalid')) {
-      return 'Выбранный город недоступен.';
+      return 'Этот город сейчас недоступен для выбора.';
     }
 
     if (error.message.includes('vacancy is invalid')) {
-      return 'Выбранная вакансия недоступна для отклика.';
+      return 'Эта вакансия уже недоступна для отклика.';
     }
 
     if (error.message.includes('application forms are disabled')) {
@@ -103,7 +104,7 @@ export function formatPublicApplicationActionError(error: unknown) {
     }
 
     if (error.message.includes('application rate limit exceeded')) {
-      return 'Слишком много отправок за короткое время. Повторите попытку позже.';
+      return 'Слишком много попыток за короткое время. Попробуйте позже.';
     }
 
     if (error.message.includes('unsupported private resume file')) {
@@ -119,7 +120,46 @@ export function formatPublicApplicationActionError(error: unknown) {
     return 'Проверьте обязательные поля и согласие на обработку данных.';
   }
 
-  return 'Не удалось отправить заявку. Проверьте данные и повторите попытку.';
+  return 'Не получилось отправить заявку. Проверьте поля и попробуйте ещё раз.';
+}
+
+export function resolvePublicApplicationActionError(action: string, error: unknown) {
+  return resolveServerActionError({
+    action,
+    error,
+    zodMessage: 'Проверьте обязательные поля и согласие на обработку данных.',
+    known: [
+      {
+        matches: (candidate) => hasErrorMessage(candidate, 'contact is required'),
+        message: 'Укажите хотя бы один способ связи: email, телефон или Telegram.'
+      },
+      {
+        matches: (candidate) => hasErrorMessage(candidate, 'city is invalid'),
+        message: 'Этот город сейчас недоступен для выбора.'
+      },
+      {
+        matches: (candidate) => hasErrorMessage(candidate, 'vacancy is invalid'),
+        message: 'Эта вакансия уже недоступна для отклика.'
+      },
+      {
+        matches: (candidate) => hasErrorMessage(candidate, 'application forms are disabled'),
+        message: 'Формы заявок временно закрыты.'
+      },
+      {
+        matches: (candidate) => hasErrorMessage(candidate, 'application rate limit exceeded'),
+        message: 'Слишком много попыток за короткое время. Попробуйте позже.'
+      },
+      {
+        matches: (candidate) => hasErrorMessage(candidate, 'unsupported private resume file'),
+        message: 'Резюме можно загрузить только в PDF, DOC, DOCX, RTF или ODT.'
+      },
+      {
+        matches: (candidate) => hasErrorMessage(candidate, 'private resume file is too large'),
+        message: 'Файл резюме превышает допустимый размер.'
+      }
+    ],
+    fallbackMessage: 'Не получилось отправить заявку. Проверьте поля и попробуйте ещё раз.'
+  });
 }
 
 export async function assertActiveCity(cityId?: string) {

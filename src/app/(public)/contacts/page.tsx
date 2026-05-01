@@ -9,44 +9,58 @@ type ContactsPageProps = {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 };
 
+const contactTopicAliases: Record<string, string> = {
+  'education-program': 'Предложить образовательный формат',
+  'education-launch': 'Другое',
+  'vacancy-placement': 'Разместить вакансию',
+  partnership: 'Обсудить партнёрство',
+  'partnership-format': 'Обсудить партнёрство',
+  sponsorship: 'Обсудить спонсорство',
+  supplier: 'Добавить поставщика',
+  event: 'Добавить событие'
+};
+
 export default async function ContactsPage({ searchParams }: ContactsPageProps) {
   const params = (await searchParams) ?? {};
   const [cities] = await Promise.all([getApplicationCityOptions()]);
   const applicationFormsEnabled = arePublicApplicationFormsEnabled(getEnv());
+  const topicParam = Array.isArray(params.topic) ? params.topic[0] : params.topic;
+  const defaultTopic = topicParam ? contactTopicAliases[topicParam] ?? topicParam : undefined;
 
   return (
     <>
       <EditorialPublicPage
         eyebrow="Контакты"
         title="Связь с командой"
-        description="Один адрес для вопросов по обучению, событиям, партнерствам, вакансиям и поставщикам."
-        summary="Напишите нам, если вам нужен курс, совместный проект, размещение, событие или рабочий контакт."
+        description="Пишите по обучению, событиям, партнёрствам, вакансиям и поставщикам."
+        summary="Если нужен курс, совместный проект, размещение или рабочий контакт, напишите через форму."
         metrics={[
           { value: 'Почта', label: 'основной канал связи' },
-          { value: 'Право', label: 'работа по российским правилам' },
-          { value: 'Ответ', label: 'обратная связь' }
+          { value: 'Форма', label: 'для рабочих запросов' },
+          { value: 'Ответ', label: 'по теме обращения' }
         ]}
         rows={[
           {
             label: 'Запрос',
             title: 'Образование и события',
-            description: 'Запросы на участие, проведение занятий, мастер-классы и корпоративные программы.'
+            description: 'Участие, проведение занятий, мастер-классы и корпоративные программы.'
           },
           {
             label: 'Запрос',
             title: 'Партнерства и размещение',
-            description: 'Обращения от брендов, школ, заведений, поставщиков и работодателей.'
+            description: 'Запросы от брендов, школ, заведений, поставщиков и работодателей.'
           },
           {
             label: 'Документы',
             title: 'Условия и данные',
-            description: 'Если запрос связан с персональными данными или регистрацией, рядом есть все необходимые документы и условия.'
+            description: 'Если запрос связан с регистрацией или персональными данными, нужные документы уже рядом.'
           }
         ]}
-        primaryLink={{ label: 'Написать на email', href: '#applications' }}
+        primaryLink={{ label: 'Открыть форму', href: '#applications' }}
         secondaryLink={{ label: 'Политика ПДн', href: '/legal/privacy' }}
       />
       <ContactApplicationForm
+        defaultTopic={defaultTopic}
         enabled={applicationFormsEnabled}
         result={getPublicApplicationResult(params)}
         utm={getPublicApplicationUtm(params)}

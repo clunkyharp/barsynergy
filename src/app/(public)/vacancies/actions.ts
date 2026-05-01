@@ -8,12 +8,12 @@ import { createPublicApplication } from '@/lib/applications/create-public-applic
 import {
   assertActiveCity,
   baseContactSchema,
-  formatPublicApplicationActionError,
   getPublicApplicationResultPath,
   getString,
   nullableString,
   optionalString,
   PERSONAL_DATA_CONSENT_TEXT,
+  resolvePublicApplicationActionError,
   utmSchema,
   VACANCY_RESPONSE_CONSENT_TEXT
 } from '@/lib/applications/public-form-helpers';
@@ -68,7 +68,7 @@ export async function submitVacancyPlacementApplication(formData: FormData) {
     assertPublicApplicationFormsEnabled();
 
     if (hasHoneypotValue(getString(formData, 'website'))) {
-      result = { type: 'success', message: 'Заявка на размещение вакансии отправлена.' };
+      result = { type: 'success', message: 'Заявку на размещение вакансии получили.' };
       redirectWithApplicationResult(result);
     }
 
@@ -119,9 +119,9 @@ export async function submitVacancyPlacementApplication(formData: FormData) {
       }
     });
 
-    result = { type: 'success', message: 'Заявка на размещение вакансии отправлена.' };
+    result = { type: 'success', message: 'Заявку на размещение вакансии получили.' };
   } catch (error) {
-    result = { type: 'error', message: formatPublicApplicationActionError(error) };
+    result = { type: 'error', message: resolvePublicApplicationActionError('public:vacancy-submission', error) };
   }
 
   redirectWithApplicationResult(result);
@@ -199,7 +199,7 @@ export async function submitVacancyResponseApplication(formData: FormData) {
     result = { type: 'success', message: 'Отклик отправлен.' };
   } catch (error) {
     await deleteUploadedFileIfUnused(uploadedResumeFileId);
-    result = { type: 'error', message: formatPublicApplicationActionError(error) };
+    result = { type: 'error', message: resolvePublicApplicationActionError('public:vacancy-response', error) };
   }
 
   redirectWithApplicationResult(result);

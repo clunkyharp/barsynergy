@@ -35,7 +35,6 @@ export default async function VacancyDetailPage({ params }: VacancyDetailPagePro
       />
       <PublicRelatedContentSection
         basePath="/vacancies"
-        description="Другие роли помогают кандидату продолжить поиск, если текущая вакансия не подходит."
         items={relatedItems}
         title="Другие вакансии"
       />

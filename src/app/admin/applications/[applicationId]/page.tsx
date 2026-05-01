@@ -1,7 +1,9 @@
+import { cookies } from 'next/headers';
 import { notFound } from 'next/navigation';
-import { ApplicationStatus, ApplicationType } from '@prisma/client';
+import { ApplicationStatus, ApplicationType, BusinessAccountStatus, UserStatus } from '@prisma/client';
 import {
   createVacancyDraftFromApplication,
+  prepareBusinessAccessAction,
   updateApplicationBusinessNotes,
   updateApplicationInternalNotes,
   updateApplicationStatus
@@ -10,6 +12,7 @@ import { AdminActionAlert, HiddenRedirect } from '@/components/admin/content-adm
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { FormField } from '@/components/ui/form-field';
+import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { Textarea } from '@/components/ui/textarea';
@@ -20,6 +23,7 @@ import {
   applicationTypeLabels
 } from '@/lib/admin/application-utils';
 import type { AdminContentSearchParams } from '@/lib/admin/content-utils';
+import { BUSINESS_ACCESS_PREVIEW_COOKIE_NAME } from '@/lib/auth/business-access';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
 import { prisma } from '@/lib/db/prisma';
 
@@ -62,13 +66,48 @@ export default async function AdminApplicationDetailPage({ params, searchParams 
   const { applicationId } = await params;
   const query = (await searchParams) ?? {};
   const currentPath = `${ADMIN_APPLICATIONS_PATH}/${applicationId}`;
+  const cookieStore = await cookies();
+  const activationPreviewValue = cookieStore.get(BUSINESS_ACCESS_PREVIEW_COOKIE_NAME)?.value;
+  const activationPreview = (() => {
+    if (!activationPreviewValue) {
+      return null;
+    }
+
+    try {
+      const parsed = JSON.parse(activationPreviewValue) as {
+        applicationId?: string;
+        activationUrl?: string;
+        email?: string;
+        companyName?: string;
+        expiresAt?: string;
+      };
+
+      return parsed.applicationId === applicationId ? parsed : null;
+    } catch {
+      return null;
+    }
+  })();
   const application = await prisma.application.findUnique({
     where: { id: applicationId },
     include: {
       city: { select: { name: true } },
       vacancy: { select: { title: true, slug: true, companyName: true } },
       resumeFile: { select: { originalName: true, mimeType: true, size: true } },
-      forwardedBy: { select: { email: true } }
+      forwardedBy: { select: { email: true } },
+      businessAccount: {
+        select: {
+          id: true,
+          companyName: true,
+          status: true,
+          owner: {
+            select: {
+              id: true,
+              email: true,
+              status: true
+            }
+          }
+        }
+      }
     }
   });
 
@@ -216,6 +255,56 @@ export default async function AdminApplicationDetailPage({ params, searchParams 
                   </Button>
                 </form>
               )}
+            </Card>
+          ) : null}
+
+          {application.type === ApplicationType.BUSINESS_ACCOUNT_REQUEST ? (
+            <Card className="p-5">
+              <h2 className="text-lg font-semibold">Подготовка доступа</h2>
+              <div className="mt-4 grid gap-3 text-sm">
+                <p className="text-[var(--muted)]">
+                  После проверки подготовьте одноразовую ссылку, по которой владелец бизнеса сам задаст пароль и завершит активацию.
+                </p>
+                {application.businessAccount ? (
+                  <p className="text-[var(--muted)]">
+                    Связанный кабинет: {application.businessAccount.companyName} / {application.businessAccount.owner.email} /{' '}
+                    {application.businessAccount.owner.status === UserStatus.ACTIVE && application.businessAccount.status === BusinessAccountStatus.ACTIVE
+                      ? 'доступ уже активирован'
+                      : 'доступ ожидает активации'}
+                  </p>
+                ) : null}
+              </div>
+
+              <form action={prepareBusinessAccessAction} className="mt-4 grid gap-4">
+                <HiddenRedirect value={currentPath} />
+                <input name="applicationId" type="hidden" value={application.id} />
+                <Button
+                  type="submit"
+                  variant="secondary"
+                  disabled={
+                    application.businessAccount?.owner.status === UserStatus.ACTIVE &&
+                    application.businessAccount.status === BusinessAccountStatus.ACTIVE
+                  }
+                >
+                  {application.businessAccount ? 'Пересоздать ссылку активации' : 'Подготовить доступ и получить ссылку'}
+                </Button>
+              </form>
+
+              {activationPreview?.activationUrl ? (
+                <div className="mt-5 border-t border-[var(--line)] pt-5">
+                  <FormField htmlFor="activationUrl" label="Свежая ссылка активации">
+                    <Input
+                      id="activationUrl"
+                      name="activationUrl"
+                      readOnly
+                      value={activationPreview.activationUrl}
+                    />
+                  </FormField>
+                  <p className="mt-3 text-xs leading-6 text-[var(--muted)]">
+                    Передайте ссылку владельцу бизнеса безопасным каналом. Срок действия: {activationPreview.expiresAt ?? 'не указан'}.
+                  </p>
+                </div>
+              ) : null}
             </Card>
           ) : null}
 

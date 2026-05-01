@@ -81,7 +81,7 @@ export default async function BusinessRequestsPage({ searchParams }: BusinessReq
                 </Panel>
               ))
             ) : (
-              <Panel className="p-5 text-sm text-[var(--muted)]" tone="elevated">У компании пока нет заявок.</Panel>
+              <Panel className="p-5 text-sm text-[var(--muted)]" tone="elevated">Заявок пока нет.</Panel>
             )}
           </div>
         </section>

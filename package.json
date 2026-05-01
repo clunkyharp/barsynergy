@@ -9,6 +9,7 @@
     "dev": "./node_modules/.bin/next dev",
     "build": "./node_modules/.bin/prisma generate && ./node_modules/.bin/next build",
     "start": "./node_modules/.bin/next start",
+    "auth:cleanup:throttles": "node ./scripts/cleanup-auth-attempt-throttles.mjs",
     "lint": "./node_modules/.bin/eslint .",
     "test": "node --experimental-strip-types --test tests/*.test.mjs",
     "typecheck": "./node_modules/.bin/next typegen && ./node_modules/.bin/tsc --noEmit",

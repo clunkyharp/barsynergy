@@ -4,8 +4,10 @@ import { revalidatePath } from 'next/cache';
 import { CategoryType, ContentStatus } from '@prisma/client';
 import { z } from 'zod';
 import {
+  assertActiveContentRelations,
   contentStatusValues,
   deleteUploadedFileIfUnused,
+  findUniqueSlug,
   formatAdminActionError,
   getString,
   initialPublicationDates,
@@ -19,6 +21,7 @@ import {
 } from '@/lib/admin/content-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
 import { prisma } from '@/lib/db/prisma';
+import { normalizeExternalUrlInput } from '@/lib/validation/external-url';
 
 const ADMIN_PARTNERS_PATH = '/admin/partners';
 
@@ -30,7 +33,7 @@ const partnerFormSchema = z.object({
   status: z.enum(contentStatusValues).default(ContentStatus.DRAFT),
   categoryId: z.string().trim().optional(),
   companyName: z.string().trim().min(2).max(180),
-  websiteUrl: z.string().trim().url().max(240).optional(),
+  websiteUrl: z.string().trim().max(240).optional(),
   partnerType: z.string().trim().max(120).optional(),
   isFeatured: z.boolean().default(false)
 });
@@ -43,36 +46,6 @@ const statusFormSchema = z.object({
 const deleteFormSchema = z.object({
   partnerId: z.string().trim().min(1)
 });
-
-async function getUniquePartnerSlug(baseSlug: string, excludeId?: string) {
-  let candidate = baseSlug;
-  let suffix = 2;
-
-  while (
-    await prisma.partner.findFirst({
-      where: { slug: candidate, id: excludeId ? { not: excludeId } : undefined },
-      select: { id: true }
-    })
-  ) {
-    candidate = `${baseSlug}-${suffix}`;
-    suffix += 1;
-  }
-
-  return candidate;
-}
-
-async function assertPartnerRelations(input: { categoryId?: string }) {
-  const category = input.categoryId
-    ? await prisma.category.findFirst({
-        where: { id: input.categoryId, type: CategoryType.PARTNER, isActive: true },
-        select: { id: true }
-      })
-    : null;
-
-  if (input.categoryId && !category) {
-    throw new Error('Partner category is invalid.');
-  }
-}
 
 export async function createPartner(formData: FormData) {
   const redirectTo = safeAdminRedirectPath(formData, ADMIN_PARTNERS_PATH);
@@ -93,18 +66,28 @@ export async function createPartner(formData: FormData) {
       partnerType: optionalString(getString(formData, 'partnerType')),
       isFeatured: getString(formData, 'isFeatured') === 'true'
     });
+    const websiteUrl = normalizeExternalUrlInput(parsed.websiteUrl);
     const slug = slugify(parsed.slug ?? parsed.title);
 
     if (!slug) {
       throw new Error('Partner slug is required.');
     }
 
-    await assertPartnerRelations({
-      categoryId: parsed.categoryId
+    await assertActiveContentRelations({
+      entityName: 'Partner',
+      categoryId: parsed.categoryId,
+      categoryType: CategoryType.PARTNER
     });
 
     const [uniqueSlug, coverImageId] = await Promise.all([
-      getUniquePartnerSlug(slug),
+      findUniqueSlug(slug, async (candidate) =>
+        Boolean(
+          await prisma.partner.findFirst({
+            where: { slug: candidate },
+            select: { id: true }
+          })
+        )
+      ),
       resolveCoverImageId({
         formData,
         userId: user.id,
@@ -124,7 +107,7 @@ export async function createPartner(formData: FormData) {
         coverImageId,
         categoryId: nullableString(parsed.categoryId),
         companyName: parsed.companyName,
-        websiteUrl: nullableString(parsed.websiteUrl),
+        websiteUrl: nullableString(websiteUrl),
         partnerType: nullableString(parsed.partnerType),
         isFeatured: parsed.isFeatured,
         createdById: user.id,
@@ -168,6 +151,7 @@ export async function updatePartner(formData: FormData) {
         partnerType: optionalString(getString(formData, 'partnerType')),
         isFeatured: getString(formData, 'isFeatured') === 'true'
       });
+    const websiteUrl = normalizeExternalUrlInput(parsed.websiteUrl);
     const slug = slugify(parsed.slug ?? parsed.title);
 
     if (!slug) {
@@ -180,12 +164,21 @@ export async function updatePartner(formData: FormData) {
     });
     previousCoverImageId = existingPartner.coverImageId;
 
-    await assertPartnerRelations({
-      categoryId: parsed.categoryId
+    await assertActiveContentRelations({
+      entityName: 'Partner',
+      categoryId: parsed.categoryId,
+      categoryType: CategoryType.PARTNER
     });
 
     const [uniqueSlug, coverImageId] = await Promise.all([
-      getUniquePartnerSlug(slug, parsed.partnerId),
+      findUniqueSlug(slug, async (candidate) =>
+        Boolean(
+          await prisma.partner.findFirst({
+            where: { slug: candidate, id: { not: parsed.partnerId } },
+            select: { id: true }
+          })
+        )
+      ),
       resolveCoverImageId({
         formData,
         userId: user.id,
@@ -207,7 +200,7 @@ export async function updatePartner(formData: FormData) {
         coverImageId,
         categoryId: nullableString(parsed.categoryId),
         companyName: parsed.companyName,
-        websiteUrl: nullableString(parsed.websiteUrl),
+        websiteUrl: nullableString(websiteUrl),
         partnerType: nullableString(parsed.partnerType),
         isFeatured: parsed.isFeatured,
         updatedById: user.id,

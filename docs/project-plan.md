@@ -74,7 +74,7 @@ Auth:
 - httpOnly cookies;
 - secure cookies in production;
 - no JWT for the main user session;
-- roles: `user`, `moderator`, `admin`.
+- roles: `user`, `business`, `moderator`, `admin`.
 
 ## Russia And Personal Data Constraints
 

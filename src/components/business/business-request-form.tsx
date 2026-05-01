@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { ApplicationType } from '@prisma/client';
 import { createBusinessApplication } from '@/app/business/actions';
 import { ActionRow } from '@/components/ui/action-row';
@@ -9,7 +9,6 @@ import { Card } from '@/components/ui/card';
 import { ConsentField } from '@/components/ui/consent-field';
 import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
-import { Panel } from '@/components/ui/panel';
 import { Select } from '@/components/ui/select';
 import { SegmentedControl } from '@/components/ui/segmented-control';
 import { Textarea } from '@/components/ui/textarea';
@@ -30,12 +29,12 @@ const requestCards = [
   {
     type: ApplicationType.VACANCY_SUBMISSION,
     title: applicationTypeLabels[ApplicationType.VACANCY_SUBMISSION],
-    description: 'Новая роль, условия, оплата и контекст вакансии.'
+    description: 'Новая роль, условия, оплата и главное по вакансии.'
   },
   {
     type: ApplicationType.SUPPLIER_SUBMISSION,
     title: applicationTypeLabels[ApplicationType.SUPPLIER_SUBMISSION],
-    description: 'Каталог поставщика, зона работы и ключевое предложение.'
+    description: 'Что вы поставляете, где работаете и чем полезны.'
   },
   {
     type: ApplicationType.PARTNER_APPLICATION,
@@ -45,52 +44,25 @@ const requestCards = [
   {
     type: ApplicationType.CORPORATE_TRAINING_APPLICATION,
     title: applicationTypeLabels[ApplicationType.CORPORATE_TRAINING_APPLICATION],
-    description: 'Обучение команды, задачи бизнеса и состав участников.'
+    description: 'Обучение команды, задача бизнеса и состав участников.'
   },
   {
     type: ApplicationType.CERTIFICATE_ORDER,
     title: applicationTypeLabels[ApplicationType.CERTIFICATE_ORDER],
-    description: 'Сертификат, сумма, получатель и как его планируют использовать.'
+    description: 'Сертификат, сумма, получатель и пожелания по использованию.'
   }
 ] as const;
 
 type BusinessRequestCardType = (typeof requestCards)[number]['type'];
 
-const typeNotes: Record<BusinessRequestCardType, { title: string; helper: string }> = {
-  [ApplicationType.VACANCY_SUBMISSION]: {
-    title: 'Что понадобится',
-    helper: 'Укажите роль, условия и краткое описание вакансии.'
-  },
-  [ApplicationType.SUPPLIER_SUBMISSION]: {
-    title: 'Что понадобится',
-    helper: 'Опишите продукт, регион работы и главное предложение.'
-  },
-  [ApplicationType.PARTNER_APPLICATION]: {
-    title: 'Что понадобится',
-    helper: 'Коротко опишите формат сотрудничества и задачу.'
-  },
-  [ApplicationType.CORPORATE_TRAINING_APPLICATION]: {
-    title: 'Что понадобится',
-    helper: 'Укажите состав команды, задачу и удобный формат обучения.'
-  },
-  [ApplicationType.CERTIFICATE_ORDER]: {
-    title: 'Что понадобится',
-    helper: 'Укажите сумму, получателя и пожелания по сертификату.'
-  }
-};
-
 export function BusinessRequestForm({ cities, defaultCityId }: BusinessRequestFormProps) {
   const [selectedType, setSelectedType] = useState<BusinessRequestCardType>(ApplicationType.VACANCY_SUBMISSION);
-  const note = useMemo(() => typeNotes[selectedType], [selectedType]);
 
   return (
     <Card className="overflow-hidden p-0">
       <div className="border-b border-black/10 px-5 py-5 md:px-6">
         <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Новая заявка</p>
         <h2 className="mt-3 text-2xl font-semibold tracking-[-0.03em]">Выберите тип заявки</h2>
-        <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--muted)]">
-          Форма покажет только те поля, которые нужны для выбранного типа заявки.
-        </p>
       </div>
       <form action={createBusinessApplication} className="grid gap-6 p-5 md:p-6">
         <input name="type" type="hidden" value={selectedType} />
@@ -106,11 +78,6 @@ export function BusinessRequestForm({ cities, defaultCityId }: BusinessRequestFo
           onChange={setSelectedType}
           value={selectedType}
         />
-
-        <Panel className="text-sm leading-6 text-[var(--muted)]" padding="sm">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">{note.title}</p>
-          <p className="mt-2">{note.helper}</p>
-        </Panel>
 
         <div className="grid gap-5 md:grid-cols-2">
           <FormField htmlFor="title" label="Короткое название">
@@ -203,14 +170,14 @@ export function BusinessRequestForm({ cities, defaultCityId }: BusinessRequestFo
           <Textarea id="details" name="details" className="min-h-40" required maxLength={4000} rows={6} />
         </FormField>
 
-        <ConsentField>Подтверждаю согласие на обработку данных заявки.</ConsentField>
+        <ConsentField>Даю согласие на обработку данных заявки.</ConsentField>
 
         <ActionRow>
           <Button className="rounded-full" size="lg" type="submit" name="intent" value="submit">
             Отправить заявку
           </Button>
           <Button className="rounded-full" size="lg" type="submit" name="intent" value="draft" variant="secondary">
-            Сохранить позже
+            Сохранить как черновик
           </Button>
         </ActionRow>
       </form>

@@ -1,6 +1,7 @@
 import { ContentStatus, FileVisibility } from '@prisma/client';
 import { prisma } from '@/lib/db/prisma';
 import { getPublicFileUrl } from '@/lib/storage/public-url';
+import { getRenderableExternalUrl } from '@/lib/validation/external-url';
 
 export type PublicContentDetailFact = {
   label: string;
@@ -206,6 +207,8 @@ export async function getPublishedSupplierDetail(slug: string): Promise<PublicCo
     return null;
   }
 
+  const externalUrl = getRenderableExternalUrl(supplier.websiteUrl);
+
   return {
     title: supplier.title,
     slug: supplier.slug,
@@ -225,8 +228,8 @@ export async function getPublishedSupplierDetail(slug: string): Promise<PublicCo
         value: rest.join(': ')
       };
     }),
-    externalUrl: supplier.websiteUrl ?? undefined,
-    externalUrlLabel: supplier.websiteUrl ? 'Сайт компании' : undefined
+    externalUrl,
+    externalUrlLabel: externalUrl ? 'Сайт компании' : undefined
   };
 }
 
@@ -242,6 +245,8 @@ export async function getPublishedPartnerDetail(slug: string): Promise<PublicCon
   if (!partner) {
     return null;
   }
+
+  const externalUrl = getRenderableExternalUrl(partner.websiteUrl);
 
   return {
     title: partner.title,
@@ -262,7 +267,7 @@ export async function getPublishedPartnerDetail(slug: string): Promise<PublicCon
         value: rest.join(': ')
       };
     }),
-    externalUrl: partner.websiteUrl ?? undefined,
-    externalUrlLabel: partner.websiteUrl ? 'Сайт партнера' : undefined
+    externalUrl,
+    externalUrlLabel: externalUrl ? 'Сайт партнера' : undefined
   };
 }

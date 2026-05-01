@@ -22,8 +22,8 @@ export default async function PartnersPage({ searchParams }: PartnersPageProps) 
       <EditorialPublicPage
         eyebrow="Партнеры"
         title="Партнерские форматы для брендов, школ и заведений"
-        description="Форматы сотрудничества для брендов, школ и заведений: заявки, размещения, события и образовательные проекты."
-        summary="Здесь можно обсудить совместные проекты, события, спецформаты и работу с аудиторией BARSYNERGY."
+        description="Форматы сотрудничества для брендов, школ и заведений: события, размещение и образовательные проекты."
+        summary="Можно обсудить совместный проект и выбрать подходящий формат партнёрства."
         metrics={[
           { value: '3', label: 'типа партнерств' },
           { value: 'Контакт', label: 'прямая связь' },
@@ -38,7 +38,7 @@ export default async function PartnersPage({ searchParams }: PartnersPageProps) 
           {
             label: 'Формат',
             title: 'Информационные партнерства',
-            description: 'Совместные материалы, анонсы и события для профессиональной аудитории.'
+            description: 'Совместные материалы, анонсы и события для профессионального сообщества.'
           },
           {
             label: 'Формат',
@@ -46,13 +46,18 @@ export default async function PartnersPage({ searchParams }: PartnersPageProps) 
             description: 'Отдельные проекты для брендов и заведений: запуск, серия встреч, обучение или интеграция.'
           }
         ]}
-        primaryLink={{ label: 'Смотреть партнеров', href: '#partners-list' }}
-        secondaryLink={{ label: 'События', href: '/events' }}
+        primaryLink={{ label: 'Обсудить партнерство', href: '/contacts?topic=partnership' }}
+        secondaryLink={{ label: 'Смотреть спонсорство', href: '/general-sponsors' }}
       />
       <PublishedContentSection
         basePath="/partners"
         content={content}
-        emptyDescription="Когда появятся новые партнеры, они отобразятся здесь."
+        countLabel="Партнеров в списке"
+        emptyDescription="Список пока пуст. Если вы представляете бренд, школу, площадку или сервис, напишите команде BARSYNERGY."
+        emptyActions={[
+          { href: '/contacts?topic=partnership', label: 'Стать партнером' },
+          { href: '/contacts?topic=partnership-format', label: 'Обсудить формат', variant: 'secondary' }
+        ]}
         emptyTitle="Партнеров пока нет"
         filters={
           <PublicFilters

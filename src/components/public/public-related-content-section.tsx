@@ -22,7 +22,7 @@ export function PublicRelatedContentSection({
   basePath,
   eyebrow = 'Дальше',
   title = 'Похожие материалы',
-  description = 'Еще несколько записей из этого раздела, чтобы пользователь не упирался в тупик после детальной страницы.'
+  description
 }: PublicRelatedContentSectionProps) {
   if (items.length === 0) {
     return null;
@@ -34,7 +34,7 @@ export function PublicRelatedContentSection({
         <div>
           <PublicEyebrow>{eyebrow}</PublicEyebrow>
           <PublicDisplayTitle className="mt-4">{title}</PublicDisplayTitle>
-          <PublicBodyText className="mt-5 max-w-md">{description}</PublicBodyText>
+          {description ? <PublicBodyText className="mt-5 max-w-md">{description}</PublicBodyText> : null}
         </div>
 
         <div className="grid gap-4 md:grid-cols-3">

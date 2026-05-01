@@ -39,7 +39,6 @@ export default async function SupplierDetailPage({ params }: SupplierDetailPageP
       />
       <PublicRelatedContentSection
         basePath="/suppliers"
-        description="Другие поставщики помогают сравнить компании и не завершать поиск на одной карточке."
         items={relatedItems}
         title="Другие поставщики"
       />

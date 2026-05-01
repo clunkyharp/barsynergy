@@ -73,7 +73,7 @@ export default async function AdminUsersPage({ searchParams }: AdminUsersPagePro
   return (
     <div className="space-y-8">
       <AdminPageIntro
-        description="Проверка статуса бизнес-аккаунтов и ручное открытие или блокировка доступа к рабочему кабинету."
+        description="Управление уже подготовленными бизнес-доступами и блокировкой кабинетов. Новые заявки сначала проходят отдельную проверку."
         eyebrow="Админка / Пользователи"
         title="Бизнес-доступы"
       />
@@ -112,13 +112,19 @@ export default async function AdminUsersPage({ searchParams }: AdminUsersPagePro
                         </dd>
                       </div>
                     </dl>
+                    {user.status === UserStatus.PENDING ? (
+                      <p className="mt-4 max-w-2xl text-sm leading-6 text-[var(--muted)]">
+                        Для ожидающих заявок доступ больше не открывается прямо из этого экрана. Сначала заявка проверяется, затем доступ
+                        подготавливается отдельным безопасным шагом.
+                      </p>
+                    ) : null}
                   </div>
                   <div className="flex flex-col gap-2 sm:flex-row lg:flex-col">
                     <form action={updateBusinessUserAccess}>
                       <HiddenRedirect value={currentPath} />
                       <input name="userId" type="hidden" value={user.id} />
                       <input name="status" type="hidden" value="active" />
-                      <Button className="w-full" type="submit" disabled={user.status === UserStatus.ACTIVE}>
+                      <Button className="w-full" type="submit" disabled={user.status !== UserStatus.BLOCKED}>
                         Открыть доступ
                       </Button>
                     </form>

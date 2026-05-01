@@ -4,8 +4,10 @@ import { revalidatePath } from 'next/cache';
 import { CategoryType, ContentStatus } from '@prisma/client';
 import { z } from 'zod';
 import {
+  assertActiveContentRelations,
   contentStatusValues,
   deleteUploadedFileIfUnused,
+  findUniqueSlug,
   formatAdminActionError,
   getString,
   initialPublicationDates,
@@ -19,6 +21,7 @@ import {
 } from '@/lib/admin/content-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
 import { prisma } from '@/lib/db/prisma';
+import { normalizeExternalUrlInput } from '@/lib/validation/external-url';
 
 const ADMIN_SUPPLIERS_PATH = '/admin/suppliers';
 
@@ -31,7 +34,7 @@ const supplierFormSchema = z.object({
   categoryId: z.string().trim().optional(),
   cityId: z.string().trim().optional(),
   companyName: z.string().trim().min(2).max(180),
-  websiteUrl: z.string().trim().url().max(240).optional(),
+  websiteUrl: z.string().trim().max(240).optional(),
   contactLabel: z.string().trim().max(160).optional(),
   isVerified: z.boolean().default(false),
   serviceArea: z.string().trim().max(180).optional()
@@ -45,48 +48,6 @@ const statusFormSchema = z.object({
 const deleteFormSchema = z.object({
   supplierId: z.string().trim().min(1)
 });
-
-async function getUniqueSupplierSlug(baseSlug: string, excludeId?: string) {
-  let candidate = baseSlug;
-  let suffix = 2;
-
-  while (
-    await prisma.supplier.findFirst({
-      where: { slug: candidate, id: excludeId ? { not: excludeId } : undefined },
-      select: { id: true }
-    })
-  ) {
-    candidate = `${baseSlug}-${suffix}`;
-    suffix += 1;
-  }
-
-  return candidate;
-}
-
-async function assertSupplierRelations(input: { categoryId?: string; cityId?: string }) {
-  const [category, city] = await Promise.all([
-    input.categoryId
-      ? prisma.category.findFirst({
-          where: { id: input.categoryId, type: CategoryType.SUPPLIER, isActive: true },
-          select: { id: true }
-        })
-      : null,
-    input.cityId
-      ? prisma.city.findFirst({
-          where: { id: input.cityId, isActive: true },
-          select: { id: true }
-        })
-      : null
-  ]);
-
-  if (input.categoryId && !category) {
-    throw new Error('Supplier category is invalid.');
-  }
-
-  if (input.cityId && !city) {
-    throw new Error('Supplier city is invalid.');
-  }
-}
 
 export async function createSupplier(formData: FormData) {
   const redirectTo = safeAdminRedirectPath(formData, ADMIN_SUPPLIERS_PATH);
@@ -109,19 +70,29 @@ export async function createSupplier(formData: FormData) {
       isVerified: getString(formData, 'isVerified') === 'true',
       serviceArea: optionalString(getString(formData, 'serviceArea'))
     });
+    const websiteUrl = normalizeExternalUrlInput(parsed.websiteUrl);
     const slug = slugify(parsed.slug ?? parsed.title);
 
     if (!slug) {
       throw new Error('Supplier slug is required.');
     }
 
-    await assertSupplierRelations({
+    await assertActiveContentRelations({
+      entityName: 'Supplier',
       categoryId: parsed.categoryId,
+      categoryType: CategoryType.SUPPLIER,
       cityId: parsed.cityId
     });
 
     const [uniqueSlug, coverImageId] = await Promise.all([
-      getUniqueSupplierSlug(slug),
+      findUniqueSlug(slug, async (candidate) =>
+        Boolean(
+          await prisma.supplier.findFirst({
+            where: { slug: candidate },
+            select: { id: true }
+          })
+        )
+      ),
       resolveCoverImageId({
         formData,
         userId: user.id,
@@ -142,7 +113,7 @@ export async function createSupplier(formData: FormData) {
         categoryId: nullableString(parsed.categoryId),
         cityId: nullableString(parsed.cityId),
         companyName: parsed.companyName,
-        websiteUrl: nullableString(parsed.websiteUrl),
+        websiteUrl: nullableString(websiteUrl),
         contactLabel: nullableString(parsed.contactLabel),
         isVerified: parsed.isVerified,
         serviceArea: nullableString(parsed.serviceArea),
@@ -189,6 +160,7 @@ export async function updateSupplier(formData: FormData) {
         isVerified: getString(formData, 'isVerified') === 'true',
         serviceArea: optionalString(getString(formData, 'serviceArea'))
       });
+    const websiteUrl = normalizeExternalUrlInput(parsed.websiteUrl);
     const slug = slugify(parsed.slug ?? parsed.title);
 
     if (!slug) {
@@ -201,13 +173,22 @@ export async function updateSupplier(formData: FormData) {
     });
     previousCoverImageId = existingSupplier.coverImageId;
 
-    await assertSupplierRelations({
+    await assertActiveContentRelations({
+      entityName: 'Supplier',
       categoryId: parsed.categoryId,
+      categoryType: CategoryType.SUPPLIER,
       cityId: parsed.cityId
     });
 
     const [uniqueSlug, coverImageId] = await Promise.all([
-      getUniqueSupplierSlug(slug, parsed.supplierId),
+      findUniqueSlug(slug, async (candidate) =>
+        Boolean(
+          await prisma.supplier.findFirst({
+            where: { slug: candidate, id: { not: parsed.supplierId } },
+            select: { id: true }
+          })
+        )
+      ),
       resolveCoverImageId({
         formData,
         userId: user.id,
@@ -230,7 +211,7 @@ export async function updateSupplier(formData: FormData) {
         categoryId: nullableString(parsed.categoryId),
         cityId: nullableString(parsed.cityId),
         companyName: parsed.companyName,
-        websiteUrl: nullableString(parsed.websiteUrl),
+        websiteUrl: nullableString(websiteUrl),
         contactLabel: nullableString(parsed.contactLabel),
         isVerified: parsed.isVerified,
         serviceArea: nullableString(parsed.serviceArea),

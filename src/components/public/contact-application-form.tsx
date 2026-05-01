@@ -15,24 +15,35 @@ import { InlineLink } from '@/components/ui/inline-link';
 import { Select } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 
-export function ContactApplicationForm({ enabled, result, utm, cities }: PublicApplicationFormProps) {
+const contactTopicOptions = [
+  'Предложить образовательный формат',
+  'Добавить событие',
+  'Разместить вакансию',
+  'Добавить поставщика',
+  'Обсудить партнёрство',
+  'Обсудить спонсорство',
+  'Предложить материал',
+  'Другое'
+] as const;
+
+export function ContactApplicationForm({ enabled, result, utm, cities, defaultTopic }: PublicApplicationFormProps) {
   return (
     <PublicApplicationSection
       eyebrow="Контакты / Сообщение"
-      title="Отправить сообщение команде"
-      description="Форма для вопросов по обучению, событиям, партнерству, поставщикам и другим рабочим темам."
+      title="Написать команде"
+      description="Вопросы по обучению, событиям, партнёрствам, вакансиям и поставщикам."
       enabled={enabled}
       result={result}
-      disabledDescription="Форма сейчас недоступна. Для связи используйте email команды."
-      disabledLink={{ href: 'mailto:hello@barsynergy.ru', label: 'Написать на email' }}
+      disabledDescription="Форма сейчас недоступна. Если вопрос срочный, напишите на email команды."
+      disabledLink={{ href: 'mailto:hello@barsynergy.ru', label: 'Написать на почту' }}
     >
       <form action={submitContactMessage} className="editorial-form-shell overflow-hidden">
         <HiddenUtmFields utm={utm} />
         <HoneypotField id="contact-message-website" />
         <PublicFormShellHeader
-          eyebrow="Рабочий запрос"
-          title="Контактное сообщение"
-          description="Для вопросов по обучению, событиям, партнерству и другим рабочим темам."
+          eyebrow="Сообщение"
+          title="О чём хотите написать"
+          description="Коротко опишите вопрос, задачу или идею."
         />
         <div className="relative p-5 md:p-6">
           <div className="grid gap-4 md:grid-cols-2">
@@ -40,7 +51,16 @@ export function ContactApplicationForm({ enabled, result, utm, cities }: PublicA
               <Input id="contactName" name="name" required maxLength={160} minLength={2} />
             </FormField>
             <FormField htmlFor="contactTopic" label="Тема">
-              <Input id="contactTopic" name="topic" required maxLength={180} minLength={2} />
+              <Select id="contactTopic" name="topic" defaultValue={defaultTopic ?? ''} required>
+                <option value="" disabled>
+                  Выберите тему обращения
+                </option>
+                {contactTopicOptions.map((topic) => (
+                  <option key={topic} value={topic}>
+                    {topic}
+                  </option>
+                ))}
+              </Select>
             </FormField>
             <FormField htmlFor="contactEmail" label="Email">
               <Input id="contactEmail" name="email" type="email" maxLength={180} />
@@ -68,13 +88,13 @@ export function ContactApplicationForm({ enabled, result, utm, cities }: PublicA
             </div>
             <div className="md:col-span-2">
               <ConsentField>
-                Согласен на обработку персональных данных для обработки сообщения. Текст{' '}
+                Даю согласие на обработку персональных данных, чтобы команда могла ответить на сообщение. Полный текст{' '}
                 <InlineLink href="/legal/personal-data-consent">согласия</InlineLink>
                 .
               </ConsentField>
             </div>
           </div>
-          <PublicFormShellFooter note="Если нужна быстрая обратная связь, укажите удобный канал связи прямо в заявке.">
+          <PublicFormShellFooter note="Если хотите получить ответ быстрее, оставьте удобный способ связи.">
             <Button className="min-h-12 rounded-full px-6 tracking-[0.12em] sm:self-start" type="submit">
               Отправить сообщение
             </Button>

@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
+const { dispatchApplicationCreatedNotification } = await import('../src/lib/notifications/application-notification-dispatch.ts');
 const {
   buildAdminApplicationTelegramMessage,
   hasSmtpNotificationConfig,
@@ -57,4 +58,52 @@ test('admin telegram message contains only summary fields and admin link', () =>
   assert.match(message, /Пятигорск/);
   assert.match(message, /\/admin\/applications\/app-1/);
   assert.doesNotMatch(message, /@/);
+});
+
+test('dispatchApplicationCreatedNotification does not block caller and logs unexpected setup failures', async () => {
+  const input = {
+    applicationId: 'app-2',
+    applicationTypeLabel: 'Отклик',
+    subject: 'Отклик: Бармен'
+  };
+
+  let notifyStarted = false;
+  let resolveNotify;
+  const silentLoggerCalls = [];
+
+  dispatchApplicationCreatedNotification(input, {
+    notify: () => {
+      notifyStarted = true;
+
+      return new Promise((resolve) => {
+        resolveNotify = resolve;
+      });
+    },
+    logger: {
+      error: (...args) => silentLoggerCalls.push(args)
+    }
+  });
+
+  assert.equal(notifyStarted, true);
+  assert.equal(silentLoggerCalls.length, 0);
+
+  resolveNotify();
+  await Promise.resolve();
+
+  const loggedErrors = [];
+  dispatchApplicationCreatedNotification(input, {
+    notify: async () => {
+      throw new Error('boom');
+    },
+    logger: {
+      error: (...args) => loggedErrors.push(args)
+    }
+  });
+
+  await Promise.resolve();
+  await Promise.resolve();
+
+  assert.equal(loggedErrors.length, 1);
+  assert.equal(loggedErrors[0][0], 'Application notification dispatch failed.');
+  assert.match(String(loggedErrors[0][1]), /boom/);
 });

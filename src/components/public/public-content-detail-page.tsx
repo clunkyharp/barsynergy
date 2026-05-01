@@ -122,7 +122,7 @@ export function PublicContentDetailPage({
             <Panel className="min-h-[260px] border-dashed md:min-h-[360px]" padding="lg">
               <PublicEyebrow tone="muted">Материал</PublicEyebrow>
               <PublicBodyText className="mt-4 max-w-md">
-                Для этой записи пока нет отдельного изображения. Основной контент и действия доступны ниже.
+                Отдельной обложки пока нет. Всё основное уже ниже на странице.
               </PublicBodyText>
             </Panel>
           )}
@@ -143,8 +143,7 @@ export function PublicContentDetailPage({
               </div>
             ) : (
               <PublicBodyText className="max-w-3xl text-[var(--text)]" size="md" tone="default">
-                Дополнительный текст для этой записи пока не опубликован. Используйте метаданные и действия справа, чтобы перейти к
-                следующему шагу.
+                Подробный текст пока не добавлен. Основная информация уже есть выше, вместе с метками и ссылками.
               </PublicBodyText>
             )}
           </div>
@@ -163,7 +162,7 @@ export function PublicContentDetailPage({
                 </dl>
               ) : (
                 <PublicBodyText className="mt-4">
-                  Для этой записи пока нет отдельного набора фактов. Основная информация дана в описании и метках выше.
+                  Отдельного блока с фактами пока нет. Главное уже указано в описании и метках выше.
                 </PublicBodyText>
               )}
             </Panel>

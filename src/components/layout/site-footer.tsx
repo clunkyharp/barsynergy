@@ -22,12 +22,12 @@ export function SiteFooter() {
           <div className="container grid min-h-[320px] gap-8 py-14 md:py-18 lg:grid-cols-[1fr_0.9fr_0.62fr] lg:items-center">
           <div>
             <h2 className={`${displayFont.className} display-tight max-w-3xl text-[38px] md:text-[56px] xl:text-[64px]`}>
-              Обратная связь с командой BARSYNERGY
+              Напишите команде BARSYNERGY
             </h2>
             </div>
             <div className="flex h-full flex-col justify-end">
               <p className="max-w-lg pb-1 text-base leading-8 text-white/76 md:text-lg">
-                Напишите, если нужно добавить программу, событие, вакансию, поставщика, партнерство или спонсорский формат.
+                Если хотите обсудить программу, событие, вакансию, поставщика, партнёрство или спонсорство, напишите нам.
               </p>
             </div>
             <div className="flex h-full items-end lg:justify-end">
@@ -47,7 +47,7 @@ export function SiteFooter() {
           <div>
             <p className={`${accentFont.className} text-base uppercase tracking-[0.18em] text-white`}>BARSYNERGY</p>
             <p className="mt-3 max-w-xl text-sm leading-7 text-white/62">
-              Обучение, события, материалы и деловые контакты для барной индустрии СКФО.
+              Обучение, события, материалы и полезные контакты для барной индустрии СКФО.
             </p>
           </div>
           <nav className="grid gap-0.5 text-sm leading-6 text-white/72 md:justify-items-end md:text-right">

@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
-import { ContentStatus, FileVisibility, StorageDriver } from '@prisma/client';
+import { CategoryType, ContentStatus, FileVisibility, StorageDriver } from '@prisma/client';
 import { ZodError } from 'zod';
 import { prisma } from '@/lib/db/prisma';
 import { isAllowedPublicImageUpload } from '@/lib/storage/file-signatures';
@@ -92,6 +92,48 @@ export function slugify(value: string) {
     .replace(/^-+|-+$/g, '');
 }
 
+export async function findUniqueSlug(baseSlug: string, exists: (candidate: string) => Promise<boolean>) {
+  let candidate = baseSlug;
+  let suffix = 2;
+
+  while (await exists(candidate)) {
+    candidate = `${baseSlug}-${suffix}`;
+    suffix += 1;
+  }
+
+  return candidate;
+}
+
+export async function assertActiveContentRelations(input: {
+  entityName: string;
+  categoryId?: string;
+  categoryType?: CategoryType;
+  cityId?: string;
+}) {
+  const [category, city] = await Promise.all([
+    input.categoryId && input.categoryType
+      ? prisma.category.findFirst({
+          where: { id: input.categoryId, type: input.categoryType, isActive: true },
+          select: { id: true }
+        })
+      : null,
+    input.cityId
+      ? prisma.city.findFirst({
+          where: { id: input.cityId, isActive: true },
+          select: { id: true }
+        })
+      : null
+  ]);
+
+  if (input.categoryId && !category) {
+    throw new Error(`${input.entityName} category is invalid.`);
+  }
+
+  if (input.cityId && !city) {
+    throw new Error(`${input.entityName} city is invalid.`);
+  }
+}
+
 export function initialPublicationDates(status: ContentStatus) {
   const now = new Date();
 
@@ -152,6 +194,10 @@ export function formatAdminActionError(error: unknown) {
   }
 
   if (error instanceof Error) {
+    if (error.message.includes('External URL must use http or https')) {
+      return 'Укажите корректный внешний адрес с http:// или https://.';
+    }
+
     if (error.message.includes('draft is invalid')) {
       return 'Черновик не найден или уже недоступен для удаления.';
     }

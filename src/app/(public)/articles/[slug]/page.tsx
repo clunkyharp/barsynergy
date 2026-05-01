@@ -35,7 +35,6 @@ export default async function ArticleDetailPage({ params }: ArticleDetailPagePro
       />
       <PublicRelatedContentSection
         basePath="/articles"
-        description="Другие материалы помогают продолжить чтение без возврата к пустому состоянию после статьи."
         items={relatedItems}
         title="Еще по теме"
       />

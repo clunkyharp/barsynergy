@@ -43,7 +43,7 @@ export function VacancyApplicationForms({ enabled, options, result, utm }: Vacan
     <PublicApplicationSection
       eyebrow="Вакансии / Заявки"
       title="Отклик и размещение"
-      description="Кандидаты могут откликнуться на открытую роль, а заведения отправить новую вакансию на сайт."
+      description="Здесь можно откликнуться на вакансию или отправить свою на публикацию."
       enabled={enabled}
       result={result}
     >
@@ -54,14 +54,14 @@ export function VacancyApplicationForms({ enabled, options, result, utm }: Vacan
               value: 'response',
               eyebrow: 'Для кандидатов',
               label: 'Откликнуться на вакансию',
-              description: hasVacancies ? 'Открытые роли из списка ниже.' : 'Форма откроется, когда в разделе появятся новые позиции.',
+              description: hasVacancies ? 'Открытые вакансии из списка ниже.' : 'Форма появится, когда в разделе будут новые вакансии.',
               disabled: !hasVacancies
             },
             {
               value: 'submission',
               eyebrow: 'Для заведений',
               label: 'Разместить вакансию',
-              description: 'Компания, роль, условия и контакт для связи.'
+              description: 'Роль, условия и контакт для связи.'
             }
           ]}
           onChange={setMode}
@@ -76,7 +76,7 @@ export function VacancyApplicationForms({ enabled, options, result, utm }: Vacan
               <PublicFormShellHeader
                 eyebrow="Для кандидатов"
                 title="Отклик на вакансию"
-                description="Выбранная роль, контакт и короткое сообщение работодателю."
+                description="Выберите вакансию, оставьте контакт и пару слов о себе."
               />
               <div className="relative p-5 md:p-6">
                 <div className="grid gap-4">
@@ -91,7 +91,7 @@ export function VacancyApplicationForms({ enabled, options, result, utm }: Vacan
                       ))}
                     </Select>
                   </FormField>
-                  <FormField htmlFor="candidateName" label="Имя кандидата">
+                  <FormField htmlFor="candidateName" label="Имя">
                     <Input id="candidateName" name="candidateName" required maxLength={160} minLength={2} />
                   </FormField>
                   <div className="grid gap-4 sm:grid-cols-2">
@@ -117,7 +117,7 @@ export function VacancyApplicationForms({ enabled, options, result, utm }: Vacan
                       </Select>
                     </FormField>
                   </div>
-                  <FormField htmlFor="roleSummary" label="Опыт или текущая роль">
+                  <FormField htmlFor="roleSummary" label="Опыт и текущая роль">
                     <Textarea id="roleSummary" name="roleSummary" required maxLength={500} minLength={4} />
                   </FormField>
                   <FormField htmlFor="responseMessage" label="Сообщение работодателю">
@@ -129,7 +129,7 @@ export function VacancyApplicationForms({ enabled, options, result, utm }: Vacan
                   <FormField
                     htmlFor="resumeFile"
                     label="Файл резюме"
-                    hint="Поддерживаются PDF, DOC, DOCX, RTF и ODT. Можно оставить поле пустым, если уже приложили ссылку."
+                    hint="Поддерживаются PDF, DOC, DOCX, RTF и ODT. Можно приложить файл или оставить ссылку выше."
                   >
                     <Input
                       id="resumeFile"
@@ -139,7 +139,7 @@ export function VacancyApplicationForms({ enabled, options, result, utm }: Vacan
                     />
                   </FormField>
                   <ConsentField>
-                    Согласен на обработку данных и передачу отклика работодателю. Текст{' '}
+                    Даю согласие на обработку данных и передачу отклика работодателю. Полный текст{' '}
                     <InlineLink href="/legal/personal-data-consent">согласия</InlineLink>.
                   </ConsentField>
                 </div>
@@ -154,8 +154,8 @@ export function VacancyApplicationForms({ enabled, options, result, utm }: Vacan
             <EditorialShell className="p-5 md:p-6">
               <h3 className="text-xl font-semibold uppercase leading-7">Пока нет открытых вакансий</h3>
               <p className="mt-3 max-w-2xl text-sm leading-7 text-[var(--muted)]">
-                Как только в разделе появятся новые позиции, здесь откроется отклик. Пока можно следить за разделом или
-                написать команде напрямую.
+                Сейчас открытых вакансий нет. Как только они появятся, отклик станет доступен здесь. Пока можно следить за разделом
+                или написать команде.
               </p>
               <div className="mt-5 flex flex-col gap-3 sm:flex-row">
                 <Button className="rounded-full" href="#vacancy-list" size="lg" variant="secondary">
@@ -174,7 +174,7 @@ export function VacancyApplicationForms({ enabled, options, result, utm }: Vacan
           <PublicFormShellHeader
             eyebrow="Для заведений"
             title="Разместить вакансию"
-            description="Компания, роль, формат работы и условия для размещения на сайте."
+            description="Оставьте роль, условия и контакт. Если понадобится, детали уточним отдельно."
           />
           <div className="relative p-5 md:p-6">
             <div className="grid gap-4">
@@ -222,20 +222,20 @@ export function VacancyApplicationForms({ enabled, options, result, utm }: Vacan
                   <Input id="employmentType" name="employmentType" maxLength={100} placeholder="Полная занятость" />
                 </FormField>
                 <FormField htmlFor="salaryLabel" label="Зарплата">
-                  <Input id="salaryLabel" name="salaryLabel" maxLength={120} placeholder="По договоренности" />
+                  <Input id="salaryLabel" name="salaryLabel" maxLength={120} placeholder="По договорённости" />
                 </FormField>
               </div>
               <FormField htmlFor="experienceLabel" label="Опыт">
                 <Input id="experienceLabel" name="experienceLabel" maxLength={120} />
               </FormField>
-              <FormField htmlFor="shortDescription" label="Краткое описание">
+              <FormField htmlFor="shortDescription" label="Описание роли">
                 <Textarea id="shortDescription" name="shortDescription" required maxLength={500} minLength={10} />
               </FormField>
-              <FormField htmlFor="details" label="Детали вакансии">
+              <FormField htmlFor="details" label="Что важно знать о вакансии">
                 <Textarea id="details" name="details" required className="min-h-40" maxLength={4000} minLength={20} />
               </FormField>
               <ConsentField>
-                Согласен на обработку персональных данных для обработки заявки. Текст{' '}
+                Даю согласие на обработку персональных данных для этой заявки. Полный текст{' '}
                 <InlineLink href="/legal/personal-data-consent">согласия</InlineLink>.
               </ConsentField>
             </div>

@@ -1,5 +1,7 @@
-import { readFile } from 'node:fs/promises';
+import { createReadStream } from 'node:fs';
+import { access } from 'node:fs/promises';
 import path from 'node:path';
+import { Readable } from 'node:stream';
 import { FileVisibility, StorageDriver } from '@prisma/client';
 import { prisma } from '@/lib/db/prisma';
 import { getEnv } from '@/lib/validation/env';
@@ -15,6 +17,10 @@ function resolveLocalUploadPath(fileKey: string) {
   }
 
   return absolutePath;
+}
+
+function asResponseBody(stream: ReturnType<typeof Readable.toWeb>) {
+  return stream as unknown as ReadableStream<Uint8Array>;
 }
 
 export async function GET(_request: Request, context: { params: Promise<{ fileKey?: string[] }> }) {
@@ -46,8 +52,9 @@ export async function GET(_request: Request, context: { params: Promise<{ fileKe
   }
 
   try {
-    const body = await readFile(/* turbopackIgnore: true */ absolutePath);
-    return new Response(body, {
+    await access(/* turbopackIgnore: true */ absolutePath);
+
+    return new Response(asResponseBody(Readable.toWeb(createReadStream(/* turbopackIgnore: true */ absolutePath))), {
       headers: {
         'Cache-Control': 'public, max-age=3600',
         'Content-Length': String(file.size),

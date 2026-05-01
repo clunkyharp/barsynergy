@@ -28,6 +28,27 @@ export async function updateBusinessUserAccess(formData: FormData) {
       userId: getString(formData, 'userId'),
       status: getString(formData, 'status')
     });
+    const currentUser = await prisma.user.findUnique({
+      where: { id: parsed.userId },
+      select: {
+        status: true,
+        businessAccount: {
+          select: { status: true }
+        }
+      }
+    });
+
+    if (!currentUser?.businessAccount) {
+      throw new Error('business account is missing');
+    }
+
+    if (
+      parsed.status === 'active' &&
+      (currentUser.status === UserStatus.PENDING || currentUser.businessAccount.status === BusinessAccountStatus.PENDING)
+    ) {
+      throw new Error('pending business activation is disabled');
+    }
+
     const userStatus = parsed.status === 'active' ? UserStatus.ACTIVE : UserStatus.BLOCKED;
     const businessStatus = parsed.status === 'active' ? BusinessAccountStatus.ACTIVE : BusinessAccountStatus.BLOCKED;
 
@@ -47,7 +68,15 @@ export async function updateBusinessUserAccess(formData: FormData) {
       type: 'success',
       message: parsed.status === 'active' ? 'Бизнес-доступ открыт.' : 'Бизнес-доступ заблокирован.'
     };
-  } catch {
+  } catch (error) {
+    if (error instanceof Error && error.message === 'pending business activation is disabled') {
+      result = {
+        type: 'error',
+        message: 'Для новых заявок доступ больше не открывается напрямую. Сначала завершите отдельную подготовку доступа.'
+      };
+      redirectWithAdminActionResult(redirectTo, result);
+    }
+
     result = {
       type: 'error',
       message: 'Не удалось изменить доступ. Проверьте, что у пользователя есть бизнес-аккаунт.'

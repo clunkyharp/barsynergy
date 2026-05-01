@@ -14,9 +14,9 @@ import { prisma } from '@/lib/db/prisma';
 import { getEnv } from '@/lib/validation/env';
 
 const errorMessages: Record<string, string> = {
-  invalid: 'Проверьте обязательные поля, email, сайт и пароль от 8 символов.',
-  exists: 'Пользователь с таким email уже существует.',
-  disabled: 'Форма заявок сейчас недоступна. Для подключения используйте контакты команды.',
+  invalid: 'Проверьте обязательные поля, email и сайт.',
+  disabled: 'Форма сейчас недоступна. Если доступ нужен, свяжитесь с командой.',
+  failed: 'Не удалось отправить заявку прямо сейчас. Попробуйте позже.',
   'rate-limited': 'Слишком много заявок за короткое время. Повторите позже.'
 };
 
@@ -48,7 +48,7 @@ export default async function RegisterPage({ searchParams }: RegisterPageProps) 
           <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Бизнес-аккаунт</p>
           <h1 className="mt-4 text-4xl font-semibold leading-tight md:text-5xl">Запросить доступ</h1>
           <p className="mt-4 max-w-md text-base leading-7 text-[var(--muted)]">
-            Оставьте данные компании, чтобы команда могла связаться с вами и открыть доступ к кабинету.
+            Оставьте данные компании. После этого команда свяжется с вами и поможет открыть кабинет.
           </p>
           <div className="mt-8 border-t border-black/10 pt-5">
             <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Что указать</p>
@@ -98,7 +98,7 @@ export default async function RegisterPage({ searchParams }: RegisterPageProps) 
                 <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Заявка на доступ</p>
                 <h2 className="mt-3 text-2xl font-semibold uppercase leading-8">Данные компании</h2>
                 <p className="mt-3 max-w-xl text-sm leading-7 text-[var(--muted)]">
-                  После проверки вы получите доступ к кабинету компании и своим заявкам.
+                  После проверки мы свяжемся с вами и объясним, как открыть кабинет.
                 </p>
               </div>
               <div className="p-5 md:p-6">
@@ -117,9 +117,6 @@ export default async function RegisterPage({ searchParams }: RegisterPageProps) 
                     </FormField>
                     <FormField htmlFor="email" label="Email для входа">
                       <Input id="email" name="email" type="email" autoComplete="email" required />
-                    </FormField>
-                    <FormField htmlFor="password" label="Пароль" hint="Минимум 8 символов. Лучше использовать уникальный пароль для кабинета.">
-                      <Input id="password" name="password" type="password" minLength={8} autoComplete="new-password" required />
                     </FormField>
                     <FormField htmlFor="cityId" label="Город">
                       <Select id="cityId" name="cityId">
@@ -146,13 +143,13 @@ export default async function RegisterPage({ searchParams }: RegisterPageProps) 
                   </FormField>
                   <ConsentField>
                     <span>
-                      Согласен на обработку персональных данных для рассмотрения заявки. Текст согласия доступен на странице{' '}
+                      Даю согласие на обработку персональных данных для рассмотрения заявки. Полный текст есть на странице{' '}
                       <InlineLink href="/legal/personal-data-consent">согласия на обработку ПДн</InlineLink>.
                     </span>
                   </ConsentField>
                   <ActionRow align="between">
                     <p className="max-w-md text-xs leading-6 text-[var(--muted)]">
-                      Используйте email, который потом будете использовать для входа в кабинет.
+                      Лучше указать рабочий email: на него команда пришлёт ответ по доступу.
                     </p>
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                       <Button className="rounded-full" size="lg" type="submit">

@@ -14,11 +14,11 @@ export const metadata: Metadata = {
     template: '%s | BARSYNERGY'
   },
   description:
-    'BARSYNERGY собирает образование, события, статьи, вакансии, поставщиков и партнерские запросы для барной индустрии СКФО.',
+    'BARSYNERGY объединяет обучение, события, вакансии, статьи, поставщиков и партнёрства для барной индустрии СКФО.',
   openGraph: {
     title: 'BARSYNERGY',
     description:
-      'Обучение, события, вакансии и рабочие контакты для барной индустрии СКФО.',
+      'Обучение, события, вакансии и полезные контакты для барной индустрии СКФО.',
     url: env.APP_URL,
     siteName: 'BARSYNERGY',
     images: [{ url: '/og-preview.svg', width: 1200, height: 630 }],

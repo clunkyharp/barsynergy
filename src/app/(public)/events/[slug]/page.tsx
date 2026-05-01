@@ -34,7 +34,6 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
       />
       <PublicRelatedContentSection
         basePath="/events"
-        description="Следующие события удерживают пользователя в афише и дают альтернативу, если текущий формат не подходит."
         items={relatedItems}
         title="Еще события"
       />

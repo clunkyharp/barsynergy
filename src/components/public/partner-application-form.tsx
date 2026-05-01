@@ -34,7 +34,7 @@ export function PartnerApplicationForm({ enabled, result, utm, cities }: PublicA
     <PublicApplicationSection
       eyebrow="Партнеры / Заявка"
       title="Обсудить партнерство"
-      description="Форма для брендов, школ и заведений: совместный проект, размещение, событие или программа."
+      description="Для брендов, школ и заведений: совместный проект, событие, размещение или программа."
       enabled={enabled}
       result={result}
     >
@@ -48,7 +48,7 @@ export function PartnerApplicationForm({ enabled, result, utm, cities }: PublicA
               Формат для брендов, школ и заведений
             </PublicDisplayTitle>
             <PublicBodyText className="mt-4 max-w-md" tone="inverse">
-              Опишите идею коротко и по делу. Команда начнет обсуждение с этой заявки.
+              Коротко опишите идею. С этого сообщения начнётся разговор.
             </PublicBodyText>
 
             <div className="mt-6 flex flex-wrap gap-2">
@@ -119,12 +119,12 @@ export function PartnerApplicationForm({ enabled, result, utm, cities }: PublicA
               </div>
               <div className="md:col-span-2 border-t border-black/10 pt-1">
                 <ConsentField>
-                  Согласен на обработку персональных данных для обработки заявки. Текст{' '}
+                  Даю согласие на обработку персональных данных для этой заявки. Полный текст{' '}
                   <InlineLink href="/legal/personal-data-consent">согласия</InlineLink>
                   .
                 </ConsentField>
               </div>
-              <PublicFormShellFooter className="md:col-span-2" note="После отправки мы свяжемся с вами и обсудим следующий шаг.">
+              <PublicFormShellFooter className="md:col-span-2" note="После отправки напишем вам и обсудим детали.">
                 <Button type="submit">Отправить заявку</Button>
               </PublicFormShellFooter>
             </div>

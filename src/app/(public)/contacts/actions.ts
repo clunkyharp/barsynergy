@@ -7,12 +7,12 @@ import { createPublicApplication } from '@/lib/applications/create-public-applic
 import {
   assertActiveCity,
   baseContactSchema,
-  formatPublicApplicationActionError,
   getPublicApplicationResultPath,
   getString,
   nullableString,
   optionalString,
   PERSONAL_DATA_CONSENT_TEXT,
+  resolvePublicApplicationActionError,
   utmSchema
 } from '@/lib/applications/public-form-helpers';
 import {
@@ -45,7 +45,7 @@ export async function submitContactMessage(formData: FormData) {
     assertPublicApplicationFormsEnabled();
 
     if (hasHoneypotValue(getString(formData, 'website'))) {
-      result = { type: 'success', message: 'Сообщение отправлено.' };
+      result = { type: 'success', message: 'Сообщение отправлено. Если понадобится, мы свяжемся с вами.' };
       redirectWithContactsResult(result);
     }
 
@@ -86,9 +86,9 @@ export async function submitContactMessage(formData: FormData) {
       }
     });
 
-    result = { type: 'success', message: 'Сообщение отправлено.' };
+    result = { type: 'success', message: 'Сообщение отправлено. Если понадобится, мы свяжемся с вами.' };
   } catch (error) {
-    result = { type: 'error', message: formatPublicApplicationActionError(error) };
+    result = { type: 'error', message: resolvePublicApplicationActionError('public:contact-message', error) };
   }
 
   redirectWithContactsResult(result);

@@ -23,18 +23,18 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
       <EditorialPublicPage
         eyebrow="События"
         title="Афиша встреч, лекций и индустриальных событий"
-        description="Публичный раздел мероприятий: встречи, лекции и отраслевые форматы для специалистов и команд."
-        summary="Здесь публикуются встречи, лекции, дегустации и партнерские события с понятным форматом участия."
+        description="Встречи, лекции и другие события для специалистов и команд."
+        summary="Здесь публикуются лекции, дегустации и партнёрские события со всей основной информацией."
         metrics={[
           { value: 'СКФО', label: 'регион событий' },
           { value: 'Открыто', label: 'форматы участия' },
-          { value: 'Афиша', label: 'публичный раздел' }
+          { value: 'Афиша', label: 'раздел событий' }
         ]}
         rows={[
           {
             label: 'Тип',
             title: 'Открытые встречи',
-            description: 'Встречи для знакомства, обмена опытом и обсуждения рабочих задач заведений.'
+            description: 'Встречи для знакомства, обмена опытом и обсуждения рабочих задач.'
           },
           {
             label: 'Тип',
@@ -44,17 +44,25 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
           {
             label: 'Тип',
             title: 'Партнерские мероприятия',
-            description: 'Форматы для школ, брендов и заведений с персональной координацией по каждому запросу.'
+            description: 'События для школ, брендов и заведений с отдельной координацией.'
           }
         ]}
         primaryLink={{ label: 'Смотреть афишу', href: '#events-list' }}
         secondaryLink={{ label: 'Партнерство', href: '/partners' }}
       />
-      <Suspense fallback={<div className="container py-6">Загрузка фильтров...</div>}>
+      <Suspense
+        fallback={
+          <section className="editorial-grid border-b border-black/20 py-10 md:py-14">
+            <div className="container">
+              <div aria-hidden="true" className="h-40 animate-pulse rounded-[var(--radius-xl)] bg-black/6" />
+            </div>
+          </section>
+        }
+      >
         <PublishedContentSection
           basePath="/events"
           content={content}
-          emptyDescription="Когда появятся новые события, они отобразятся здесь."
+          emptyDescription="Когда появятся новые события, они будут здесь."
           emptyTitle="Событий пока нет"
           filters={
             <PublicFilters

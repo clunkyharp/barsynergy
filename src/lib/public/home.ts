@@ -35,47 +35,47 @@ export type HomepageData = {
 const fallbackCards: Record<HomepageCardKind, Omit<HomepageLiveCard, 'kind'>> = {
   course: {
     eyebrow: 'Образование',
-    title: 'Программы для команд и специалистов',
-    summary: 'Когда появятся новые курсы и интенсивы, они будут показаны здесь. Пока можно открыть раздел и посмотреть формат платформы.',
-    meta: ['Очные и онлайн-форматы', 'СКФО'],
+    title: 'Обучение для команд и специалистов',
+    summary: 'Здесь собраны интенсивы, корпоративные программы и материалы, к которым можно возвращаться в работе.',
+    meta: ['Очные и онлайн-занятия', 'СКФО'],
     href: '/education',
-    actionLabel: 'Перейти в раздел образования',
+    actionLabel: 'Открыть образование',
     isFallback: true
   },
   event: {
     eyebrow: 'События',
-    title: 'Ближайшие встречи и отраслевые форматы',
-    summary: 'Здесь будет появляться ближайшее событие. Если афиша еще не заполнена, раздел все равно остается точкой входа в будущую программу.',
+    title: 'Ближайшие встречи и события',
+    summary: 'В разделе есть лекции, гостевые смены, дегустации и встречи по городам региона.',
     meta: ['Афиша обновляется', 'СКФО'],
     href: '/events',
-    actionLabel: 'Открыть афиши',
+    actionLabel: 'Открыть события',
     isFallback: true
   },
   article: {
     eyebrow: 'Знания',
-    title: 'Материалы, интервью и практические разборы',
-    summary: 'Витрина знаний подключается к живым публикациям. Пока новых материалов нет, но раздел уже можно использовать как вход в медийную часть.',
-    meta: ['Открытый доступ', 'Редакционные материалы'],
+    title: 'Материалы, интервью и рабочие разборы',
+    summary: 'Тексты о сервисе, команде, меню, управлении и том, что реально работает в регионе.',
+    meta: ['BARSYNERGY Index', 'Открытый доступ'],
     href: '/articles',
-    actionLabel: 'Перейти в раздел знаний',
+    actionLabel: 'Открыть знания',
     isFallback: true
   },
   vacancy: {
     eyebrow: 'Вакансии',
-    title: 'Открытые роли для баров и команд региона',
-    summary: 'Если сейчас нет опубликованных вакансий, этот блок все равно ведет в рабочий job-flow с откликами и размещением.',
-    meta: ['Для кандидатов и бизнеса', 'СКФО'],
+    title: 'Вакансии для баров и команд региона',
+    summary: 'Здесь можно откликнуться на открытую роль или отправить заявку на публикацию вакансии.',
+    meta: ['Для кандидатов и компаний', 'СКФО'],
     href: '/vacancies',
-    actionLabel: 'Перейти к вакансиям',
+    actionLabel: 'Открыть вакансии',
     isFallback: true
   },
   supplier: {
     eyebrow: 'Поставщики',
     title: 'Каталог компаний, сервисов и полезных контактов',
-    summary: 'В этом блоке показывается заметный поставщик. Если каталог еще пуст, пользователь все равно попадает в рабочий вход для B2B-запросов.',
-    meta: ['Каталог для закупок', 'B2B'],
+    summary: 'Компании и сервисы, с которыми проще закрывать закупки, расходники и оборудование по региону.',
+    meta: ['Закупки и сервис', 'B2B'],
     href: '/suppliers',
-    actionLabel: 'Открыть каталог',
+    actionLabel: 'Открыть поставщиков',
     isFallback: true
   }
 };
@@ -123,12 +123,18 @@ export async function getHomepageData(): Promise<HomepageData> {
   const partnerSignals =
     partners.items.length > 0
       ? partners.items.map((item) => item.title)
-      : ['Партнерские программы', 'Локальные бренды', 'Школы и площадки', 'B2B-интеграции'];
+      : ['Партнёрские программы', 'Локальные бренды', 'Школы и площадки', 'Совместные проекты'];
 
   return {
     course: toHomepageCard(courses.items[0], 'course', '/education', 'Открыть программы', 'Образование'),
     event: toHomepageCard(featuredEvent, 'event', '/events', 'Открыть афиши', 'Ближайшее событие'),
-    article: toHomepageCard(articles.items[0], 'article', '/articles', 'Читать материал', 'Новый материал'),
+    article: toHomepageCard(
+      articles.items[0],
+      'article',
+      articles.items[0] ? `/articles/${articles.items[0].slug}` : '/articles',
+      'Читать материал',
+      'BARSYNERGY Index'
+    ),
     vacancy: toHomepageCard(vacancies.items[0], 'vacancy', '/vacancies', 'Откликнуться на вакансию', 'Открытая вакансия'),
     supplier: toHomepageCard(featuredSupplier, 'supplier', '/suppliers', 'Открыть поставщика', 'Поставщик недели'),
     partnerSignals

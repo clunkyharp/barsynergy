@@ -24,15 +24,26 @@ docker compose --env-file .env.production -f docker-compose.production.yml exec 
 
 Migration command must run inside the `app` container because production `DATABASE_URL` resolves `postgres` inside Docker network, not on the host.
 
-## TLS Note (Current State)
+## Supported Ingress Contract (Current Repository State)
 
-Current repository state:
+Current repository state supports one ingress mode only:
 
 - `docker-compose.production.yml` publishes `80`;
 - `docker/nginx/nginx.conf` listens only on `80`;
-- TLS is expected to terminate on an external edge proxy or load balancer.
+- TLS terminates on one trusted external edge proxy or load balancer;
+- the external edge forwards `X-Forwarded-For` and `X-Forwarded-Proto`;
+- app-side Nginx stays on private HTTP and appends its hop with `$proxy_add_x_forwarded_for`;
+- Next.js and server actions treat the first IP in `X-Forwarded-For` as the client IP for throttling and request identity.
 
-Treat this as `Needs verification` until the production host is configured: confirm the external TLS layer and keep the app-side Nginx private HTTP only, or add TLS listener/cert paths in Nginx config if TLS must terminate in this compose stack.
+Unsupported production mode for the current repo:
+
+- exposing this compose Nginx directly to the public internet without a trusted edge in front of it.
+
+Before production sign-off, verify on the real host that:
+
+- public traffic cannot bypass the trusted edge and hit the compose Nginx directly;
+- the trusted edge preserves `X-Forwarded-For`;
+- application logs and throttling see the real client IP instead of the edge proxy IP.
 
 ## Future Multi-Server And HA Plan
 
@@ -48,7 +59,7 @@ This is enough for the first launch, but it is not true high availability. If th
 
 For a later fault-tolerant setup, split the system into separate roles:
 
-- Load Balancer or external edge proxy in front of the app servers;
+- one trusted Load Balancer or external edge proxy in front of the app servers;
 - at least two `app` servers in different zones or on different cloud nodes;
 - PostgreSQL outside the local app server Docker Compose stack;
 - Timeweb Cloud Object Storage or another Russia-compatible S3 storage as the persistent file layer;

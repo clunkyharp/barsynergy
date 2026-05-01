@@ -4,8 +4,10 @@ import { revalidatePath } from 'next/cache';
 import { CategoryType, ContentStatus } from '@prisma/client';
 import { z } from 'zod';
 import {
+  assertActiveContentRelations,
   contentStatusValues,
   deleteUploadedFileIfUnused,
+  findUniqueSlug,
   formatAdminActionError,
   getString,
   initialPublicationDates,
@@ -45,48 +47,6 @@ const deleteFormSchema = z.object({
   articleId: z.string().trim().min(1)
 });
 
-async function getUniqueArticleSlug(baseSlug: string, excludeId?: string) {
-  let candidate = baseSlug;
-  let suffix = 2;
-
-  while (
-    await prisma.article.findFirst({
-      where: { slug: candidate, id: excludeId ? { not: excludeId } : undefined },
-      select: { id: true }
-    })
-  ) {
-    candidate = `${baseSlug}-${suffix}`;
-    suffix += 1;
-  }
-
-  return candidate;
-}
-
-async function assertArticleRelations(input: { categoryId?: string; cityId?: string }) {
-  const [category, city] = await Promise.all([
-    input.categoryId
-      ? prisma.category.findFirst({
-          where: { id: input.categoryId, type: CategoryType.ARTICLE, isActive: true },
-          select: { id: true }
-        })
-      : null,
-    input.cityId
-      ? prisma.city.findFirst({
-          where: { id: input.cityId, isActive: true },
-          select: { id: true }
-        })
-      : null
-  ]);
-
-  if (input.categoryId && !category) {
-    throw new Error('Article category is invalid.');
-  }
-
-  if (input.cityId && !city) {
-    throw new Error('Article city is invalid.');
-  }
-}
-
 export async function createArticle(formData: FormData) {
   const redirectTo = safeAdminRedirectPath(formData, ADMIN_ARTICLES_PATH);
   let result: { type: 'success' | 'error'; message: string };
@@ -112,13 +72,22 @@ export async function createArticle(formData: FormData) {
       throw new Error('Article slug is required.');
     }
 
-    await assertArticleRelations({
+    await assertActiveContentRelations({
+      entityName: 'Article',
       categoryId: parsed.categoryId,
+      categoryType: CategoryType.ARTICLE,
       cityId: parsed.cityId
     });
 
     const [uniqueSlug, coverImageId] = await Promise.all([
-      getUniqueArticleSlug(slug),
+      findUniqueSlug(slug, async (candidate) =>
+        Boolean(
+          await prisma.article.findFirst({
+            where: { slug: candidate },
+            select: { id: true }
+          })
+        )
+      ),
       resolveCoverImageId({
         formData,
         userId: user.id,
@@ -196,13 +165,22 @@ export async function updateArticle(formData: FormData) {
     });
     previousCoverImageId = existingArticle.coverImageId;
 
-    await assertArticleRelations({
+    await assertActiveContentRelations({
+      entityName: 'Article',
       categoryId: parsed.categoryId,
+      categoryType: CategoryType.ARTICLE,
       cityId: parsed.cityId
     });
 
     const [uniqueSlug, coverImageId] = await Promise.all([
-      getUniqueArticleSlug(slug, parsed.articleId),
+      findUniqueSlug(slug, async (candidate) =>
+        Boolean(
+          await prisma.article.findFirst({
+            where: { slug: candidate, id: { not: parsed.articleId } },
+            select: { id: true }
+          })
+        )
+      ),
       resolveCoverImageId({
         formData,
         userId: user.id,

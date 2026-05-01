@@ -25,8 +25,8 @@ export default async function ArticlesPage({ searchParams }: ArticlesPageProps) 
       <EditorialPublicPage
         eyebrow="Знания"
         title="Статьи, интервью и практические материалы"
-        description="Редакционные материалы, интервью, разборы и прикладные гиды для специалистов барной индустрии."
-        summary="Материалы доступны без оплаты: интервью, разборы, прикладные статьи и тематические подборки."
+        description="Статьи, интервью, разборы и практические материалы для специалистов барной индустрии."
+        summary="Все материалы открыты: можно читать интервью, разборы, прикладные тексты и подборки."
         metrics={[
           { value: '4', label: 'типа контента' },
           { value: 'Открыто', label: 'доступ к материалам' },
@@ -58,7 +58,6 @@ export default async function ArticlesPage({ searchParams }: ArticlesPageProps) 
       <PublicFeaturedContent
         actionLabel="Читать материал"
         basePath="/articles"
-        description="Материал с темой, кратким описанием и переходом к полному тексту."
         eyebrow="Рекомендуем"
         item={featuredItem}
         title="Материал для начала"
@@ -66,7 +65,7 @@ export default async function ArticlesPage({ searchParams }: ArticlesPageProps) 
       <PublishedContentSection
         basePath="/articles"
         content={content}
-        emptyDescription="Когда появятся новые материалы, они отобразятся здесь."
+        emptyDescription="Когда появятся новые материалы, они будут здесь."
         emptyTitle="Материалов пока нет"
         excludedItemIds={featuredItem ? [featuredItem.id] : []}
         title="Материалы"

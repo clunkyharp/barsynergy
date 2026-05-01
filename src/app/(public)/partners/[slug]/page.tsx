@@ -39,7 +39,6 @@ export default async function PartnerDetailPage({ params }: PartnerDetailPagePro
       />
       <PublicRelatedContentSection
         basePath="/partners"
-        description="Другие партнерские форматы помогают понять, какие варианты сотрудничества уже есть в системе."
         items={relatedItems}
         title="Другие партнеры"
       />

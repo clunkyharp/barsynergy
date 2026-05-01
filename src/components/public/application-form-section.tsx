@@ -25,6 +25,7 @@ export type PublicApplicationFormProps = {
   result?: PublicApplicationResult;
   utm: PublicApplicationUtm;
   cities: ApplicationCityOption[];
+  defaultTopic?: string;
 };
 
 export function HiddenUtmFields({ utm }: { utm: PublicApplicationUtm }) {
@@ -144,12 +145,12 @@ export function PublicApplicationSection({
 
         {!enabled ? (
           <EditorialShell className="p-5 md:p-6">
-            <h3 className="text-lg font-semibold uppercase leading-7">Заявки временно закрыты</h3>
+            <h3 className="text-lg font-semibold uppercase leading-7">Формы сейчас закрыты</h3>
             <p className="mt-3 text-sm leading-7 text-[var(--muted)]">
-              {disabledDescription ?? 'Форма сейчас недоступна. Для связи используйте раздел контактов.'}
+              {disabledDescription ?? 'Сейчас форму использовать нельзя. Напишите нам через страницу контактов.'}
             </p>
             <Button className="mt-6 rounded-full sm:self-start" href={disabledLink?.href ?? '/contacts'} size="lg" variant="secondary">
-              {disabledLink?.label ?? 'Перейти в контакты'}
+              {disabledLink?.label ?? 'Открыть контакты'}
             </Button>
           </EditorialShell>
         ) : (

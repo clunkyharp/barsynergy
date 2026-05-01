@@ -2,15 +2,17 @@ import { displayFont } from '@/lib/fonts';
 
 export default function Loading() {
   return (
-    <main className="editorial-grid min-h-[65vh] border-b border-black/20">
+    <main aria-busy="true" className="editorial-grid min-h-[55vh] border-b border-black/20">
       <section className="container flex flex-col justify-center py-16">
-        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--accent)]">Загрузка</p>
-        <h1 className={`${displayFont.className} display-tight mt-4 max-w-2xl text-[36px] md:text-[52px]`}>
-          Подготавливаем страницу
-        </h1>
-        <p className="mt-4 max-w-xl text-base leading-7 text-[var(--muted)]">
-          Подождите несколько секунд. Данные загружаются.
-        </p>
+        <p className="sr-only">Страница загружается.</p>
+        <div aria-hidden="true" className="max-w-3xl space-y-4">
+          <div className="h-3 w-28 animate-pulse rounded-full bg-[var(--accent)]/20" />
+          <div className="grid gap-3">
+            <div className={`${displayFont.className} h-12 w-full max-w-2xl animate-pulse rounded-[18px] bg-black/6 md:h-16`} />
+            <div className="h-5 w-full max-w-xl animate-pulse rounded-full bg-black/6" />
+            <div className="h-5 w-3/4 max-w-lg animate-pulse rounded-full bg-black/6" />
+          </div>
+        </div>
       </section>
     </main>
   );

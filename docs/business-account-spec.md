@@ -46,6 +46,7 @@ Rules:
 - login should use email and password with PostgreSQL sessions and httpOnly cookies;
 - password reset and invite acceptance should be email-based when an approved email provider is configured;
 - until email is configured, admin-created accounts or manual invite links may be used for local/internal testing only;
+- first activation may use a one-time admin-prepared link that lets the owner set the password manually;
 - business accounts must not expose candidate personal data automatically.
 
 ## First Cabinet Capabilities
@@ -109,8 +110,10 @@ Implemented on 2026-04-28:
 - `ApplicationStatus.DRAFT`;
 - `Application.businessNotes` for admin comments visible to the business account;
 - `/auth/login` email/password session login;
-- `/auth/register` pending business-access request with a linked admin-review application;
-- `/admin/users` business access approval/blocking;
+- `/auth/register` pending business-access request with a linked admin-review application only;
+- `/admin/applications/[applicationId]` one-time activation-link preparation for approved business-access requests;
+- `/auth/activate` password setup and first activation through a one-time link;
+- `/admin/users` blocking and reopening already prepared business access;
 - guarded `/business` cabinet for active business users;
 - company profile editing;
 - `/business/requests` request creation, draft saving and submission for vacancy placement with the fixed MVP positions `Бариста`, `Управляющий`, `Менеджер`, supplier placement, partner application, corporate training and certificate order;
@@ -119,7 +122,7 @@ Implemented on 2026-04-28:
 
 Current limitations:
 
-- password reset and invite acceptance are not implemented yet;
+- password reset through email is not implemented yet;
 - production public business registration stays covered by the same personal-data/legal blocker as other public forms.
 
 ## Validation Expectations
