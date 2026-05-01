@@ -35,6 +35,14 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: 's3.twcstorage.ru'
+      },
+      {
+        protocol: 'https',
+        hostname: '72.56.1.69.sslip.io'
+      },
+      {
+        protocol: 'https',
+        hostname: 'barsynergy.ru'
       }
     ]
   }
