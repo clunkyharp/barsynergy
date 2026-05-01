@@ -13,6 +13,7 @@ const envSchema = z
     DATABASE_URL: optionalString,
     SESSION_SECRET: z.preprocess(emptyToUndefined, z.string().min(16).optional()),
     STORAGE_DRIVER: z.enum(['local', 's3']).default('local'),
+    ALLOW_LOCAL_STORAGE_IN_PRODUCTION: optionalBooleanFlag,
     LOCAL_UPLOAD_DIR: z.string().default('./uploads'),
     S3_ENDPOINT: z.preprocess(emptyToUndefined, z.string().url().optional()),
     S3_REGION: optionalString,
@@ -34,15 +35,17 @@ const envSchema = z
     const isProductionBuild = process.env.NEXT_PHASE === 'phase-production-build' || process.env.npm_lifecycle_event === 'build';
     const isProductionRuntime = env.NODE_ENV === 'production' && !isProductionBuild;
 
-    if (isProductionRuntime && env.STORAGE_DRIVER === 'local') {
+    const allowLocalStorageInProduction = env.ALLOW_LOCAL_STORAGE_IN_PRODUCTION === true;
+
+    if (isProductionRuntime && env.STORAGE_DRIVER === 'local' && !allowLocalStorageInProduction) {
       ctx.addIssue({
         code: 'custom',
         path: ['STORAGE_DRIVER'],
-        message: 'Production must use STORAGE_DRIVER=s3. Local uploads are allowed only in development.'
+        message: 'Production must use STORAGE_DRIVER=s3 unless ALLOW_LOCAL_STORAGE_IN_PRODUCTION=true is set explicitly for a single-server fallback.'
       });
     }
 
-    if (isProductionRuntime) {
+    if (isProductionRuntime && env.STORAGE_DRIVER === 's3') {
       const required = [
         'DATABASE_URL',
         'SESSION_SECRET',
@@ -55,6 +58,18 @@ const envSchema = z
       ] as const;
 
       for (const key of required) {
+        if (!env[key]) {
+          ctx.addIssue({
+            code: 'custom',
+            path: [key],
+            message: `${key} is required in production`
+          });
+        }
+      }
+    }
+
+    if (isProductionRuntime && env.STORAGE_DRIVER === 'local') {
+      for (const key of ['DATABASE_URL', 'SESSION_SECRET'] as const) {
         if (!env[key]) {
           ctx.addIssue({
             code: 'custom',

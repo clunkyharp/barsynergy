@@ -56,6 +56,12 @@ For a temporary one-server launch, the repository also supports this narrower fa
 
 This fallback keeps the app compatible with `STORAGE_DRIVER=s3`, but it is less isolated than the preferred external edge + external object storage production shape.
 
+If S3-compatible storage is still unavailable, the last-resort launch path is:
+
+- `STORAGE_DRIVER=local`;
+- `ALLOW_LOCAL_STORAGE_IN_PRODUCTION=true`;
+- one server with local uploads on disk and regular host-level backups.
+
 Before production sign-off, verify on the real host that:
 
 - public traffic cannot bypass the trusted edge and hit the compose Nginx directly;

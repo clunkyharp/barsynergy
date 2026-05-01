@@ -27,7 +27,10 @@ POSTGRES_PASSWORD=<password>
 
 ## Storage Rule
 
-Production with `STORAGE_DRIVER=local` is invalid and must fail at startup.
+Default production mode uses `STORAGE_DRIVER=s3`.
+
+Single-server fallback is allowed only when `ALLOW_LOCAL_STORAGE_IN_PRODUCTION=true` is set explicitly together with `STORAGE_DRIVER=local`.
+Use this only when the launch must run on one host without ready external object storage.
 
 ## Public Application Forms
 

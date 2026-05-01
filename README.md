@@ -74,7 +74,8 @@ Production must use:
 STORAGE_DRIVER=s3
 ```
 
-If production starts with `STORAGE_DRIVER=local`, env validation fails by design.
+If production starts with `STORAGE_DRIVER=local`, env validation fails by default.
+The only supported exception is an explicit single-server fallback with `ALLOW_LOCAL_STORAGE_IN_PRODUCTION=true`.
 
 ## Prisma
 
