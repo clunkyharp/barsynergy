@@ -14,6 +14,12 @@ Production target is a Russian VPS/cloud, with Timeweb Cloud VPS as the primary 
 - Next.js app
 - Timeweb Cloud Object Storage for files
 
+Single-node fallback for first launch when external object storage or edge proxy is not ready:
+
+- direct TLS on the same host;
+- local MinIO as the S3-compatible storage backend;
+- one public app host that serves both the site and `/storage/*`.
+
 ## Production Flow
 
 ```bash
@@ -38,6 +44,17 @@ Current repository state supports one ingress mode only:
 Unsupported production mode for the current repo:
 
 - exposing this compose Nginx directly to the public internet without a trusted edge in front of it.
+
+## Single-Node Fallback Contract
+
+For a temporary one-server launch, the repository also supports this narrower fallback:
+
+- Nginx listens on `80` and `443` directly on the app host;
+- Let's Encrypt terminates on the same host;
+- public S3-style file URLs are proxied through `https://<app-host>/storage/<bucket>/<fileKey>`;
+- MinIO runs inside the same Docker Compose stack and uses the same S3 credentials as the app.
+
+This fallback keeps the app compatible with `STORAGE_DRIVER=s3`, but it is less isolated than the preferred external edge + external object storage production shape.
 
 Before production sign-off, verify on the real host that:
 
