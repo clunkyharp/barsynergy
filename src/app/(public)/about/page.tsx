@@ -30,7 +30,7 @@ export default function AboutPage() {
         }
       ]}
       primaryLink={{ label: 'Связаться', href: '/contacts' }}
-      secondaryLink={{ label: 'Смотреть образование', href: '/education' }}
+      secondaryLink={{ label: 'Перейти к материалам', href: '/education' }}
     />
   );
 }

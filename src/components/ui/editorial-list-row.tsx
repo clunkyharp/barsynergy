@@ -90,17 +90,18 @@ export function EditorialListRow({
       <article
         className={cn(
           variant === 'opportunity'
-            ? 'mb-4 rounded-[28px] border border-black/10 bg-[color-mix(in_oklab,var(--surface),white_20%)] px-4 shadow-[0_12px_34px_rgba(20,20,18,0.035)] transition-colors duration-300 hover:border-black/16'
-            : 'border-b border-black/10 transition-colors duration-300 hover:border-black/20',
+            ? 'rounded-[28px] border border-black/10 bg-[color-mix(in_oklab,var(--surface),white_20%)] px-4 shadow-[0_12px_34px_rgba(20,20,18,0.035)] transition-[border-color,background-color,box-shadow] duration-300 hover:border-black/16 hover:bg-[color-mix(in_oklab,var(--surface),white_24%)] hover:shadow-[0_16px_38px_rgba(20,20,18,0.045)]'
+            : 'rounded-[28px] border border-black/10 bg-[color-mix(in_oklab,var(--surface),white_18%)] px-4 shadow-[0_12px_34px_rgba(20,20,18,0.03)] transition-[border-color,background-color,box-shadow] duration-300 hover:border-black/16 hover:bg-[color-mix(in_oklab,var(--surface),white_24%)] hover:shadow-[0_16px_38px_rgba(20,20,18,0.04)]',
           className
         )}
         {...props}
       >
         <a
           className={cn(
-            'group -mx-2 grid gap-5 rounded-[var(--radius-xl)] px-2 py-6 transition-colors duration-300 hover:bg-[rgba(247,240,232,0.88)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] focus-visible:ring-inset md:py-7',
+            'group grid gap-5 rounded-[var(--radius-xl)] py-6 transition-colors duration-300 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] focus-visible:ring-inset md:py-7',
             variant === 'default' && columns === 'default' && 'md:grid-cols-[0.24fr_0.5fr_0.7fr]',
             variant === 'default' && columns === 'content' && 'md:grid-cols-[0.26fr_0.52fr_0.72fr]',
+            variant === 'default' && 'px-0',
             variant === 'opportunity' && 'px-4 lg:grid-cols-[minmax(0,1.08fr)_minmax(18rem,0.66fr)]'
           )}
           href={href}

@@ -48,7 +48,7 @@ export default async function SuppliersPage({ searchParams }: SuppliersPageProps
           }
         ]}
         rowsHeading="По задачам"
-        primaryLink={{ label: 'Смотреть каталог', href: '#suppliers-list' }}
+        primaryLink={{ label: 'Перейти к поставщикам', href: '#suppliers-list' }}
         secondaryLink={{ label: 'Партнеры', href: '/partners' }}
       />
       <PublishedContentSection

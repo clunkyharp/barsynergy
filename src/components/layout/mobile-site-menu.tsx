@@ -51,7 +51,7 @@ export function MobileSiteMenu({ navItems, pathname }: MobileSiteMenuProps) {
       <button
         aria-expanded={isOpen}
         aria-label={isOpen ? 'Закрыть меню' : 'Открыть меню'}
-        className={cn(menuButtonClassName, 'xl:hidden', isOpen && 'pointer-events-none opacity-0')}
+        className={cn(menuButtonClassName, 'lg:hidden', isOpen && 'pointer-events-none opacity-0')}
         onClick={() => setIsOpen((open) => !open)}
         type="button"
       >

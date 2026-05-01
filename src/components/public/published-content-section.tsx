@@ -240,7 +240,7 @@ export function PublishedContentSection({
               ) : null}
             </div>
 
-            <div className="border-t border-black/10">
+            <div className="flex flex-col gap-4">
               {visibleItems.map((item) => (
                 <EditorialListRow
                   actionLabel="Подробнее"
@@ -267,7 +267,7 @@ export function PublishedContentSection({
               ))}
             </div>
 
-            <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-black/10 pt-4">
+            <div className="mt-2 flex flex-wrap items-center justify-between gap-3 border-t border-black/10 pt-5">
               <MetaChip className="border-black/10 bg-transparent text-[var(--muted)]" variant="default">
                 Страница {content.page} из {content.totalPages}
               </MetaChip>

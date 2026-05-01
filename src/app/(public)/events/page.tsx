@@ -47,7 +47,7 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
             description: 'События для школ, брендов и заведений с отдельной координацией.'
           }
         ]}
-        primaryLink={{ label: 'Смотреть афишу', href: '#events-list' }}
+        primaryLink={{ label: 'Перейти к афишам', href: '#events-list' }}
         secondaryLink={{ label: 'Партнерство', href: '/partners' }}
       />
       <Suspense

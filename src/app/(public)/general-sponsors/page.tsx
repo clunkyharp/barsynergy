@@ -110,7 +110,7 @@ export default function GeneralSponsorsPage() {
                 Каталог для брендов, поставщиков и сервисов
               </p>
               <EditorialAction className="mt-4" href="/partners">
-                Смотреть каталог партнёров
+                Перейти к партнёрам
                 <ArrowUpRight size={18} />
               </EditorialAction>
             </div>

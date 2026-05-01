@@ -4,7 +4,6 @@ import { EditorialPublicPage } from '@/components/public/editorial-public-page';
 import { PublishedContentSection } from '@/components/public/published-content-section';
 import { PublicFeaturedContent } from '@/components/public/public-featured-content';
 import { PublicFilters } from '@/components/public/public-filters';
-import { Button } from '@/components/ui/button';
 import { getPublishedCourses, type PublicContentSearchParams } from '@/lib/public/content';
 import { getCourseFilterOptions, getPublicCategoryOptions, getPublicCityFilterOptions } from '@/lib/public/filter-options';
 
@@ -51,7 +50,7 @@ export default async function EducationPage({ searchParams }: EducationPageProps
             description: 'Программы для команд: сервис, бар, меню, продажи и внутренняя подготовка.'
           }
         ]}
-        primaryLink={{ label: 'Смотреть программы', href: '#education-list' }}
+        primaryLink={{ label: 'Перейти к материалам', href: '#education-list' }}
         secondaryLink={{ label: 'Предложить формат', href: '/contacts' }}
       />
       <Suspense
@@ -94,40 +93,6 @@ export default async function EducationPage({ searchParams }: EducationPageProps
         sectionId="education-list"
         title="Программы"
       />
-      {content.total === 0 ? (
-        <section className="editorial-grid border-b border-black/20 py-10 md:py-14">
-          <div className="container grid gap-4 md:grid-cols-3">
-            {[
-              {
-                label: 'Интенсив',
-                title: 'Сервис и коммуникация с гостем',
-                meta: 'Ставрополь / offline / базовый уровень'
-              },
-              {
-                label: 'Корпоративная программа',
-                title: 'Запуск барной карты для команды',
-                meta: 'По запросу / offline + консультация'
-              },
-              {
-                label: 'Онлайн-материал',
-                title: 'Основы сезонного меню',
-                meta: 'Бесплатный вводный материал'
-              }
-            ].map((item) => (
-              <article className="rounded-[var(--radius-xl)] border border-black/12 bg-[var(--surface)] p-6" key={item.title}>
-                <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--accent)]">{item.label}</p>
-                <h3 className="mt-3 text-xl font-semibold leading-7">{item.title}</h3>
-                <p className="mt-4 text-sm leading-6 text-[var(--muted)]">{item.meta}</p>
-              </article>
-            ))}
-          </div>
-          <div className="container mt-6">
-            <Button className="rounded-full px-6" href="/contacts?topic=education-program" variant="secondary">
-              Обсудить образовательный формат
-            </Button>
-          </div>
-        </section>
-      ) : null}
     </>
   );
 }
