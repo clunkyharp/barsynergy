@@ -1,216 +1,175 @@
-import Link from 'next/link';
-import { ArrowUpRight } from 'lucide-react';
-import { EditorialPublicPage } from '@/components/public/editorial-public-page';
+import type { Metadata } from 'next';
+import { ArrowUpRight, BookOpen, GraduationCap, Handshake, Megaphone, Star, Users } from 'lucide-react';
+import { GeneralSponsorCard } from '@/components/public/general-sponsor-card';
 import { PublicBodyText, PublicDisplayTitle, PublicEyebrow } from '@/components/public/public-primitives';
-import { EditorialAction } from '@/components/ui/editorial-action';
-import { MetaChip } from '@/components/ui/meta-chip';
+import { FeatureItem, IconBadge, SectionCtaPanel } from '@/components/public/public-ui-adaptation';
+import { Button } from '@/components/ui/button';
 import { Panel } from '@/components/ui/panel';
-import { StatCard } from '@/components/ui/stat-card';
+import { GENERAL_SPONSORS } from '@/lib/public/general-sponsors';
 
-const visibilityRows = [
+export const metadata: Metadata = {
+  title: 'Спонсорство',
+  description: 'Спонсорские форматы BARSYNERGY для брендов и компаний.'
+};
+
+const benefits = [
   {
-    label: 'Видимость',
-    title: 'Статус на сайте и в ключевых разделах',
-    description: 'Приоритетное присутствие на главных точках входа, в сезонных подборках и рядом с важными публикациями.'
+    icon: Users,
+    title: 'Прямой доступ к аудитории',
+    description: 'Профессиональная барная среда СКФО: бармены, владельцы, менеджеры, поставщики.'
   },
   {
-    label: 'События',
-    title: 'События, обучение и спецпроекты',
-    description: 'Интеграции в программы, дегустации, лекции, интенсивы и другие форматы работы с профессиональной аудиторией.'
+    icon: Megaphone,
+    title: 'Повышение узнаваемости',
+    description: 'Упоминания в событиях, материалах платформы и рассылках.'
   },
   {
-    label: 'Контент',
-    title: 'Контент и долгий отраслевой контакт',
-    description: 'Совместные материалы, спецвыпуски и работа с рынком не в одну дату, а на несколько циклов вперед.'
+    icon: Star,
+    title: 'Доверие и репутация',
+    description: 'Ассоциация бренда с экспертизой и развитием индустрии.'
+  },
+  {
+    icon: GraduationCap,
+    title: 'Интеграции и контент',
+    description: 'Возможность совместных активаций, коллабораций и специальных форматов.'
   }
-];
+] as const;
 
-const sponsorFormats = [
-  'Отдельный пакет присутствия под бренд, сезон и задачу',
-  'Интеграции в события, лекции, дегустации и профессиональные встречи',
-  'Совместные материалы, подборки и редакционные проекты',
-  'Прямая рабочая коммуникация с командой BARSYNERGY'
-];
-
-const sponsorShowcase = [
+const packageLevels = [
   {
-    name: 'AROMA TRADE SOUTH',
-    city: 'Ставрополь',
-    status: 'Поставщик',
-    focus: 'Ингредиенты и расходники',
-    note: 'Поставки для ежедневной работы заведений, гостевых смен и образовательных форматов для команд.',
-    badges: ['Генеральный партнёр', 'HoReCa'],
-    href: '/partners'
+    title: 'Партнёр события',
+    description: 'Поддержка отдельного события или инициативы сообщества.',
+    price: 'от 50 000 ₽',
+    recommended: false,
+    items: ['Логотип на странице события', 'Упоминание в анонсах', 'Пост в социальных сетях', 'Материалы на площадке']
   },
   {
-    name: 'MONTELIBERO',
-    city: 'Пятигорск',
-    status: 'Бренд',
-    focus: 'Бренд и дистрибуция напитков',
-    note: 'Дегустации, спецпроекты и работа с бар-менеджерами, которым важны новые линейки и сезонные запуски.',
-    badges: ['Дистрибуция', 'Спецпроекты'],
-    href: '/partners'
+    title: 'Сезонный партнёр',
+    description: 'Сотрудничество на сезон мероприятий BARSYNERGY.',
+    price: 'от 150 000 ₽',
+    recommended: false,
+    items: ['Всё из пакета события', 'Логотип на событиях сезона', '2 публикации в социальных сетях', 'Интеграция в email-рассылку']
   },
   {
-    name: 'LINEA SERVICE',
-    city: 'КМВ',
-    status: 'Сервис',
-    focus: 'Оборудование и сервис',
-    note: 'Оснащение, запуск новых точек и поддержка проектов, где важны стабильная техника и сервисное сопровождение.',
-    badges: ['Оборудование', 'Поддержка'],
-    href: '/partners'
+    title: 'Генеральный спонсор',
+    description: 'Статусное партнёрство и максимальная представленность.',
+    price: 'от 300 000 ₽',
+    recommended: true,
+    items: ['Эксклюзивная категория в сезон', 'Главный логотип на площадках', 'Приветственное слово или интервью', 'Совместные активности и контент']
   }
-];
+] as const;
 
 export default function GeneralSponsorsPage() {
   return (
     <>
-      <EditorialPublicPage
-        eyebrow="Генеральные спонсоры"
-        title="Генеральные спонсоры BARSYNERGY"
-        description="Формат для брендов и компаний, которым важно регулярно работать с профессиональной аудиторией региона."
-        summary="Подходит брендам, дистрибьюторам, производителям и сервисам, которым нужны события, обучение и заметное присутствие в локальной среде."
-        summaryHeading="Кому подходит"
-        metrics={[
-          { value: 'СКФО', label: 'региональный фокус' },
-          { value: 'События', label: 'живые интеграции' },
-          { value: 'Контент', label: 'долгая видимость' }
-        ]}
-        rows={[
-          {
-            label: 'Брендам',
-            title: 'Присутствие в отраслевой среде',
-            description: 'Для брендов, которым важно системно работать с барной аудиторией, а не ограничиваться разовым выходом.'
-          },
-          {
-            label: 'Дистрибьюторам',
-            title: 'Связка с рынком и командами',
-            description: 'Для компаний, которым нужны прямые точки касания с заведениями, управляющими, барменами и преподавателями.'
-          },
-          {
-            label: 'Производителям',
-            title: 'Форматы под задачу бренда',
-            description: 'Для производителей и сервисов, которым нужны образовательные, событийные или контентные интеграции в регионе.'
-          }
-        ]}
-        rowsHeading="Основные направления"
-        primaryLink={{ label: 'Обсудить спонсорство', href: '/contacts' }}
-        secondaryLink={{ label: 'Партнеры', href: '/partners' }}
-      />
-
-      <section className="editorial-grid border-b border-black/20 py-10 md:py-14">
-        <div className="container grid gap-8 xl:grid-cols-[0.72fr_1.28fr]">
-          <div className="flex flex-col justify-between gap-8">
-            <div>
-              <PublicEyebrow>Партнёрский каталог</PublicEyebrow>
-              <PublicDisplayTitle className="mt-3">Примеры профилей</PublicDisplayTitle>
-            </div>
-            <div className="max-w-md border-l border-[rgba(191,168,143,0.45)] pl-4">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">
-                Каталог для брендов, поставщиков и сервисов
-              </p>
-              <EditorialAction className="mt-4" href="/partners">
-                Перейти к партнёрам
-                <ArrowUpRight size={18} />
-              </EditorialAction>
-            </div>
-          </div>
-          <div className="grid grid-flow-dense gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {sponsorShowcase.map((sponsor) => (
-              <Link className="block h-full rounded-[var(--radius-xl)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]" href={sponsor.href} key={sponsor.name}>
-                <Panel
-                  className="flex h-full min-h-[320px] flex-col justify-between overflow-hidden border-[rgba(191,168,143,0.34)] bg-[color-mix(in_oklab,var(--surface),white_28%)]"
-                  padding="lg"
-                >
-                  <div>
-                    <div className="flex flex-wrap items-center justify-between gap-3 border-b border-black/10 pb-4">
-                      <PublicEyebrow>{sponsor.city}</PublicEyebrow>
-                      <MetaChip className="border-[var(--accent)]/28 px-2.5 py-1 text-[10px] tracking-[0.14em] text-[var(--text)]">
-                        {sponsor.status}
-                      </MetaChip>
-                    </div>
-                    <h3 className="mt-5 text-[26px] font-semibold uppercase leading-8 text-[var(--text)]">
-                      {sponsor.name}
-                    </h3>
-                    <p className="mt-3 text-sm font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">
-                      {sponsor.focus}
-                    </p>
-                    <PublicBodyText className="mt-5 pr-2">{sponsor.note}</PublicBodyText>
-                  </div>
-                  <div className="mt-8 border-t border-black/10 pt-4">
-                    <div className="flex flex-wrap gap-2">
-                      {sponsor.badges.map((badge) => (
-                        <MetaChip
-                          className="border-[rgba(191,168,143,0.55)] bg-transparent px-2.5 py-1 text-[10px] tracking-[0.14em] text-[var(--muted)]"
-                          key={badge}
-                        >
-                          {badge}
-                        </MetaChip>
-                      ))}
-                    </div>
-                    <div className="mt-5 inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.08em] text-[var(--text)]">
-                      <span>Профиль партнёра</span>
-                      <ArrowUpRight size={16} />
-                    </div>
-                  </div>
-                </Panel>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="border-b border-black/20 bg-[var(--graphite)] py-10 text-white md:py-14">
-        <div className="container grid gap-8 xl:grid-cols-[0.72fr_1.28fr]">
-          <div>
-            <PublicDisplayTitle className="text-white">Что входит</PublicDisplayTitle>
-            <PublicBodyText className="mt-5 max-w-md" tone="inverse">
-              Состав подбираем под бренд, сезон и задачу. Ниже базовые точки, из которых обычно собирается пакет.
+      <section className="border-b border-black/20 py-10 pt-[118px] md:py-14 md:pt-[132px]">
+        <div className="container grid gap-8 lg:grid-cols-[minmax(0,0.95fr)_minmax(20rem,0.72fr)] lg:items-center">
+          <div className="min-w-0">
+            <p className="text-sm leading-6 text-[var(--muted)]">
+              <a className="muted-link" href="/">Главная</a> <span aria-hidden="true">›</span> Спонсорство
+            </p>
+            <PublicEyebrow className="mt-8">Спонсорство</PublicEyebrow>
+            <PublicDisplayTitle as="h1" className="mt-5" size="hero">
+              Партнёрство, которое работает
+            </PublicDisplayTitle>
+            <PublicBodyText className="mt-6 max-w-2xl" size="md">
+              Поддерживайте развитие барной культуры СКФО и усиливайте присутствие бренда среди профессионалов и лидеров индустрии.
             </PublicBodyText>
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <Button className="rounded-full px-7" href="/contacts?topic=sponsorship" size="lg">
+                Запросить условия
+              </Button>
+              <Button className="rounded-full px-7" href="/contacts?topic=sponsorship-presentation" size="lg" variant="secondary">
+                Скачать презентацию
+              </Button>
+            </div>
           </div>
-          <div className="grid gap-4 md:grid-cols-3">
-            {visibilityRows.map((row) => (
-              <StatCard
-                className="h-full border-white/16 bg-[#181817] text-white"
-                description={row.description}
-                descriptionClassName="text-white/76"
-                key={row.title}
-                label={row.label}
-                labelClassName="text-[#f1b6ad]"
-                tone="inverse"
-                value={row.title}
-                valueClassName="text-lg font-semibold uppercase leading-7 tracking-[0.02em] text-white"
-                style={{ backgroundColor: '#181817', borderColor: 'rgba(255,255,255,0.16)', color: '#ffffff' }}
-              />
+          <div
+            aria-hidden="true"
+            className="min-h-[300px] rounded-[24px] border border-black/10 bg-[url('/images/generated/hustle-brew-lineup-v1.png')] bg-cover bg-center grayscale-[0.08] shadow-[0_24px_60px_rgba(20,20,18,0.08)]"
+          />
+        </div>
+      </section>
+
+      <section className="border-b border-black/20 py-10 md:py-14">
+        <div className="container">
+          <PublicEyebrow>Что получает бренд</PublicEyebrow>
+          <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+            {benefits.map((benefit) => (
+              <Panel className="border-black/10 bg-[rgba(255,250,244,0.76)]" key={benefit.title} padding="lg">
+                <IconBadge icon={benefit.icon} size="md" tone="accent" />
+                <h2 className="mt-5 text-xl font-semibold uppercase leading-7 text-[var(--text)]">{benefit.title}</h2>
+                <p className="mt-3 text-sm leading-7 text-[var(--muted)]">{benefit.description}</p>
+              </Panel>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="editorial-grid border-b border-black/20 py-10 md:py-14">
-        <div className="container grid gap-8 xl:grid-cols-[0.72fr_1.28fr]">
-          <div className="flex flex-col justify-between gap-8">
-            <div>
-              <PublicDisplayTitle>Формат работы</PublicDisplayTitle>
-              <PublicBodyText className="mt-5 max-w-md">
-                Сначала обсуждаем задачу бренда, потом собираем точки присутствия и согласуем понятный рабочий план.
-              </PublicBodyText>
-            </div>
-            <EditorialAction href="/contacts">
-              Обсудить формат
-              <ArrowUpRight size={18} />
-            </EditorialAction>
-          </div>
-          <div className="border-t border-black/20">
-            {sponsorFormats.map((item, index) => (
-              <div className="grid gap-4 border-b border-black/20 py-5 md:grid-cols-[0.18fr_1fr]" key={item}>
-                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">
-                  {String(index + 1).padStart(2, '0')}
-                </p>
-                <p className="text-xl font-semibold uppercase leading-7">{item}</p>
-              </div>
+      <section className="border-b border-black/20 py-10 md:py-14">
+        <div className="container">
+          <PublicEyebrow>Пакеты спонсорства</PublicEyebrow>
+          <div className="mt-6 grid gap-5 lg:grid-cols-3">
+            {packageLevels.map((level) => (
+              <Panel
+                className={
+                  level.recommended
+                    ? 'relative border-[var(--accent)]/52 bg-[rgba(255,250,244,0.82)]'
+                    : 'border-black/10 bg-[rgba(255,250,244,0.72)]'
+                }
+                key={level.title}
+                padding="lg"
+              >
+                {level.recommended ? (
+                  <span className="absolute -top-3 left-6 rounded-full bg-[var(--accent)] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-white">
+                    Рекомендуем
+                  </span>
+                ) : null}
+                <h2 className="text-2xl font-semibold uppercase leading-8 text-[var(--text)]">{level.title}</h2>
+                <p className="mt-4 text-sm leading-7 text-[var(--muted)]">{level.description}</p>
+                <div className="mt-6 grid gap-3">
+                  {level.items.map((item) => (
+                    <FeatureItem icon={BookOpen} key={item} title={item} />
+                  ))}
+                </div>
+                <div className="mt-8 flex items-center justify-between gap-4 border-t border-black/10 pt-5">
+                  <p className="text-lg font-semibold text-[var(--text)]">{level.price}</p>
+                  <Button
+                    className="px-0 text-[11px] tracking-[0.14em]"
+                    href={`/contacts?topic=sponsorship&partnerType=${encodeURIComponent(level.title)}`}
+                    size="sm"
+                    variant="ghost"
+                  >
+                    Подробнее
+                    <ArrowUpRight size={16} />
+                  </Button>
+                </div>
+              </Panel>
             ))}
           </div>
+        </div>
+      </section>
+
+      <section className="border-b border-black/20 py-10 md:py-14">
+        <div className="container">
+          <PublicEyebrow>Генеральный спонсор сезона</PublicEyebrow>
+          <div className="mt-6 grid gap-5">
+            {GENERAL_SPONSORS.map((sponsor) => (
+              <GeneralSponsorCard key={sponsor.id} sponsor={sponsor} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="border-b border-black/20 py-10 md:py-14">
+        <div className="container">
+          <SectionCtaPanel
+            description="Расскажите о своих целях, и команда подберёт формат партнёрства под задачу бренда."
+            icon={Handshake}
+            primary={{ href: '/contacts?topic=sponsorship', label: 'Оставить заявку' }}
+            secondary={{ href: '/contacts?topic=sponsorship-presentation', label: 'Скачать презентацию' }}
+            title="Запросить условия"
+          />
         </div>
       </section>
     </>

@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { SiteFooter } from '@/components/layout/site-footer';
 import { SiteHeader } from '@/components/layout/site-header';
+import { CookieNotice } from '@/components/public/cookie-notice';
+import { ScrollToTopButton } from '@/components/layout/scroll-to-top-button';
 import { bodyFont } from '@/lib/fonts';
 import { getEnv } from '@/lib/validation/env';
 
@@ -38,6 +40,8 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           <SiteHeader />
           <main className="site-main overflow-x-hidden w-full max-w-full">{children}</main>
           <SiteFooter />
+          <ScrollToTopButton />
+          <CookieNotice />
         </div>
       </body>
     </html>

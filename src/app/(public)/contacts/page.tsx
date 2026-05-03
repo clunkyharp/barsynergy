@@ -10,22 +10,51 @@ type ContactsPageProps = {
 };
 
 const contactTopicAliases: Record<string, string> = {
-  'education-program': 'Предложить образовательный формат',
-  'education-launch': 'Другое',
-  'vacancy-placement': 'Разместить вакансию',
-  partnership: 'Обсудить партнёрство',
-  'partnership-format': 'Обсудить партнёрство',
-  sponsorship: 'Обсудить спонсорство',
-  supplier: 'Добавить поставщика',
-  event: 'Добавить событие'
+  'education-program': 'education-program',
+  'education-launch': 'education-program',
+  'vacancy-placement': 'vacancy-placement',
+  partnership: 'partnership',
+  'partnership-format': 'partnership',
+  sponsorship: 'sponsorship',
+  'sponsorship-presentation': 'sponsorship',
+  supplier: 'supplier',
+  event: 'event',
+  'article-topic': 'article-topic',
+  'article-interview': 'article-topic',
+  'article-launch': 'article-topic'
 };
+
+const contextParamKeys = [
+  'companyName',
+  'teamSize',
+  'topicTitle',
+  'position',
+  'employmentType',
+  'salaryLabel',
+  'supplierCategory',
+  'serviceArea',
+  'websiteUrl',
+  'eventTitle',
+  'eventDate',
+  'venueName',
+  'formatLabel',
+  'registrationUrl',
+  'partnerType'
+] as const;
+
+function firstParam(value: string | string[] | undefined) {
+  return Array.isArray(value) ? value[0] : value;
+}
 
 export default async function ContactsPage({ searchParams }: ContactsPageProps) {
   const params = (await searchParams) ?? {};
   const [cities] = await Promise.all([getApplicationCityOptions()]);
   const applicationFormsEnabled = arePublicApplicationFormsEnabled(getEnv());
-  const topicParam = Array.isArray(params.topic) ? params.topic[0] : params.topic;
+  const topicParam = firstParam(params.topic);
   const defaultTopic = topicParam ? contactTopicAliases[topicParam] ?? topicParam : undefined;
+  const defaults: Record<string, string | undefined> = Object.fromEntries(
+    contextParamKeys.map((key) => [key, firstParam(params[key])]).filter(([, value]) => Boolean(value))
+  );
 
   return (
     <>
@@ -33,7 +62,7 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
         eyebrow="Контакты"
         title="Связь с командой"
         description="Пишите по обучению, событиям, партнёрствам, вакансиям и поставщикам."
-        summary="Если нужен курс, совместный проект, размещение или рабочий контакт, напишите через форму."
+        summary="После выбора темы форма покажет нужные поля, чтобы команда сразу получила нормальный рабочий запрос."
         metrics={[
           { value: 'Почта', label: 'основной канал связи' },
           { value: 'Форма', label: 'для рабочих запросов' },
@@ -64,6 +93,7 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
         enabled={applicationFormsEnabled}
         result={getPublicApplicationResult(params)}
         utm={getPublicApplicationUtm(params)}
+        defaults={defaults}
         cities={cities}
       />
     </>

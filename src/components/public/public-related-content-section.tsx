@@ -2,7 +2,6 @@ import { ArrowUpRight } from 'lucide-react';
 import { PublicBodyText, PublicDisplayTitle, PublicEyebrow } from '@/components/public/public-primitives';
 import { InlineLink } from '@/components/ui/inline-link';
 import { MetaChip } from '@/components/ui/meta-chip';
-import { Panel } from '@/components/ui/panel';
 import type { PublishedContentItem } from '@/lib/public/content';
 
 type PublicRelatedContentSectionProps = {
@@ -30,39 +29,40 @@ export function PublicRelatedContentSection({
 
   return (
     <section className="border-b border-black/20 py-10 md:py-14">
-      <div className="container grid gap-8 xl:grid-cols-[0.72fr_1.28fr]">
+      <div className="container grid gap-8 xl:grid-cols-[0.58fr_1.42fr]">
         <div>
           <PublicEyebrow>{eyebrow}</PublicEyebrow>
           <PublicDisplayTitle className="mt-4">{title}</PublicDisplayTitle>
           {description ? <PublicBodyText className="mt-5 max-w-md">{description}</PublicBodyText> : null}
         </div>
 
-        <div className="grid gap-4 md:grid-cols-3">
-          {items.map((item) => (
-            <Panel className="flex h-full flex-col" key={item.id} padding="md" tone="elevated">
-              <div>
-                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">
-                  {item.label ?? 'Запись'}
-                </p>
-                <h3 className="mt-3 text-lg font-semibold uppercase leading-7">{item.title}</h3>
-                <PublicBodyText className="mt-3">{item.summary}</PublicBodyText>
-              </div>
+        <div className="border-y border-black/15">
+          {items.map((item, index) => (
+            <article className="grid gap-4 border-b border-black/10 py-5 last:border-b-0 md:grid-cols-[auto_minmax(0,1fr)_auto] md:items-start md:gap-6" key={item.id}>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">
+                {String(index + 1).padStart(2, '0')}
+              </p>
 
-              {item.meta.length > 0 ? (
-                <div className="mt-5 flex flex-wrap gap-2">
-                  {item.meta.slice(0, 3).map((entry) => (
+              <div className="min-w-0">
+                <div className="flex flex-wrap gap-2">
+                  <MetaChip variant="selected">{item.label ?? 'Запись'}</MetaChip>
+                  {item.meta.slice(0, 2).map((entry) => (
                     <MetaChip key={entry} variant="filter">
                       {entry}
                     </MetaChip>
                   ))}
                 </div>
-              ) : null}
+                <h3 className="mt-3 text-xl font-semibold uppercase leading-7 tracking-[-0.01em] text-[var(--text)] md:text-2xl">
+                  {item.title}
+                </h3>
+                <PublicBodyText className="mt-3 max-w-2xl text-[var(--muted)]">{item.summary}</PublicBodyText>
+              </div>
 
-              <InlineLink className="mt-auto inline-flex items-center gap-2 pt-5" href={itemHref(basePath, item.slug)}>
+              <InlineLink className="inline-flex items-center gap-2 md:mt-1 md:self-start" href={itemHref(basePath, item.slug)}>
                 Открыть
                 <ArrowUpRight size={16} />
               </InlineLink>
-            </Panel>
+            </article>
           ))}
         </div>
       </div>

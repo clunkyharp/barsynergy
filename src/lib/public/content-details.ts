@@ -9,6 +9,7 @@ export type PublicContentDetailFact = {
 };
 
 export type PublicContentDetail = {
+  id: string;
   title: string;
   slug: string;
   summary: string;
@@ -19,6 +20,8 @@ export type PublicContentDetail = {
   facts: PublicContentDetailFact[];
   externalUrl?: string;
   externalUrlLabel?: string;
+  companyName?: string;
+  cityName?: string;
 };
 
 function publicImageUrl(
@@ -62,6 +65,7 @@ export async function getPublishedArticleDetail(slug: string): Promise<PublicCon
   }
 
   return {
+    id: article.id,
     title: article.title,
     slug: article.slug,
     summary: article.summary,
@@ -97,6 +101,7 @@ export async function getPublishedEventDetail(slug: string): Promise<PublicConte
   }
 
   return {
+    id: event.id,
     title: event.title,
     slug: event.slug,
     summary: event.summary,
@@ -135,6 +140,7 @@ export async function getPublishedCourseDetail(slug: string): Promise<PublicCont
   }
 
   return {
+    id: course.id,
     title: course.title,
     slug: course.slug,
     summary: course.summary,
@@ -171,6 +177,7 @@ export async function getPublishedVacancyDetail(slug: string): Promise<PublicCon
   }
 
   return {
+    id: vacancy.id,
     title: vacancy.title,
     slug: vacancy.slug,
     summary: vacancy.summary,
@@ -178,6 +185,8 @@ export async function getPublishedVacancyDetail(slug: string): Promise<PublicCon
     label: vacancy.category?.name,
     meta: compact([vacancy.city?.name, vacancy.companyName, vacancy.employmentType, vacancy.salaryLabel]),
     imageUrl: publicImageUrl(vacancy.coverImage),
+    companyName: vacancy.companyName,
+    cityName: vacancy.city?.name,
     facts: compact([
       `Компания: ${vacancy.companyName}`,
       `Позиция: ${vacancy.position}`,
@@ -210,6 +219,7 @@ export async function getPublishedSupplierDetail(slug: string): Promise<PublicCo
   const externalUrl = getRenderableExternalUrl(supplier.websiteUrl);
 
   return {
+    id: supplier.id,
     title: supplier.title,
     slug: supplier.slug,
     summary: supplier.summary,
@@ -217,6 +227,7 @@ export async function getPublishedSupplierDetail(slug: string): Promise<PublicCo
     label: supplier.category?.name,
     meta: compact([supplier.city?.name, supplier.companyName, supplier.isVerified ? 'Проверенный поставщик' : undefined]),
     imageUrl: publicImageUrl(supplier.coverImage),
+    companyName: supplier.companyName,
     facts: compact([
       `Компания: ${supplier.companyName}`,
       supplier.serviceArea ? `Поставка: ${supplier.serviceArea}` : undefined,
@@ -249,6 +260,7 @@ export async function getPublishedPartnerDetail(slug: string): Promise<PublicCon
   const externalUrl = getRenderableExternalUrl(partner.websiteUrl);
 
   return {
+    id: partner.id,
     title: partner.title,
     slug: partner.slug,
     summary: partner.summary,
@@ -256,6 +268,7 @@ export async function getPublishedPartnerDetail(slug: string): Promise<PublicCon
     label: partner.category?.name,
     meta: compact([partner.companyName, partner.partnerType, partner.isFeatured ? 'В подборке' : undefined]),
     imageUrl: publicImageUrl(partner.coverImage),
+    companyName: partner.companyName,
     facts: compact([
       `Компания: ${partner.companyName}`,
       partner.partnerType ? `Тип партнерства: ${partner.partnerType}` : undefined,

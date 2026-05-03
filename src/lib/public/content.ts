@@ -21,8 +21,9 @@ export type PublishedContentItem = {
   label?: string;
   meta: string[];
   imageUrl?: string;
-  kind?: 'default' | 'vacancy';
+  kind?: 'default' | 'vacancy' | 'supplier' | 'partner';
   subtitle?: string;
+  dateIso?: string;
   metaGroups?: PublishedContentMetaGroup[];
   statusLabel?: string;
   updatedLabel?: string;
@@ -244,6 +245,7 @@ export async function getPublishedEvents(params: PublicContentSearchParams = {})
       slug: event.slug,
       summary: event.summary,
       label: event.category?.name,
+      dateIso: event.startsAt.toISOString(),
       meta: [event.city?.name, event.locationName, event.format, event.startsAt.toLocaleDateString('ru-RU')].filter(Boolean) as string[],
       imageUrl: publicImageUrl(event.coverImage)
     }))
@@ -420,8 +422,17 @@ export async function getPublishedSuppliers(params: PublicContentSearchParams = 
       title: supplier.title,
       slug: supplier.slug,
       summary: supplier.summary,
+      kind: 'supplier',
       label: supplier.category?.name,
+      subtitle: supplier.companyName,
       meta: [supplier.city?.name, supplier.companyName, supplier.isVerified ? 'Проверен' : undefined, supplier.serviceArea].filter(Boolean) as string[],
+      metaGroups: [
+        supplier.category?.name ? { label: 'Категория', value: supplier.category.name } : undefined,
+        supplier.city?.name ? { label: 'Город', value: supplier.city.name } : undefined,
+        supplier.serviceArea ? { label: 'География', value: supplier.serviceArea } : undefined,
+        supplier.isVerified ? { value: 'Проверен BARSYNERGY', tone: 'accent' } : undefined
+      ].filter(Boolean) as PublishedContentMetaGroup[],
+      statusLabel: supplier.isVerified ? 'Проверен' : undefined,
       imageUrl: publicImageUrl(supplier.coverImage)
     }))
   });
@@ -464,8 +475,15 @@ export async function getPublishedPartners(params: PublicContentSearchParams = {
       title: partner.title,
       slug: partner.slug,
       summary: partner.summary,
+      kind: 'partner',
       label: partner.category?.name,
+      subtitle: partner.companyName,
       meta: [partner.companyName, partner.partnerType, partner.isFeatured ? 'В подборке' : undefined].filter(Boolean) as string[],
+      metaGroups: [
+        partner.companyName ? { label: 'Компания', value: partner.companyName } : undefined,
+        partner.partnerType ? { label: 'Формат', value: partner.partnerType } : undefined,
+        partner.isFeatured ? { value: 'В подборке', tone: 'accent' } : undefined
+      ].filter(Boolean) as PublishedContentMetaGroup[],
       imageUrl: publicImageUrl(partner.coverImage)
     }))
   });

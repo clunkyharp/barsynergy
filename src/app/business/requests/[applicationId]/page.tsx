@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { CheckboxField } from '@/components/ui/checkbox-field';
 import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
+import { InlineLink } from '@/components/ui/inline-link';
 import { PageHeader } from '@/components/ui/page-header';
 import { Panel } from '@/components/ui/panel';
 import { Select } from '@/components/ui/select';
@@ -182,7 +183,8 @@ export default async function BusinessRequestDetailPage({ params, searchParams }
                 <Textarea id="details" name="details" required maxLength={4000} rows={6} defaultValue={application.message ?? ''} />
               </FormField>
               <CheckboxField defaultChecked name="consent" required value="accepted">
-                Даю согласие на обработку данных заявки.
+                Согласен с <InlineLink href="/legal/privacy">политикой обработки персональных данных</InlineLink> и даю{' '}
+                <InlineLink href="/legal/personal-data-consent">согласие на обработку персональных данных</InlineLink> для этой заявки.
               </CheckboxField>
               <ActionRow className="border-t-0 pt-0">
                 <Button type="submit">Сохранить изменения</Button>

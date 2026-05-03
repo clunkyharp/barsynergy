@@ -72,9 +72,8 @@ export function SupplierApplicationForm({ enabled, result, utm, cities }: Public
             </div>
             <div className="md:col-span-2">
               <ConsentField>
-                Даю согласие на обработку персональных данных для этой заявки. Полный текст{' '}
-                <InlineLink href="/legal/personal-data-consent">согласия</InlineLink>
-                .
+                Согласен с <InlineLink href="/legal/privacy">политикой обработки персональных данных</InlineLink> и даю{' '}
+                <InlineLink href="/legal/personal-data-consent">согласие на обработку персональных данных</InlineLink> для этой заявки.
               </ConsentField>
             </div>
           </div>

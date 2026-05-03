@@ -1,6 +1,8 @@
 import { ArrowUpRight } from 'lucide-react';
 import { PublicActionRow, PublicBodyText, PublicDisplayTitle, PublicEyebrow } from '@/components/public/public-primitives';
 import { Button } from '@/components/ui/button';
+import { MetaChip } from '@/components/ui/meta-chip';
+import { Panel } from '@/components/ui/panel';
 
 type Metric = {
   value: string;
@@ -36,6 +38,10 @@ export function EditorialPublicPage({
   title,
   description,
   summary,
+  summaryHeading = 'Коротко',
+  metrics,
+  rows,
+  rowsHeading = 'Что внутри',
   primaryLink,
   secondaryLink
 }: EditorialPublicPageProps) {
@@ -52,12 +58,25 @@ export function EditorialPublicPage({
             <PublicDisplayTitle as="h1" className="mt-3 max-w-5xl break-words text-[32px] sm:text-[44px] md:text-[64px] xl:text-[78px]" size="section">
               {title}
             </PublicDisplayTitle>
+            {metrics.length > 0 ? (
+              <div className="mt-8 grid gap-3 sm:grid-cols-3 xl:max-w-4xl">
+                {metrics.map((metric) => (
+                  <div className="border-t border-black/20 pt-3" key={`${metric.value}-${metric.label}`}>
+                    <p className="text-[1.6rem] font-semibold leading-none text-[var(--text)]">{metric.value}</p>
+                    <p className="mt-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">
+                      {metric.label}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            ) : null}
           </div>
           <div className="min-w-0 border-l border-black/20 pl-5 xl:pt-4">
-            <PublicBodyText className="max-w-[36rem]" size="md">
+            <PublicEyebrow tone="muted">{summaryHeading}</PublicEyebrow>
+            <PublicBodyText className="mt-3 max-w-[36rem] text-[var(--text)]" size="md" tone="default">
               {description}
             </PublicBodyText>
-            <PublicBodyText className="mt-5 max-w-[36rem] text-[var(--muted)]" size="sm">
+            <PublicBodyText className="mt-5 max-w-[36rem]" size="sm">
               {summary}
             </PublicBodyText>
             <PublicActionRow>
@@ -81,6 +100,27 @@ export function EditorialPublicPage({
           </div>
         </div>
       </section>
+
+      {rows.length > 0 ? (
+        <section className="border-b border-black/12 py-8 md:py-10">
+          <div className="container grid gap-6 xl:grid-cols-[minmax(14rem,0.36fr)_minmax(0,1fr)]">
+            <div>
+              <PublicEyebrow>{rowsHeading}</PublicEyebrow>
+            </div>
+            <div className="grid gap-3 md:grid-cols-3">
+              {rows.map((row) => (
+                <Panel className="border-black/10 bg-[rgba(255,250,244,0.7)]" key={`${row.label}-${row.title}`} padding="lg">
+                  <MetaChip className="border-black/10 bg-transparent text-[var(--muted)]" variant="filter">
+                    {row.label}
+                  </MetaChip>
+                  <h2 className="mt-4 text-[1.1rem] font-semibold leading-7 text-[var(--text)]">{row.title}</h2>
+                  <PublicBodyText className="mt-3">{row.description}</PublicBodyText>
+                </Panel>
+              ))}
+            </div>
+          </div>
+        </section>
+      ) : null}
     </div>
   );
 }

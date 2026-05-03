@@ -1,24 +1,10 @@
+import type { Metadata } from 'next';
 import { LegalDraftPage } from '@/components/public/legal-draft-page';
+import { buildLegalMetadata, getCookiesDocument } from '@/lib/legal/legal-documents';
+
+const cookiesDocument = getCookiesDocument();
+export const metadata: Metadata = buildLegalMetadata(cookiesDocument);
 
 export default function CookiesPage() {
-  return (
-    <LegalDraftPage
-      title="Cookies и аналитика"
-      description="Описание технических cookies, серверных логов и аналитики, которые помогают поддерживать стабильную работу сайта."
-      sections={[
-        {
-          title: 'Технические cookies',
-          items: ['Cookies используются для сессий, безопасности и стабильной работы сайта.', 'Сессионные cookies помогают защищать вход и пользовательскую сессию.']
-        },
-        {
-          title: 'Аналитика',
-          items: ['Аналитика подключается только с понятной целью обработки и описанием используемого сервиса.', 'Для production используются решения, совместимые с российской инфраструктурой и требованиями проекта.']
-        },
-        {
-          title: 'Управление',
-          items: ['Пользователь может ограничить cookies настройками браузера, но часть функций сайта может работать некорректно.', 'Изменения в cookie-политике фиксируются в актуальной редакции этой страницы.']
-        }
-      ]}
-    />
-  );
+  return <LegalDraftPage document={cookiesDocument} />;
 }

@@ -15,12 +15,14 @@ import { InlineLink } from '@/components/ui/inline-link';
 import { Select } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 
-export function EventApplicationForm({ enabled, result, utm, cities }: PublicApplicationFormProps) {
+export function EventApplicationForm({ enabled, result, utm, cities, defaults = {} }: PublicApplicationFormProps) {
+  const hasEventContext = Boolean(defaults.eventTitle);
+
   return (
     <PublicApplicationSection
       eyebrow="События / Заявка"
-      title="Участие в событии или своё предложение"
-      description="Можно записаться на событие или предложить свой формат."
+      title={hasEventContext ? 'Заявка на выбранное событие' : 'Участие в событии или своё предложение'}
+      description={hasEventContext ? 'Название события уже подставлено в форму.' : 'Можно записаться на событие или предложить свой формат.'}
       enabled={enabled}
       result={result}
     >
@@ -29,8 +31,8 @@ export function EventApplicationForm({ enabled, result, utm, cities }: PublicApp
         <HoneypotField id="event-application-website" />
         <PublicFormShellHeader
           eyebrow="Участие и предложение"
-          title="Заявка на событие"
-          description="Для участия, новой темы, коллаборации или события в календаре."
+          title={hasEventContext ? defaults.eventTitle! : 'Заявка на событие'}
+          description={hasEventContext ? 'Оставьте контакт и короткий комментарий по участию.' : 'Для участия, новой темы, коллаборации или события в календаре.'}
         />
         <div className="relative p-5 md:p-6">
           <div className="grid gap-4 md:grid-cols-2">
@@ -38,7 +40,7 @@ export function EventApplicationForm({ enabled, result, utm, cities }: PublicApp
               <Input id="eventName" name="name" required maxLength={160} minLength={2} />
             </FormField>
             <FormField htmlFor="eventTitle" label="Событие или тема">
-              <Input id="eventTitle" name="eventTitle" required maxLength={180} minLength={2} />
+              <Input id="eventTitle" name="eventTitle" defaultValue={defaults.eventTitle} required maxLength={180} minLength={2} />
             </FormField>
             <FormField htmlFor="eventEmail" label="Email">
               <Input id="eventEmail" name="email" type="email" maxLength={180} />
@@ -66,9 +68,8 @@ export function EventApplicationForm({ enabled, result, utm, cities }: PublicApp
             </div>
             <div className="md:col-span-2">
               <ConsentField>
-                Даю согласие на обработку персональных данных для этой заявки. Полный текст{' '}
-                <InlineLink href="/legal/personal-data-consent">согласия</InlineLink>
-                .
+                Согласен с <InlineLink href="/legal/privacy">политикой обработки персональных данных</InlineLink> и даю{' '}
+                <InlineLink href="/legal/personal-data-consent">согласие на обработку персональных данных</InlineLink> для этой заявки.
               </ConsentField>
             </div>
           </div>

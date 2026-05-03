@@ -7,12 +7,12 @@ import {
   assertActiveContentRelations,
   contentStatusValues,
   deleteUploadedFileIfUnused,
-  findUniqueSlug,
   formatAdminActionError,
   getString,
   initialPublicationDates,
   nullableString,
   optionalString,
+  persistWithUniqueSlugRetry,
   redirectWithAdminActionResult,
   resolveCoverImageId,
   safeAdminRedirectPath,
@@ -79,41 +79,42 @@ export async function createPartner(formData: FormData) {
       categoryType: CategoryType.PARTNER
     });
 
-    const [uniqueSlug, coverImageId] = await Promise.all([
-      findUniqueSlug(slug, async (candidate) =>
+    const coverImageId = await resolveCoverImageId({
+      formData,
+      userId: user.id,
+      onUploadedImageId: (fileId) => {
+        uploadedCoverImageId = fileId;
+      }
+    });
+
+    await persistWithUniqueSlugRetry({
+      baseSlug: slug,
+      exists: async (candidate) =>
         Boolean(
           await prisma.partner.findFirst({
             where: { slug: candidate },
             select: { id: true }
           })
-        )
-      ),
-      resolveCoverImageId({
-        formData,
-        userId: user.id,
-        onUploadedImageId: (fileId) => {
-          uploadedCoverImageId = fileId;
-        }
-      })
-    ]);
-
-    await prisma.partner.create({
-      data: {
-        title: parsed.title,
-        slug: uniqueSlug,
-        summary: parsed.summary,
-        description: parsed.description,
-        status: parsed.status,
-        coverImageId,
-        categoryId: nullableString(parsed.categoryId),
-        companyName: parsed.companyName,
-        websiteUrl: nullableString(websiteUrl),
-        partnerType: nullableString(parsed.partnerType),
-        isFeatured: parsed.isFeatured,
-        createdById: user.id,
-        updatedById: user.id,
-        ...initialPublicationDates(parsed.status)
-      }
+        ),
+      persist: (uniqueSlug) =>
+        prisma.partner.create({
+          data: {
+            title: parsed.title,
+            slug: uniqueSlug,
+            summary: parsed.summary,
+            description: parsed.description,
+            status: parsed.status,
+            coverImageId,
+            categoryId: nullableString(parsed.categoryId),
+            companyName: parsed.companyName,
+            websiteUrl: nullableString(websiteUrl),
+            partnerType: nullableString(parsed.partnerType),
+            isFeatured: parsed.isFeatured,
+            createdById: user.id,
+            updatedById: user.id,
+            ...initialPublicationDates(parsed.status)
+          }
+        })
     });
 
     revalidatePath(ADMIN_PARTNERS_PATH);
@@ -170,42 +171,43 @@ export async function updatePartner(formData: FormData) {
       categoryType: CategoryType.PARTNER
     });
 
-    const [uniqueSlug, coverImageId] = await Promise.all([
-      findUniqueSlug(slug, async (candidate) =>
+    const coverImageId = await resolveCoverImageId({
+      formData,
+      userId: user.id,
+      currentCoverImageId: existingPartner.coverImageId,
+      onUploadedImageId: (fileId) => {
+        uploadedCoverImageId = fileId;
+      }
+    });
+
+    await persistWithUniqueSlugRetry({
+      baseSlug: slug,
+      exists: async (candidate) =>
         Boolean(
           await prisma.partner.findFirst({
             where: { slug: candidate, id: { not: parsed.partnerId } },
             select: { id: true }
           })
-        )
-      ),
-      resolveCoverImageId({
-        formData,
-        userId: user.id,
-        currentCoverImageId: existingPartner.coverImageId,
-        onUploadedImageId: (fileId) => {
-          uploadedCoverImageId = fileId;
-        }
-      })
-    ]);
-
-    await prisma.partner.update({
-      where: { id: parsed.partnerId },
-      data: {
-        title: parsed.title,
-        slug: uniqueSlug,
-        summary: parsed.summary,
-        description: parsed.description,
-        status: parsed.status,
-        coverImageId,
-        categoryId: nullableString(parsed.categoryId),
-        companyName: parsed.companyName,
-        websiteUrl: nullableString(websiteUrl),
-        partnerType: nullableString(parsed.partnerType),
-        isFeatured: parsed.isFeatured,
-        updatedById: user.id,
-        ...statusTransitionDates(parsed.status, existingPartner.publishedAt)
-      }
+        ),
+      persist: (uniqueSlug) =>
+        prisma.partner.update({
+          where: { id: parsed.partnerId },
+          data: {
+            title: parsed.title,
+            slug: uniqueSlug,
+            summary: parsed.summary,
+            description: parsed.description,
+            status: parsed.status,
+            coverImageId,
+            categoryId: nullableString(parsed.categoryId),
+            companyName: parsed.companyName,
+            websiteUrl: nullableString(websiteUrl),
+            partnerType: nullableString(parsed.partnerType),
+            isFeatured: parsed.isFeatured,
+            updatedById: user.id,
+            ...statusTransitionDates(parsed.status, existingPartner.publishedAt)
+          }
+        })
     });
 
     if (previousCoverImageId !== coverImageId) {

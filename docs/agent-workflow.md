@@ -12,6 +12,8 @@ The central agent must:
 - keep the phase sequence in `docs/phase-plan.md` as the implementation roadmap;
 - lock one mode before work: `DECISION`, `IMPLEMENTATION` or `QA`;
 - define goal, scope, ownership, done criteria and validation before meaningful implementation;
+- keep public and user-facing Russian copy simple, literal and natural instead of promo-style or machine-like phrasing;
+- use the `humanizer-ru` cleanup principle by default when rewriting connected Russian user-facing prose, while leaving code, logs, commands, schemas and exact quotations untouched;
 - decide whether subagents are needed;
 - assign bounded tasks to subagents;
 - review subagent output before accepting it;

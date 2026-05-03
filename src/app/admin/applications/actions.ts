@@ -24,9 +24,9 @@ import {
 } from '@/lib/auth/business-access';
 import { hashPassword } from '@/lib/auth/password';
 import {
-  findUniqueSlug,
   getString,
   optionalString,
+  persistWithUniqueSlugRetry,
   redirectWithAdminActionResult,
   safeAdminRedirectPath,
   slugify
@@ -197,22 +197,25 @@ export async function createVacancyDraftFromApplication(formData: FormData) {
         throw new Error('vacancy draft requires slug');
       }
 
-      const uniqueSlug = await findUniqueSlug(slug, async (candidate) =>
-        Boolean(
-          await tx.vacancy.findFirst({
-            where: { slug: candidate },
-            select: { id: true }
+      const vacancy = await persistWithUniqueSlugRetry({
+        baseSlug: slug,
+        exists: async (candidate) =>
+          Boolean(
+            await tx.vacancy.findFirst({
+              where: { slug: candidate },
+              select: { id: true }
+            })
+          ),
+        persist: (uniqueSlug) =>
+          tx.vacancy.create({
+            data: {
+              ...draftFields,
+              slug: uniqueSlug,
+              createdById: user.id,
+              updatedById: user.id
+            },
+            select: { id: true, title: true, slug: true }
           })
-        )
-      );
-      const vacancy = await tx.vacancy.create({
-        data: {
-          ...draftFields,
-          slug: uniqueSlug,
-          createdById: user.id,
-          updatedById: user.id
-        },
-        select: { id: true, title: true }
       });
 
       await tx.application.update({
@@ -222,7 +225,7 @@ export async function createVacancyDraftFromApplication(formData: FormData) {
           status: ApplicationStatus.APPROVED,
           internalNotes: appendApplicationInternalNote(
             application.internalNotes,
-            `Создан черновик вакансии: ${vacancy.title} (${uniqueSlug}).`
+            `Создан черновик вакансии: ${vacancy.title} (${vacancy.slug}).`
           )
         }
       });
@@ -363,31 +366,35 @@ export async function prepareBusinessAccessAction(formData: FormData) {
       const businessAccount =
         application.businessAccount ??
         existingUser?.businessAccount ??
-        (await tx.businessAccount.create({
-          data: {
-            ownerId: user.id,
-            companyName: requestProfile.companyName,
-            slug: await findUniqueSlug(slugify(requestProfile.companyName) || 'business', async (candidate) =>
-              Boolean(
-                await tx.businessAccount.findFirst({
-                  where: { slug: candidate },
-                  select: { id: true }
-                })
-              )
+        (await persistWithUniqueSlugRetry({
+          baseSlug: slugify(requestProfile.companyName) || 'business',
+          exists: async (candidate) =>
+            Boolean(
+              await tx.businessAccount.findFirst({
+                where: { slug: candidate },
+                select: { id: true }
+              })
             ),
-            status: BusinessAccountStatus.PENDING,
-            cityId: application.cityId,
-            contactPerson: requestProfile.contactPerson,
-            phone: application.phone,
-            telegram: application.telegram,
-            websiteUrl: requestProfile.websiteUrl,
-            description: requestProfile.description
-          },
-          select: {
-            id: true,
-            companyName: true,
-            status: true
-          }
+          persist: (uniqueSlug) =>
+            tx.businessAccount.create({
+              data: {
+                ownerId: user.id,
+                companyName: requestProfile.companyName,
+                slug: uniqueSlug,
+                status: BusinessAccountStatus.PENDING,
+                cityId: application.cityId,
+                contactPerson: requestProfile.contactPerson,
+                phone: application.phone,
+                telegram: application.telegram,
+                websiteUrl: requestProfile.websiteUrl,
+                description: requestProfile.description
+              },
+              select: {
+                id: true,
+                companyName: true,
+                status: true
+              }
+            })
         }));
 
       if (businessAccount.status === BusinessAccountStatus.ACTIVE && user.status === UserStatus.ACTIVE) {

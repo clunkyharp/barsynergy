@@ -7,12 +7,12 @@ import {
   assertActiveContentRelations,
   contentStatusValues,
   deleteUploadedFileIfUnused,
-  findUniqueSlug,
   formatAdminActionError,
   getString,
   initialPublicationDates,
   nullableString,
   optionalString,
+  persistWithUniqueSlugRetry,
   redirectWithAdminActionResult,
   resolveCoverImageId,
   safeAdminRedirectPath,
@@ -82,43 +82,44 @@ export async function createCourse(formData: FormData) {
       cityId: parsed.cityId
     });
 
-    const [uniqueSlug, coverImageId] = await Promise.all([
-      findUniqueSlug(slug, async (candidate) =>
+    const coverImageId = await resolveCoverImageId({
+      formData,
+      userId: user.id,
+      onUploadedImageId: (fileId) => {
+        uploadedCoverImageId = fileId;
+      }
+    });
+
+    await persistWithUniqueSlugRetry({
+      baseSlug: slug,
+      exists: async (candidate) =>
         Boolean(
           await prisma.course.findFirst({
             where: { slug: candidate },
             select: { id: true }
           })
-        )
-      ),
-      resolveCoverImageId({
-        formData,
-        userId: user.id,
-        onUploadedImageId: (fileId) => {
-          uploadedCoverImageId = fileId;
-        }
-      })
-    ]);
-
-    await prisma.course.create({
-      data: {
-        title: parsed.title,
-        slug: uniqueSlug,
-        summary: parsed.summary,
-        program: parsed.program,
-        status: parsed.status,
-        coverImageId,
-        categoryId: nullableString(parsed.categoryId),
-        cityId: nullableString(parsed.cityId),
-        format: nullableString(parsed.format),
-        durationLabel: nullableString(parsed.durationLabel),
-        level: nullableString(parsed.level),
-        priceLabel: nullableString(parsed.priceLabel),
-        instructorName: nullableString(parsed.instructorName),
-        createdById: user.id,
-        updatedById: user.id,
-        ...initialPublicationDates(parsed.status)
-      }
+        ),
+      persist: (uniqueSlug) =>
+        prisma.course.create({
+          data: {
+            title: parsed.title,
+            slug: uniqueSlug,
+            summary: parsed.summary,
+            program: parsed.program,
+            status: parsed.status,
+            coverImageId,
+            categoryId: nullableString(parsed.categoryId),
+            cityId: nullableString(parsed.cityId),
+            format: nullableString(parsed.format),
+            durationLabel: nullableString(parsed.durationLabel),
+            level: nullableString(parsed.level),
+            priceLabel: nullableString(parsed.priceLabel),
+            instructorName: nullableString(parsed.instructorName),
+            createdById: user.id,
+            updatedById: user.id,
+            ...initialPublicationDates(parsed.status)
+          }
+        })
     });
 
     revalidatePath(ADMIN_COURSES_PATH);
@@ -177,44 +178,45 @@ export async function updateCourse(formData: FormData) {
       cityId: parsed.cityId
     });
 
-    const [uniqueSlug, coverImageId] = await Promise.all([
-      findUniqueSlug(slug, async (candidate) =>
+    const coverImageId = await resolveCoverImageId({
+      formData,
+      userId: user.id,
+      currentCoverImageId: existingCourse.coverImageId,
+      onUploadedImageId: (fileId) => {
+        uploadedCoverImageId = fileId;
+      }
+    });
+
+    await persistWithUniqueSlugRetry({
+      baseSlug: slug,
+      exists: async (candidate) =>
         Boolean(
           await prisma.course.findFirst({
             where: { slug: candidate, id: { not: parsed.courseId } },
             select: { id: true }
           })
-        )
-      ),
-      resolveCoverImageId({
-        formData,
-        userId: user.id,
-        currentCoverImageId: existingCourse.coverImageId,
-        onUploadedImageId: (fileId) => {
-          uploadedCoverImageId = fileId;
-        }
-      })
-    ]);
-
-    await prisma.course.update({
-      where: { id: parsed.courseId },
-      data: {
-        title: parsed.title,
-        slug: uniqueSlug,
-        summary: parsed.summary,
-        program: parsed.program,
-        status: parsed.status,
-        coverImageId,
-        categoryId: nullableString(parsed.categoryId),
-        cityId: nullableString(parsed.cityId),
-        format: nullableString(parsed.format),
-        durationLabel: nullableString(parsed.durationLabel),
-        level: nullableString(parsed.level),
-        priceLabel: nullableString(parsed.priceLabel),
-        instructorName: nullableString(parsed.instructorName),
-        updatedById: user.id,
-        ...statusTransitionDates(parsed.status, existingCourse.publishedAt)
-      }
+        ),
+      persist: (uniqueSlug) =>
+        prisma.course.update({
+          where: { id: parsed.courseId },
+          data: {
+            title: parsed.title,
+            slug: uniqueSlug,
+            summary: parsed.summary,
+            program: parsed.program,
+            status: parsed.status,
+            coverImageId,
+            categoryId: nullableString(parsed.categoryId),
+            cityId: nullableString(parsed.cityId),
+            format: nullableString(parsed.format),
+            durationLabel: nullableString(parsed.durationLabel),
+            level: nullableString(parsed.level),
+            priceLabel: nullableString(parsed.priceLabel),
+            instructorName: nullableString(parsed.instructorName),
+            updatedById: user.id,
+            ...statusTransitionDates(parsed.status, existingCourse.publishedAt)
+          }
+        })
     });
 
     if (previousCoverImageId !== coverImageId) {

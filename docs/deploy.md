@@ -22,6 +22,8 @@ Single-node fallback for first launch when external object storage or edge proxy
 
 ## Production Flow
 
+Before enabling public forms that collect personal data, complete [Personal data launch checklist](personal-data-launch-checklist.md).
+
 ```bash
 cp .env.production.example .env.production
 docker compose --env-file .env.production -f docker-compose.production.yml up -d --build
@@ -29,6 +31,8 @@ docker compose --env-file .env.production -f docker-compose.production.yml exec 
 ```
 
 Migration command must run inside the `app` container because production `DATABASE_URL` resolves `postgres` inside Docker network, not on the host.
+
+If the app is deployed from a host checkout with `barsynergy.service` running `node .next/standalone/server.js`, the build step must also sync `public/` and `.next/static/` into `.next/standalone/`. The repository `npm run build` command now does this automatically through `scripts/sync-standalone-assets.mjs`.
 
 ## Supported Ingress Contract (Current Repository State)
 
@@ -116,7 +120,7 @@ Operational rules for multi-server mode:
 - PostgreSQL must stay private and must not expose `5432` to the public internet;
 - production files must not depend on local app-server disks;
 - Prisma migrations must run once per release from a controlled migration step, not independently on every app server;
-- scheduled jobs, such as expired session cleanup, must run in one controlled place only;
+- scheduled cleanup jobs must run in one controlled place only, following [Scheduler runbook](scheduler-runbook.md);
 - database backups must be automated and restore must be tested before public launch.
 
 Connection pooling should be reviewed before running many app instances. Each Next.js app process can open PostgreSQL connections through Prisma; with multiple app servers and traffic spikes, this can exhaust the database connection limit. Use managed pooling or PgBouncer when app instance count, request volume or Prisma connection count starts approaching the PostgreSQL limit.
@@ -125,6 +129,7 @@ Connection pooling should be reviewed before running many app instances. Each Ne
 
 - [Remediation plan](remediation-plan.md)
 - [Project audit workflow](audit-workflow.md)
+- [Scheduler runbook](scheduler-runbook.md)
 
 ## Restrictions
 

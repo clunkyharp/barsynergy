@@ -39,7 +39,7 @@ const fallbackCards: Record<HomepageCardKind, Omit<HomepageLiveCard, 'kind'>> = 
     summary: 'Здесь собраны интенсивы, корпоративные программы и материалы, к которым можно возвращаться в работе.',
     meta: ['Очные и онлайн-занятия', 'СКФО'],
     href: '/education',
-    actionLabel: 'Перейти к материалам',
+    actionLabel: 'Запросить обучение',
     isFallback: true
   },
   event: {
@@ -48,7 +48,7 @@ const fallbackCards: Record<HomepageCardKind, Omit<HomepageLiveCard, 'kind'>> = 
     summary: 'В разделе есть лекции, гостевые смены, дегустации и встречи по городам региона.',
     meta: ['Афиша обновляется', 'СКФО'],
     href: '/events',
-    actionLabel: 'Перейти к афишам',
+    actionLabel: 'Смотреть афишу',
     isFallback: true
   },
   article: {
@@ -57,7 +57,7 @@ const fallbackCards: Record<HomepageCardKind, Omit<HomepageLiveCard, 'kind'>> = 
     summary: 'Тексты о сервисе, команде, меню, управлении и том, что реально работает в регионе.',
     meta: ['BARSYNERGY Index', 'Открытый доступ'],
     href: '/articles',
-    actionLabel: 'Открыть знания',
+    actionLabel: 'Открыть материалы',
     isFallback: true
   },
   vacancy: {
@@ -66,7 +66,7 @@ const fallbackCards: Record<HomepageCardKind, Omit<HomepageLiveCard, 'kind'>> = 
     summary: 'Здесь можно откликнуться на открытую роль или отправить заявку на публикацию вакансии.',
     meta: ['Для кандидатов и компаний', 'СКФО'],
     href: '/vacancies',
-    actionLabel: 'Откликнуться',
+    actionLabel: 'Смотреть вакансии',
     isFallback: true
   },
   supplier: {
@@ -75,7 +75,7 @@ const fallbackCards: Record<HomepageCardKind, Omit<HomepageLiveCard, 'kind'>> = 
     summary: 'Компании и сервисы, с которыми проще закрывать закупки, расходники и оборудование по региону.',
     meta: ['Закупки и сервис', 'B2B'],
     href: '/suppliers',
-    actionLabel: 'Перейти к поставщику',
+    actionLabel: 'Найти поставщика',
     isFallback: true
   }
 };
@@ -126,17 +126,17 @@ export async function getHomepageData(): Promise<HomepageData> {
       : ['Партнёрские программы', 'Локальные бренды', 'Школы и площадки', 'Совместные проекты'];
 
   return {
-    course: toHomepageCard(courses.items[0], 'course', '/education', 'Перейти к материалам', 'Образование'),
-    event: toHomepageCard(featuredEvent, 'event', '/events', 'Перейти к афишам', 'Ближайшее событие'),
+    course: toHomepageCard(courses.items[0], 'course', '/education', 'Открыть обучение', 'Образование'),
+    event: toHomepageCard(featuredEvent, 'event', '/events', 'Смотреть афишу', 'Ближайшее событие'),
     article: toHomepageCard(
       articles.items[0],
       'article',
       articles.items[0] ? `/articles/${articles.items[0].slug}` : '/articles',
-      'Читать материал',
+      'Открыть материал',
       'BARSYNERGY Index'
     ),
-    vacancy: toHomepageCard(vacancies.items[0], 'vacancy', '/vacancies', 'Откликнуться', 'Открытая вакансия'),
-    supplier: toHomepageCard(featuredSupplier, 'supplier', '/suppliers', 'Перейти к поставщику', 'Поставщик недели'),
+    vacancy: toHomepageCard(vacancies.items[0], 'vacancy', '/vacancies', 'Смотреть вакансии', 'Открытая вакансия'),
+    supplier: toHomepageCard(featuredSupplier, 'supplier', '/suppliers', 'Найти поставщика', 'Поставщик недели'),
     partnerSignals
   };
 }

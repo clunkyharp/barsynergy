@@ -11,6 +11,7 @@ const staticRoutes = [
   '/suppliers',
   '/partners',
   '/general-sponsors',
+  '/tools/cost-calculator',
   '/contacts',
   '/legal/privacy',
   '/legal/personal-data-consent',

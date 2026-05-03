@@ -32,6 +32,8 @@ type PublicFiltersProps = {
   embedded?: boolean;
   extraFilters?: ExtraFilter[];
   placeholder?: string;
+  description?: string;
+  variant?: 'stacked' | 'toolbar' | 'sidebar';
 };
 
 type ActiveFilter = {
@@ -49,7 +51,9 @@ export function PublicFilters({
   cities = [],
   embedded = false,
   extraFilters = [],
-  placeholder = 'Поиск по названию или теме...'
+  placeholder = 'Поиск по названию или теме…',
+  description = 'Город, категория и формат.',
+  variant
 }: PublicFiltersProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -57,6 +61,7 @@ export function PublicFilters({
   const [isPending, startTransition] = useTransition();
   const [draftQuery, setDraftQuery] = useState('');
   const [showFilters, setShowFilters] = useState(false);
+  const searchInputId = 'public-filters-search';
 
   const currentQ = searchParams?.get('q') ?? '';
   const currentCategory = searchParams?.get('category') ?? '';
@@ -167,12 +172,41 @@ export function PublicFilters({
   }, [categories, cities, currentCategory, currentCity, currentQ, extraFilters, searchParams]);
 
   const hasActiveFilters = activeFilters.length > 0;
+  const resolvedVariant = variant ?? (embedded ? 'sidebar' : 'stacked');
+
+  const searchField = (
+    <div className="relative">
+      <label className="sr-only" htmlFor={searchInputId}>
+        Поиск по списку
+      </label>
+      <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--muted)]" size={17} strokeWidth={1.8} />
+      <Input
+        aria-label="Поиск по списку"
+        autoComplete="off"
+        className={cn(fieldClassName(), 'pl-10')}
+        id={searchInputId}
+        inputMode="search"
+        name="q"
+        onChange={(e) => setDraftQuery(e.target.value)}
+        placeholder={placeholder}
+        spellCheck={false}
+        type="search"
+        value={draftQuery}
+      />
+    </div>
+  );
 
   const filterFields = (
     <>
       {categories.length > 0 ? (
         <div className="w-full">
-          <Select className={fieldClassName()} value={currentCategory} onChange={(e) => handleFilter('category', e.target.value)}>
+          <Select
+            aria-label="Категория"
+            className={fieldClassName()}
+            name="category"
+            value={currentCategory}
+            onChange={(e) => handleFilter('category', e.target.value)}
+          >
             <option value="">Все категории</option>
             {categories.map((cat) => (
               <option key={cat.id} value={cat.slug}>
@@ -185,7 +219,7 @@ export function PublicFilters({
 
       {cities.length > 0 ? (
         <div className="w-full">
-          <Select className={fieldClassName()} value={currentCity} onChange={(e) => handleFilter('city', e.target.value)}>
+          <Select aria-label="Город" className={fieldClassName()} name="city" value={currentCity} onChange={(e) => handleFilter('city', e.target.value)}>
             <option value="">Все города</option>
             {cities.map((city) => (
               <option key={city.id} value={city.slug}>
@@ -201,7 +235,13 @@ export function PublicFilters({
 
         return (
           <div className="w-full" key={filter.name}>
-            <Select className={fieldClassName()} aria-label={filter.label} value={currentValue} onChange={(e) => handleFilter(filter.name, e.target.value)}>
+            <Select
+              aria-label={filter.label}
+              className={fieldClassName()}
+              name={filter.name}
+              value={currentValue}
+              onChange={(e) => handleFilter(filter.name, e.target.value)}
+            >
               <option value="">{filter.allLabel ?? filter.label}</option>
               {filter.options.map((option) => (
                 <option key={`${filter.name}-${option.value}`} value={option.value}>
@@ -215,19 +255,71 @@ export function PublicFilters({
     </>
   );
 
+  if (resolvedVariant === 'toolbar') {
+    const toolbarContent = (
+      <div className={cn('grid gap-3', embedded ? '' : 'container')}>
+        <Panel className="border-black/10 bg-[rgba(255,250,244,0.84)] shadow-[0_18px_50px_rgba(20,20,18,0.04)]" padding="md">
+          <div className="grid gap-3 lg:grid-cols-[minmax(16rem,1.1fr)_repeat(3,minmax(10rem,0.8fr))]">
+            {searchField}
+            {filterFields}
+          </div>
+
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-black/10 pt-4">
+            <p className="text-sm leading-6 text-[var(--muted)]">{description}</p>
+            <div className="flex items-center gap-3">
+              {isPending ? (
+                <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">
+                  Обновляем…
+                </span>
+              ) : null}
+              {hasActiveFilters ? (
+                <button
+                  className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--accent)] transition-colors hover:text-[var(--accent-strong)]"
+                  onClick={clearAllFilters}
+                  type="button"
+                >
+                  <RotateCcw size={14} strokeWidth={1.8} />
+                  Сбросить
+                </button>
+              ) : null}
+            </div>
+          </div>
+
+          {hasActiveFilters ? (
+            <div className="mt-4 flex flex-wrap gap-2">
+              {activeFilters.map((filter) => (
+                <button
+                  className="inline-flex max-w-full items-center gap-2 rounded-full border border-[rgba(101,32,27,0.18)] bg-[rgba(101,32,27,0.05)] px-3 py-1.5 text-[11px] leading-5 text-[var(--accent)] transition hover:border-[rgba(101,32,27,0.28)] hover:bg-[rgba(101,32,27,0.08)]"
+                  key={`${filter.name}-${filter.value}`}
+                  onClick={() => clearSingleFilter(filter.name)}
+                  type="button"
+                >
+                  <span className="font-semibold uppercase tracking-[0.12em]">{filter.label}</span>
+                  <span className="break-words text-[var(--text)]">{filter.value}</span>
+                  <X size={12} strokeWidth={1.8} />
+                </button>
+              ))}
+            </div>
+          ) : null}
+        </Panel>
+      </div>
+    );
+
+    if (embedded) {
+      return toolbarContent;
+    }
+
+    return (
+      <section className="border-b border-black/10 bg-[var(--surface-muted)] py-6">
+        {toolbarContent}
+      </section>
+    );
+  }
+
   const content = (
     <div className={cn('grid gap-3', embedded ? '' : 'container')}>
       <Panel className="border-black/10 bg-[rgba(255,249,243,0.78)]" padding="md">
-        <div className="relative">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--muted)]" size={17} />
-          <Input
-            className={cn(fieldClassName(), 'pl-10')}
-            onChange={(e) => setDraftQuery(e.target.value)}
-            placeholder={placeholder}
-            type="search"
-            value={draftQuery}
-          />
-        </div>
+        {searchField}
       </Panel>
 
       {hasFilters ? (
@@ -235,9 +327,10 @@ export function PublicFilters({
           <div className="flex items-start justify-between gap-3">
             <div>
               <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Фильтры</p>
-              <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
-                {hasActiveFilters ? `Сейчас выбрано: ${activeFilters.length}.` : 'Город, категория и формат.'}
-              </p>
+              <p className="mt-2 text-sm leading-6 text-[var(--muted)]">{description}</p>
+              {hasActiveFilters ? (
+                <p className="text-sm leading-6 text-[var(--muted)]">Сейчас выбрано: {activeFilters.length}.</p>
+              ) : null}
             </div>
             <div className="flex items-center gap-2">
               {hasActiveFilters ? (

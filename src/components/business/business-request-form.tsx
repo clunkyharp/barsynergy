@@ -9,6 +9,7 @@ import { Card } from '@/components/ui/card';
 import { ConsentField } from '@/components/ui/consent-field';
 import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
+import { InlineLink } from '@/components/ui/inline-link';
 import { Select } from '@/components/ui/select';
 import { SegmentedControl } from '@/components/ui/segmented-control';
 import { Textarea } from '@/components/ui/textarea';
@@ -170,7 +171,10 @@ export function BusinessRequestForm({ cities, defaultCityId }: BusinessRequestFo
           <Textarea id="details" name="details" className="min-h-40" required maxLength={4000} rows={6} />
         </FormField>
 
-        <ConsentField>Даю согласие на обработку данных заявки.</ConsentField>
+        <ConsentField>
+          Согласен с <InlineLink href="/legal/privacy">политикой обработки персональных данных</InlineLink> и даю{' '}
+          <InlineLink href="/legal/personal-data-consent">согласие на обработку персональных данных</InlineLink> для этой заявки.
+        </ConsentField>
 
         <ActionRow>
           <Button className="rounded-full" size="lg" type="submit" name="intent" value="submit">

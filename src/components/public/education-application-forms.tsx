@@ -19,7 +19,7 @@ import { InlineLink } from '@/components/ui/inline-link';
 import { Select } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 
-export function EducationApplicationForms({ enabled, result, utm, cities }: PublicApplicationFormProps) {
+export function EducationApplicationForms({ enabled, result, utm, cities, defaults = {} }: PublicApplicationFormProps) {
   return (
     <PublicApplicationSection
       eyebrow="Образование / Заявки"
@@ -66,15 +66,14 @@ export function EducationApplicationForms({ enabled, result, utm, cities }: Publ
                 </FormField>
               </div>
               <FormField htmlFor="courseTitle" label="Интересующая программа или тема">
-                <Input id="courseTitle" name="courseTitle" required maxLength={180} minLength={2} />
+                <Input id="courseTitle" name="courseTitle" defaultValue={defaults.courseTitle} required maxLength={180} minLength={2} />
               </FormField>
               <FormField htmlFor="courseGoals" label="Комментарий">
                 <Textarea id="courseGoals" name="goals" required className="min-h-36" maxLength={3000} minLength={10} />
               </FormField>
               <ConsentField>
-                Даю согласие на обработку персональных данных для этой заявки. Полный текст{' '}
-                <InlineLink href="/legal/personal-data-consent">согласия</InlineLink>
-                .
+                Согласен с <InlineLink href="/legal/privacy">политикой обработки персональных данных</InlineLink> и даю{' '}
+                <InlineLink href="/legal/personal-data-consent">согласие на обработку персональных данных</InlineLink> для этой заявки.
               </ConsentField>
             </div>
             <PublicFormShellFooter note="Подойдёт, если хотите записаться или подобрать программу под свою задачу.">
@@ -128,12 +127,19 @@ export function EducationApplicationForms({ enabled, result, utm, cities }: Publ
                 <Input id="trainingTeamSize" name="teamSize" required maxLength={80} minLength={1} />
               </FormField>
               <FormField htmlFor="trainingRequest" label="Запрос">
-                <Textarea id="trainingRequest" name="requestDetails" required className="min-h-36" maxLength={4000} minLength={20} />
+                <Textarea
+                  id="trainingRequest"
+                  name="requestDetails"
+                  defaultValue={defaults.trainingRequest}
+                  required
+                  className="min-h-36"
+                  maxLength={4000}
+                  minLength={20}
+                />
               </FormField>
               <ConsentField>
-                Даю согласие на обработку персональных данных для этой заявки. Полный текст{' '}
-                <InlineLink href="/legal/personal-data-consent">согласия</InlineLink>
-                .
+                Согласен с <InlineLink href="/legal/privacy">политикой обработки персональных данных</InlineLink> и даю{' '}
+                <InlineLink href="/legal/personal-data-consent">согласие на обработку персональных данных</InlineLink> для этой заявки.
               </ConsentField>
             </div>
             <PublicFormShellFooter note="Подойдёт для обучения команды, запуска новой карты или внутреннего интенсива.">
@@ -187,9 +193,8 @@ export function EducationApplicationForms({ enabled, result, utm, cities }: Publ
               </FormField>
               <div className="md:col-span-2">
                 <ConsentField>
-                  Даю согласие на обработку персональных данных для этой заявки. Полный текст{' '}
-                  <InlineLink href="/legal/personal-data-consent">согласия</InlineLink>
-                  .
+                  Согласен с <InlineLink href="/legal/privacy">политикой обработки персональных данных</InlineLink> и даю{' '}
+                  <InlineLink href="/legal/personal-data-consent">согласие на обработку персональных данных</InlineLink> для этой заявки.
                 </ConsentField>
               </div>
             </div>

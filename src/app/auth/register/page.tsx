@@ -143,8 +143,8 @@ export default async function RegisterPage({ searchParams }: RegisterPageProps) 
                   </FormField>
                   <ConsentField>
                     <span>
-                      Даю согласие на обработку персональных данных для рассмотрения заявки. Полный текст есть на странице{' '}
-                      <InlineLink href="/legal/personal-data-consent">согласия на обработку ПДн</InlineLink>.
+                      Согласен с <InlineLink href="/legal/privacy">политикой обработки персональных данных</InlineLink> и даю{' '}
+                      <InlineLink href="/legal/personal-data-consent">согласие на обработку персональных данных</InlineLink> для рассмотрения заявки.
                     </span>
                   </ConsentField>
                   <ActionRow align="between">

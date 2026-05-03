@@ -35,6 +35,28 @@ http://localhost:3000
 
 Local PostgreSQL from Docker is exposed on `localhost:55432` to avoid conflicts with existing local databases.
 
+## Local Admin Access
+
+Create or reset a local admin account:
+
+```bash
+npm run admin:upsert:local
+```
+
+Default email:
+
+```txt
+admin@barsynergy.local
+```
+
+The script only allows local database hosts, creates the admin if it does not exist, resets the password if it already exists, marks the account as `ACTIVE`, deletes existing sessions for that user and prints the password once.
+
+Safer custom-password example without putting the password into the repo:
+
+```bash
+printf '%s\n' 'YourStrongPassword123!' | npm run admin:upsert:local -- --email admin@barsynergy.local --password-stdin
+```
+
 ## Validation
 
 ```bash
@@ -113,9 +135,11 @@ Production releases go `dev -> validation -> prod` only after owner confirmation
 - [Services specialists mini-spec](docs/services-specialists-spec.md)
 - [Setup](docs/setup.md)
 - [Deploy](docs/deploy.md)
+- [Scheduler runbook](docs/scheduler-runbook.md)
 - [Environment](docs/env.md)
 - [Backup](docs/backup.md)
 - [Security](docs/security.md)
+- [Personal data launch checklist](docs/personal-data-launch-checklist.md)
 - [Features](docs/features.md)
 - [Monetization](docs/monetization.md)
 - [Git workflow](docs/git-workflow.md)

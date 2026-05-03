@@ -26,6 +26,7 @@ export type PublicApplicationFormProps = {
   utm: PublicApplicationUtm;
   cities: ApplicationCityOption[];
   defaultTopic?: string;
+  defaults?: Record<string, string | undefined>;
 };
 
 export function HiddenUtmFields({ utm }: { utm: PublicApplicationUtm }) {
@@ -130,10 +131,12 @@ export function PublicApplicationSection({
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_24%,rgba(153,44,38,0.08),transparent_18%),radial-gradient(circle_at_78%_22%,rgba(255,255,255,0.62),transparent_20%),radial-gradient(circle_at_72%_82%,rgba(20,20,18,0.05),transparent_22%)]"
       />
       <div className="container relative grid gap-6 xl:grid-cols-[0.64fr_1.36fr] xl:items-start">
-        <div className="xl:sticky xl:top-24">
+        <div className="xl:self-start">
           <EditorialShell className="p-6 md:p-8">
             <PublicEyebrow>{eyebrow}</PublicEyebrow>
-            <PublicDisplayTitle className="mt-4 max-w-4xl">{title}</PublicDisplayTitle>
+            <PublicDisplayTitle className="mt-4 max-w-4xl !text-[clamp(2rem,3vw,3.25rem)] [overflow-wrap:normal] [word-break:normal]">
+              {title}
+            </PublicDisplayTitle>
             <PublicBodyText className="mt-5 max-w-md">{description}</PublicBodyText>
             {result ? (
               <InlineAlert className="mt-8" tone={result.type === 'error' ? 'error' : 'success'}>

@@ -1,24 +1,10 @@
+import type { Metadata } from 'next';
 import { LegalDraftPage } from '@/components/public/legal-draft-page';
+import { buildLegalMetadata, getPersonalDataConsentDocument } from '@/lib/legal/legal-documents';
+
+const personalDataConsentDocument = getPersonalDataConsentDocument();
+export const metadata: Metadata = buildLegalMetadata(personalDataConsentDocument);
 
 export default function PersonalDataConsentPage() {
-  return (
-    <LegalDraftPage
-      title="Согласие на обработку персональных данных"
-      description="Согласие для заявок, регистрации и контактных форм. Все формы с персональными данными должны ссылаться на эту страницу."
-      sections={[
-        {
-          title: 'Состав согласия',
-          items: ['Пользователь подтверждает передачу данных через форму сайта добровольно.', 'Пользователь соглашается на обработку данных для ответа на обращение или обработки заявки.']
-        },
-        {
-          title: 'Действия с данными',
-          items: ['Получение, запись, систематизация, хранение, уточнение, использование и удаление данных.', 'Передача третьим лицам не должна происходить без отдельного основания или требования закона.']
-        },
-        {
-          title: 'Обязательное правило',
-          items: ['Форма не должна отправляться без явного чекбокса согласия.', 'Текст согласия синхронизируется с фактическими полями и целями обработки данных.']
-        }
-      ]}
-    />
-  );
+  return <LegalDraftPage document={personalDataConsentDocument} />;
 }

@@ -3,7 +3,7 @@ import { cn } from '@/lib/utils';
 
 type PanelProps = HTMLAttributes<HTMLDivElement> & {
   tone?: 'default' | 'elevated' | 'inverse';
-  padding?: 'sm' | 'md' | 'lg';
+  padding?: 'none' | 'sm' | 'md' | 'lg';
 };
 
 export function Panel({ className, tone = 'default', padding = 'md', ...props }: PanelProps) {

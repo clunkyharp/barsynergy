@@ -20,9 +20,7 @@ const navItems = [
   { label: 'Контакты', href: '/contacts' }
 ];
 
-const desktopNavItems = navItems.filter(
-  (item) => !['/contacts', '/auth/login', '/general-sponsors', '/about'].includes(item.href)
-);
+const desktopNavItems = navItems.filter((item) => !['/contacts', '/auth/login'].includes(item.href));
 
 function isWorkspacePath(pathname: string | null) {
   return Boolean(pathname?.startsWith('/admin') || pathname?.startsWith('/business') || pathname?.startsWith('/auth'));
@@ -66,7 +64,7 @@ export function SiteHeader() {
       <div className="container">
         <div
           className={cn(
-            'relative z-10 flex min-h-[82px] items-center justify-between gap-2 rounded-full px-3 shadow-[0_18px_50px_rgba(20,20,18,0.08)] backdrop-blur lg:grid lg:grid-cols-[236px_minmax(0,1fr)_236px] lg:items-center lg:gap-2.5 lg:px-4 xl:grid-cols-[270px_minmax(0,1fr)_270px] xl:gap-4 2xl:grid-cols-[286px_minmax(0,1fr)_286px] 2xl:gap-5',
+            'relative z-10 flex min-h-[82px] items-center justify-between gap-2 rounded-full px-3 shadow-[0_18px_50px_rgba(20,20,18,0.08)] backdrop-blur lg:grid lg:grid-cols-[188px_minmax(0,1fr)_188px] lg:items-center lg:gap-2 lg:px-4 xl:grid-cols-[220px_minmax(0,1fr)_236px] xl:gap-3 2xl:grid-cols-[250px_minmax(0,1fr)_260px] 2xl:gap-4',
             isMobileMenuOpen
               ? 'border border-white/14 bg-[rgba(20,20,18,0.52)] text-white shadow-[0_18px_40px_rgba(0,0,0,0.22)] backdrop-blur-[18px] lg:border-black/10 lg:bg-[color-mix(in_oklab,var(--surface),white_46%)]/90 lg:text-[var(--text)] lg:shadow-[0_18px_50px_rgba(20,20,18,0.08)]'
               : 'border border-black/10 bg-[color-mix(in_oklab,var(--surface),white_46%)]/90'
@@ -91,14 +89,14 @@ export function SiteHeader() {
               width={162}
             />
           </a>
-          <nav className="hidden min-w-0 items-center justify-center gap-0.5 px-1 text-[11px] font-semibold uppercase tracking-[0.05em] text-[var(--text)] lg:flex lg:justify-self-center xl:px-2 xl:text-[11px] 2xl:gap-1 2xl:px-4 2xl:text-[12px]">
+          <nav className="hidden min-w-0 items-center justify-center gap-0 px-0.5 text-[10px] font-semibold uppercase tracking-[0.035em] text-[var(--text)] lg:flex lg:justify-self-center xl:px-1 xl:text-[10px] 2xl:gap-0.5 2xl:px-3 2xl:text-[11px]">
             {desktopNavItems.map((item) => {
               const isActive = pathname ? isActiveItem(pathname, item.href) : false;
 
               return (
                 <a
                   className={cn(
-                    'inline-flex min-h-11 items-center whitespace-nowrap rounded-full px-2 opacity-84 transition hover:bg-white hover:opacity-100 xl:px-3 2xl:px-3.5',
+                    'inline-flex min-h-10 items-center whitespace-nowrap rounded-full px-1.5 opacity-84 transition hover:bg-white hover:opacity-100 xl:px-2 2xl:min-h-11 2xl:px-3',
                     focusClassName,
                     isActive && 'bg-[var(--graphite)] text-white opacity-100 hover:bg-[var(--graphite)]'
                   )}
@@ -113,7 +111,7 @@ export function SiteHeader() {
           <div className="hidden items-center justify-end gap-1.5 lg:flex lg:w-full">
             <a
               className={cn(
-                'inline-flex min-h-11 items-center whitespace-nowrap rounded-full px-2.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)] transition hover:text-[var(--accent)] xl:px-3.5 2xl:px-4 2xl:text-[12px]',
+                'hidden min-h-10 items-center whitespace-nowrap rounded-full px-2.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)] transition hover:text-[var(--accent)] xl:inline-flex 2xl:min-h-11 2xl:px-4 2xl:text-[11px]',
                 focusClassName
               )}
               href="/auth/login"
@@ -122,7 +120,7 @@ export function SiteHeader() {
             </a>
             <a
               className={cn(
-                'inline-flex min-h-11 shrink-0 items-center gap-2 whitespace-nowrap rounded-full border border-[var(--graphite)] bg-[var(--graphite)] px-3 text-[11px] font-semibold uppercase tracking-[0.06em] text-white transition-colors duration-200 hover:border-[var(--graphite)] hover:bg-[var(--graphite)] hover:text-white xl:px-3.5 xl:text-[12px] 2xl:gap-3 2xl:px-4 2xl:text-[12px]',
+                'inline-flex min-h-10 shrink-0 items-center gap-2 whitespace-nowrap rounded-full border border-[var(--graphite)] bg-[var(--graphite)] px-3 text-[10px] font-semibold uppercase tracking-[0.06em] text-white transition-colors duration-200 hover:border-[var(--graphite)] hover:bg-[var(--graphite)] hover:text-white xl:px-3.5 xl:text-[11px] 2xl:min-h-11 2xl:gap-3 2xl:px-5 2xl:text-[12px]',
                 focusClassName
               )}
               href="/contacts"

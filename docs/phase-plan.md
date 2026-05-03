@@ -91,17 +91,22 @@ Done when:
 
 Current status:
 
-- public routes and legal pages are implemented;
+- public routes are implemented, and legal pages now have project-specific working texts for the current MVP flows;
+- personal-data launch checklist is documented in `docs/personal-data-launch-checklist.md`;
 - shared header, footer and public page templates are implemented;
 - `/general-sponsors` is implemented as a separate visible public screen with homepage and navigation entry points;
 - route-level loading, error and not-found states are implemented;
 - design-system foundation is documented in `DESIGN.md` and `design-tokens.json`;
 - lint, typecheck, build, Prisma validate, public route smoke and desktop/mobile homepage spot checks pass;
 - the homepage has been rebuilt as a live CMS-fed front page with a new public shell, GSAP-driven narrative sections, stronger B2B routing and renewed desktop/mobile screenshot checks;
+- homepage browser-comment follow-up is applied locally: the `О проекте` section is simplified, explanation cards now have direct CTA buttons, audience cards have aligned action rows, the general sponsor block no longer duplicates social buttons or the extra lineup photo, and social promo cards now use integrated icon backgrounds;
+- homepage social promo cards are refined locally again: the three channel cards now share one `SocialCard` component and use dedicated local SVG Telegram/WhatsApp/Instagram logos as separate right-side background layers instead of pseudo-icons;
+- sponsor data is now shared between the homepage and `/general-sponsors`, so the separate sponsors page renders the same real entries and no longer keeps a separate test showcase list;
+- partner/sponsor follow-up is applied locally: `/partners` now leads with clearer plain-Russian copy, shows the current general sponsor directly on the page, the `Hustle Brew` block now reads as an editorial partner profile instead of a promo slab, social promo cards no longer let their oversized logos collide with the right-side divider treatment, and the public header no longer overflows or shifts its desktop nav/actions on medium desktop widths;
 - the main public routes now share normalized public primitives for typography, section headers, stat shells, filters, content meta chips and form action rows, while keeping demo/test data and section-specific information structure;
 - focused browser smoke is rerun for key public and auth routes, including shell-safety checks and corrected desktop navigation/contrast fixes on the vacancies surface;
 - Phase 1 is complete for the current static public surface;
-- legal text still needs owner/legal review before personal-data collection.
+- legal text and operator/Roskomnadzor readiness still need owner/legal review before personal-data collection.
 
 ## Phase 2: Database Models And Content Admin
 
@@ -195,7 +200,7 @@ Current status:
 - admin-only private resume download is available at `/admin/applications/[applicationId]/resume`;
 - user confirmation emails are sent when `SMTP_*` is configured, and short Telegram admin notifications are sent when Telegram env config is present;
 - Phase 3 is complete at source level for the current MVP applications contract;
-- legal text still needs owner/legal review before personal-data forms are enabled in production.
+- legal text and operator/Roskomnadzor readiness still need owner/legal review before personal-data forms are enabled in production.
 
 ## Phase 4: Auth And Business Account First
 

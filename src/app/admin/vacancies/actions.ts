@@ -7,12 +7,12 @@ import {
   assertActiveContentRelations,
   contentStatusValues,
   deleteUploadedFileIfUnused,
-  findUniqueSlug,
   formatAdminActionError,
   getString,
   initialPublicationDates,
   nullableString,
   optionalString,
+  persistWithUniqueSlugRetry,
   redirectWithAdminActionResult,
   resolveCoverImageId,
   safeAdminRedirectPath,
@@ -85,44 +85,45 @@ export async function createVacancy(formData: FormData) {
       cityId: parsed.cityId
     });
 
-    const [uniqueSlug, coverImageId] = await Promise.all([
-      findUniqueSlug(slug, async (candidate) =>
+    const coverImageId = await resolveCoverImageId({
+      formData,
+      userId: user.id,
+      onUploadedImageId: (fileId) => {
+        uploadedCoverImageId = fileId;
+      }
+    });
+
+    await persistWithUniqueSlugRetry({
+      baseSlug: slug,
+      exists: async (candidate) =>
         Boolean(
           await prisma.vacancy.findFirst({
             where: { slug: candidate },
             select: { id: true }
           })
-        )
-      ),
-      resolveCoverImageId({
-        formData,
-        userId: user.id,
-        onUploadedImageId: (fileId) => {
-          uploadedCoverImageId = fileId;
-        }
-      })
-    ]);
-
-    await prisma.vacancy.create({
-      data: {
-        title: parsed.title,
-        slug: uniqueSlug,
-        summary: parsed.summary,
-        description: parsed.description,
-        status: parsed.status,
-        coverImageId,
-        categoryId: nullableString(parsed.categoryId),
-        cityId: nullableString(parsed.cityId),
-        companyName: parsed.companyName,
-        position: parsed.position,
-        employmentType: nullableString(parsed.employmentType),
-        salaryLabel: nullableString(parsed.salaryLabel),
-        experienceLabel: nullableString(parsed.experienceLabel),
-        contactMode: nullableString(parsed.contactMode),
-        createdById: user.id,
-        updatedById: user.id,
-        ...initialPublicationDates(parsed.status)
-      }
+        ),
+      persist: (uniqueSlug) =>
+        prisma.vacancy.create({
+          data: {
+            title: parsed.title,
+            slug: uniqueSlug,
+            summary: parsed.summary,
+            description: parsed.description,
+            status: parsed.status,
+            coverImageId,
+            categoryId: nullableString(parsed.categoryId),
+            cityId: nullableString(parsed.cityId),
+            companyName: parsed.companyName,
+            position: parsed.position,
+            employmentType: nullableString(parsed.employmentType),
+            salaryLabel: nullableString(parsed.salaryLabel),
+            experienceLabel: nullableString(parsed.experienceLabel),
+            contactMode: nullableString(parsed.contactMode),
+            createdById: user.id,
+            updatedById: user.id,
+            ...initialPublicationDates(parsed.status)
+          }
+        })
     });
 
     revalidatePath(ADMIN_VACANCIES_PATH);
@@ -182,45 +183,46 @@ export async function updateVacancy(formData: FormData) {
       cityId: parsed.cityId
     });
 
-    const [uniqueSlug, coverImageId] = await Promise.all([
-      findUniqueSlug(slug, async (candidate) =>
+    const coverImageId = await resolveCoverImageId({
+      formData,
+      userId: user.id,
+      currentCoverImageId: existingVacancy.coverImageId,
+      onUploadedImageId: (fileId) => {
+        uploadedCoverImageId = fileId;
+      }
+    });
+
+    await persistWithUniqueSlugRetry({
+      baseSlug: slug,
+      exists: async (candidate) =>
         Boolean(
           await prisma.vacancy.findFirst({
             where: { slug: candidate, id: { not: parsed.vacancyId } },
             select: { id: true }
           })
-        )
-      ),
-      resolveCoverImageId({
-        formData,
-        userId: user.id,
-        currentCoverImageId: existingVacancy.coverImageId,
-        onUploadedImageId: (fileId) => {
-          uploadedCoverImageId = fileId;
-        }
-      })
-    ]);
-
-    await prisma.vacancy.update({
-      where: { id: parsed.vacancyId },
-      data: {
-        title: parsed.title,
-        slug: uniqueSlug,
-        summary: parsed.summary,
-        description: parsed.description,
-        status: parsed.status,
-        coverImageId,
-        categoryId: nullableString(parsed.categoryId),
-        cityId: nullableString(parsed.cityId),
-        companyName: parsed.companyName,
-        position: parsed.position,
-        employmentType: nullableString(parsed.employmentType),
-        salaryLabel: nullableString(parsed.salaryLabel),
-        experienceLabel: nullableString(parsed.experienceLabel),
-        contactMode: nullableString(parsed.contactMode),
-        updatedById: user.id,
-        ...statusTransitionDates(parsed.status, existingVacancy.publishedAt)
-      }
+        ),
+      persist: (uniqueSlug) =>
+        prisma.vacancy.update({
+          where: { id: parsed.vacancyId },
+          data: {
+            title: parsed.title,
+            slug: uniqueSlug,
+            summary: parsed.summary,
+            description: parsed.description,
+            status: parsed.status,
+            coverImageId,
+            categoryId: nullableString(parsed.categoryId),
+            cityId: nullableString(parsed.cityId),
+            companyName: parsed.companyName,
+            position: parsed.position,
+            employmentType: nullableString(parsed.employmentType),
+            salaryLabel: nullableString(parsed.salaryLabel),
+            experienceLabel: nullableString(parsed.experienceLabel),
+            contactMode: nullableString(parsed.contactMode),
+            updatedById: user.id,
+            ...statusTransitionDates(parsed.status, existingVacancy.publishedAt)
+          }
+        })
     });
 
     if (previousCoverImageId !== coverImageId) {

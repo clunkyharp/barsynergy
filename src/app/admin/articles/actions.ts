@@ -7,12 +7,12 @@ import {
   assertActiveContentRelations,
   contentStatusValues,
   deleteUploadedFileIfUnused,
-  findUniqueSlug,
   formatAdminActionError,
   getString,
   initialPublicationDates,
   nullableString,
   optionalString,
+  persistWithUniqueSlugRetry,
   redirectWithAdminActionResult,
   resolveCoverImageId,
   safeAdminRedirectPath,
@@ -79,41 +79,42 @@ export async function createArticle(formData: FormData) {
       cityId: parsed.cityId
     });
 
-    const [uniqueSlug, coverImageId] = await Promise.all([
-      findUniqueSlug(slug, async (candidate) =>
+    const coverImageId = await resolveCoverImageId({
+      formData,
+      userId: user.id,
+      onUploadedImageId: (fileId) => {
+        uploadedCoverImageId = fileId;
+      }
+    });
+
+    await persistWithUniqueSlugRetry({
+      baseSlug: slug,
+      exists: async (candidate) =>
         Boolean(
           await prisma.article.findFirst({
             where: { slug: candidate },
             select: { id: true }
           })
-        )
-      ),
-      resolveCoverImageId({
-        formData,
-        userId: user.id,
-        onUploadedImageId: (fileId) => {
-          uploadedCoverImageId = fileId;
-        }
-      })
-    ]);
-
-    await prisma.article.create({
-      data: {
-        title: parsed.title,
-        slug: uniqueSlug,
-        summary: parsed.summary,
-        body: parsed.body,
-        status: parsed.status,
-        coverImageId,
-        categoryId: nullableString(parsed.categoryId),
-        cityId: nullableString(parsed.cityId),
-        authorName: nullableString(parsed.authorName),
-        sourceLabel: nullableString(parsed.sourceLabel),
-        readingTimeMinutes: parsed.readingTimeMinutes,
-        createdById: user.id,
-        updatedById: user.id,
-        ...initialPublicationDates(parsed.status)
-      }
+        ),
+      persist: (uniqueSlug) =>
+        prisma.article.create({
+          data: {
+            title: parsed.title,
+            slug: uniqueSlug,
+            summary: parsed.summary,
+            body: parsed.body,
+            status: parsed.status,
+            coverImageId,
+            categoryId: nullableString(parsed.categoryId),
+            cityId: nullableString(parsed.cityId),
+            authorName: nullableString(parsed.authorName),
+            sourceLabel: nullableString(parsed.sourceLabel),
+            readingTimeMinutes: parsed.readingTimeMinutes,
+            createdById: user.id,
+            updatedById: user.id,
+            ...initialPublicationDates(parsed.status)
+          }
+        })
     });
 
     revalidatePath(ADMIN_ARTICLES_PATH);
@@ -172,42 +173,43 @@ export async function updateArticle(formData: FormData) {
       cityId: parsed.cityId
     });
 
-    const [uniqueSlug, coverImageId] = await Promise.all([
-      findUniqueSlug(slug, async (candidate) =>
+    const coverImageId = await resolveCoverImageId({
+      formData,
+      userId: user.id,
+      currentCoverImageId: existingArticle.coverImageId,
+      onUploadedImageId: (fileId) => {
+        uploadedCoverImageId = fileId;
+      }
+    });
+
+    await persistWithUniqueSlugRetry({
+      baseSlug: slug,
+      exists: async (candidate) =>
         Boolean(
           await prisma.article.findFirst({
             where: { slug: candidate, id: { not: parsed.articleId } },
             select: { id: true }
           })
-        )
-      ),
-      resolveCoverImageId({
-        formData,
-        userId: user.id,
-        currentCoverImageId: existingArticle.coverImageId,
-        onUploadedImageId: (fileId) => {
-          uploadedCoverImageId = fileId;
-        }
-      })
-    ]);
-
-    await prisma.article.update({
-      where: { id: parsed.articleId },
-      data: {
-        title: parsed.title,
-        slug: uniqueSlug,
-        summary: parsed.summary,
-        body: parsed.body,
-        status: parsed.status,
-        coverImageId,
-        categoryId: nullableString(parsed.categoryId),
-        cityId: nullableString(parsed.cityId),
-        authorName: nullableString(parsed.authorName),
-        sourceLabel: nullableString(parsed.sourceLabel),
-        readingTimeMinutes: parsed.readingTimeMinutes,
-        updatedById: user.id,
-        ...statusTransitionDates(parsed.status, existingArticle.publishedAt)
-      }
+        ),
+      persist: (uniqueSlug) =>
+        prisma.article.update({
+          where: { id: parsed.articleId },
+          data: {
+            title: parsed.title,
+            slug: uniqueSlug,
+            summary: parsed.summary,
+            body: parsed.body,
+            status: parsed.status,
+            coverImageId,
+            categoryId: nullableString(parsed.categoryId),
+            cityId: nullableString(parsed.cityId),
+            authorName: nullableString(parsed.authorName),
+            sourceLabel: nullableString(parsed.sourceLabel),
+            readingTimeMinutes: parsed.readingTimeMinutes,
+            updatedById: user.id,
+            ...statusTransitionDates(parsed.status, existingArticle.publishedAt)
+          }
+        })
     });
 
     if (previousCoverImageId !== coverImageId) {

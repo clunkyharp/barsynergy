@@ -1,24 +1,10 @@
+import type { Metadata } from 'next';
 import { LegalDraftPage } from '@/components/public/legal-draft-page';
+import { buildLegalMetadata, getTermsDocument } from '@/lib/legal/legal-documents';
+
+const termsDocument = getTermsDocument();
+export const metadata: Metadata = buildLegalMetadata(termsDocument);
 
 export default function TermsPage() {
-  return (
-    <LegalDraftPage
-      title="Пользовательское соглашение"
-      description="Условия использования публичного сайта, материалов, контактных каналов и пользовательских разделов."
-      sections={[
-        {
-          title: 'Предмет соглашения',
-          items: ['Сайт предоставляет информацию о проекте, образовании, событиях, вакансиях, поставщиках и партнерствах.', 'Интерактивные функции сайта регулируются актуальной версией соглашения.']
-        },
-        {
-          title: 'Ответственность пользователя',
-          items: ['Пользователь отвечает за корректность данных, которые отправляет через формы сайта.', 'Запрещены спам, ложные заявки и попытки нарушить работу сайта.']
-        },
-        {
-          title: 'Ограничение текущей версии',
-          items: ['Онлайн-оплата, подписки, LMS и публичные профили не входят в текущий публичный контур сайта.', 'Коммерческие заявки обрабатываются через контактный канал.']
-        }
-      ]}
-    />
-  );
+  return <LegalDraftPage document={termsDocument} />;
 }

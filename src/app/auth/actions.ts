@@ -290,7 +290,8 @@ export async function createBusinessAccountRequestAction(formData: FormData) {
             description: parsed.data.description || null
           },
           consentAcceptedAt: new Date(),
-          consentText: 'Согласие на обработку персональных данных для рассмотрения заявки на бизнес-доступ.'
+          consentText:
+            'Пользователь согласился с политикой обработки персональных данных и дал согласие на обработку персональных данных для рассмотрения заявки на бизнес-доступ.'
         }
       });
     });

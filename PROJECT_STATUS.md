@@ -1,10 +1,10 @@
 # BARSYNERGY Project Status
 
-Last updated: 2026-05-01
+Last updated: 2026-05-03
 
 ## Current Branch
 
-- Active branch: `dev`
+- Active branch: `codex/barsynergy-ui-preview`
 - Production branch: `prod`
 - Current work mode: `IMPLEMENTATION`
 
@@ -12,8 +12,15 @@ Last updated: 2026-05-01
 
 Active phase: Phase 4 auth and first business account is implemented for the current MVP contract. Phase 1 public website MVP is complete. Phase 2 content/admin work is implemented and runtime-verified for admin create flows, published-only public reads, upload boundaries, pagination and publish/archive behavior. Phase 3 covers the unified `Application` model, public forms, admin review, guarded employer-forwarding metadata, draft vacancy creation, private resume upload/download and optional SMTP/Telegram notifications when approved env config is present. Phase 4 covers email/password login, logout, reviewed business-access requests, admin-prepared one-time activation links, approved business accounts, blocking/reopening, editable business profile, business request drafts/submission/tracking and business-visible admin comments. Public personal-data forms remain disabled by default in production until `APPLICATION_FORMS_ENABLED=true` is explicitly set after legal approval.
 
-Current local follow-up completed on `dev`:
+Current local follow-up completed on the current preview branch:
 
+- public mockup-structure implementation is applied locally across `/`, `/events`, `/articles`, `/vacancies`, `/suppliers`, `/education`, `/partners`, `/general-sponsors`, `/tools/cost-calculator` and `/contacts`: the pages now follow the supplied layout hierarchy while keeping existing routes, public data flows, form actions and the current UI foundation;
+- validation for the mockup-structure batch is green locally: `npm run lint`, `npm run typecheck`, `npm run build`, scoped demo-content repair, Playwright desktop/mobile route smoke, calculator edge checks and mobile-menu open/close checks passed; Browser Use was unavailable in this session, so Playwright was used as the browser fallback;
+- public UI-flow implementation from `docs/agent/ui-flow-research-qa-2026-05-03.md` is applied locally: event list registration now opens the selected event detail form with event title context, supplier and partner detail CTAs pass company/context into contacts, education and partner format cards prefill their request forms, sponsorship packages link to sponsor-specific contact context, the empty knowledge state now keeps two editorial CTAs, and the calculator has clearer zero/partial-input/result hints; Browser Use and Playwright QA confirmed context prefill and no horizontal overflow on the checked public routes;
+- legal pages are now filled with project-specific working texts instead of short draft placeholders: `/legal/privacy`, `/legal/personal-data-consent`, `/legal/terms` and `/legal/cookies` describe the current contact, application, auth and business-access flows and still remain pending owner/legal review before production personal-data collection;
+- legal operator data is now centralized in env-backed runtime fields so the public legal pages can switch from a legal entity to an individual entrepreneur without another route rewrite; production startup now blocks enabling public personal-data forms until operator name, email, address, INN and registration ID are filled;
+- personal-data and confidentiality follow-up is applied locally: legal pages now spell out subjects, data categories, purposes, legal bases, processing actions, retention, employer transfer, processor/hosting caveats and RKN-readiness notes; production startup also requires operator address and explicit readiness flags before public forms can be enabled, public consent checkbox text links to both policy and consent, and a public technical-cookie notice is shown on non-workspace pages;
+- personal-data launch checklist is now documented in `docs/personal-data-launch-checklist.md`, and the owner-facing action list is copied into the Obsidian BARSYNERGY folder;
 - the design-system stabilization batch is completed locally: runtime font drift is fixed, semantic foundation tokens are expanded, and shared UI primitives now cover fields, checkbox rows, consent blocks, notices, segmented selectors, helper panels, status badges, editorial/public links, reusable list rows and admin CRUD tables;
 - article full editing has been moved from the `/admin/articles` table to a dedicated `/admin/articles/[articleId]` screen so long article bodies are not rendered inside the list view;
 - public application throttling now has a dedicated cleanup command: `npm run application:cleanup:throttles`.
@@ -44,12 +51,27 @@ Current local follow-up completed on `dev`:
 - public public-facing helper sections are trimmed further: featured/related content blocks no longer explain their own layout, while `/auth/login`, `/business/requests` and `/general-sponsors` now show action-oriented content without meta-descriptions of the page itself.
 - demo content for client-facing screen review is now available through `npm run demo:seed:screens`, and the current local database is already populated with realistic mock vacancies, suppliers, applications, draft content and pending business-access examples for admin, vacancies, suppliers and general-sponsor review.
 - auth, business-access and vacancy-request screens were cleaned further: `/auth/login`, `/auth/register`, `/business` and the business/public vacancy request forms now focus on the next user step instead of legal-process, moderation or queue-heavy explanations.
+- homepage and auth polish follow-up is now applied locally: the homepage has a fixed scroll-to-top button, a new on-page `О проекте` block linked from the footer, calmer first-screen link hovers, denser one-row social cards, a rebuilt general sponsor card with copyable contacts, and `/auth/login` now has a direct way back to the homepage plus a separate right-side info panel.
+- homepage browser-comment follow-up is now applied locally: the `О проекте` block no longer uses decorative chips or metric counters, the right-hand explanation cards now have direct CTA buttons, the `Для кого` section is explicitly titled and its action rows are vertically aligned, the sponsor block no longer duplicates Instagram/WhatsApp buttons or the extra lineup photo, and social cards now use integrated background icons instead of cropped square artwork.
+- homepage social cards are refined locally again: Telegram, WhatsApp and Instagram now use dedicated local SVG brand marks as separate right-side background objects inside a shared `SocialCard` component, with calmer gradients, equal card height and safer text/logo separation on desktop and mobile.
+- sponsor data is now unified between `/` and `/general-sponsors`: the separate sponsors page no longer shows test showcase entries and instead renders the same real `GENERAL_SPONSORS` records as the homepage.
 - security remediation batch is applied locally: login and business-access registration now use persistent per-email/per-IP throttling, unknown-email login performs a dummy bcrypt comparison, upload validation checks file signatures, S3 uploads request AES256 server-side encryption, Nginx overwrites inbound forwarding headers and emits a baseline CSP.
 - business-access activation remediation is applied locally: `/auth/register` stays request-only, admin application review can now prepare a one-time `/auth/activate` link, and the business owner sets the first password directly instead of receiving a pre-created password-bearing account.
 - trusted ingress remediation is applied locally: production docs and Nginx now use one supported external-edge contract, and request identity resolves the first forwarded client IP instead of depending on an overwritten proxy hop.
+- follow-up resilience batch is applied locally: admin content writes now retry cleanly on raced slug conflicts, and business-access invites now have a dedicated cleanup command for expired or old used tokens.
+- scheduler maintenance runbook is now documented locally: expired sessions, public application throttles and business-access invites are described as one combined production cleanup job instead of separate scattered notes.
+- production scheduler proof is now completed on the real host: `ssh.md` is confirmed as the repo source of truth for access, the app runs from `/opt/barsynergy` under `barsynergy.service`, and `barsynergy-cleanup.timer` now runs hourly with a verified manual pass for session/application cleanup on the current production revision.
+- production runtime hotfix is now applied on the real host: `.next/standalone/.next` is rebuilt under the `barsynergy` user so Next can create its runtime cache again, and the deploy contract now includes a stable `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` plus a release-specific deployment ID to reduce stale-client Server Action mismatches after deploys.
+- production style/runtime hotfix is now applied on the real host: the standalone service was missing copied `public/` and `/_next/static` assets after host-side builds, so CSS and fonts returned `404`; the live host is fixed and repo `npm run build` now syncs those assets into `.next/standalone` automatically.
+- standalone deploy guard is now part of the local build gate: after `next build`, the repo now syncs standalone assets and then boots `.next/standalone/server.js` in a smoke check that must return `200` for the homepage, one CSS asset, one font asset and one public asset before the build is considered green.
 - public mobile/tunnel interaction hardening is applied locally: decorative homepage overlays no longer capture taps above the hero/header area, the public header sits on a stronger interaction layer, and external tunnel origins are now allowlisted for dev assets and Server Actions so menu/form checks are less likely to fail during ngrok-like mobile review.
 - public trust cleanup is applied locally: the root loading screen no longer exposes a visible technical message, public filter fallbacks now use visual skeletons, education and partners got controlled empty states with clearer CTA paths, the homepage hero now routes into broader platform actions instead of a dead education-first CTA, and the contacts form uses a fixed topic selector instead of a free-text field.
+- public UX pre-launch follow-up is now applied locally: empty education/articles/partners states are rebuilt as action-led pre-launch screens, shared filters now speak in section-specific language, homepage CTAs and availability proof are more concrete, vacancies now expose separate candidate/employer entry points plus the previously unused public application forms, suppliers and partners have direct company/application paths, sponsors now show tiered entry packages, and the contacts form switches to topic-specific fields instead of one generic message flow.
+- separate public UI QA hardening is now applied locally after that follow-up: filter controls have explicit accessible labels and keep their route-specific guidance while active, desktop/mobile navigation and footer links expose visible keyboard focus states, internal pre-launch and package cards use calmer product-facing typography, the oversized footer CTA no longer competes with pages that already end in their own local form, suppliers now keep a visible `Добавить компанию` path even when the catalog is populated, and the vacancy application sidebar uses shorter copy that no longer breaks awkwardly in the narrow supporting column.
 - local review/demo content is cleaned for public screens: the garbage published vacancy is removed from the current database, the event demo summaries are normalized, and city options are now taken from the same active database list across public filters and the contact form instead of diverging hardcoded values.
+- public detail pages now follow a stronger shared editorial article pattern: articles, events, education, vacancies, suppliers and partners use a centered reference-style header, larger hero image, narrower reading column, utility sidebar and a calmer `read next` block instead of the older promo-like split hero.
+- partner/sponsor copy cleanup and browser-comment follow-up are now applied locally: homepage CTA hover states keep readable light text, the public header grid no longer pushes nav/actions out of alignment on medium desktop widths, `/partners` now shows the current general sponsor block directly on the page, the `Hustle Brew` card is rebuilt as a calmer editorial partner profile with compact contact rows, social promo cards no longer let the large logo collide with the right-side divider treatment, and project-local agent rules explicitly fix simple human Russian plus the `humanizer-ru` cleanup principle for user-facing prose.
+- mobile menu header follow-up is now applied locally: the burger/close control is one stable `MenuToggle` without a second overlay button, the open menu keeps the same mobile header shell for the logo and toggle, body scroll lock compensates scrollbar width to avoid header shift, and `Escape` plus `aria-expanded`/`aria-controls` continue to work on the shared control.
 
 Phase 0 is implemented as the technical foundation:
 
@@ -150,12 +172,17 @@ Auth attempt throttling is backed by migration `20260430120000_auth_attempt_thro
 
 - `AuthAttemptThrottle`.
 
+Business-access invite activation is backed by migration `20260430225454_phase4_business_access_invites`:
+
+- `BusinessAccessInvite`.
+
 ## Next Planned Work
 
 1. Start Phase 5 filters/search/directory-quality work, including the separate service-specialist catalog, only after owner confirms the Phase 4 result is acceptable.
-2. Keep legal approval as a blocker before enabling `APPLICATION_FORMS_ENABLED=true` in production.
-3. Configure production scheduler tasks for expired-session cleanup and public application throttle cleanup when production access is available.
+2. Keep owner/legal approval and Roskomnadzor/operator-readiness confirmation as blockers before enabling `APPLICATION_FORMS_ENABLED=true` in production.
+3. Ship the current remediation release to `prod` so the deployed revision includes `business-access:cleanup:invites`; the live hourly timer already skips that step explicitly when the script is absent.
 4. Verify the trusted external edge on the real production host before security sign-off.
+5. Watch production logs after the next user-traffic window and confirm no new `EACCES` cache errors or fresh Server Action mismatch spikes appear after the hotfix.
 
 ## Phase 4 Business Account Implementation Update
 
@@ -262,7 +289,7 @@ Validation:
 Remaining Phase 3 gaps:
 
 - legal text still needs owner/legal review before `APPLICATION_FORMS_ENABLED=true` is allowed in production;
-- production scheduler for application throttle cleanup is not configured yet;
+- the live host now runs one hourly cleanup timer, but the current production revision still lacks the business-access invite cleanup script from the newer local remediation batch;
 - notification providers still require real production SMTP/Telegram credentials before they can send outside local testing;
 
 ## Phase 2 Database Update
@@ -436,11 +463,11 @@ Completed on 2026-04-27:
 - project docs, Phase 2 mini-spec, remediation plan and Obsidian Kanban were compared with current source files;
 - Phase 2 database models are now implemented, so admin CRUD is the next implementation focus;
 - admin section guards, storage boundary changes, upload size cap and session cleanup command are present in source and documented as completed safeguards;
-- remaining blockers are unchanged: TLS ownership, production scheduler, legal review and future payment decision.
+- remaining blockers are now narrowed to trusted edge verification, legal review and future payment decision; the production cleanup timer is configured on the live host.
 
 ## Known Blockers
 
 - Production TLS ownership is not confirmed.
-- Production scheduler for expired session cleanup is not configured.
+- The live host timer is configured, but the current production revision still needs the next release before business-access invite cleanup can run there.
 - Legal texts need owner/legal review before collecting personal data.
 - Online payments are out of MVP scope and need a separate legal/accounting decision.

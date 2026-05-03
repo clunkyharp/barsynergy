@@ -37,7 +37,8 @@ type PublishedContentSectionProps = {
     variant?: ActionVariant;
   };
   sortLabel?: string;
-  rowVariant?: 'default' | 'opportunity';
+  rowVariant?: 'default' | 'opportunity' | 'directory';
+  rowActionLabel?: string;
 };
 
 function pageHref(content: PublishedContentList, basePath: string, page: number) {
@@ -98,7 +99,7 @@ function renderOpportunityChip(entry: PublishedContentMetaGroup) {
   );
 }
 
-function buildLabel(item: PublishedContentItem, rowVariant: 'default' | 'opportunity') {
+function buildLabel(item: PublishedContentItem, rowVariant: 'default' | 'opportunity' | 'directory') {
   if (rowVariant === 'opportunity') {
     const city = item.metaGroups?.find((entry) => entry.label === 'Город')?.value;
 
@@ -113,8 +114,8 @@ function buildLabel(item: PublishedContentItem, rowVariant: 'default' | 'opportu
   return <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">{item.label ?? 'Запись'}</p>;
 }
 
-function buildLabelMeta(item: PublishedContentItem, rowVariant: 'default' | 'opportunity') {
-  if (rowVariant !== 'opportunity') {
+function buildLabelMeta(item: PublishedContentItem, rowVariant: 'default' | 'opportunity' | 'directory') {
+  if (rowVariant !== 'opportunity' && rowVariant !== 'directory') {
     return null;
   }
 
@@ -136,8 +137,8 @@ function buildLabelMeta(item: PublishedContentItem, rowVariant: 'default' | 'opp
   );
 }
 
-function buildMeta(item: PublishedContentItem, rowVariant: 'default' | 'opportunity') {
-  if (rowVariant === 'opportunity' && item.metaGroups && item.metaGroups.length > 0) {
+function buildMeta(item: PublishedContentItem, rowVariant: 'default' | 'opportunity' | 'directory') {
+  if ((rowVariant === 'opportunity' || rowVariant === 'directory') && item.metaGroups && item.metaGroups.length > 0) {
     return <div className="flex flex-wrap gap-2.5">{item.metaGroups.map((entry) => renderOpportunityChip(entry))}</div>;
   }
 
@@ -156,6 +157,53 @@ function buildMeta(item: PublishedContentItem, rowVariant: 'default' | 'opportun
   );
 }
 
+function titleInitials(title: string) {
+  return title
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase())
+    .join('');
+}
+
+function buildListMedia(item: PublishedContentItem, rowVariant: 'default' | 'opportunity' | 'directory') {
+  if (rowVariant === 'opportunity') {
+    return (
+      <div className="grid h-16 w-16 place-items-center overflow-hidden rounded-[18px] border border-black/10 bg-[rgba(255,252,248,0.88)] text-lg font-semibold uppercase text-[var(--text)]">
+        {item.imageUrl ? (
+          <span aria-hidden="true" className="h-full w-full bg-cover bg-center" style={{ backgroundImage: `url("${item.imageUrl}")` }} />
+        ) : (
+          <span>{titleInitials(item.subtitle ?? item.title)}</span>
+        )}
+      </div>
+    );
+  }
+
+  if (rowVariant === 'directory') {
+    return (
+      <div className="grid min-h-28 w-full place-items-center overflow-hidden rounded-[18px] border border-black/10 bg-[rgba(255,252,248,0.82)] px-4 text-center text-lg font-semibold uppercase tracking-[0.08em] text-[var(--text)]">
+        {item.imageUrl ? (
+          <span aria-hidden="true" className="h-full min-h-28 w-full bg-contain bg-center bg-no-repeat" style={{ backgroundImage: `url("${item.imageUrl}")` }} />
+        ) : (
+          <span>{titleInitials(item.subtitle ?? item.title)}</span>
+        )}
+      </div>
+    );
+  }
+
+  if (item.imageUrl) {
+    return (
+      <div
+        aria-hidden="true"
+        className="aspect-[4/3] overflow-hidden rounded-[var(--radius-lg)] border border-black/10 bg-cover bg-center transition-transform duration-700 ease-out group-hover:scale-[1.02]"
+        style={{ backgroundImage: `url("${item.imageUrl}")` }}
+      />
+    );
+  }
+
+  return null;
+}
+
 export function PublishedContentSection({
   title,
   emptyTitle,
@@ -171,7 +219,8 @@ export function PublishedContentSection({
   listLabel = 'Список',
   listAction,
   sortLabel,
-  rowVariant = 'default'
+  rowVariant = 'default',
+  rowActionLabel = 'Подробнее'
 }: PublishedContentSectionProps) {
   const visibleItems = content.items.filter((item) => !excludedItemIds.includes(item.id));
   const resolvedEmptyActions = emptyActions ?? (emptyAction ? [emptyAction] : []);
@@ -243,22 +292,14 @@ export function PublishedContentSection({
             <div className="flex flex-col gap-4">
               {visibleItems.map((item) => (
                 <EditorialListRow
-                  actionLabel="Подробнее"
+                  actionLabel={rowActionLabel}
                   columns="content"
                   description={item.summary}
                   href={detailHref(basePath, item.slug)}
                   key={item.id}
                   label={buildLabel(item, rowVariant)}
                   labelMeta={buildLabelMeta(item, rowVariant)}
-                  media={
-                    rowVariant === 'default' && item.imageUrl ? (
-                      <div
-                        aria-hidden="true"
-                        className="aspect-[4/3] overflow-hidden rounded-[var(--radius-lg)] border border-black/10 bg-cover bg-center transition-transform duration-700 ease-out group-hover:scale-[1.02]"
-                        style={{ backgroundImage: `url("${item.imageUrl}")` }}
-                      />
-                    ) : null
-                  }
+                  media={buildListMedia(item, rowVariant)}
                   meta={buildMeta(item, rowVariant)}
                   subtitle={item.subtitle}
                   title={item.title}

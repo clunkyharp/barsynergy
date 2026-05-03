@@ -16,25 +16,25 @@ import { MetaChip } from '@/components/ui/meta-chip';
 import { Select } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 
-export function PartnerApplicationForm({ enabled, result, utm, cities }: PublicApplicationFormProps) {
+export function PartnerApplicationForm({ enabled, result, utm, cities, defaults = {} }: PublicApplicationFormProps) {
   const highlights = [
     'Образовательные коллаборации',
     'Спецпроекты для заведений',
-    'Партнерские интеграции',
+    'Партнёрские интеграции',
     'Размещение и поддержка событий'
   ];
 
   const preparationNotes = [
-    'Кто вы и какой формат сотрудничества хотите обсудить.',
-    'Какую задачу должен решить проект: обучение, мероприятие, размещение или запуск.',
-    'Ссылку на сайт, Telegram или материалы, если они уже готовы.'
+    'Кто вы и что хотите сделать вместе с BARSYNERGY.',
+    'Какую задачу решает проект: обучение, событие, запуск, размещение или набор контактов.',
+    'Ссылку на сайт, Telegram или материалы, если их уже можно посмотреть.'
   ];
 
   return (
     <PublicApplicationSection
-      eyebrow="Партнеры / Заявка"
-      title="Обсудить партнерство"
-      description="Для брендов, школ и заведений: совместный проект, событие, размещение или программа."
+      eyebrow="Партнёрство / Заявка"
+      title="Обсудить партнёрство"
+      description="Для брендов, школ, заведений и сервисных команд: совместный проект, событие, размещение или программа."
       enabled={enabled}
       result={result}
     >
@@ -48,7 +48,7 @@ export function PartnerApplicationForm({ enabled, result, utm, cities }: PublicA
               Формат для брендов, школ и заведений
             </PublicDisplayTitle>
             <PublicBodyText className="mt-4 max-w-md" tone="inverse">
-              Коротко опишите идею. С этого сообщения начнётся разговор.
+              Коротко опишите задачу и идею. Этого достаточно, чтобы начать разговор по делу.
             </PublicBodyText>
 
             <div className="mt-6 flex flex-wrap gap-2">
@@ -100,7 +100,7 @@ export function PartnerApplicationForm({ enabled, result, utm, cities }: PublicA
                 </Select>
               </FormField>
               <FormField htmlFor="partnerType" label="Тип партнерства">
-                <Input id="partnerType" name="partnerType" required maxLength={160} minLength={2} />
+                <Input id="partnerType" name="partnerType" defaultValue={defaults.partnerType} required maxLength={160} minLength={2} />
               </FormField>
               <FormField htmlFor="partnerWebsiteUrl" label="Сайт">
                 <Input id="partnerWebsiteUrl" name="websiteUrl" type="url" maxLength={500} />
@@ -119,12 +119,11 @@ export function PartnerApplicationForm({ enabled, result, utm, cities }: PublicA
               </div>
               <div className="md:col-span-2 border-t border-black/10 pt-1">
                 <ConsentField>
-                  Даю согласие на обработку персональных данных для этой заявки. Полный текст{' '}
-                  <InlineLink href="/legal/personal-data-consent">согласия</InlineLink>
-                  .
+                  Согласен с <InlineLink href="/legal/privacy">политикой обработки персональных данных</InlineLink> и даю{' '}
+                  <InlineLink href="/legal/personal-data-consent">согласие на обработку персональных данных</InlineLink> для этой заявки.
                 </ConsentField>
               </div>
-              <PublicFormShellFooter className="md:col-span-2" note="После отправки напишем вам и обсудим детали.">
+              <PublicFormShellFooter className="md:col-span-2" note="После отправки свяжемся и обсудим следующий шаг.">
                 <Button type="submit">Отправить заявку</Button>
               </PublicFormShellFooter>
             </div>

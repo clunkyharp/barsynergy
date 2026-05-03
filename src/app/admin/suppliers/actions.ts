@@ -7,12 +7,12 @@ import {
   assertActiveContentRelations,
   contentStatusValues,
   deleteUploadedFileIfUnused,
-  findUniqueSlug,
   formatAdminActionError,
   getString,
   initialPublicationDates,
   nullableString,
   optionalString,
+  persistWithUniqueSlugRetry,
   redirectWithAdminActionResult,
   resolveCoverImageId,
   safeAdminRedirectPath,
@@ -84,43 +84,44 @@ export async function createSupplier(formData: FormData) {
       cityId: parsed.cityId
     });
 
-    const [uniqueSlug, coverImageId] = await Promise.all([
-      findUniqueSlug(slug, async (candidate) =>
+    const coverImageId = await resolveCoverImageId({
+      formData,
+      userId: user.id,
+      onUploadedImageId: (fileId) => {
+        uploadedCoverImageId = fileId;
+      }
+    });
+
+    await persistWithUniqueSlugRetry({
+      baseSlug: slug,
+      exists: async (candidate) =>
         Boolean(
           await prisma.supplier.findFirst({
             where: { slug: candidate },
             select: { id: true }
           })
-        )
-      ),
-      resolveCoverImageId({
-        formData,
-        userId: user.id,
-        onUploadedImageId: (fileId) => {
-          uploadedCoverImageId = fileId;
-        }
-      })
-    ]);
-
-    await prisma.supplier.create({
-      data: {
-        title: parsed.title,
-        slug: uniqueSlug,
-        summary: parsed.summary,
-        description: parsed.description,
-        status: parsed.status,
-        coverImageId,
-        categoryId: nullableString(parsed.categoryId),
-        cityId: nullableString(parsed.cityId),
-        companyName: parsed.companyName,
-        websiteUrl: nullableString(websiteUrl),
-        contactLabel: nullableString(parsed.contactLabel),
-        isVerified: parsed.isVerified,
-        serviceArea: nullableString(parsed.serviceArea),
-        createdById: user.id,
-        updatedById: user.id,
-        ...initialPublicationDates(parsed.status)
-      }
+        ),
+      persist: (uniqueSlug) =>
+        prisma.supplier.create({
+          data: {
+            title: parsed.title,
+            slug: uniqueSlug,
+            summary: parsed.summary,
+            description: parsed.description,
+            status: parsed.status,
+            coverImageId,
+            categoryId: nullableString(parsed.categoryId),
+            cityId: nullableString(parsed.cityId),
+            companyName: parsed.companyName,
+            websiteUrl: nullableString(websiteUrl),
+            contactLabel: nullableString(parsed.contactLabel),
+            isVerified: parsed.isVerified,
+            serviceArea: nullableString(parsed.serviceArea),
+            createdById: user.id,
+            updatedById: user.id,
+            ...initialPublicationDates(parsed.status)
+          }
+        })
     });
 
     revalidatePath(ADMIN_SUPPLIERS_PATH);
@@ -180,44 +181,45 @@ export async function updateSupplier(formData: FormData) {
       cityId: parsed.cityId
     });
 
-    const [uniqueSlug, coverImageId] = await Promise.all([
-      findUniqueSlug(slug, async (candidate) =>
+    const coverImageId = await resolveCoverImageId({
+      formData,
+      userId: user.id,
+      currentCoverImageId: existingSupplier.coverImageId,
+      onUploadedImageId: (fileId) => {
+        uploadedCoverImageId = fileId;
+      }
+    });
+
+    await persistWithUniqueSlugRetry({
+      baseSlug: slug,
+      exists: async (candidate) =>
         Boolean(
           await prisma.supplier.findFirst({
             where: { slug: candidate, id: { not: parsed.supplierId } },
             select: { id: true }
           })
-        )
-      ),
-      resolveCoverImageId({
-        formData,
-        userId: user.id,
-        currentCoverImageId: existingSupplier.coverImageId,
-        onUploadedImageId: (fileId) => {
-          uploadedCoverImageId = fileId;
-        }
-      })
-    ]);
-
-    await prisma.supplier.update({
-      where: { id: parsed.supplierId },
-      data: {
-        title: parsed.title,
-        slug: uniqueSlug,
-        summary: parsed.summary,
-        description: parsed.description,
-        status: parsed.status,
-        coverImageId,
-        categoryId: nullableString(parsed.categoryId),
-        cityId: nullableString(parsed.cityId),
-        companyName: parsed.companyName,
-        websiteUrl: nullableString(websiteUrl),
-        contactLabel: nullableString(parsed.contactLabel),
-        isVerified: parsed.isVerified,
-        serviceArea: nullableString(parsed.serviceArea),
-        updatedById: user.id,
-        ...statusTransitionDates(parsed.status, existingSupplier.publishedAt)
-      }
+        ),
+      persist: (uniqueSlug) =>
+        prisma.supplier.update({
+          where: { id: parsed.supplierId },
+          data: {
+            title: parsed.title,
+            slug: uniqueSlug,
+            summary: parsed.summary,
+            description: parsed.description,
+            status: parsed.status,
+            coverImageId,
+            categoryId: nullableString(parsed.categoryId),
+            cityId: nullableString(parsed.cityId),
+            companyName: parsed.companyName,
+            websiteUrl: nullableString(websiteUrl),
+            contactLabel: nullableString(parsed.contactLabel),
+            isVerified: parsed.isVerified,
+            serviceArea: nullableString(parsed.serviceArea),
+            updatedById: user.id,
+            ...statusTransitionDates(parsed.status, existingSupplier.publishedAt)
+          }
+        })
     });
 
     if (previousCoverImageId !== coverImageId) {

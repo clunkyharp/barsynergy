@@ -7,12 +7,12 @@ import {
   assertActiveContentRelations,
   contentStatusValues,
   deleteUploadedFileIfUnused,
-  findUniqueSlug,
   formatAdminActionError,
   getString,
   initialPublicationDates,
   nullableString,
   optionalString,
+  persistWithUniqueSlugRetry,
   redirectWithAdminActionResult,
   resolveCoverImageId,
   safeAdminRedirectPath,
@@ -88,44 +88,45 @@ export async function createEvent(formData: FormData) {
       cityId: parsed.cityId
     });
 
-    const [uniqueSlug, coverImageId] = await Promise.all([
-      findUniqueSlug(slug, async (candidate) =>
+    const coverImageId = await resolveCoverImageId({
+      formData,
+      userId: user.id,
+      onUploadedImageId: (fileId) => {
+        uploadedCoverImageId = fileId;
+      }
+    });
+
+    await persistWithUniqueSlugRetry({
+      baseSlug: slug,
+      exists: async (candidate) =>
         Boolean(
           await prisma.event.findFirst({
             where: { slug: candidate },
             select: { id: true }
           })
-        )
-      ),
-      resolveCoverImageId({
-        formData,
-        userId: user.id,
-        onUploadedImageId: (fileId) => {
-          uploadedCoverImageId = fileId;
-        }
-      })
-    ]);
-
-    await prisma.event.create({
-      data: {
-        title: parsed.title,
-        slug: uniqueSlug,
-        summary: parsed.summary,
-        status: parsed.status,
-        coverImageId,
-        categoryId: nullableString(parsed.categoryId),
-        cityId: nullableString(parsed.cityId),
-        startsAt: parsed.startsAt,
-        endsAt: parsed.endsAt ?? null,
-        locationName: nullableString(parsed.locationName),
-        address: nullableString(parsed.address),
-        format: nullableString(parsed.format),
-        capacity: parsed.capacity,
-        registrationMode: nullableString(parsed.registrationMode),
-        createdById: user.id,
-        updatedById: user.id,
-        ...initialPublicationDates(parsed.status)
-      }
+        ),
+      persist: (uniqueSlug) =>
+        prisma.event.create({
+          data: {
+            title: parsed.title,
+            slug: uniqueSlug,
+            summary: parsed.summary,
+            status: parsed.status,
+            coverImageId,
+            categoryId: nullableString(parsed.categoryId),
+            cityId: nullableString(parsed.cityId),
+            startsAt: parsed.startsAt,
+            endsAt: parsed.endsAt ?? null,
+            locationName: nullableString(parsed.locationName),
+            address: nullableString(parsed.address),
+            format: nullableString(parsed.format),
+            capacity: parsed.capacity,
+            registrationMode: nullableString(parsed.registrationMode),
+            createdById: user.id,
+            updatedById: user.id,
+            ...initialPublicationDates(parsed.status)
+          }
+        })
     });
 
     revalidatePath(ADMIN_EVENTS_PATH);
@@ -189,45 +190,46 @@ export async function updateEvent(formData: FormData) {
       cityId: parsed.cityId
     });
 
-    const [uniqueSlug, coverImageId] = await Promise.all([
-      findUniqueSlug(slug, async (candidate) =>
+    const coverImageId = await resolveCoverImageId({
+      formData,
+      userId: user.id,
+      currentCoverImageId: existingEvent.coverImageId,
+      onUploadedImageId: (fileId) => {
+        uploadedCoverImageId = fileId;
+      }
+    });
+
+    await persistWithUniqueSlugRetry({
+      baseSlug: slug,
+      exists: async (candidate) =>
         Boolean(
           await prisma.event.findFirst({
             where: { slug: candidate, id: { not: parsed.eventId } },
             select: { id: true }
           })
-        )
-      ),
-      resolveCoverImageId({
-        formData,
-        userId: user.id,
-        currentCoverImageId: existingEvent.coverImageId,
-        onUploadedImageId: (fileId) => {
-          uploadedCoverImageId = fileId;
-        }
-      })
-    ]);
-
-    await prisma.event.update({
-      where: { id: parsed.eventId },
-      data: {
-        title: parsed.title,
-        slug: uniqueSlug,
-        summary: parsed.summary,
-        status: parsed.status,
-        coverImageId,
-        categoryId: nullableString(parsed.categoryId),
-        cityId: nullableString(parsed.cityId),
-        startsAt: parsed.startsAt,
-        endsAt: parsed.endsAt ?? null,
-        locationName: nullableString(parsed.locationName),
-        address: nullableString(parsed.address),
-        format: nullableString(parsed.format),
-        capacity: parsed.capacity,
-        registrationMode: nullableString(parsed.registrationMode),
-        updatedById: user.id,
-        ...statusTransitionDates(parsed.status, existingEvent.publishedAt)
-      }
+        ),
+      persist: (uniqueSlug) =>
+        prisma.event.update({
+          where: { id: parsed.eventId },
+          data: {
+            title: parsed.title,
+            slug: uniqueSlug,
+            summary: parsed.summary,
+            status: parsed.status,
+            coverImageId,
+            categoryId: nullableString(parsed.categoryId),
+            cityId: nullableString(parsed.cityId),
+            startsAt: parsed.startsAt,
+            endsAt: parsed.endsAt ?? null,
+            locationName: nullableString(parsed.locationName),
+            address: nullableString(parsed.address),
+            format: nullableString(parsed.format),
+            capacity: parsed.capacity,
+            registrationMode: nullableString(parsed.registrationMode),
+            updatedById: user.id,
+            ...statusTransitionDates(parsed.status, existingEvent.publishedAt)
+          }
+        })
     });
 
     if (previousCoverImageId !== coverImageId) {

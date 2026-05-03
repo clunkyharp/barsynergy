@@ -8,26 +8,29 @@ export function SiteFooter() {
   const pathname = usePathname();
   const isWorkspacePath =
     pathname?.startsWith('/admin') || pathname?.startsWith('/business') || pathname?.startsWith('/auth');
+  const aboutHref = pathname === '/' ? '#home-about' : '/#home-about';
+  const compactFooterOnlyRoutes = ['/contacts', '/education', '/events', '/general-sponsors', '/partners', '/suppliers', '/vacancies'];
+  const showContactCta = !compactFooterOnlyRoutes.some((route) => pathname === route || pathname?.startsWith(`${route}/`));
+  const footerLinkClassName =
+    'flex items-center rounded-[var(--radius-sm)] py-0.5 transition hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white';
 
   if (isWorkspacePath) {
     return null;
   }
 
-  const showContactCta = true;
-
   return (
-    <footer>
+    <footer className="mt-auto">
       {showContactCta ? (
         <section className="border-t border-black/12 bg-[var(--graphite)] text-white">
           <div className="container grid min-h-[320px] gap-8 py-14 md:py-18 lg:grid-cols-[1fr_0.9fr_0.62fr] lg:items-center">
-          <div>
-            <h2 className={`${displayFont.className} display-tight max-w-3xl text-[38px] md:text-[56px] xl:text-[64px]`}>
-              Напишите команде BARSYNERGY
-            </h2>
+            <div>
+              <h2 className={`${displayFont.className} display-tight max-w-3xl text-[38px] md:text-[56px] xl:text-[64px]`}>
+                Напишите команде BARSYNERGY
+              </h2>
             </div>
             <div className="flex h-full flex-col justify-end">
               <p className="max-w-lg pb-1 text-base leading-8 text-white/76 md:text-lg">
-                Если хотите обсудить программу, событие, вакансию, поставщика, партнёрство или спонсорство, напишите нам.
+                Если хотите обсудить программу, событие, вакансию, поставщика, партнёрство или спонсорство, просто напишите нам.
               </p>
             </div>
             <div className="flex h-full items-end lg:justify-end">
@@ -51,27 +54,27 @@ export function SiteFooter() {
             </p>
           </div>
           <nav className="grid gap-0.5 text-sm leading-6 text-white/72 md:justify-items-end md:text-right">
-            <a className="flex items-center py-0.5 transition hover:text-white" href="/about">
-              О проекте
+            <a className={footerLinkClassName} href={aboutHref}>
+              О нас
             </a>
-            <a className="flex items-center py-0.5 transition hover:text-white" href="/partners">
-              Партнерства
+            <a className={footerLinkClassName} href="/partners">
+              Для партнёров
             </a>
-            <a className="flex items-center py-0.5 transition hover:text-white" href="/general-sponsors">
-              Спонсоры
+            <a className={footerLinkClassName} href="/general-sponsors">
+              Спонсорство
             </a>
           </nav>
           <nav className="grid gap-0.5 text-sm leading-6 text-white/72 md:justify-items-end md:text-right">
-            <a className="flex items-center py-0.5 transition hover:text-white" href="/legal/privacy">
+            <a className={footerLinkClassName} href="/legal/privacy">
               Политика конфиденциальности
             </a>
-            <a className="flex items-center py-0.5 transition hover:text-white" href="/legal/personal-data-consent">
+            <a className={footerLinkClassName} href="/legal/personal-data-consent">
               Согласие на обработку ПДн
             </a>
-            <a className="flex items-center py-0.5 transition hover:text-white" href="/legal/terms">
+            <a className={footerLinkClassName} href="/legal/terms">
               Условия использования
             </a>
-            <a className="flex items-center py-0.5 transition hover:text-white" href="/legal/cookies">
+            <a className={footerLinkClassName} href="/legal/cookies">
               Куки и аналитика
             </a>
           </nav>

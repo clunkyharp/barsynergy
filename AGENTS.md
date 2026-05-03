@@ -140,6 +140,8 @@ Run build and typecheck sequentially. Next.js type generation can make parallel 
 - Keep server data access, route handlers, and client components clearly separated.
 - Prefer existing components in `src/components/ui`, `src/components/layout`, and `src/components/public`.
 - Keep public UI responsive and check mobile behavior for visible page changes.
+- Keep public and user-facing Russian copy simple, literal and easy to scan. Avoid vague promo wording, internal workflow jargon and text that sounds machine-generated.
+- When editing or rewriting connected Russian user-facing prose, apply the `humanizer-ru` cleanup principle by default. Do not apply it to code, logs, commands, schemas or exact quotations.
 - For small visible UI fixes, prefer concrete browser diff evidence, screenshot notes, page URL, and target element over a generic `поправь дизайн` prompt.
 - Use Prisma migrations for schema changes. Do not edit generated Prisma client files.
 - Keep validation close to boundaries using existing Zod/env patterns.

@@ -62,6 +62,7 @@
 - `PublishedContentSection` теперь строит переходы в detail routes;
 - detail flow добавлен для шести публичных каталогов;
 - shared detail shell введен в `src/components/public/public-content-detail-page.tsx`.
+- shared detail shell дополнительно приведен ближе к owner reference: центрированный article-header, крупный hero, узкая колонка чтения и более спокойный related-block.
 - featured blocks добавлены над каталогами через `PublicFeaturedContent`;
 - related/next-step blocks добавлены на detail pages через `PublicRelatedContentSection`.
 

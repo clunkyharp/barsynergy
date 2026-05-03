@@ -14,7 +14,7 @@ type EditorialListRowProps = HTMLAttributes<HTMLElement> & {
   as?: 'article' | 'div';
   href?: string;
   actionLabel?: string;
-  variant?: 'default' | 'opportunity';
+  variant?: 'default' | 'opportunity' | 'directory';
 };
 
 export function EditorialListRow({
@@ -60,17 +60,20 @@ export function EditorialListRow({
 
   const opportunityContent = (
     <>
-      <div className="min-w-0">
-        <div>{label}</div>
-        {labelMeta ? <div className="mt-3">{labelMeta}</div> : null}
-        <div className="mt-4">
-          <h3 className="text-[1.35rem] font-semibold uppercase leading-[1.15] tracking-[-0.02em] transition-colors duration-300 group-hover:text-[var(--accent)] md:text-[1.55rem]">
-            {title}
-          </h3>
-          {subtitle ? (
-            <p className="mt-2 text-[12px] font-semibold uppercase tracking-[0.12em] text-[var(--muted)]">{subtitle}</p>
-          ) : null}
-          {meta ? <div className="mt-4">{meta}</div> : null}
+      <div className="grid min-w-0 gap-4 sm:grid-cols-[4.5rem_minmax(0,1fr)]">
+        {media ? <div className="sm:pt-1">{media}</div> : null}
+        <div className="min-w-0">
+          <div>{label}</div>
+          {labelMeta ? <div className="mt-3">{labelMeta}</div> : null}
+          <div className="mt-4">
+            <h3 className="text-[1.35rem] font-semibold uppercase leading-[1.15] tracking-[-0.02em] transition-colors duration-300 group-hover:text-[var(--accent)] md:text-[1.55rem]">
+              {title}
+            </h3>
+            {subtitle ? (
+              <p className="mt-2 text-[12px] font-semibold uppercase tracking-[0.12em] text-[var(--muted)]">{subtitle}</p>
+            ) : null}
+            {meta ? <div className="mt-4">{meta}</div> : null}
+          </div>
         </div>
       </div>
       <div className="flex min-w-0 flex-col justify-between gap-4 border-t border-black/10 pt-4 lg:border-l lg:border-t-0 lg:pl-7 lg:pt-0">
@@ -85,12 +88,45 @@ export function EditorialListRow({
     </>
   );
 
+  const directoryContent = (
+    <>
+      <div className="grid min-w-0 gap-4 md:grid-cols-[8rem_minmax(0,1fr)]">
+        {media ? <div>{media}</div> : null}
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-center gap-3">
+            <div>{label}</div>
+            {labelMeta ? <div>{labelMeta}</div> : null}
+          </div>
+          <h3 className="mt-3 text-[1.35rem] font-semibold uppercase leading-[1.12] tracking-[-0.02em] transition-colors duration-300 group-hover:text-[var(--accent)] md:text-[1.6rem]">
+            {title}
+          </h3>
+          {subtitle ? <p className="mt-2 text-sm leading-6 text-[var(--muted)]">{subtitle}</p> : null}
+          <div className="mt-3 max-w-2xl text-sm leading-7 text-[var(--muted)]">{description}</div>
+          {meta ? <div className="mt-4">{meta}</div> : null}
+        </div>
+      </div>
+      {href ? (
+        <div className="flex min-w-0 flex-col justify-center gap-3 border-t border-black/10 pt-4 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
+          <span className="inline-flex min-h-11 items-center justify-center gap-2 whitespace-nowrap rounded-full border border-[var(--accent)]/38 px-5 text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--accent)] transition-colors group-hover:border-[var(--accent)] group-hover:bg-[var(--accent)] group-hover:text-white">
+            {actionLabel}
+            <ArrowUpRight className="transition-transform duration-300 group-hover:translate-x-1" size={16} />
+          </span>
+          <span className="inline-flex min-h-11 items-center justify-center whitespace-nowrap rounded-full border border-black/10 px-5 text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--text)]">
+            Связаться
+          </span>
+        </div>
+      ) : null}
+    </>
+  );
+
   if (href) {
     return (
       <article
         className={cn(
-          variant === 'opportunity'
-            ? 'rounded-[28px] border border-black/10 bg-[color-mix(in_oklab,var(--surface),white_20%)] px-4 shadow-[0_12px_34px_rgba(20,20,18,0.035)] transition-[border-color,background-color,box-shadow] duration-300 hover:border-black/16 hover:bg-[color-mix(in_oklab,var(--surface),white_24%)] hover:shadow-[0_16px_38px_rgba(20,20,18,0.045)]'
+            variant === 'opportunity'
+              ? 'rounded-[28px] border border-black/10 bg-[color-mix(in_oklab,var(--surface),white_20%)] px-4 shadow-[0_12px_34px_rgba(20,20,18,0.035)] transition-[border-color,background-color,box-shadow] duration-300 hover:border-black/16 hover:bg-[color-mix(in_oklab,var(--surface),white_24%)] hover:shadow-[0_16px_38px_rgba(20,20,18,0.045)]'
+              : variant === 'directory'
+                ? 'rounded-[24px] border border-black/10 bg-[color-mix(in_oklab,var(--surface),white_22%)] px-4 shadow-[0_12px_34px_rgba(20,20,18,0.03)] transition-[border-color,background-color,box-shadow] duration-300 hover:border-black/16 hover:bg-[color-mix(in_oklab,var(--surface),white_28%)] hover:shadow-[0_16px_38px_rgba(20,20,18,0.04)]'
             : 'rounded-[28px] border border-black/10 bg-[color-mix(in_oklab,var(--surface),white_18%)] px-4 shadow-[0_12px_34px_rgba(20,20,18,0.03)] transition-[border-color,background-color,box-shadow] duration-300 hover:border-black/16 hover:bg-[color-mix(in_oklab,var(--surface),white_24%)] hover:shadow-[0_16px_38px_rgba(20,20,18,0.04)]',
           className
         )}
@@ -102,11 +138,12 @@ export function EditorialListRow({
             variant === 'default' && columns === 'default' && 'md:grid-cols-[0.24fr_0.5fr_0.7fr]',
             variant === 'default' && columns === 'content' && 'md:grid-cols-[0.26fr_0.52fr_0.72fr]',
             variant === 'default' && 'px-0',
-            variant === 'opportunity' && 'px-4 lg:grid-cols-[minmax(0,1.08fr)_minmax(18rem,0.66fr)]'
+            variant === 'opportunity' && 'px-4 lg:grid-cols-[minmax(0,1.08fr)_minmax(18rem,0.66fr)]',
+            variant === 'directory' && 'px-0 lg:grid-cols-[minmax(0,1fr)_minmax(13.5rem,0.28fr)]'
           )}
           href={href}
         >
-          {variant === 'opportunity' ? opportunityContent : defaultContent}
+          {variant === 'opportunity' ? opportunityContent : variant === 'directory' ? directoryContent : defaultContent}
         </a>
       </article>
     );
@@ -119,11 +156,12 @@ export function EditorialListRow({
         variant === 'default' && columns === 'default' && 'md:grid-cols-[0.24fr_0.5fr_0.7fr]',
         variant === 'default' && columns === 'content' && 'md:grid-cols-[0.26fr_0.52fr_0.72fr]',
         variant === 'opportunity' && 'lg:grid-cols-[minmax(0,1.08fr)_minmax(18rem,0.66fr)]',
+        variant === 'directory' && 'lg:grid-cols-[minmax(0,1fr)_minmax(13.5rem,0.28fr)]',
         className
       )}
       {...props}
     >
-      {variant === 'opportunity' ? opportunityContent : defaultContent}
+      {variant === 'opportunity' ? opportunityContent : variant === 'directory' ? directoryContent : defaultContent}
     </Component>
   );
 }

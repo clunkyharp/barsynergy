@@ -7,9 +7,11 @@
   },
   "scripts": {
     "dev": "./node_modules/.bin/next dev",
-    "build": "./node_modules/.bin/prisma generate && ./node_modules/.bin/next build",
+    "build": "./node_modules/.bin/prisma generate && ./node_modules/.bin/next build && node ./scripts/sync-standalone-assets.mjs && node ./scripts/verify-standalone-runtime.mjs",
     "start": "./node_modules/.bin/next start",
+    "admin:upsert:local": "node ./scripts/upsert-local-admin.mjs",
     "auth:cleanup:throttles": "node ./scripts/cleanup-auth-attempt-throttles.mjs",
+    "business-access:cleanup:invites": "node ./scripts/cleanup-business-access-invites.mjs",
     "lint": "./node_modules/.bin/eslint .",
     "test": "node --experimental-strip-types --test tests/*.test.mjs",
     "typecheck": "./node_modules/.bin/next typegen && ./node_modules/.bin/tsc --noEmit",

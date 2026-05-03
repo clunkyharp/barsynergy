@@ -1,4 +1,4 @@
-import { ArrowLeft, ArrowUpRight } from 'lucide-react';
+import { ArrowLeft, ArrowUpRight, ChevronRight } from 'lucide-react';
 import { PublicActionRow, PublicBodyText, PublicDisplayTitle, PublicEyebrow } from '@/components/public/public-primitives';
 import { Button } from '@/components/ui/button';
 import { InlineLink } from '@/components/ui/inline-link';
@@ -38,6 +38,10 @@ function paragraphsFromBody(body?: string) {
     .filter(Boolean);
 }
 
+function normalizeText(value: string) {
+  return value.replace(/\s+/g, ' ').trim().toLowerCase();
+}
+
 export function PublicContentDetailPage({
   eyebrow,
   backHref,
@@ -52,40 +56,63 @@ export function PublicContentDetailPage({
   primaryLink,
   secondaryLink
 }: PublicContentDetailPageProps) {
-  const paragraphs = paragraphsFromBody(body);
+  const rawParagraphs = paragraphsFromBody(body);
+  const paragraphs =
+    rawParagraphs.length > 0 && normalizeText(rawParagraphs[0]) === normalizeText(summary) ? rawParagraphs.slice(1) : rawParagraphs;
 
   return (
     <div>
       <section className="relative overflow-hidden border-b border-black/20 py-10 md:py-14">
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_18%,rgba(153,44,38,0.08),transparent_18%),radial-gradient(circle_at_82%_24%,rgba(255,255,255,0.58),transparent_18%),radial-gradient(circle_at_74%_82%,rgba(20,20,18,0.05),transparent_24%)]"
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_14%_16%,rgba(153,44,38,0.08),transparent_18%),radial-gradient(circle_at_82%_22%,rgba(255,255,255,0.62),transparent_22%),linear-gradient(180deg,rgba(255,255,255,0.24),transparent_56%),radial-gradient(circle_at_74%_82%,rgba(20,20,18,0.04),transparent_26%)]"
         />
-        <div className="container relative grid gap-8 xl:grid-cols-[1.1fr_0.9fr] xl:items-end">
-          <div className="min-w-0">
+        <div className="container relative">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-black/10 pb-5">
             <InlineLink className="inline-flex items-center gap-2 text-sm" href={backHref}>
               <ArrowLeft size={16} />
               {backLabel}
             </InlineLink>
-            <PublicEyebrow className="mt-5">{eyebrow}</PublicEyebrow>
-            <PublicDisplayTitle as="h1" className="mt-3 max-w-5xl break-words text-[32px] sm:text-[44px] md:text-[64px]" size="section">
+            <div className="hidden items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--muted)] md:flex">
+              <span>Главная</span>
+              <ChevronRight size={12} />
+              <span>{eyebrow}</span>
+              <ChevronRight size={12} />
+              <span>{label ?? 'Материал'}</span>
+            </div>
+          </div>
+
+          <div className="mx-auto max-w-5xl px-0 py-10 text-center md:py-14">
+            <div className="flex flex-wrap items-center justify-center gap-3">
+              <PublicEyebrow>{eyebrow}</PublicEyebrow>
+              {label ? <MetaChip variant="selected">{label}</MetaChip> : null}
+            </div>
+
+            <PublicDisplayTitle
+              as="h1"
+              className="mx-auto mt-5 max-w-4xl break-words text-[34px] sm:text-[48px] md:text-[72px] md:leading-[0.94]"
+              size="section"
+            >
               {title}
             </PublicDisplayTitle>
-            <PublicBodyText className="mt-5 max-w-3xl" size="md" tone="default">
-              {summary}
-            </PublicBodyText>
-            {label || meta.length > 0 ? (
-              <div className="mt-6 flex flex-wrap gap-2">
-                {label ? <MetaChip variant="selected">{label}</MetaChip> : null}
-                {meta.map((entry) => (
-                  <MetaChip key={entry} variant="filter">
-                    {entry}
-                  </MetaChip>
+
+            {meta.length > 0 ? (
+              <div className="mt-6 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-xs font-medium uppercase tracking-[0.14em] text-[var(--muted)]">
+                {meta.map((entry, index) => (
+                  <span className="inline-flex items-center gap-4" key={entry}>
+                    {index > 0 ? <span className="hidden h-1 w-1 rounded-full bg-black/30 sm:block" /> : null}
+                    <span>{entry}</span>
+                  </span>
                 ))}
               </div>
             ) : null}
+
+            <PublicBodyText className="mx-auto mt-6 max-w-3xl text-[15px] leading-8 text-[var(--text)] md:text-[17px]" size="md" tone="default">
+              {summary}
+            </PublicBodyText>
+
             {primaryLink || secondaryLink ? (
-              <PublicActionRow>
+              <PublicActionRow className="justify-center">
                 {primaryLink ? (
                   <Button
                     className="min-h-12 rounded-full px-6 tracking-[0.08em]"
@@ -113,59 +140,103 @@ export function PublicContentDetailPage({
           </div>
 
           {imageUrl ? (
-            <div
-              aria-hidden="true"
-              className="min-h-[260px] rounded-[var(--radius-lg)] border border-black/15 bg-cover bg-center shadow-[0_18px_60px_rgba(20,20,18,0.08)] md:min-h-[360px]"
-              style={{ backgroundImage: `url("${imageUrl}")` }}
-            />
-          ) : (
-            <Panel className="min-h-[260px] border-dashed md:min-h-[360px]" padding="lg">
-              <PublicEyebrow tone="muted">Материал</PublicEyebrow>
-              <PublicBodyText className="mt-4 max-w-md">
-                Отдельной обложки пока нет. Всё основное уже ниже на странице.
-              </PublicBodyText>
-            </Panel>
-          )}
+            <div className="mx-auto max-w-5xl">
+              <div
+                aria-hidden="true"
+                className="min-h-[260px] overflow-hidden rounded-[28px] border border-black/12 bg-cover bg-center shadow-[0_24px_80px_rgba(20,20,18,0.08)] md:min-h-[420px] xl:min-h-[520px]"
+                style={{ backgroundImage: `url("${imageUrl}")` }}
+              />
+            </div>
+          ) : null}
         </div>
       </section>
 
       <section className="border-b border-black/20 py-10 md:py-14">
-        <div className="container grid gap-8 xl:grid-cols-[0.95fr_0.45fr]">
-          <div className="space-y-4">
-            <PublicDisplayTitle size="card">Подробности</PublicDisplayTitle>
-            {paragraphs.length > 0 ? (
-              <div className="grid gap-4">
-                {paragraphs.map((paragraph) => (
-                  <PublicBodyText className="max-w-3xl text-[var(--text)]" key={paragraph} size="md" tone="default">
-                    {paragraph}
-                  </PublicBodyText>
-                ))}
-              </div>
-            ) : (
-              <PublicBodyText className="max-w-3xl text-[var(--text)]" size="md" tone="default">
-                Подробный текст пока не добавлен. Основная информация уже есть выше, вместе с метками и ссылками.
-              </PublicBodyText>
-            )}
-          </div>
+        <div className="container grid gap-10 xl:grid-cols-[minmax(17rem,0.32fr)_minmax(0,1fr)]">
+          <aside className="order-2 xl:order-1">
+            <div className="space-y-4 xl:sticky xl:top-28">
+              <Panel padding="lg">
+                <PublicEyebrow tone="muted">Навигация</PublicEyebrow>
+                <InlineLink className="mt-4 inline-flex items-center gap-2 text-sm" href={backHref}>
+                  <ArrowLeft size={16} />
+                  {backLabel}
+                </InlineLink>
+                {primaryLink || secondaryLink ? (
+                  <div className="mt-5 grid gap-3">
+                    {primaryLink ? (
+                      <Button
+                        className="w-full min-w-0 justify-center rounded-full px-4 !whitespace-normal leading-5"
+                        href={primaryLink.href}
+                        rel={primaryLink.external ? 'noreferrer noopener' : undefined}
+                        target={primaryLink.external ? '_blank' : undefined}
+                      >
+                        <span className="min-w-0 break-words">{primaryLink.label}</span>
+                        <ArrowUpRight size={18} />
+                      </Button>
+                    ) : null}
+                    {secondaryLink ? (
+                      <Button
+                        className="w-full min-w-0 justify-center rounded-full px-4 !whitespace-normal leading-5"
+                        href={secondaryLink.href}
+                        rel={secondaryLink.external ? 'noreferrer noopener' : undefined}
+                        target={secondaryLink.external ? '_blank' : undefined}
+                        variant="secondary"
+                      >
+                        <span className="min-w-0 break-words">{secondaryLink.label}</span>
+                      </Button>
+                    ) : null}
+                  </div>
+                ) : null}
+              </Panel>
 
-          <div className="space-y-4">
-            <Panel padding="lg">
-              <PublicEyebrow tone="muted">Что важно</PublicEyebrow>
-              {facts.length > 0 ? (
-                <dl className="mt-5 grid gap-4">
-                  {facts.map((fact) => (
-                    <div className="border-b border-black/10 pb-3 last:border-b-0 last:pb-0" key={`${fact.label}-${fact.value}`}>
-                      <dt className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">{fact.label}</dt>
-                      <dd className="mt-2 text-sm leading-7 text-[var(--text)]">{fact.value}</dd>
-                    </div>
+              <Panel padding="lg">
+                <PublicEyebrow tone="muted">Что важно</PublicEyebrow>
+                {facts.length > 0 ? (
+                  <dl className="mt-5 grid gap-4">
+                    {facts.map((fact) => (
+                      <div className="border-b border-black/10 pb-3 last:border-b-0 last:pb-0" key={`${fact.label}-${fact.value}`}>
+                        <dt className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">{fact.label}</dt>
+                        <dd className="mt-2 text-sm leading-7 text-[var(--text)]">{fact.value}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                ) : (
+                  <PublicBodyText className="mt-4">
+                    Отдельного блока с фактами пока нет. Главное уже указано в описании и метках выше.
+                  </PublicBodyText>
+                )}
+              </Panel>
+            </div>
+          </aside>
+
+          <div className="order-1 xl:order-2">
+            <div className="mx-auto max-w-3xl">
+              <PublicEyebrow tone="muted">Подробности</PublicEyebrow>
+              <div className="mt-5 border-t border-black/10 pt-6">
+                <p className="max-w-2xl text-[24px] font-semibold leading-[1.34] tracking-[-0.02em] text-[var(--text)] md:text-[30px]">
+                  {summary}
+                </p>
+              </div>
+
+              {paragraphs.length > 0 ? (
+                <div className="mt-8 grid gap-6">
+                  {paragraphs.map((paragraph) => (
+                    <PublicBodyText
+                      className="max-w-none text-[15px] leading-8 text-[var(--text)] md:text-base"
+                      key={paragraph}
+                      size="md"
+                      tone="default"
+                    >
+                      {paragraph}
+                    </PublicBodyText>
                   ))}
-                </dl>
+                </div>
               ) : (
-                <PublicBodyText className="mt-4">
-                  Отдельного блока с фактами пока нет. Главное уже указано в описании и метках выше.
+                <PublicBodyText className="mt-8 max-w-none text-[var(--text)]" size="md" tone="default">
+                  Подробный текст пока не добавлен. Основная информация уже есть выше, вместе с метками и ссылками.
                 </PublicBodyText>
               )}
-            </Panel>
+            </div>
           </div>
         </div>
       </section>
