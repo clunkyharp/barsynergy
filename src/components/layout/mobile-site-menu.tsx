@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { ArrowUpRight } from 'lucide-react';
+import { ThemeToggle } from '@/components/layout/theme-toggle';
 import { displayFont } from '@/lib/fonts';
 import { cn } from '@/lib/utils';
 
@@ -93,14 +94,12 @@ export function MobileSiteMenu({ isOpen, navItems, onOpenChange }: MobileSiteMen
 
     if (typeof mediaQuery.addEventListener === 'function') {
       mediaQuery.addEventListener('change', handleChange);
-
       return () => {
         mediaQuery.removeEventListener('change', handleChange);
       };
     }
 
     mediaQuery.addListener(handleChange);
-
     return () => {
       mediaQuery.removeListener(handleChange);
     };
@@ -115,12 +114,13 @@ export function MobileSiteMenu({ isOpen, navItems, onOpenChange }: MobileSiteMen
             <div
               aria-hidden={!isOpen}
               id={overlayId}
+              style={{ background: 'var(--mobile-menu-bg)' }}
               className={cn(
-                'fixed inset-0 z-[45] overflow-y-auto overscroll-contain bg-[radial-gradient(circle_at_76%_10%,rgba(153,44,38,0.22),transparent_26rem),radial-gradient(circle_at_18%_18%,rgba(245,239,228,0.08),transparent_22rem),linear-gradient(145deg,#100f0d_0%,#17110f_52%,#0f0d0c_100%)] text-white transition-opacity duration-[240ms] ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none',
+                'mobile-menu-overlay fixed inset-0 z-[45] overflow-y-auto overscroll-contain text-[var(--text)] transition-opacity duration-[240ms] ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none lg:hidden',
                 isOpen ? 'opacity-100' : 'pointer-events-none opacity-0'
               )}
             >
-              <div aria-hidden="true" className="absolute inset-0 bg-[url('/images/grain.svg')] opacity-[0.18]" />
+              <div aria-hidden="true" className="absolute inset-0 bg-[url('/images/grain.svg')] opacity-[0.22]" />
               <div
                 aria-modal="true"
                 role="dialog"
@@ -131,10 +131,11 @@ export function MobileSiteMenu({ isOpen, navItems, onOpenChange }: MobileSiteMen
                 )}
               >
                 <nav aria-label="Мобильная навигация" className="grid content-start gap-4 sm:gap-5">
-                  <div className="grid gap-2 border-t border-white/12 pt-2">
+                  <ThemeToggle className="w-fit" />
+                  <div className="grid gap-2 border-t border-[var(--line)] pt-2">
                     {navItems.map((item) => (
                       <a
-                        className="group/link grid min-h-20 grid-cols-[minmax(0,1fr)_auto] items-center gap-5 rounded-[26px] border border-transparent px-4 py-3 text-white transition-[background-color,border-color,color] duration-[240ms] ease-[cubic-bezier(0.22,1,0.36,1)] hover:border-white/10 hover:bg-white/[0.05] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white motion-reduce:transition-none sm:min-h-[88px] sm:px-5"
+                        className="group/link grid min-h-20 grid-cols-[minmax(0,1fr)_auto] items-center gap-5 rounded-[var(--radius-lg)] border border-transparent px-4 py-3 text-[var(--text)] transition-[background-color,border-color,color] duration-[240ms] ease-[cubic-bezier(0.22,1,0.36,1)] hover:border-[var(--line)] hover:bg-[var(--surface-wash)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] motion-reduce:transition-none sm:min-h-[88px] sm:px-5"
                         href={item.href}
                         key={item.href}
                         onClick={() => onOpenChange(false)}
@@ -143,14 +144,14 @@ export function MobileSiteMenu({ isOpen, navItems, onOpenChange }: MobileSiteMen
                           {item.label}
                         </span>
                         <ArrowUpRight
-                          className="text-white/72 transition duration-[240ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover/link:-translate-y-1 group-hover/link:translate-x-1 group-hover/link:text-white motion-reduce:transition-none"
+                          className="text-[var(--accent)] transition duration-[240ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover/link:-translate-y-1 group-hover/link:translate-x-1 motion-reduce:transition-none"
                           size={24}
                         />
                       </a>
                     ))}
                   </div>
                   <a
-                    className="mt-4 inline-flex min-h-14 w-fit items-center gap-3 rounded-full border border-white/16 bg-white/[0.04] px-6 text-sm font-semibold uppercase tracking-[0.1em] text-white transition-[background-color,color,border-color] duration-[240ms] ease-[cubic-bezier(0.22,1,0.36,1)] hover:border-white/24 hover:bg-white hover:text-[var(--graphite)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white motion-reduce:transition-none"
+                    className="mt-4 inline-flex min-h-14 w-fit items-center gap-3 rounded-[var(--radius-md)] border border-[var(--accent)] px-6 text-sm font-semibold text-[var(--accent)] transition-[background-color,color,border-color] duration-[240ms] ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-[var(--accent)] hover:text-[var(--accent-contrast)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] motion-reduce:transition-none"
                     href="/contacts"
                     onClick={() => onOpenChange(false)}
                   >
@@ -182,7 +183,7 @@ function MenuToggle({
       aria-expanded={isOpen}
       aria-label={isOpen ? 'Закрыть меню' : 'Открыть меню'}
       className={cn(
-        'group inline-flex shrink-0 items-center justify-center rounded-full border border-black/10 bg-[rgba(247,240,228,0.92)] text-[var(--graphite)] shadow-[0_12px_24px_rgba(20,20,18,0.08)] backdrop-blur-[12px] transition-[background-color,border-color,box-shadow,color] duration-[240ms] ease-[cubic-bezier(0.22,1,0.36,1)] hover:border-black/16 hover:bg-[rgba(252,246,236,0.98)] hover:shadow-[0_16px_28px_rgba(20,20,18,0.1)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] motion-reduce:transition-none lg:hidden',
+        'group inline-flex shrink-0 items-center justify-center rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--surface-elevated)] text-[var(--text)] shadow-[0_12px_24px_rgba(20,20,18,0.08)] backdrop-blur-[12px] transition-[background-color,border-color,box-shadow,color] duration-[240ms] ease-[cubic-bezier(0.22,1,0.36,1)] hover:border-[var(--accent)]/30 hover:bg-[var(--surface)] hover:shadow-[0_16px_28px_rgba(20,20,18,0.1)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] motion-reduce:transition-none lg:hidden',
         MENU_TOGGLE_SIZE_CLASS
       )}
       onClick={onClick}

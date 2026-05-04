@@ -115,7 +115,7 @@ export function PublicContentDetailPage({
               <PublicActionRow className="justify-center">
                 {primaryLink ? (
                   <Button
-                    className="min-h-12 rounded-full px-6 tracking-[0.08em]"
+                    className="min-h-12 rounded-[var(--radius-md)] px-6 tracking-normal"
                     href={primaryLink.href}
                     rel={primaryLink.external ? 'noreferrer noopener' : undefined}
                     target={primaryLink.external ? '_blank' : undefined}
@@ -126,7 +126,7 @@ export function PublicContentDetailPage({
                 ) : null}
                 {secondaryLink ? (
                   <Button
-                    className="min-h-12 rounded-full px-6 tracking-[0.08em]"
+                    className="min-h-12 rounded-[var(--radius-md)] px-6 tracking-normal"
                     href={secondaryLink.href}
                     rel={secondaryLink.external ? 'noreferrer noopener' : undefined}
                     target={secondaryLink.external ? '_blank' : undefined}
@@ -143,7 +143,7 @@ export function PublicContentDetailPage({
             <div className="mx-auto max-w-5xl">
               <div
                 aria-hidden="true"
-                className="min-h-[260px] overflow-hidden rounded-[28px] border border-black/12 bg-cover bg-center shadow-[0_24px_80px_rgba(20,20,18,0.08)] md:min-h-[420px] xl:min-h-[520px]"
+                className="min-h-[260px] overflow-hidden rounded-[var(--radius-lg)] border border-black/12 bg-cover bg-center shadow-[0_24px_80px_rgba(20,20,18,0.08)] md:min-h-[420px] xl:min-h-[520px]"
                 style={{ backgroundImage: `url("${imageUrl}")` }}
               />
             </div>
@@ -165,7 +165,7 @@ export function PublicContentDetailPage({
                   <div className="mt-5 grid gap-3">
                     {primaryLink ? (
                       <Button
-                        className="w-full min-w-0 justify-center rounded-full px-4 !whitespace-normal leading-5"
+                        className="w-full min-w-0 justify-center rounded-[var(--radius-md)] px-4 !whitespace-normal leading-5"
                         href={primaryLink.href}
                         rel={primaryLink.external ? 'noreferrer noopener' : undefined}
                         target={primaryLink.external ? '_blank' : undefined}
@@ -176,7 +176,7 @@ export function PublicContentDetailPage({
                     ) : null}
                     {secondaryLink ? (
                       <Button
-                        className="w-full min-w-0 justify-center rounded-full px-4 !whitespace-normal leading-5"
+                        className="w-full min-w-0 justify-center rounded-[var(--radius-md)] px-4 !whitespace-normal leading-5"
                         href={secondaryLink.href}
                         rel={secondaryLink.external ? 'noreferrer noopener' : undefined}
                         target={secondaryLink.external ? '_blank' : undefined}
@@ -213,7 +213,7 @@ export function PublicContentDetailPage({
             <div className="mx-auto max-w-3xl">
               <PublicEyebrow tone="muted">Подробности</PublicEyebrow>
               <div className="mt-5 border-t border-black/10 pt-6">
-                <p className="max-w-2xl text-[24px] font-semibold leading-[1.34] tracking-[-0.02em] text-[var(--text)] md:text-[30px]">
+                <p className="max-w-2xl text-[24px] font-semibold leading-[1.34] tracking-normal text-[var(--text)] md:text-[30px]">
                   {summary}
                 </p>
               </div>

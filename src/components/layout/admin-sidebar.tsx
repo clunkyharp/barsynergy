@@ -13,7 +13,7 @@ const adminLinks: { label: string; href: string; section: AdminSection; availabl
   { label: 'Курсы', href: '/admin/courses', section: 'courses', available: true },
   { label: 'Вакансии', href: '/admin/vacancies', section: 'vacancies', available: true },
   { label: 'Поставщики', href: '/admin/suppliers', section: 'suppliers', available: true },
-  { label: 'Партнеры', href: '/admin/partners', section: 'partners', available: true },
+  { label: 'Партнёры', href: '/admin/partners', section: 'partners', available: true },
   { label: 'Заявки', href: '/admin/applications', section: 'applications', available: true },
   { label: 'Пользователи', href: '/admin/users', section: 'users', available: true },
   { label: 'Категории', href: '/admin/categories', section: 'categories', available: false },
@@ -32,7 +32,7 @@ export function AdminSidebar({ role }: AdminSidebarProps) {
 
   return (
     <Panel className="backdrop-blur" padding="md" tone="elevated">
-      <a className="block text-lg font-bold tracking-[-0.02em]" href="/admin">
+      <a className="block text-lg font-bold tracking-normal" href="/admin">
         Админка BARSYNERGY
       </a>
       <nav className="mt-5 grid gap-1.5 text-sm">
@@ -51,7 +51,7 @@ export function AdminSidebar({ role }: AdminSidebarProps) {
           <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Скоро</p>
           <div className="mt-3 grid gap-1.5 text-sm text-[var(--muted)]">
             {upcomingLinks.map((item) => (
-              <span className="rounded-2xl px-3 py-2.5" key={item.href}>
+              <span className="rounded-[var(--radius-md)] px-3 py-2.5" key={item.href}>
                 {item.label}
               </span>
             ))}

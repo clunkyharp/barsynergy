@@ -19,6 +19,7 @@ import {
 } from '@/lib/applications/public-form-helpers';
 import { getPublishedEvents, type PublicContentSearchParams } from '@/lib/public/content';
 import { getEventFilterOptions, getPublicCategoryOptions, getPublicCityFilterOptions } from '@/lib/public/filter-options';
+import { displayFont } from '@/lib/fonts';
 import { getEnv } from '@/lib/validation/env';
 
 type EventsPageProps = {
@@ -29,6 +30,10 @@ export const metadata: Metadata = {
   title: 'События',
   description: 'Афиша встреч, лекций и индустриальных событий BARSYNERGY.'
 };
+
+function firstParam(value: string | string[] | undefined) {
+  return Array.isArray(value) ? value[0] : value;
+}
 
 export default async function EventsPage({ searchParams }: EventsPageProps) {
   const params = (await searchParams) ?? {};
@@ -43,11 +48,14 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
   const applicationFormsEnabled = arePublicApplicationFormsEnabled(getEnv());
   const applicationResult = getPublicApplicationResult(params);
   const applicationUtm = getPublicApplicationUtm(params);
+  const eventTitle = firstParam(params.eventTitle);
+  const isEventProposal = firstParam(params.intent) === 'proposal';
+  const shouldShowEventForm = Boolean(eventTitle?.trim() || isEventProposal || applicationResult);
   const isEmpty = content.total === 0;
 
   return (
     <>
-      <section className="border-b border-black/20 py-10 pt-[118px] md:py-14 md:pt-[132px]">
+      <section className="border-b border-[var(--line)] py-10 pt-[118px] md:py-14 md:pt-[132px]">
         <div className="container grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(20rem,0.48fr)] lg:items-center">
           <div className="min-w-0">
             <p className="text-sm leading-6 text-[var(--muted)]">
@@ -56,20 +64,20 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
             <PublicDisplayTitle as="h1" className="mt-6" size="hero">
               События
             </PublicDisplayTitle>
-            <h2 className="mt-3 text-[1.7rem] font-semibold uppercase leading-[1.1] text-[var(--text)] md:text-[2.2rem]">
+            <h2 className={`${displayFont.className} mt-3 text-[2.1rem] font-semibold leading-none text-[var(--text)] md:text-[2.8rem]`}>
               Афиша барной индустрии СКФО
             </h2>
             <PublicBodyText className="mt-5 max-w-3xl" size="md">
               Встречи, лекции и другие события для специалистов и команд.
             </PublicBodyText>
           </div>
-          <Panel className="border-black/10 bg-[rgba(255,250,244,0.8)]" padding="lg">
+          <Panel className="border-[var(--border-default)] bg-[var(--surface-wash)]" padding="lg">
             <IconBadge icon={CalendarDays} size="lg" tone="accent" />
-            <h2 className="mt-5 text-2xl font-semibold uppercase leading-8 text-[var(--text)]">Добавьте своё событие</h2>
+            <h2 className={`${displayFont.className} mt-5 text-[2rem] font-semibold leading-none text-[var(--text)]`}>Добавьте своё событие</h2>
             <p className="mt-3 text-sm leading-7 text-[var(--muted)]">
               Делитесь важными событиями с индустрией СКФО.
             </p>
-            <Button className="mt-6 rounded-full px-5" href="#applications" variant="ghost">
+            <Button className="mt-6 rounded-[var(--radius-md)] px-5" href="/events?intent=proposal#applications" variant="ghost">
               Предложить событие
               <ArrowUpRight size={16} />
             </Button>
@@ -79,7 +87,7 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
       {isEmpty ? (
         <PublicPrelaunchSection
           actions={[
-            { href: '#applications', label: 'Предложить событие' },
+            { href: '/events?intent=proposal#applications', label: 'Предложить событие' },
             { href: '/partners', label: 'Обсудить партнёрство', variant: 'secondary' }
           ]}
           badges={['Афиша собирается', 'Можно предложить свой формат']}
@@ -98,15 +106,15 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
             }
           ]}
           description="Раздел уже принимает предложения по событиям и новым темам, даже если афиша ещё не заполнена."
-          eyebrow="Pre-launch / События"
+          eyebrow="Раздел готовится"
           title="Первые события ещё собираются"
         />
       ) : (
         <Suspense
           fallback={
-            <section className="editorial-grid border-b border-black/20 py-10 md:py-14">
+            <section className="editorial-grid border-b border-[var(--line)] py-10 md:py-14">
               <div className="container">
-                <div aria-hidden="true" className="h-40 animate-pulse rounded-[var(--radius-xl)] bg-black/6" />
+                <div aria-hidden="true" className="h-40 animate-pulse rounded-[var(--radius-xl)] bg-[var(--skeleton-fill)]" />
               </div>
             </section>
           }
@@ -136,12 +144,15 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
           />
         </Suspense>
       )}
-      <EventApplicationForm
-        cities={cities}
-        enabled={applicationFormsEnabled}
-        result={applicationResult}
-        utm={applicationUtm}
-      />
+      {shouldShowEventForm ? (
+        <EventApplicationForm
+          cities={cities}
+          defaults={{ eventTitle: eventTitle ?? (isEventProposal ? 'Предложение события' : undefined) }}
+          enabled={applicationFormsEnabled}
+          result={applicationResult}
+          utm={applicationUtm}
+        />
+      ) : null}
     </>
   );
 }

@@ -16,7 +16,8 @@ import {
   getPublicApplicationUtm,
   stripPublicApplicationResultParams
 } from '@/lib/applications/public-form-helpers';
-import { getPublishedCourses, type PublicContentSearchParams } from '@/lib/public/content';
+import { displayFont } from '@/lib/fonts';
+import { getPublishedCourses, hasActivePublicContentParams, type PublicContentSearchParams } from '@/lib/public/content';
 import { getCourseFilterOptions, getPublicCategoryOptions, getPublicCityFilterOptions } from '@/lib/public/filter-options';
 import { getEnv } from '@/lib/validation/env';
 
@@ -37,52 +38,52 @@ const educationFormats = [
     audience: 'Для специалистов и руководителей, которым нужен быстрый результат.',
     outcome: 'Концентрированная программа и работа над реальным кейсом.',
     icon: Zap,
-    meta: ['Скоро на платформе']
+    meta: []
   },
   {
     label: 'Лекция',
     title: 'Лекция или разбор',
     description: 'Встреча по одной теме: продукт, команда, сезон, сервис или операционная задача.',
-    audience: 'Для тех, кто хочет быть в курсе трендов и получать новые инсайты.',
-    outcome: 'Актуальные знания от лидеров индустрии в удобном формате.',
+    audience: 'Для тех, кто хочет разбирать рабочие темы без длинной программы.',
+    outcome: 'Короткая встреча с понятной темой и ответами на вопросы.',
     icon: MonitorPlay,
-    meta: ['Скоро на платформе']
+    meta: []
   },
   {
     label: 'Команда',
     title: 'Корпоративное обучение',
     description: 'Программа под конкретное заведение, смену, запуск или внутреннюю задачу команды.',
-    audience: 'Для команд и компаний, которым важно расти вместе.',
-    outcome: 'Индивидуальная программа под задачи бизнеса.',
+    audience: 'Для команд и компаний, которым нужно учиться вместе.',
+    outcome: 'Программа под задачи заведения и уровень команды.',
     icon: Building2,
-    meta: ['Скоро на платформе']
+    meta: []
   },
   {
     label: 'Меню',
     title: 'Разбор меню',
     description: 'Практическая сессия по напиткам, себестоимости, сезонным позициям и подаче.',
     audience: 'Для шефов, бар-менеджеров и концепт-команд.',
-    outcome: 'Экспертная оценка меню и рекомендации по улучшению.',
+    outcome: 'Разбор меню и список понятных правок.',
     icon: ClipboardList,
-    meta: ['Скоро на платформе']
+    meta: []
   },
   {
     label: 'Сервис',
     title: 'Сервисная сессия',
     description: 'Работа со стандартами, гостевым опытом, сменой и понятными действиями команды.',
-    audience: 'Для команд зала и сервиса, стремящихся к уровню.',
-    outcome: 'Разбор сервиса, стандартов и клиентского опыта.',
+    audience: 'Для команд зала и сервиса, которым нужно выровнять работу смены.',
+    outcome: 'Разбор сервиса, стандартов и действий в смене.',
     icon: Headphones,
-    meta: ['Скоро на платформе']
+    meta: []
   },
   {
     label: 'Управление',
     title: 'Программа для управляющих',
     description: 'Формат для тех, кто отвечает за людей, процессы, закупки и развитие точки.',
-    audience: 'Для управляющих ресторанов и операционных лидеров.',
-    outcome: 'Системный подход к управлению, финансам и команде.',
+    audience: 'Для управляющих ресторанов и тех, кто отвечает за работу точки.',
+    outcome: 'Понятный план по команде, закупкам, деньгам и процессам.',
     icon: GraduationCap,
-    meta: ['Скоро на платформе']
+    meta: []
   }
 ] as const;
 
@@ -105,7 +106,10 @@ export default async function EducationPage({ searchParams }: EducationPageProps
   const applicationResult = getPublicApplicationResult(params);
   const applicationUtm = getPublicApplicationUtm(params);
   const courseTitle = firstParam(params.courseTitle);
+  const hasSelectedEducationFormat = Boolean(courseTitle?.trim() || applicationResult);
   const isEmpty = content.total === 0;
+  const hasActiveFilters = hasActivePublicContentParams(contentParams, ['q', 'category', 'city', 'format', 'level']);
+  const isPrelaunchEmpty = isEmpty && !hasActiveFilters;
 
   return (
     <>
@@ -136,18 +140,18 @@ export default async function EducationPage({ searchParams }: EducationPageProps
             description: 'Программы для команд: сервис, бар, меню, продажи и внутренняя подготовка.'
           }
         ]}
-        primaryLink={{ label: 'Запросить обучение', href: '#applications' }}
+        primaryLink={{ label: 'Выбрать формат', href: '#education-formats' }}
         secondaryLink={{ label: 'Посмотреть события', href: '/events' }}
       />
-      <section className="editorial-grid border-b border-black/20 py-10 md:py-14">
+      <section className="editorial-grid border-b border-[var(--line)] py-10 md:py-14" id="education-formats">
         <div className="container grid gap-8 xl:grid-cols-[minmax(16rem,0.58fr)_minmax(0,1.42fr)]">
           <div className="xl:sticky xl:top-24 xl:self-start">
             <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Форматы</p>
-            <h2 className="mt-4 max-w-sm text-[2.4rem] font-semibold uppercase leading-[0.98] tracking-[-0.02em] text-[var(--text)]">
+            <h2 className={`${displayFont.className} mt-4 max-w-sm text-[2.8rem] font-semibold leading-none tracking-normal text-[var(--text)]`}>
               Что можно собрать
             </h2>
           </div>
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6">
             {educationFormats.map((format) => (
               <PlatformFormatCard
                 key={format.title}
@@ -161,15 +165,14 @@ export default async function EducationPage({ searchParams }: EducationPageProps
           </div>
         </div>
       </section>
-      {isEmpty ? (
+      {isPrelaunchEmpty ? (
         <PublicPrelaunchSection
           actions={[
-            { href: '#applications', label: 'Запросить обучение' },
+            { href: `/education?courseTitle=${encodeURIComponent('Интенсив для специалистов')}#applications`, label: 'Запросить интенсив' },
             { href: '/contacts?topic=education-program', label: 'Предложить тему', variant: 'secondary' },
-            { href: '/contacts?topic=education-launch', label: 'Узнать о запуске', variant: 'secondary' },
             { href: '/events', label: 'Посмотреть события', variant: 'ghost' }
           ]}
-          badges={['Скоро здесь появятся первые программы', 'Заявки на обучение уже открыты']}
+          badges={[]}
           cards={[
             {
               title: 'Интенсивы для специалистов',
@@ -181,20 +184,20 @@ export default async function EducationPage({ searchParams }: EducationPageProps
             },
             {
               title: 'Лекции и разборы',
-              description: 'Короткие образовательные встречи с экспертами и практиками индустрии.'
+              description: 'Короткие встречи с экспертами и практиками индустрии.'
             }
           ]}
           description="Сейчас мы собираем первые программы. Пока можно оставить заявку, описать задачу команды или предложить тему для запуска."
-          eyebrow="Pre-launch / Образование"
+          eyebrow="Раздел готовится"
           title="Раздел уже принимает запросы"
         />
       ) : (
         <>
           <Suspense
             fallback={
-              <section className="border-b border-black/10 bg-[var(--surface-muted)] py-6">
+              <section className="border-b border-[var(--line)] bg-[var(--surface-muted)] py-6">
                 <div className="container">
-                  <div aria-hidden="true" className="h-14 animate-pulse rounded-[var(--radius-lg)] bg-black/6" />
+                  <div aria-hidden="true" className="h-14 animate-pulse rounded-[var(--radius-lg)] bg-[var(--skeleton-fill)]" />
                 </div>
               </section>
             }
@@ -235,13 +238,15 @@ export default async function EducationPage({ searchParams }: EducationPageProps
         </>
       )}
       <ToolTeaser />
-      <EducationApplicationForms
-        cities={cities}
-        defaults={{ courseTitle }}
-        enabled={applicationFormsEnabled}
-        result={applicationResult}
-        utm={applicationUtm}
-      />
+      {hasSelectedEducationFormat ? (
+        <EducationApplicationForms
+          cities={cities}
+          defaults={{ courseTitle }}
+          enabled={applicationFormsEnabled}
+          result={applicationResult}
+          utm={applicationUtm}
+        />
+      ) : null}
     </>
   );
 }

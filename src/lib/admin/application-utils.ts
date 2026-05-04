@@ -35,7 +35,7 @@ export const applicationTypeLabels: Record<ApplicationType, string> = {
   [ApplicationType.VACANCY_SUBMISSION]: 'Размещение вакансии',
   [ApplicationType.VACANCY_RESPONSE]: 'Отклик на вакансию',
   [ApplicationType.SUPPLIER_SUBMISSION]: 'Заявка поставщика',
-  [ApplicationType.PARTNER_APPLICATION]: 'Партнерская заявка',
+  [ApplicationType.PARTNER_APPLICATION]: 'Партнёрская заявка',
   [ApplicationType.CONTACT_MESSAGE]: 'Контактное сообщение',
   [ApplicationType.CORPORATE_TRAINING_APPLICATION]: 'Корпоративное обучение',
   [ApplicationType.CERTIFICATE_ORDER]: 'Заказ сертификата'

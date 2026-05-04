@@ -52,6 +52,21 @@ export type VacancyApplicationFormOptions = {
   }[];
 };
 
+export function hasActivePublicContentParams(
+  params: PublicContentSearchParams,
+  keys: readonly string[] = ['q', 'category', 'city', 'format', 'level', 'period', 'partnerType', 'featured', 'verified', 'employmentType']
+) {
+  return keys.some((key) => {
+    const value = params[key];
+
+    if (Array.isArray(value)) {
+      return value.some((item) => item.trim().length > 0);
+    }
+
+    return Boolean(value?.trim());
+  });
+}
+
 function firstParam(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] : value;
 }
@@ -200,6 +215,8 @@ export async function getPublishedArticles(params: PublicContentSearchParams = {
       meta: [article.city?.name, article.authorName, article.readingTimeMinutes ? `${article.readingTimeMinutes} мин` : undefined].filter(
         Boolean
       ) as string[],
+      dateIso: (article.publishedAt ?? article.createdAt).toISOString(),
+      updatedLabel: (article.publishedAt ?? article.createdAt).toLocaleDateString('ru-RU'),
       imageUrl: publicImageUrl(article.coverImage)
     }))
   });

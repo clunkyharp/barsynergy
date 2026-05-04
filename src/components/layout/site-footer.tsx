@@ -1,18 +1,15 @@
 'use client';
 
-import { ArrowUpRight } from 'lucide-react';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { accentFont, displayFont } from '@/lib/fonts';
 
 export function SiteFooter() {
   const pathname = usePathname();
   const isWorkspacePath =
     pathname?.startsWith('/admin') || pathname?.startsWith('/business') || pathname?.startsWith('/auth');
   const aboutHref = pathname === '/' ? '#home-about' : '/#home-about';
-  const compactFooterOnlyRoutes = ['/contacts', '/education', '/events', '/general-sponsors', '/partners', '/suppliers', '/vacancies'];
-  const showContactCta = !compactFooterOnlyRoutes.some((route) => pathname === route || pathname?.startsWith(`${route}/`));
   const footerLinkClassName =
-    'flex items-center rounded-[var(--radius-sm)] py-0.5 transition hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white';
+    'flex items-center rounded-[var(--radius-sm)] py-0.5 transition hover:text-[var(--accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]';
 
   if (isWorkspacePath) {
     return null;
@@ -20,51 +17,50 @@ export function SiteFooter() {
 
   return (
     <footer className="mt-auto">
-      {showContactCta ? (
-        <section className="border-t border-black/12 bg-[var(--graphite)] text-white">
-          <div className="container grid min-h-[320px] gap-8 py-14 md:py-18 lg:grid-cols-[1fr_0.9fr_0.62fr] lg:items-center">
-            <div>
-              <h2 className={`${displayFont.className} display-tight max-w-3xl text-[38px] md:text-[56px] xl:text-[64px]`}>
-                Напишите команде BARSYNERGY
-              </h2>
-            </div>
-            <div className="flex h-full flex-col justify-end">
-              <p className="max-w-lg pb-1 text-base leading-8 text-white/76 md:text-lg">
-                Если хотите обсудить программу, событие, вакансию, поставщика, партнёрство или спонсорство, просто напишите нам.
-              </p>
-            </div>
-            <div className="flex h-full items-end lg:justify-end">
-              <a
-                className="inline-flex min-h-16 w-full items-center justify-center gap-4 rounded-full border border-white/22 px-8 text-base font-semibold uppercase tracking-[0.08em] text-white transition hover:border-white hover:bg-white hover:text-[var(--graphite)] focus-visible:border-white focus-visible:bg-white focus-visible:text-[var(--graphite)] active:translate-y-px sm:w-fit md:min-h-[72px] md:px-10"
-                href="/contacts"
-              >
-                Связаться
-                <ArrowUpRight size={18} />
-              </a>
-            </div>
-          </div>
-        </section>
-      ) : null}
-      <section className="border-t border-white/8 bg-black py-10 text-white">
-        <div className="container grid gap-8 md:grid-cols-[1fr_auto_auto]">
+      <section className="border-t border-[var(--line)] bg-[var(--footer-bg)] py-9 text-[var(--text)]">
+        <div className="container grid gap-8 md:grid-cols-[1fr_auto_auto_auto]">
           <div>
-            <p className={`${accentFont.className} text-base uppercase tracking-[0.18em] text-white`}>BARSYNERGY</p>
-            <p className="mt-3 max-w-xl text-sm leading-7 text-white/62">
+            <a className="inline-flex w-fit items-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]" href="/">
+              <Image alt="BARSYNERGY" className="theme-logo-light h-auto w-[168px]" height={54} src="/brand/barsynergy-lockup.svg" width={252} />
+              <Image alt="BARSYNERGY" className="theme-logo-dark h-auto w-[168px]" height={54} src="/brand/barsynergy-lockup-light.svg" width={252} />
+            </a>
+            <p className="mt-4 max-w-md text-sm leading-7 text-[var(--muted)]">
               Обучение, события, материалы и полезные контакты для барной индустрии СКФО.
             </p>
+            <p className="mt-5 text-xs leading-5 text-[var(--muted)]">© 2026 BARSYNERGY. Все права защищены.</p>
           </div>
-          <nav className="grid gap-0.5 text-sm leading-6 text-white/72 md:justify-items-end md:text-right">
+          <nav className="grid gap-0.5 text-sm leading-6 text-[var(--muted)] md:justify-items-start">
+            <p className="mb-2 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--text)]">Платформа</p>
             <a className={footerLinkClassName} href={aboutHref}>
               О нас
             </a>
+            <a className={footerLinkClassName} href="/education">
+              Образование
+            </a>
+            <a className={footerLinkClassName} href="/events">
+              События
+            </a>
+            <a className={footerLinkClassName} href="/vacancies">
+              Вакансии
+            </a>
+          </nav>
+          <nav className="grid gap-0.5 text-sm leading-6 text-[var(--muted)] md:justify-items-start">
+            <p className="mb-2 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--text)]">Сообщество</p>
             <a className={footerLinkClassName} href="/partners">
               Для партнёров
+            </a>
+            <a className={footerLinkClassName} href="/suppliers">
+              Поставщики
             </a>
             <a className={footerLinkClassName} href="/general-sponsors">
               Спонсорство
             </a>
+            <a className={footerLinkClassName} href="/contacts">
+              Контакты
+            </a>
           </nav>
-          <nav className="grid gap-0.5 text-sm leading-6 text-white/72 md:justify-items-end md:text-right">
+          <nav className="grid gap-0.5 text-sm leading-6 text-[var(--muted)] md:justify-items-start">
+            <p className="mb-2 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--text)]">Документы</p>
             <a className={footerLinkClassName} href="/legal/privacy">
               Политика конфиденциальности
             </a>

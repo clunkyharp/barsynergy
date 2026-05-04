@@ -6,6 +6,7 @@ import { submitContactMessage } from '@/app/(public)/contacts/actions';
 import {
   HiddenUtmFields,
   HoneypotField,
+  ContactChannelFieldset,
   PublicFormShellFooter,
   PublicFormShellHeader,
   type PublicApplicationFormProps
@@ -116,17 +117,11 @@ export function ContactApplicationForm({ enabled, result, utm, cities, defaultTo
               </Select>
             </FormField>
             <div className="md:col-span-2">
-              <p className="text-sm leading-6 text-[var(--muted)]">{selectedTopic.description}</p>
+              <p className="rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--surface-wash)] px-4 py-3 text-sm leading-6 text-[var(--muted)]">
+                {selectedTopic.description}
+              </p>
             </div>
-            <FormField htmlFor="contactEmail" label="Email">
-              <Input autoComplete="email" id="contactEmail" name="email" spellCheck={false} type="email" maxLength={180} />
-            </FormField>
-            <FormField htmlFor="contactPhone" label="Телефон">
-              <Input autoComplete="tel" id="contactPhone" name="phone" inputMode="tel" maxLength={80} />
-            </FormField>
-            <FormField htmlFor="contactTelegram" label="Telegram">
-              <Input autoComplete="off" id="contactTelegram" name="telegram" spellCheck={false} maxLength={80} />
-            </FormField>
+            <ContactChannelFieldset className="md:col-span-2" emailId="contactEmail" phoneId="contactPhone" telegramId="contactTelegram" />
             <FormField htmlFor="contactCityId" label="Город">
               <Select id="contactCityId" name="cityId" defaultValue="">
                 <option value="">Не указан</option>
@@ -237,8 +232,8 @@ export function ContactApplicationForm({ enabled, result, utm, cities, defaultTo
               </ConsentField>
             </div>
           </div>
-          <PublicFormShellFooter note="Форма подстраивается под тему, но удобный способ связи всё равно лучше оставить явно.">
-            <Button className="min-h-12 rounded-full px-6 tracking-[0.12em] sm:self-start" type="submit">
+          <PublicFormShellFooter note="Форма подстраивается под тему. Ответ придёт по указанному способу связи.">
+            <Button className="min-h-12 rounded-[var(--radius-md)] px-6 tracking-normal sm:self-start" type="submit">
               Отправить сообщение
             </Button>
           </PublicFormShellFooter>
@@ -246,21 +241,21 @@ export function ContactApplicationForm({ enabled, result, utm, cities, defaultTo
       </form>
   ) : (
     <EditorialShell className="p-5 md:p-6">
-      <h3 className="text-lg font-semibold uppercase leading-7">Форма сейчас закрыта</h3>
+      <h3 className="text-lg font-semibold leading-7">Форма сейчас закрыта</h3>
       <p className="mt-3 text-sm leading-7 text-[var(--muted)]">
         Если вопрос срочный, напишите на email команды.
       </p>
-      <Button className="mt-6 rounded-full sm:self-start" href="mailto:hello@barsynergy.ru" size="lg" variant="secondary">
+      <Button className="mt-6 rounded-[var(--radius-md)] sm:self-start" href="mailto:hello@barsynergy.ru" size="lg" variant="secondary">
         Написать на почту
       </Button>
     </EditorialShell>
   );
 
   return (
-    <section className="relative overflow-hidden border-b border-black/20 bg-[var(--surface)] py-14 md:py-18" id="applications">
+    <section className="relative overflow-hidden border-b border-[var(--line)] bg-[var(--surface)] py-14 md:py-18" id="applications">
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_24%,rgba(153,44,38,0.08),transparent_18%),radial-gradient(circle_at_78%_22%,rgba(255,255,255,0.62),transparent_20%)]"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_24%,var(--accent-soft),transparent_18%),radial-gradient(circle_at_78%_22%,var(--surface-muted),transparent_20%)]"
       />
       <div className="container relative grid gap-6 xl:grid-cols-[0.72fr_1.28fr] xl:items-start">
         <div className="grid gap-5">
@@ -289,7 +284,7 @@ export function ContactApplicationForm({ enabled, result, utm, cities, defaultTo
                 <IconBadge icon={MapPin} size="md" tone="soft" />
                 <div>
                   <h3 className="text-lg font-semibold leading-7 text-[var(--text)]">Город / регион</h3>
-                  <p className="mt-1 text-sm leading-6 text-[var(--muted)]">Пятигорск, Ставропольский край, Россия</p>
+                  <p className="mt-1 text-sm leading-6 text-[var(--muted)]">Махачкала, Республика Дагестан, Россия</p>
                 </div>
               </div>
               <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-4">

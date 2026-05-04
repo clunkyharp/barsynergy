@@ -76,7 +76,7 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
           },
           {
             label: 'Запрос',
-            title: 'Партнерства и размещение',
+            title: 'Партнёрства и размещение',
             description: 'Запросы от брендов, школ, заведений, поставщиков и работодателей.'
           },
           {

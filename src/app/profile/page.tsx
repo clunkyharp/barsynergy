@@ -31,19 +31,19 @@ export default async function ProfileDashboardPage() {
     <div className="space-y-6">
       <PageHeader
         eyebrow="Кабинет специалиста"
-        description="Добро пожаловать в ваш личный кабинет. Здесь вы можете управлять своими откликами и настройками профиля."
+        description="Здесь будут отклики, контакты и настройки профиля."
         title={`Привет, ${user.profile?.fullName || user.email}!`}
       />
 
       <div className="grid gap-4 md:grid-cols-3">
-        <StatCard label="Email" value={user.email} valueClassName="text-base font-semibold tracking-[-0.02em]" />
-        <StatCard label="Город" value={user.profile?.city?.name || '—'} valueClassName="text-base font-semibold tracking-[-0.02em]" />
-        <StatCard label="Профессия" value={user.profile?.profession || '—'} valueClassName="text-base font-semibold tracking-[-0.02em]" />
+        <StatCard label="Email" value={user.email} valueClassName="text-base font-semibold tracking-normal" />
+        <StatCard label="Город" value={user.profile?.city?.name || '—'} valueClassName="text-base font-semibold tracking-normal" />
+        <StatCard label="Профессия" value={user.profile?.profession || '—'} valueClassName="text-base font-semibold tracking-normal" />
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
         <Panel padding="lg" tone="elevated">
-          <h2 className="text-lg font-semibold tracking-[-0.02em]">Основная информация</h2>
+          <h2 className="text-lg font-semibold tracking-normal">Основная информация</h2>
           <div className="mt-4 space-y-3 text-sm">
             <div className="flex justify-between border-b border-[var(--line)] pb-2">
               <span className="text-[var(--muted)]">Email</span>
@@ -65,7 +65,7 @@ export default async function ProfileDashboardPage() {
         </Panel>
 
         <Panel padding="lg" tone="elevated">
-          <h2 className="text-lg font-semibold tracking-[-0.02em]">Контактные данные</h2>
+          <h2 className="text-lg font-semibold tracking-normal">Контактные данные</h2>
           <div className="mt-4 space-y-3 text-sm">
             <div className="flex justify-between border-b border-[var(--line)] pb-2">
               <span className="text-[var(--muted)]">Телефон</span>
@@ -84,9 +84,9 @@ export default async function ProfileDashboardPage() {
       </div>
 
       <Panel padding="lg" tone="elevated">
-        <h2 className="text-lg font-semibold tracking-[-0.02em]">Ваш профиль</h2>
+        <h2 className="text-lg font-semibold tracking-normal">Ваш профиль</h2>
         <p className="mt-2 text-sm text-[var(--muted)]">
-          {user.profile?.bio || 'Вы еще не заполнили биографию. Это можно сделать в настройках.'}
+          {user.profile?.bio || 'Вы ещё не добавили описание профиля. Это можно будет сделать в настройках.'}
         </p>
       </Panel>
     </div>

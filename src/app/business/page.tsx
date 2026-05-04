@@ -15,6 +15,7 @@ import { applicationStatusLabels } from '@/lib/admin/application-utils';
 import type { AdminContentSearchParams } from '@/lib/admin/content-utils';
 import { requireBusinessAccountAccess } from '@/lib/auth/require-business-account';
 import { prisma } from '@/lib/db/prisma';
+import { displayFont } from '@/lib/fonts';
 
 type BusinessDashboardPageProps = {
   searchParams?: Promise<AdminContentSearchParams>;
@@ -54,7 +55,7 @@ export default async function BusinessDashboardPage({ searchParams }: BusinessDa
         <Panel className="overflow-hidden p-0" tone="elevated">
           <div className="border-b border-black/10 px-5 py-5 md:px-6">
             <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Компания</p>
-            <h2 className="mt-3 text-2xl font-semibold tracking-[-0.03em]">Профиль компании</h2>
+            <h2 className={`${displayFont.className} mt-3 text-[2rem] font-semibold leading-none tracking-normal`}>Профиль компании</h2>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--muted)]">
               Заполненный профиль экономит время: не придётся каждый раз вводить одни и те же данные.
             </p>
@@ -105,7 +106,7 @@ export default async function BusinessDashboardPage({ searchParams }: BusinessDa
                 />
               </FormField>
               <ActionRow className="border-t-0 pt-0">
-                <Button className="rounded-full" type="submit">Сохранить профиль</Button>
+                <Button className="rounded-[var(--radius-md)]" type="submit">Сохранить профиль</Button>
               </ActionRow>
             </form>
           </div>
@@ -126,7 +127,7 @@ export default async function BusinessDashboardPage({ searchParams }: BusinessDa
               <StatCard label="Всего заявок" value={requestCount} />
               <StatCard label="В работе" value={activeRequestCount} />
             </div>
-            <Button className="mt-5 w-full rounded-full" href="/business/requests" variant="secondary">
+            <Button className="mt-5 w-full rounded-[var(--radius-md)]" href="/business/requests" variant="secondary">
               Открыть заявки
             </Button>
           </Panel>

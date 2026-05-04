@@ -43,7 +43,7 @@ type ActiveFilter = {
 };
 
 function fieldClassName() {
-  return 'min-h-11 rounded-[var(--radius-lg)] border-black/10 bg-[rgba(255,252,248,0.94)] px-4 py-2.5 text-sm leading-6 placeholder:text-[var(--muted)] hover:border-black/20 focus:border-[var(--accent)] focus:bg-white';
+  return 'min-h-11 rounded-[var(--radius-md)] border-[var(--border-default)] bg-[var(--field-bg)] px-4 py-2.5 text-sm leading-6 placeholder:text-[var(--muted)] hover:border-[var(--accent)]/35 hover:bg-[var(--field-bg-hover)] focus:border-[var(--accent)] focus:bg-[var(--field-bg-hover)]';
 }
 
 export function PublicFilters({
@@ -258,13 +258,13 @@ export function PublicFilters({
   if (resolvedVariant === 'toolbar') {
     const toolbarContent = (
       <div className={cn('grid gap-3', embedded ? '' : 'container')}>
-        <Panel className="border-black/10 bg-[rgba(255,250,244,0.84)] shadow-[0_18px_50px_rgba(20,20,18,0.04)]" padding="md">
+        <Panel className="border-[var(--border-default)] bg-[var(--surface-wash)] shadow-[0_18px_50px_rgba(20,20,18,0.04)]" padding="md">
           <div className="grid gap-3 lg:grid-cols-[minmax(16rem,1.1fr)_repeat(3,minmax(10rem,0.8fr))]">
             {searchField}
             {filterFields}
           </div>
 
-          <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-black/10 pt-4">
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-[var(--line)] pt-4">
             <p className="text-sm leading-6 text-[var(--muted)]">{description}</p>
             <div className="flex items-center gap-3">
               {isPending ? (
@@ -289,7 +289,7 @@ export function PublicFilters({
             <div className="mt-4 flex flex-wrap gap-2">
               {activeFilters.map((filter) => (
                 <button
-                  className="inline-flex max-w-full items-center gap-2 rounded-full border border-[rgba(101,32,27,0.18)] bg-[rgba(101,32,27,0.05)] px-3 py-1.5 text-[11px] leading-5 text-[var(--accent)] transition hover:border-[rgba(101,32,27,0.28)] hover:bg-[rgba(101,32,27,0.08)]"
+                  className="inline-flex max-w-full items-center gap-2 rounded-[var(--radius-sm)] border border-[var(--accent)]/25 bg-[var(--accent-soft)] px-3 py-1.5 text-[11px] leading-5 text-[var(--accent)] transition hover:border-[var(--accent)]/40"
                   key={`${filter.name}-${filter.value}`}
                   onClick={() => clearSingleFilter(filter.name)}
                   type="button"
@@ -310,7 +310,7 @@ export function PublicFilters({
     }
 
     return (
-      <section className="border-b border-black/10 bg-[var(--surface-muted)] py-6">
+      <section className="border-b border-[var(--line)] bg-[var(--surface-muted)] py-6">
         {toolbarContent}
       </section>
     );
@@ -318,12 +318,12 @@ export function PublicFilters({
 
   const content = (
     <div className={cn('grid gap-3', embedded ? '' : 'container')}>
-      <Panel className="border-black/10 bg-[rgba(255,249,243,0.78)]" padding="md">
+      <Panel className="border-[var(--border-default)] bg-[var(--surface-wash)]" padding="md">
         {searchField}
       </Panel>
 
       {hasFilters ? (
-        <Panel className="border-black/10 bg-[rgba(255,250,244,0.82)]" padding="md">
+        <Panel className="border-[var(--border-default)] bg-[var(--surface-wash)]" padding="md">
           <div className="flex items-start justify-between gap-3">
             <div>
               <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Фильтры</p>
@@ -346,7 +346,7 @@ export function PublicFilters({
               {embedded ? (
                 <button
                   aria-expanded={showFilters}
-                  className="inline-flex items-center gap-2 rounded-full border border-black/10 px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--text)] transition hover:border-black/20 md:hidden"
+                  className="inline-flex items-center gap-2 rounded-[var(--radius-md)] border border-[var(--border-default)] px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--text)] transition hover:border-[var(--accent)]/35 md:hidden"
                   onClick={() => setShowFilters((value) => !value)}
                   type="button"
                 >
@@ -362,7 +362,7 @@ export function PublicFilters({
             <div className="mt-4 flex flex-wrap gap-2">
               {activeFilters.map((filter) => (
                 <button
-                  className="inline-flex max-w-full items-center gap-2 rounded-full border border-[rgba(101,32,27,0.18)] bg-[rgba(101,32,27,0.05)] px-3 py-1.5 text-[11px] leading-5 text-[var(--accent)] transition hover:border-[rgba(101,32,27,0.28)] hover:bg-[rgba(101,32,27,0.08)]"
+                  className="inline-flex max-w-full items-center gap-2 rounded-[var(--radius-sm)] border border-[var(--accent)]/25 bg-[var(--accent-soft)] px-3 py-1.5 text-[11px] leading-5 text-[var(--accent)] transition hover:border-[var(--accent)]/40"
                   key={`${filter.name}-${filter.value}`}
                   onClick={() => clearSingleFilter(filter.name)}
                   type="button"
@@ -399,7 +399,7 @@ export function PublicFilters({
   }
 
   return (
-    <section className="border-b border-black/10 bg-[var(--surface-muted)] py-6">
+    <section className="border-b border-[var(--line)] bg-[var(--surface-muted)] py-6">
       {content}
     </section>
   );

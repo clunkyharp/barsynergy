@@ -6,6 +6,7 @@ import { InlineAlert } from '@/components/ui/inline-alert';
 import { Input } from '@/components/ui/input';
 import { Panel } from '@/components/ui/panel';
 import { findActiveBusinessAccessInvite, parseBusinessAccessRequestPayload } from '@/lib/auth/business-access';
+import { displayFont } from '@/lib/fonts';
 
 const errorMessages: Record<string, string> = {
   invalid: 'Ссылка активации недействительна или уже использована.',
@@ -45,7 +46,7 @@ export default async function ActivateBusinessAccessPage({ searchParams }: Activ
       <div className="grid gap-6 lg:grid-cols-[0.42fr_0.58fr] lg:items-start">
         <section className="editorial-form-shell p-6 md:p-8">
           <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Бизнес-аккаунт</p>
-          <h1 className="mt-4 text-4xl font-semibold leading-tight md:text-5xl">Завершить подключение</h1>
+          <h1 className={`${displayFont.className} display-tight mt-4 text-[40px] md:text-[54px]`}>Завершить подключение</h1>
           <p className="mt-4 max-w-md text-base leading-7 text-[var(--muted)]">
             Установите пароль для первого входа в кабинет компании. Ссылка действует ограниченное время и используется один раз.
           </p>
@@ -63,7 +64,7 @@ export default async function ActivateBusinessAccessPage({ searchParams }: Activ
         <section className="editorial-form-shell overflow-hidden">
           <div className="border-b border-black/10 bg-[linear-gradient(135deg,rgba(255,255,255,0.86),rgba(255,255,255,0.58))] px-5 py-5 md:px-6 md:py-6">
             <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Активация</p>
-            <h2 className="mt-3 text-2xl font-semibold uppercase leading-8">Создайте пароль</h2>
+            <h2 className={`${displayFont.className} mt-3 text-[2rem] font-semibold leading-none`}>Создайте пароль</h2>
             <p className="mt-3 max-w-xl text-sm leading-7 text-[var(--muted)]">
               После активации вы сразу попадёте в кабинет и сможете продолжить работу с заявками компании.
             </p>
@@ -87,10 +88,10 @@ export default async function ActivateBusinessAccessPage({ searchParams }: Activ
                   <Input id="confirmPassword" name="confirmPassword" type="password" minLength={8} autoComplete="new-password" required />
                 </FormField>
                 <ActionRow>
-                  <Button className="rounded-full" size="lg" type="submit">
+                  <Button className="rounded-[var(--radius-md)]" size="lg" type="submit">
                     Активировать доступ
                   </Button>
-                  <Button className="rounded-full" href="/auth/login" size="lg" variant="secondary">
+                  <Button className="rounded-[var(--radius-md)]" href="/auth/login" size="lg" variant="secondary">
                     Уже есть вход
                   </Button>
                 </ActionRow>

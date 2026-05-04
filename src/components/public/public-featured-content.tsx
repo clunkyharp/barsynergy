@@ -3,6 +3,7 @@ import { PublicBodyText, PublicDisplayTitle, PublicEyebrow } from '@/components/
 import { Button } from '@/components/ui/button';
 import { MetaChip } from '@/components/ui/meta-chip';
 import { Panel } from '@/components/ui/panel';
+import { displayFont } from '@/lib/fonts';
 import type { PublishedContentItem } from '@/lib/public/content';
 
 type PublicFeaturedContentProps = {
@@ -54,7 +55,7 @@ export function PublicFeaturedContent({
               <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">
                 {item.label ?? 'Рекомендуем'}
               </p>
-              <h3 className="mt-3 text-2xl font-semibold uppercase leading-8 md:text-3xl">{item.title}</h3>
+              <h3 className={`${displayFont.className} mt-3 text-[2rem] font-semibold leading-none md:text-[2.6rem]`}>{item.title}</h3>
               <PublicBodyText className="mt-4 max-w-2xl">{item.summary}</PublicBodyText>
             </div>
 
@@ -69,7 +70,7 @@ export function PublicFeaturedContent({
             ) : null}
 
             <div className="mt-auto">
-              <Button className="rounded-full px-6" href={itemHref(basePath, item.slug)}>
+              <Button className="rounded-[var(--radius-md)] px-6" href={itemHref(basePath, item.slug)}>
                 {actionLabel}
                 <ArrowUpRight size={18} />
               </Button>

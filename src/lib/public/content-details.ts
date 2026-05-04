@@ -271,7 +271,7 @@ export async function getPublishedPartnerDetail(slug: string): Promise<PublicCon
     companyName: partner.companyName,
     facts: compact([
       `Компания: ${partner.companyName}`,
-      partner.partnerType ? `Тип партнерства: ${partner.partnerType}` : undefined,
+      partner.partnerType ? `Тип партнёрства: ${partner.partnerType}` : undefined,
       partner.isFeatured ? 'Статус: В подборке' : undefined
     ]).map((entry) => {
       const [label, ...rest] = entry.split(': ');
@@ -281,6 +281,6 @@ export async function getPublishedPartnerDetail(slug: string): Promise<PublicCon
       };
     }),
     externalUrl,
-    externalUrlLabel: externalUrl ? 'Сайт партнера' : undefined
+    externalUrlLabel: externalUrl ? 'Сайт партнёра' : undefined
   };
 }

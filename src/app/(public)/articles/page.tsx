@@ -8,8 +8,15 @@ import { PublicPrelaunchSection } from '@/components/public/public-prelaunch-sec
 import { FilterChip } from '@/components/public/public-ui-adaptation';
 import { Button } from '@/components/ui/button';
 import { MetaChip } from '@/components/ui/meta-chip';
+import { Panel } from '@/components/ui/panel';
+import { displayFont } from '@/lib/fonts';
 import { getPublicCategoryOptions } from '@/lib/public/filter-options';
-import { getPublishedArticles, type PublishedContentList, type PublicContentSearchParams } from '@/lib/public/content';
+import {
+  getPublishedArticles,
+  hasActivePublicContentParams,
+  type PublishedContentList,
+  type PublicContentSearchParams
+} from '@/lib/public/content';
 
 type ArticlesPageProps = {
   searchParams?: Promise<PublicContentSearchParams>;
@@ -64,7 +71,7 @@ function ArticleGridSection({ content, excludedItemId }: { content: PublishedCon
         <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Материалы</p>
-            <h2 className="mt-3 text-[2.2rem] font-semibold uppercase leading-none text-[var(--text)] md:text-[3rem]">
+            <h2 className={`${displayFont.className} mt-3 text-[2.7rem] font-semibold leading-none text-[var(--text)] md:text-[3.45rem]`}>
               Последние публикации
             </h2>
           </div>
@@ -76,7 +83,7 @@ function ArticleGridSection({ content, excludedItemId }: { content: PublishedCon
         <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
           {items.map((item) => (
             <article
-              className="group overflow-hidden rounded-[24px] border border-black/10 bg-[rgba(255,250,244,0.76)] transition hover:border-[var(--accent)]/26 hover:bg-white/72"
+              className="group overflow-hidden rounded-[var(--radius-lg)] border border-black/10 bg-[rgba(255,250,244,0.76)] transition hover:border-[var(--accent)]/26 hover:bg-white/72"
               key={item.id}
             >
               <a className="block focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]" href={`/articles/${item.slug}`}>
@@ -89,12 +96,17 @@ function ArticleGridSection({ content, excludedItemId }: { content: PublishedCon
                   <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">
                     {item.label ?? 'Материал'}
                   </p>
-                  <h3 className="mt-3 text-[1.35rem] font-semibold uppercase leading-[1.12] text-[var(--text)] group-hover:text-[var(--accent)]">
+                  <h3 className={`${displayFont.className} mt-3 text-[1.75rem] font-semibold leading-none text-[var(--text)] group-hover:text-[var(--accent)]`}>
                     {item.title}
                   </h3>
                   <p className="mt-3 text-sm leading-7 text-[var(--muted)]">{item.summary}</p>
-                  {item.meta.length > 0 ? (
+                  {(item.updatedLabel || item.meta.length > 0) ? (
                     <div className="mt-4 flex flex-wrap gap-2">
+                      {item.updatedLabel ? (
+                        <MetaChip className="border-black/10 bg-transparent text-[var(--muted)]" variant="filter">
+                          {item.updatedLabel}
+                        </MetaChip>
+                      ) : null}
                       {item.meta.slice(0, 3).map((entry) => (
                         <MetaChip className="border-black/10 bg-transparent text-[var(--muted)]" key={entry} variant="filter">
                           {entry}
@@ -129,6 +141,32 @@ function ArticleGridSection({ content, excludedItemId }: { content: PublishedCon
   );
 }
 
+function ArticleEmptyResults() {
+  return (
+    <section className="border-b border-black/20 py-10 md:py-14">
+      <div className="container">
+        <Panel className="border-black/10 bg-[rgba(255,250,244,0.72)]" padding="lg">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Знания</p>
+          <h2 className={`${displayFont.className} mt-4 text-[2.4rem] font-semibold leading-none text-[var(--text)] md:text-[3rem]`}>
+            По этим параметрам материалов нет
+          </h2>
+          <p className="mt-4 max-w-2xl text-sm leading-7 text-[var(--muted)]">
+            Сбросьте выбранную тему или предложите материал, которого сейчас не хватает.
+          </p>
+          <div className="mt-6 flex flex-wrap gap-3">
+            <Button href="/articles" variant="secondary">
+              Сбросить фильтры
+            </Button>
+            <Button href="/contacts?topic=article-topic">
+              Предложить тему
+            </Button>
+          </div>
+        </Panel>
+      </div>
+    </section>
+  );
+}
+
 export default async function ArticlesPage({ searchParams }: ArticlesPageProps) {
   const params = (await searchParams) ?? {};
   const [content, categories] = await Promise.all([
@@ -137,6 +175,8 @@ export default async function ArticlesPage({ searchParams }: ArticlesPageProps) 
   ]);
   const featuredItem = content.page === 1 ? content.items[0] : undefined;
   const isEmpty = content.total === 0;
+  const hasActiveFilters = hasActivePublicContentParams(params, ['q', 'category', 'city', 'tag']);
+  const isPrelaunchEmpty = isEmpty && !hasActiveFilters;
 
   return (
     <>
@@ -144,12 +184,16 @@ export default async function ArticlesPage({ searchParams }: ArticlesPageProps) 
         eyebrow="Знания"
         title="Статьи, интервью и практические материалы"
         description="Статьи, интервью, разборы и практические материалы для специалистов барной индустрии."
-        summary={isEmpty ? 'Первые материалы готовятся. Сейчас можно предложить тему или героя интервью.' : 'Все материалы открыты: можно читать интервью, разборы, прикладные тексты и подборки.'}
-        metrics={[
-          { value: '4', label: 'типа контента' },
-          { value: 'Открыто', label: 'доступ к материалам' },
-          { value: 'Без оплаты', label: 'публичное чтение' }
-        ]}
+        summary={isPrelaunchEmpty ? 'Первые материалы готовятся. Сейчас можно предложить тему или героя интервью.' : 'Все материалы открыты: можно читать интервью, разборы, прикладные тексты и подборки.'}
+        metrics={
+          isPrelaunchEmpty
+            ? []
+            : [
+                { value: String(content.total), label: 'материалов' },
+                { value: 'Открыто', label: 'доступ к материалам' },
+                { value: 'Без оплаты', label: 'публичное чтение' }
+              ]
+        }
         rows={[
           {
             label: 'Материалы',
@@ -159,7 +203,7 @@ export default async function ArticlesPage({ searchParams }: ArticlesPageProps) 
           {
             label: 'Материалы',
             title: 'Интервью и кейсы',
-            description: 'Истории специалистов, заведений и партнеров с акцентом на опыт, решения и ошибки.'
+            description: 'Истории специалистов, заведений и партнёров с акцентом на опыт, решения и ошибки.'
           },
           {
             label: 'Материалы',
@@ -168,9 +212,9 @@ export default async function ArticlesPage({ searchParams }: ArticlesPageProps) 
           }
         ]}
         primaryLink={{ label: 'Предложить тему', href: '/contacts?topic=article-topic' }}
-        secondaryLink={isEmpty ? { label: 'Стать героем интервью', href: '/contacts?topic=article-interview' } : { label: 'Посмотреть события', href: '/events' }}
+        secondaryLink={isPrelaunchEmpty ? { label: 'Стать героем интервью', href: '/contacts?topic=article-interview' } : { label: 'Посмотреть события', href: '/events' }}
       />
-      {isEmpty ? (
+      {isPrelaunchEmpty ? (
         <>
           <PublicPrelaunchSection
             actions={[
@@ -223,7 +267,7 @@ export default async function ArticlesPage({ searchParams }: ArticlesPageProps) 
             item={featuredItem}
             title="Материал для начала"
           />
-          <ArticleGridSection content={content} excludedItemId={featuredItem?.id} />
+          {isEmpty ? <ArticleEmptyResults /> : <ArticleGridSection content={content} excludedItemId={featuredItem?.id} />}
           <ToolTeaser />
         </>
       )}

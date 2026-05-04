@@ -1,10 +1,10 @@
 import Image from 'next/image';
-import { ArrowUpRight, CalendarDays, Globe2, Mail, Star, Users } from 'lucide-react';
+import { CalendarDays, Mail, Phone, Star, Users } from 'lucide-react';
 import { PublicBodyText, PublicEyebrow } from '@/components/public/public-primitives';
 import { CardActionRow, FeatureItem, IconBadge } from '@/components/public/public-ui-adaptation';
 import { Button } from '@/components/ui/button';
-import { MetaChip } from '@/components/ui/meta-chip';
 import { Panel } from '@/components/ui/panel';
+import { displayFont } from '@/lib/fonts';
 import type { GeneralSponsor } from '@/lib/public/general-sponsors';
 
 type GeneralSponsorCardProps = {
@@ -12,22 +12,21 @@ type GeneralSponsorCardProps = {
 };
 
 export function GeneralSponsorCard({ sponsor }: GeneralSponsorCardProps) {
-  const primaryLink = sponsor.links[0];
-  const secondaryLink = sponsor.links[1];
+  const socialLinks = sponsor.links.filter((link) => ['Instagram', 'WhatsApp'].includes(link.label));
 
   return (
     <Panel
-      className="overflow-hidden border-[rgba(191,168,143,0.48)] bg-[color-mix(in_oklab,var(--surface),white_22%)] shadow-[0_24px_70px_rgba(20,20,18,0.06)]"
+      className="general-sponsor-card overflow-hidden border-[rgba(191,168,143,0.48)] bg-[color-mix(in_oklab,var(--surface),white_22%)] shadow-[0_18px_46px_rgba(20,20,18,0.045)]"
       padding="none"
     >
       <div className="grid gap-0 lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)]">
         <div className="flex flex-col justify-between gap-8 border-b border-[rgba(191,168,143,0.42)] p-6 lg:border-b-0 lg:border-r md:p-8">
           <div>
             <PublicEyebrow>Генеральный спонсор</PublicEyebrow>
-            <div className="mt-7 rounded-[24px] border border-black/10 bg-[rgba(255,252,248,0.82)] p-6">
+            <div className="general-sponsor-logo-panel mt-7">
               <Image
                 alt={sponsor.logoAlt}
-                className="mx-auto h-auto w-full max-w-[380px] object-contain"
+                className="general-sponsor-logo-image h-auto w-full max-w-[340px] object-contain"
                 height={1252}
                 priority={false}
                 sizes="(min-width: 1024px) 24rem, 82vw"
@@ -37,11 +36,10 @@ export function GeneralSponsorCard({ sponsor }: GeneralSponsorCardProps) {
             </div>
           </div>
 
-          <div className="flex flex-wrap gap-2">
-            <MetaChip className="border-[var(--accent)]/28 bg-[var(--accent)]/7 text-[var(--accent)]">
-              Сезон 2026
-            </MetaChip>
-            <MetaChip className="border-black/10 bg-transparent text-[var(--muted)]">{sponsor.title}</MetaChip>
+          <div>
+            <p className={`${displayFont.className} max-w-lg text-[2rem] font-semibold leading-[1.05] text-[var(--text)] md:text-[2.55rem]`}>
+              {sponsor.title}
+            </p>
           </div>
         </div>
 
@@ -51,54 +49,83 @@ export function GeneralSponsorCard({ sponsor }: GeneralSponsorCardProps) {
             <PublicEyebrow tone="muted">Главный партнёр сезона</PublicEyebrow>
           </div>
 
-          <h3 className="mt-5 text-[2.3rem] font-semibold uppercase leading-none text-[var(--text)] md:text-[3.25rem]">
+          <h3 className={`${displayFont.className} mt-5 text-[2.6rem] font-semibold leading-none text-[var(--text)] md:text-[3.7rem]`}>
             {sponsor.name}
           </h3>
           <PublicBodyText className="mt-5 max-w-3xl" size="md">
             {sponsor.description}
           </PublicBodyText>
 
-          <div className="mt-7 divide-y divide-black/10 border-y border-black/10">
+          <div className="mt-7 divide-y divide-[var(--line)] border-y border-[var(--line)]">
             <FeatureItem className="py-4" icon={Star} title="Генеральный спонсор BARSYNERGY" />
-            <FeatureItem className="py-4" icon={CalendarDays} title="Присутствие в ключевых событиях и материалах" />
+            <FeatureItem className="py-4" icon={CalendarDays} title="Участие в главных событиях и материалах" />
             <FeatureItem className="py-4" icon={Mail} title="Прямые контакты для рабочих запросов" />
-            <FeatureItem className="py-4" icon={Users} title="Поддержка профессионального сообщества" />
+            <FeatureItem className="py-4" icon={Users} title="Поддержка барного сообщества" />
           </div>
 
           <div className="mt-6 grid gap-3 md:grid-cols-2">
             {sponsor.contacts.map((contact) => (
-              <a
-                className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-3 rounded-[18px] border border-black/10 bg-[rgba(255,252,248,0.72)] p-3 transition hover:border-[var(--accent)]/28 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
-                href={contact.href}
+              <div
+                className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-3 rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--surface-wash)] p-3"
                 key={contact.phone}
               >
-                <IconBadge icon={Mail} size="sm" tone="soft" />
+                <IconBadge icon={Phone} size="sm" tone="soft" />
                 <span className="min-w-0">
                   <span className="block text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">
                     {contact.name}
                   </span>
-                  <span className="mt-1 block text-sm font-semibold text-[var(--text)]">{contact.phone}</span>
+                  <a
+                    className="mt-1 block w-fit select-all rounded-[var(--radius-sm)] text-sm font-semibold text-[var(--text)] transition hover:text-[var(--accent)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+                    href={contact.href}
+                  >
+                    {contact.phone}
+                  </a>
                 </span>
-              </a>
+              </div>
             ))}
+            {socialLinks.map((link) => {
+              const isInstagram = link.label === 'Instagram';
+
+              return (
+                <a
+                  className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-3 rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--surface-wash)] p-3 transition hover:border-[var(--accent)]/35 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+                  href={link.href}
+                  key={link.href}
+                  rel="noreferrer"
+                  target="_blank"
+                >
+                  <span
+                    className={
+                      isInstagram
+                        ? 'grid h-9 w-9 place-items-center rounded-full bg-[linear-gradient(135deg,#feda75_0%,#d62976_45%,#4f5bd5_100%)] p-2'
+                        : 'grid h-9 w-9 place-items-center rounded-full bg-[#238c46] p-2'
+                    }
+                  >
+                    <Image
+                      alt=""
+                      className="h-full w-full object-contain"
+                      height={24}
+                      src={isInstagram ? '/images/social/instagram-logo.png' : '/images/social/whatsapp-logo.png'}
+                      width={24}
+                    />
+                  </span>
+                  <span className="min-w-0">
+                    <span className="block text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">
+                      Соцсеть
+                    </span>
+                    <span className="mt-1 block text-sm font-semibold text-[var(--text)] transition hover:text-[var(--accent)]">
+                      {link.label}
+                    </span>
+                  </span>
+                </a>
+              );
+            })}
           </div>
 
           <CardActionRow>
-            <Button className="rounded-full px-7" href="/general-sponsors">
+            <Button className="rounded-[var(--radius-md)] px-7" href="/general-sponsors">
               Подробнее
             </Button>
-            {primaryLink ? (
-              <Button className="rounded-full px-7" href={primaryLink.href} rel="noreferrer" target="_blank" variant="secondary">
-                {primaryLink.label}
-                <Globe2 size={16} />
-              </Button>
-            ) : null}
-            {secondaryLink ? (
-              <Button className="rounded-full px-7" href={secondaryLink.href} rel="noreferrer" target="_blank" variant="ghost">
-                {secondaryLink.label}
-                <ArrowUpRight size={16} />
-              </Button>
-            ) : null}
           </CardActionRow>
         </div>
       </div>

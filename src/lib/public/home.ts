@@ -30,6 +30,14 @@ export type HomepageData = {
   vacancy: HomepageLiveCard;
   supplier: HomepageLiveCard;
   partnerSignals: string[];
+  stats: {
+    courses: number;
+    events: number;
+    articles: number;
+    vacancies: number;
+    suppliers: number;
+    partners: number;
+  };
 };
 
 const fallbackCards: Record<HomepageCardKind, Omit<HomepageLiveCard, 'kind'>> = {
@@ -137,6 +145,14 @@ export async function getHomepageData(): Promise<HomepageData> {
     ),
     vacancy: toHomepageCard(vacancies.items[0], 'vacancy', '/vacancies', 'Смотреть вакансии', 'Открытая вакансия'),
     supplier: toHomepageCard(featuredSupplier, 'supplier', '/suppliers', 'Найти поставщика', 'Поставщик недели'),
-    partnerSignals
+    partnerSignals,
+    stats: {
+      courses: courses.total,
+      events: latestEvents.total,
+      articles: articles.total,
+      vacancies: vacancies.total,
+      suppliers: suppliers.total,
+      partners: partners.total
+    }
   };
 }

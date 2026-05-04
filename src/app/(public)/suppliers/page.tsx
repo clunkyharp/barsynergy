@@ -12,7 +12,7 @@ import {
   getPublicApplicationUtm,
   stripPublicApplicationResultParams
 } from '@/lib/applications/public-form-helpers';
-import { getPublishedSuppliers, type PublicContentSearchParams } from '@/lib/public/content';
+import { getPublishedSuppliers, hasActivePublicContentParams, type PublicContentSearchParams } from '@/lib/public/content';
 import { getPublicCategoryOptions, getPublicCityFilterOptions } from '@/lib/public/filter-options';
 import { getEnv } from '@/lib/validation/env';
 
@@ -38,6 +38,8 @@ export default async function SuppliersPage({ searchParams }: SuppliersPageProps
   const applicationResult = getPublicApplicationResult(params);
   const applicationUtm = getPublicApplicationUtm(params);
   const isEmpty = content.total === 0;
+  const hasActiveFilters = hasActivePublicContentParams(contentParams, ['q', 'category', 'city', 'verified']);
+  const isPrelaunchEmpty = isEmpty && !hasActiveFilters;
 
   return (
     <>
@@ -73,7 +75,7 @@ export default async function SuppliersPage({ searchParams }: SuppliersPageProps
         primaryLink={{ label: isEmpty ? 'Добавить компанию' : 'Найти поставщика', href: isEmpty ? '#applications' : '#suppliers-list' }}
         secondaryLink={{ label: isEmpty ? 'Написать команде' : 'Добавить компанию', href: isEmpty ? '/contacts?topic=supplier' : '#applications' }}
       />
-      {isEmpty ? (
+      {isPrelaunchEmpty ? (
         <PublicPrelaunchSection
           actions={[
             { href: '#applications', label: 'Добавить компанию' },
@@ -95,7 +97,7 @@ export default async function SuppliersPage({ searchParams }: SuppliersPageProps
             }
           ]}
           description="Каталог формируется, но заявки на добавление компаний уже открыты. Можно сразу оставить контакты и описание работы."
-          eyebrow="Pre-launch / Поставщики"
+          eyebrow="Раздел готовится"
           title="Сейчас мы собираем первую подборку"
         />
       ) : (

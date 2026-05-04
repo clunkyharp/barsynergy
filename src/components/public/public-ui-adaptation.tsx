@@ -1,6 +1,7 @@
 import type { ComponentType, HTMLAttributes, ReactNode } from 'react';
 import { ArrowUpRight, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { displayFont } from '@/lib/fonts';
 import { cn } from '@/lib/utils';
 
 type IconComponent = ComponentType<{ className?: string; size?: number; strokeWidth?: number }>;
@@ -8,10 +9,10 @@ type IconComponent = ComponentType<{ className?: string; size?: number; strokeWi
 type IconBadgeTone = 'default' | 'accent' | 'inverse' | 'soft';
 
 const iconBadgeTones: Record<IconBadgeTone, string> = {
-  default: 'border-black/10 bg-[rgba(255,250,244,0.8)] text-[var(--text)]',
+  default: 'border-[var(--border-default)] bg-[var(--surface-wash)] text-[var(--text)]',
   accent: 'border-[var(--accent)]/22 bg-[var(--accent)]/7 text-[var(--accent)]',
   inverse: 'border-white/14 bg-white/8 text-white',
-  soft: 'border-[rgba(191,168,143,0.38)] bg-[rgba(255,252,248,0.68)] text-[var(--accent)]'
+  soft: 'border-[var(--border-default)] bg-[var(--surface-wash)] text-[var(--accent)]'
 };
 
 export function IconBadge({
@@ -74,7 +75,7 @@ export function CardActionRow({
   children: ReactNode;
 }) {
   return (
-    <div className={cn('mt-6 flex flex-wrap items-center gap-3 border-t border-black/10 pt-5', className)} {...props}>
+    <div className={cn('mt-6 flex flex-wrap items-center gap-3 border-t border-[var(--line)] pt-5', className)} {...props}>
       {children}
     </div>
   );
@@ -94,10 +95,10 @@ export function FilterChip({
   className?: string;
 }) {
   const chipClassName = cn(
-    'inline-flex min-h-10 max-w-full items-center gap-2 rounded-full border px-4 text-[11px] font-semibold uppercase tracking-[0.1em] transition-colors',
+    'inline-flex min-h-10 max-w-full items-center gap-2 rounded-[var(--radius-sm)] border px-4 text-[11px] font-semibold uppercase tracking-[0.1em] transition-colors',
     selected
-      ? 'border-[var(--accent)] bg-[var(--accent)] text-white'
-      : 'border-black/10 bg-[rgba(255,252,248,0.82)] text-[var(--text)] hover:border-[var(--accent)]/28 hover:text-[var(--accent)]',
+      ? 'border-[var(--accent)] bg-[var(--accent)] text-[var(--accent-contrast)]'
+      : 'border-[var(--border-default)] bg-[var(--surface-wash)] text-[var(--text)] hover:border-[var(--accent)]/28 hover:text-[var(--accent)]',
     className
   );
 
@@ -140,22 +141,22 @@ export function SectionCtaPanel({
   return (
     <div
       className={cn(
-        'grid gap-5 rounded-[var(--radius-xl)] border border-[rgba(191,168,143,0.42)] bg-[linear-gradient(135deg,rgba(255,250,244,0.88),rgba(236,224,206,0.58))] p-5 md:grid-cols-[auto_minmax(0,1fr)_auto] md:items-center md:p-7',
+        'grid gap-5 rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--surface-wash)] p-5 md:grid-cols-[auto_minmax(0,1fr)_auto] md:items-center md:p-7',
         className
       )}
     >
       <IconBadge icon={icon} size="lg" tone="soft" />
       <div className="min-w-0">
-        <h2 className="text-[1.6rem] font-semibold uppercase leading-[1.12] text-[var(--text)] md:text-[2rem]">{title}</h2>
+        <h2 className={`${displayFont.className} text-[1.9rem] font-semibold leading-none text-[var(--text)] md:text-[2.35rem]`}>{title}</h2>
         <p className="mt-2 max-w-2xl text-sm leading-7 text-[var(--muted)]">{description}</p>
       </div>
       <div className="flex flex-col gap-3 sm:flex-row md:flex-col">
-        <Button className="rounded-full px-6" href={primary.href}>
+        <Button className="rounded-[var(--radius-md)] px-6" href={primary.href}>
           {primary.label}
           <ArrowUpRight size={16} strokeWidth={1.8} />
         </Button>
         {secondary ? (
-          <Button className="rounded-full px-6" href={secondary.href} variant="ghost">
+          <Button className="rounded-[var(--radius-md)] px-6" href={secondary.href} variant="ghost">
             {secondary.label}
             <ArrowUpRight size={16} strokeWidth={1.8} />
           </Button>

@@ -70,7 +70,7 @@ function getApplicationSubject(input: { type: ApplicationType; companyName: stri
   }
 
   if (input.type === ApplicationType.PARTNER_APPLICATION) {
-    return `Партнерство: ${input.companyName}`;
+    return `Партнёрство: ${input.companyName}`;
   }
 
   if (input.type === ApplicationType.CORPORATE_TRAINING_APPLICATION) {

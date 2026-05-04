@@ -25,8 +25,8 @@ export default async function AdminCreatePartnerPage() {
   return (
     <div className="space-y-8">
       <header>
-        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Админка / Партнеры / Создание</p>
-        <h1 className="mt-2 text-3xl font-semibold">Новый партнер</h1>
+        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Админка / Партнёры / Создание</p>
+        <h1 className="mt-2 text-3xl font-semibold">Новый партнёр</h1>
       </header>
 
       <Card className="p-5">
@@ -53,7 +53,7 @@ export default async function AdminCreatePartnerPage() {
               ))}
             </Select>
           </FormField>
-          <FormField htmlFor="partner-partnerType" label="Тип партнера">
+          <FormField htmlFor="partner-partnerType" label="Тип партнёра">
             <Input id="partner-partnerType" name="partnerType" maxLength={120} />
           </FormField>
           <FormField htmlFor="partner-isFeatured" label="В подборке">
@@ -86,7 +86,7 @@ export default async function AdminCreatePartnerPage() {
             <Button type="button" variant="secondary" href="/admin/partners">
               Отмена
             </Button>
-            <Button type="submit">Создать партнера</Button>
+            <Button type="submit">Создать партнёра</Button>
           </div>
         </form>
       </Card>

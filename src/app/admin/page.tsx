@@ -7,6 +7,7 @@ import { StatusBadge } from '@/components/ui/status-badge';
 import { applicationStatusLabels, applicationTypeLabels } from '@/lib/admin/application-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
 import { prisma } from '@/lib/db/prisma';
+import { displayFont } from '@/lib/fonts';
 
 export const dynamic = 'force-dynamic';
 
@@ -46,7 +47,7 @@ export default async function AdminPage() {
         <Card className="overflow-hidden xl:col-span-7">
           <div className="border-b border-black/10 px-5 py-5 md:px-6">
             <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">BARSYNERGY / admin</p>
-            <h1 className="mt-3 text-4xl font-semibold leading-tight tracking-[-0.04em] md:text-5xl xl:text-[3.65rem]">Рабочая панель</h1>
+            <h1 className={`${displayFont.className} mt-3 text-[3rem] font-semibold leading-none tracking-normal md:text-[4.2rem]`}>Рабочая панель</h1>
             <p className="mt-3 text-sm leading-6 text-[var(--muted)]">{currentUser.email}</p>
           </div>
           <div className="grid gap-0 md:grid-cols-2">
@@ -88,9 +89,9 @@ export default async function AdminPage() {
           <div className="flex flex-col gap-3 border-b border-black/10 pb-4 md:flex-row md:items-end md:justify-between">
             <div>
               <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Последние входящие</p>
-              <h2 className="mt-3 text-2xl font-semibold tracking-[-0.03em]">Новые заявки</h2>
+              <h2 className={`${displayFont.className} mt-3 text-[2rem] font-semibold leading-none tracking-normal`}>Новые заявки</h2>
             </div>
-            <Button className="rounded-full" href="/admin/applications" variant="secondary">
+            <Button className="rounded-[var(--radius-md)]" href="/admin/applications" variant="secondary">
               Открыть всю очередь
             </Button>
           </div>

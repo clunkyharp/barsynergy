@@ -118,7 +118,7 @@ export async function createPartner(formData: FormData) {
     });
 
     revalidatePath(ADMIN_PARTNERS_PATH);
-    result = { type: 'success', message: 'Партнер создан.' };
+    result = { type: 'success', message: 'Партнёр создан.' };
   } catch (error) {
     await deleteUploadedFileIfUnused(uploadedCoverImageId);
     result = { type: 'error', message: formatAdminActionError(error) };
@@ -215,7 +215,7 @@ export async function updatePartner(formData: FormData) {
     }
 
     revalidatePath(ADMIN_PARTNERS_PATH);
-    result = { type: 'success', message: 'Партнер обновлен.' };
+    result = { type: 'success', message: 'Партнёр обновлён.' };
   } catch (error) {
     await deleteUploadedFileIfUnused(uploadedCoverImageId);
     result = { type: 'error', message: formatAdminActionError(error) };
@@ -252,7 +252,7 @@ export async function updatePartnerStatus(formData: FormData) {
     });
 
     revalidatePath(ADMIN_PARTNERS_PATH);
-    result = { type: 'success', message: 'Статус партнера обновлен.' };
+    result = { type: 'success', message: 'Статус партнёра обновлён.' };
   } catch (error) {
     result = { type: 'error', message: formatAdminActionError(error) };
   }
@@ -300,7 +300,7 @@ export async function deletePartnerDraft(formData: FormData) {
     await deleteUploadedFileIfUnused(deletedPartner.coverImageId);
 
     revalidatePath(ADMIN_PARTNERS_PATH);
-    result = { type: 'success', message: 'Черновик партнера удален.' };
+    result = { type: 'success', message: 'Черновик партнёра удалён.' };
   } catch (error) {
     result = { type: 'error', message: formatAdminActionError(error) };
   }

@@ -38,14 +38,14 @@ export default async function PartnerDetailPage({ params }: PartnerDetailPagePro
     <>
       <PublicContentDetailPage
         backHref="/partners"
-        backLabel="Ко всем партнерам"
+        backLabel="Ко всем партнёрам"
         body={partner.body}
-        eyebrow="Партнеры"
+        eyebrow="Партнёры"
         facts={partner.facts}
         imageUrl={partner.imageUrl}
         label={partner.label}
         meta={partner.meta}
-        primaryLink={{ href: partnerContactHref(partner), label: 'Обсудить партнерство' }}
+        primaryLink={{ href: partnerContactHref(partner), label: 'Обсудить партнёрство' }}
         secondaryLink={
           partner.externalUrl && partner.externalUrlLabel
             ? { href: partner.externalUrl, label: partner.externalUrlLabel, external: true }
@@ -57,7 +57,7 @@ export default async function PartnerDetailPage({ params }: PartnerDetailPagePro
       <PublicRelatedContentSection
         basePath="/partners"
         items={relatedItems}
-        title="Другие партнеры"
+        title="Другие партнёры"
       />
     </>
   );

@@ -47,10 +47,10 @@ export function EditorialPublicPage({
 }: EditorialPublicPageProps) {
   return (
     <div>
-      <section className="relative overflow-hidden border-b border-black/12 py-10 md:py-14">
+      <section className="relative overflow-hidden border-b border-[var(--line)] py-10 md:py-14">
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_18%,rgba(153,44,38,0.08),transparent_18%),radial-gradient(circle_at_82%_26%,rgba(255,255,255,0.54),transparent_18%),radial-gradient(circle_at_74%_80%,rgba(20,20,18,0.05),transparent_24%)]"
+          className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,var(--background)_0%,var(--background)_45%,var(--surface-muted)_100%),radial-gradient(circle_at_82%_26%,var(--accent-soft),transparent_22%),radial-gradient(circle_at_74%_80%,rgba(20,20,18,0.05),transparent_24%)]"
         />
         <div className="container relative grid gap-8 xl:grid-cols-[1fr_0.58fr] xl:items-start">
           <div className="min-w-0 xl:pt-4">
@@ -61,7 +61,7 @@ export function EditorialPublicPage({
             {metrics.length > 0 ? (
               <div className="mt-8 grid gap-3 sm:grid-cols-3 xl:max-w-4xl">
                 {metrics.map((metric) => (
-                  <div className="border-t border-black/20 pt-3" key={`${metric.value}-${metric.label}`}>
+                  <div className="border-t border-[var(--line)] pt-3" key={`${metric.value}-${metric.label}`}>
                     <p className="text-[1.6rem] font-semibold leading-none text-[var(--text)]">{metric.value}</p>
                     <p className="mt-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">
                       {metric.label}
@@ -71,7 +71,7 @@ export function EditorialPublicPage({
               </div>
             ) : null}
           </div>
-          <div className="min-w-0 border-l border-black/20 pl-5 xl:pt-4">
+          <div className="min-w-0 border-t border-[var(--line)] pt-5 xl:border-l xl:border-t-0 xl:pl-5 xl:pt-4">
             <PublicEyebrow tone="muted">{summaryHeading}</PublicEyebrow>
             <PublicBodyText className="mt-3 max-w-[36rem] text-[var(--text)]" size="md" tone="default">
               {description}
@@ -81,7 +81,7 @@ export function EditorialPublicPage({
             </PublicBodyText>
             <PublicActionRow>
               <Button
-                className="min-h-12 w-full max-w-full border-[var(--graphite)] bg-[var(--graphite)] px-5 leading-5 tracking-[0.06em] hover:bg-black sm:w-auto"
+                className="min-h-12 w-full max-w-full rounded-[var(--radius-md)] px-5 leading-5 tracking-normal sm:w-auto"
                 href={primaryLink.href}
               >
                 {primaryLink.label}
@@ -89,7 +89,7 @@ export function EditorialPublicPage({
               </Button>
               {secondaryLink ? (
                 <Button
-                  className="min-h-12 w-full max-w-full border-black/25 px-5 leading-5 tracking-[0.06em] sm:w-auto"
+                  className="min-h-12 w-full max-w-full rounded-[var(--radius-md)] px-5 leading-5 tracking-normal sm:w-auto"
                   href={secondaryLink.href}
                   variant="secondary"
                 >
@@ -102,15 +102,15 @@ export function EditorialPublicPage({
       </section>
 
       {rows.length > 0 ? (
-        <section className="border-b border-black/12 py-8 md:py-10">
+        <section className="border-b border-[var(--line)] py-8 md:py-10">
           <div className="container grid gap-6 xl:grid-cols-[minmax(14rem,0.36fr)_minmax(0,1fr)]">
             <div>
               <PublicEyebrow>{rowsHeading}</PublicEyebrow>
             </div>
             <div className="grid gap-3 md:grid-cols-3">
               {rows.map((row) => (
-                <Panel className="border-black/10 bg-[rgba(255,250,244,0.7)]" key={`${row.label}-${row.title}`} padding="lg">
-                  <MetaChip className="border-black/10 bg-transparent text-[var(--muted)]" variant="filter">
+                <Panel className="border-[var(--border-default)] bg-[var(--surface-wash)]" key={`${row.label}-${row.title}`} padding="lg">
+                  <MetaChip className="border-[var(--border-default)] bg-transparent text-[var(--muted)]" variant="filter">
                     {row.label}
                   </MetaChip>
                   <h2 className="mt-4 text-[1.1rem] font-semibold leading-7 text-[var(--text)]">{row.title}</h2>

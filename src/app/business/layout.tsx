@@ -13,7 +13,7 @@ export default async function BusinessLayout({ children }: { children: ReactNode
         <div className="space-y-4">
           <BusinessSidebar companyName={businessAccount.companyName} />
           <form action={logoutAction}>
-            <Button className="w-full rounded-full" type="submit" variant="secondary">
+            <Button className="w-full rounded-[var(--radius-md)]" type="submit" variant="secondary">
               Выйти
             </Button>
           </form>

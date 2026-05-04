@@ -69,28 +69,28 @@ export default async function AdminPartnersPage({ searchParams }: AdminPartnersP
   return (
     <div className="space-y-8">
       <AdminPageIntro
-        action={<Button href="/admin/partners/create">Создать партнера</Button>}
-        description="Карточки партнерских программ, типы сотрудничества и управление публикацией."
-        eyebrow="Админка / Партнеры"
-        title="Партнеры"
+        action={<Button href="/admin/partners/create">Создать партнёра</Button>}
+        description="Карточки партнёрских программ, типы сотрудничества и управление публикацией."
+        eyebrow="Админка / Партнёры"
+        title="Партнёры"
       />
 
       <AdminActionAlert params={params} />
 
       <section className="space-y-4">
         <div>
-          <h2 className="text-lg font-semibold">Все партнеры</h2>
+          <h2 className="text-lg font-semibold">Все партнёры</h2>
           <p className="text-sm text-[var(--muted)]">Всего записей: {total}.</p>
         </div>
 
         {partners.length === 0 ? (
-          <EmptyState title="Партнеров пока нет" />
+          <EmptyState title="Партнёров пока нет" />
         ) : (
           <AdminTableFrame>
             <AdminTable minWidth={980}>
               <AdminTableHead>
                 <AdminTableRow>
-                  <AdminTableHeaderCell>Партнер</AdminTableHeaderCell>
+                  <AdminTableHeaderCell>Партнёр</AdminTableHeaderCell>
                   <AdminTableHeaderCell>Контекст</AdminTableHeaderCell>
                   <AdminTableHeaderCell>Статус</AdminTableHeaderCell>
                   <AdminTableHeaderCell>Обновлено</AdminTableHeaderCell>

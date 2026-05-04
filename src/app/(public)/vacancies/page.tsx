@@ -18,6 +18,7 @@ import {
   type PublicContentSearchParams
 } from '@/lib/public/content';
 import { getPublicCategoryOptions, getPublicCityFilterOptions, getVacancyFilterOptions } from '@/lib/public/filter-options';
+import { displayFont } from '@/lib/fonts';
 import { getEnv } from '@/lib/validation/env';
 
 type VacanciesPageProps = {
@@ -60,39 +61,39 @@ export default async function VacanciesPage({ searchParams }: VacanciesPageProps
               Здесь собраны открытые вакансии для баров, кофеен и команд региона. Можно открыть конкретную роль и отправить свою вакансию на публикацию.
             </PublicBodyText>
             <PublicActionRow className="flex-col gap-3 sm:flex-row">
-              <Button className="min-h-12 rounded-full px-6 tracking-[0.08em]" href="#vacancy-list">
+              <Button className="min-h-12 rounded-[var(--radius-md)] px-6 tracking-normal" href="#vacancy-list">
                 Смотреть вакансии
                 <ArrowUpRight size={18} />
               </Button>
-              <Button className="min-h-12 px-6 tracking-[0.08em]" href="#vacancy-submission" variant="secondary">
+              <Button className="min-h-12 rounded-[var(--radius-md)] px-6 tracking-normal" href="#vacancy-submission" variant="secondary">
                 Разместить вакансию
               </Button>
             </PublicActionRow>
             <div className="mt-8 grid gap-4 lg:grid-cols-2">
-              <div className="rounded-[26px] border border-black/10 bg-[rgba(255,250,244,0.8)] p-5">
+              <div className="rounded-[var(--radius-lg)] border border-black/10 bg-[rgba(255,250,244,0.8)] p-5">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Я ищу работу</p>
-                <h2 className="mt-4 text-[1.4rem] font-semibold leading-8 text-[var(--text)] md:text-[1.55rem]">
+                <h2 className={`${displayFont.className} mt-4 text-[1.8rem] font-semibold leading-none text-[var(--text)]`}>
                   Смотреть роли и откликнуться
                 </h2>
                 <p className="mt-3 max-w-[34ch] text-sm leading-7 text-[var(--muted)]">
                   Отклик открывается на странице конкретной вакансии, чтобы заявка сразу была привязана к роли.
                 </p>
                 <div className="mt-5 flex flex-wrap gap-3">
-                  <Button className="rounded-full px-5" href="#vacancy-list" size="sm">
+                  <Button className="rounded-[var(--radius-md)] px-5" href="#vacancy-list" size="sm">
                     Смотреть вакансии
                   </Button>
                 </div>
               </div>
-              <div className="rounded-[26px] border border-black/10 bg-[rgba(255,250,244,0.8)] p-5">
+              <div className="rounded-[var(--radius-lg)] border border-black/10 bg-[rgba(255,250,244,0.8)] p-5">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Я ищу сотрудника</p>
-                <h2 className="mt-4 text-[1.4rem] font-semibold leading-8 text-[var(--text)] md:text-[1.55rem]">
+                <h2 className={`${displayFont.className} mt-4 text-[1.8rem] font-semibold leading-none text-[var(--text)]`}>
                   Разместить вакансию и получить отклики
                 </h2>
                 <p className="mt-3 max-w-[34ch] text-sm leading-7 text-[var(--muted)]">
                   Отправьте роль, условия и контакт. Если понадобится, команда поможет уточнить детали перед публикацией.
                 </p>
                 <div className="mt-5 flex flex-wrap gap-3">
-                  <Button className="rounded-full px-5" href="#vacancy-submission" size="sm">
+                  <Button className="rounded-[var(--radius-md)] px-5" href="#vacancy-submission" size="sm">
                     Разместить вакансию
                   </Button>
                 </div>

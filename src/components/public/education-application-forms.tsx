@@ -4,6 +4,7 @@ import {
   submitCourseApplication
 } from '@/app/(public)/education/actions';
 import {
+  ContactChannelFieldset,
   HiddenUtmFields,
   HoneypotField,
   PublicApplicationSection,
@@ -20,6 +21,8 @@ import { Select } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 
 export function EducationApplicationForms({ enabled, result, utm, cities, defaults = {} }: PublicApplicationFormProps) {
+  const hasSelectedCourse = Boolean(defaults.courseTitle?.trim());
+
   return (
     <PublicApplicationSection
       eyebrow="Образование / Заявки"
@@ -42,18 +45,8 @@ export function EducationApplicationForms({ enabled, result, utm, cities, defaul
               <FormField htmlFor="courseName" label="Имя">
                 <Input id="courseName" name="name" required maxLength={160} minLength={2} />
               </FormField>
+              <ContactChannelFieldset emailId="courseEmail" phoneId="coursePhone" telegramId="courseTelegram" />
               <div className="grid gap-4 sm:grid-cols-2">
-                <FormField htmlFor="courseEmail" label="Email">
-                  <Input id="courseEmail" name="email" type="email" maxLength={180} />
-                </FormField>
-                <FormField htmlFor="coursePhone" label="Телефон">
-                  <Input id="coursePhone" name="phone" maxLength={80} />
-                </FormField>
-              </div>
-              <div className="grid gap-4 sm:grid-cols-2">
-                <FormField htmlFor="courseTelegram" label="Telegram">
-                  <Input id="courseTelegram" name="telegram" maxLength={80} />
-                </FormField>
                 <FormField htmlFor="courseCityId" label="Город">
                   <Select id="courseCityId" name="cityId" defaultValue="">
                     <option value="">Не указан</option>
@@ -77,13 +70,14 @@ export function EducationApplicationForms({ enabled, result, utm, cities, defaul
               </ConsentField>
             </div>
             <PublicFormShellFooter note="Подойдёт, если хотите записаться или подобрать программу под свою задачу.">
-              <Button className="min-h-12 rounded-full px-6 tracking-[0.12em] sm:self-start" type="submit">
+              <Button className="min-h-12 rounded-[var(--radius-md)] px-6 tracking-normal sm:self-start" type="submit">
                 Отправить заявку
               </Button>
             </PublicFormShellFooter>
           </div>
         </form>
 
+        {!hasSelectedCourse ? (
         <form action={submitCorporateTrainingApplication} className="editorial-form-shell h-full overflow-hidden">
           <HiddenUtmFields utm={utm} />
           <HoneypotField id="corporate-training-website" />
@@ -100,18 +94,8 @@ export function EducationApplicationForms({ enabled, result, utm, cities, defaul
               <FormField htmlFor="trainingContactName" label="Контактное лицо">
                 <Input id="trainingContactName" name="contactName" required maxLength={160} minLength={2} />
               </FormField>
+              <ContactChannelFieldset emailId="trainingEmail" phoneId="trainingPhone" telegramId="trainingTelegram" />
               <div className="grid gap-4 sm:grid-cols-2">
-                <FormField htmlFor="trainingEmail" label="Email">
-                  <Input id="trainingEmail" name="email" type="email" maxLength={180} />
-                </FormField>
-                <FormField htmlFor="trainingPhone" label="Телефон">
-                  <Input id="trainingPhone" name="phone" maxLength={80} />
-                </FormField>
-              </div>
-              <div className="grid gap-4 sm:grid-cols-2">
-                <FormField htmlFor="trainingTelegram" label="Telegram">
-                  <Input id="trainingTelegram" name="telegram" maxLength={80} />
-                </FormField>
                 <FormField htmlFor="trainingCityId" label="Город">
                   <Select id="trainingCityId" name="cityId" defaultValue="">
                     <option value="">Не указан</option>
@@ -143,13 +127,15 @@ export function EducationApplicationForms({ enabled, result, utm, cities, defaul
               </ConsentField>
             </div>
             <PublicFormShellFooter note="Подойдёт для обучения команды, запуска новой карты или внутреннего интенсива.">
-              <Button className="min-h-12 rounded-full px-6 tracking-[0.12em] sm:self-start" type="submit">
+              <Button className="min-h-12 rounded-[var(--radius-md)] px-6 tracking-normal sm:self-start" type="submit">
                 Отправить запрос
               </Button>
             </PublicFormShellFooter>
           </div>
         </form>
+        ) : null}
 
+        {!hasSelectedCourse ? (
         <form action={submitCertificateOrderApplication} className="editorial-form-shell h-full overflow-hidden lg:col-span-2">
           <HiddenUtmFields utm={utm} />
           <HoneypotField id="certificate-order-website" />
@@ -166,15 +152,7 @@ export function EducationApplicationForms({ enabled, result, utm, cities, defaul
               <FormField htmlFor="recipientName" label="Получатель сертификата">
                 <Input id="recipientName" name="recipientName" required maxLength={160} minLength={2} />
               </FormField>
-              <FormField htmlFor="certificateEmail" label="Email">
-                <Input id="certificateEmail" name="email" type="email" maxLength={180} />
-              </FormField>
-              <FormField htmlFor="certificatePhone" label="Телефон">
-                <Input id="certificatePhone" name="phone" maxLength={80} />
-              </FormField>
-              <FormField htmlFor="certificateTelegram" label="Telegram">
-                <Input id="certificateTelegram" name="telegram" maxLength={80} />
-              </FormField>
+              <ContactChannelFieldset className="md:col-span-2" emailId="certificateEmail" phoneId="certificatePhone" telegramId="certificateTelegram" />
               <FormField htmlFor="certificateCityId" label="Город">
                 <Select id="certificateCityId" name="cityId" defaultValue="">
                   <option value="">Не указан</option>
@@ -202,12 +180,13 @@ export function EducationApplicationForms({ enabled, result, utm, cities, defaul
               className="md:items-center"
               note="Если нужен корпоративный сертификат или нестандартный формат, напишите об этом в комментарии."
             >
-              <Button className="min-h-12 rounded-full px-6 tracking-[0.12em] sm:self-start" type="submit">
+              <Button className="min-h-12 rounded-[var(--radius-md)] px-6 tracking-normal sm:self-start" type="submit">
                 Отправить заказ
               </Button>
             </PublicFormShellFooter>
           </div>
         </form>
+        ) : null}
       </div>
     </PublicApplicationSection>
   );

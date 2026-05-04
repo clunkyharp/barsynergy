@@ -2,9 +2,9 @@
   "$schema": "https://tokens.studio/schemas/tokens.json",
   "meta": {
     "name": "BARSYNERGY Design Tokens",
-    "version": "0.2.1",
-    "status": "stabilizing",
-    "updated": "2026-04-29",
+    "version": "0.3.0",
+    "status": "photo-reference-redesign",
+    "updated": "2026-05-04",
     "sourceOfTruth": [
       "src/lib/fonts.ts",
       "src/app/globals.css",
@@ -25,35 +25,35 @@
   },
   "reference": {
     "color": {
-      "ivory": { "value": "#f4ebdb", "type": "color" },
-      "cream": { "value": "#faf4e8", "type": "color" },
-      "sand": { "value": "#ece0ce", "type": "color" },
-      "ink": { "value": "#16130f", "type": "color" },
-      "graphite": { "value": "#141412", "type": "color" },
-      "clay": { "value": "#5f564b", "type": "color" },
-      "burgundy": { "value": "#992c26", "type": "color" },
-      "burgundyDark": { "value": "#7b1f1a", "type": "color" },
+      "ivory": { "value": "#fbf7f0", "type": "color" },
+      "cream": { "value": "#fffdf9", "type": "color" },
+      "sand": { "value": "#f2eadf", "type": "color" },
+      "ink": { "value": "#171513", "type": "color" },
+      "graphite": { "value": "#171311", "type": "color" },
+      "clay": { "value": "#6d6861", "type": "color" },
+      "burgundy": { "value": "#9d090e", "type": "color" },
+      "burgundyDark": { "value": "#76060a", "type": "color" },
       "green": { "value": "#2f684f", "type": "color" },
       "ochre": { "value": "#9a661a", "type": "color" },
       "red": { "value": "#9f2f2f", "type": "color" },
       "white": { "value": "#ffffff", "type": "color" },
-      "lineInk22": { "value": "rgba(22, 19, 15, 0.22)", "type": "color" },
-      "borderSubtle": { "value": "rgba(22, 19, 15, 0.1)", "type": "color" },
-      "borderDefault": { "value": "rgba(22, 19, 15, 0.16)", "type": "color" },
-      "borderStrong": { "value": "rgba(22, 19, 15, 0.3)", "type": "color" },
+      "lineInk22": { "value": "rgba(48, 40, 35, 0.22)", "type": "color" },
+      "borderSubtle": { "value": "rgba(48, 40, 35, 0.08)", "type": "color" },
+      "borderDefault": { "value": "rgba(48, 40, 35, 0.14)", "type": "color" },
+      "borderStrong": { "value": "rgba(48, 40, 35, 0.28)", "type": "color" },
       "borderInverse": { "value": "rgba(255, 255, 255, 0.22)", "type": "color" },
       "successBg": { "value": "rgba(47, 104, 79, 0.08)", "type": "color" },
       "warningBg": { "value": "rgba(154, 102, 26, 0.09)", "type": "color" },
       "dangerBg": { "value": "rgba(159, 47, 47, 0.08)", "type": "color" },
-      "focusRing": { "value": "rgba(20, 20, 18, 0.1)", "type": "color" },
+      "focusRing": { "value": "rgba(157, 9, 14, 0.16)", "type": "color" },
       "focusRingDanger": { "value": "rgba(159, 47, 47, 0.12)", "type": "color" },
       "pendingBg": { "value": "rgba(95, 86, 75, 0.08)", "type": "color" },
       "skeletonFill": { "value": "rgba(22, 19, 15, 0.08)", "type": "color" }
     },
     "font": {
-      "body": { "value": "Geist", "type": "fontFamily" },
-      "display": { "value": "Oswald", "type": "fontFamily" },
-      "accent": { "value": "Outfit", "type": "fontFamily" }
+      "body": { "value": "Manrope", "type": "fontFamily" },
+      "display": { "value": "Playfair Display", "type": "fontFamily" },
+      "accent": { "value": "Manrope", "type": "fontFamily" }
     },
     "size": {
       "0": { "value": "0", "type": "dimension" },
@@ -87,15 +87,15 @@
       "success": { "value": "{reference.color.green}", "type": "color" },
       "warning": { "value": "{reference.color.ochre}", "type": "color" },
       "danger": { "value": "{reference.color.red}", "type": "color" },
-      "fieldBg": { "value": "linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(255, 255, 255, 0.78))", "type": "color" },
+      "fieldBg": { "value": "rgba(255, 253, 249, 0.92)", "type": "color" },
       "fieldBgHover": { "value": "{reference.color.white}", "type": "color" },
       "fieldBgDisabled": { "value": "{reference.color.sand}", "type": "color" },
       "borderSubtle": { "value": "{reference.color.borderSubtle}", "type": "color" },
       "borderDefault": { "value": "{reference.color.borderDefault}", "type": "color" },
       "borderStrong": { "value": "{reference.color.borderStrong}", "type": "color" },
       "borderInverse": { "value": "{reference.color.borderInverse}", "type": "color" },
-      "dividerPublic": { "value": "rgba(0, 0, 0, 0.2)", "type": "color" },
-      "dividerProduct": { "value": "rgba(22, 19, 15, 0.12)", "type": "color" },
+      "dividerPublic": { "value": "rgba(48, 40, 35, 0.14)", "type": "color" },
+      "dividerProduct": { "value": "rgba(48, 40, 35, 0.12)", "type": "color" },
       "successBg": { "value": "{reference.color.successBg}", "type": "color" },
       "successBorder": { "value": "rgba(47, 104, 79, 0.32)", "type": "color" },
       "successText": { "value": "{reference.color.green}", "type": "color" },
@@ -105,8 +105,8 @@
       "dangerBg": { "value": "{reference.color.dangerBg}", "type": "color" },
       "dangerBorder": { "value": "rgba(159, 47, 47, 0.34)", "type": "color" },
       "dangerText": { "value": "{reference.color.red}", "type": "color" },
-      "selectedBg": { "value": "rgba(20, 20, 18, 0.96)", "type": "color" },
-      "selectedBorder": { "value": "{reference.color.graphite}", "type": "color" },
+      "selectedBg": { "value": "{reference.color.burgundy}", "type": "color" },
+      "selectedBorder": { "value": "{reference.color.burgundy}", "type": "color" },
       "pendingBg": { "value": "{reference.color.pendingBg}", "type": "color" },
       "skeletonFill": { "value": "{reference.color.skeletonFill}", "type": "color" },
       "focusRing": { "value": "{reference.color.focusRing}", "type": "color" },
@@ -129,7 +129,7 @@
         "fontWeight": "700",
         "lineHeight": "0.92",
         "letterSpacing": "0",
-        "textTransform": "uppercase"
+        "textTransform": "none"
       },
       "textH2Public": {
         "fontFamily": "{reference.font.display}",
@@ -138,7 +138,7 @@
         "fontWeight": "700",
         "lineHeight": "0.92",
         "letterSpacing": "0",
-        "textTransform": "uppercase"
+        "textTransform": "none"
       },
       "textH1Product": {
         "fontFamily": "{reference.font.body}",
@@ -146,7 +146,7 @@
         "fontSizeMax": "56px",
         "fontWeight": "600",
         "lineHeight": "1.02",
-        "letterSpacing": "-0.05em"
+        "letterSpacing": "0"
       },
       "textH2Product": {
         "fontFamily": "{reference.font.body}",
@@ -154,7 +154,7 @@
         "fontSizeMax": "32px",
         "fontWeight": "600",
         "lineHeight": "1.15",
-        "letterSpacing": "-0.03em"
+        "letterSpacing": "0"
       },
       "textBody": {
         "fontFamily": "{reference.font.body}",
@@ -183,15 +183,15 @@
         "fontWeight": "700",
         "lineHeight": "1.35",
         "letterSpacing": "0.14em",
-        "textTransform": "uppercase"
+        "textTransform": "none"
       },
       "textButton": {
         "fontFamily": "{reference.font.body}",
         "fontSize": "14px",
         "fontWeight": "700",
         "lineHeight": "1.4",
-        "letterSpacing": "0.08em",
-        "textTransform": "uppercase"
+        "letterSpacing": "0",
+        "textTransform": "none"
       }
     },
     "space": {
@@ -206,18 +206,18 @@
     },
     "radius": {
       "none": { "value": "0", "type": "borderRadius" },
-      "sm": { "value": "0.4rem", "type": "borderRadius" },
-      "md": { "value": "1rem", "type": "borderRadius" },
-      "lg": { "value": "1.15rem", "type": "borderRadius" },
-      "xl": { "value": "1.75rem", "type": "borderRadius" },
+      "sm": { "value": "0.35rem", "type": "borderRadius" },
+      "md": { "value": "0.55rem", "type": "borderRadius" },
+      "lg": { "value": "0.8rem", "type": "borderRadius" },
+      "xl": { "value": "1rem", "type": "borderRadius" },
       "pill": { "value": "999px", "type": "borderRadius" }
     },
     "shadow": {
       "none": { "value": "none", "type": "boxShadow" },
-      "card": { "value": "0 1px 2px rgba(20, 20, 18, 0.06)", "type": "boxShadow" },
-      "panel": { "value": "0 26px 80px rgba(22, 19, 15, 0.08)", "type": "boxShadow" },
-      "overlay": { "value": "0 18px 36px rgba(20, 20, 18, 0.12)", "type": "boxShadow" },
-      "focus": { "value": "0 0 0 3px rgba(20, 20, 18, 0.1)", "type": "boxShadow" }
+      "card": { "value": "0 10px 30px rgba(48, 40, 35, 0.035)", "type": "boxShadow" },
+      "panel": { "value": "0 24px 72px rgba(48, 40, 35, 0.07)", "type": "boxShadow" },
+      "overlay": { "value": "0 18px 42px rgba(48, 40, 35, 0.14)", "type": "boxShadow" },
+      "focus": { "value": "0 0 0 3px rgba(157, 9, 14, 0.16)", "type": "boxShadow" }
     },
     "state": {
       "focus": { "value": "{system.color.focusRing}", "type": "color" },

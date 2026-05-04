@@ -1,5 +1,6 @@
 import { submitSupplierApplication } from '@/app/(public)/suppliers/actions';
 import {
+  ContactChannelFieldset,
   HiddenUtmFields,
   HoneypotField,
   PublicApplicationSection,
@@ -40,15 +41,7 @@ export function SupplierApplicationForm({ enabled, result, utm, cities }: Public
             <FormField htmlFor="supplierContactName" label="Контактное лицо">
               <Input id="supplierContactName" name="contactName" required maxLength={160} minLength={2} />
             </FormField>
-            <FormField htmlFor="supplierEmail" label="Email">
-              <Input id="supplierEmail" name="email" type="email" maxLength={180} />
-            </FormField>
-            <FormField htmlFor="supplierPhone" label="Телефон">
-              <Input id="supplierPhone" name="phone" maxLength={80} />
-            </FormField>
-            <FormField htmlFor="supplierTelegram" label="Telegram">
-              <Input id="supplierTelegram" name="telegram" maxLength={80} />
-            </FormField>
+            <ContactChannelFieldset className="md:col-span-2" emailId="supplierEmail" phoneId="supplierPhone" telegramId="supplierTelegram" />
             <FormField htmlFor="supplierCityId" label="Город">
               <Select id="supplierCityId" name="cityId" defaultValue="">
                 <option value="">Не указан</option>
@@ -78,7 +71,7 @@ export function SupplierApplicationForm({ enabled, result, utm, cities }: Public
             </div>
           </div>
           <PublicFormShellFooter>
-            <Button className="min-h-12 rounded-full px-6 tracking-[0.12em] sm:self-start" type="submit">
+            <Button className="min-h-12 rounded-[var(--radius-md)] px-6 tracking-normal sm:self-start" type="submit">
               Отправить заявку
             </Button>
           </PublicFormShellFooter>

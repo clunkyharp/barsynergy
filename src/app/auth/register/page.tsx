@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import { createBusinessAccountRequestAction } from '@/app/auth/actions';
 import { ActionRow } from '@/components/ui/action-row';
 import { Button } from '@/components/ui/button';
@@ -11,6 +12,7 @@ import { Select } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { arePublicApplicationFormsEnabled } from '@/lib/applications/public-forms';
 import { prisma } from '@/lib/db/prisma';
+import { displayFont } from '@/lib/fonts';
 import { getEnv } from '@/lib/validation/env';
 
 const errorMessages: Record<string, string> = {
@@ -42,11 +44,14 @@ export default async function RegisterPage({ searchParams }: RegisterPageProps) 
     : [];
 
   return (
-    <div className="container max-w-6xl py-12 md:py-16">
-      <div className="grid gap-6 xl:grid-cols-[0.4fr_0.6fr] xl:items-start">
+    <div className="container max-w-6xl py-10 md:py-14 xl:py-18">
+      <div className="grid gap-6 xl:grid-cols-[0.42fr_0.58fr] xl:items-start">
         <section className="editorial-form-shell p-6 md:p-8">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Бизнес-аккаунт</p>
-          <h1 className="mt-4 text-4xl font-semibold leading-tight md:text-5xl">Запросить доступ</h1>
+          <a className="inline-flex w-fit focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]" href="/">
+            <Image alt="BARSYNERGY" className="h-auto w-[220px]" height={70} priority src="/brand/barsynergy-lockup.svg" width={360} />
+          </a>
+          <p className="mt-10 text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Бизнес-аккаунт</p>
+          <h1 className={`${displayFont.className} display-tight mt-8 text-[40px] md:text-[54px]`}>Запросить доступ</h1>
           <p className="mt-4 max-w-md text-base leading-7 text-[var(--muted)]">
             Оставьте данные компании. После этого команда свяжется с вами и поможет открыть кабинет.
           </p>
@@ -83,10 +88,10 @@ export default async function RegisterPage({ searchParams }: RegisterPageProps) 
                   </Panel>
                 </div>
                 <ActionRow className="mt-7 border-t-0 pt-0">
-                  <Button className="rounded-full" href="/contacts" size="lg">
+                  <Button className="rounded-[var(--radius-md)]" href="/contacts" size="lg">
                     Связаться с командой
                   </Button>
-                  <Button className="rounded-full" href="/auth/login" size="lg" variant="secondary">
+                  <Button className="rounded-[var(--radius-md)]" href="/auth/login" size="lg" variant="secondary">
                     Уже есть доступ
                   </Button>
                 </ActionRow>
@@ -96,7 +101,7 @@ export default async function RegisterPage({ searchParams }: RegisterPageProps) 
             <>
               <div className="border-b border-black/10 bg-[linear-gradient(135deg,rgba(255,255,255,0.86),rgba(255,255,255,0.58))] px-5 py-5 md:px-6 md:py-6">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Заявка на доступ</p>
-                <h2 className="mt-3 text-2xl font-semibold uppercase leading-8">Данные компании</h2>
+                <h2 className={`${displayFont.className} mt-3 text-[2rem] font-semibold leading-none`}>Данные компании</h2>
                 <p className="mt-3 max-w-xl text-sm leading-7 text-[var(--muted)]">
                   После проверки мы свяжемся с вами и объясним, как открыть кабинет.
                 </p>
@@ -149,13 +154,13 @@ export default async function RegisterPage({ searchParams }: RegisterPageProps) 
                   </ConsentField>
                   <ActionRow align="between">
                     <p className="max-w-md text-xs leading-6 text-[var(--muted)]">
-                      Лучше указать рабочий email: на него команда пришлёт ответ по доступу.
+                      Укажите рабочий email и хотя бы один удобный контакт для ответа.
                     </p>
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-                      <Button className="rounded-full" size="lg" type="submit">
+                      <Button className="rounded-[var(--radius-md)]" size="lg" type="submit">
                         Отправить заявку
                       </Button>
-                      <Button className="rounded-full" href="/auth/login" size="lg" variant="secondary">
+                      <Button className="rounded-[var(--radius-md)]" href="/auth/login" size="lg" variant="secondary">
                         Уже есть доступ
                       </Button>
                     </div>

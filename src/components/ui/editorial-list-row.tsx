@@ -1,5 +1,6 @@
 import type { HTMLAttributes, ReactNode } from 'react';
 import { ArrowUpRight } from 'lucide-react';
+import { displayFont } from '@/lib/fonts';
 import { cn } from '@/lib/utils';
 
 type EditorialListRowProps = HTMLAttributes<HTMLElement> & {
@@ -42,14 +43,16 @@ export function EditorialListRow({
         {media ? <div className="mt-4">{media}</div> : null}
       </div>
       <div className="min-w-0">
-        <h3 className="text-xl font-semibold uppercase leading-7 transition-colors duration-300 group-hover:text-[var(--accent)]">{title}</h3>
+        <h3 className={`${displayFont.className} text-2xl font-semibold leading-none transition-colors duration-300 group-hover:text-[var(--accent)]`}>
+          {title}
+        </h3>
         {subtitle ? <p className="mt-2 text-sm leading-6 text-[var(--muted)]">{subtitle}</p> : null}
         {meta ? <div className="mt-3">{meta}</div> : null}
       </div>
       <div className="flex min-w-0 flex-col justify-between gap-4">
         <div className="max-w-2xl text-sm leading-7 text-[var(--muted)]">{description}</div>
         {href ? (
-          <div className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">
+          <div className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--accent)]">
             <span>{actionLabel}</span>
             <ArrowUpRight className="transition-transform duration-300 group-hover:translate-x-1" size={16} />
           </div>
@@ -66,7 +69,7 @@ export function EditorialListRow({
           <div>{label}</div>
           {labelMeta ? <div className="mt-3">{labelMeta}</div> : null}
           <div className="mt-4">
-            <h3 className="text-[1.35rem] font-semibold uppercase leading-[1.15] tracking-[-0.02em] transition-colors duration-300 group-hover:text-[var(--accent)] md:text-[1.55rem]">
+            <h3 className={`${displayFont.className} text-[1.65rem] font-semibold leading-none transition-colors duration-300 group-hover:text-[var(--accent)] md:text-[1.95rem]`}>
               {title}
             </h3>
             {subtitle ? (
@@ -79,7 +82,7 @@ export function EditorialListRow({
       <div className="flex min-w-0 flex-col justify-between gap-4 border-t border-black/10 pt-4 lg:border-l lg:border-t-0 lg:pl-7 lg:pt-0">
         <div className="max-w-[34rem] text-sm leading-7 text-[var(--muted)]">{description}</div>
         {href ? (
-          <div className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">
+          <div className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--accent)]">
             <span>{actionLabel}</span>
             <ArrowUpRight className="transition-transform duration-300 group-hover:translate-x-1" size={16} />
           </div>
@@ -97,7 +100,7 @@ export function EditorialListRow({
             <div>{label}</div>
             {labelMeta ? <div>{labelMeta}</div> : null}
           </div>
-          <h3 className="mt-3 text-[1.35rem] font-semibold uppercase leading-[1.12] tracking-[-0.02em] transition-colors duration-300 group-hover:text-[var(--accent)] md:text-[1.6rem]">
+          <h3 className={`${displayFont.className} mt-3 text-[1.65rem] font-semibold leading-none transition-colors duration-300 group-hover:text-[var(--accent)] md:text-[2rem]`}>
             {title}
           </h3>
           {subtitle ? <p className="mt-2 text-sm leading-6 text-[var(--muted)]">{subtitle}</p> : null}
@@ -107,11 +110,11 @@ export function EditorialListRow({
       </div>
       {href ? (
         <div className="flex min-w-0 flex-col justify-center gap-3 border-t border-black/10 pt-4 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
-          <span className="inline-flex min-h-11 items-center justify-center gap-2 whitespace-nowrap rounded-full border border-[var(--accent)]/38 px-5 text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--accent)] transition-colors group-hover:border-[var(--accent)] group-hover:bg-[var(--accent)] group-hover:text-white">
+          <span className="inline-flex min-h-11 items-center justify-center gap-2 whitespace-nowrap rounded-[var(--radius-md)] border border-[var(--accent)]/38 px-5 text-sm font-semibold text-[var(--accent)] transition-colors group-hover:border-[var(--accent)] group-hover:bg-[var(--accent)] group-hover:text-white">
             {actionLabel}
             <ArrowUpRight className="transition-transform duration-300 group-hover:translate-x-1" size={16} />
           </span>
-          <span className="inline-flex min-h-11 items-center justify-center whitespace-nowrap rounded-full border border-black/10 px-5 text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--text)]">
+          <span className="inline-flex min-h-11 items-center justify-center whitespace-nowrap rounded-[var(--radius-md)] border border-black/10 px-5 text-sm font-semibold text-[var(--text)]">
             Связаться
           </span>
         </div>
@@ -124,10 +127,10 @@ export function EditorialListRow({
       <article
         className={cn(
             variant === 'opportunity'
-              ? 'rounded-[28px] border border-black/10 bg-[color-mix(in_oklab,var(--surface),white_20%)] px-4 shadow-[0_12px_34px_rgba(20,20,18,0.035)] transition-[border-color,background-color,box-shadow] duration-300 hover:border-black/16 hover:bg-[color-mix(in_oklab,var(--surface),white_24%)] hover:shadow-[0_16px_38px_rgba(20,20,18,0.045)]'
+              ? 'rounded-[var(--radius-lg)] border border-black/10 bg-[color-mix(in_oklab,var(--surface),white_20%)] px-4 shadow-[0_12px_34px_rgba(20,20,18,0.035)] transition-[border-color,background-color,box-shadow] duration-300 hover:border-black/16 hover:bg-[color-mix(in_oklab,var(--surface),white_24%)] hover:shadow-[0_16px_38px_rgba(20,20,18,0.045)]'
               : variant === 'directory'
-                ? 'rounded-[24px] border border-black/10 bg-[color-mix(in_oklab,var(--surface),white_22%)] px-4 shadow-[0_12px_34px_rgba(20,20,18,0.03)] transition-[border-color,background-color,box-shadow] duration-300 hover:border-black/16 hover:bg-[color-mix(in_oklab,var(--surface),white_28%)] hover:shadow-[0_16px_38px_rgba(20,20,18,0.04)]'
-            : 'rounded-[28px] border border-black/10 bg-[color-mix(in_oklab,var(--surface),white_18%)] px-4 shadow-[0_12px_34px_rgba(20,20,18,0.03)] transition-[border-color,background-color,box-shadow] duration-300 hover:border-black/16 hover:bg-[color-mix(in_oklab,var(--surface),white_24%)] hover:shadow-[0_16px_38px_rgba(20,20,18,0.04)]',
+                ? 'rounded-[var(--radius-lg)] border border-black/10 bg-[color-mix(in_oklab,var(--surface),white_22%)] px-4 shadow-[0_12px_34px_rgba(20,20,18,0.03)] transition-[border-color,background-color,box-shadow] duration-300 hover:border-black/16 hover:bg-[color-mix(in_oklab,var(--surface),white_28%)] hover:shadow-[0_16px_38px_rgba(20,20,18,0.04)]'
+            : 'rounded-[var(--radius-lg)] border border-black/10 bg-[color-mix(in_oklab,var(--surface),white_18%)] px-4 shadow-[0_12px_34px_rgba(20,20,18,0.03)] transition-[border-color,background-color,box-shadow] duration-300 hover:border-black/16 hover:bg-[color-mix(in_oklab,var(--surface),white_24%)] hover:shadow-[0_16px_38px_rgba(20,20,18,0.04)]',
           className
         )}
         {...props}

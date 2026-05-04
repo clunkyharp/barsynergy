@@ -20,7 +20,7 @@ export function BusinessSidebar({ companyName }: BusinessSidebarProps) {
   return (
     <Panel className="h-fit backdrop-blur" padding="md" tone="elevated">
       <MetaChip variant="filter">Бизнес-кабинет</MetaChip>
-      <p className="mt-3 text-2xl font-semibold tracking-[-0.03em]">{companyName}</p>
+      <p className="mt-3 text-2xl font-semibold tracking-normal">{companyName}</p>
       <p className="mt-2 text-sm leading-6 text-[var(--muted)]">Управление заявками, статусом компании и рабочими комментариями.</p>
       <nav className="mt-6 grid gap-2 text-sm">
         {links.map((link) => {

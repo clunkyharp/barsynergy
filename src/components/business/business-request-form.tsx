@@ -14,6 +14,7 @@ import { Select } from '@/components/ui/select';
 import { SegmentedControl } from '@/components/ui/segmented-control';
 import { Textarea } from '@/components/ui/textarea';
 import { applicationTypeLabels } from '@/lib/admin/application-utils';
+import { displayFont } from '@/lib/fonts';
 import { vacancyPositionValues } from '@/lib/vacancies/positions';
 
 type CityOption = {
@@ -56,14 +57,23 @@ const requestCards = [
 
 type BusinessRequestCardType = (typeof requestCards)[number]['type'];
 
+const requestRequirements: Record<BusinessRequestCardType, string[]> = {
+  [ApplicationType.VACANCY_SUBMISSION]: ['должность и формат занятости', 'условия оплаты или понятный ориентир', 'короткое описание роли'],
+  [ApplicationType.SUPPLIER_SUBMISSION]: ['что поставляете или какую услугу оказываете', 'география работы', 'почему предложение полезно заведениям'],
+  [ApplicationType.PARTNER_APPLICATION]: ['желаемый формат партнёрства', 'цель совместного проекта', 'ссылка на сайт или материалы, если есть'],
+  [ApplicationType.CORPORATE_TRAINING_APPLICATION]: ['задача обучения', 'размер и уровень команды', 'желаемый формат или сроки'],
+  [ApplicationType.CERTIFICATE_ORDER]: ['сумма или формат сертификата', 'получатель', 'пожелания по использованию']
+};
+
 export function BusinessRequestForm({ cities, defaultCityId }: BusinessRequestFormProps) {
   const [selectedType, setSelectedType] = useState<BusinessRequestCardType>(ApplicationType.VACANCY_SUBMISSION);
+  const selectedRequest = requestCards.find((card) => card.type === selectedType) ?? requestCards[0];
 
   return (
     <Card className="overflow-hidden p-0">
       <div className="border-b border-black/10 px-5 py-5 md:px-6">
         <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Новая заявка</p>
-        <h2 className="mt-3 text-2xl font-semibold tracking-[-0.03em]">Выберите тип заявки</h2>
+        <h2 className={`${displayFont.className} mt-3 text-[2rem] font-semibold leading-none tracking-normal`}>Выберите тип заявки</h2>
       </div>
       <form action={createBusinessApplication} className="grid gap-6 p-5 md:p-6">
         <input name="type" type="hidden" value={selectedType} />
@@ -79,6 +89,19 @@ export function BusinessRequestForm({ cities, defaultCityId }: BusinessRequestFo
           onChange={setSelectedType}
           value={selectedType}
         />
+
+        <div className="rounded-[var(--radius-md)] border border-black/10 bg-[rgba(255,252,248,0.72)] p-4">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Что подготовить</p>
+          <h3 className="mt-2 text-base font-semibold leading-7 text-[var(--text)]">{selectedRequest.title}</h3>
+          <ul className="mt-3 grid gap-2 text-sm leading-6 text-[var(--muted)] md:grid-cols-3">
+            {requestRequirements[selectedType].map((item) => (
+              <li className="grid grid-cols-[0.45rem_minmax(0,1fr)] gap-3" key={item}>
+                <span className="mt-2 h-1.5 w-1.5 rounded-full bg-[var(--accent)]" />
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
 
         <div className="grid gap-5 md:grid-cols-2">
           <FormField htmlFor="title" label="Короткое название">
@@ -135,7 +158,7 @@ export function BusinessRequestForm({ cities, defaultCityId }: BusinessRequestFo
 
           {selectedType === ApplicationType.PARTNER_APPLICATION ? (
             <>
-              <FormField htmlFor="partnerType" label="Тип партнерства">
+              <FormField htmlFor="partnerType" label="Тип партнёрства">
                 <Input id="partnerType" name="partnerType" maxLength={160} />
               </FormField>
               <FormField htmlFor="shortDescription" label="Краткое описание формата">
@@ -177,10 +200,10 @@ export function BusinessRequestForm({ cities, defaultCityId }: BusinessRequestFo
         </ConsentField>
 
         <ActionRow>
-          <Button className="rounded-full" size="lg" type="submit" name="intent" value="submit">
+          <Button className="rounded-[var(--radius-md)]" size="lg" type="submit" name="intent" value="submit">
             Отправить заявку
           </Button>
-          <Button className="rounded-full" size="lg" type="submit" name="intent" value="draft" variant="secondary">
+          <Button className="rounded-[var(--radius-md)]" size="lg" type="submit" name="intent" value="draft" variant="ghost">
             Сохранить как черновик
           </Button>
         </ActionRow>

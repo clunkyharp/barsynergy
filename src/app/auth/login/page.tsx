@@ -1,5 +1,6 @@
+import Image from 'next/image';
+import { FileText, Headphones, Lock, Mail, Settings2 } from 'lucide-react';
 import { loginAction } from '@/app/auth/actions';
-import { ActionRow } from '@/components/ui/action-row';
 import { Button } from '@/components/ui/button';
 import { InlineAlert } from '@/components/ui/inline-alert';
 import { FormField } from '@/components/ui/form-field';
@@ -34,28 +35,82 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   const success = firstParam(params.success);
 
   return (
-    <div className="container max-w-[1180px] py-8 md:py-10 xl:py-12">
-      <div className="grid gap-5 xl:grid-cols-[minmax(0,0.94fr)_minmax(360px,0.66fr)] xl:items-start">
-        <section className="editorial-form-shell overflow-hidden">
-          <div className="border-b border-black/10 bg-[linear-gradient(135deg,rgba(255,255,255,0.86),rgba(255,255,255,0.58))] px-5 py-5 md:px-6 md:py-5 xl:px-7">
-            <div className="mx-auto w-full max-w-[560px]">
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                <div>
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Аккаунт</p>
-                  <h1 className={`${displayFont.className} display-tight mt-3 text-[34px] leading-[0.96] md:text-[42px]`}>
-                    Вход в кабинет
-                  </h1>
+    <div className="container max-w-[1220px] py-10 md:py-14 xl:py-20">
+      <div className="grid gap-8 xl:grid-cols-[minmax(0,0.82fr)_minmax(380px,0.72fr)] xl:items-center">
+        <aside className="min-w-0">
+          <a className="inline-flex w-fit focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]" href="/">
+            <Image alt="BARSYNERGY" className="h-auto w-[250px]" height={70} priority src="/brand/barsynergy-lockup.svg" width={360} />
+          </a>
+          <h1 className={`${displayFont.className} display-tight mt-12 max-w-[13ch] text-[40px] md:text-[54px]`}>
+            Платформа для развития барной индустрии СКФО
+          </h1>
+          <span className="mt-7 block h-1 w-20 bg-[var(--accent)]" />
+          <p className="mt-7 max-w-xl text-base leading-8 text-[var(--muted)]">
+            Вход открыт для компаний, партнёров и редакции, которым команда уже выдала доступ.
+          </p>
+
+          <div className="mt-10 hidden gap-5 md:grid">
+            {[
+              {
+                icon: Settings2,
+                title: 'Кабинет компании',
+                description: 'Обновляйте данные компании, создавайте заявки и отслеживайте ответы команды.'
+              },
+              {
+                icon: FileText,
+                title: 'Работа с заявками',
+                description: 'Проверяйте статусы, комментарии и следующие шаги без переписки в разных каналах.'
+              },
+              {
+                icon: Mail,
+                title: 'Редакционный доступ',
+                description: 'Команда платформы управляет материалами, событиями и публичными разделами.'
+              }
+            ].map((item) => {
+              const Icon = item.icon;
+
+              return (
+                <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-4" key={item.title}>
+                  <span className="grid h-14 w-14 place-items-center rounded-full border border-[rgba(157,9,14,0.16)] bg-[var(--accent-soft)] text-[var(--accent)]">
+                    <Icon size={23} strokeWidth={1.7} />
+                  </span>
+                  <span className="pt-1">
+                    <span className="block text-base font-semibold text-[var(--text)]">{item.title}</span>
+                    <span className="mt-1 block max-w-md text-sm leading-6 text-[var(--muted)]">{item.description}</span>
+                  </span>
                 </div>
-                <Button className="rounded-full" href="/" size="sm" variant="secondary">
-                  На главную
-                </Button>
-              </div>
-              <p className="mt-4 max-w-[480px] text-sm leading-6 text-[var(--muted)] md:text-[15px]">
-                Используйте email и пароль, к которым уже привязан доступ.
-              </p>
-            </div>
+              );
+            })}
           </div>
-          <div className="px-5 py-5 md:px-6 md:py-6 xl:px-7 xl:py-5">
+
+          <Panel className="mt-10 hidden max-w-xl border-[rgba(191,168,143,0.42)] bg-[rgba(255,253,249,0.74)] md:block" padding="md">
+            <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-4">
+              <span className="grid h-11 w-11 place-items-center rounded-[var(--radius-md)] border border-[rgba(157,9,14,0.16)] bg-[var(--accent-soft)] text-[var(--accent)]">
+                <Lock size={19} strokeWidth={1.7} />
+              </span>
+              <div>
+                <p className="text-sm font-semibold text-[var(--text)]">Безопасный доступ</p>
+                <p className="mt-1 text-sm leading-6 text-[var(--muted)]">
+                  Вход доступен только для аккаунтов, которым команда уже открыла кабинет.
+                </p>
+              </div>
+            </div>
+          </Panel>
+        </aside>
+
+        <section className="editorial-form-shell overflow-hidden">
+          <div className="px-5 pt-9 text-center md:px-8 md:pt-11">
+            <div className="mx-auto grid h-16 w-16 place-items-center rounded-full border border-[rgba(157,9,14,0.16)] bg-[var(--accent-soft)] text-[var(--accent)]">
+              <Lock size={25} strokeWidth={1.7} />
+            </div>
+            <h2 className={`${displayFont.className} display-tight mt-7 text-[34px] leading-[0.96] md:text-[42px]`}>
+              Вход в кабинет
+            </h2>
+            <p className="mx-auto mt-4 max-w-md text-sm leading-6 text-[var(--muted)] md:text-[15px]">
+              Используйте email и пароль от аккаунта, который команда уже открыла.
+            </p>
+          </div>
+          <div className="px-5 py-7 md:px-8 md:py-8">
             <div className="mx-auto w-full max-w-[560px]">
               {error && errorMessages[error] ? (
                 <InlineAlert className="mb-4" tone="error">
@@ -67,10 +122,10 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
                   {successMessages[success]}
                 </InlineAlert>
               ) : null}
-              <form action={loginAction} className="grid gap-3.5">
+              <form action={loginAction} className="grid gap-4">
                 <FormField className="space-y-2" htmlFor="email" label="Email">
                   <Input
-                    className="px-4 py-2.5 text-[14px] leading-6"
+                    className="px-4 py-3 text-[14px] leading-6"
                     id="email"
                     name="email"
                     type="email"
@@ -80,7 +135,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
                 </FormField>
                 <FormField className="space-y-2" htmlFor="password" label="Пароль">
                   <Input
-                    className="px-4 py-2.5 text-[14px] leading-6"
+                    className="px-4 py-3 text-[14px] leading-6"
                     id="password"
                     name="password"
                     type="password"
@@ -88,67 +143,37 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
                     required
                   />
                 </FormField>
-                <ActionRow className="gap-2.5 pt-4">
-                  <Button className="rounded-full" size="md" type="submit">
-                    Войти
-                  </Button>
-                  <Button className="rounded-full" href="/" size="md" variant="secondary">
-                    Вернуться на сайт
-                  </Button>
-                </ActionRow>
+                <Button className="mt-3 rounded-[var(--radius-md)]" size="lg" type="submit">
+                  Войти
+                </Button>
+                <Button className="rounded-[var(--radius-md)]" href="/contacts?topic=other" size="lg" variant="ghost">
+                  Восстановить доступ через команду
+                </Button>
+                <Button className="rounded-[var(--radius-md)]" href="/" size="lg" variant="secondary">
+                  Вернуться на сайт
+                  <ArrowRightMark />
+                </Button>
               </form>
+              <div className="mt-7 border-t border-black/10 pt-6">
+                <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-3">
+                  <Headphones className="mt-1 text-[var(--accent)]" size={22} strokeWidth={1.7} />
+                  <p className="text-sm leading-6 text-[var(--muted)]">
+                    Нужна помощь? Напишите на{' '}
+                    <a className="font-semibold text-[var(--accent)] hover:text-[var(--accent-strong)]" href="mailto:hello@barsynergy.ru">
+                      hello@barsynergy.ru
+                    </a>
+                    .
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </section>
-
-        <aside className="editorial-form-shell flex flex-col p-5 md:p-6 xl:p-7">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Что здесь</p>
-          <h2 className={`${displayFont.className} display-tight mt-4 max-w-[14ch] text-[30px] leading-[0.98] md:text-[34px]`}>
-            Вход для уже открытых кабинетов
-          </h2>
-          <p className="mt-4 max-w-sm text-[15px] leading-7 text-[var(--muted)]">
-            Здесь входят компании и пользователи, которым команда уже открыла доступ.
-          </p>
-
-          <div className="mt-6 grid gap-2.5">
-            <Panel className="bg-white/70" padding="sm">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Когда нужен этот экран</p>
-              <p className="mt-3 text-sm leading-6 text-[var(--muted)]">
-                Когда кабинет уже подтверждён и у вас есть рабочий email с паролем.
-              </p>
-            </Panel>
-            <Panel className="bg-white/70" padding="sm">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Если доступа ещё нет</p>
-              <p className="mt-3 text-sm leading-6 text-[var(--muted)]">
-                Для бизнеса сначала нужно оставить заявку. После проверки команда свяжется и откроет кабинет.
-              </p>
-            </Panel>
-            <Panel className="bg-white/70" padding="sm">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Для кого кабинет</p>
-              <p className="mt-3 text-sm leading-6 text-[var(--muted)]">
-                Кабинет нужен компаниям, поставщикам, партнёрам, организаторам событий, работодателям и команде BARSYNERGY.
-              </p>
-            </Panel>
-            <Panel className="bg-white/70" padding="sm">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Если вы специалист</p>
-              <p className="mt-3 text-sm leading-6 text-[var(--muted)]">
-                Чтобы откликнуться на вакансию или написать команде, кабинет не нужен.
-              </p>
-            </Panel>
-          </div>
-
-          <div className="mt-6 border-t border-black/10 pt-4">
-            <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-              <Button className="rounded-full" href="/auth/register" size="md">
-                Запросить доступ
-              </Button>
-              <Button className="rounded-full" href="/contacts" size="md" variant="secondary">
-                Связаться с командой
-              </Button>
-            </div>
-          </div>
-        </aside>
       </div>
     </div>
   );
+}
+
+function ArrowRightMark() {
+  return <span aria-hidden="true">→</span>;
 }

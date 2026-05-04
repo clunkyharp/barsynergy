@@ -14,16 +14,16 @@ export default function CostCalculatorPage() {
         description="Быстрый расчёт себестоимости напитка или позиции меню: ингредиенты, итоговая себестоимость и рекомендованная цена продажи."
         eyebrow="Инструменты"
         metrics={[
-          { value: 'MVP', label: 'без сохранения данных' },
+          { value: 'Быстрый расчёт', label: 'без сохранения данных' },
           { value: '₽', label: 'расчёт в рублях' },
-          { value: 'Food cost', label: 'целевая доля' }
+          { value: '%', label: 'целевая доля себестоимости' }
         ]}
         primaryLink={{ label: 'Перейти к расчёту', href: '#calculator' }}
         rows={[
           {
             label: '1',
             title: 'Ингредиенты',
-            description: 'Добавьте цену упаковки, объём или вес и количество в рецепте.'
+            description: 'Добавьте цену упаковки, размер упаковки и количество ингредиента в рецепте.'
           },
           {
             label: '2',
@@ -33,7 +33,7 @@ export default function CostCalculatorPage() {
           {
             label: '3',
             title: 'Цена продажи',
-            description: 'Укажите желаемый food cost, чтобы получить ориентир по продаже.'
+            description: 'Укажите желаемую долю себестоимости, чтобы получить ориентир по продаже.'
           }
         ]}
         rowsHeading="Как считать"

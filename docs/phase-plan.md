@@ -104,7 +104,9 @@ Current status:
 - sponsor data is now shared between the homepage and `/general-sponsors`, so the separate sponsors page renders the same real entries and no longer keeps a separate test showcase list;
 - partner/sponsor follow-up is applied locally: `/partners` now leads with clearer plain-Russian copy, shows the current general sponsor directly on the page, the `Hustle Brew` block now reads as an editorial partner profile instead of a promo slab, social promo cards no longer let their oversized logos collide with the right-side divider treatment, and the public header no longer overflows or shifts its desktop nav/actions on medium desktop widths;
 - the main public routes now share normalized public primitives for typography, section headers, stat shells, filters, content meta chips and form action rows, while keeping demo/test data and section-specific information structure;
-- focused browser smoke is rerun for key public and auth routes, including shell-safety checks and corrected desktop navigation/contrast fixes on the vacancies surface;
+- current photo-reference redesign is applied locally on `codex/photo-reference-ui-redesign`: public routes, auth, calculator, profile, business and admin surfaces now share the supplied warm serif/burgundy UI direction while preserving current data sources, routes, forms and permissions;
+- focused browser smoke is rerun for the photo-reference branch: public routes across mobile/tablet/desktop/wide viewports, plus authenticated profile, business and admin routes, mobile menu, active nav, visible focus, calculator interaction and contact form state;
+- dark-theme UI consistency follow-up is applied locally on the same branch: separate light/dark logo assets, compact header theme toggle, retokenized dark contrast states, denser homepage/sponsor/education/event surfaces, conditional education/event forms and Playwright screenshots across the requested public/auth routes and viewports;
 - Phase 1 is complete for the current static public surface;
 - legal text and operator/Roskomnadzor readiness still need owner/legal review before personal-data collection.
 

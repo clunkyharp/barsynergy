@@ -7,7 +7,7 @@ export function Select({ className, ...props }: SelectHTMLAttributes<HTMLSelectE
     <select
       className={cn(
         fieldBaseClassName,
-        'cursor-pointer appearance-auto pr-10 hover:border-[rgba(22,19,15,0.34)] hover:bg-white focus:border-[var(--graphite)]',
+        'cursor-pointer appearance-auto pr-10 hover:border-[var(--accent)]/35 hover:bg-[var(--field-bg-hover)] focus:border-[var(--accent)]',
         className
       )}
       {...props}

@@ -86,7 +86,7 @@ function renderOpportunityChip(entry: PublishedContentMetaGroup) {
   return (
     <span
       className={cn(
-        'inline-flex max-w-full items-center gap-2 rounded-full border px-3 py-1.5 text-[11px] leading-5 text-[var(--text)]',
+        'inline-flex max-w-full items-center gap-2 rounded-[var(--radius-sm)] border px-3 py-1.5 text-[11px] leading-5 text-[var(--text)]',
         entry.tone === 'accent'
           ? 'border-[rgba(101,32,27,0.22)] bg-[rgba(101,32,27,0.05)] font-semibold text-[var(--accent)]'
           : 'border-black/10 bg-[rgba(255,252,247,0.96)]'
@@ -126,7 +126,7 @@ function buildLabelMeta(item: PublishedContentItem, rowVariant: 'default' | 'opp
   return (
     <div className="flex flex-wrap items-center gap-2">
       {item.statusLabel ? (
-        <span className="inline-flex items-center rounded-full border border-[rgba(101,32,27,0.2)] bg-[rgba(101,32,27,0.05)] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--accent)]">
+        <span className="inline-flex items-center rounded-[var(--radius-sm)] border border-[rgba(101,32,27,0.2)] bg-[rgba(101,32,27,0.05)] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--accent)]">
           {item.statusLabel}
         </span>
       ) : null}
@@ -169,7 +169,7 @@ function titleInitials(title: string) {
 function buildListMedia(item: PublishedContentItem, rowVariant: 'default' | 'opportunity' | 'directory') {
   if (rowVariant === 'opportunity') {
     return (
-      <div className="grid h-16 w-16 place-items-center overflow-hidden rounded-[18px] border border-black/10 bg-[rgba(255,252,248,0.88)] text-lg font-semibold uppercase text-[var(--text)]">
+      <div className="grid h-16 w-16 place-items-center overflow-hidden rounded-[var(--radius-md)] border border-black/10 bg-[rgba(255,252,248,0.88)] text-lg font-semibold uppercase text-[var(--text)]">
         {item.imageUrl ? (
           <span aria-hidden="true" className="h-full w-full bg-cover bg-center" style={{ backgroundImage: `url("${item.imageUrl}")` }} />
         ) : (
@@ -181,7 +181,7 @@ function buildListMedia(item: PublishedContentItem, rowVariant: 'default' | 'opp
 
   if (rowVariant === 'directory') {
     return (
-      <div className="grid min-h-28 w-full place-items-center overflow-hidden rounded-[18px] border border-black/10 bg-[rgba(255,252,248,0.82)] px-4 text-center text-lg font-semibold uppercase tracking-[0.08em] text-[var(--text)]">
+      <div className="grid min-h-28 w-full place-items-center overflow-hidden rounded-[var(--radius-md)] border border-black/10 bg-[rgba(255,252,248,0.82)] px-4 text-center text-lg font-semibold uppercase tracking-[0.08em] text-[var(--text)]">
         {item.imageUrl ? (
           <span aria-hidden="true" className="h-full min-h-28 w-full bg-contain bg-center bg-no-repeat" style={{ backgroundImage: `url("${item.imageUrl}")` }} />
         ) : (
@@ -248,14 +248,14 @@ export function PublishedContentSection({
           <Panel className="space-y-4 border-black/10 bg-[rgba(255,250,244,0.72)]" padding="lg">
             <div>
               <PublicEyebrow tone="muted">{listLabel}</PublicEyebrow>
-              <h3 className="mt-3 text-2xl font-semibold uppercase leading-8">{noResultsTitle}</h3>
+              <h3 className="mt-3 text-2xl font-semibold leading-8">{noResultsTitle}</h3>
             </div>
             <PublicBodyText className="max-w-2xl">{noResultsDescription}</PublicBodyText>
             {emptyStateActions.length > 0 ? (
               <div className="flex flex-wrap gap-3">
                 {emptyStateActions.map((action) => (
                   <Button
-                    className="min-h-12 rounded-full px-6 tracking-[0.08em]"
+                    className="min-h-12 rounded-[var(--radius-md)] px-6 tracking-normal"
                     href={action.href}
                     key={`${action.href}-${action.label}`}
                     variant={action.variant ?? 'primary'}
@@ -268,7 +268,7 @@ export function PublishedContentSection({
           </Panel>
         ) : visibleItems.length === 0 ? (
           <Panel className="space-y-4 border-black/10 bg-[rgba(255,250,244,0.72)]" padding="lg">
-            <h3 className="text-xl font-semibold uppercase leading-7">Других записей пока нет</h3>
+            <h3 className="text-xl font-semibold leading-7">Других записей пока нет</h3>
             <PublicBodyText className="max-w-2xl">
               Главная рекомендация уже показана выше. Когда появятся новые записи с такими фильтрами, они будут здесь.
             </PublicBodyText>
@@ -282,7 +282,7 @@ export function PublishedContentSection({
                 {sortLabel ? <span className="text-sm text-[var(--muted)]">{sortLabel}</span> : null}
               </div>
               {listAction ? (
-                <Button className="gap-2 px-0 text-[11px] tracking-[0.16em]" href={listAction.href} size="sm" variant={listAction.variant ?? 'ghost'}>
+                <Button className="gap-2 px-0 text-sm tracking-normal" href={listAction.href} size="sm" variant={listAction.variant ?? 'ghost'}>
                   {listAction.label}
                   <ArrowUpRight size={14} />
                 </Button>

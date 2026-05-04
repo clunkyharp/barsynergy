@@ -1,5 +1,6 @@
 import { submitEventApplication } from '@/app/(public)/events/actions';
 import {
+  ContactChannelFieldset,
   HiddenUtmFields,
   HoneypotField,
   PublicApplicationSection,
@@ -42,15 +43,7 @@ export function EventApplicationForm({ enabled, result, utm, cities, defaults = 
             <FormField htmlFor="eventTitle" label="Событие или тема">
               <Input id="eventTitle" name="eventTitle" defaultValue={defaults.eventTitle} required maxLength={180} minLength={2} />
             </FormField>
-            <FormField htmlFor="eventEmail" label="Email">
-              <Input id="eventEmail" name="email" type="email" maxLength={180} />
-            </FormField>
-            <FormField htmlFor="eventPhone" label="Телефон">
-              <Input id="eventPhone" name="phone" maxLength={80} />
-            </FormField>
-            <FormField htmlFor="eventTelegram" label="Telegram">
-              <Input id="eventTelegram" name="telegram" maxLength={80} />
-            </FormField>
+            <ContactChannelFieldset className="md:col-span-2" emailId="eventEmail" phoneId="eventPhone" telegramId="eventTelegram" />
             <FormField htmlFor="eventCityId" label="Город">
               <Select id="eventCityId" name="cityId" defaultValue="">
                 <option value="">Не указан</option>
@@ -74,7 +67,7 @@ export function EventApplicationForm({ enabled, result, utm, cities, defaults = 
             </div>
           </div>
           <PublicFormShellFooter note="Если предлагаете своё событие, напишите, где оно пройдёт, о чём будет и кто придёт.">
-            <Button className="min-h-12 rounded-full px-6 tracking-[0.12em] sm:self-start" type="submit">
+            <Button className="min-h-12 rounded-[var(--radius-md)] px-6 tracking-normal sm:self-start" type="submit">
               Отправить заявку
             </Button>
           </PublicFormShellFooter>

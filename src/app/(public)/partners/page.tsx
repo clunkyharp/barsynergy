@@ -15,7 +15,8 @@ import {
   getPublicApplicationUtm,
   stripPublicApplicationResultParams
 } from '@/lib/applications/public-form-helpers';
-import { getPublishedPartners, type PublicContentSearchParams } from '@/lib/public/content';
+import { displayFont } from '@/lib/fonts';
+import { getPublishedPartners, hasActivePublicContentParams, type PublicContentSearchParams } from '@/lib/public/content';
 import { getPartnerFilterOptions, getPublicCategoryOptions } from '@/lib/public/filter-options';
 import { getEnv } from '@/lib/validation/env';
 
@@ -91,6 +92,8 @@ export default async function PartnersPage({ searchParams }: PartnersPageProps) 
   const applicationUtm = getPublicApplicationUtm(params);
   const requestFormat = firstParam(params.requestFormat);
   const isEmpty = content.total === 0;
+  const hasActiveFilters = hasActivePublicContentParams(contentParams, ['q', 'category', 'partnerType', 'featured']);
+  const isPrelaunchEmpty = isEmpty && !hasActiveFilters;
   const logoItems = content.items.map((partner) => ({
     name: partner.title,
     label: partner.label,
@@ -103,7 +106,7 @@ export default async function PartnersPage({ searchParams }: PartnersPageProps) 
         eyebrow="Для партнёров"
         title="Партнёрство для брендов, школ и заведений"
         description="Если у вас есть событие, обучение, запуск или совместный проект, здесь можно быстро выйти на разговор с командой BARSYNERGY."
-        summary="Помогаем собрать формат под задачу: от одного события до сезонной серии и постоянного присутствия."
+        summary="Помогаем выбрать формат: одно событие, сезонная серия или постоянное присутствие на сайте."
         metrics={[
           { value: '3', label: 'типа партнёрства' },
           { value: 'Контакт', label: 'прямая связь' },
@@ -118,12 +121,12 @@ export default async function PartnersPage({ searchParams }: PartnersPageProps) 
           {
             label: 'События',
             title: 'Гостевые смены, дегустации и специальные встречи',
-            description: 'Разовые или серийные форматы, где важно привести нужную аудиторию и не потерять смысл ради шума.'
+            description: 'Разовые или серийные форматы для нужной аудитории без лишнего шума.'
           },
           {
             label: 'Контент',
             title: 'Материалы и заметное присутствие на платформе',
-            description: 'Интервью, подборки, анонсы и редакционные интеграции, которые работают дольше одного дня.'
+            description: 'Интервью, подборки и анонсы, которые остаются на сайте после события.'
           }
         ]}
         primaryLink={{ label: 'Оставить заявку', href: '#applications' }}
@@ -133,7 +136,7 @@ export default async function PartnersPage({ searchParams }: PartnersPageProps) 
         <div className="container grid gap-8 xl:grid-cols-[minmax(16rem,0.58fr)_minmax(0,1.42fr)]">
           <div className="xl:sticky xl:top-24 xl:self-start">
             <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Форматы</p>
-            <h2 className="mt-4 max-w-sm text-[2.4rem] font-semibold uppercase leading-[0.98] tracking-[-0.02em] text-[var(--text)]">
+            <h2 className={`${displayFont.className} mt-4 max-w-sm text-[2.8rem] font-semibold leading-none tracking-normal text-[var(--text)]`}>
               Как можно работать вместе
             </h2>
           </div>
@@ -151,7 +154,7 @@ export default async function PartnersPage({ searchParams }: PartnersPageProps) 
           </div>
         </div>
       </section>
-      {isEmpty ? (
+      {isPrelaunchEmpty ? (
         <PublicPrelaunchSection
           actions={[
             { href: '#applications', label: 'Оставить заявку' },
@@ -215,7 +218,7 @@ export default async function PartnersPage({ searchParams }: PartnersPageProps) 
           <div className="container grid gap-8 xl:grid-cols-[minmax(16rem,0.58fr)_minmax(0,1.42fr)]">
             <div>
               <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Нам доверяют</p>
-              <h2 className="mt-4 max-w-sm text-[2.4rem] font-semibold uppercase leading-[0.98] tracking-[-0.02em] text-[var(--text)]">
+              <h2 className={`${displayFont.className} mt-4 max-w-sm text-[2.8rem] font-semibold leading-none tracking-normal text-[var(--text)]`}>
                 Компании и форматы
               </h2>
             </div>
@@ -226,10 +229,10 @@ export default async function PartnersPage({ searchParams }: PartnersPageProps) 
       <section className="editorial-grid border-b border-black/20 py-10 md:py-14">
         <div className="container">
           <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Как это работает</p>
-          <div className="mt-5 grid gap-5 rounded-[var(--radius-xl)] border border-black/10 bg-[rgba(255,250,244,0.72)] p-5 md:grid-cols-3 md:p-7">
+          <div className="mt-5 grid gap-5 rounded-[var(--radius-lg)] border border-black/10 bg-[rgba(255,250,244,0.72)] p-5 md:grid-cols-3 md:p-7">
             <FeatureItem icon={Handshake} title="Обсуждаем цели" description="Понимаем задачу и подбираем подходящий формат." />
-            <FeatureItem icon={CalendarDays} title="Запускаем совместно" description="Планируем инициативу с фокусом на результат." />
-            <FeatureItem icon={ChartNoAxesColumnIncreasing} title="Измеряем эффект" description="Анализируем итоги и решаем, что делать дальше." />
+            <FeatureItem icon={CalendarDays} title="Готовим запуск" description="Согласуем формат, сроки, площадку и роли команды." />
+            <FeatureItem icon={ChartNoAxesColumnIncreasing} title="Смотрим итоги" description="Разбираем, что сработало и что делать дальше." />
           </div>
           <SectionCtaPanel
             className="mt-7"

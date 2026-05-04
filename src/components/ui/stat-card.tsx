@@ -47,7 +47,7 @@ export function StatCard({
         >
           {label}
         </p>
-        <div className={cn('mt-4 text-4xl font-semibold tracking-[-0.04em]', valueClassName)}>{value}</div>
+        <div className={cn('mt-4 text-4xl font-semibold tracking-normal', valueClassName)}>{value}</div>
         {description ? (
           <div className={cn(tone === 'inverse' ? 'mt-4 text-sm leading-6 text-white/72' : 'mt-4 text-sm leading-6 text-[var(--muted)]', descriptionClassName)}>
             {description}

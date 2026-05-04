@@ -1,5 +1,6 @@
 import { submitPartnerApplication } from '@/app/(public)/partners/actions';
 import {
+  ContactChannelFieldset,
   HiddenUtmFields,
   HoneypotField,
   PublicFormShellFooter,
@@ -80,15 +81,7 @@ export function PartnerApplicationForm({ enabled, result, utm, cities, defaults 
               <FormField htmlFor="partnerContactName" label="Контактное лицо">
                 <Input id="partnerContactName" name="contactName" required maxLength={160} minLength={2} />
               </FormField>
-              <FormField htmlFor="partnerEmail" label="Email">
-                <Input id="partnerEmail" name="email" type="email" maxLength={180} />
-              </FormField>
-              <FormField htmlFor="partnerPhone" label="Телефон">
-                <Input id="partnerPhone" name="phone" maxLength={80} />
-              </FormField>
-              <FormField htmlFor="partnerTelegram" label="Telegram">
-                <Input id="partnerTelegram" name="telegram" maxLength={80} />
-              </FormField>
+              <ContactChannelFieldset className="md:col-span-2" emailId="partnerEmail" phoneId="partnerPhone" telegramId="partnerTelegram" />
               <FormField htmlFor="partnerCityId" label="Город">
                 <Select id="partnerCityId" name="cityId" defaultValue="">
                   <option value="">Не указан</option>
@@ -99,7 +92,7 @@ export function PartnerApplicationForm({ enabled, result, utm, cities, defaults 
                   ))}
                 </Select>
               </FormField>
-              <FormField htmlFor="partnerType" label="Тип партнерства">
+              <FormField htmlFor="partnerType" label="Тип партнёрства">
                 <Input id="partnerType" name="partnerType" defaultValue={defaults.partnerType} required maxLength={160} minLength={2} />
               </FormField>
               <FormField htmlFor="partnerWebsiteUrl" label="Сайт">

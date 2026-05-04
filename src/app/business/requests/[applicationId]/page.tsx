@@ -161,7 +161,7 @@ export default async function BusinessRequestDetailPage({ params, searchParams }
                 <FormField htmlFor="serviceArea" label="Зона поставки">
                   <Input id="serviceArea" name="serviceArea" maxLength={160} defaultValue={payloadValue(application.payload, 'serviceArea')} />
                 </FormField>
-                <FormField htmlFor="partnerType" label="Тип партнерства">
+                <FormField htmlFor="partnerType" label="Тип партнёрства">
                   <Input id="partnerType" name="partnerType" maxLength={160} defaultValue={payloadValue(application.payload, 'partnerType')} />
                 </FormField>
                 <FormField htmlFor="teamSize" label="Размер команды">

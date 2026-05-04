@@ -2,6 +2,7 @@ import { ArrowUpRight } from 'lucide-react';
 import { PublicBodyText, PublicDisplayTitle, PublicEyebrow } from '@/components/public/public-primitives';
 import { InlineLink } from '@/components/ui/inline-link';
 import { MetaChip } from '@/components/ui/meta-chip';
+import { displayFont } from '@/lib/fonts';
 import type { PublishedContentItem } from '@/lib/public/content';
 
 type PublicRelatedContentSectionProps = {
@@ -52,7 +53,7 @@ export function PublicRelatedContentSection({
                     </MetaChip>
                   ))}
                 </div>
-                <h3 className="mt-3 text-xl font-semibold uppercase leading-7 tracking-[-0.01em] text-[var(--text)] md:text-2xl">
+                <h3 className={`${displayFont.className} mt-3 text-[1.65rem] font-semibold leading-none tracking-normal text-[var(--text)] md:text-[2rem]`}>
                   {item.title}
                 </h3>
                 <PublicBodyText className="mt-3 max-w-2xl text-[var(--muted)]">{item.summary}</PublicBodyText>

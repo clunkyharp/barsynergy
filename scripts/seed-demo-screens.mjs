@@ -35,10 +35,15 @@ async function upsertCategory({ name, slug, type, sortOrder }) {
 async function main() {
   const passwordHash = await bcrypt.hash('DemoPass123', 10);
 
-  const [stavropol, pyatigorsk, nalchik, barsCategory, coffeeCategory, ingredientCategory, equipmentCategory] = await Promise.all([
-    upsertCity({ name: 'Ставрополь', slug: 'stavropol', region: 'Ставропольский край', sortOrder: 1 }),
-    upsertCity({ name: 'Пятигорск', slug: 'pyatigorsk', region: 'Ставропольский край', sortOrder: 2 }),
-    upsertCity({ name: 'Нальчик', slug: 'nalchik', region: 'Кабардино-Балкария', sortOrder: 3 }),
+  await prisma.city.updateMany({
+    where: { slug: { in: ['stavropol', 'pyatigorsk', 'nalchik'] } },
+    data: { isActive: false }
+  });
+
+  const [makhachkala, kaspiysk, derbent, barsCategory, coffeeCategory, ingredientCategory, equipmentCategory] = await Promise.all([
+    upsertCity({ name: 'Махачкала', slug: 'makhachkala', region: 'Республика Дагестан', sortOrder: 1 }),
+    upsertCity({ name: 'Каспийск', slug: 'kaspiysk', region: 'Республика Дагестан', sortOrder: 2 }),
+    upsertCity({ name: 'Дербент', slug: 'derbent', region: 'Республика Дагестан', sortOrder: 3 }),
     upsertCategory({ name: 'Бары', slug: 'bars', type: CategoryType.VACANCY, sortOrder: 1 }),
     upsertCategory({ name: 'Кофейни', slug: 'coffee-shops', type: CategoryType.VACANCY, sortOrder: 2 }),
     upsertCategory({ name: 'Ингредиенты', slug: 'ingredients', type: CategoryType.SUPPLIER, sortOrder: 1 }),
@@ -85,7 +90,7 @@ async function main() {
         ownerId: atelierUser.id,
         companyName: 'Atelier 12',
         status: BusinessAccountStatus.PENDING,
-        cityId: stavropol.id,
+        cityId: makhachkala.id,
         contactPerson: 'Мария Соколова',
         phone: '+7 962 401-12-12',
         telegram: '@atelier12_team',
@@ -97,7 +102,7 @@ async function main() {
         slug: 'atelier-12-demo',
         companyName: 'Atelier 12',
         status: BusinessAccountStatus.PENDING,
-        cityId: stavropol.id,
+        cityId: makhachkala.id,
         contactPerson: 'Мария Соколова',
         phone: '+7 962 401-12-12',
         telegram: '@atelier12_team',
@@ -111,7 +116,7 @@ async function main() {
         ownerId: lineaUser.id,
         companyName: 'Linea Service',
         status: BusinessAccountStatus.PENDING,
-        cityId: pyatigorsk.id,
+        cityId: kaspiysk.id,
         contactPerson: 'Руслан Алиев',
         phone: '+7 928 145-45-10',
         telegram: '@linea_service',
@@ -123,7 +128,7 @@ async function main() {
         slug: 'linea-service-demo',
         companyName: 'Linea Service',
         status: BusinessAccountStatus.PENDING,
-        cityId: pyatigorsk.id,
+        cityId: kaspiysk.id,
         contactPerson: 'Руслан Алиев',
         phone: '+7 928 145-45-10',
         telegram: '@linea_service',
@@ -173,7 +178,7 @@ async function main() {
         summary: 'Гостевая смена для команд региона: совместный бар, обмен сервисными практиками и открытая регистрация для специалистов.',
         startsAt: daysAgo(-12),
         locationName: 'Atelier 12',
-        address: 'Ставрополь, улица Мира, 12',
+        address: 'Махачкала, улица Даниялова, 12',
         format: 'offline',
         status: ContentStatus.DRAFT
       },
@@ -183,7 +188,7 @@ async function main() {
         summary: 'Гостевая смена для команд региона: совместный бар, обмен сервисными практиками и открытая регистрация для специалистов.',
         startsAt: daysAgo(-12),
         locationName: 'Atelier 12',
-        address: 'Ставрополь, улица Мира, 12',
+        address: 'Махачкала, улица Даниялова, 12',
         format: 'offline',
         status: ContentStatus.DRAFT
       }
@@ -195,7 +200,7 @@ async function main() {
         summary: 'Практический интенсив по сервису, работе с гостем и координации смены для бариста, барменов и менеджеров.',
         startsAt: daysAgo(-21),
         locationName: 'North Hall',
-        address: 'Пятигорск, проспект Кирова, 44',
+        address: 'Каспийск, улица Ленина, 44',
         format: 'offline',
         status: ContentStatus.DRAFT
       },
@@ -205,7 +210,7 @@ async function main() {
         summary: 'Практический интенсив по сервису, работе с гостем и координации смены для бариста, барменов и менеджеров.',
         startsAt: daysAgo(-21),
         locationName: 'North Hall',
-        address: 'Пятигорск, проспект Кирова, 44',
+        address: 'Каспийск, улица Ленина, 44',
         format: 'offline',
         status: ContentStatus.DRAFT
       }
@@ -217,11 +222,11 @@ async function main() {
       where: { slug: 'senior-barista-aster-roasters-demo' },
       update: {
         title: 'Старший бариста в дневную смену',
-        summary: 'Кофейня в центре Ставрополя ищет сильного бариста с опытом настройки потока и обучения смены.',
+        summary: 'Кофейня в центре Махачкалы ищет сильного бариста с опытом настройки потока и обучения смены.',
         status: ContentStatus.PUBLISHED,
         publishedAt: daysAgo(2),
         archivedAt: null,
-        cityId: stavropol.id,
+        cityId: makhachkala.id,
         categoryId: coffeeCategory.id,
         companyName: 'Aster Roasters',
         position: 'Бариста',
@@ -234,10 +239,10 @@ async function main() {
       create: {
         slug: 'senior-barista-aster-roasters-demo',
         title: 'Старший бариста в дневную смену',
-        summary: 'Кофейня в центре Ставрополя ищет сильного бариста с опытом настройки потока и обучения смены.',
+        summary: 'Кофейня в центре Махачкалы ищет сильного бариста с опытом настройки потока и обучения смены.',
         status: ContentStatus.PUBLISHED,
         publishedAt: daysAgo(2),
-        cityId: stavropol.id,
+        cityId: makhachkala.id,
         categoryId: coffeeCategory.id,
         companyName: 'Aster Roasters',
         position: 'Бариста',
@@ -256,7 +261,7 @@ async function main() {
         status: ContentStatus.PUBLISHED,
         publishedAt: daysAgo(5),
         archivedAt: null,
-        cityId: pyatigorsk.id,
+        cityId: kaspiysk.id,
         categoryId: barsCategory.id,
         companyName: 'Atelier 12',
         position: 'Управляющий',
@@ -272,7 +277,7 @@ async function main() {
         summary: 'Нужен человек, который возьмёт смены, команду и запуск сезонного меню на себя.',
         status: ContentStatus.PUBLISHED,
         publishedAt: daysAgo(5),
-        cityId: pyatigorsk.id,
+        cityId: kaspiysk.id,
         categoryId: barsCategory.id,
         companyName: 'Atelier 12',
         position: 'Управляющий',
@@ -291,7 +296,7 @@ async function main() {
         status: ContentStatus.DRAFT,
         publishedAt: null,
         archivedAt: null,
-        cityId: nalchik.id,
+        cityId: derbent.id,
         categoryId: barsCategory.id,
         companyName: 'Room 24',
         position: 'Менеджер',
@@ -306,7 +311,7 @@ async function main() {
         title: 'Менеджер смены / бар-координатор',
         summary: 'Черновик позиции для проекта с акцентом на вечерний сервис и координацию команды в пиковые часы.',
         status: ContentStatus.DRAFT,
-        cityId: nalchik.id,
+        cityId: derbent.id,
         categoryId: barsCategory.id,
         companyName: 'Room 24',
         position: 'Менеджер',
@@ -325,7 +330,7 @@ async function main() {
         status: ContentStatus.ARCHIVED,
         publishedAt: daysAgo(28),
         archivedAt: daysAgo(7),
-        cityId: stavropol.id,
+        cityId: makhachkala.id,
         categoryId: coffeeCategory.id,
         companyName: 'Mesto Coffee',
         position: 'Бариста',
@@ -342,7 +347,7 @@ async function main() {
         status: ContentStatus.ARCHIVED,
         publishedAt: daysAgo(28),
         archivedAt: daysAgo(7),
-        cityId: stavropol.id,
+        cityId: makhachkala.id,
         categoryId: coffeeCategory.id,
         companyName: 'Mesto Coffee',
         position: 'Бариста',
@@ -364,14 +369,14 @@ async function main() {
         status: ContentStatus.PUBLISHED,
         publishedAt: daysAgo(3),
         archivedAt: null,
-        cityId: stavropol.id,
+        cityId: makhachkala.id,
         categoryId: ingredientCategory.id,
         companyName: 'Aroma Trade South',
         description: 'Демо-поставщик с упором на стабильные поставки, подбор ассортимента и работу по региону.',
         websiteUrl: 'https://aroma-trade.example',
         contactLabel: 'sales@aroma-trade.example / +7 962 120-44-10',
         isVerified: true,
-        serviceArea: 'Ставрополь, Пятигорск, Нальчик'
+        serviceArea: 'Махачкала, Каспийск, Дербент'
       },
       create: {
         slug: 'aroma-trade-south-demo',
@@ -379,14 +384,14 @@ async function main() {
         summary: 'Поставки кофе, сиропов, молока, расходников и POS-материалов для заведений разного масштаба.',
         status: ContentStatus.PUBLISHED,
         publishedAt: daysAgo(3),
-        cityId: stavropol.id,
+        cityId: makhachkala.id,
         categoryId: ingredientCategory.id,
         companyName: 'Aroma Trade South',
         description: 'Демо-поставщик с упором на стабильные поставки, подбор ассортимента и работу по региону.',
         websiteUrl: 'https://aroma-trade.example',
         contactLabel: 'sales@aroma-trade.example / +7 962 120-44-10',
         isVerified: true,
-        serviceArea: 'Ставрополь, Пятигорск, Нальчик'
+        serviceArea: 'Махачкала, Каспийск, Дербент'
       }
     }),
     prisma.supplier.upsert({
@@ -397,14 +402,14 @@ async function main() {
         status: ContentStatus.PUBLISHED,
         publishedAt: daysAgo(6),
         archivedAt: null,
-        cityId: pyatigorsk.id,
+        cityId: kaspiysk.id,
         categoryId: equipmentCategory.id,
         companyName: 'Linea Service',
         description: 'Демо-поставщик оборудования с монтажом, обучением команды и регулярным сервисом.',
         websiteUrl: 'https://linea-service.example',
         contactLabel: '@linea_service / +7 928 145-45-10',
         isVerified: true,
-        serviceArea: 'Пятигорск и КМВ'
+        serviceArea: 'Каспийск и Махачкала'
       },
       create: {
         slug: 'linea-service-equipment-demo',
@@ -412,14 +417,14 @@ async function main() {
         summary: 'Оснащение новых точек, подбор оборудования и сервисное сопровождение после запуска.',
         status: ContentStatus.PUBLISHED,
         publishedAt: daysAgo(6),
-        cityId: pyatigorsk.id,
+        cityId: kaspiysk.id,
         categoryId: equipmentCategory.id,
         companyName: 'Linea Service',
         description: 'Демо-поставщик оборудования с монтажом, обучением команды и регулярным сервисом.',
         websiteUrl: 'https://linea-service.example',
         contactLabel: '@linea_service / +7 928 145-45-10',
         isVerified: true,
-        serviceArea: 'Пятигорск и КМВ'
+        serviceArea: 'Каспийск и Махачкала'
       }
     }),
     prisma.supplier.upsert({
@@ -430,28 +435,28 @@ async function main() {
         status: ContentStatus.DRAFT,
         publishedAt: null,
         archivedAt: null,
-        cityId: nalchik.id,
+        cityId: derbent.id,
         categoryId: ingredientCategory.id,
         companyName: 'Forma Glass',
         description: 'Демо-черновик поставщика для показа админского сценария редактирования и публикации.',
         websiteUrl: 'https://forma-glass.example',
         contactLabel: 'hello@forma-glass.example',
         isVerified: false,
-        serviceArea: 'Нальчик и соседние города'
+        serviceArea: 'Дербент и соседние города'
       },
       create: {
         slug: 'forma-glass-demo',
         title: 'Стекло, посуда и сервировочные позиции',
         summary: 'Подбор стекла, сервировочной посуды и предметов для сезонных обновлений бара и кухни.',
         status: ContentStatus.DRAFT,
-        cityId: nalchik.id,
+        cityId: derbent.id,
         categoryId: ingredientCategory.id,
         companyName: 'Forma Glass',
         description: 'Демо-черновик поставщика для показа админского сценария редактирования и публикации.',
         websiteUrl: 'https://forma-glass.example',
         contactLabel: 'hello@forma-glass.example',
         isVerified: false,
-        serviceArea: 'Нальчик и соседние города'
+        serviceArea: 'Дербент и соседние города'
       }
     }),
     prisma.supplier.upsert({
@@ -462,14 +467,14 @@ async function main() {
         status: ContentStatus.ARCHIVED,
         publishedAt: daysAgo(35),
         archivedAt: daysAgo(10),
-        cityId: stavropol.id,
+        cityId: makhachkala.id,
         categoryId: ingredientCategory.id,
         companyName: 'North Table Supply',
         description: 'Демо-архив поставщика, оставленный для показа жизненного цикла карточки.',
         websiteUrl: 'https://north-table.example',
         contactLabel: '+7 8652 00-10-20',
         isVerified: false,
-        serviceArea: 'Ставрополь'
+        serviceArea: 'Махачкала'
       },
       create: {
         slug: 'north-table-archive-demo',
@@ -478,14 +483,14 @@ async function main() {
         status: ContentStatus.ARCHIVED,
         publishedAt: daysAgo(35),
         archivedAt: daysAgo(10),
-        cityId: stavropol.id,
+        cityId: makhachkala.id,
         categoryId: ingredientCategory.id,
         companyName: 'North Table Supply',
         description: 'Демо-архив поставщика, оставленный для показа жизненного цикла карточки.',
         websiteUrl: 'https://north-table.example',
         contactLabel: '+7 8652 00-10-20',
         isVerified: false,
-        serviceArea: 'Ставрополь'
+        serviceArea: 'Махачкала'
       }
     })
   ]);
@@ -502,7 +507,7 @@ async function main() {
         email: 'nika.demo@example.com',
         phone: '+7 928 500-41-10',
         telegram: '@nika_demo',
-        cityId: stavropol.id,
+        cityId: makhachkala.id,
         vacancyId: vacancyOne.id,
         consentAcceptedAt: daysAgo(1),
         consentText: 'Демо-согласие на обработку данных и передачу работодателю.'
@@ -517,7 +522,7 @@ async function main() {
         email: 'nika.demo@example.com',
         phone: '+7 928 500-41-10',
         telegram: '@nika_demo',
-        cityId: stavropol.id,
+        cityId: makhachkala.id,
         vacancyId: vacancyOne.id,
         consentAcceptedAt: daysAgo(1),
         consentText: 'Демо-согласие на обработку данных и передачу работодателю.'
@@ -534,7 +539,7 @@ async function main() {
         email: 'atelier.demo@example.com',
         phone: '+7 962 401-12-12',
         telegram: '@atelier12_team',
-        cityId: pyatigorsk.id,
+        cityId: kaspiysk.id,
         businessAccountId: atelierBusiness.id,
         consentAcceptedAt: daysAgo(3),
         consentText: 'Демо-согласие на обработку данных.'
@@ -549,7 +554,7 @@ async function main() {
         email: 'atelier.demo@example.com',
         phone: '+7 962 401-12-12',
         telegram: '@atelier12_team',
-        cityId: pyatigorsk.id,
+        cityId: kaspiysk.id,
         businessAccountId: atelierBusiness.id,
         consentAcceptedAt: daysAgo(3),
         consentText: 'Демо-согласие на обработку данных.'
@@ -566,7 +571,7 @@ async function main() {
         email: 'sales@aroma-trade.example',
         phone: '+7 962 120-44-10',
         telegram: '@aroma_trade',
-        cityId: stavropol.id,
+        cityId: makhachkala.id,
         consentAcceptedAt: daysAgo(4),
         consentText: 'Демо-согласие на обработку данных.'
       },
@@ -580,7 +585,7 @@ async function main() {
         email: 'sales@aroma-trade.example',
         phone: '+7 962 120-44-10',
         telegram: '@aroma_trade',
-        cityId: stavropol.id,
+        cityId: makhachkala.id,
         consentAcceptedAt: daysAgo(4),
         consentText: 'Демо-согласие на обработку данных.'
       }
@@ -596,7 +601,7 @@ async function main() {
         email: 'demo-business-linea@barsynergy.local',
         phone: '+7 928 145-45-10',
         telegram: '@linea_service',
-        cityId: pyatigorsk.id,
+        cityId: kaspiysk.id,
         businessAccountId: lineaBusiness.id,
         consentAcceptedAt: daysAgo(2),
         consentText: 'Демо-согласие на обработку данных.'
@@ -611,7 +616,7 @@ async function main() {
         email: 'demo-business-linea@barsynergy.local',
         phone: '+7 928 145-45-10',
         telegram: '@linea_service',
-        cityId: pyatigorsk.id,
+        cityId: kaspiysk.id,
         businessAccountId: lineaBusiness.id,
         consentAcceptedAt: daysAgo(2),
         consentText: 'Демо-согласие на обработку данных.'
@@ -620,7 +625,7 @@ async function main() {
   ]);
 
   console.log('Demo screen data is ready.');
-  console.log(`Cities: ${stavropol.name}, ${pyatigorsk.name}, ${nalchik.name}`);
+  console.log(`Cities: ${makhachkala.name}, ${kaspiysk.name}, ${derbent.name}`);
   console.log(`Vacancies: ${vacancyOne.title}, ${vacancyTwo.title}, ${vacancyThree.title}, ${vacancyFour.title}`);
   console.log(`Suppliers: ${supplierOne.companyName}, ${supplierTwo.companyName}, ${supplierThree.companyName}, ${supplierFour.companyName}`);
   console.log(`Draft content: ${articleOne.slug}, ${articleTwo.slug}, ${eventOne.slug}, ${eventTwo.slug}`);

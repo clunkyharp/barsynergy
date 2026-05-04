@@ -14,7 +14,7 @@ const applicationTypeLabels: Record<ApplicationType, string> = {
   VACANCY_SUBMISSION: 'Подача вакансии',
   VACANCY_RESPONSE: 'Отклик на вакансию',
   SUPPLIER_SUBMISSION: 'Подача поставщика',
-  PARTNER_APPLICATION: 'Заявка на партнерство',
+  PARTNER_APPLICATION: 'Заявка на партнёрство',
   CONTACT_MESSAGE: 'Сообщение из контактов',
   CORPORATE_TRAINING_APPLICATION: 'Заявка на корпоративное обучение',
   CERTIFICATE_ORDER: 'Заказ сертификата'

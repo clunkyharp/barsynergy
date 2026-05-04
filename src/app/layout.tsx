@@ -34,8 +34,22 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html data-scroll-behavior="smooth" lang="ru">
+    <html data-scroll-behavior="smooth" lang="ru" suppressHydrationWarning>
       <body className={bodyFont.className}>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              try {
+                var storedTheme = window.localStorage.getItem('barsynergy-theme');
+                var theme = storedTheme === 'dark' || storedTheme === 'light'
+                  ? storedTheme
+                  : (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+                document.documentElement.dataset.theme = theme;
+                document.documentElement.style.colorScheme = theme;
+              } catch (_) {}
+            `
+          }}
+        />
         <div className="site-shell overflow-x-clip">
           <SiteHeader />
           <main className="site-main overflow-x-hidden w-full max-w-full">{children}</main>

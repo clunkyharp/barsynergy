@@ -41,7 +41,7 @@ export default async function AdminEditPartnerPage({ params }: AdminEditPartnerP
   return (
     <div className="space-y-8">
       <header>
-        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Админка / Партнеры / Редактирование</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Админка / Партнёры / Редактирование</p>
         <h1 className="mt-2 text-3xl font-semibold">{partner.title}</h1>
       </header>
 
@@ -70,7 +70,7 @@ export default async function AdminEditPartnerPage({ params }: AdminEditPartnerP
               ))}
             </Select>
           </FormField>
-          <FormField htmlFor="partner-partnerType" label="Тип партнера">
+          <FormField htmlFor="partner-partnerType" label="Тип партнёра">
             <Input id="partner-partnerType" name="partnerType" maxLength={120} defaultValue={partner.partnerType ?? ''} />
           </FormField>
           <FormField htmlFor="partner-isFeatured" label="В подборке">

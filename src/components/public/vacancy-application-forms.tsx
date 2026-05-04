@@ -2,6 +2,7 @@
 
 import { submitVacancyPlacementApplication, submitVacancyResponseApplication } from '@/app/(public)/vacancies/actions';
 import {
+  ContactChannelFieldset,
   HiddenUtmFields,
   HoneypotField,
   PublicApplicationSection,
@@ -62,10 +63,10 @@ function VacancyResponseForm({
           Сейчас открытых вакансий нет. Как только они появятся, отклик станет доступен на странице конкретной вакансии.
         </p>
         <div className="mt-5 flex flex-col gap-3 sm:flex-row">
-          <Button className="rounded-full" href="#vacancy-list" size="lg" variant="secondary">
+          <Button className="rounded-[var(--radius-md)]" href="#vacancy-list" size="lg" variant="secondary">
             Смотреть раздел
           </Button>
-          <Button className="rounded-full" href="/contacts" size="lg">
+          <Button className="rounded-[var(--radius-md)]" href="/contacts" size="lg">
             Написать команде
           </Button>
         </div>
@@ -114,18 +115,8 @@ function VacancyResponseForm({
           <FormField htmlFor="candidateName" label="Имя">
             <Input id="candidateName" name="candidateName" required maxLength={160} minLength={2} />
           </FormField>
+          <ContactChannelFieldset emailId="responseEmail" phoneId="responsePhone" telegramId="responseTelegram" />
           <div className="grid gap-4 sm:grid-cols-2">
-            <FormField htmlFor="responseEmail" label="Email">
-              <Input id="responseEmail" name="email" maxLength={180} type="email" />
-            </FormField>
-            <FormField htmlFor="responsePhone" label="Телефон">
-              <Input id="responsePhone" name="phone" maxLength={80} />
-            </FormField>
-          </div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <FormField htmlFor="responseTelegram" label="Telegram">
-              <Input id="responseTelegram" name="telegram" maxLength={80} />
-            </FormField>
             <FormField htmlFor="responseCityId" label="Город">
               <Select id="responseCityId" name="cityId" defaultValue="">
                 <option value="">Не указан</option>
@@ -164,7 +155,7 @@ function VacancyResponseForm({
           </ConsentField>
         </div>
         <PublicFormShellFooter>
-          <Button className="rounded-full sm:self-start" size="lg" type="submit">
+          <Button className="rounded-[var(--radius-md)] sm:self-start" size="lg" type="submit">
             Отправить отклик
           </Button>
         </PublicFormShellFooter>
@@ -197,18 +188,8 @@ function VacancySubmissionForm({
           <FormField htmlFor="contactName" label="Контактное лицо">
             <Input id="contactName" name="contactName" required maxLength={160} minLength={2} />
           </FormField>
+          <ContactChannelFieldset emailId="submissionEmail" phoneId="submissionPhone" telegramId="submissionTelegram" />
           <div className="grid gap-4 sm:grid-cols-2">
-            <FormField htmlFor="submissionEmail" label="Email">
-              <Input id="submissionEmail" name="email" maxLength={180} type="email" />
-            </FormField>
-            <FormField htmlFor="submissionPhone" label="Телефон">
-              <Input id="submissionPhone" name="phone" maxLength={80} />
-            </FormField>
-          </div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <FormField htmlFor="submissionTelegram" label="Telegram">
-              <Input id="submissionTelegram" name="telegram" maxLength={80} />
-            </FormField>
             <FormField htmlFor="submissionCityId" label="Город">
               <Select id="submissionCityId" name="cityId" defaultValue="">
                 <option value="">Не указан</option>
@@ -253,7 +234,7 @@ function VacancySubmissionForm({
           </ConsentField>
         </div>
         <PublicFormShellFooter>
-          <Button className="rounded-full sm:self-start" size="lg" type="submit">
+          <Button className="rounded-[var(--radius-md)] sm:self-start" size="lg" type="submit">
             Отправить вакансию
           </Button>
         </PublicFormShellFooter>
@@ -302,7 +283,7 @@ export function VacancyApplicationForms({
             Выберите вакансию в списке и откройте её страницу. Там будет форма отклика без выбора вакансии.
           </p>
           <div className="mt-5">
-            <Button className="rounded-full" href="#vacancy-list" size="lg" variant="secondary">
+            <Button className="rounded-[var(--radius-md)]" href="#vacancy-list" size="lg" variant="secondary">
               Смотреть вакансии
             </Button>
           </div>

@@ -5,17 +5,18 @@ type Variant = 'primary' | 'secondary' | 'ghost' | 'destructive' | 'inverse';
 type Size = 'sm' | 'md' | 'lg';
 
 const variants: Record<Variant, string> = {
-  primary: 'border-[var(--accent)] bg-[var(--accent)] text-white hover:bg-[var(--accent-strong)]',
-  secondary: 'border-[var(--border-default)] bg-transparent text-[var(--text)] hover:border-[var(--accent)] hover:text-[var(--accent)]',
+  primary:
+    'border-[var(--accent)] bg-[var(--accent)] text-[var(--accent-contrast)] shadow-[0_12px_28px_rgba(157,9,14,0.16)] hover:border-[var(--accent-strong)] hover:bg-[var(--accent-strong)]',
+  secondary: 'border-[var(--accent)] bg-transparent text-[var(--accent)] hover:bg-[var(--accent)] hover:text-[var(--accent-contrast)]',
   ghost: 'border-transparent bg-transparent text-[var(--muted)] hover:text-[var(--accent)]',
   destructive: 'border-[var(--danger)] bg-[var(--danger)] text-white hover:bg-[#842726]',
-  inverse: 'border-[var(--border-inverse)] bg-[var(--surface-inverse)] text-white hover:bg-black'
+  inverse: 'border-[var(--border-inverse)] bg-[var(--surface-inverse)] text-[var(--background)] hover:bg-[var(--accent)] hover:text-[var(--accent-contrast)]'
 };
 
 const sizes: Record<Size, string> = {
-  sm: 'min-h-9 px-3 py-1.5 text-xs tracking-[0.08em]',
-  md: 'min-h-11 px-5 py-2.5 text-sm tracking-[0.08em]',
-  lg: 'min-h-12 px-6 py-3 text-sm tracking-[0.12em]'
+  sm: 'min-h-9 px-3 py-1.5 text-xs tracking-normal',
+  md: 'min-h-11 px-5 py-2.5 text-sm tracking-normal',
+  lg: 'min-h-12 px-6 py-3 text-sm tracking-normal'
 };
 
 type CommonProps = {
@@ -46,7 +47,7 @@ function LoadingMark() {
 export function Button(props: ButtonProps | LinkProps) {
   const { children, variant = 'primary', size = 'md', className, loading = false, loadingText, ...rest } = props;
   const classes = cn(
-    'inline-flex items-center justify-center gap-2.5 whitespace-nowrap rounded-full border text-center font-semibold transition focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--background)] active:translate-y-px disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-55 aria-disabled:pointer-events-none aria-disabled:cursor-not-allowed aria-disabled:opacity-55 aria-busy:cursor-wait',
+    'inline-flex items-center justify-center gap-2.5 whitespace-nowrap rounded-[var(--radius-md)] border text-center font-semibold transition focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--background)] active:translate-y-px disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-55 aria-disabled:pointer-events-none aria-disabled:cursor-not-allowed aria-disabled:opacity-55 aria-busy:cursor-wait',
     variants[variant],
     sizes[size],
     className

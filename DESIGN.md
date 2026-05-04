@@ -4,9 +4,9 @@ This document is the working UI contract for BARSYNERGY. It exists to keep runti
 
 ## Status
 
-Current status: `v0.2 stabilization`.
+Current status: `v0.3 photo-reference redesign`.
 
-The project already has a stable editorial public language and a usable product/admin layer. The current goal is not redesign. The goal is to stop UI drift and make future implementation predictable across public, auth and workspace screens.
+The project is being aligned to the supplied photo references: warm off-white pages, serif editorial headlines, burgundy actions, thin dividers, low-radius cards and compact product screens. The goal is to keep that visual direction while preserving current routes, data, auth, applications and admin permissions.
 
 ## Source Of Truth
 
@@ -31,11 +31,13 @@ Rules:
 BARSYNERGY keeps one visual identity across the product:
 
 - warm ivory and cream surfaces;
+- high-contrast serif public and auth headings;
 - dark graphite typography;
-- muted burgundy accent;
+- burgundy primary actions;
 - thin dividers;
 - editorial grids on public surfaces;
-- compact, readable product density for admin and business flows.
+- compact, readable product density for admin and business flows;
+- small card/button radius instead of large rounded cards.
 
 Avoid:
 
@@ -59,16 +61,16 @@ Avoid:
 
 Runtime fonts:
 
-- body: `Geist`
-- display: `Oswald`
-- accent: `Outfit`
+- body: `Manrope`
+- display: `Playfair Display`
+- accent: `Manrope`
 
 Rules:
 
-- `Oswald` is for editorial display roles only.
-- `Geist` is the default body and product/workspace font.
-- `Outfit` is limited to brand marks and short Latin labels such as `BARSYNERGY`.
-- Russian helper labels and long Russian copy must stay on `Geist`, not on the accent font.
+- `Playfair Display` is for public, auth and selected workspace headings.
+- `Manrope` is the default body, control and product/workspace font.
+- The accent role is limited to short labels and brand-adjacent text; it should not replace body copy.
+- Russian helper labels and long Russian copy must stay on `Manrope`, not on the display font.
 - Long Russian text stays in body typography.
 - Do not use display sizing for dense product workflows.
 
@@ -159,8 +161,8 @@ Rules:
 
 - `radius-md` is the default field and button radius.
 - `radius-lg` is the default inner panel/card radius.
-- `radius-xl` is for larger editorial shells and selectable cards.
-- `radius-pill` is for chips and round CTA treatments only.
+- `radius-xl` is reserved for large editorial/form shells only.
+- `radius-pill` is for icon circles, status dots and explicitly round controls only.
 - New repeated `rounded-[...]` values are not allowed without token promotion.
 
 ## Elevation And Border Rules

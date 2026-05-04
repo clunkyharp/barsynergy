@@ -71,7 +71,7 @@ export async function submitPartnerApplication(formData: FormData) {
     await assertPublicApplicationSubmissionAllowed(ApplicationType.PARTNER_APPLICATION);
     await createPublicApplication({
       type: ApplicationType.PARTNER_APPLICATION,
-      subject: `Партнерство: ${parsed.companyName}`,
+      subject: `Партнёрство: ${parsed.companyName}`,
       message: parsed.proposal,
       name: parsed.contactName,
       email: nullableString(parsed.email),
