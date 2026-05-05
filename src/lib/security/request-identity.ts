@@ -21,9 +21,8 @@ function getFirstForwardedIp(value: string | null) {
 
 export function getClientIpFromHeaders(headerList: Headers) {
   return (
-    getFirstForwardedIp(headerList.get('x-forwarded-for')) ||
-    normalizeIpHeaderValue(headerList.get('cf-connecting-ip')) ||
     normalizeIpHeaderValue(headerList.get('x-real-ip')) ||
+    getFirstForwardedIp(headerList.get('x-forwarded-for')) ||
     'unknown'
   );
 }

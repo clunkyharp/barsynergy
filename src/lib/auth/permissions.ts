@@ -8,6 +8,8 @@ export const adminSections = [
   'vacancies',
   'suppliers',
   'partners',
+  'generalSponsors',
+  'homepage',
   'applications',
   'users',
   'categories',
@@ -25,6 +27,8 @@ const adminSectionRoles = {
   vacancies: [UserRole.ADMIN, UserRole.MODERATOR],
   suppliers: [UserRole.ADMIN, UserRole.MODERATOR],
   partners: [UserRole.ADMIN, UserRole.MODERATOR],
+  generalSponsors: [UserRole.ADMIN, UserRole.MODERATOR],
+  homepage: [UserRole.ADMIN, UserRole.MODERATOR],
   applications: [UserRole.ADMIN, UserRole.MODERATOR],
   users: [UserRole.ADMIN],
   categories: [UserRole.ADMIN],
@@ -43,4 +47,8 @@ export function canAccessAdminSection(role: UserRole | null | undefined, section
 
 export function canManageUsers(role?: UserRole | null) {
   return canAccessAdminSection(role, 'users');
+}
+
+export function canPrepareBusinessAccess(role?: UserRole | null) {
+  return canManageUsers(role);
 }

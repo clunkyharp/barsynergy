@@ -32,6 +32,7 @@ import {
   slugify
 } from '@/lib/admin/content-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
+import { canPrepareBusinessAccess } from '@/lib/auth/permissions';
 import { prisma } from '@/lib/db/prisma';
 
 const ADMIN_APPLICATIONS_PATH = '/admin/applications';
@@ -54,6 +55,8 @@ const businessNotesFormSchema = z.object({
 const vacancyDraftFormSchema = z.object({
   applicationId: z.string().trim().min(1)
 });
+
+const BUSINESS_ACCESS_ADMIN_REQUIRED_ERROR = 'business access requires admin';
 
 const prepareBusinessAccessFormSchema = z.object({
   applicationId: z.string().trim().min(1)
@@ -248,7 +251,12 @@ export async function prepareBusinessAccessAction(formData: FormData) {
   let result: { type: 'success' | 'error'; message: string };
 
   try {
-    await requireAdminSectionAccess('applications');
+    const user = await requireAdminSectionAccess('applications');
+
+    if (!canPrepareBusinessAccess(user.role)) {
+      throw new Error(BUSINESS_ACCESS_ADMIN_REQUIRED_ERROR);
+    }
+
     const parsed = prepareBusinessAccessFormSchema.parse({
       applicationId: getString(formData, 'applicationId')
     });
@@ -470,7 +478,10 @@ export async function prepareBusinessAccessAction(formData: FormData) {
       message: 'Ссылка активации подготовлена. Покажите её владельцу бизнеса безопасным каналом.'
     };
   } catch (error) {
-    result = { type: 'error', message: formatApplicationActionError(error) };
+    result =
+      error instanceof Error && error.message === BUSINESS_ACCESS_ADMIN_REQUIRED_ERROR
+        ? { type: 'error', message: 'Недостаточно прав для подготовки бизнес-доступа.' }
+        : { type: 'error', message: formatApplicationActionError(error) };
   }
 
   redirectWithAdminActionResult(redirectTo, result);

@@ -48,14 +48,14 @@ test('admin telegram message contains only summary fields and admin link', () =>
       applicationId: 'app-1',
       applicationTypeLabel: 'Отклик на вакансию',
       subject: 'Отклик: Старший бармен',
-      cityName: 'Пятигорск'
+      cityName: 'Махачкала'
     },
     'https://barsynergy.example'
   );
 
   assert.match(message, /Отклик на вакансию/);
   assert.match(message, /Отклик: Старший бармен/);
-  assert.match(message, /Пятигорск/);
+  assert.match(message, /Махачкала/);
   assert.match(message, /\/admin\/applications\/app-1/);
   assert.doesNotMatch(message, /@/);
 });

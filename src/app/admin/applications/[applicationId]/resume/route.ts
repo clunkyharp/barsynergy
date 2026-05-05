@@ -1,4 +1,4 @@
-import { GetObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import { GetObjectCommand } from '@aws-sdk/client-s3';
 import { createReadStream } from 'node:fs';
 import { access } from 'node:fs/promises';
 import path from 'node:path';
@@ -6,6 +6,7 @@ import { Readable } from 'node:stream';
 import { FileVisibility, StorageDriver } from '@prisma/client';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
 import { prisma } from '@/lib/db/prisma';
+import { getS3Client } from '@/lib/storage/s3-client';
 import { getEnv } from '@/lib/validation/env';
 
 function resolveLocalUploadPath(fileKey: string) {
@@ -32,20 +33,6 @@ function buildDownloadHeaders(input: { mimeType: string; size: number; originalN
     'Content-Type': input.mimeType,
     'X-Content-Type-Options': 'nosniff'
   };
-}
-
-function createS3Client() {
-  const env = getEnv();
-
-  return new S3Client({
-    endpoint: env.S3_ENDPOINT,
-    region: env.S3_REGION,
-    credentials: {
-      accessKeyId: env.S3_ACCESS_KEY_ID ?? '',
-      secretAccessKey: env.S3_SECRET_ACCESS_KEY ?? ''
-    },
-    forcePathStyle: true
-  });
 }
 
 function toWebStream(body: unknown) {
@@ -118,7 +105,7 @@ export async function GET(_request: Request, context: { params: Promise<{ applic
       return new Response('Not found', { status: 404 });
     }
 
-    const response = await createS3Client().send(
+    const response = await getS3Client(getEnv()).send(
       new GetObjectCommand({
         Bucket: file.bucket,
         Key: file.fileKey

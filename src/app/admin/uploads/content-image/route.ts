@@ -2,8 +2,14 @@ import { NextResponse } from 'next/server';
 import { uploadPublicContentImageFromFormData } from '@/lib/admin/content-utils';
 import { getCurrentUser } from '@/lib/auth/current-user';
 import { canAccessAdminSection } from '@/lib/auth/permissions';
+import { isSameOriginBrowserRequest } from '@/lib/security/same-origin';
+import { getEnv } from '@/lib/validation/env';
 
 export async function POST(request: Request) {
+  if (!isSameOriginBrowserRequest(request, getEnv().APP_URL)) {
+    return NextResponse.json({ error: 'Forbidden.' }, { status: 403 });
+  }
+
   const user = await getCurrentUser();
 
   if (!user) {
