@@ -1,16 +1,20 @@
-import { ContentStatus } from '@prisma/client';
+import { CategoryType, type Prisma } from '@prisma/client';
 import { deletePartnerDraft, updatePartnerStatus } from '@/app/admin/partners/actions';
 import {
   AdminActionAlert,
-  AdminPagination,
-  HiddenRedirect
+  AdminContentRowActions,
+  AdminListFilters,
+  AdminPagination
 } from '@/components/admin/content-admin-controls';
 import { AdminPageIntro } from '@/components/admin/admin-page-intro';
 import { Button } from '@/components/ui/button';
 import {
   AdminTable,
+  AdminTableActionsCell,
+  AdminTableActionsHeaderCell,
   AdminTableBody,
   AdminTableCell,
+  AdminTableClamp,
   AdminTableFrame,
   AdminTableHead,
   AdminTableHeaderCell,
@@ -24,7 +28,12 @@ import {
   contentStatusLabels,
   getAdminCurrentPath,
   getAdminPage,
+  getAdminBooleanFilter,
+  getAdminSearchQuery,
+  getAdminStringFilter,
+  getAdminStatusFilter,
   getAdminTotalPages,
+  partnerTypeOptions,
   type AdminContentSearchParams
 } from '@/lib/admin/content-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
@@ -50,10 +59,33 @@ export default async function AdminPartnersPage({ searchParams }: AdminPartnersP
   const params = (await searchParams) ?? {};
   const page = getAdminPage(params);
   const currentPath = getAdminCurrentPath(ADMIN_PARTNERS_PATH, params);
+  const q = getAdminSearchQuery(params);
+  const status = getAdminStatusFilter(params);
+  const categoryId = getAdminStringFilter(params, 'categoryId');
+  const partnerType = getAdminStringFilter(params, 'partnerType');
+  const isFeatured = getAdminBooleanFilter(params, 'featured');
+  const where: Prisma.PartnerWhereInput = {
+    status,
+    categoryId,
+    partnerType,
+    isFeatured,
+    ...(q
+      ? {
+          OR: [
+            { title: { contains: q, mode: 'insensitive' } },
+            { summary: { contains: q, mode: 'insensitive' } },
+            { slug: { contains: q, mode: 'insensitive' } },
+            { companyName: { contains: q, mode: 'insensitive' } },
+            { partnerType: { contains: q, mode: 'insensitive' } }
+          ]
+        }
+      : {})
+  };
 
-  const [total, partners] = await Promise.all([
-    prisma.partner.count(),
+  const [total, partners, categories] = await Promise.all([
+    prisma.partner.count({ where }),
     prisma.partner.findMany({
+      where,
       orderBy: [{ createdAt: 'desc' }],
       skip: (page - 1) * ADMIN_CONTENT_PAGE_SIZE,
       take: ADMIN_CONTENT_PAGE_SIZE,
@@ -62,6 +94,11 @@ export default async function AdminPartnersPage({ searchParams }: AdminPartnersP
         coverImage: { select: { originalName: true } },
         updatedBy: { select: { email: true } }
       }
+    }),
+    prisma.category.findMany({
+      where: { type: CategoryType.PARTNER, isActive: true },
+      orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
+      select: { id: true, name: true }
     })
   ]);
   const totalPages = getAdminTotalPages(total);
@@ -76,6 +113,24 @@ export default async function AdminPartnersPage({ searchParams }: AdminPartnersP
       />
 
       <AdminActionAlert params={params} />
+      <AdminListFilters
+        basePath={ADMIN_PARTNERS_PATH}
+        filters={[
+          { name: 'categoryId', label: 'Категория', allLabel: 'Все категории', options: categories.map((category) => ({ value: category.id, label: category.name })) },
+          { name: 'partnerType', label: 'Тип партнёра', allLabel: 'Все типы', options: [...partnerTypeOptions] },
+          {
+            name: 'featured',
+            label: 'Подборка',
+            allLabel: 'Любой статус',
+            options: [
+              { value: 'true', label: 'В подборке' },
+              { value: 'false', label: 'Не в подборке' }
+            ]
+          }
+        ]}
+        params={params}
+        searchPlaceholder="Поиск по партнёру, компании или типу"
+      />
 
       <section className="space-y-4">
         <div>
@@ -94,14 +149,14 @@ export default async function AdminPartnersPage({ searchParams }: AdminPartnersP
                   <AdminTableHeaderCell>Контекст</AdminTableHeaderCell>
                   <AdminTableHeaderCell>Статус</AdminTableHeaderCell>
                   <AdminTableHeaderCell>Обновлено</AdminTableHeaderCell>
-                  <AdminTableHeaderCell>Действия</AdminTableHeaderCell>
+                  <AdminTableActionsHeaderCell>Действия</AdminTableActionsHeaderCell>
                 </AdminTableRow>
               </AdminTableHead>
               <AdminTableBody>
                 {partners.map((partner) => (
                   <AdminTableRow key={partner.id}>
                     <AdminTableCell className="max-w-[320px]">
-                      <div className="font-semibold">{partner.title}</div>
+                      <AdminTableClamp className="font-semibold">{partner.title}</AdminTableClamp>
                       <div className="mt-1 truncate text-xs text-[var(--muted)]">/{partner.slug}</div>
                       <div className="mt-1 text-xs text-[var(--muted)]">{partner.category?.name ?? 'Без категории'}</div>
                       {partner.coverImage?.originalName ? (
@@ -120,42 +175,18 @@ export default async function AdminPartnersPage({ searchParams }: AdminPartnersP
                       <div>{dateFormatter.format(partner.updatedAt)}</div>
                       {partner.updatedBy?.email ? <div className="mt-1 text-xs">{partner.updatedBy.email}</div> : null}
                     </AdminTableCell>
-                    <AdminTableCell>
-                      <div className="flex flex-wrap gap-2">
-                        <Button className="min-h-9 px-3 py-1.5 text-xs" variant="secondary" href={`/admin/partners/${partner.id}`}>
-                          Изменить
-                        </Button>
-                        {partner.status !== ContentStatus.PUBLISHED ? (
-                          <form action={updatePartnerStatus}>
-                            <HiddenRedirect value={currentPath} />
-                            <input name="partnerId" type="hidden" value={partner.id} />
-                            <input name="status" type="hidden" value={ContentStatus.PUBLISHED} />
-                            <Button className="min-h-9 px-3 py-1.5 text-xs" type="submit">
-                              Опубликовать
-                            </Button>
-                          </form>
-                        ) : null}
-                        {partner.status !== ContentStatus.ARCHIVED ? (
-                          <form action={updatePartnerStatus}>
-                            <HiddenRedirect value={currentPath} />
-                            <input name="partnerId" type="hidden" value={partner.id} />
-                            <input name="status" type="hidden" value={ContentStatus.ARCHIVED} />
-                            <Button className="min-h-9 px-3 py-1.5 text-xs" type="submit" variant="secondary">
-                              В архив
-                            </Button>
-                          </form>
-                        ) : null}
-                        {partner.status !== ContentStatus.PUBLISHED ? (
-                          <form action={deletePartnerDraft}>
-                            <HiddenRedirect value={currentPath} />
-                            <input name="partnerId" type="hidden" value={partner.id} />
-                            <Button className="min-h-9 px-3 py-1.5 text-xs" type="submit" variant="ghost">
-                              Удалить
-                            </Button>
-                          </form>
-                        ) : null}
-                      </div>
-                    </AdminTableCell>
+                    <AdminTableActionsCell>
+                      <AdminContentRowActions
+                        currentPath={currentPath}
+                        deleteAction={deletePartnerDraft}
+                        editHref={`${ADMIN_PARTNERS_PATH}/${partner.id}`}
+                        idName="partnerId"
+                        idValue={partner.id}
+                        publicHref={`/partners/${partner.slug}`}
+                        status={partner.status}
+                        updateStatusAction={updatePartnerStatus}
+                      />
+                    </AdminTableActionsCell>
                   </AdminTableRow>
                 ))}
               </AdminTableBody>

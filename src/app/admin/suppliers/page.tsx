@@ -1,16 +1,20 @@
-import { ContentStatus } from '@prisma/client';
+import { CategoryType, ContentStatus, type Prisma } from '@prisma/client';
 import { deleteSupplierDraft, updateSupplierStatus } from '@/app/admin/suppliers/actions';
 import {
   AdminActionAlert,
-  AdminPagination,
-  HiddenRedirect
+  AdminContentRowActions,
+  AdminListFilters,
+  AdminPagination
 } from '@/components/admin/content-admin-controls';
 import { AdminPageIntro } from '@/components/admin/admin-page-intro';
 import { Button } from '@/components/ui/button';
 import {
   AdminTable,
+  AdminTableActionsCell,
+  AdminTableActionsHeaderCell,
   AdminTableBody,
   AdminTableCell,
+  AdminTableClamp,
   AdminTableFrame,
   AdminTableHead,
   AdminTableHeaderCell,
@@ -25,6 +29,10 @@ import {
   contentStatusLabels,
   getAdminCurrentPath,
   getAdminPage,
+  getAdminBooleanFilter,
+  getAdminSearchQuery,
+  getAdminStringFilter,
+  getAdminStatusFilter,
   getAdminTotalPages,
   type AdminContentSearchParams
 } from '@/lib/admin/content-utils';
@@ -51,10 +59,34 @@ export default async function AdminSuppliersPage({ searchParams }: AdminSupplier
   const params = (await searchParams) ?? {};
   const page = getAdminPage(params);
   const currentPath = getAdminCurrentPath(ADMIN_SUPPLIERS_PATH, params);
+  const q = getAdminSearchQuery(params);
+  const status = getAdminStatusFilter(params);
+  const categoryId = getAdminStringFilter(params, 'categoryId');
+  const cityId = getAdminStringFilter(params, 'cityId');
+  const isVerified = getAdminBooleanFilter(params, 'verified');
+  const searchWhere: Prisma.SupplierWhereInput = q
+    ? {
+        OR: [
+          { title: { contains: q, mode: 'insensitive' } },
+          { summary: { contains: q, mode: 'insensitive' } },
+          { slug: { contains: q, mode: 'insensitive' } },
+          { companyName: { contains: q, mode: 'insensitive' } },
+          { serviceArea: { contains: q, mode: 'insensitive' } }
+        ]
+      }
+    : {};
+  const where: Prisma.SupplierWhereInput = {
+    status,
+    categoryId,
+    cityId,
+    isVerified,
+    ...searchWhere
+  };
 
-  const [total, suppliers, supplierStatusCounts] = await Promise.all([
-    prisma.supplier.count(),
+  const [total, suppliers, supplierStatusCounts, categories, cities] = await Promise.all([
+    prisma.supplier.count({ where }),
     prisma.supplier.findMany({
+      where,
       orderBy: [{ createdAt: 'desc' }],
       skip: (page - 1) * ADMIN_CONTENT_PAGE_SIZE,
       take: ADMIN_CONTENT_PAGE_SIZE,
@@ -67,7 +99,18 @@ export default async function AdminSuppliersPage({ searchParams }: AdminSupplier
     }),
     prisma.supplier.groupBy({
       by: ['status'],
+      where: searchWhere,
       _count: { _all: true }
+    }),
+    prisma.category.findMany({
+      where: { type: CategoryType.SUPPLIER, isActive: true },
+      orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
+      select: { id: true, name: true }
+    }),
+    prisma.city.findMany({
+      where: { isActive: true },
+      orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
+      select: { id: true, name: true }
     })
   ]);
   const totalPages = getAdminTotalPages(total);
@@ -81,12 +124,30 @@ export default async function AdminSuppliersPage({ searchParams }: AdminSupplier
             Новый поставщик
           </Button>
         }
-        description="Карточки компаний, проверка контекста и ручная публикация каталога поставщиков."
+        description="Карточки компаний, проверка данных и ручная публикация каталога поставщиков."
         eyebrow="Админка / Поставщики"
         title="Поставщики"
       />
 
       <AdminActionAlert params={params} />
+      <AdminListFilters
+        basePath={ADMIN_SUPPLIERS_PATH}
+        filters={[
+          { name: 'categoryId', label: 'Категория', allLabel: 'Все категории', options: categories.map((category) => ({ value: category.id, label: category.name })) },
+          { name: 'cityId', label: 'Город', allLabel: 'Все города', options: cities.map((city) => ({ value: city.id, label: city.name })) },
+          {
+            name: 'verified',
+            label: 'Проверка',
+            allLabel: 'Любой статус',
+            options: [
+              { value: 'true', label: 'Проверен' },
+              { value: 'false', label: 'Не проверен' }
+            ]
+          }
+        ]}
+        params={params}
+        searchPlaceholder="Поиск по поставщику, компании или географии"
+      />
 
       <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard label="Всего" value={total} />
@@ -115,14 +176,14 @@ export default async function AdminSuppliersPage({ searchParams }: AdminSupplier
                   <AdminTableHeaderCell>Город</AdminTableHeaderCell>
                   <AdminTableHeaderCell>Статус</AdminTableHeaderCell>
                   <AdminTableHeaderCell>Обновлено</AdminTableHeaderCell>
-                  <AdminTableHeaderCell>Действия</AdminTableHeaderCell>
+                  <AdminTableActionsHeaderCell>Действия</AdminTableActionsHeaderCell>
                 </tr>
               </AdminTableHead>
               <AdminTableBody>
                 {suppliers.map((supplier) => (
                   <AdminTableRow key={supplier.id}>
                     <AdminTableCell className="max-w-[320px]">
-                      <div className="font-semibold">{supplier.title}</div>
+                      <AdminTableClamp className="font-semibold">{supplier.title}</AdminTableClamp>
                       <div className="mt-1 truncate text-xs text-[var(--muted)]">/{supplier.slug}</div>
                       <div className="mt-1 text-xs text-[var(--muted)]">{supplier.category?.name ?? 'Без категории'}</div>
                       {supplier.coverImage?.originalName ? (
@@ -142,45 +203,22 @@ export default async function AdminSuppliersPage({ searchParams }: AdminSupplier
                       <div>{dateFormatter.format(supplier.updatedAt)}</div>
                       {supplier.updatedBy?.email ? <div className="mt-1 text-xs">{supplier.updatedBy.email}</div> : null}
                     </AdminTableCell>
-                    <AdminTableCell>
-                      <div className="flex flex-wrap gap-2">
-                        <Button href={`${ADMIN_SUPPLIERS_PATH}/${supplier.id}`} className="min-h-9 px-3 py-1.5 text-xs" variant="secondary">
-                          Изменить
-                        </Button>
-                        {supplier.status !== ContentStatus.PUBLISHED ? (
-                          <form action={updateSupplierStatus}>
-                            <HiddenRedirect value={currentPath} />
-                            <input name="supplierId" type="hidden" value={supplier.id} />
-                            <input name="status" type="hidden" value={ContentStatus.PUBLISHED} />
-                            <Button className="min-h-9 px-3 py-1.5 text-xs" type="submit">
-                              Опубликовать
-                            </Button>
-                          </form>
-                        ) : null}
-                        {supplier.status !== ContentStatus.ARCHIVED ? (
-                          <form action={updateSupplierStatus}>
-                            <HiddenRedirect value={currentPath} />
-                            <input name="supplierId" type="hidden" value={supplier.id} />
-                            <input name="status" type="hidden" value={ContentStatus.ARCHIVED} />
-                            <Button className="min-h-9 px-3 py-1.5 text-xs" type="submit" variant="secondary">
-                              В архив
-                            </Button>
-                          </form>
-                        ) : null}
-                        {supplier.status !== ContentStatus.PUBLISHED ? (
-                          <form action={deleteSupplierDraft}>
-                            <HiddenRedirect value={currentPath} />
-                            <input name="supplierId" type="hidden" value={supplier.id} />
-                            <Button className="min-h-9 px-3 py-1.5 text-xs" type="submit" variant="ghost">
-                              Удалить
-                            </Button>
-                          </form>
-                        ) : null}
-                      </div>
-                    </AdminTableCell>
+                    <AdminTableActionsCell>
+                      <AdminContentRowActions
+                        currentPath={currentPath}
+                        deleteAction={deleteSupplierDraft}
+                        editHref={`${ADMIN_SUPPLIERS_PATH}/${supplier.id}`}
+                        idName="supplierId"
+                        idValue={supplier.id}
+                        publicHref={`/suppliers/${supplier.slug}`}
+                        status={supplier.status}
+                        updateStatusAction={updateSupplierStatus}
+                      />
+                    </AdminTableActionsCell>
                   </AdminTableRow>
                 ))}
-              </AdminTableBody>            </AdminTable>
+              </AdminTableBody>
+            </AdminTable>
           </AdminTableFrame>
         )}
 

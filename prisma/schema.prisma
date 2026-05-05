@@ -34,6 +34,8 @@ enum CategoryType {
   VACANCY  @map("vacancy")
   SUPPLIER @map("supplier")
   PARTNER  @map("partner")
+  SERVICE  @map("service")
+  GENERAL  @map("general")
 }
 
 enum StorageDriver {
@@ -105,6 +107,8 @@ model User {
   updatedSuppliers      Supplier[]       @relation("SupplierUpdatedBy")
   createdPartners       Partner[]        @relation("PartnerCreatedBy")
   updatedPartners       Partner[]        @relation("PartnerUpdatedBy")
+  createdGeneralSponsors GeneralSponsor[] @relation("GeneralSponsorCreatedBy")
+  updatedGeneralSponsors GeneralSponsor[] @relation("GeneralSponsorUpdatedBy")
   forwardedApplications Application[]    @relation("ApplicationForwardedBy")
   businessAccessInvites BusinessAccessInvite[]
 
@@ -188,6 +192,7 @@ model City {
   courses          Course[]
   vacancies        Vacancy[]
   suppliers        Supplier[]
+  generalSponsors  GeneralSponsor[]
   applications     Application[]
 
   @@index([isActive, sortOrder])
@@ -198,6 +203,7 @@ model Category {
   name      String
   slug      String
   type      CategoryType
+  description String?
   isActive  Boolean      @default(true)
   sortOrder Int          @default(0)
   createdAt DateTime     @default(now())
@@ -219,13 +225,16 @@ model Tag {
   name      String
   slug      String
   type      CategoryType
+  description String?
+  isActive  Boolean      @default(true)
+  sortOrder Int          @default(0)
   createdAt DateTime     @default(now())
   updatedAt DateTime     @updatedAt
 
   articleTags ArticleTag[]
 
   @@unique([slug, type])
-  @@index([type])
+  @@index([type, isActive, sortOrder])
 }
 
 model UploadedFile {
@@ -247,6 +256,8 @@ model UploadedFile {
   vacancyCoverImages  Vacancy[]     @relation("VacancyCoverImage")
   supplierCoverImages Supplier[]    @relation("SupplierCoverImage")
   partnerCoverImages  Partner[]     @relation("PartnerCoverImage")
+  generalSponsorLogoImages  GeneralSponsor[] @relation("GeneralSponsorLogoImage")
+  generalSponsorCoverImages GeneralSponsor[] @relation("GeneralSponsorCoverImage")
   resumeApplications  Application[] @relation("ApplicationResumeFile")
 
   @@index([fileKey])
@@ -262,6 +273,7 @@ model Article {
   body               String
   status             ContentStatus @default(DRAFT)
   coverImageId       String?
+  coverImageAlt      String?
   cityId             String?
   categoryId         String?
   sortOrder          Int           @default(0)
@@ -307,6 +319,7 @@ model Event {
   summary          String
   status           ContentStatus @default(DRAFT)
   coverImageId     String?
+  coverImageAlt    String?
   cityId           String?
   categoryId       String?
   sortOrder        Int           @default(0)
@@ -344,6 +357,7 @@ model Course {
   summary        String
   status         ContentStatus @default(DRAFT)
   coverImageId   String?
+  coverImageAlt  String?
   cityId         String?
   categoryId     String?
   sortOrder      Int           @default(0)
@@ -379,6 +393,7 @@ model Vacancy {
   summary         String
   status          ContentStatus @default(DRAFT)
   coverImageId    String?
+  coverImageAlt   String?
   cityId          String?
   categoryId      String?
   sortOrder       Int           @default(0)
@@ -416,6 +431,7 @@ model Supplier {
   summary      String
   status       ContentStatus @default(DRAFT)
   coverImageId String?
+  coverImageAlt String?
   cityId       String?
   categoryId   String?
   sortOrder    Int           @default(0)
@@ -452,6 +468,7 @@ model Partner {
   summary      String
   status       ContentStatus @default(DRAFT)
   coverImageId String?
+  coverImageAlt String?
   categoryId   String?
   sortOrder    Int           @default(0)
   publishedAt  DateTime?
@@ -476,6 +493,155 @@ model Partner {
   @@index([partnerType, status])
   @@index([isFeatured, status])
   @@index([sortOrder])
+}
+
+model GeneralSponsor {
+  id                String        @id @default(cuid())
+  name              String
+  slug              String        @unique
+  status            ContentStatus @default(DRAFT)
+  logoImageId       String?
+  logoImageAlt      String?
+  logoPath          String?
+  coverImageId      String?
+  coverImageAlt     String?
+  coverImagePath    String?
+  shortDescription  String
+  fullDescription   String
+  seasonLabel       String?
+  priority          Int           @default(0)
+  isFeatured        Boolean       @default(false)
+  websiteUrl        String?
+  instagramUrl      String?
+  whatsappUrl       String?
+  telegramUrl       String?
+  contactName       String?
+  contactPhone      String?
+  contactEmail      String?
+  representedBrands String?
+  benefitsForVenues String?
+  cityId            String?
+  publishedAt       DateTime?
+  archivedAt        DateTime?
+  createdById       String?
+  updatedById       String?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  logoImage  UploadedFile? @relation("GeneralSponsorLogoImage", fields: [logoImageId], references: [id], onDelete: SetNull)
+  coverImage UploadedFile? @relation("GeneralSponsorCoverImage", fields: [coverImageId], references: [id], onDelete: SetNull)
+  city       City?         @relation(fields: [cityId], references: [id], onDelete: SetNull)
+  createdBy  User?         @relation("GeneralSponsorCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  updatedBy  User?         @relation("GeneralSponsorUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
+
+  @@index([status, publishedAt])
+  @@index([cityId, status])
+  @@index([isFeatured, status])
+  @@index([priority])
+}
+
+model HomepageHero {
+  id          String        @id @default(cuid())
+  status      ContentStatus @default(DRAFT)
+  eyebrow     String
+  title       String
+  description String
+  signalsText String?
+  priority    Int           @default(0)
+  publishedAt DateTime?
+  archivedAt  DateTime?
+  createdById String?
+  updatedById String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@index([status, priority])
+}
+
+model HomepageAudienceCard {
+  id          String        @id @default(cuid())
+  status      ContentStatus @default(DRAFT)
+  title       String
+  description String
+  href        String
+  actionLabel String
+  proof       String?
+  imagePath   String?
+  iconKey     String?
+  priority    Int           @default(0)
+  publishedAt DateTime?
+  archivedAt  DateTime?
+  createdById String?
+  updatedById String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@index([status, priority])
+}
+
+model HomepageSocialBlock {
+  id          String        @id @default(cuid())
+  status      ContentStatus @default(DRAFT)
+  name        String
+  title       String
+  description String
+  helperText  String?
+  actionLabel String
+  href        String
+  logoPath    String?
+  variant     String?
+  priority    Int           @default(0)
+  publishedAt DateTime?
+  archivedAt  DateTime?
+  createdById String?
+  updatedById String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@index([status, priority])
+}
+
+model HomepageCtaBlock {
+  id             String        @id @default(cuid())
+  status         ContentStatus @default(DRAFT)
+  title          String
+  description    String
+  helperText     String?
+  primaryLabel   String
+  primaryHref    String
+  secondaryLabel String?
+  secondaryHref  String?
+  priority       Int           @default(0)
+  publishedAt    DateTime?
+  archivedAt     DateTime?
+  createdById    String?
+  updatedById    String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  @@index([status, priority])
+}
+
+model HomepageCalculatorTeaser {
+  id          String        @id @default(cuid())
+  status      ContentStatus @default(DRAFT)
+  eyebrow     String
+  title       String
+  cardEyebrow String
+  cardTitle   String
+  description String
+  stepsText   String?
+  actionLabel String
+  actionHref  String
+  priority    Int           @default(0)
+  publishedAt DateTime?
+  archivedAt  DateTime?
+  createdById String?
+  updatedById String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@index([status, priority])
 }
 
 model Application {

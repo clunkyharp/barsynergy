@@ -31,6 +31,7 @@ const articleFormSchema = z.object({
   summary: z.string().trim().min(10).max(500),
   body: z.string().trim().min(20).max(ARTICLE_BODY_MAX_LENGTH),
   status: z.enum(contentStatusValues).default(ContentStatus.DRAFT),
+  coverImageAlt: z.string().trim().max(180).optional(),
   categoryId: z.string().trim().optional(),
   cityId: z.string().trim().optional(),
   authorName: z.string().trim().max(120).optional(),
@@ -47,6 +48,37 @@ const deleteFormSchema = z.object({
   articleId: z.string().trim().min(1)
 });
 
+function getArticleTagIds(formData: FormData) {
+  return Array.from(
+    new Set(
+      formData
+        .getAll('tagIds')
+        .filter((value): value is string => typeof value === 'string')
+        .map((value) => value.trim())
+        .filter(Boolean)
+    )
+  );
+}
+
+async function assertActiveArticleTags(tagIds: string[]) {
+  if (tagIds.length === 0) {
+    return;
+  }
+
+  const activeTags = await prisma.tag.findMany({
+    where: {
+      id: { in: tagIds },
+      type: CategoryType.ARTICLE,
+      isActive: true
+    },
+    select: { id: true }
+  });
+
+  if (activeTags.length !== tagIds.length) {
+    throw new Error('tag is invalid');
+  }
+}
+
 export async function createArticle(formData: FormData) {
   const redirectTo = safeAdminRedirectPath(formData, ADMIN_ARTICLES_PATH);
   let result: { type: 'success' | 'error'; message: string };
@@ -60,6 +92,7 @@ export async function createArticle(formData: FormData) {
       summary: getString(formData, 'summary'),
       body: getString(formData, 'body'),
       status: getString(formData, 'status') || ContentStatus.DRAFT,
+      coverImageAlt: optionalString(getString(formData, 'coverImageAlt')),
       categoryId: optionalString(getString(formData, 'categoryId')),
       cityId: optionalString(getString(formData, 'cityId')),
       authorName: optionalString(getString(formData, 'authorName')),
@@ -67,17 +100,21 @@ export async function createArticle(formData: FormData) {
       readingTimeMinutes: optionalString(getString(formData, 'readingTimeMinutes'))
     });
     const slug = slugify(parsed.slug ?? parsed.title);
+    const tagIds = getArticleTagIds(formData);
 
     if (!slug) {
       throw new Error('Article slug is required.');
     }
 
-    await assertActiveContentRelations({
-      entityName: 'Article',
-      categoryId: parsed.categoryId,
-      categoryType: CategoryType.ARTICLE,
-      cityId: parsed.cityId
-    });
+    await Promise.all([
+      assertActiveContentRelations({
+        entityName: 'Article',
+        categoryId: parsed.categoryId,
+        categoryType: CategoryType.ARTICLE,
+        cityId: parsed.cityId
+      }),
+      assertActiveArticleTags(tagIds)
+    ]);
 
     const coverImageId = await resolveCoverImageId({
       formData,
@@ -97,23 +134,36 @@ export async function createArticle(formData: FormData) {
           })
         ),
       persist: (uniqueSlug) =>
-        prisma.article.create({
-          data: {
-            title: parsed.title,
-            slug: uniqueSlug,
-            summary: parsed.summary,
-            body: parsed.body,
-            status: parsed.status,
-            coverImageId,
-            categoryId: nullableString(parsed.categoryId),
-            cityId: nullableString(parsed.cityId),
-            authorName: nullableString(parsed.authorName),
-            sourceLabel: nullableString(parsed.sourceLabel),
-            readingTimeMinutes: parsed.readingTimeMinutes,
-            createdById: user.id,
-            updatedById: user.id,
-            ...initialPublicationDates(parsed.status)
+        prisma.$transaction(async (tx) => {
+          const article = await tx.article.create({
+            data: {
+              title: parsed.title,
+              slug: uniqueSlug,
+              summary: parsed.summary,
+              body: parsed.body,
+              status: parsed.status,
+              coverImageId,
+              coverImageAlt: nullableString(parsed.coverImageAlt),
+              categoryId: nullableString(parsed.categoryId),
+              cityId: nullableString(parsed.cityId),
+              authorName: nullableString(parsed.authorName),
+              sourceLabel: nullableString(parsed.sourceLabel),
+              readingTimeMinutes: parsed.readingTimeMinutes,
+              createdById: user.id,
+              updatedById: user.id,
+              ...initialPublicationDates(parsed.status)
+            },
+            select: { id: true }
+          });
+
+          if (tagIds.length > 0) {
+            await tx.articleTag.createMany({
+              data: tagIds.map((tagId) => ({ articleId: article.id, tagId })),
+              skipDuplicates: true
+            });
           }
+
+          return article;
         })
     });
 
@@ -147,14 +197,16 @@ export async function updateArticle(formData: FormData) {
         slug: optionalString(getString(formData, 'slug')),
         summary: getString(formData, 'summary'),
         body: getString(formData, 'body'),
-        status: getString(formData, 'status') || ContentStatus.DRAFT,
+       status: getString(formData, 'status') || ContentStatus.DRAFT,
+        coverImageAlt: optionalString(getString(formData, 'coverImageAlt')),
         categoryId: optionalString(getString(formData, 'categoryId')),
         cityId: optionalString(getString(formData, 'cityId')),
         authorName: optionalString(getString(formData, 'authorName')),
         sourceLabel: optionalString(getString(formData, 'sourceLabel')),
         readingTimeMinutes: optionalString(getString(formData, 'readingTimeMinutes'))
-      });
+    });
     const slug = slugify(parsed.slug ?? parsed.title);
+    const tagIds = getArticleTagIds(formData);
 
     if (!slug) {
       throw new Error('Article slug is required.');
@@ -166,12 +218,15 @@ export async function updateArticle(formData: FormData) {
     });
     previousCoverImageId = existingArticle.coverImageId;
 
-    await assertActiveContentRelations({
-      entityName: 'Article',
-      categoryId: parsed.categoryId,
-      categoryType: CategoryType.ARTICLE,
-      cityId: parsed.cityId
-    });
+    await Promise.all([
+      assertActiveContentRelations({
+        entityName: 'Article',
+        categoryId: parsed.categoryId,
+        categoryType: CategoryType.ARTICLE,
+        cityId: parsed.cityId
+      }),
+      assertActiveArticleTags(tagIds)
+    ]);
 
     const coverImageId = await resolveCoverImageId({
       formData,
@@ -192,23 +247,38 @@ export async function updateArticle(formData: FormData) {
           })
         ),
       persist: (uniqueSlug) =>
-        prisma.article.update({
-          where: { id: parsed.articleId },
-          data: {
-            title: parsed.title,
-            slug: uniqueSlug,
-            summary: parsed.summary,
-            body: parsed.body,
-            status: parsed.status,
-            coverImageId,
-            categoryId: nullableString(parsed.categoryId),
-            cityId: nullableString(parsed.cityId),
-            authorName: nullableString(parsed.authorName),
-            sourceLabel: nullableString(parsed.sourceLabel),
-            readingTimeMinutes: parsed.readingTimeMinutes,
-            updatedById: user.id,
-            ...statusTransitionDates(parsed.status, existingArticle.publishedAt)
+        prisma.$transaction(async (tx) => {
+          const article = await tx.article.update({
+            where: { id: parsed.articleId },
+            data: {
+              title: parsed.title,
+              slug: uniqueSlug,
+              summary: parsed.summary,
+              body: parsed.body,
+              status: parsed.status,
+              coverImageId,
+              coverImageAlt: nullableString(parsed.coverImageAlt),
+              categoryId: nullableString(parsed.categoryId),
+              cityId: nullableString(parsed.cityId),
+              authorName: nullableString(parsed.authorName),
+              sourceLabel: nullableString(parsed.sourceLabel),
+              readingTimeMinutes: parsed.readingTimeMinutes,
+              updatedById: user.id,
+              ...statusTransitionDates(parsed.status, existingArticle.publishedAt)
+            },
+            select: { id: true }
+          });
+
+          await tx.articleTag.deleteMany({ where: { articleId: article.id } });
+
+          if (tagIds.length > 0) {
+            await tx.articleTag.createMany({
+              data: tagIds.map((tagId) => ({ articleId: article.id, tagId })),
+              skipDuplicates: true
+            });
           }
+
+          return article;
         })
     });
 

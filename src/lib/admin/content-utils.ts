@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 import { CategoryType, ContentStatus, FileVisibility, Prisma, StorageDriver } from '@prisma/client';
-import { ZodError } from 'zod';
+import { hasErrorMessage, resolveServerActionError } from '../actions/server-action-errors';
 import { prisma } from '@/lib/db/prisma';
 import { isAllowedPublicImageUpload } from '@/lib/storage/file-signatures';
 import { MAX_UPLOAD_FILE_SIZE_BYTES } from '@/lib/storage/storage.types';
@@ -30,6 +30,59 @@ export const contentStatusBadgeVariants: Record<ContentStatus, 'neutral' | 'succ
   [ContentStatus.ARCHIVED]: 'danger'
 };
 
+export const eventFormatOptions = [
+  { value: 'offline', label: 'Оффлайн' },
+  { value: 'online', label: 'Онлайн' },
+  { value: 'hybrid', label: 'Гибрид' }
+] as const;
+
+export const eventRegistrationModeOptions = [
+  { value: 'not_required', label: 'Не требуется' },
+  { value: 'open', label: 'Открыта' },
+  { value: 'soon', label: 'Скоро' },
+  { value: 'closed', label: 'Закрыта' },
+  { value: 'external', label: 'Внешняя ссылка' }
+] as const;
+
+export const courseFormatOptions = [
+  { value: 'intensive', label: 'Интенсив' },
+  { value: 'online_lecture', label: 'Онлайн-лекция' },
+  { value: 'corporate', label: 'Корпоративное обучение' },
+  { value: 'program', label: 'Программа' }
+] as const;
+
+export const courseLevelOptions = [
+  { value: 'beginner', label: 'Новичок' },
+  { value: 'middle', label: 'Средний' },
+  { value: 'pro', label: 'Профи' },
+  { value: 'manager', label: 'Управляющий' }
+] as const;
+
+export const vacancyEmploymentTypeOptions = [
+  { value: 'full_time', label: 'Полная занятость' },
+  { value: 'part_time', label: 'Частичная занятость' },
+  { value: 'shift', label: 'Сменный график' },
+  { value: 'project', label: 'Проектная работа' },
+  { value: 'internship', label: 'Стажировка' }
+] as const;
+
+export const vacancyExperienceOptions = [
+  { value: 'no_experience', label: 'Без опыта' },
+  { value: 'one_year', label: 'От 1 года' },
+  { value: 'three_years', label: 'От 3 лет' },
+  { value: 'manager', label: 'Управленческий опыт' }
+] as const;
+
+export const partnerTypeOptions = [
+  { value: 'brand', label: 'Бренд' },
+  { value: 'venue', label: 'Площадка' },
+  { value: 'education', label: 'Образовательный партнёр' },
+  { value: 'media', label: 'Информационный партнёр' },
+  { value: 'supplier', label: 'Поставщик' },
+  { value: 'sponsor', label: 'Спонсор' },
+  { value: 'expert', label: 'Эксперт' }
+] as const;
+
 export function firstParam(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] : value;
 }
@@ -37,6 +90,48 @@ export function firstParam(value: string | string[] | undefined) {
 export function getAdminPage(params: AdminContentSearchParams) {
   const value = Number.parseInt(firstParam(params.page) ?? '1', 10);
   return Number.isFinite(value) && value > 0 ? value : 1;
+}
+
+export function getAdminSearchQuery(params: AdminContentSearchParams) {
+  const value = firstParam(params.q)?.trim();
+  return value && value.length > 0 ? value : undefined;
+}
+
+export function getAdminStatusFilter(params: AdminContentSearchParams) {
+  const value = firstParam(params.status);
+  return contentStatusValues.includes(value as ContentStatus) ? (value as ContentStatus) : undefined;
+}
+
+export function getAdminStringFilter(params: AdminContentSearchParams, key: string) {
+  const value = firstParam(params[key])?.trim();
+  return value && value.length > 0 ? value : undefined;
+}
+
+export function getAdminBooleanFilter(params: AdminContentSearchParams, key: string) {
+  const value = firstParam(params[key])?.trim();
+
+  if (value === 'true') {
+    return true;
+  }
+
+  if (value === 'false') {
+    return false;
+  }
+
+  return undefined;
+}
+
+export function withCurrentValueOption(
+  options: Array<{ value: string; label: string }>,
+  currentValue?: string | null
+) {
+  const value = currentValue?.trim();
+
+  if (!value || options.some((option) => option.value === value)) {
+    return options;
+  }
+
+  return [{ value, label: value }, ...options];
 }
 
 export function getAdminTotalPages(total: number) {
@@ -224,45 +319,62 @@ export function redirectWithAdminActionResult(
 }
 
 export function formatAdminActionError(error: unknown) {
-  if (error instanceof ZodError) {
-    return 'Проверьте обязательные поля и формат значений.';
-  }
-
-  if (error instanceof Error) {
-    if (error.message.includes('External URL must use http or https')) {
-      return 'Укажите корректный внешний адрес с http:// или https://.';
-    }
-
-    if (error.message.includes('draft is invalid')) {
-      return 'Черновик не найден или уже недоступен для удаления.';
-    }
-
-    if (error.message.includes('slug is required')) {
-      return 'Укажите slug или заголовок, из которого можно создать slug.';
-    }
-
-    if (error.message.includes('category is invalid')) {
-      return 'Выбранная категория недоступна для этого раздела.';
-    }
-
-    if (error.message.includes('city is invalid')) {
-      return 'Выбранный город недоступен.';
-    }
-
-    if (error.message.includes('end date cannot be before start date')) {
-      return 'Дата окончания не может быть раньше даты начала.';
-    }
-
-    if (error.message.includes('Unsupported image type')) {
-      return 'Загрузите изображение JPEG, PNG, WebP или AVIF.';
-    }
-
-    if (error.message.includes('File is too large')) {
-      return 'Файл слишком большой для текущего лимита загрузки.';
-    }
-  }
-
-  return 'Не удалось сохранить изменения. Проверьте данные и повторите попытку.';
+  return resolveServerActionError({
+    action: 'admin:content',
+    error,
+    zodMessage: 'Проверьте обязательные поля и формат значений.',
+    known: [
+      {
+        matches: (candidate) => hasErrorMessage(candidate, 'External URL must use http or https'),
+        message: 'Укажите корректный внешний адрес с http:// или https://.'
+      },
+      {
+        matches: (candidate) => hasErrorMessage(candidate, 'public asset path is invalid'),
+        message: 'Укажите путь к публичному файлу от корня сайта, например /brand/logo.png.'
+      },
+      {
+        matches: (candidate) => hasErrorMessage(candidate, 'homepage link is invalid'),
+        message: 'Укажите внутренний путь от / или внешний адрес с http:// или https://.'
+      },
+      {
+        matches: (candidate) => hasErrorMessage(candidate, 'published content cannot be deleted'),
+        message: 'Опубликованную запись нельзя удалить. Переведите ее в архив.'
+      },
+      {
+        matches: (candidate) => hasErrorMessage(candidate, 'draft is invalid'),
+        message: 'Черновик не найден или уже недоступен для удаления.'
+      },
+      {
+        matches: (candidate) => hasErrorMessage(candidate, 'slug is required'),
+        message: 'Укажите slug или заголовок, из которого можно создать slug.'
+      },
+      {
+        matches: (candidate) => hasErrorMessage(candidate, 'category is invalid'),
+        message: 'Выбранная категория недоступна для этого раздела.'
+      },
+      {
+        matches: (candidate) => hasErrorMessage(candidate, 'city is invalid'),
+        message: 'Выбранный город недоступен.'
+      },
+      {
+        matches: (candidate) => hasErrorMessage(candidate, 'tag is invalid'),
+        message: 'Выбранный тег недоступен.'
+      },
+      {
+        matches: (candidate) => hasErrorMessage(candidate, 'end date cannot be before start date'),
+        message: 'Дата окончания не может быть раньше даты начала.'
+      },
+      {
+        matches: (candidate) => hasErrorMessage(candidate, 'Unsupported image type'),
+        message: 'Загрузите изображение JPEG, PNG, WebP или AVIF.'
+      },
+      {
+        matches: (candidate) => hasErrorMessage(candidate, 'File is too large'),
+        message: 'Файл слишком большой для текущего лимита загрузки.'
+      }
+    ],
+    fallbackMessage: 'Не удалось сохранить изменения. Проверьте данные и повторите попытку.'
+  });
 }
 
 export async function uploadPublicContentImageFromFormData(formData: FormData, key: string, userId: string) {
@@ -332,16 +444,18 @@ export async function resolveCoverImageId(input: {
   formData: FormData;
   userId: string;
   currentCoverImageId?: string | null;
+  formDataKey?: string;
+  removeFormDataKey?: string;
   onUploadedImageId?: (fileId: string) => void;
 }) {
-  const uploadedImage = await uploadPublicContentImageFromFormData(input.formData, 'coverImage', input.userId);
+  const uploadedImage = await uploadPublicContentImageFromFormData(input.formData, input.formDataKey ?? 'coverImage', input.userId);
 
   if (uploadedImage) {
     input.onUploadedImageId?.(uploadedImage.file.id);
     return uploadedImage.file.id;
   }
 
-  if (getString(input.formData, 'removeCoverImage') === 'true') {
+  if (getString(input.formData, input.removeFormDataKey ?? 'removeCoverImage') === 'true') {
     return null;
   }
 
@@ -356,6 +470,8 @@ async function getUploadedFileReferenceCount(fileId: string) {
     vacancyCount,
     supplierCount,
     partnerCount,
+    generalSponsorLogoCount,
+    generalSponsorCoverCount,
     resumeApplicationCount
   ] = await Promise.all([
     prisma.article.count({ where: { coverImageId: fileId } }),
@@ -364,10 +480,22 @@ async function getUploadedFileReferenceCount(fileId: string) {
     prisma.vacancy.count({ where: { coverImageId: fileId } }),
     prisma.supplier.count({ where: { coverImageId: fileId } }),
     prisma.partner.count({ where: { coverImageId: fileId } }),
+    prisma.generalSponsor.count({ where: { logoImageId: fileId } }),
+    prisma.generalSponsor.count({ where: { coverImageId: fileId } }),
     prisma.application.count({ where: { resumeFileId: fileId } })
   ]);
 
-  return articleCount + eventCount + courseCount + vacancyCount + supplierCount + partnerCount + resumeApplicationCount;
+  return (
+    articleCount +
+    eventCount +
+    courseCount +
+    vacancyCount +
+    supplierCount +
+    partnerCount +
+    generalSponsorLogoCount +
+    generalSponsorCoverCount +
+    resumeApplicationCount
+  );
 }
 
 export async function deleteUploadedFileIfUnused(fileId: string | null | undefined) {

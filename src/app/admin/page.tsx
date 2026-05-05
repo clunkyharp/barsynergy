@@ -12,12 +12,14 @@ import { displayFont } from '@/lib/fonts';
 export const dynamic = 'force-dynamic';
 
 const quickLinks = [
-  { label: 'Заявки', href: '/admin/applications' },
+  { label: 'Новые заявки', href: `/admin/applications?status=${ApplicationStatus.NEW}` },
+  { label: 'На проверке', href: `/admin/applications?status=${ApplicationStatus.IN_REVIEW}` },
+  { label: 'Ожидают оплаты', href: `/admin/applications?status=${ApplicationStatus.PAYMENT_PENDING}` },
   { label: 'Бизнес-доступы', href: '/admin/users' },
-  { label: 'Статьи', href: '/admin/articles' },
-  { label: 'События', href: '/admin/events' },
-  { label: 'Вакансии', href: '/admin/vacancies' },
-  { label: 'Поставщики', href: '/admin/suppliers' }
+  { label: 'Черновики статей', href: `/admin/articles?status=${ContentStatus.DRAFT}` },
+  { label: 'Черновики событий', href: `/admin/events?status=${ContentStatus.DRAFT}` },
+  { label: 'Поставщики без города', href: `/admin/suppliers?status=${ContentStatus.PUBLISHED}` },
+  { label: 'Генспонсоры', href: '/admin/general-sponsors' }
 ];
 
 const dateFormatter = new Intl.DateTimeFormat('ru-RU', {
@@ -27,19 +29,85 @@ const dateFormatter = new Intl.DateTimeFormat('ru-RU', {
 
 export default async function AdminPage() {
   const currentUser = await requireAdminSectionAccess('dashboard');
-  const [newApplications, pendingBusinessAccounts, draftArticles, draftEvents, draftVacancies, draftSuppliers, latestApplications] = await Promise.all([
+  const [
+    newApplications,
+    inReviewApplications,
+    paymentPendingApplications,
+    pendingBusinessAccounts,
+    draftArticles,
+    draftEvents,
+    draftVacancies,
+    draftSuppliers,
+    draftGeneralSponsors,
+    publishedArticles,
+    archivedArticles,
+    publishedCourses,
+    publishedPartners,
+    publishedSuppliersWithoutCity,
+    activeCategories,
+    activeCities,
+    activeTags,
+    latestApplications
+  ] = await Promise.all([
     prisma.application.count({ where: { status: ApplicationStatus.NEW } }),
+    prisma.application.count({ where: { status: ApplicationStatus.IN_REVIEW } }),
+    prisma.application.count({ where: { status: ApplicationStatus.PAYMENT_PENDING } }),
     prisma.businessAccount.count({ where: { status: BusinessAccountStatus.PENDING } }),
     prisma.article.count({ where: { status: ContentStatus.DRAFT } }),
     prisma.event.count({ where: { status: ContentStatus.DRAFT } }),
     prisma.vacancy.count({ where: { status: ContentStatus.DRAFT } }),
     prisma.supplier.count({ where: { status: ContentStatus.DRAFT } }),
+    prisma.generalSponsor.count({ where: { status: ContentStatus.DRAFT } }),
+    prisma.article.count({ where: { status: ContentStatus.PUBLISHED } }),
+    prisma.article.count({ where: { status: ContentStatus.ARCHIVED } }),
+    prisma.course.count({ where: { status: ContentStatus.PUBLISHED } }),
+    prisma.partner.count({ where: { status: ContentStatus.PUBLISHED } }),
+    prisma.supplier.count({ where: { status: ContentStatus.PUBLISHED, cityId: null } }),
+    prisma.category.count({ where: { isActive: true } }),
+    prisma.city.count({ where: { isActive: true } }),
+    prisma.tag.count({ where: { isActive: true } }),
     prisma.application.findMany({
+      where: {
+        status: {
+          in: [
+            ApplicationStatus.NEW,
+            ApplicationStatus.IN_REVIEW,
+            ApplicationStatus.PAYMENT_PENDING,
+            ApplicationStatus.APPROVED
+          ]
+        }
+      },
       orderBy: [{ createdAt: 'desc' }],
-      take: 4,
+      take: 8,
       select: { id: true, type: true, status: true, subject: true, createdAt: true }
     })
   ]);
+  const statusPriority = new Map<ApplicationStatus, number>([
+    [ApplicationStatus.NEW, 1],
+    [ApplicationStatus.IN_REVIEW, 2],
+    [ApplicationStatus.PAYMENT_PENDING, 3],
+    [ApplicationStatus.APPROVED, 4]
+  ]);
+  const prioritizedApplications = latestApplications
+    .sort((a, b) => (statusPriority.get(a.status) ?? 10) - (statusPriority.get(b.status) ?? 10) || b.createdAt.getTime() - a.createdAt.getTime())
+    .slice(0, 5);
+  const draftContentTotal = draftArticles + draftEvents + draftVacancies + draftSuppliers + draftGeneralSponsors;
+  const actionQueue = [
+    { count: newApplications, label: 'новые заявки', href: `/admin/applications?status=${ApplicationStatus.NEW}` },
+    { count: inReviewApplications, label: 'заявки на проверке', href: `/admin/applications?status=${ApplicationStatus.IN_REVIEW}` },
+    { count: paymentPendingApplications, label: 'ожидают оплаты', href: `/admin/applications?status=${ApplicationStatus.PAYMENT_PENDING}` },
+    { count: pendingBusinessAccounts, label: 'бизнес-доступы ждут активации', href: '/admin/users' },
+    { count: publishedSuppliersWithoutCity, label: 'опубликованные поставщики без города', href: `/admin/suppliers?status=${ContentStatus.PUBLISHED}` },
+    { count: draftContentTotal, label: 'черновики контента', href: `/admin/articles?status=${ContentStatus.DRAFT}` }
+  ].filter((item) => item.count > 0);
+  const healthIssues = [
+    publishedCourses === 0 ? { label: 'Нет опубликованных курсов', href: '/admin/courses' } : null,
+    publishedPartners === 0 ? { label: 'Нет опубликованных партнёров', href: '/admin/partners' } : null,
+    publishedArticles === 0 && archivedArticles > 0 ? { label: 'Статьи есть только в архиве', href: '/admin/articles' } : null,
+    activeCategories === 0 ? { label: 'Нет активных категорий', href: '/admin/categories' } : null,
+    activeCities === 0 ? { label: 'Нет активных городов', href: '/admin/cities' } : null,
+    activeTags === 0 ? { label: 'Нет активных тегов', href: '/admin/tags' } : null
+  ].filter(Boolean) as Array<{ label: string; href: string }>;
 
   return (
     <div className="space-y-6">
@@ -75,6 +143,35 @@ export default async function AdminPage() {
           </div>
         </Card>
 
+        <Card className="p-5 xl:col-span-12">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Требует действия</p>
+          <div className="mt-4 grid gap-3 md:grid-cols-4">
+            <StatCard label="Новые" value={newApplications} />
+            <StatCard label="На проверке" value={inReviewApplications} />
+            <StatCard label="Ожидают оплаты" value={paymentPendingApplications} />
+            <StatCard label="Ожидают доступа" value={pendingBusinessAccounts} />
+          </div>
+          <div className="mt-5 grid gap-2">
+            {actionQueue.length > 0 ? (
+              actionQueue.map((item) => (
+                <Button
+                  className="justify-between rounded-[var(--radius-md)] px-4 py-3 text-left text-sm normal-case tracking-normal"
+                  href={item.href}
+                  key={item.label}
+                  variant="secondary"
+                >
+                  <span>{item.label}</span>
+                  <span>{item.count}</span>
+                </Button>
+              ))
+            ) : (
+              <Panel className="text-sm text-[var(--muted)]" padding="sm">
+                Очередь действий пуста.
+              </Panel>
+            )}
+          </div>
+        </Card>
+
         <Card className="p-5 xl:col-span-4">
           <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Черновики контента</p>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
@@ -82,6 +179,29 @@ export default async function AdminPage() {
             <StatCard label="События" value={draftEvents} />
             <StatCard label="Вакансии" value={draftVacancies} />
             <StatCard label="Поставщики" value={draftSuppliers} />
+            <StatCard label="Генспонсоры" value={draftGeneralSponsors} />
+          </div>
+        </Card>
+
+        <Card className="p-5 xl:col-span-4">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Проверки CMS</p>
+          <div className="mt-4 grid gap-2">
+            {healthIssues.length > 0 ? (
+              healthIssues.map((issue) => (
+                <Button
+                  className="justify-between rounded-[var(--radius-md)] px-4 py-3 text-left text-sm normal-case tracking-normal"
+                  href={issue.href}
+                  key={issue.label}
+                  variant="secondary"
+                >
+                  {issue.label}
+                </Button>
+              ))
+            ) : (
+              <Panel className="text-sm text-[var(--muted)]" padding="sm">
+                Критичных пустых блоков не найдено.
+              </Panel>
+            )}
           </div>
         </Card>
 
@@ -96,8 +216,8 @@ export default async function AdminPage() {
             </Button>
           </div>
           <div className="mt-4 grid gap-3">
-            {latestApplications.length > 0 ? (
-              latestApplications.map((application) => (
+            {prioritizedApplications.length > 0 ? (
+              prioritizedApplications.map((application) => (
                 <Panel key={application.id} padding="sm">
                   <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
                     <div>

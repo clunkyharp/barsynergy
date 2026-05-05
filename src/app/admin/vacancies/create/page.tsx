@@ -7,7 +7,7 @@ import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { contentStatusLabels } from '@/lib/admin/content-utils';
+import { contentStatusLabels, vacancyEmploymentTypeOptions, vacancyExperienceOptions } from '@/lib/admin/content-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
 import { prisma } from '@/lib/db/prisma';
 import { vacancyPositionValues } from '@/lib/vacancies/positions';
@@ -106,13 +106,27 @@ export default async function AdminVacanciesCreatePage() {
                 </Select>
               </FormField>
               <FormField htmlFor="vacancy-employmentType" label="Тип занятости">
-                <Input id="vacancy-employmentType" name="employmentType" maxLength={100} />
+                <Select id="vacancy-employmentType" name="employmentType" defaultValue="">
+                  <option value="">Не указан</option>
+                  {vacancyEmploymentTypeOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </Select>
               </FormField>
               <FormField htmlFor="vacancy-salaryLabel" label="Оплата">
                 <Input id="vacancy-salaryLabel" name="salaryLabel" maxLength={120} />
               </FormField>
               <FormField htmlFor="vacancy-experienceLabel" label="Опыт">
-                <Input id="vacancy-experienceLabel" name="experienceLabel" maxLength={120} />
+                <Select id="vacancy-experienceLabel" name="experienceLabel" defaultValue="">
+                  <option value="">Не указан</option>
+                  {vacancyExperienceOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </Select>
               </FormField>
               <FormField htmlFor="vacancy-contactMode" label="Контакт">
                 <Input id="vacancy-contactMode" name="contactMode" maxLength={120} />

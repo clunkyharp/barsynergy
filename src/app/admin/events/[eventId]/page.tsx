@@ -8,7 +8,12 @@ import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { contentStatusLabels } from '@/lib/admin/content-utils';
+import {
+  contentStatusLabels,
+  eventFormatOptions,
+  eventRegistrationModeOptions,
+  withCurrentValueOption
+} from '@/lib/admin/content-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
 import { prisma } from '@/lib/db/prisma';
 
@@ -122,13 +127,27 @@ export default async function AdminEventEditPage({ params }: AdminEventEditPageP
                 <Input id="event-address" name="address" maxLength={240} defaultValue={event.address ?? ''} />
               </FormField>
               <FormField htmlFor="event-format" label="Формат">
-                <Input id="event-format" name="format" maxLength={80} defaultValue={event.format ?? ''} />
+                <Select id="event-format" name="format" defaultValue={event.format ?? ''}>
+                  <option value="">Не указан</option>
+                  {withCurrentValueOption([...eventFormatOptions], event.format).map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </Select>
               </FormField>
               <FormField htmlFor="event-capacity" label="Лимит мест">
                 <Input id="event-capacity" name="capacity" min={1} max={100000} type="number" defaultValue={event.capacity ?? ''} />
               </FormField>
               <FormField htmlFor="event-registrationMode" label="Регистрация">
-                <Input id="event-registrationMode" name="registrationMode" maxLength={120} defaultValue={event.registrationMode ?? ''} />
+                <Select id="event-registrationMode" name="registrationMode" defaultValue={event.registrationMode ?? ''}>
+                  <option value="">Не указана</option>
+                  {withCurrentValueOption([...eventRegistrationModeOptions], event.registrationMode).map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </Select>
               </FormField>
             </div>
           </section>
@@ -136,7 +155,7 @@ export default async function AdminEventEditPage({ params }: AdminEventEditPageP
           <section>
             <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-[var(--muted)]">Время проведения</h3>
             <div className="grid gap-5 lg:grid-cols-2">
-              <FormField htmlFor="event-startsAt" label="Начало">
+              <FormField htmlFor="event-startsAt" label="Начало" hint="Дата отображается в русском формате: дд.мм.гггг, чч:мм.">
                 <Input
                   id="event-startsAt"
                   name="startsAt"
@@ -145,7 +164,7 @@ export default async function AdminEventEditPage({ params }: AdminEventEditPageP
                   defaultValue={dateTimeLocalValue(event.startsAt)}
                 />
               </FormField>
-              <FormField htmlFor="event-endsAt" label="Окончание">
+              <FormField htmlFor="event-endsAt" label="Окончание" hint="Заполните, если событие длится несколько часов или дней.">
                 <Input
                   id="event-endsAt"
                   name="endsAt"
@@ -159,7 +178,7 @@ export default async function AdminEventEditPage({ params }: AdminEventEditPageP
           <section>
             <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-[var(--muted)]">Медиа и описание</h3>
             <div className="grid gap-5 lg:grid-cols-2">
-              <CoverImageField id="event-coverImage" currentName={event.coverImage?.originalName} />
+              <CoverImageField id="event-coverImage" currentName={event.coverImage?.originalName} currentAlt={event.coverImageAlt} />
               <div className="lg:col-span-2">
                 <FormField htmlFor="event-summary" label="Краткое описание">
                   <Textarea id="event-summary" name="summary" required minLength={10} maxLength={500} defaultValue={event.summary} />

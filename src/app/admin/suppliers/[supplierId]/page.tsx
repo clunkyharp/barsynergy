@@ -137,7 +137,7 @@ export default async function AdminSupplierEditPage({ params }: AdminSupplierEdi
           <section>
             <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-[var(--muted)]">Медиа и описание</h3>
             <div className="grid gap-5 lg:grid-cols-2">
-              <CoverImageField id="supplier-coverImage" currentName={supplier.coverImage?.originalName} />
+              <CoverImageField id="supplier-coverImage" currentName={supplier.coverImage?.originalName} currentAlt={supplier.coverImageAlt} />
               <div className="lg:col-span-2">
                 <FormField htmlFor="supplier-summary" label="Краткое описание">
                   <Textarea

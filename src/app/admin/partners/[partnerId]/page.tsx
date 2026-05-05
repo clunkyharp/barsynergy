@@ -8,7 +8,7 @@ import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { contentStatusLabels } from '@/lib/admin/content-utils';
+import { contentStatusLabels, partnerTypeOptions, withCurrentValueOption } from '@/lib/admin/content-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
 import { prisma } from '@/lib/db/prisma';
 
@@ -71,7 +71,14 @@ export default async function AdminEditPartnerPage({ params }: AdminEditPartnerP
             </Select>
           </FormField>
           <FormField htmlFor="partner-partnerType" label="Тип партнёра">
-            <Input id="partner-partnerType" name="partnerType" maxLength={120} defaultValue={partner.partnerType ?? ''} />
+            <Select id="partner-partnerType" name="partnerType" defaultValue={partner.partnerType ?? ''}>
+              <option value="">Не указан</option>
+              {withCurrentValueOption([...partnerTypeOptions], partner.partnerType).map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </Select>
           </FormField>
           <FormField htmlFor="partner-isFeatured" label="В подборке">
             <Select id="partner-isFeatured" name="isFeatured" defaultValue={String(partner.isFeatured)}>
@@ -79,7 +86,7 @@ export default async function AdminEditPartnerPage({ params }: AdminEditPartnerP
               <option value="true">Да</option>
             </Select>
           </FormField>
-          <CoverImageField id="partner-coverImage" currentName={partner.coverImage?.originalName} />
+          <CoverImageField id="partner-coverImage" currentName={partner.coverImage?.originalName} currentAlt={partner.coverImageAlt} />
           <FormField htmlFor="partner-status" label="Статус">
             <Select id="partner-status" name="status" defaultValue={partner.status}>
               {Object.values(ContentStatus).map((status) => (

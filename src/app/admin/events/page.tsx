@@ -1,16 +1,20 @@
-import { ContentStatus } from '@prisma/client';
+import { CategoryType, type Prisma } from '@prisma/client';
 import { deleteEventDraft, updateEventStatus } from '@/app/admin/events/actions';
 import {
   AdminActionAlert,
-  AdminPagination,
-  HiddenRedirect
+  AdminContentRowActions,
+  AdminListFilters,
+  AdminPagination
 } from '@/components/admin/content-admin-controls';
 import { AdminPageIntro } from '@/components/admin/admin-page-intro';
 import { Button } from '@/components/ui/button';
 import {
   AdminTable,
+  AdminTableActionsCell,
+  AdminTableActionsHeaderCell,
   AdminTableBody,
   AdminTableCell,
+  AdminTableClamp,
   AdminTableFrame,
   AdminTableHead,
   AdminTableHeaderCell,
@@ -24,7 +28,11 @@ import {
   contentStatusLabels,
   getAdminCurrentPath,
   getAdminPage,
+  getAdminSearchQuery,
+  getAdminStringFilter,
+  getAdminStatusFilter,
   getAdminTotalPages,
+  eventFormatOptions,
   type AdminContentSearchParams
 } from '@/lib/admin/content-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
@@ -52,10 +60,32 @@ export default async function AdminEventsPage({ searchParams }: AdminEventsPageP
   const params = (await searchParams) ?? {};
   const page = getAdminPage(params);
   const currentPath = getAdminCurrentPath(ADMIN_EVENTS_PATH, params);
+  const q = getAdminSearchQuery(params);
+  const status = getAdminStatusFilter(params);
+  const categoryId = getAdminStringFilter(params, 'categoryId');
+  const cityId = getAdminStringFilter(params, 'cityId');
+  const format = getAdminStringFilter(params, 'format');
+  const where: Prisma.EventWhereInput = {
+    status,
+    categoryId,
+    cityId,
+    format,
+    ...(q
+      ? {
+          OR: [
+            { title: { contains: q, mode: 'insensitive' } },
+            { summary: { contains: q, mode: 'insensitive' } },
+            { slug: { contains: q, mode: 'insensitive' } },
+            { locationName: { contains: q, mode: 'insensitive' } }
+          ]
+        }
+      : {})
+  };
 
-  const [total, events] = await Promise.all([
-    prisma.event.count(),
+  const [total, events, categories, cities] = await Promise.all([
+    prisma.event.count({ where }),
     prisma.event.findMany({
+      where,
       orderBy: [{ startsAt: 'desc' }],
       skip: (page - 1) * ADMIN_CONTENT_PAGE_SIZE,
       take: ADMIN_CONTENT_PAGE_SIZE,
@@ -65,6 +95,16 @@ export default async function AdminEventsPage({ searchParams }: AdminEventsPageP
         coverImage: { select: { originalName: true } },
         updatedBy: { select: { email: true } }
       }
+    }),
+    prisma.category.findMany({
+      where: { type: CategoryType.EVENT, isActive: true },
+      orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
+      select: { id: true, name: true }
+    }),
+    prisma.city.findMany({
+      where: { isActive: true },
+      orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
+      select: { id: true, name: true }
     })
   ]);
   const totalPages = getAdminTotalPages(total);
@@ -83,6 +123,16 @@ export default async function AdminEventsPage({ searchParams }: AdminEventsPageP
       />
 
       <AdminActionAlert params={params} />
+      <AdminListFilters
+        basePath={ADMIN_EVENTS_PATH}
+        filters={[
+          { name: 'categoryId', label: 'Категория', allLabel: 'Все категории', options: categories.map((category) => ({ value: category.id, label: category.name })) },
+          { name: 'cityId', label: 'Город', allLabel: 'Все города', options: cities.map((city) => ({ value: city.id, label: city.name })) },
+          { name: 'format', label: 'Формат', allLabel: 'Все форматы', options: [...eventFormatOptions] }
+        ]}
+        params={params}
+        searchPlaceholder="Поиск по названию, месту или описанию"
+      />
 
       <section className="space-y-4">
         <div>
@@ -102,14 +152,14 @@ export default async function AdminEventsPage({ searchParams }: AdminEventsPageP
                   <AdminTableHeaderCell>Город</AdminTableHeaderCell>
                   <AdminTableHeaderCell>Статус</AdminTableHeaderCell>
                   <AdminTableHeaderCell>Обновлено</AdminTableHeaderCell>
-                  <AdminTableHeaderCell>Действия</AdminTableHeaderCell>
+                  <AdminTableActionsHeaderCell>Действия</AdminTableActionsHeaderCell>
                 </tr>
               </AdminTableHead>
               <AdminTableBody>
                 {events.map((event) => (
                   <AdminTableRow key={event.id}>
                     <AdminTableCell className="max-w-[320px]">
-                      <div className="font-semibold">{event.title}</div>
+                      <AdminTableClamp className="font-semibold">{event.title}</AdminTableClamp>
                       <div className="mt-1 truncate text-xs text-[var(--muted)]">/{event.slug}</div>
                       <div className="mt-1 text-xs text-[var(--muted)]">{event.category?.name ?? 'Без категории'}</div>
                       {event.coverImage?.originalName ? (
@@ -128,42 +178,18 @@ export default async function AdminEventsPage({ searchParams }: AdminEventsPageP
                       <div>{dateFormatter.format(event.updatedAt)}</div>
                       {event.updatedBy?.email ? <div className="mt-1 text-xs">{event.updatedBy.email}</div> : null}
                     </AdminTableCell>
-                    <AdminTableCell>
-                      <div className="flex flex-wrap gap-2">
-                        <Button href={`${ADMIN_EVENTS_PATH}/${event.id}`} className="min-h-9 px-3 py-1.5 text-xs" variant="secondary">
-                          Изменить
-                        </Button>
-                        {event.status !== ContentStatus.PUBLISHED ? (
-                          <form action={updateEventStatus}>
-                            <HiddenRedirect value={currentPath} />
-                            <input name="eventId" type="hidden" value={event.id} />
-                            <input name="status" type="hidden" value={ContentStatus.PUBLISHED} />
-                            <Button className="min-h-9 px-3 py-1.5 text-xs" type="submit">
-                              Опубликовать
-                            </Button>
-                          </form>
-                        ) : null}
-                        {event.status !== ContentStatus.ARCHIVED ? (
-                          <form action={updateEventStatus}>
-                            <HiddenRedirect value={currentPath} />
-                            <input name="eventId" type="hidden" value={event.id} />
-                            <input name="status" type="hidden" value={ContentStatus.ARCHIVED} />
-                            <Button className="min-h-9 px-3 py-1.5 text-xs" type="submit" variant="secondary">
-                              В архив
-                            </Button>
-                          </form>
-                        ) : null}
-                        {event.status !== ContentStatus.PUBLISHED ? (
-                          <form action={deleteEventDraft}>
-                            <HiddenRedirect value={currentPath} />
-                            <input name="eventId" type="hidden" value={event.id} />
-                            <Button className="min-h-9 px-3 py-1.5 text-xs" type="submit" variant="ghost">
-                              Удалить
-                            </Button>
-                          </form>
-                        ) : null}
-                      </div>
-                    </AdminTableCell>
+                    <AdminTableActionsCell>
+                      <AdminContentRowActions
+                        currentPath={currentPath}
+                        deleteAction={deleteEventDraft}
+                        editHref={`${ADMIN_EVENTS_PATH}/${event.id}`}
+                        idName="eventId"
+                        idValue={event.id}
+                        publicHref={`/events/${event.slug}`}
+                        status={event.status}
+                        updateStatusAction={updateEventStatus}
+                      />
+                    </AdminTableActionsCell>
                   </AdminTableRow>
                 ))}
               </AdminTableBody>

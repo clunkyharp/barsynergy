@@ -8,7 +8,7 @@ import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { contentStatusLabels } from '@/lib/admin/content-utils';
+import { contentStatusLabels, courseFormatOptions, courseLevelOptions, withCurrentValueOption } from '@/lib/admin/content-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
 import { prisma } from '@/lib/db/prisma';
 
@@ -80,13 +80,27 @@ export default async function AdminEditCoursePage({ params }: AdminEditCoursePag
             </Select>
           </FormField>
           <FormField htmlFor="course-format" label="Формат">
-            <Input id="course-format" name="format" maxLength={80} defaultValue={course.format ?? ''} />
+            <Select id="course-format" name="format" defaultValue={course.format ?? ''}>
+              <option value="">Не указан</option>
+              {withCurrentValueOption([...courseFormatOptions], course.format).map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </Select>
           </FormField>
           <FormField htmlFor="course-durationLabel" label="Длительность">
             <Input id="course-durationLabel" name="durationLabel" maxLength={120} defaultValue={course.durationLabel ?? ''} />
           </FormField>
           <FormField htmlFor="course-level" label="Уровень">
-            <Input id="course-level" name="level" maxLength={80} defaultValue={course.level ?? ''} />
+            <Select id="course-level" name="level" defaultValue={course.level ?? ''}>
+              <option value="">Не указан</option>
+              {withCurrentValueOption([...courseLevelOptions], course.level).map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </Select>
           </FormField>
           <FormField htmlFor="course-priceLabel" label="Стоимость">
             <Input id="course-priceLabel" name="priceLabel" maxLength={120} defaultValue={course.priceLabel ?? ''} />
@@ -94,7 +108,7 @@ export default async function AdminEditCoursePage({ params }: AdminEditCoursePag
           <FormField htmlFor="course-instructorName" label="Преподаватель">
             <Input id="course-instructorName" name="instructorName" maxLength={160} defaultValue={course.instructorName ?? ''} />
           </FormField>
-          <CoverImageField id="course-coverImage" currentName={course.coverImage?.originalName} />
+          <CoverImageField id="course-coverImage" currentName={course.coverImage?.originalName} currentAlt={course.coverImageAlt} />
           <FormField htmlFor="course-status" label="Статус">
             <Select id="course-status" name="status" defaultValue={course.status}>
               {Object.values(ContentStatus).map((status) => (

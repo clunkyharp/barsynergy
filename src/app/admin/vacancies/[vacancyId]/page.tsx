@@ -8,7 +8,12 @@ import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { contentStatusLabels } from '@/lib/admin/content-utils';
+import {
+  contentStatusLabels,
+  vacancyEmploymentTypeOptions,
+  vacancyExperienceOptions,
+  withCurrentValueOption
+} from '@/lib/admin/content-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
 import { prisma } from '@/lib/db/prisma';
 import { vacancyPositionValues } from '@/lib/vacancies/positions';
@@ -123,13 +128,27 @@ export default async function AdminVacancyEditPage({ params }: AdminVacancyEditP
                 </Select>
               </FormField>
               <FormField htmlFor="vacancy-employmentType" label="Тип занятости">
-                <Input id="vacancy-employmentType" name="employmentType" maxLength={100} defaultValue={vacancy.employmentType ?? ''} />
+                <Select id="vacancy-employmentType" name="employmentType" defaultValue={vacancy.employmentType ?? ''}>
+                  <option value="">Не указан</option>
+                  {withCurrentValueOption([...vacancyEmploymentTypeOptions], vacancy.employmentType).map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </Select>
               </FormField>
               <FormField htmlFor="vacancy-salaryLabel" label="Оплата">
                 <Input id="vacancy-salaryLabel" name="salaryLabel" maxLength={120} defaultValue={vacancy.salaryLabel ?? ''} />
               </FormField>
               <FormField htmlFor="vacancy-experienceLabel" label="Опыт">
-                <Input id="vacancy-experienceLabel" name="experienceLabel" maxLength={120} defaultValue={vacancy.experienceLabel ?? ''} />
+                <Select id="vacancy-experienceLabel" name="experienceLabel" defaultValue={vacancy.experienceLabel ?? ''}>
+                  <option value="">Не указан</option>
+                  {withCurrentValueOption([...vacancyExperienceOptions], vacancy.experienceLabel).map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </Select>
               </FormField>
               <FormField htmlFor="vacancy-contactMode" label="Контакт">
                 <Input id="vacancy-contactMode" name="contactMode" maxLength={120} defaultValue={vacancy.contactMode ?? ''} />
@@ -140,7 +159,7 @@ export default async function AdminVacancyEditPage({ params }: AdminVacancyEditP
           <section>
             <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-[var(--muted)]">Медиа и описание</h3>
             <div className="grid gap-5 lg:grid-cols-2">
-              <CoverImageField id="vacancy-coverImage" currentName={vacancy.coverImage?.originalName} />
+              <CoverImageField id="vacancy-coverImage" currentName={vacancy.coverImage?.originalName} currentAlt={vacancy.coverImageAlt} />
               <div className="lg:col-span-2">
                 <FormField htmlFor="vacancy-summary" label="Краткое описание">
                   <Textarea id="vacancy-summary" name="summary" required minLength={10} maxLength={500} defaultValue={vacancy.summary} />

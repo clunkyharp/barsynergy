@@ -7,7 +7,7 @@ import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { contentStatusLabels } from '@/lib/admin/content-utils';
+import { contentStatusLabels, partnerTypeOptions } from '@/lib/admin/content-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
 import { prisma } from '@/lib/db/prisma';
 
@@ -54,7 +54,14 @@ export default async function AdminCreatePartnerPage() {
             </Select>
           </FormField>
           <FormField htmlFor="partner-partnerType" label="Тип партнёра">
-            <Input id="partner-partnerType" name="partnerType" maxLength={120} />
+            <Select id="partner-partnerType" name="partnerType" defaultValue="">
+              <option value="">Не указан</option>
+              {partnerTypeOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </Select>
           </FormField>
           <FormField htmlFor="partner-isFeatured" label="В подборке">
             <Select id="partner-isFeatured" name="isFeatured" defaultValue="false">

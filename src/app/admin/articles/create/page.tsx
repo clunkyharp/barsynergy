@@ -3,6 +3,7 @@ import { createArticle } from '@/app/admin/articles/actions';
 import { CoverImageField, HiddenRedirect } from '@/components/admin/content-admin-controls';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { CheckboxField } from '@/components/ui/checkbox-field';
 import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
@@ -19,7 +20,7 @@ const ARTICLE_BODY_MAX_LENGTH = 20_000;
 export default async function AdminArticlesCreatePage() {
   await requireAdminSectionAccess('articles');
 
-  const [categories, cities] = await Promise.all([
+  const [categories, cities, tags] = await Promise.all([
     prisma.category.findMany({
       where: { type: CategoryType.ARTICLE, isActive: true },
       orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
@@ -27,6 +28,11 @@ export default async function AdminArticlesCreatePage() {
     }),
     prisma.city.findMany({
       where: { isActive: true },
+      orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
+      select: { id: true, name: true }
+    }),
+    prisma.tag.findMany({
+      where: { type: CategoryType.ARTICLE, isActive: true },
       orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
       select: { id: true, name: true }
     })
@@ -86,6 +92,23 @@ export default async function AdminArticlesCreatePage() {
                   ))}
                 </Select>
               </FormField>
+              {tags.length > 0 ? (
+                <div className="lg:col-span-2">
+                  <p className="mb-3 text-sm font-semibold">Теги</p>
+                  <div className="flex flex-wrap gap-3">
+                    {tags.map((tag) => (
+                      <CheckboxField
+                        className="rounded-[var(--radius-md)] border border-[var(--line)] bg-[var(--surface-muted)] px-3 py-2"
+                        key={tag.id}
+                        name="tagIds"
+                        value={tag.id}
+                      >
+                        {tag.name}
+                      </CheckboxField>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
             </div>
           </section>
 

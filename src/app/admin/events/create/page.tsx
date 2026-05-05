@@ -7,7 +7,7 @@ import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { contentStatusLabels } from '@/lib/admin/content-utils';
+import { contentStatusLabels, eventFormatOptions, eventRegistrationModeOptions } from '@/lib/admin/content-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
 import { prisma } from '@/lib/db/prisma';
 
@@ -98,13 +98,27 @@ export default async function AdminEventsCreatePage() {
                 <Input id="event-address" name="address" maxLength={240} />
               </FormField>
               <FormField htmlFor="event-format" label="Формат">
-                <Input id="event-format" name="format" maxLength={80} placeholder="offline, online, hybrid" />
+                <Select id="event-format" name="format" defaultValue="">
+                  <option value="">Не указан</option>
+                  {eventFormatOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </Select>
               </FormField>
               <FormField htmlFor="event-capacity" label="Лимит мест">
                 <Input id="event-capacity" name="capacity" min={1} max={100000} type="number" />
               </FormField>
               <FormField htmlFor="event-registrationMode" label="Регистрация">
-                <Input id="event-registrationMode" name="registrationMode" maxLength={120} />
+                <Select id="event-registrationMode" name="registrationMode" defaultValue="">
+                  <option value="">Не указана</option>
+                  {eventRegistrationModeOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </Select>
               </FormField>
             </div>
           </section>
@@ -112,10 +126,10 @@ export default async function AdminEventsCreatePage() {
           <section>
             <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-[var(--muted)]">Время проведения</h3>
             <div className="grid gap-5 lg:grid-cols-2">
-              <FormField htmlFor="event-startsAt" label="Начало">
+              <FormField htmlFor="event-startsAt" label="Начало" hint="Дата отображается в русском формате: дд.мм.гггг, чч:мм.">
                 <Input id="event-startsAt" name="startsAt" required type="datetime-local" />
               </FormField>
-              <FormField htmlFor="event-endsAt" label="Окончание">
+              <FormField htmlFor="event-endsAt" label="Окончание" hint="Заполните, если событие длится несколько часов или дней.">
                 <Input id="event-endsAt" name="endsAt" type="datetime-local" />
               </FormField>
             </div>

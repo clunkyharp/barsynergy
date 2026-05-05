@@ -14,11 +14,13 @@ const adminLinks: { label: string; href: string; section: AdminSection; availabl
   { label: 'Вакансии', href: '/admin/vacancies', section: 'vacancies', available: true },
   { label: 'Поставщики', href: '/admin/suppliers', section: 'suppliers', available: true },
   { label: 'Партнёры', href: '/admin/partners', section: 'partners', available: true },
+  { label: 'Генспонсоры', href: '/admin/general-sponsors', section: 'generalSponsors', available: true },
+  { label: 'Главная сайта', href: '/admin/homepage', section: 'homepage', available: true },
   { label: 'Заявки', href: '/admin/applications', section: 'applications', available: true },
   { label: 'Пользователи', href: '/admin/users', section: 'users', available: true },
-  { label: 'Категории', href: '/admin/categories', section: 'categories', available: false },
-  { label: 'Города', href: '/admin/cities', section: 'cities', available: false },
-  { label: 'Теги', href: '/admin/tags', section: 'tags', available: false }
+  { label: 'Категории', href: '/admin/categories', section: 'categories', available: true },
+  { label: 'Города', href: '/admin/cities', section: 'cities', available: true },
+  { label: 'Теги', href: '/admin/taxonomy/tags', section: 'tags', available: true }
 ];
 
 type AdminSidebarProps = {
@@ -37,7 +39,7 @@ export function AdminSidebar({ role }: AdminSidebarProps) {
       </a>
       <nav className="mt-5 grid gap-1.5 text-sm">
         {visibleLinks.map((item) => {
-          const isActive = pathname === item.href || pathname?.startsWith(`${item.href}/`);
+          const isActive = item.href === '/admin' ? pathname === item.href : pathname === item.href || pathname?.startsWith(`${item.href}/`);
 
           return (
             <NavLink active={isActive} className={!isActive ? 'text-[var(--muted)]' : undefined} href={item.href} key={item.href}>

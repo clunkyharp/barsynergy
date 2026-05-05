@@ -7,7 +7,7 @@ import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { contentStatusLabels } from '@/lib/admin/content-utils';
+import { contentStatusLabels, courseFormatOptions, courseLevelOptions } from '@/lib/admin/content-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
 import { prisma } from '@/lib/db/prisma';
 
@@ -65,13 +65,27 @@ export default async function AdminCreateCoursePage() {
             </Select>
           </FormField>
           <FormField htmlFor="course-format" label="Формат">
-            <Input id="course-format" name="format" maxLength={80} placeholder="offline, online, hybrid" />
+            <Select id="course-format" name="format" defaultValue="">
+              <option value="">Не указан</option>
+              {courseFormatOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </Select>
           </FormField>
           <FormField htmlFor="course-durationLabel" label="Длительность">
             <Input id="course-durationLabel" name="durationLabel" maxLength={120} />
           </FormField>
           <FormField htmlFor="course-level" label="Уровень">
-            <Input id="course-level" name="level" maxLength={80} />
+            <Select id="course-level" name="level" defaultValue="">
+              <option value="">Не указан</option>
+              {courseLevelOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </Select>
           </FormField>
           <FormField htmlFor="course-priceLabel" label="Стоимость">
             <Input id="course-priceLabel" name="priceLabel" maxLength={120} />

@@ -1,10 +1,5 @@
-import { AdminPlaceholderPage } from '@/components/admin/admin-placeholder-page';
-import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
+import { redirect } from 'next/navigation';
 
-export const dynamic = 'force-dynamic';
-
-export default async function AdminTagsPage() {
-  await requireAdminSectionAccess('tags');
-
-  return <AdminPlaceholderPage title="Теги" />;
+export default function AdminTagsRedirectPage() {
+  redirect('/admin/taxonomy/tags');
 }

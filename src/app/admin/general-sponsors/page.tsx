@@ -1,0 +1,210 @@
+import type { Prisma } from '@prisma/client';
+import {
+  deleteGeneralSponsorDraft,
+  updateGeneralSponsorStatus
+} from '@/app/admin/general-sponsors/actions';
+import {
+  AdminActionAlert,
+  AdminContentRowActions,
+  AdminListFilters,
+  AdminPagination
+} from '@/components/admin/content-admin-controls';
+import { AdminPageIntro } from '@/components/admin/admin-page-intro';
+import {
+  AdminTable,
+  AdminTableActionsCell,
+  AdminTableActionsHeaderCell,
+  AdminTableBody,
+  AdminTableCell,
+  AdminTableClamp,
+  AdminTableFrame,
+  AdminTableHead,
+  AdminTableHeaderCell,
+  AdminTableRow
+} from '@/components/ui/admin-table';
+import { Button } from '@/components/ui/button';
+import { EmptyState } from '@/components/ui/empty-state';
+import { StatusBadge } from '@/components/ui/status-badge';
+import {
+  ADMIN_CONTENT_PAGE_SIZE,
+  contentStatusBadgeVariants,
+  contentStatusLabels,
+  getAdminCurrentPath,
+  getAdminPage,
+  getAdminBooleanFilter,
+  getAdminSearchQuery,
+  getAdminStringFilter,
+  getAdminStatusFilter,
+  getAdminTotalPages,
+  type AdminContentSearchParams
+} from '@/lib/admin/content-utils';
+import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
+import { prisma } from '@/lib/db/prisma';
+
+export const dynamic = 'force-dynamic';
+
+const ADMIN_GENERAL_SPONSORS_PATH = '/admin/general-sponsors';
+
+const dateFormatter = new Intl.DateTimeFormat('ru-RU', {
+  day: '2-digit',
+  month: '2-digit',
+  year: 'numeric'
+});
+
+type AdminGeneralSponsorsPageProps = {
+  searchParams?: Promise<AdminContentSearchParams>;
+};
+
+export default async function AdminGeneralSponsorsPage({ searchParams }: AdminGeneralSponsorsPageProps) {
+  await requireAdminSectionAccess('generalSponsors');
+
+  const params = (await searchParams) ?? {};
+  const page = getAdminPage(params);
+  const currentPath = getAdminCurrentPath(ADMIN_GENERAL_SPONSORS_PATH, params);
+  const q = getAdminSearchQuery(params);
+  const status = getAdminStatusFilter(params);
+  const cityId = getAdminStringFilter(params, 'cityId');
+  const isFeatured = getAdminBooleanFilter(params, 'featured');
+  const where: Prisma.GeneralSponsorWhereInput = {
+    status,
+    cityId,
+    isFeatured,
+    ...(q
+      ? {
+          OR: [
+            { name: { contains: q, mode: 'insensitive' } },
+            { shortDescription: { contains: q, mode: 'insensitive' } },
+            { fullDescription: { contains: q, mode: 'insensitive' } }
+          ]
+        }
+      : {})
+  };
+
+  const [total, sponsors, cities] = await Promise.all([
+    prisma.generalSponsor.count({ where }),
+    prisma.generalSponsor.findMany({
+      where,
+      orderBy: [{ isFeatured: 'desc' }, { priority: 'asc' }, { createdAt: 'desc' }],
+      skip: (page - 1) * ADMIN_CONTENT_PAGE_SIZE,
+      take: ADMIN_CONTENT_PAGE_SIZE,
+      include: {
+        city: { select: { name: true } },
+        logoImage: { select: { originalName: true } },
+        coverImage: { select: { originalName: true } },
+        updatedBy: { select: { email: true } }
+      }
+    }),
+    prisma.city.findMany({
+      where: { isActive: true },
+      orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
+      select: { id: true, name: true }
+    })
+  ]);
+  const totalPages = getAdminTotalPages(total);
+
+  return (
+    <div className="space-y-8">
+      <AdminPageIntro
+        action={<Button href={`${ADMIN_GENERAL_SPONSORS_PATH}/new`}>Создать спонсора</Button>}
+        description="Генеральные спонсоры для главной страницы и раздела спонсорства."
+        eyebrow="Админка / Генспонсоры"
+        title="Генеральные спонсоры"
+      />
+
+      <AdminActionAlert params={params} />
+      <AdminListFilters
+        basePath={ADMIN_GENERAL_SPONSORS_PATH}
+        filters={[
+          { name: 'cityId', label: 'Город', allLabel: 'Все города', options: cities.map((city) => ({ value: city.id, label: city.name })) },
+          {
+            name: 'featured',
+            label: 'Приоритет',
+            allLabel: 'Любой статус',
+            options: [
+              { value: 'true', label: 'Приоритетный' },
+              { value: 'false', label: 'Обычный' }
+            ]
+          }
+        ]}
+        params={params}
+        searchPlaceholder="Поиск по названию или описанию"
+      />
+
+      <section className="space-y-4">
+        <div>
+          <h2 className="text-lg font-semibold">Все генеральные спонсоры</h2>
+          <p className="text-sm text-[var(--muted)]">Найдено записей: {total}.</p>
+        </div>
+
+        {sponsors.length === 0 ? (
+          <EmptyState title="Генеральных спонсоров пока нет" />
+        ) : (
+          <AdminTableFrame>
+            <AdminTable minWidth={1040}>
+              <AdminTableHead>
+                <AdminTableRow>
+                  <AdminTableHeaderCell>Спонсор</AdminTableHeaderCell>
+                  <AdminTableHeaderCell>Контекст</AdminTableHeaderCell>
+                  <AdminTableHeaderCell>Статус</AdminTableHeaderCell>
+                  <AdminTableHeaderCell>Обновлено</AdminTableHeaderCell>
+                  <AdminTableActionsHeaderCell>Действия</AdminTableActionsHeaderCell>
+                </AdminTableRow>
+              </AdminTableHead>
+              <AdminTableBody>
+                {sponsors.map((sponsor) => (
+                  <AdminTableRow key={sponsor.id}>
+                    <AdminTableCell className="max-w-[320px]">
+                      <AdminTableClamp className="font-semibold">{sponsor.name}</AdminTableClamp>
+                      <div className="mt-1 truncate text-xs text-[var(--muted)]">/{sponsor.slug}</div>
+                      {sponsor.logoImage?.originalName ? (
+                        <div className="mt-1 text-xs text-[var(--muted)]">Логотип: {sponsor.logoImage.originalName}</div>
+                      ) : sponsor.logoPath ? (
+                        <div className="mt-1 truncate text-xs text-[var(--muted)]">Логотип: {sponsor.logoPath}</div>
+                      ) : null}
+                      {sponsor.coverImage?.originalName ? (
+                        <div className="mt-1 text-xs text-[var(--muted)]">Обложка: {sponsor.coverImage.originalName}</div>
+                      ) : null}
+                    </AdminTableCell>
+                    <AdminTableCell className="text-[var(--muted)]">
+                      <div>{sponsor.city?.name ?? 'Без города'}</div>
+                      {sponsor.seasonLabel ? <div className="mt-1 text-xs">{sponsor.seasonLabel}</div> : null}
+                      {sponsor.isFeatured ? <div className="mt-1 text-xs">Приоритетный</div> : null}
+                    </AdminTableCell>
+                    <AdminTableCell>
+                      <StatusBadge variant={contentStatusBadgeVariants[sponsor.status]}>{contentStatusLabels[sponsor.status]}</StatusBadge>
+                    </AdminTableCell>
+                    <AdminTableCell className="text-[var(--muted)]">
+                      <div>{dateFormatter.format(sponsor.updatedAt)}</div>
+                      {sponsor.updatedBy?.email ? <div className="mt-1 text-xs">{sponsor.updatedBy.email}</div> : null}
+                    </AdminTableCell>
+                    <AdminTableActionsCell>
+                      <AdminContentRowActions
+                        currentPath={currentPath}
+                        deleteAction={deleteGeneralSponsorDraft}
+                        editHref={`${ADMIN_GENERAL_SPONSORS_PATH}/${sponsor.id}/edit`}
+                        idName="sponsorId"
+                        idValue={sponsor.id}
+                        publicHref="/general-sponsors"
+                        status={sponsor.status}
+                        updateStatusAction={updateGeneralSponsorStatus}
+                      />
+                    </AdminTableActionsCell>
+                  </AdminTableRow>
+                ))}
+              </AdminTableBody>
+            </AdminTable>
+          </AdminTableFrame>
+        )}
+
+        <AdminPagination
+          basePath={ADMIN_GENERAL_SPONSORS_PATH}
+          page={page}
+          pageSize={ADMIN_CONTENT_PAGE_SIZE}
+          params={params}
+          total={total}
+          totalPages={totalPages}
+        />
+      </section>
+    </div>
+  );
+}
