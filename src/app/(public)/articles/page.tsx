@@ -1,11 +1,10 @@
 import type { Metadata } from 'next';
 import { CategoryType } from '@prisma/client';
-import { ArrowUpRight } from 'lucide-react';
+import { ArrowUpRight, BriefcaseBusiness, Calculator, CalendarDays, Map, Truck } from 'lucide-react';
 import { EditorialPublicPage } from '@/components/public/editorial-public-page';
-import { ToolTeaser } from '@/components/public/platform-ui';
 import { PublicFeaturedContent } from '@/components/public/public-featured-content';
 import { PublicPrelaunchSection } from '@/components/public/public-prelaunch-section';
-import { FilterChip } from '@/components/public/public-ui-adaptation';
+import { FilterChip, IconBadge } from '@/components/public/public-ui-adaptation';
 import { Button } from '@/components/ui/button';
 import { MetaChip } from '@/components/ui/meta-chip';
 import { Panel } from '@/components/ui/panel';
@@ -24,10 +23,53 @@ type ArticlesPageProps = {
 
 export const metadata: Metadata = {
   title: 'Знания',
-  description: 'Статьи, интервью и практические материалы BARSYNERGY.'
+  description: 'Статьи, интервью и рабочие материалы BARSYNERGY.'
 };
 
 const knowledgeTopics = ['Сервис', 'Меню', 'Команда', 'Управление', 'Поставщики', 'Индустрия региона'] as const;
+
+const starterEditorialCards = [
+  {
+    title: 'Как считать себестоимость напитка',
+    description: 'Короткий разбор упаковки, граммовки, процента себестоимости и цены продажи.',
+    href: '/tools/cost-calculator',
+    label: 'Калькулятор',
+    actionLabel: 'Открыть калькулятор',
+    icon: Calculator
+  },
+  {
+    title: 'Что указать в вакансии',
+    description: 'Чек-лист для заведения: роль, график, оплата, опыт, условия и контакт для откликов.',
+    href: '/vacancies#vacancy-submission',
+    label: 'Найм',
+    actionLabel: 'Разместить вакансию',
+    icon: BriefcaseBusiness
+  },
+  {
+    title: 'Как выбрать поставщика',
+    description: 'На что смотреть перед первым заказом: категория, география, условия, проверка и контакт.',
+    href: '/suppliers',
+    label: 'Поставщики',
+    actionLabel: 'Смотреть каталог',
+    icon: Truck
+  },
+  {
+    title: 'Как подготовить гостевую смену',
+    description: 'Мини-план для команды: тема, площадка, партнёр, роли, анонс и регистрация.',
+    href: '/events?intent=proposal#applications',
+    label: 'События',
+    actionLabel: 'Предложить событие',
+    icon: CalendarDays
+  },
+  {
+    title: 'Карта барной индустрии СКФО',
+    description: 'Заведения, поставщики, школы, бренды и события, которые помогают понять рынок региона.',
+    href: '/about',
+    label: 'Регион',
+    actionLabel: 'О проекте',
+    icon: Map
+  }
+] as const;
 
 function pageHref(content: PublishedContentList, page: number) {
   const params = new URLSearchParams();
@@ -114,13 +156,17 @@ function ArticleGridSection({ content, excludedItemId }: { content: PublishedCon
                       ))}
                     </div>
                   ) : null}
+                  <span className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-[var(--accent)]">
+                    Читать материал
+                    <ArrowUpRight className="transition group-hover:translate-x-1" size={16} />
+                  </span>
                 </div>
               </a>
             </article>
           ))}
         </div>
 
-        <div className="mt-8 flex flex-wrap items-center justify-between gap-3 border-t border-black/10 pt-5">
+        <div className="mt-8 flex flex-wrap items-center justify-between gap-3 pt-3">
           <MetaChip className="border-black/10 bg-transparent text-[var(--muted)]" variant="default">
             Страница {content.page} из {content.totalPages}
           </MetaChip>
@@ -167,6 +213,54 @@ function ArticleEmptyResults() {
   );
 }
 
+function KnowledgeStarterSection() {
+  return (
+    <section className="border-b border-black/20 py-10 md:py-14">
+      <div className="container">
+        <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Стартовые материалы</p>
+            <h2 className={`${displayFont.className} mt-3 text-[2.35rem] font-semibold leading-none text-[var(--text)] md:text-[3.2rem]`}>
+              С чего начать
+            </h2>
+          </div>
+          <p className="max-w-xl text-sm leading-7 text-[var(--muted)]">
+            Эти темы уже можно использовать как точки старта, пока редакция наполняет каталог.
+          </p>
+        </div>
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {starterEditorialCards.map((card) => {
+            const Icon = card.icon;
+
+            return (
+              <a
+                className="group flex min-h-[246px] flex-col justify-between rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[color-mix(in_oklab,var(--surface),white_18%)] p-5 transition hover:border-[var(--accent)]/28 hover:bg-[color-mix(in_oklab,var(--surface),white_24%)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)]"
+                href={card.href}
+                key={card.title}
+              >
+                <span>
+                  <span className="flex items-start justify-between gap-4">
+                    <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">{card.label}</span>
+                    <IconBadge icon={Icon} size="sm" tone="soft" />
+                  </span>
+                  <span className={`${displayFont.className} mt-5 block text-[1.8rem] font-semibold leading-none text-[var(--text)] group-hover:text-[var(--accent)]`}>
+                    {card.title}
+                  </span>
+                  <span className="mt-4 block text-sm leading-7 text-[var(--muted)]">{card.description}</span>
+                </span>
+                <span className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-[var(--accent)]">
+                  {card.actionLabel}
+                  <ArrowUpRight className="transition group-hover:translate-x-1" size={16} />
+                </span>
+              </a>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export default async function ArticlesPage({ searchParams }: ArticlesPageProps) {
   const params = (await searchParams) ?? {};
   const [content, categories] = await Promise.all([
@@ -184,7 +278,7 @@ export default async function ArticlesPage({ searchParams }: ArticlesPageProps) 
         eyebrow="Знания"
         title="Статьи, интервью и практические материалы"
         description="Статьи, интервью, разборы и практические материалы для специалистов барной индустрии."
-        summary={isPrelaunchEmpty ? 'Первые материалы готовятся. Сейчас можно предложить тему или героя интервью.' : 'Все материалы открыты: можно читать интервью, разборы, прикладные тексты и подборки.'}
+        summary={isPrelaunchEmpty ? 'Первые материалы готовятся. Сейчас можно предложить тему или героя интервью.' : 'Все материалы открыты: можно читать интервью, разборы, рабочие тексты и подборки.'}
         metrics={
           isPrelaunchEmpty
             ? []
@@ -203,17 +297,18 @@ export default async function ArticlesPage({ searchParams }: ArticlesPageProps) 
           {
             label: 'Материалы',
             title: 'Интервью и кейсы',
-            description: 'Истории специалистов, заведений и партнёров с акцентом на опыт, решения и ошибки.'
+            description: 'Истории специалистов, заведений и партнёров: опыт, решения и ошибки.'
           },
           {
             label: 'Материалы',
             title: 'Гиды и подборки',
-            description: 'Структурированные материалы, которые можно связать с обучением, событиями и каталогами.'
+            description: 'Гиды и подборки, связанные с обучением, событиями и каталогами.'
           }
         ]}
         primaryLink={{ label: 'Предложить тему', href: '/contacts?topic=article-topic' }}
         secondaryLink={isPrelaunchEmpty ? { label: 'Стать героем интервью', href: '/contacts?topic=article-interview' } : { label: 'Посмотреть события', href: '/events' }}
       />
+      <KnowledgeStarterSection />
       {isPrelaunchEmpty ? (
         <>
           <PublicPrelaunchSection
@@ -233,7 +328,7 @@ export default async function ArticlesPage({ searchParams }: ArticlesPageProps) 
               },
               {
                 title: 'Команда',
-                description: 'Найм, адаптация, обучение и рост специалистов внутри заведения.'
+                description: 'Найм, адаптация и обучение специалистов внутри заведения.'
               },
               {
                 title: 'Индустрия региона',
@@ -242,9 +337,8 @@ export default async function ArticlesPage({ searchParams }: ArticlesPageProps) 
             ]}
             description="Раздел знаний ещё собирается. Пока команда принимает темы, интервью и рабочие кейсы для первых публикаций."
             eyebrow="Знания"
-            title="Будущие рубрики уже определены"
+            title="Первые рубрики уже понятны"
           />
-          <ToolTeaser />
         </>
       ) : (
         <>
@@ -268,7 +362,6 @@ export default async function ArticlesPage({ searchParams }: ArticlesPageProps) 
             title="Материал для начала"
           />
           {isEmpty ? <ArticleEmptyResults /> : <ArticleGridSection content={content} excludedItemId={featuredItem?.id} />}
-          <ToolTeaser />
         </>
       )}
     </>

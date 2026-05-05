@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { InlineLink } from '@/components/ui/inline-link';
 import { MetaChip } from '@/components/ui/meta-chip';
 import { Panel } from '@/components/ui/panel';
-import type { PublicContentDetailFact } from '@/lib/public/content-details';
+import type { PublicContentDetailFact, PublicContentDetailSection } from '@/lib/public/content-details';
 
 type DetailLink = {
   href: string;
@@ -23,6 +23,7 @@ type PublicContentDetailPageProps = {
   body?: string;
   imageUrl?: string;
   facts?: PublicContentDetailFact[];
+  sections?: PublicContentDetailSection[];
   primaryLink?: DetailLink;
   secondaryLink?: DetailLink;
 };
@@ -53,6 +54,7 @@ export function PublicContentDetailPage({
   body,
   imageUrl,
   facts = [],
+  sections = [],
   primaryLink,
   secondaryLink
 }: PublicContentDetailPageProps) {
@@ -236,6 +238,24 @@ export function PublicContentDetailPage({
                   Подробный текст пока не добавлен. Основная информация уже есть выше, вместе с метками и ссылками.
                 </PublicBodyText>
               )}
+
+              {sections.length > 0 ? (
+                <div className="mt-10 grid gap-5">
+                  {sections.map((section) => (
+                    <Panel className="border-black/10 bg-[color-mix(in_oklab,var(--surface),white_18%)]" key={section.title} padding="lg">
+                      <h2 className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">{section.title}</h2>
+                      <ul className="mt-5 grid gap-3">
+                        {section.items.map((item) => (
+                          <li className="grid grid-cols-[0.7rem_minmax(0,1fr)] gap-3 text-sm leading-7 text-[var(--text)]" key={item}>
+                            <span className="mt-[0.7rem] h-1.5 w-1.5 rounded-full bg-[var(--accent)]" aria-hidden="true" />
+                            <span>{item}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </Panel>
+                  ))}
+                </div>
+              ) : null}
             </div>
           </div>
         </div>

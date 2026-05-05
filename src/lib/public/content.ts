@@ -174,6 +174,25 @@ function formatUpdatedLabel(date: Date) {
   return `обновлено ${date.toLocaleDateString('ru-RU')}`;
 }
 
+function formatDateTimeLabel(date: Date) {
+  return date.toLocaleString('ru-RU', {
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    month: 'short'
+  });
+}
+
+function compactLabel(value: string, maxLength = 72) {
+  const normalized = value.replace(/\s+/g, ' ').trim();
+
+  if (normalized.length <= maxLength) {
+    return normalized;
+  }
+
+  return `${normalized.slice(0, maxLength - 1).trim()}…`;
+}
+
 export async function getPublishedArticles(params: PublicContentSearchParams = {}) {
   const page = getPage(params);
   const pageSize = getPageSize(params);
@@ -183,7 +202,9 @@ export async function getPublishedArticles(params: PublicContentSearchParams = {
     ...textSearch(q),
     category: optionalParam(params, 'category') ? { slug: optionalParam(params, 'category'), type: CategoryType.ARTICLE } : undefined,
     city: optionalParam(params, 'city') ? { slug: optionalParam(params, 'city') } : undefined,
-    tags: optionalParam(params, 'tag') ? { some: { tag: { slug: optionalParam(params, 'tag'), type: CategoryType.ARTICLE } } } : undefined
+    tags: optionalParam(params, 'tag')
+      ? { some: { tag: { slug: optionalParam(params, 'tag'), type: CategoryType.ARTICLE, isActive: true } } }
+      : undefined
   };
   const [total, articles] = await Promise.all([
     prisma.article.count({ where }),
@@ -195,7 +216,12 @@ export async function getPublishedArticles(params: PublicContentSearchParams = {
       include: {
         category: { select: { name: true } },
         city: { select: { name: true } },
-        coverImage: { select: { fileKey: true, bucket: true, visibility: true } }
+        coverImage: { select: { fileKey: true, bucket: true, visibility: true } },
+        tags: {
+          where: { tag: { isActive: true, type: CategoryType.ARTICLE } },
+          orderBy: { tag: { sortOrder: 'asc' } },
+          select: { tag: { select: { name: true } } }
+        }
       }
     })
   ]);
@@ -212,9 +238,12 @@ export async function getPublishedArticles(params: PublicContentSearchParams = {
       slug: article.slug,
       summary: article.summary,
       label: article.category?.name,
-      meta: [article.city?.name, article.authorName, article.readingTimeMinutes ? `${article.readingTimeMinutes} мин` : undefined].filter(
-        Boolean
-      ) as string[],
+      meta: [
+        article.city?.name,
+        article.authorName,
+        article.readingTimeMinutes ? `${article.readingTimeMinutes} мин` : undefined,
+        ...article.tags.map((entry) => entry.tag.name)
+      ].filter(Boolean) as string[],
       dateIso: (article.publishedAt ?? article.createdAt).toISOString(),
       updatedLabel: (article.publishedAt ?? article.createdAt).toLocaleDateString('ru-RU'),
       imageUrl: publicImageUrl(article.coverImage)
@@ -264,6 +293,16 @@ export async function getPublishedEvents(params: PublicContentSearchParams = {})
       label: event.category?.name,
       dateIso: event.startsAt.toISOString(),
       meta: [event.city?.name, event.locationName, event.format, event.startsAt.toLocaleDateString('ru-RU')].filter(Boolean) as string[],
+      metaGroups: [
+        event.city?.name ? { label: 'Город', value: event.city.name } : undefined,
+        { label: 'Дата', value: formatDateTimeLabel(event.startsAt), tone: 'accent' },
+        event.locationName ? { label: 'Место', value: event.locationName } : undefined,
+        event.format ? { label: 'Формат', value: event.format } : undefined,
+        { label: 'Для кого', value: 'специалисты и команды' },
+        { label: 'Участие', value: 'по условиям организатора' },
+        { label: 'Организатор', value: 'BARSYNERGY / партнёры' }
+      ].filter(Boolean) as PublishedContentMetaGroup[],
+      statusLabel: event.registrationMode ?? 'Заявки принимаются',
       imageUrl: publicImageUrl(event.coverImage)
     }))
   });
@@ -360,7 +399,9 @@ export async function getPublishedVacancies(params: PublicContentSearchParams = 
       metaGroups: [
         vacancy.city?.name ? { label: 'Город', value: vacancy.city.name } : undefined,
         vacancy.companyName ? { label: 'Компания', value: vacancy.companyName } : undefined,
-        vacancy.employmentType ? { label: 'Формат', value: vacancy.employmentType } : undefined,
+        vacancy.employmentType ? { label: 'График', value: vacancy.employmentType } : undefined,
+        vacancy.category?.name ? { label: 'Формат', value: vacancy.category.name } : undefined,
+        vacancy.experienceLabel ? { label: 'Опыт', value: vacancy.experienceLabel } : undefined,
         vacancy.salaryLabel ? { label: 'Оплата', value: vacancy.salaryLabel, tone: 'accent' } : undefined
       ].filter(Boolean) as PublishedContentMetaGroup[],
       statusLabel: 'Открыта',
@@ -447,9 +488,12 @@ export async function getPublishedSuppliers(params: PublicContentSearchParams = 
         supplier.category?.name ? { label: 'Категория', value: supplier.category.name } : undefined,
         supplier.city?.name ? { label: 'Город', value: supplier.city.name } : undefined,
         supplier.serviceArea ? { label: 'География', value: supplier.serviceArea } : undefined,
+        { label: 'Условия', value: 'по запросу' },
+        { label: 'Продукты / услуги', value: compactLabel(supplier.summary) },
         supplier.isVerified ? { value: 'Проверен BARSYNERGY', tone: 'accent' } : undefined
       ].filter(Boolean) as PublishedContentMetaGroup[],
-      statusLabel: supplier.isVerified ? 'Проверен' : undefined,
+      statusLabel: supplier.isVerified ? 'Проверен' : 'Данные уточняются',
+      updatedLabel: formatUpdatedLabel(supplier.publishedAt ?? supplier.createdAt),
       imageUrl: publicImageUrl(supplier.coverImage)
     }))
   });

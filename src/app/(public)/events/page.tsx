@@ -55,7 +55,7 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
 
   return (
     <>
-      <section className="border-b border-[var(--line)] py-10 pt-[118px] md:py-14 md:pt-[132px]">
+      <section className="background-zone background-zone-hero border-b border-[var(--line)] py-10 md:py-14">
         <div className="container grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(20rem,0.48fr)] lg:items-center">
           <div className="min-w-0">
             <p className="text-sm leading-6 text-[var(--muted)]">
@@ -75,7 +75,7 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
             <IconBadge icon={CalendarDays} size="lg" tone="accent" />
             <h2 className={`${displayFont.className} mt-5 text-[2rem] font-semibold leading-none text-[var(--text)]`}>Добавьте своё событие</h2>
             <p className="mt-3 text-sm leading-7 text-[var(--muted)]">
-              Делитесь важными событиями с индустрией СКФО.
+              Добавьте событие для специалистов и команд СКФО.
             </p>
             <Button className="mt-6 rounded-[var(--radius-md)] px-5" href="/events?intent=proposal#applications" variant="ghost">
               Предложить событие
@@ -102,7 +102,7 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
             },
             {
               title: 'Профессиональные встречи',
-              description: 'Форматы для комьюнити, где можно собрать рынок вокруг одной задачи.'
+              description: 'Встречи для специалистов, заведений и брендов по одной рабочей теме.'
             }
           ]}
           description="Раздел уже принимает предложения по событиям и новым темам, даже если афиша ещё не заполнена."
@@ -112,7 +112,7 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
       ) : (
         <Suspense
           fallback={
-            <section className="editorial-grid border-b border-[var(--line)] py-10 md:py-14">
+            <section className="background-zone background-zone-ivory editorial-grid border-b border-[var(--line)] py-10 md:py-14">
               <div className="container">
                 <div aria-hidden="true" className="h-40 animate-pulse rounded-[var(--radius-xl)] bg-[var(--skeleton-fill)]" />
               </div>

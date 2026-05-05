@@ -8,26 +8,26 @@ import {
   type PublicApplicationFormProps
 } from '@/components/public/application-form-section';
 import { PublicBodyText, PublicDisplayTitle, PublicEyebrow } from '@/components/public/public-primitives';
-import { Button } from '@/components/ui/button';
 import { ConsentField } from '@/components/ui/consent-field';
 import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
 import { InlineLink } from '@/components/ui/inline-link';
 import { MetaChip } from '@/components/ui/meta-chip';
 import { Select } from '@/components/ui/select';
+import { SubmitButton } from '@/components/ui/submit-button';
 import { Textarea } from '@/components/ui/textarea';
 
 export function PartnerApplicationForm({ enabled, result, utm, cities, defaults = {} }: PublicApplicationFormProps) {
   const highlights = [
-    'Образовательные коллаборации',
-    'Спецпроекты для заведений',
-    'Партнёрские интеграции',
-    'Размещение и поддержка событий'
+    'Образовательные проекты',
+    'События для заведений',
+    'Партнёрские материалы',
+    'Поддержка событий'
   ];
 
   const preparationNotes = [
     'Кто вы и что хотите сделать вместе с BARSYNERGY.',
-    'Какую задачу решает проект: обучение, событие, запуск, размещение или набор контактов.',
+    'Какая задача: обучение, событие, запуск, размещение или новые контакты.',
     'Ссылку на сайт, Telegram или материалы, если их уже можно посмотреть.'
   ];
 
@@ -46,7 +46,7 @@ export function PartnerApplicationForm({ enabled, result, utm, cities, defaults 
           <div className="relative border-b border-white/10 bg-[var(--graphite)] px-5 py-6 text-white md:px-6 md:py-7 lg:border-b-0 lg:border-r lg:border-white/10">
             <PublicEyebrow tone="inverse">Совместный проект</PublicEyebrow>
             <PublicDisplayTitle as="h3" className="mt-3 text-white" size="card">
-              Формат для брендов, школ и заведений
+              Заявка для брендов, школ и заведений
             </PublicDisplayTitle>
             <PublicBodyText className="mt-4 max-w-md" tone="inverse">
               Коротко опишите задачу и идею. Этого достаточно, чтобы начать разговор по делу.
@@ -117,7 +117,7 @@ export function PartnerApplicationForm({ enabled, result, utm, cities, defaults 
                 </ConsentField>
               </div>
               <PublicFormShellFooter className="md:col-span-2" note="После отправки свяжемся и обсудим следующий шаг.">
-                <Button type="submit">Отправить заявку</Button>
+                <SubmitButton>Отправить заявку</SubmitButton>
               </PublicFormShellFooter>
             </div>
           </div>

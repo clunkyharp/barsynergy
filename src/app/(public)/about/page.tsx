@@ -2,14 +2,14 @@ import { EditorialPublicPage } from '@/components/public/editorial-public-page';
 
 export default function AboutPage() {
   return (
-    <EditorialPublicPage
-      eyebrow="О проекте"
-      title="Обучение, события и рабочие контакты для барной индустрии"
-      description="BARSYNERGY собирает образовательные форматы, отраслевые встречи, вакансии, поставщиков и партнёрские запросы."
+      <EditorialPublicPage
+        eyebrow="О проекте"
+        title="Обучение, события и рабочие контакты для барной индустрии"
+        description="BARSYNERGY собирает обучение, отраслевые встречи, вакансии, поставщиков и партнёрские запросы."
       summary="Сайт помогает специалистам, заведениям и партнёрам быстро найти нужный раздел и связаться с командой."
       metrics={[
         { value: '01', label: 'региональный фокус' },
-        { value: '06', label: 'аудиторий проекта' },
+        { value: '06', label: 'разделов сайта' },
         { value: '24/7', label: 'открытый доступ' }
       ]}
       rows={[
@@ -25,7 +25,7 @@ export default function AboutPage() {
         },
         {
           label: 'Граница',
-          title: 'Публичный фокус',
+          title: 'Открытые разделы',
           description: 'Основные разделы открыты без регистрации: материалы, события, вакансии, партнёрства и связь с командой.'
         }
       ]}

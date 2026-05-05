@@ -1,10 +1,10 @@
 import type { AnchorHTMLAttributes, ButtonHTMLAttributes, ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 
-type Variant = 'primary' | 'secondary' | 'ghost' | 'destructive' | 'inverse';
-type Size = 'sm' | 'md' | 'lg';
+export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'destructive' | 'inverse';
+export type ButtonSize = 'sm' | 'md' | 'lg';
 
-const variants: Record<Variant, string> = {
+const variants: Record<ButtonVariant, string> = {
   primary:
     'border-[var(--accent)] bg-[var(--accent)] text-[var(--accent-contrast)] shadow-[0_12px_28px_rgba(157,9,14,0.16)] hover:border-[var(--accent-strong)] hover:bg-[var(--accent-strong)]',
   secondary: 'border-[var(--accent)] bg-transparent text-[var(--accent)] hover:bg-[var(--accent)] hover:text-[var(--accent-contrast)]',
@@ -13,7 +13,7 @@ const variants: Record<Variant, string> = {
   inverse: 'border-[var(--border-inverse)] bg-[var(--surface-inverse)] text-[var(--background)] hover:bg-[var(--accent)] hover:text-[var(--accent-contrast)]'
 };
 
-const sizes: Record<Size, string> = {
+const sizes: Record<ButtonSize, string> = {
   sm: 'min-h-9 px-3 py-1.5 text-xs tracking-normal',
   md: 'min-h-11 px-5 py-2.5 text-sm tracking-normal',
   lg: 'min-h-12 px-6 py-3 text-sm tracking-normal'
@@ -21,14 +21,14 @@ const sizes: Record<Size, string> = {
 
 type CommonProps = {
   children: ReactNode;
-  variant?: Variant;
-  size?: Size;
+  variant?: ButtonVariant;
+  size?: ButtonSize;
   className?: string;
   loading?: boolean;
   loadingText?: string;
 };
 
-type ButtonProps = CommonProps & ButtonHTMLAttributes<HTMLButtonElement>;
+export type ButtonProps = CommonProps & ButtonHTMLAttributes<HTMLButtonElement>;
 type LinkProps = CommonProps &
   AnchorHTMLAttributes<HTMLAnchorElement> & {
     href: string;

@@ -16,6 +16,7 @@ import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
 import { InlineLink } from '@/components/ui/inline-link';
 import { Select } from '@/components/ui/select';
+import { SubmitButton } from '@/components/ui/submit-button';
 import { Textarea } from '@/components/ui/textarea';
 import type { VacancyApplicationFormOptions } from '@/lib/public/content';
 import { vacancyPositionValues } from '@/lib/vacancies/positions';
@@ -64,7 +65,7 @@ function VacancyResponseForm({
         </p>
         <div className="mt-5 flex flex-col gap-3 sm:flex-row">
           <Button className="rounded-[var(--radius-md)]" href="#vacancy-list" size="lg" variant="secondary">
-            Смотреть раздел
+            К вакансиям
           </Button>
           <Button className="rounded-[var(--radius-md)]" href="/contacts" size="lg">
             Написать команде
@@ -155,9 +156,9 @@ function VacancyResponseForm({
           </ConsentField>
         </div>
         <PublicFormShellFooter>
-          <Button className="rounded-[var(--radius-md)] sm:self-start" size="lg" type="submit">
+          <SubmitButton className="rounded-[var(--radius-md)] sm:self-start" size="lg">
             Отправить отклик
-          </Button>
+          </SubmitButton>
         </PublicFormShellFooter>
       </div>
     </form>
@@ -225,7 +226,7 @@ function VacancySubmissionForm({
           <FormField htmlFor="shortDescription" label="Описание роли">
             <Textarea id="shortDescription" name="shortDescription" required maxLength={500} minLength={10} />
           </FormField>
-          <FormField htmlFor="details" label="Что важно знать о вакансии">
+          <FormField htmlFor="details" label="Детали вакансии">
             <Textarea id="details" name="details" required className="min-h-40" maxLength={4000} minLength={20} />
           </FormField>
           <ConsentField>
@@ -234,9 +235,9 @@ function VacancySubmissionForm({
           </ConsentField>
         </div>
         <PublicFormShellFooter>
-          <Button className="rounded-[var(--radius-md)] sm:self-start" size="lg" type="submit">
+          <SubmitButton className="rounded-[var(--radius-md)] sm:self-start" size="lg">
             Отправить вакансию
-          </Button>
+          </SubmitButton>
         </PublicFormShellFooter>
       </div>
     </form>
@@ -270,24 +271,12 @@ export function VacancyApplicationForms({
   return (
     <PublicApplicationSection
       eyebrow="Вакансии / Заявки"
-      title="Заявка на публикацию"
-      description="Отклик доступен на странице конкретной вакансии. Здесь можно отправить вакансию на публикацию."
+      title="Разместить вакансию"
+      description="Заполните роль, условия и контакты компании. После проверки команда подготовит вакансию к публикации."
       enabled={enabled}
       result={result}
     >
       <div className="grid gap-6" id="vacancy-forms">
-        <EditorialShell className="border-black/10 bg-[rgba(255,250,244,0.72)] p-5 shadow-none md:p-6">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Для кандидатов</p>
-          <h3 className="mt-3 text-xl font-semibold leading-7 text-[var(--text)]">Отклик внутри вакансии</h3>
-          <p className="mt-3 max-w-2xl text-sm leading-7 text-[var(--muted)]">
-            Выберите вакансию в списке и откройте её страницу. Там будет форма отклика без выбора вакансии.
-          </p>
-          <div className="mt-5">
-            <Button className="rounded-[var(--radius-md)]" href="#vacancy-list" size="lg" variant="secondary">
-              Смотреть вакансии
-            </Button>
-          </div>
-        </EditorialShell>
         <VacancySubmissionForm options={options} utm={utm} />
       </div>
     </PublicApplicationSection>

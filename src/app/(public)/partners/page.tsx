@@ -33,9 +33,9 @@ const partnerFormats = [
   {
     label: 'Событие',
     title: 'Совместное событие',
-    description: 'Гостевая смена, лекция, дегустация или профессиональная встреча под общую задачу.',
+    description: 'Гостевая смена, лекция, дегустация или встреча под общую задачу.',
     icon: CalendarDays,
-    meta: ['События', 'Комьюнити']
+    meta: ['События', 'Встречи']
   },
   {
     label: 'Обучение',
@@ -53,8 +53,8 @@ const partnerFormats = [
   },
   {
     label: 'Проект',
-    title: 'Спецпроект',
-    description: 'Серия касаний вокруг запуска, сезона, продукта или отраслевой темы.',
+    title: 'Серия материалов или событий',
+    description: 'Несколько материалов или событий вокруг запуска, сезона, продукта или отраслевой темы.',
     icon: Star,
     meta: ['Серия', 'Запуск']
   },
@@ -68,7 +68,7 @@ const partnerFormats = [
   {
     label: 'Регион',
     title: 'Региональная инициатива',
-    description: 'Формат, который помогает собрать рынок вокруг общей задачи в СКФО.',
+    description: 'Формат, который собирает специалистов, заведения и бренды вокруг одной рабочей темы.',
     icon: MapPin,
     meta: ['СКФО', 'Инициатива']
   }
@@ -105,12 +105,12 @@ export default async function PartnersPage({ searchParams }: PartnersPageProps) 
       <EditorialPublicPage
         eyebrow="Для партнёров"
         title="Партнёрство для брендов, школ и заведений"
-        description="Если у вас есть событие, обучение, запуск или совместный проект, здесь можно быстро выйти на разговор с командой BARSYNERGY."
-        summary="Помогаем выбрать формат: одно событие, сезонная серия или постоянное присутствие на сайте."
+        description="Если у вас есть событие, обучение, запуск или совместный проект, здесь можно сразу написать команде BARSYNERGY."
+        summary="Помогаем выбрать формат: одно событие, сезонная серия или карточка компании на сайте."
         metrics={[
           { value: '3', label: 'типа партнёрства' },
           { value: 'Контакт', label: 'прямая связь' },
-          { value: 'СКФО', label: 'локальный рынок' }
+          { value: 'СКФО', label: 'рынок региона' }
         ]}
         rows={[
           {
@@ -121,18 +121,18 @@ export default async function PartnersPage({ searchParams }: PartnersPageProps) 
           {
             label: 'События',
             title: 'Гостевые смены, дегустации и специальные встречи',
-            description: 'Разовые или серийные форматы для нужной аудитории без лишнего шума.'
+            description: 'Разовые или серийные встречи для нужной аудитории без лишних обещаний.'
           },
           {
             label: 'Контент',
-            title: 'Материалы и заметное присутствие на платформе',
+            title: 'Материалы и карточка на сайте',
             description: 'Интервью, подборки и анонсы, которые остаются на сайте после события.'
           }
         ]}
         primaryLink={{ label: 'Оставить заявку', href: '#applications' }}
         secondaryLink={{ label: 'Смотреть спонсорство', href: '/general-sponsors' }}
       />
-      <section className="editorial-grid border-b border-black/20 py-10 md:py-14">
+      <section className="background-zone background-zone-beige editorial-grid border-b border-[var(--line)] py-10 md:py-14">
         <div className="container grid gap-8 xl:grid-cols-[minmax(16rem,0.58fr)_minmax(0,1.42fr)]">
           <div className="xl:sticky xl:top-24 xl:self-start">
             <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Форматы</p>
@@ -165,7 +165,7 @@ export default async function PartnersPage({ searchParams }: PartnersPageProps) 
           cards={[
             {
               title: 'Совместное событие',
-              description: 'Гостевая смена, лекция, дегустация или профессиональная встреча под общую задачу.'
+              description: 'Гостевая смена, лекция, дегустация или встреча под общую задачу.'
             },
             {
               title: 'Образовательный формат',
@@ -176,11 +176,11 @@ export default async function PartnersPage({ searchParams }: PartnersPageProps) 
               description: 'Интервью, подборка, материал или спецвыпуск с понятной пользой для аудитории.'
             },
             {
-              title: 'Каталог и присутствие',
+              title: 'Каталог и карточка компании',
               description: 'Профиль компании, контакты, продукты и география работы в первой подборке.'
             }
           ]}
-          description="Публичный каталог ещё собирается, но заявку на партнёрство уже можно отправить. Ниже основные сценарии, с которыми к нам заходят чаще всего."
+          description="Каталог ещё собирается, но заявку на партнёрство уже можно отправить. Ниже форматы, с которых обычно начинают."
           eyebrow="Партнёрство"
           title="С чего можно начать"
         />
@@ -214,10 +214,10 @@ export default async function PartnersPage({ searchParams }: PartnersPageProps) 
         />
       )}
       {logoItems.length > 0 ? (
-        <section className="editorial-grid border-b border-black/20 py-10 md:py-14">
+        <section className="background-zone background-zone-ivory editorial-grid border-b border-[var(--line)] py-10 md:py-14">
           <div className="container grid gap-8 xl:grid-cols-[minmax(16rem,0.58fr)_minmax(0,1.42fr)]">
             <div>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Нам доверяют</p>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Уже на сайте</p>
               <h2 className={`${displayFont.className} mt-4 max-w-sm text-[2.8rem] font-semibold leading-none tracking-normal text-[var(--text)]`}>
                 Компании и форматы
               </h2>
@@ -226,17 +226,17 @@ export default async function PartnersPage({ searchParams }: PartnersPageProps) 
           </div>
         </section>
       ) : null}
-      <section className="editorial-grid border-b border-black/20 py-10 md:py-14">
+      <section className="background-zone background-zone-cta editorial-grid border-b border-[var(--line)] py-10 md:py-14">
         <div className="container">
           <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Как это работает</p>
-          <div className="mt-5 grid gap-5 rounded-[var(--radius-lg)] border border-black/10 bg-[rgba(255,250,244,0.72)] p-5 md:grid-cols-3 md:p-7">
+          <div className="mt-5 grid gap-5 rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--surface-wash)] p-5 md:grid-cols-3 md:p-7">
             <FeatureItem icon={Handshake} title="Обсуждаем цели" description="Понимаем задачу и подбираем подходящий формат." />
             <FeatureItem icon={CalendarDays} title="Готовим запуск" description="Согласуем формат, сроки, площадку и роли команды." />
             <FeatureItem icon={ChartNoAxesColumnIncreasing} title="Смотрим итоги" description="Разбираем, что сработало и что делать дальше." />
           </div>
           <SectionCtaPanel
             className="mt-7"
-            description="Есть идея или предложение? Давайте обсудим формат и соберём понятный следующий шаг."
+            description="Есть идея или предложение? Опишите её, и команда предложит следующий шаг."
             icon={Handshake}
             primary={{ href: '#applications', label: 'Предложить партнёрство' }}
             secondary={{ href: '/general-sponsors', label: 'Смотреть спонсорство' }}

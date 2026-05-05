@@ -12,11 +12,11 @@ const env = getEnv();
 export const metadata: Metadata = {
   metadataBase: new URL(env.APP_URL),
   title: {
-    default: 'BARSYNERGY: профессиональная среда барной индустрии СКФО',
+    default: 'BARSYNERGY: барная индустрия СКФО',
     template: '%s | BARSYNERGY'
   },
   description:
-    'BARSYNERGY объединяет обучение, события, вакансии, статьи, поставщиков и партнёрства для барной индустрии СКФО.',
+    'Здесь собраны обучение, события, вакансии, статьи, поставщики и партнёрские запросы для барной индустрии СКФО.',
   openGraph: {
     title: 'BARSYNERGY',
     description:

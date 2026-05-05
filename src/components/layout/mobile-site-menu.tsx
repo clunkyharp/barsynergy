@@ -26,6 +26,7 @@ const MENU_TOGGLE_ICON_OFFSET = 5;
 export function MobileSiteMenu({ isOpen, navItems, onOpenChange }: MobileSiteMenuProps) {
   const [isRendered, setIsRendered] = useState(false);
   const overlayId = 'mobile-menu';
+  const portalTarget = typeof document !== 'undefined' ? document.querySelector('.site-shell') ?? document.body : null;
 
   useEffect(() => {
     if (isOpen) {
@@ -109,7 +110,7 @@ export function MobileSiteMenu({ isOpen, navItems, onOpenChange }: MobileSiteMen
     <>
       <MenuToggle isOpen={isOpen} onClick={() => onOpenChange(!isOpen)} overlayId={overlayId} />
 
-      {isRendered && typeof document !== 'undefined'
+      {isRendered && portalTarget
         ? createPortal(
             <div
               aria-hidden={!isOpen}
@@ -161,7 +162,7 @@ export function MobileSiteMenu({ isOpen, navItems, onOpenChange }: MobileSiteMen
                 </nav>
               </div>
             </div>,
-            document.body
+            portalTarget
           )
         : null}
     </>

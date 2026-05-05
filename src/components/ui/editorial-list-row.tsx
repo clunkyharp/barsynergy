@@ -79,7 +79,7 @@ export function EditorialListRow({
           </div>
         </div>
       </div>
-      <div className="flex min-w-0 flex-col justify-between gap-4 border-t border-black/10 pt-4 lg:border-l lg:border-t-0 lg:pl-7 lg:pt-0">
+      <div className="flex min-w-0 flex-col justify-between gap-4 border-t border-[var(--border-default)] pt-4 lg:border-l lg:border-t-0 lg:pl-7 lg:pt-0">
         <div className="max-w-[34rem] text-sm leading-7 text-[var(--muted)]">{description}</div>
         {href ? (
           <div className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--accent)]">
@@ -109,12 +109,12 @@ export function EditorialListRow({
         </div>
       </div>
       {href ? (
-        <div className="flex min-w-0 flex-col justify-center gap-3 border-t border-black/10 pt-4 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
+      <div className="flex min-w-0 flex-col justify-center gap-3 border-t border-[var(--border-default)] pt-4 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
           <span className="inline-flex min-h-11 items-center justify-center gap-2 whitespace-nowrap rounded-[var(--radius-md)] border border-[var(--accent)]/38 px-5 text-sm font-semibold text-[var(--accent)] transition-colors group-hover:border-[var(--accent)] group-hover:bg-[var(--accent)] group-hover:text-white">
             {actionLabel}
             <ArrowUpRight className="transition-transform duration-300 group-hover:translate-x-1" size={16} />
           </span>
-          <span className="inline-flex min-h-11 items-center justify-center whitespace-nowrap rounded-[var(--radius-md)] border border-black/10 px-5 text-sm font-semibold text-[var(--text)]">
+          <span className="inline-flex min-h-11 items-center justify-center whitespace-nowrap rounded-[var(--radius-md)] border border-[var(--border-default)] px-5 text-sm font-semibold text-[var(--text)]">
             Связаться
           </span>
         </div>
@@ -127,10 +127,10 @@ export function EditorialListRow({
       <article
         className={cn(
             variant === 'opportunity'
-              ? 'rounded-[var(--radius-lg)] border border-black/10 bg-[color-mix(in_oklab,var(--surface),white_20%)] px-4 shadow-[0_12px_34px_rgba(20,20,18,0.035)] transition-[border-color,background-color,box-shadow] duration-300 hover:border-black/16 hover:bg-[color-mix(in_oklab,var(--surface),white_24%)] hover:shadow-[0_16px_38px_rgba(20,20,18,0.045)]'
+              ? 'rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[color-mix(in_oklab,var(--surface),white_20%)] px-4 shadow-[0_12px_34px_rgba(20,20,18,0.035)] transition-[border-color,background-color,box-shadow] duration-300 hover:border-[var(--accent)]/24 hover:bg-[color-mix(in_oklab,var(--surface),white_24%)] hover:shadow-[0_16px_38px_rgba(20,20,18,0.045)]'
               : variant === 'directory'
-                ? 'rounded-[var(--radius-lg)] border border-black/10 bg-[color-mix(in_oklab,var(--surface),white_22%)] px-4 shadow-[0_12px_34px_rgba(20,20,18,0.03)] transition-[border-color,background-color,box-shadow] duration-300 hover:border-black/16 hover:bg-[color-mix(in_oklab,var(--surface),white_28%)] hover:shadow-[0_16px_38px_rgba(20,20,18,0.04)]'
-            : 'rounded-[var(--radius-lg)] border border-black/10 bg-[color-mix(in_oklab,var(--surface),white_18%)] px-4 shadow-[0_12px_34px_rgba(20,20,18,0.03)] transition-[border-color,background-color,box-shadow] duration-300 hover:border-black/16 hover:bg-[color-mix(in_oklab,var(--surface),white_24%)] hover:shadow-[0_16px_38px_rgba(20,20,18,0.04)]',
+                ? 'rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[color-mix(in_oklab,var(--surface),white_22%)] px-4 shadow-[0_12px_34px_rgba(20,20,18,0.03)] transition-[border-color,background-color,box-shadow] duration-300 hover:border-[var(--accent)]/24 hover:bg-[color-mix(in_oklab,var(--surface),white_28%)] hover:shadow-[0_16px_38px_rgba(20,20,18,0.04)]'
+            : 'rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[color-mix(in_oklab,var(--surface),white_18%)] px-4 shadow-[0_12px_34px_rgba(20,20,18,0.03)] transition-[border-color,background-color,box-shadow] duration-300 hover:border-[var(--accent)]/24 hover:bg-[color-mix(in_oklab,var(--surface),white_24%)] hover:shadow-[0_16px_38px_rgba(20,20,18,0.04)]',
           className
         )}
         {...props}
@@ -155,7 +155,7 @@ export function EditorialListRow({
   return (
     <Component
       className={cn(
-        'grid gap-5 border-b border-black/10 py-6 md:py-7',
+        'grid gap-5 border-b border-[var(--border-default)] py-6 md:py-7',
         variant === 'default' && columns === 'default' && 'md:grid-cols-[0.24fr_0.5fr_0.7fr]',
         variant === 'default' && columns === 'content' && 'md:grid-cols-[0.26fr_0.52fr_0.72fr]',
         variant === 'opportunity' && 'lg:grid-cols-[minmax(0,1.08fr)_minmax(18rem,0.66fr)]',

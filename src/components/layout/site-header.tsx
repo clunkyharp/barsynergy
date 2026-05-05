@@ -61,7 +61,7 @@ export function SiteHeader() {
       )}
     >
       <div className="container">
-        <div className="relative z-10 flex min-h-[76px] items-center justify-between gap-3 px-0 text-[var(--text)] lg:grid lg:grid-cols-[180px_minmax(0,1fr)_166px] lg:items-center lg:gap-2 xl:grid-cols-[200px_minmax(0,1fr)_188px] xl:gap-3 2xl:grid-cols-[220px_minmax(0,1fr)_236px] 2xl:gap-5">
+        <div className="relative z-10 flex min-h-[76px] items-center justify-between gap-3 px-0 text-[var(--text)] lg:grid lg:grid-cols-[180px_minmax(0,1fr)_180px] lg:items-center lg:gap-2 xl:grid-cols-[190px_minmax(0,1fr)_220px] xl:gap-3 2xl:grid-cols-[220px_minmax(0,1fr)_248px] 2xl:gap-5">
           <a
             aria-label="BARSYNERGY"
             className={cn(
@@ -96,9 +96,9 @@ export function SiteHeader() {
               return (
                 <a
                   className={cn(
-                    'relative inline-flex min-h-9 items-center whitespace-nowrap rounded-[var(--radius-sm)] border border-transparent px-1.5 opacity-86 transition hover:border-[var(--border-subtle)] hover:bg-[var(--accent-soft)] hover:text-[var(--text)] hover:opacity-100 2xl:px-2',
+                    'relative inline-flex min-h-9 items-center whitespace-nowrap rounded-[var(--radius-sm)] px-1.5 opacity-86 transition after:absolute after:inset-x-1.5 after:bottom-1 after:h-px after:origin-left after:scale-x-0 after:bg-[var(--accent)] after:transition-transform hover:text-[var(--text)] hover:opacity-100 hover:after:scale-x-100 2xl:px-2',
                     focusClassName,
-                    isActive && 'border-[var(--accent)] text-[var(--accent)] opacity-100'
+                    isActive && 'text-[var(--accent)] opacity-100 after:scale-x-100'
                   )}
                   key={item.href}
                   href={item.href}
@@ -112,22 +112,24 @@ export function SiteHeader() {
             <ThemeToggle compact />
             <a
               className={cn(
-                'hidden min-h-10 items-center gap-2 whitespace-nowrap rounded-[var(--radius-md)] px-2.5 text-[12px] font-semibold text-[var(--accent)] transition hover:text-[var(--accent-strong)] 2xl:inline-flex 2xl:min-h-11 2xl:px-4',
+                'inline-flex min-h-10 w-10 shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-[var(--radius-md)] px-0 text-[12px] font-semibold text-[var(--accent)] transition hover:bg-[var(--accent-soft)] hover:text-[var(--accent-strong)] 2xl:min-h-11 2xl:w-auto 2xl:px-4',
                 focusClassName
               )}
               href="/auth/login"
+              aria-label="Войти в кабинет"
             >
               <UserRound size={16} strokeWidth={1.8} />
-              Войти
+              <span className="hidden 2xl:inline">Войти</span>
             </a>
             <a
               className={cn(
-                'inline-flex min-h-10 shrink-0 items-center gap-2 whitespace-nowrap rounded-[var(--radius-md)] border border-[var(--accent)] px-3 text-[12px] font-semibold text-[var(--accent)] transition-colors duration-200 hover:bg-[var(--accent)] hover:text-[var(--accent-contrast)] xl:px-3.5 2xl:min-h-11 2xl:gap-3 2xl:px-5',
+                'inline-flex min-h-10 shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-[var(--radius-md)] border border-[var(--accent)] px-2.5 text-[12px] font-semibold text-[var(--accent)] transition-colors duration-200 hover:bg-[var(--accent)] hover:text-[var(--accent-contrast)] xl:px-3.5 2xl:min-h-11 2xl:gap-3 2xl:px-5',
                 focusClassName
               )}
               href="/contacts"
+              aria-label="Связаться"
             >
-              <span>Связаться</span>
+              <span className="hidden xl:inline">Связаться</span>
               <ArrowUpRight size={18} />
             </a>
           </div>

@@ -8,12 +8,12 @@ import {
   PublicFormShellHeader,
   type PublicApplicationFormProps
 } from '@/components/public/application-form-section';
-import { Button } from '@/components/ui/button';
 import { ConsentField } from '@/components/ui/consent-field';
 import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
 import { InlineLink } from '@/components/ui/inline-link';
 import { Select } from '@/components/ui/select';
+import { SubmitButton } from '@/components/ui/submit-button';
 import { Textarea } from '@/components/ui/textarea';
 
 export function EventApplicationForm({ enabled, result, utm, cities, defaults = {} }: PublicApplicationFormProps) {
@@ -22,8 +22,8 @@ export function EventApplicationForm({ enabled, result, utm, cities, defaults = 
   return (
     <PublicApplicationSection
       eyebrow="События / Заявка"
-      title={hasEventContext ? 'Заявка на выбранное событие' : 'Участие в событии или своё предложение'}
-      description={hasEventContext ? 'Название события уже подставлено в форму.' : 'Можно записаться на событие или предложить свой формат.'}
+      title={hasEventContext ? 'Заявка на выбранное событие' : 'Записаться или предложить событие'}
+      description={hasEventContext ? 'Название события уже подставлено в форму.' : 'Можно записаться или предложить новую встречу.'}
       enabled={enabled}
       result={result}
     >
@@ -31,9 +31,9 @@ export function EventApplicationForm({ enabled, result, utm, cities, defaults = 
         <HiddenUtmFields utm={utm} />
         <HoneypotField id="event-application-website" />
         <PublicFormShellHeader
-          eyebrow="Участие и предложение"
+          eyebrow="Событие"
           title={hasEventContext ? defaults.eventTitle! : 'Заявка на событие'}
-          description={hasEventContext ? 'Оставьте контакт и короткий комментарий по участию.' : 'Для участия, новой темы, коллаборации или события в календаре.'}
+          description={hasEventContext ? 'Оставьте контакт и короткий комментарий по участию.' : 'Для участия, новой темы или события в календаре.'}
         />
         <div className="relative p-5 md:p-6">
           <div className="grid gap-4 md:grid-cols-2">
@@ -67,9 +67,9 @@ export function EventApplicationForm({ enabled, result, utm, cities, defaults = 
             </div>
           </div>
           <PublicFormShellFooter note="Если предлагаете своё событие, напишите, где оно пройдёт, о чём будет и кто придёт.">
-            <Button className="min-h-12 rounded-[var(--radius-md)] px-6 tracking-normal sm:self-start" type="submit">
+            <SubmitButton className="min-h-12 rounded-[var(--radius-md)] px-6 tracking-normal sm:self-start">
               Отправить заявку
-            </Button>
+            </SubmitButton>
           </PublicFormShellFooter>
         </div>
       </form>

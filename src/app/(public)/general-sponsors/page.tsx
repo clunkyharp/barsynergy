@@ -6,22 +6,24 @@ import { FeatureItem, IconBadge, SectionCtaPanel } from '@/components/public/pub
 import { Button } from '@/components/ui/button';
 import { Panel } from '@/components/ui/panel';
 import { displayFont } from '@/lib/fonts';
-import { GENERAL_SPONSORS } from '@/lib/public/general-sponsors';
+import { getPublishedGeneralSponsors } from '@/lib/public/general-sponsors';
 
 export const metadata: Metadata = {
   title: 'Спонсорство',
   description: 'Спонсорские форматы BARSYNERGY для брендов и компаний.'
 };
 
+export const dynamic = 'force-dynamic';
+
 const benefits = [
   {
     icon: Users,
-    title: 'Прямой доступ к аудитории',
-    description: 'Профессиональная барная среда СКФО: бармены, владельцы, менеджеры, поставщики.'
+    title: 'Выход к аудитории',
+    description: 'Бармены, владельцы, менеджеры и поставщики СКФО.'
   },
   {
     icon: Megaphone,
-    title: 'Больше точек контакта',
+    title: 'Несколько мест для упоминания',
     description: 'Упоминания в событиях, материалах сайта и рассылках.'
   },
   {
@@ -39,31 +41,33 @@ const benefits = [
 const packageLevels = [
   {
     title: 'Партнёр события',
-    description: 'Поддержка отдельного события или инициативы сообщества.',
-    price: 'от 50 000 ₽',
+    description: 'Поддержка отдельной встречи или проекта.',
+    price: 'Цена по запросу',
     recommended: false,
     items: ['Логотип на странице события', 'Упоминание в анонсах', 'Пост в социальных сетях', 'Материалы на площадке']
   },
   {
     title: 'Сезонный партнёр',
-    description: 'Сотрудничество на сезон мероприятий BARSYNERGY.',
-    price: 'от 150 000 ₽',
+    description: 'Участие в серии событий сезона.',
+    price: 'Цена по запросу',
     recommended: false,
-    items: ['Всё из пакета события', 'Логотип на событиях сезона', '2 публикации в социальных сетях', 'Интеграция в email-рассылку']
+    items: ['Всё из пакета события', 'Логотип на событиях сезона', '2 публикации в социальных сетях', 'Упоминание в email-рассылке']
   },
   {
     title: 'Генеральный спонсор',
-    description: 'Главное партнёрское место на сезон.',
-    price: 'от 300 000 ₽',
+    description: 'Главная партнёрская позиция на сезон.',
+    price: 'Цена по запросу',
     recommended: true,
-    items: ['Эксклюзивная категория в сезон', 'Главный логотип на площадках', 'Приветственное слово или интервью', 'Совместные активности и контент']
+    items: ['Эксклюзивная категория в сезон', 'Главный логотип на площадках', 'Приветственное слово или интервью', 'Совместные события и материалы']
   }
 ] as const;
 
-export default function GeneralSponsorsPage() {
+export default async function GeneralSponsorsPage() {
+  const generalSponsors = await getPublishedGeneralSponsors();
+
   return (
     <>
-      <section className="border-b border-[var(--line)] py-10 pt-[118px] md:py-14 md:pt-[132px]">
+      <section className="background-zone background-zone-hero border-b border-[var(--line)] py-10 md:py-14">
         <div className="container grid gap-8 lg:grid-cols-[minmax(0,0.95fr)_minmax(20rem,0.72fr)] lg:items-center">
           <div className="min-w-0">
             <p className="text-sm leading-6 text-[var(--muted)]">
@@ -74,7 +78,7 @@ export default function GeneralSponsorsPage() {
               Спонсорство BARSYNERGY
             </PublicDisplayTitle>
             <PublicBodyText className="mt-6 max-w-2xl" size="md">
-              Поддерживайте события, обучение и материалы для барной индустрии СКФО. Мы покажем бренд там, где его увидят специалисты и заведения.
+              Бренд может поддержать события, обучение и материалы для барной индустрии СКФО. Мы покажем его там, где его увидят специалисты и заведения.
             </PublicBodyText>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Button className="rounded-[var(--radius-md)] px-7" href="/contacts?topic=sponsorship" size="lg">
@@ -87,12 +91,12 @@ export default function GeneralSponsorsPage() {
           </div>
           <div
             aria-hidden="true"
-            className="min-h-[300px] rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[url('/images/generated/hustle-brew-lineup-v1.png')] bg-cover bg-center grayscale-[0.08] shadow-[0_24px_60px_rgba(20,20,18,0.08)]"
+            className="min-h-[300px] rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[url('/images/generated/sponsorship-coffee-bar.jpg')] bg-cover bg-center grayscale-[0.03] shadow-[0_24px_60px_rgba(20,20,18,0.08)]"
           />
         </div>
       </section>
 
-      <section className="border-b border-[var(--line)] py-10 md:py-14">
+      <section className="background-zone background-zone-beige border-b border-[var(--line)] py-10 md:py-14">
         <div className="container">
           <PublicEyebrow>Что получает бренд</PublicEyebrow>
           <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
@@ -107,7 +111,7 @@ export default function GeneralSponsorsPage() {
         </div>
       </section>
 
-      <section className="border-b border-[var(--line)] py-10 md:py-14">
+      <section className="background-zone background-zone-ivory border-b border-[var(--line)] py-10 md:py-14">
         <div className="container">
           <PublicEyebrow>Пакеты спонсорства</PublicEyebrow>
           <div className="mt-6 grid gap-5 lg:grid-cols-3">
@@ -115,8 +119,8 @@ export default function GeneralSponsorsPage() {
               <Panel
                 className={
                   level.recommended
-                    ? 'relative border-[var(--accent)]/52 bg-[var(--accent-soft)]'
-                    : 'border-[var(--border-default)] bg-[var(--surface-wash)]'
+                    ? 'relative flex h-full flex-col border-[var(--accent)]/52 bg-[var(--accent-soft)]'
+                    : 'flex h-full flex-col border-[var(--border-default)] bg-[var(--surface-wash)]'
                 }
                 key={level.title}
                 padding="lg"
@@ -128,7 +132,7 @@ export default function GeneralSponsorsPage() {
                 ) : null}
                 <h2 className={`${displayFont.className} text-[2rem] font-semibold leading-none text-[var(--text)]`}>{level.title}</h2>
                 <p className="mt-4 text-sm leading-7 text-[var(--muted)]">{level.description}</p>
-                <div className="mt-6 grid gap-3">
+                <div className="mt-6 grid flex-1 content-start gap-3">
                   {level.items.map((item) => (
                     <FeatureItem icon={BookOpen} key={item} title={item} />
                   ))}
@@ -151,21 +155,35 @@ export default function GeneralSponsorsPage() {
         </div>
       </section>
 
-      <section className="border-b border-[var(--line)] py-10 md:py-14">
+      <section className="background-zone background-zone-sponsor border-b border-[var(--line)] py-10 md:py-14">
         <div className="container">
           <PublicEyebrow>Генеральный спонсор сезона</PublicEyebrow>
           <div className="mt-6 grid gap-5">
-            {GENERAL_SPONSORS.map((sponsor) => (
-              <GeneralSponsorCard key={sponsor.id} sponsor={sponsor} />
-            ))}
+            {generalSponsors.length > 0 ? (
+              generalSponsors.map((sponsor) => <GeneralSponsorCard key={sponsor.id} sponsor={sponsor} />)
+            ) : (
+              <Panel className="border-[var(--border-default)] bg-[var(--surface-wash)]" padding="lg">
+                <h2 className={`${displayFont.className} text-[2rem] font-semibold leading-none text-[var(--text)]`}>
+                  Опубликованного генерального спонсора пока нет
+                </h2>
+                <p className="mt-4 max-w-2xl text-sm leading-7 text-[var(--muted)]">
+                  Когда команда опубликует запись в админке, карточка появится здесь и на главной странице.
+                </p>
+                <div className="mt-6">
+                  <Button className="rounded-[var(--radius-md)] px-7" href="/contacts?topic=sponsorship">
+                    Обсудить спонсорство
+                  </Button>
+                </div>
+              </Panel>
+            )}
           </div>
         </div>
       </section>
 
-      <section className="border-b border-[var(--line)] py-10 md:py-14">
+      <section className="background-zone background-zone-cta border-b border-[var(--line)] py-10 md:py-14">
         <div className="container">
           <SectionCtaPanel
-            description="Расскажите о своих целях, и команда подберёт формат партнёрства под задачу бренда."
+            description="Расскажите, какую задачу нужно решить, и команда предложит формат партнёрства."
             icon={Handshake}
             primary={{ href: '/contacts?topic=sponsorship', label: 'Оставить заявку' }}
             secondary={{ href: '/contacts?topic=sponsorship-presentation', label: 'Запросить презентацию' }}

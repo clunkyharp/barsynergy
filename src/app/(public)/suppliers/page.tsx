@@ -22,7 +22,7 @@ type SuppliersPageProps = {
 
 export const metadata: Metadata = {
   title: 'Поставщики',
-  description: 'Каталог поставщиков, сервисов и полезных контактов BARSYNERGY.'
+  description: 'Каталог поставщиков, сервисов и контактов BARSYNERGY.'
 };
 
 export default async function SuppliersPage({ searchParams }: SuppliersPageProps) {
@@ -46,12 +46,12 @@ export default async function SuppliersPage({ searchParams }: SuppliersPageProps
       <EditorialPublicPage
         eyebrow="Поставщики"
         title="Поставщики, сервисы и полезные контакты"
-        description="Каталог компаний и сервисов для закупок, запуска и повседневной работы баров, кофеен и ресторанных команд."
-        summary="Здесь собраны производители, дистрибьюторы, сервисные команды и локальные контакты, которые правда помогают в работе."
+        description="Каталог для заведений: поставки, сервис, оборудование и контакты компаний, с которыми можно обсудить рабочие условия."
+        summary="Карточка поставщика показывает категорию, географию, статус проверки и понятный способ связаться с компанией."
         summaryHeading="В фокусе"
         metrics={[
           { value: 'СКФО', label: 'региональный фокус' },
-          { value: 'B2B', label: 'прикладной каталог' },
+          { value: 'Каталог', label: 'для заведений' },
           { value: 'Контакт', label: 'прямой выход на компанию' }
         ]}
         rows={[
@@ -93,10 +93,10 @@ export default async function SuppliersPage({ searchParams }: SuppliersPageProps
             },
             {
               title: 'Сервисные команды',
-              description: 'Подрядчики, обслуживание и поддержка там, где нужен понятный рабочий контакт.'
+              description: 'Подрядчики, обслуживание и поддержка там, где нужен прямой контакт.'
             }
           ]}
-          description="Каталог формируется, но заявки на добавление компаний уже открыты. Можно сразу оставить контакты и описание работы."
+          description="Каталог формируется, но заявки на добавление компаний уже открыты. Укажите категорию, географию работы, условия поставки и контакт для заведений."
           eyebrow="Раздел готовится"
           title="Сейчас мы собираем первую подборку"
         />
@@ -120,7 +120,7 @@ export default async function SuppliersPage({ searchParams }: SuppliersPageProps
           listAction={{ href: '#applications', label: 'Добавить компанию', variant: 'ghost' }}
           listLabel="Поставщики"
           rowVariant="directory"
-          rowActionLabel="Открыть профиль"
+          rowActionLabel="Связаться"
           sectionId="suppliers-list"
           title="Каталог"
         />

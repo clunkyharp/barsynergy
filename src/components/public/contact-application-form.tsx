@@ -20,38 +20,39 @@ import { InlineAlert } from '@/components/ui/inline-alert';
 import { Input } from '@/components/ui/input';
 import { InlineLink } from '@/components/ui/inline-link';
 import { Select } from '@/components/ui/select';
+import { SubmitButton } from '@/components/ui/submit-button';
 import { Textarea } from '@/components/ui/textarea';
 
 const contactTopicOptions = [
   {
     value: 'education-program',
     label: 'Обучение',
-    description: 'Для команды, новой темы, запуска программы или учебного запроса.'
+    description: 'Для команды, темы занятия или запроса на программу.'
   },
   {
     value: 'event',
     label: 'Событие',
-    description: 'Для добавления события, участия, коллаборации или предложения новой встречи.'
+    description: 'Для добавления события, участия или предложения новой встречи.'
   },
   {
     value: 'vacancy-placement',
     label: 'Вакансия',
-    description: 'Для размещения роли, поиска сотрудника и сбора первых откликов.'
+    description: 'Для размещения роли, поиска сотрудника и получения откликов.'
   },
   {
     value: 'supplier',
     label: 'Поставщик',
-    description: 'Для заявки в каталог, добавления компании или сервисной команды.'
+    description: 'Для заявки в каталог, добавления компании или сервисной услуги.'
   },
   {
     value: 'partnership',
     label: 'Партнёрство',
-    description: 'Для совместных проектов, размещения, образовательных и редакционных форматов.'
+    description: 'Для совместных проектов, размещения, обучения или материалов.'
   },
   {
     value: 'sponsorship',
     label: 'Спонсорство',
-    description: 'Для сезонного присутствия, партнёрства в событиях и брендовых интеграций.'
+    description: 'Для участия бренда в сезоне, событиях или материалах.'
   },
   {
     value: 'article-topic',
@@ -61,7 +62,7 @@ const contactTopicOptions = [
   {
     value: 'other',
     label: 'Другое',
-    description: 'Если запрос не подходит под готовые сценарии.'
+    description: 'Если запрос не подходит под другие темы.'
   }
 ] as const;
 
@@ -86,7 +87,7 @@ export function ContactApplicationForm({ enabled, result, utm, cities, defaultTo
           : topic === 'partnership'
             ? 'Какой формат партнёрства хотите обсудить'
             : topic === 'sponsorship'
-              ? 'Какую задачу должно решить спонсорство'
+              ? 'Что хотите получить от спонсорства'
               : topic === 'article-topic'
                 ? 'О чём должен быть материал'
                 : topic === 'education-program'
@@ -232,10 +233,10 @@ export function ContactApplicationForm({ enabled, result, utm, cities, defaultTo
               </ConsentField>
             </div>
           </div>
-          <PublicFormShellFooter note="Форма подстраивается под тему. Ответ придёт по указанному способу связи.">
-            <Button className="min-h-12 rounded-[var(--radius-md)] px-6 tracking-normal sm:self-start" type="submit">
+          <PublicFormShellFooter note="Поля меняются после выбора темы. Ответ придёт по указанному способу связи.">
+            <SubmitButton className="min-h-12 rounded-[var(--radius-md)] px-6 tracking-normal sm:self-start">
               Отправить сообщение
-            </Button>
+            </SubmitButton>
           </PublicFormShellFooter>
         </div>
       </form>

@@ -82,7 +82,7 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
           {
             label: 'Документы',
             title: 'Условия и данные',
-            description: 'Если запрос связан с регистрацией или персональными данными, нужные документы уже рядом.'
+            description: 'Если запрос связан с регистрацией или персональными данными, ссылки на документы собраны здесь.'
           }
         ]}
         primaryLink={{ label: 'Открыть форму', href: '#applications' }}

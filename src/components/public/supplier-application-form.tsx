@@ -8,12 +8,12 @@ import {
   PublicFormShellHeader,
   type PublicApplicationFormProps
 } from '@/components/public/application-form-section';
-import { Button } from '@/components/ui/button';
 import { ConsentField } from '@/components/ui/consent-field';
 import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
 import { InlineLink } from '@/components/ui/inline-link';
 import { Select } from '@/components/ui/select';
+import { SubmitButton } from '@/components/ui/submit-button';
 import { Textarea } from '@/components/ui/textarea';
 
 export function SupplierApplicationForm({ enabled, result, utm, cities }: PublicApplicationFormProps) {
@@ -21,7 +21,7 @@ export function SupplierApplicationForm({ enabled, result, utm, cities }: Public
     <PublicApplicationSection
       eyebrow="Поставщики / Заявка"
       title="Подать заявку в каталог"
-      description="Оставьте данные компании и коротко расскажите, что вы поставляете."
+      description="Укажите компанию, города работы, условия поставки и контакт для заведений."
       enabled={enabled}
       result={result}
     >
@@ -31,7 +31,7 @@ export function SupplierApplicationForm({ enabled, result, utm, cities }: Public
         <PublicFormShellHeader
           eyebrow="Компания и поставка"
           title="Заявка поставщика"
-          description="Компания, контакты и короткое описание того, с чем вы работаете."
+          description="Укажите категорию, продукты или услуги, минимальные условия заказа, если они есть, и рабочий контакт."
         />
         <div className="relative p-5 md:p-6">
           <div className="grid gap-4 md:grid-cols-2">
@@ -55,7 +55,7 @@ export function SupplierApplicationForm({ enabled, result, utm, cities }: Public
             <FormField htmlFor="supplierWebsiteUrl" label="Сайт">
               <Input id="supplierWebsiteUrl" name="websiteUrl" type="url" maxLength={500} />
             </FormField>
-            <FormField htmlFor="supplierServiceArea" label="Что поставляете">
+            <FormField htmlFor="supplierServiceArea" label="Категория и география">
               <Input id="supplierServiceArea" name="serviceArea" required maxLength={160} minLength={2} />
             </FormField>
             <div className="md:col-span-2">
@@ -71,9 +71,9 @@ export function SupplierApplicationForm({ enabled, result, utm, cities }: Public
             </div>
           </div>
           <PublicFormShellFooter>
-            <Button className="min-h-12 rounded-[var(--radius-md)] px-6 tracking-normal sm:self-start" type="submit">
+            <SubmitButton className="min-h-12 rounded-[var(--radius-md)] px-6 tracking-normal sm:self-start">
               Отправить заявку
-            </Button>
+            </SubmitButton>
           </PublicFormShellFooter>
         </div>
       </form>

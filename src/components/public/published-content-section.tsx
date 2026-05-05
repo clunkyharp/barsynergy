@@ -89,7 +89,7 @@ function renderOpportunityChip(entry: PublishedContentMetaGroup) {
         'inline-flex max-w-full items-center gap-2 rounded-[var(--radius-sm)] border px-3 py-1.5 text-[11px] leading-5 text-[var(--text)]',
         entry.tone === 'accent'
           ? 'border-[rgba(101,32,27,0.22)] bg-[rgba(101,32,27,0.05)] font-semibold text-[var(--accent)]'
-          : 'border-black/10 bg-[rgba(255,252,247,0.96)]'
+          : 'border-[var(--border-default)] bg-[var(--surface-wash)]'
       )}
       key={`${entry.label ?? 'meta'}-${entry.value}`}
     >
@@ -232,7 +232,7 @@ export function PublishedContentSection({
   const emptyStateActions = buildEmptyActions(basePath, hasActiveFilters, resolvedEmptyActions);
 
   return (
-    <section className="editorial-grid border-b border-black/20 py-10 md:py-14" id={sectionId}>
+    <section className="background-zone background-zone-ivory editorial-grid border-b border-[var(--line)] py-10 md:py-14" id={sectionId}>
       <div className="container grid gap-8 xl:grid-cols-[minmax(16rem,0.58fr)_minmax(0,1.42fr)] xl:gap-10">
         <div className="xl:sticky xl:top-24 xl:self-start">
           <PublicDisplayTitle className="max-w-sm">{title}</PublicDisplayTitle>
@@ -308,7 +308,7 @@ export function PublishedContentSection({
               ))}
             </div>
 
-            <div className="mt-2 flex flex-wrap items-center justify-between gap-3 border-t border-black/10 pt-5">
+            <div className="mt-4 flex flex-wrap items-center justify-between gap-3 pt-3">
               <MetaChip className="border-black/10 bg-transparent text-[var(--muted)]" variant="default">
                 Страница {content.page} из {content.totalPages}
               </MetaChip>

@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { MetaChip } from '@/components/ui/meta-chip';
 import { Panel } from '@/components/ui/panel';
 import { displayFont } from '@/lib/fonts';
-import type { PublishedContentList } from '@/lib/public/content';
+import type { PublishedContentList, PublishedContentMetaGroup } from '@/lib/public/content';
 import { cn } from '@/lib/utils';
 
 type LinkAction = {
@@ -51,9 +51,9 @@ export function PlatformActionCard({
 
         <div className="min-w-0 rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--surface-wash)] p-4">
           <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Как это работает</p>
-          <ol className="mt-4 grid gap-3">
+          <ol className="mt-4 grid gap-0">
             {steps.map((step, index) => (
-              <li className="grid grid-cols-[2rem_minmax(0,1fr)] gap-3" key={step}>
+              <li className="grid min-h-[3.7rem] grid-cols-[2rem_minmax(0,1fr)] gap-3" key={step}>
                 <span className="flex h-8 w-8 items-center justify-center rounded-full border border-[var(--accent)]/20 bg-[var(--accent)]/8 text-[11px] font-semibold tabular-nums text-[var(--accent)]">
                   {String(index + 1).padStart(2, '0')}
                 </span>
@@ -90,6 +90,7 @@ export type PlatformFormatCardProps = {
   icon?: ComponentType<{ className?: string; size?: number; strokeWidth?: number }>;
   audience?: string;
   outcome?: string;
+  status?: string;
   meta?: readonly string[];
   action?: LinkAction;
   className?: string;
@@ -102,6 +103,7 @@ export function PlatformFormatCard({
   icon,
   audience,
   outcome,
+  status,
   meta = [],
   action,
   className
@@ -147,6 +149,9 @@ export function PlatformFormatCard({
         ) : null}
         {action ? (
           <CardActionRow className="mt-5 pt-4">
+            <span className="rounded-[var(--radius-sm)] border border-[var(--accent)]/20 bg-[var(--accent-soft)] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--accent)]">
+              {status ?? 'Заявки принимаются'}
+            </span>
             <Button className="px-0 text-[11px] tracking-[0.14em]" href={action.href} size="sm" variant={action.variant ?? 'ghost'}>
               {action.label}
               <ArrowUpRight size={14} />
@@ -213,22 +218,33 @@ export function DateBlock({ date }: { date: string }) {
   );
 }
 
-export function ToolTeaser() {
+export type ToolTeaserContent = {
+  eyebrow: string;
+  title: string;
+  cardEyebrow: string;
+  cardTitle: string;
+  description: string;
+  steps: string[];
+  actionLabel: string;
+  actionHref: string;
+};
+
+export function ToolTeaser({ teaser }: { teaser: ToolTeaserContent }) {
   return (
-    <section className="editorial-grid border-b border-[var(--line)] py-10 md:py-14">
+    <section className="background-zone background-zone-tool editorial-grid border-b border-[var(--line)] py-10 md:py-14">
       <div className="container grid gap-8 xl:grid-cols-[minmax(16rem,0.58fr)_minmax(0,1.42fr)]">
         <div className="min-w-0">
-          <PublicEyebrow>Инструменты</PublicEyebrow>
+          <PublicEyebrow>{teaser.eyebrow}</PublicEyebrow>
           <PublicDisplayTitle className="mt-3 max-w-[22rem] !text-[clamp(2rem,3vw,2.85rem)] [overflow-wrap:normal] [word-break:normal]">
-            Калькулятор себестоимости
+            {teaser.title}
           </PublicDisplayTitle>
         </div>
         <PlatformActionCard
-          action={{ href: '/tools/cost-calculator', label: 'Открыть калькулятор' }}
-          description="Быстрый расчёт себестоимости напитка или позиции меню без регистрации и сохранения данных."
-          eyebrow="Практический инструмент"
-          steps={['Введите ингредиенты и цену упаковки', 'Укажите количество в рецепте', 'Получите себестоимость и рекомендованную цену']}
-          title="Для меню, обучения и расчётов по экономике бара"
+          action={{ href: teaser.actionHref, label: teaser.actionLabel }}
+          description={teaser.description}
+          eyebrow={teaser.cardEyebrow}
+          steps={teaser.steps}
+          title={teaser.cardTitle}
         />
       </div>
     </section>
@@ -271,6 +287,23 @@ function monthLabel(dateIso?: string) {
   return value.toLocaleDateString('ru-RU', { month: 'long', year: 'numeric' });
 }
 
+function renderEntityMeta(entry: PublishedContentMetaGroup) {
+  return (
+    <span
+      className={cn(
+        'inline-flex max-w-full items-center gap-2 rounded-[var(--radius-sm)] border px-3 py-1.5 text-[11px] leading-5 text-[var(--text)]',
+        entry.tone === 'accent'
+          ? 'border-[rgba(101,32,27,0.22)] bg-[rgba(101,32,27,0.05)] font-semibold text-[var(--accent)]'
+          : 'border-[var(--border-default)] bg-[var(--surface-wash)]'
+      )}
+      key={`${entry.label ?? 'meta'}-${entry.value}`}
+    >
+      {entry.label ? <span className="font-semibold uppercase tracking-[0.12em] text-[var(--muted)]">{entry.label}</span> : null}
+      <span className="break-words">{entry.value}</span>
+    </span>
+  );
+}
+
 export function EventAgendaSection({
   content,
   filters
@@ -292,7 +325,7 @@ export function EventAgendaSection({
   }, []);
 
   return (
-    <section className="editorial-grid border-b border-[var(--line)] py-10 md:py-14" id="events-list">
+    <section className="background-zone background-zone-ivory editorial-grid border-b border-[var(--line)] py-10 md:py-14" id="events-list">
       <div className="container">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
@@ -332,24 +365,37 @@ export function EventAgendaSection({
                 <div className="grid gap-4">
                   {group.items.map((item) => (
                     <article
-                      className="grid gap-4 border-b border-[var(--line)] bg-transparent py-6 md:grid-cols-[6rem_minmax(0,1fr)_minmax(13rem,0.34fr)_9rem] md:items-center"
+                      className="grid gap-5 rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[color-mix(in_oklab,var(--surface),white_18%)] p-4 shadow-[0_12px_34px_rgba(20,20,18,0.03)] transition hover:border-[var(--accent)]/28 hover:bg-[color-mix(in_oklab,var(--surface),white_24%)] md:grid-cols-[5.5rem_minmax(0,1fr)_minmax(13rem,0.34fr)_9rem] md:items-center md:p-5"
                       key={item.id}
                     >
                       <DateBlock date={item.dateIso ?? ''} />
                       <div className="min-w-0">
-                        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">
-                          {item.label ?? 'Событие'}
-                        </p>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">
+                            {item.label ?? 'Событие'}
+                          </p>
+                          {item.statusLabel ? (
+                            <span className="rounded-[var(--radius-sm)] border border-[var(--accent)]/20 bg-[var(--accent-soft)] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--accent)]">
+                              {item.statusLabel}
+                            </span>
+                          ) : null}
+                        </div>
                         <h3 className={`${displayFont.className} mt-2 text-[1.65rem] font-semibold leading-none text-[var(--text)] md:text-[2.2rem]`}>
                           {item.title}
                         </h3>
-                        <div className="mt-3 flex flex-wrap gap-2">
-                          {(item.meta ?? []).slice(0, 4).map((entry) => (
-                            <MetaChip className="border-[var(--border-default)] bg-transparent text-[var(--muted)]" key={entry} variant="filter">
-                              {entry}
-                            </MetaChip>
-                          ))}
-                        </div>
+                        {item.metaGroups && item.metaGroups.length > 0 ? (
+                          <div className="mt-4 flex flex-wrap gap-2.5">
+                            {item.metaGroups.map((entry) => renderEntityMeta(entry))}
+                          </div>
+                        ) : (
+                          <div className="mt-3 flex flex-wrap gap-2">
+                            {(item.meta ?? []).slice(0, 4).map((entry) => (
+                              <MetaChip className="border-[var(--border-default)] bg-transparent text-[var(--muted)]" key={entry} variant="filter">
+                                {entry}
+                              </MetaChip>
+                            ))}
+                          </div>
+                        )}
                         <PublicBodyText className="mt-3 max-w-2xl">{item.summary}</PublicBodyText>
                       </div>
                       <a
@@ -381,7 +427,7 @@ export function EventAgendaSection({
               </div>
             ))}
 
-            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[var(--line)] pt-5">
+            <div className="flex flex-wrap items-center justify-between gap-3 pt-3">
               <MetaChip className="border-[var(--border-default)] bg-transparent text-[var(--muted)]" variant="default">
                 Страница {content.page} из {content.totalPages}
               </MetaChip>

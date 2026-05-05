@@ -30,6 +30,8 @@ export const metadata: Metadata = {
   description: 'Вакансии для баров, кофеен и команд Северного Кавказа.'
 };
 
+const moderationSteps = ['Отправка', 'Проверка', 'Уточнение', 'Публикация', 'Отклики'] as const;
+
 export default async function VacanciesPage({ searchParams }: VacanciesPageProps) {
   const params = (await searchParams) ?? {};
   const contentParams = stripPublicApplicationResultParams(params);
@@ -46,11 +48,7 @@ export default async function VacanciesPage({ searchParams }: VacanciesPageProps
 
   return (
     <>
-      <section className="relative overflow-hidden border-b border-black/20 py-10 md:py-14">
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_20%,rgba(153,44,38,0.1),transparent_18%),radial-gradient(circle_at_82%_22%,rgba(255,255,255,0.62),transparent_18%),radial-gradient(circle_at_76%_84%,rgba(20,20,18,0.06),transparent_24%)]"
-        />
+      <section className="background-zone background-zone-hero border-b border-[var(--line)] py-10 md:py-14">
         <div className="container relative">
           <div className="min-w-0 max-w-5xl">
             <PublicEyebrow>Вакансии</PublicEyebrow>
@@ -58,19 +56,23 @@ export default async function VacanciesPage({ searchParams }: VacanciesPageProps
               Работа для баров, кофеен и команд Северного Кавказа
             </PublicDisplayTitle>
             <PublicBodyText className="mt-5 max-w-2xl" size="md">
-              Здесь собраны открытые вакансии для баров, кофеен и команд региона. Можно открыть конкретную роль и отправить свою вакансию на публикацию.
+              Здесь можно найти открытую роль или отправить вакансию на публикацию.
             </PublicBodyText>
-            <PublicActionRow className="flex-col gap-3 sm:flex-row">
-              <Button className="min-h-12 rounded-[var(--radius-md)] px-6 tracking-normal" href="#vacancy-list">
+            <PublicActionRow className="items-start gap-3">
+              <Button className="min-h-12 w-full max-w-[14.5rem] rounded-[var(--radius-md)] px-6 tracking-normal sm:w-auto" href="#vacancy-list">
                 Смотреть вакансии
                 <ArrowUpRight size={18} />
               </Button>
-              <Button className="min-h-12 rounded-[var(--radius-md)] px-6 tracking-normal" href="#vacancy-submission" variant="secondary">
+              <Button
+                className="min-h-12 w-full max-w-[15rem] rounded-[var(--radius-md)] px-6 tracking-normal sm:w-auto"
+                href="#vacancy-submission"
+                variant="secondary"
+              >
                 Разместить вакансию
               </Button>
             </PublicActionRow>
             <div className="mt-8 grid gap-4 lg:grid-cols-2">
-              <div className="rounded-[var(--radius-lg)] border border-black/10 bg-[rgba(255,250,244,0.8)] p-5">
+              <div className="rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--surface-wash)] p-5">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Я ищу работу</p>
                 <h2 className={`${displayFont.className} mt-4 text-[1.8rem] font-semibold leading-none text-[var(--text)]`}>
                   Смотреть роли и откликнуться
@@ -79,12 +81,12 @@ export default async function VacanciesPage({ searchParams }: VacanciesPageProps
                   Отклик открывается на странице конкретной вакансии, чтобы заявка сразу была привязана к роли.
                 </p>
                 <div className="mt-5 flex flex-wrap gap-3">
-                  <Button className="rounded-[var(--radius-md)] px-5" href="#vacancy-list" size="sm">
+                  <Button className="w-full max-w-[13.5rem] rounded-[var(--radius-md)] px-5 sm:w-auto" href="#vacancy-list" size="sm">
                     Смотреть вакансии
                   </Button>
                 </div>
               </div>
-              <div className="rounded-[var(--radius-lg)] border border-black/10 bg-[rgba(255,250,244,0.8)] p-5">
+              <div className="rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--surface-wash)] p-5">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Я ищу сотрудника</p>
                 <h2 className={`${displayFont.className} mt-4 text-[1.8rem] font-semibold leading-none text-[var(--text)]`}>
                   Разместить вакансию и получить отклики
@@ -93,7 +95,7 @@ export default async function VacanciesPage({ searchParams }: VacanciesPageProps
                   Отправьте роль, условия и контакт. Если понадобится, команда поможет уточнить детали перед публикацией.
                 </p>
                 <div className="mt-5 flex flex-wrap gap-3">
-                  <Button className="rounded-[var(--radius-md)] px-5" href="#vacancy-submission" size="sm">
+                  <Button className="w-full max-w-[14rem] rounded-[var(--radius-md)] px-5 sm:w-auto" href="#vacancy-submission" size="sm">
                     Разместить вакансию
                   </Button>
                 </div>
@@ -130,6 +132,32 @@ export default async function VacanciesPage({ searchParams }: VacanciesPageProps
         sortLabel="Сначала новые"
         title="Открытые вакансии"
       />
+      <section className="background-zone background-zone-beige border-b border-[var(--line)] py-10 md:py-14">
+        <div className="container grid gap-8 xl:grid-cols-[minmax(16rem,0.58fr)_minmax(0,1.42fr)]">
+          <div>
+            <PublicEyebrow>Проверка вакансий</PublicEyebrow>
+            <h2 className={`${displayFont.className} mt-4 max-w-sm text-[2.6rem] font-semibold leading-none text-[var(--text)] md:text-[3.15rem]`}>
+              Как вакансия попадает на сайт
+            </h2>
+            <PublicBodyText className="mt-4 max-w-md">
+              Команда проверяет карточку перед публикацией, чтобы кандидат видел понятные условия, а заведение получало подходящие отклики.
+            </PublicBodyText>
+          </div>
+          <div className="grid gap-3 md:grid-cols-5">
+            {moderationSteps.map((step, index) => (
+              <div
+                className="rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--surface-wash)] p-4"
+                key={step}
+              >
+                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">
+                  {String(index + 1).padStart(2, '0')}
+                </p>
+                <h3 className={`${displayFont.className} mt-4 text-[1.55rem] font-semibold leading-none text-[var(--text)]`}>{step}</h3>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
       <VacancyApplicationForms
         enabled={applicationFormsEnabled}
         options={formOptions}

@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { Calculator, Info, Plus, Trash2 } from 'lucide-react';
+import { Calculator, Check, Copy, CopyPlus, Info, Plus, RotateCcw, Trash2 } from 'lucide-react';
 import { IconBadge } from '@/components/public/public-ui-adaptation';
 import { Button } from '@/components/ui/button';
 import { FormField } from '@/components/ui/form-field';
@@ -39,10 +39,22 @@ const unitOptions: { value: Unit; label: string; kind: UnitKind; factor: number 
 ];
 
 const demoIngredients: Ingredient[] = [
-  { id: 'ingredient-1', name: 'Джин', packagePrice: '1890', packageAmount: '700', packageUnit: 'ml', recipeAmount: '30', recipeUnit: 'ml' },
-  { id: 'ingredient-2', name: 'Красный вермут', packagePrice: '2250', packageAmount: '1000', packageUnit: 'ml', recipeAmount: '30', recipeUnit: 'ml' },
-  { id: 'ingredient-3', name: 'Кампари', packagePrice: '1650', packageAmount: '1000', packageUnit: 'ml', recipeAmount: '30', recipeUnit: 'ml' }
+  { id: 'ingredient-1', name: 'Зерно для эспрессо', packagePrice: '1450', packageAmount: '1', packageUnit: 'kg', recipeAmount: '18', recipeUnit: 'g' },
+  { id: 'ingredient-2', name: 'Молоко', packagePrice: '120', packageAmount: '1', packageUnit: 'l', recipeAmount: '180', recipeUnit: 'ml' },
+  { id: 'ingredient-3', name: 'Ванильный сироп', packagePrice: '650', packageAmount: '1', packageUnit: 'l', recipeAmount: '15', recipeUnit: 'ml' }
 ];
+
+function createEmptyIngredient(id = `ingredient-${Date.now()}`): Ingredient {
+  return {
+    id,
+    name: '',
+    packagePrice: '',
+    packageAmount: '',
+    packageUnit: 'ml',
+    recipeAmount: '',
+    recipeUnit: 'ml'
+  };
+}
 
 function numberValue(value: string): number | null {
   if (!value.trim()) {
@@ -247,9 +259,10 @@ function UnitField({
 }
 
 export function CostCalculatorClient() {
-  const [itemName, setItemName] = useState('Классический Негрони');
-  const [foodCostPercent, setFoodCostPercent] = useState('22');
+  const [itemName, setItemName] = useState('Ванильный латте');
+  const [foodCostPercent, setFoodCostPercent] = useState('30');
   const [ingredients, setIngredients] = useState<Ingredient[]>(demoIngredients);
+  const [copyState, setCopyState] = useState<'idle' | 'copied' | 'failed'>('idle');
 
   const rows = useMemo(
     () => ingredients.map((ingredient) => ingredientCost(ingredient)),
@@ -266,6 +279,13 @@ export function CostCalculatorClient() {
   const grossMargin = recommendedPrice > 0 ? (grossProfit / recommendedPrice) * 100 : 0;
   const markup = totalCost > 0 ? recommendedPrice / totalCost : 0;
   const completedRows = rows.filter((ingredient) => ingredient.isComplete).length;
+  const hasAnyInput = Boolean(
+    itemName.trim() ||
+      foodCostPercent.trim() ||
+      rows.some((ingredient) =>
+        [ingredient.name, ingredient.packagePrice, ingredient.packageAmount, ingredient.recipeAmount].some((value) => value.trim().length > 0)
+      )
+  );
   const hasPartialRows = rows.some((ingredient) => {
     const filledFields = [ingredient.packagePrice, ingredient.packageAmount, ingredient.recipeAmount].filter((value) => value.trim()).length;
     return filledFields > 0 && !ingredient.isComplete && !ingredient.error;
@@ -285,33 +305,66 @@ export function CostCalculatorClient() {
   }
 
   function addIngredient() {
-    setIngredients((current) => [
-      ...current,
-      {
-        id: `ingredient-${Date.now()}`,
-        name: '',
-        packagePrice: '',
-        packageAmount: '',
-        packageUnit: 'ml',
-        recipeAmount: '',
-        recipeUnit: 'ml'
+    setIngredients((current) => [...current, createEmptyIngredient()]);
+  }
+
+  function duplicateIngredient(id: string) {
+    setIngredients((current) => {
+      const source = current.find((ingredient) => ingredient.id === id);
+
+      if (!source) {
+        return current;
       }
-    ]);
+
+      return [...current, { ...source, id: `ingredient-${Date.now()}` }];
+    });
   }
 
   function removeIngredient(id: string) {
     setIngredients((current) => (current.length === 1 ? current : current.filter((ingredient) => ingredient.id !== id)));
   }
 
+  function clearCalculator() {
+    setItemName('');
+    setFoodCostPercent('');
+    setIngredients([createEmptyIngredient('ingredient-empty')]);
+    setCopyState('idle');
+  }
+
   function fillDemo() {
-    setItemName('Классический Негрони');
-    setFoodCostPercent('22');
+    setItemName('Ванильный латте');
+    setFoodCostPercent('30');
     setIngredients(demoIngredients);
+    setCopyState('idle');
+  }
+
+  async function copyResult() {
+    if (!canShowRecommendedPrice) {
+      return;
+    }
+
+    const resultText = [
+      `Позиция: ${itemName.trim() || 'Позиция меню'}`,
+      `Себестоимость: ${money(totalCost)}`,
+      `Целевая доля себестоимости: ${percent(foodCost * 100)}`,
+      `Рекомендованная цена продажи: ${money(recommendedPrice)}`,
+      `Валовая прибыль: ${money(grossProfit)}`,
+      `Валовая маржа: ${percent(grossMargin)}`
+    ].join('\n');
+
+    try {
+      await navigator.clipboard.writeText(resultText);
+      setCopyState('copied');
+      window.setTimeout(() => setCopyState('idle'), 1800);
+    } catch {
+      setCopyState('failed');
+      window.setTimeout(() => setCopyState('idle'), 2200);
+    }
   }
 
   return (
-    <section className="border-b border-[var(--line)] py-10 md:py-14">
-      <div className="container grid gap-6 2xl:grid-cols-[minmax(0,1fr)_minmax(20rem,0.34fr)] 2xl:items-start">
+    <section className="background-zone background-zone-ivory border-b border-[var(--line)] py-10 md:py-14">
+      <div className="container grid gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(21rem,0.34fr)] xl:items-start">
         <div className="min-w-0 rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--surface-wash)]">
           <div className="border-b border-[var(--line)] p-5 md:p-6">
             <h2 className={`${displayFont.className} text-[1.9rem] font-semibold leading-none text-[var(--text)]`}>1. Информация о позиции</h2>
@@ -323,11 +376,11 @@ export function CostCalculatorClient() {
                   id="calculatorItemName"
                   maxLength={120}
                   onChange={(event) => setItemName(event.target.value)}
-                  placeholder="Например, классический Негрони"
+                  placeholder="Например, ванильный латте"
                   value={itemName}
                 />
               </FormField>
-              <FormField htmlFor="calculatorFoodCost" hint="Рекомендуемый диапазон: 18-28%." label="Целевая доля себестоимости, %">
+              <FormField htmlFor="calculatorFoodCost" hint="Ориентир для кофейных напитков: 25-35%." label="Целевая доля себестоимости, %">
                 <Input
                   aria-invalid={foodCostError ? true : undefined}
                   className="h-12"
@@ -342,7 +395,26 @@ export function CostCalculatorClient() {
           </div>
 
           <div className="p-5 md:p-6">
-            <h2 className={`${displayFont.className} text-[1.9rem] font-semibold leading-none text-[var(--text)]`}>2. Состав рецепта</h2>
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <h2 className={`${displayFont.className} text-[1.9rem] font-semibold leading-none text-[var(--text)]`}>2. Состав рецепта</h2>
+              <Button className="rounded-[var(--radius-md)] px-4" disabled={!hasAnyInput} onClick={clearCalculator} size="sm" type="button" variant="ghost">
+                <RotateCcw size={16} strokeWidth={1.8} />
+                Очистить
+              </Button>
+            </div>
+            <div className="mt-4 rounded-[var(--radius-md)] border border-[var(--accent)]/25 bg-[var(--accent-soft)] p-4 xl:hidden">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--accent)]">Краткий итог</p>
+              <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                <div>
+                  <p className="text-sm leading-6 text-[var(--muted)]">Себестоимость</p>
+                  <p className="text-xl font-semibold text-[var(--text)]">{rowErrors.length ? '—' : money(totalCost)}</p>
+                </div>
+                <div>
+                  <p className="text-sm leading-6 text-[var(--muted)]">Цена продажи</p>
+                  <p className="text-xl font-semibold text-[var(--text)]">{canShowRecommendedPrice ? money(recommendedPrice) : '—'}</p>
+                </div>
+              </div>
+            </div>
             <div className="mt-4 rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--surface-wash)] p-4 text-sm leading-6 text-[var(--muted)]">
               <p className="font-semibold text-[var(--text)]">Как считается себестоимость</p>
               <p className="mt-1">
@@ -353,29 +425,46 @@ export function CostCalculatorClient() {
                 Рекомендованная цена продажи = итоговая себестоимость <DivisionSign /> доля себестоимости.
               </p>
               <p className="mt-1">
-                Пример: бутылка джина 700 мл стоит 1890 ₽, в рецепте 30 мл. Себестоимость: 1890 <DivisionSign /> 700 × 30 = 81 ₽.
+                Единицы: мл и л для объёма, г и кг для веса, шт для поштучных ингредиентов.
+              </p>
+              <p className="mt-1">
+                Пример: пачка зерна 1 кг стоит 1450 ₽, в рецепте 18 г. Себестоимость: 1450 <DivisionSign /> 1000 × 18 = 26,10 ₽.
               </p>
             </div>
             <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--surface-wash)] p-4">
               <p className="text-sm leading-6 text-[var(--muted)]">
-                Пример строки: <span className="font-semibold text-[var(--text)]">Джин · 1890 ₽ · 700 мл · 30 мл · 81 ₽</span>
+                Пример строки: <span className="font-semibold text-[var(--text)]">Зерно для эспрессо · 1450 ₽ · 1 кг · 18 г · 26,10 ₽</span>
               </p>
-              <Button className="rounded-[var(--radius-md)] px-4" onClick={fillDemo} type="button" variant="secondary">
-                Заполнить примером
-              </Button>
+              <div className="flex flex-wrap gap-2">
+                <Button className="rounded-[var(--radius-md)] px-4" onClick={fillDemo} type="button" variant="secondary">
+                  Заполнить примером
+                </Button>
+                <Button className="rounded-[var(--radius-md)] px-4" disabled={!hasAnyInput} onClick={clearCalculator} type="button" variant="ghost">
+                  Очистить
+                </Button>
+              </div>
             </div>
 
-            <div className="mt-6 hidden grid-cols-[minmax(220px,1.4fr)_minmax(140px,0.8fr)_minmax(190px,0.9fr)_minmax(190px,0.9fr)_minmax(140px,0.7fr)_44px] gap-3 border-b border-[var(--line)] pb-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--muted)] lg:grid">
+            {!hasAnyInput ? (
+              <div className="mt-5 rounded-[var(--radius-md)] border border-dashed border-[var(--border-default)] bg-[var(--surface-wash)] p-5">
+                <p className="text-sm font-semibold text-[var(--text)]">Рецепт пока пуст</p>
+                <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
+                  Добавьте ингредиент вручную или заполните примером, чтобы увидеть расчёт себестоимости и цены продажи.
+                </p>
+              </div>
+            ) : null}
+
+            <div className="mt-6 hidden grid-cols-[minmax(220px,1.4fr)_minmax(140px,0.8fr)_minmax(190px,0.9fr)_minmax(190px,0.9fr)_minmax(140px,0.7fr)_44px_44px] gap-3 border-b border-[var(--line)] pb-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--muted)] 2xl:grid">
               <div>
                 <span>Ингредиент</span>
               </div>
               <div>
                 <span>Цена упаковки, ₽</span>
-                <p className="mt-1 text-[12px] font-medium normal-case leading-5 tracking-normal">Сколько стоит вся бутылка / пачка / упаковка</p>
+                <p className="mt-1 text-[12px] font-medium normal-case leading-5 tracking-normal">Сколько стоит вся пачка / бутылка / упаковка</p>
               </div>
               <div>
                 <span>Размер упаковки</span>
-                <p className="mt-1 text-[12px] font-medium normal-case leading-5 tracking-normal">Например: 700 мл, 1 л, 1000 г, 1 шт</p>
+                <p className="mt-1 text-[12px] font-medium normal-case leading-5 tracking-normal">Например: 1 кг, 1 л, 1000 г, 1 шт</p>
               </div>
               <div>
                 <span>Кол-во в рецепте</span>
@@ -384,67 +473,77 @@ export function CostCalculatorClient() {
               <div>
                 <span>Себестоимость</span>
               </div>
+              <span className="sr-only">Дублировать</span>
               <span className="sr-only">Удалить</span>
             </div>
 
-            <div className="grid gap-4 lg:gap-0">
+            <div className="grid gap-4 2xl:gap-0">
               {rows.map((ingredient, index) => (
                 <div
-                  className="grid gap-3 rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--surface-wash)] p-4 lg:grid-cols-[minmax(220px,1.4fr)_minmax(140px,0.8fr)_minmax(190px,0.9fr)_minmax(190px,0.9fr)_minmax(140px,0.7fr)_44px] lg:items-start lg:border-0 lg:border-b lg:border-[var(--line)] lg:bg-transparent lg:p-0 lg:py-4"
+                  className="grid gap-3 rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--surface-wash)] p-4 2xl:grid-cols-[minmax(220px,1.4fr)_minmax(140px,0.8fr)_minmax(190px,0.9fr)_minmax(190px,0.9fr)_minmax(140px,0.7fr)_44px_44px] 2xl:items-start 2xl:border-0 2xl:border-b 2xl:border-[var(--line)] 2xl:bg-transparent 2xl:p-0 2xl:py-4"
                   key={ingredient.id}
                 >
-                  <FormField className="lg:[&>label]:sr-only" htmlFor={`${ingredient.id}-name`} label="Ингредиент">
+                  <FormField className="2xl:[&>label]:sr-only" htmlFor={`${ingredient.id}-name`} label="Ингредиент">
                     <Input
                       autoComplete="off"
                       className="h-12"
                       id={`${ingredient.id}-name`}
                       onChange={(event) => updateIngredient(ingredient.id, 'name', event.target.value)}
-                      placeholder={index === 0 ? 'Джин, сироп, сок...' : 'Ингредиент'}
+                      placeholder={index === 0 ? 'Эспрессо, молоко, сироп...' : 'Ингредиент'}
                       value={ingredient.name}
                     />
                   </FormField>
-                  <FormField className="lg:[&>label]:sr-only lg:[&>p]:sr-only" htmlFor={`${ingredient.id}-packagePrice`} hint="В рублях" label="Цена упаковки, ₽">
+                  <FormField className="2xl:[&>label]:sr-only 2xl:[&>p]:sr-only" htmlFor={`${ingredient.id}-packagePrice`} hint="В рублях" label="Цена упаковки, ₽">
                     <Input
                       className="h-12"
                       id={`${ingredient.id}-packagePrice`}
                       inputMode="decimal"
                       onChange={(event) => updateIngredient(ingredient.id, 'packagePrice', event.target.value)}
-                      placeholder="1890"
+                      placeholder="1450"
                       value={ingredient.packagePrice}
                     />
                   </FormField>
                   <UnitField
-                    className="lg:[&>label]:sr-only lg:[&>p]:sr-only"
-                    hint="Например: 700 мл, 1 л, 1000 г, 1 шт."
+                    className="2xl:[&>label]:sr-only 2xl:[&>p]:sr-only"
+                    hint="Например: 1 кг, 1 л, 1000 г, 1 шт."
                     id={`${ingredient.id}-packageAmount`}
                     label="Размер упаковки"
                     onAmountChange={(value) => updateIngredient(ingredient.id, 'packageAmount', value)}
                     onUnitChange={(value) => updateIngredient(ingredient.id, 'packageUnit', value)}
-                    placeholder="700"
+                    placeholder="1"
                     unit={ingredient.packageUnit}
                     value={ingredient.packageAmount}
                   />
                   <UnitField
-                    className="lg:[&>label]:sr-only lg:[&>p]:sr-only"
+                    className="2xl:[&>label]:sr-only 2xl:[&>p]:sr-only"
                     hint="Сколько ингредиента используется в одной порции."
                     id={`${ingredient.id}-recipeAmount`}
                     label="Кол-во в рецепте"
                     onAmountChange={(value) => updateIngredient(ingredient.id, 'recipeAmount', value)}
                     onUnitChange={(value) => updateIngredient(ingredient.id, 'recipeUnit', value)}
-                    placeholder="30"
+                    placeholder="18"
                     unit={ingredient.recipeUnit}
                     value={ingredient.recipeAmount}
                   />
                   <div className="space-y-2.5">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--muted)] lg:sr-only">Себестоимость</p>
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--muted)] 2xl:sr-only">Себестоимость</p>
                     <p className="flex h-12 items-center rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--surface-wash)] px-4 text-sm font-semibold leading-6 text-[var(--text)]">
                       {ingredient.error ? '—' : ingredient.cost === null ? 'Пока нет' : money(ingredient.cost)}
                     </p>
                   </div>
                   <button
+                    aria-label="Дублировать ингредиент"
+                    className="inline-flex h-12 items-center justify-center rounded-[var(--radius-md)] border border-[var(--border-default)] px-4 text-[var(--muted)] transition hover:border-[var(--accent)]/30 hover:text-[var(--accent)] 2xl:px-0"
+                    onClick={() => duplicateIngredient(ingredient.id)}
+                    type="button"
+                  >
+                    <CopyPlus size={17} strokeWidth={1.8} />
+                    <span className="ml-2 2xl:sr-only">Дублировать</span>
+                  </button>
+                  <button
                     aria-label="Удалить ингредиент"
                     className={cn(
-                      'inline-flex h-12 items-center justify-center rounded-[var(--radius-md)] border border-[var(--border-default)] px-4 text-[var(--muted)] transition hover:border-[var(--accent)]/30 hover:text-[var(--accent)] lg:px-0',
+                      'inline-flex h-12 items-center justify-center rounded-[var(--radius-md)] border border-[var(--border-default)] px-4 text-[var(--muted)] transition hover:border-[var(--accent)]/30 hover:text-[var(--accent)] 2xl:px-0',
                       rows.length === 1 && 'pointer-events-none opacity-45'
                     )}
                     disabled={rows.length === 1}
@@ -452,10 +551,10 @@ export function CostCalculatorClient() {
                     type="button"
                   >
                     <Trash2 size={17} strokeWidth={1.8} />
-                    <span className="ml-2 lg:sr-only">Удалить</span>
+                    <span className="ml-2 2xl:sr-only">Удалить</span>
                   </button>
                   {ingredient.error || ingredient.note ? (
-                    <p className={cn('text-sm leading-6 lg:col-span-5', ingredient.error ? 'text-[var(--danger)]' : 'text-[var(--muted)]')}>
+                    <p className={cn('text-sm leading-6 2xl:col-span-7', ingredient.error ? 'text-[var(--danger)]' : 'text-[var(--muted)]')}>
                       {ingredient.error ?? ingredient.note}
                     </p>
                   ) : null}
@@ -479,7 +578,7 @@ export function CostCalculatorClient() {
           </div>
         </div>
 
-        <aside className="2xl:sticky 2xl:top-28">
+        <aside className="xl:sticky xl:top-28">
           <div className="rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--surface-wash)] p-5 shadow-[0_18px_50px_rgba(20,20,18,0.05)] md:p-6">
             <div className="flex items-center gap-3">
               <IconBadge icon={Calculator} size="md" tone="accent" />
@@ -531,6 +630,22 @@ export function CostCalculatorClient() {
               ) : null}
             </dl>
 
+            <div className="mt-5 grid gap-2">
+              <Button
+                className="w-full rounded-[var(--radius-md)]"
+                disabled={!canShowRecommendedPrice}
+                onClick={copyResult}
+                type="button"
+                variant="secondary"
+              >
+                {copyState === 'copied' ? <Check size={17} strokeWidth={1.8} /> : <Copy size={17} strokeWidth={1.8} />}
+                {copyState === 'copied' ? 'Результат скопирован' : 'Скопировать результат'}
+              </Button>
+              {copyState === 'failed' ? (
+                <p className="text-sm leading-6 text-[var(--danger)]">Не удалось скопировать автоматически. Выделите итог вручную.</p>
+              ) : null}
+            </div>
+
             <div className="mt-6 rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--surface-wash)] p-4">
               <div className="flex items-start gap-3">
                 <Info className="mt-1 text-[var(--accent)]" size={18} strokeWidth={1.8} />
@@ -540,7 +655,7 @@ export function CostCalculatorClient() {
                     Цена продажи = итоговая себестоимость <DivisionSign /> доля себестоимости.
                   </p>
                   <p className="mt-1">
-                    Пример: 173,70 ₽ <DivisionSign /> 0,22 = 789,55 ₽.
+                    Пример: 57,45 ₽ <DivisionSign /> 0,30 = 191,50 ₽.
                   </p>
                 </div>
               </div>
