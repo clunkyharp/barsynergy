@@ -126,6 +126,7 @@ Production releases go `dev -> validation -> prod` only after owner confirmation
 - [Project plan](docs/project-plan.md)
 - [AI agent workflow](docs/agent-workflow.md)
 - [Project audit workflow](docs/audit-workflow.md)
+- [Homepage data-source audit](docs/homepage-data-source-audit.md)
 - [Remediation plan](docs/remediation-plan.md)
 - [Phase plan](docs/phase-plan.md)
 - [Obsidian Kanban sync](docs/kanban-sync.md)

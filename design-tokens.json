@@ -4,7 +4,7 @@
     "name": "BARSYNERGY Design Tokens",
     "version": "0.3.0",
     "status": "photo-reference-redesign",
-    "updated": "2026-05-04",
+    "updated": "2026-05-05",
     "sourceOfTruth": [
       "src/lib/fonts.ts",
       "src/app/globals.css",
@@ -26,10 +26,15 @@
   "reference": {
     "color": {
       "ivory": { "value": "#fbf7f0", "type": "color" },
+      "ivoryStrong": { "value": "#fffdf8", "type": "color" },
       "cream": { "value": "#fffdf9", "type": "color" },
       "sand": { "value": "#f2eadf", "type": "color" },
+      "beigeBand": { "value": "#f3eadc", "type": "color" },
+      "beigeBandSoft": { "value": "#f7f1e8", "type": "color" },
+      "beigeBandGray": { "value": "#eee9e1", "type": "color" },
       "ink": { "value": "#171513", "type": "color" },
       "graphite": { "value": "#171311", "type": "color" },
+      "warmBlack": { "value": "#151210", "type": "color" },
       "clay": { "value": "#6d6861", "type": "color" },
       "burgundy": { "value": "#9d090e", "type": "color" },
       "burgundyDark": { "value": "#76060a", "type": "color" },
@@ -48,7 +53,9 @@
       "focusRing": { "value": "rgba(157, 9, 14, 0.16)", "type": "color" },
       "focusRingDanger": { "value": "rgba(159, 47, 47, 0.12)", "type": "color" },
       "pendingBg": { "value": "rgba(95, 86, 75, 0.08)", "type": "color" },
-      "skeletonFill": { "value": "rgba(22, 19, 15, 0.08)", "type": "color" }
+      "skeletonFill": { "value": "rgba(22, 19, 15, 0.08)", "type": "color" },
+      "backgroundBurgundyGlow": { "value": "rgba(157, 9, 14, 0.08)", "type": "color" },
+      "backgroundGraphiteGlow": { "value": "rgba(23, 19, 17, 0.045)", "type": "color" }
     },
     "font": {
       "body": { "value": "Manrope", "type": "fontFamily" },
@@ -76,6 +83,14 @@
   "system": {
     "color": {
       "background": { "value": "{reference.color.ivory}", "type": "color" },
+      "backgroundCreamStrong": { "value": "{reference.color.ivoryStrong}", "type": "color" },
+      "backgroundBand": { "value": "{reference.color.beigeBand}", "type": "color" },
+      "backgroundBandSoft": { "value": "{reference.color.beigeBandSoft}", "type": "color" },
+      "backgroundBandGray": { "value": "{reference.color.beigeBandGray}", "type": "color" },
+      "backgroundGraphiteBand": { "value": "{reference.color.graphite}", "type": "color" },
+      "backgroundBurgundyGlow": { "value": "{reference.color.backgroundBurgundyGlow}", "type": "color" },
+      "backgroundGraphiteGlow": { "value": "{reference.color.backgroundGraphiteGlow}", "type": "color" },
+      "backgroundPaperGrainOpacity": { "value": "0.026", "type": "number" },
       "surfaceBase": { "value": "{reference.color.cream}", "type": "color" },
       "surfaceMuted": { "value": "{reference.color.sand}", "type": "color" },
       "surfaceElevated": { "value": "rgba(255, 255, 255, 0.9)", "type": "color" },

@@ -4,6 +4,21 @@
 
 This document turns the code, security, performance, UX/UI and documentation audits into one implementation plan.
 
+## Current Use
+
+This is a historical remediation plan from the 2026-04-26 audit cycle. Keep it for audit trail and context, but do not use the open/closed labels below as the current launch queue.
+
+Current operational sources supersede this file when they conflict with it:
+
+- `PROJECT_STATUS.md`;
+- `docs/phase-plan.md`;
+- `docs/deploy.md`;
+- `docs/scheduler-runbook.md`;
+- `docs/security.md`;
+- `docs/personal-data-launch-checklist.md`.
+
+Known superseded areas: Phase 2 content/admin implementation is complete for the current MVP contract, auth pages are no longer placeholders, production cleanup is documented in the scheduler runbook, and deploy/ingress instructions now live in the deploy runbook.
+
 ## Scope
 
 In scope:

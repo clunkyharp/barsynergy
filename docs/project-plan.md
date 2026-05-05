@@ -232,10 +232,17 @@ Current runtime schema:
 - `Vacancy`;
 - `Supplier`;
 - `Partner`.
-
-Target MVP entities by later phases:
-
+- `GeneralSponsor`.
+- `HomepageHero`;
+- `HomepageAudienceCard`;
+- `HomepageSocialBlock`;
+- `HomepageCtaBlock`;
+- `HomepageCalculatorTeaser`.
 - `Application`.
+- `ApplicationSubmissionThrottle`;
+- `AuthAttemptThrottle`;
+- `BusinessAccount`;
+- `BusinessAccessInvite`.
 
 Planned catalog extension entities:
 
@@ -278,6 +285,7 @@ Every public form must include personal data consent and must not submit without
 Application statuses:
 
 ```txt
+draft
 new
 in_review
 contacted
@@ -298,7 +306,7 @@ Vacancy MVP rule:
 - candidate data and resumes are private application data, not public profile data;
 - vacancy responses are not sent to employers automatically;
 - admin forwards an approved response to the employer and records the status as `forwarded_to_employer`;
-- reusable saved resumes and "my applications" belong to Phase 4 user profile scope.
+- reusable saved resumes and "my applications" belong to the later general user profile phase, not to the current business-cabinet MVP.
 
 Service specialist catalog rule:
 
@@ -334,7 +342,7 @@ Monetization order:
 4. Partner packages.
 5. Online payments after legal/accounting review.
 6. Premium/subscription after regular audience appears.
-7. B2B cabinets after stable MVP.
+7. General user profiles and optional B2B expansion after the current business-cabinet MVP proves useful.
 
 Online payments require a separate mini-spec and legal review before implementation.
 

@@ -36,18 +36,20 @@ If the app is deployed from a host checkout with `barsynergy.service` running `n
 
 ## Supported Ingress Contract (Current Repository State)
 
-Current repository state supports one ingress mode only:
+Current repository state supports the single-node ingress mode:
 
-- `docker-compose.production.yml` publishes `80`;
-- `docker/nginx/nginx.conf` listens only on `80`;
-- TLS terminates on one trusted external edge proxy or load balancer;
-- the external edge forwards `X-Forwarded-For` and `X-Forwarded-Proto`;
-- app-side Nginx stays on private HTTP and appends its hop with `$proxy_add_x_forwarded_for`;
-- Next.js and server actions treat the first IP in `X-Forwarded-For` as the client IP for throttling and request identity.
+- `docker-compose.production.yml` publishes `80` and `443`;
+- `docker/nginx/nginx.conf` terminates TLS on the app host;
+- app-side Nginx sets `X-Real-IP` and `X-Forwarded-For` to `$remote_addr`;
+- inbound client-supplied forwarding chains are overwritten before they reach Next.js;
+- Next.js and server actions prefer `X-Real-IP` for throttling and request identity, then fall back to `X-Forwarded-For`.
 
-Unsupported production mode for the current repo:
+Unsupported production mode for the current repo without a separate ingress review:
 
-- exposing this compose Nginx directly to the public internet without a trusted edge in front of it.
+- putting a trusted external edge in front of this compose Nginx and expecting the current Nginx config to preserve the original client IP;
+- trusting `CF-Connecting-IP` or another provider-specific header without locking traffic to that provider.
+
+Status note, 2026-05-05: this single-node Nginx/TLS contract is the current launch-readiness target. Older notes about a trusted external edge are historical unless the owner explicitly reopens that architecture.
 
 ## Single-Node Fallback Contract
 
@@ -68,9 +70,9 @@ If S3-compatible storage is still unavailable, the last-resort launch path is:
 
 Before production sign-off, verify on the real host that:
 
-- public traffic cannot bypass the trusted edge and hit the compose Nginx directly;
-- the trusted edge preserves `X-Forwarded-For`;
-- application logs and throttling see the real client IP instead of the edge proxy IP.
+- public HTTP redirects to HTTPS;
+- application logs and throttling see the real client IP from `X-Real-IP`;
+- spoofed inbound `X-Forwarded-For` and `CF-Connecting-IP` headers do not change the throttling identity.
 
 ## Future Multi-Server And HA Plan
 

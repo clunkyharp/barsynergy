@@ -55,8 +55,9 @@ Current status:
 
 - Phase 0 foundation is implemented and backed by migration `20260425160217_init_foundation`;
 - public route structure for Phase 1 exists and the public surface is implemented at source level;
-- current Prisma entities include foundation models plus Phase 2 content models: `Article`, `ArticleTag`, `Event`, `Course`, `Vacancy`, `Supplier`, `Partner`;
-- `Application` remains target scope for Phase 3.
+- current Prisma entities include foundation models plus Phase 2 content models: `Article`, `ArticleTag`, `Event`, `Course`, `Vacancy`, `Supplier`, `Partner`, `GeneralSponsor`, `HomepageHero`, `HomepageAudienceCard`, `HomepageSocialBlock`, `HomepageCtaBlock`, `HomepageCalculatorTeaser`;
+- `Application`, auth throttles, business accounts and business-access invites are implemented in later migrations;
+- `ServiceSpecialist` remains planned Phase 5 scope and is not present in the current schema or routes.
 
 ## Phase 1: Public Website MVP
 
@@ -101,6 +102,8 @@ Current status:
 - the homepage has been rebuilt as a live CMS-fed front page with a new public shell, GSAP-driven narrative sections, stronger B2B routing and renewed desktop/mobile screenshot checks;
 - homepage browser-comment follow-up is applied locally: the `О проекте` section is simplified, explanation cards now have direct CTA buttons, audience cards have aligned action rows, the general sponsor block no longer duplicates social buttons or the extra lineup photo, and social promo cards now use integrated icon backgrounds;
 - homepage social promo cards are refined locally again: the three channel cards now share one `SocialCard` component and use dedicated local SVG Telegram/WhatsApp/Instagram logos as separate right-side background layers instead of pseudo-icons;
+- editorial UI consistency follow-up is applied locally for the requested blocks: `/education` pre-launch cards now expose format/audience/status details, homepage social cards use shared editorial surfaces with small platform accents, the dark community CTA and dark-theme actions use the burgundy token stack, and vacancy CTA buttons are width-limited through the shared `Button`; Playwright fallback screenshots cover `/`, `/education` and `/vacancies` at desktop/tablet/mobile widths in light/dark with no horizontal overflow;
+- editorial background follow-up is applied locally: the public base background now uses warm ivory/deep graphite layers, subtle paper grain, no square grid layers and burgundy/graphite radial accents; homepage sections now have explicit hero, ivory, beige, warm gray, graphite tool, sponsor, social and CTA zones with Playwright fallback screenshots across mobile/tablet/desktop in light/dark and no horizontal overflow;
 - sponsor data is now shared between the homepage and `/general-sponsors`, so the separate sponsors page renders the same real entries and no longer keeps a separate test showcase list;
 - partner/sponsor follow-up is applied locally: `/partners` now leads with clearer plain-Russian copy, shows the current general sponsor directly on the page, the `Hustle Brew` block now reads as an editorial partner profile instead of a promo slab, social promo cards no longer let their oversized logos collide with the right-side divider treatment, and the public header no longer overflows or shifts its desktop nav/actions on medium desktop widths;
 - the main public routes now share normalized public primitives for typography, section headers, stat shells, filters, content meta chips and form action rows, while keeping demo/test data and section-specific information structure;
@@ -118,7 +121,7 @@ Build the database and admin content management.
 
 In scope:
 
-- Prisma models for Article, Event, Course, Vacancy, Supplier, Partner, Category, City, Tag;
+- Prisma models for Article, Event, Course, Vacancy, Supplier, Partner, GeneralSponsor, homepage CMS blocks, Category, City, Tag;
 - admin CRUD;
 - publication statuses;
 - image upload through StorageService;
@@ -141,6 +144,8 @@ Current status:
 
 - Phase 2 Prisma models are implemented and backed by migration `20260427123417_phase2_content_models`;
 - the first admin CRUD slices are implemented for articles, events, courses, vacancies, suppliers and partners at `/admin/articles`, `/admin/events`, `/admin/courses`, `/admin/vacancies`, `/admin/suppliers` and `/admin/partners`;
+- the CMS-first sponsor/taxonomy/homepage follow-up is backed by migrations `20260505103000_cms_admin_sponsors_taxonomy` and `20260505123000_homepage_cms_blocks`;
+- that follow-up adds `GeneralSponsor`, `/admin/general-sponsors`, `/admin/homepage`, real category/city/tag admin screens, canonical `/admin/taxonomy/tags` with `/admin/tags` compatibility redirect, active article tags, broader admin list filters and homepage source audit `docs/homepage-data-source-audit.md`;
 - public read queries are connected to articles, events, education, vacancies, suppliers and partners and return only `published` records with pagination that preserves active filters;
 - public content image upload route is implemented at `/admin/uploads/content-image`;
 - Phase 2 admin UX follow-up is implemented: edit forms, cover image upload slots, admin list pagination and admin action success/error states;
@@ -302,6 +307,7 @@ Implementation contract:
 Current status:
 
 - service-specialist module is planned as a Phase 5 catalog expansion;
+- current schema has `CategoryType.SERVICE` as taxonomy preparation, but it does not yet have `ServiceSpecialist`, `ApplicationType.SERVICE_SPECIALIST_SUBMISSION`, `/services` or `/admin/services`;
 - it must not interrupt Phase 4 auth and first business account work unless the owner explicitly records a roadmap reorder;
 - first version has no specialist personal cabinet and no direct public publishing.
 

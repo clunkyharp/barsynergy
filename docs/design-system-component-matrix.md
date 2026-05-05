@@ -23,4 +23,3 @@
 | `Badge` | compatibility alias | default | legacy compatibility only | `src/components/ui/badge.tsx` | keep only for backward compatibility; new code should use `StatusBadge` |
 | `MetaChip` | `default`, `filter`, `selected`, `inverse` | default, selected | public-editorial, filters, workspace metadata | `src/components/ui/meta-chip.tsx` | metadata/filter meaning only |
 | `EditorialListRow` | `default`, `content`; `article`, `div` | default, hover by container context | public-editorial | `src/components/ui/editorial-list-row.tsx` | reusable row for editorial sections and index pages |
-*** Delete File: /Users/amir/Desktop/CODEX:AGENTS/BARSENERGY/docs/design-system-qa-report.md

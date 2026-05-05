@@ -8,6 +8,8 @@ Current status: `v0.3 photo-reference redesign`.
 
 The project is being aligned to the supplied photo references: warm off-white pages, serif editorial headlines, burgundy actions, thin dividers, low-radius cards and compact product screens. The goal is to keep that visual direction while preserving current routes, data, auth, applications and admin permissions.
 
+Latest background update: public pages use a quiet editorial background system with a warm ivory paper base, low-opacity grain, subtle burgundy/graphite radial accents and reusable `background-zone-*` section bands. Square grids, index-map lines, dot matrices and tech patterns are not part of the runtime background contract.
+
 ## Source Of Truth
 
 Use this order when rules conflict:
@@ -35,14 +37,18 @@ BARSYNERGY keeps one visual identity across the product:
 - dark graphite typography;
 - burgundy primary actions;
 - thin dividers;
-- editorial grids on public surfaces;
+- editorial structure on public surfaces;
+- low-opacity paper grain without square or dotted patterns;
+- section zones for hero, ivory, beige, warm gray, graphite sponsor, social, tool and CTA areas;
 - compact, readable product density for admin and business flows;
 - small card/button radius instead of large rounded cards.
 
 Avoid:
 
 - neon or nightlife cliches;
+- bottles, glasses, shakers or cocktail-object patterns;
 - generic startup gradients;
+- square grids, tech grids, dotted matrices or AI-style background patterns;
 - decorative 3D;
 - gratuitous glassmorphism;
 - uncontrolled shadow stacks;
@@ -230,7 +236,8 @@ Rules:
 - display typography allowed;
 - thin public dividers;
 - warm cream background;
-- editorial grid;
+- visual separation through spacing, borders and calm background bands;
+- graphite bands are allowed for tool, sponsor, partnership and CTA emphasis and must preserve readable card contrast;
 - stronger brand expression.
 
 ### `auth-acquisition`

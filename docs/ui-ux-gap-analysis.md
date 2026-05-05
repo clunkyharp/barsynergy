@@ -122,8 +122,8 @@
 
 **Текущее состояние**
 
-- Есть бизнес-кабинет: [src/app/business/page.tsx](/Users/amir/Desktop/CODEX:AGENTS/BARSENERGY/src/app/business/page.tsx).
-- Есть минимальный кабинет специалиста: [src/app/profile/page.tsx](/Users/amir/Desktop/CODEX:AGENTS/BARSENERGY/src/app/profile/page.tsx).
+- Есть бизнес-кабинет: `src/app/business/page.tsx`.
+- Есть минимальный кабинет специалиста: `src/app/profile/page.tsx`.
 
 **Что работает**
 
@@ -160,13 +160,13 @@
 
 ### Текущее состояние
 
-- Есть единый shell: [src/components/layout/admin-sidebar.tsx](/Users/amir/Desktop/CODEX:AGENTS/BARSENERGY/src/components/layout/admin-sidebar.tsx).
-- Есть dashboard: [src/app/admin/page.tsx](/Users/amir/Desktop/CODEX:AGENTS/BARSENERGY/src/app/admin/page.tsx).
+- Есть единый shell: `src/components/layout/admin-sidebar.tsx`.
+- Есть dashboard: `src/app/admin/page.tsx`.
 - Для части сущностей уже есть нормальный паттерн:
   - список;
   - создание;
   - редактирование.
-- Пример: [src/app/admin/articles/page.tsx](/Users/amir/Desktop/CODEX:AGENTS/BARSENERGY/src/app/admin/articles/page.tsx), [src/app/admin/articles/create/page.tsx](/Users/amir/Desktop/CODEX:AGENTS/BARSENERGY/src/app/admin/articles/create/page.tsx), [src/app/admin/articles/[articleId]/page.tsx](/Users/amir/Desktop/CODEX:AGENTS/BARSENERGY/src/app/admin/articles/[articleId]/page.tsx).
+- Пример: `src/app/admin/articles/page.tsx`, `src/app/admin/articles/create/page.tsx`, `src/app/admin/articles/[articleId]/page.tsx`.
 
 ### Что уже хорошо
 

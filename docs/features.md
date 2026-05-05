@@ -18,11 +18,11 @@ Feature planning must follow [Project Plan](project-plan.md), [AI Agent Workflow
 ## Later Phases
 
 - Phase 1: public website MVP
-- Phase 2: database models and content admin (`Article`, `Event`, `Course`, `Vacancy`, `Supplier`, `Partner`)
+- Phase 2: database models and content admin (`Article`, `Event`, `Course`, `Vacancy`, `Supplier`, `Partner`, `GeneralSponsor`, homepage CMS blocks and taxonomy CRUD)
 - Phase 3: applications and forms (`Application`; see [Phase 3 applications mini-spec](phase-3-applications-spec.md))
 - Phase 4: auth and first business account MVP (`BusinessAccount`, business login/request/approval/cabinet/profile/request drafts; see [Business account mini-spec](business-account-spec.md))
 - Later phase: general user profile and "my applications" for non-business users
-- Phase 5: filters, search and directory quality
+- Phase 5: filters, search and directory quality, including the planned separate `ServiceSpecialist` catalog
 - Phase 6: monetization without online payment
 - Phase 7: stabilization and release 1.0
 

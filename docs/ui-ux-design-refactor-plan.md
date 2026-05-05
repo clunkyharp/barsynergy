@@ -26,7 +26,7 @@
 - создан чекпоинт текущего dirty tree на `codex/barsynergy-ui-preview`, после чего работа продолжена в ветке `codex/photo-reference-ui-redesign`;
 - глобальный визуальный слой переведён ближе к фото-референсам: `Playfair Display` для крупных заголовков, `Manrope` для основного текста, тёплый off-white фон, бордовые action-цвета, тонкие разделители, меньшие радиусы и спокойные тени;
 - обновлены shared primitives: header, mobile menu, footer, `Button`, `Panel`, `Card`, `MetaChip`, `PageHeader`, `StatCard`, public list rows, filters, sponsor card, auth shells, калькулятор, business/profile/admin shell;
-- главная `/` перестроена под структуру референса с реальными счётчиками, текущими CMS-данными, разделами платформы, аудиториями и `GENERAL_SPONSORS` / Hustle Brew;
+- главная `/` перестроена под структуру референса с реальными счётчиками, текущими CMS-данными, разделами платформы, аудиториями и DB-записями `GeneralSponsor` / Hustle Brew;
 - public-каталоги, формы, детальные страницы, auth, калькулятор, profile, business и admin-поверхности приведены к одной фото-reference системе без изменения маршрутов, Prisma schema, auth, application actions, storage, notifications или permissions;
 
 - интерактивные public list rows;
