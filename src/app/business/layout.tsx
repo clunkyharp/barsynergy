@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { logoutAction } from '@/app/auth/actions';
 import { BusinessSidebar } from '@/components/layout/business-sidebar';
-import { Button } from '@/components/ui/button';
+import { SubmitButton } from '@/components/ui/submit-button';
 import { requireBusinessAccountAccess } from '@/lib/auth/require-business-account';
 
 export default async function BusinessLayout({ children }: { children: ReactNode }) {
@@ -13,9 +13,9 @@ export default async function BusinessLayout({ children }: { children: ReactNode
         <div className="space-y-4">
           <BusinessSidebar companyName={businessAccount.companyName} />
           <form action={logoutAction}>
-            <Button className="w-full rounded-[var(--radius-md)]" type="submit" variant="secondary">
+            <SubmitButton className="w-full rounded-[var(--radius-md)]" variant="secondary">
               Выйти
-            </Button>
+            </SubmitButton>
           </form>
         </div>
         <div className="min-w-0">{children}</div>

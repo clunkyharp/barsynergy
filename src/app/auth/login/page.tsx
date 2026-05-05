@@ -6,6 +6,7 @@ import { InlineAlert } from '@/components/ui/inline-alert';
 import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
 import { Panel } from '@/components/ui/panel';
+import { SubmitButton } from '@/components/ui/submit-button';
 import { displayFont } from '@/lib/fonts';
 
 const errorMessages: Record<string, string> = {
@@ -42,19 +43,27 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
             <Image alt="BARSYNERGY" className="h-auto w-[250px]" height={70} priority src="/brand/barsynergy-lockup.svg" width={360} />
           </a>
           <h1 className={`${displayFont.className} display-tight mt-12 max-w-[13ch] text-[40px] md:text-[54px]`}>
-            Платформа для развития барной индустрии СКФО
+            Кабинет BARSYNERGY для барной индустрии СКФО
           </h1>
           <span className="mt-7 block h-1 w-20 bg-[var(--accent)]" />
           <p className="mt-7 max-w-xl text-base leading-8 text-[var(--muted)]">
-            Вход открыт для компаний, партнёров и редакции, которым команда уже выдала доступ.
+            Регистрация закрытая. Кабинет открывает команда BARSYNERGY после заявки и проверки роли.
           </p>
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+            <Button className="rounded-[var(--radius-md)] px-6" href="/auth/register" size="lg">
+              Запросить доступ
+            </Button>
+            <Button className="rounded-[var(--radius-md)] px-6" href="/" size="lg" variant="secondary">
+              Вернуться на сайт
+            </Button>
+          </div>
 
           <div className="mt-10 hidden gap-5 md:grid">
             {[
               {
                 icon: Settings2,
                 title: 'Кабинет компании',
-                description: 'Обновляйте данные компании, создавайте заявки и отслеживайте ответы команды.'
+                description: 'Обновляйте карточку компании, создавайте заявки и смотрите ответы команды.'
               },
               {
                 icon: FileText,
@@ -63,8 +72,8 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
               },
               {
                 icon: Mail,
-                title: 'Редакционный доступ',
-                description: 'Команда платформы управляет материалами, событиями и публичными разделами.'
+                title: 'Доступ команды',
+                description: 'Команда BARSYNERGY управляет материалами, событиями и публичными разделами.'
               }
             ].map((item) => {
               const Icon = item.icon;
@@ -107,7 +116,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
               Вход в кабинет
             </h2>
             <p className="mx-auto mt-4 max-w-md text-sm leading-6 text-[var(--muted)] md:text-[15px]">
-              Используйте email и пароль от аккаунта, который команда уже открыла.
+              Используйте email и пароль от аккаунта, который команда уже открыла. Если доступа ещё нет, отправьте заявку.
             </p>
           </div>
           <div className="px-5 py-7 md:px-8 md:py-8">
@@ -143,13 +152,16 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
                     required
                   />
                 </FormField>
-                <Button className="mt-3 rounded-[var(--radius-md)]" size="lg" type="submit">
+                <SubmitButton className="mt-3 rounded-[var(--radius-md)]" size="lg">
                   Войти
+                </SubmitButton>
+                <Button className="rounded-[var(--radius-md)]" href="/auth/register" size="lg" variant="secondary">
+                  Запросить доступ
                 </Button>
                 <Button className="rounded-[var(--radius-md)]" href="/contacts?topic=other" size="lg" variant="ghost">
                   Восстановить доступ через команду
                 </Button>
-                <Button className="rounded-[var(--radius-md)]" href="/" size="lg" variant="secondary">
+                <Button className="rounded-[var(--radius-md)]" href="/" size="lg" variant="ghost">
                   Вернуться на сайт
                   <ArrowRightMark />
                 </Button>

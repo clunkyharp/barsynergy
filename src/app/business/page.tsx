@@ -10,6 +10,7 @@ import { PageHeader } from '@/components/ui/page-header';
 import { Select } from '@/components/ui/select';
 import { StatCard } from '@/components/ui/stat-card';
 import { StatusBadge } from '@/components/ui/status-badge';
+import { SubmitButton } from '@/components/ui/submit-button';
 import { Textarea } from '@/components/ui/textarea';
 import { applicationStatusLabels } from '@/lib/admin/application-utils';
 import type { AdminContentSearchParams } from '@/lib/admin/content-utils';
@@ -106,7 +107,7 @@ export default async function BusinessDashboardPage({ searchParams }: BusinessDa
                 />
               </FormField>
               <ActionRow className="border-t-0 pt-0">
-                <Button className="rounded-[var(--radius-md)]" type="submit">Сохранить профиль</Button>
+                <SubmitButton className="rounded-[var(--radius-md)]">Сохранить профиль</SubmitButton>
               </ActionRow>
             </form>
           </div>

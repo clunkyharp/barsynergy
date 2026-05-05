@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { ApplicationType } from '@prisma/client';
 import { createBusinessApplication } from '@/app/business/actions';
 import { ActionRow } from '@/components/ui/action-row';
-import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ConsentField } from '@/components/ui/consent-field';
 import { FormField } from '@/components/ui/form-field';
@@ -12,6 +11,7 @@ import { Input } from '@/components/ui/input';
 import { InlineLink } from '@/components/ui/inline-link';
 import { Select } from '@/components/ui/select';
 import { SegmentedControl } from '@/components/ui/segmented-control';
+import { SubmitButton } from '@/components/ui/submit-button';
 import { Textarea } from '@/components/ui/textarea';
 import { applicationTypeLabels } from '@/lib/admin/application-utils';
 import { displayFont } from '@/lib/fonts';
@@ -41,7 +41,7 @@ const requestCards = [
   {
     type: ApplicationType.PARTNER_APPLICATION,
     title: applicationTypeLabels[ApplicationType.PARTNER_APPLICATION],
-    description: 'Совместный формат, площадка, коллаборация или участие в проекте.'
+    description: 'Совместный формат, площадка, событие или участие в проекте.'
   },
   {
     type: ApplicationType.CORPORATE_TRAINING_APPLICATION,
@@ -59,7 +59,7 @@ type BusinessRequestCardType = (typeof requestCards)[number]['type'];
 
 const requestRequirements: Record<BusinessRequestCardType, string[]> = {
   [ApplicationType.VACANCY_SUBMISSION]: ['должность и формат занятости', 'условия оплаты или понятный ориентир', 'короткое описание роли'],
-  [ApplicationType.SUPPLIER_SUBMISSION]: ['что поставляете или какую услугу оказываете', 'география работы', 'почему предложение полезно заведениям'],
+  [ApplicationType.SUPPLIER_SUBMISSION]: ['что поставляете или какую услугу оказываете', 'география работы', 'для каких заведений это подходит'],
   [ApplicationType.PARTNER_APPLICATION]: ['желаемый формат партнёрства', 'цель совместного проекта', 'ссылка на сайт или материалы, если есть'],
   [ApplicationType.CORPORATE_TRAINING_APPLICATION]: ['задача обучения', 'размер и уровень команды', 'желаемый формат или сроки'],
   [ApplicationType.CERTIFICATE_ORDER]: ['сумма или формат сертификата', 'получатель', 'пожелания по использованию']
@@ -200,12 +200,12 @@ export function BusinessRequestForm({ cities, defaultCityId }: BusinessRequestFo
         </ConsentField>
 
         <ActionRow>
-          <Button className="rounded-[var(--radius-md)]" size="lg" type="submit" name="intent" value="submit">
+          <SubmitButton className="rounded-[var(--radius-md)]" size="lg" name="intent" value="submit">
             Отправить заявку
-          </Button>
-          <Button className="rounded-[var(--radius-md)]" size="lg" type="submit" name="intent" value="draft" variant="ghost">
+          </SubmitButton>
+          <SubmitButton className="rounded-[var(--radius-md)]" size="lg" name="intent" value="draft" variant="ghost">
             Сохранить как черновик
-          </Button>
+          </SubmitButton>
         </ActionRow>
       </form>
     </Card>

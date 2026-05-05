@@ -1,10 +1,11 @@
-import { BusinessAccountStatus, UserRole, UserStatus } from '@prisma/client';
+import { ApplicationType, BusinessAccountStatus, UserRole, UserStatus } from '@prisma/client';
 import { updateBusinessUserAccess } from '@/app/admin/users/actions';
 import { AdminActionAlert, HiddenRedirect } from '@/components/admin/content-admin-controls';
 import { AdminPageIntro } from '@/components/admin/admin-page-intro';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { StatusBadge, type StatusBadgeVariant } from '@/components/ui/status-badge';
+import { applicationStatusLabels } from '@/lib/admin/application-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
 import { prisma } from '@/lib/db/prisma';
 import type { AdminContentSearchParams } from '@/lib/admin/content-utils';
@@ -64,7 +65,13 @@ export default async function AdminUsersPage({ searchParams }: AdminUsersPagePro
           contactPerson: true,
           phone: true,
           telegram: true,
-          city: { select: { name: true } }
+          city: { select: { name: true } },
+          applications: {
+            where: { type: ApplicationType.BUSINESS_ACCOUNT_REQUEST },
+            orderBy: [{ createdAt: 'desc' }],
+            take: 1,
+            select: { id: true, status: true }
+          }
         }
       }
     }
@@ -82,6 +89,8 @@ export default async function AdminUsersPage({ searchParams }: AdminUsersPagePro
         {users.length > 0 ? (
           users.map((user) => {
             const account = user.businessAccount;
+            const relatedApplication = account?.applications[0] ?? null;
+            const isPendingAccess = user.status === UserStatus.PENDING || account?.status === BusinessAccountStatus.PENDING;
 
             return (
               <Card className="p-5" key={user.id}>
@@ -89,8 +98,8 @@ export default async function AdminUsersPage({ searchParams }: AdminUsersPagePro
                   <div>
                     <div className="flex flex-wrap items-center gap-2">
                       <h2 className="text-lg font-semibold">{account?.companyName ?? user.email}</h2>
-                      <StatusBadge variant={userStatusVariants[user.status]}>{userStatusLabels[user.status]}</StatusBadge>
-                      {account ? <StatusBadge variant={businessStatusVariants[account.status]}>{businessStatusLabels[account.status]}</StatusBadge> : null}
+                      <StatusBadge variant={userStatusVariants[user.status]}>Аккаунт: {userStatusLabels[user.status]}</StatusBadge>
+                      {account ? <StatusBadge variant={businessStatusVariants[account.status]}>Доступ: {businessStatusLabels[account.status]}</StatusBadge> : null}
                     </div>
                     <dl className="mt-4 grid gap-2 text-sm text-[var(--muted)] md:grid-cols-2">
                       <div>
@@ -112,11 +121,23 @@ export default async function AdminUsersPage({ searchParams }: AdminUsersPagePro
                         </dd>
                       </div>
                     </dl>
-                    {user.status === UserStatus.PENDING ? (
-                      <p className="mt-4 max-w-2xl text-sm leading-6 text-[var(--muted)]">
-                        Для ожидающих заявок доступ больше не открывается прямо из этого экрана. Сначала заявка проверяется, затем доступ
-                        подготавливается отдельным безопасным шагом.
-                      </p>
+                    {isPendingAccess ? (
+                      <div className="mt-4 max-w-2xl rounded-[var(--radius-md)] border border-[var(--border-default)] p-4 text-sm leading-6">
+                        <p className="font-medium text-[var(--text)]">Следующий шаг: проверить заявку и подготовить ссылку активации.</p>
+                        <p className="mt-1 text-[var(--muted)]">
+                          {relatedApplication
+                            ? `Связанная заявка: ${applicationStatusLabels[relatedApplication.status]}.`
+                            : 'Связанная заявка не найдена в последних бизнес-заявках.'}
+                        </p>
+                        <Button
+                          className="mt-3"
+                          href={relatedApplication ? `/admin/applications/${relatedApplication.id}` : `/admin/applications?type=${ApplicationType.BUSINESS_ACCOUNT_REQUEST}`}
+                          size="sm"
+                          variant="secondary"
+                        >
+                          {relatedApplication ? 'Открыть заявку' : 'Найти бизнес-заявки'}
+                        </Button>
+                      </div>
                     ) : null}
                   </div>
                   <div className="flex flex-col gap-2 sm:flex-row lg:flex-col">
@@ -132,7 +153,12 @@ export default async function AdminUsersPage({ searchParams }: AdminUsersPagePro
                       <HiddenRedirect value={currentPath} />
                       <input name="userId" type="hidden" value={user.id} />
                       <input name="status" type="hidden" value="blocked" />
-                      <Button className="w-full" type="submit" variant="secondary" disabled={user.status === UserStatus.BLOCKED}>
+                      <Button
+                        className="w-full border-transparent text-[var(--danger)] hover:border-[var(--danger)] hover:bg-transparent hover:text-[var(--danger)]"
+                        type="submit"
+                        variant="ghost"
+                        disabled={user.status === UserStatus.BLOCKED}
+                      >
                         Заблокировать
                       </Button>
                     </form>

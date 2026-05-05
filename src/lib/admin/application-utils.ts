@@ -1,5 +1,5 @@
 import { ApplicationStatus, ApplicationType } from '@prisma/client';
-import { ZodError } from 'zod';
+import { hasErrorMessage, resolveServerActionError } from '../actions/server-action-errors';
 
 export const applicationTypeValues = [
   ApplicationType.BUSINESS_ACCOUNT_REQUEST,
@@ -81,37 +81,40 @@ export function parseApplicationStatus(value?: string) {
 }
 
 export function formatApplicationActionError(error: unknown) {
-  if (error instanceof ZodError) {
-    return 'Проверьте обязательные поля и формат значений.';
-  }
-
-  if (error instanceof Error && error.message.includes('forwarding requires')) {
-    return 'Передача работодателю доступна только для отклика на вакансию с зафиксированным согласием.';
-  }
-
-  if (error instanceof Error && error.message.includes('vacancy draft')) {
-    return 'Черновик вакансии можно создать только из заявки на размещение вакансии с полными данными и согласием.';
-  }
-
-  if (error instanceof Error && error.message.includes('business access request is invalid')) {
-    return 'Ссылка доступа доступна только для заявок на бизнес-подключение.';
-  }
-
-  if (error instanceof Error && error.message.includes('business access email is missing')) {
-    return 'В заявке не указан email для подготовки доступа.';
-  }
-
-  if (error instanceof Error && error.message.includes('business access role conflict')) {
-    return 'Этот email уже привязан к другому типу аккаунта. Проверьте заявку вручную.';
-  }
-
-  if (error instanceof Error && error.message.includes('business access already active')) {
-    return 'Доступ для этого email уже активирован.';
-  }
-
-  if (error instanceof Error && error.message.includes('business access is blocked')) {
-    return 'Для этого доступа установлен блок. Снимите блокировку перед новой активацией.';
-  }
-
-  return 'Не удалось сохранить заявку. Проверьте данные и повторите попытку.';
+  return resolveServerActionError({
+    action: 'admin:applications',
+    error,
+    zodMessage: 'Проверьте обязательные поля и формат значений.',
+    known: [
+      {
+        matches: (candidate) => hasErrorMessage(candidate, 'forwarding requires'),
+        message: 'Передача работодателю доступна только для отклика на вакансию с зафиксированным согласием.'
+      },
+      {
+        matches: (candidate) => hasErrorMessage(candidate, 'vacancy draft'),
+        message: 'Черновик вакансии можно создать только из заявки на размещение вакансии с полными данными и согласием.'
+      },
+      {
+        matches: (candidate) => hasErrorMessage(candidate, 'business access request is invalid'),
+        message: 'Ссылка доступа доступна только для заявок на бизнес-подключение.'
+      },
+      {
+        matches: (candidate) => hasErrorMessage(candidate, 'business access email is missing'),
+        message: 'В заявке не указан email для подготовки доступа.'
+      },
+      {
+        matches: (candidate) => hasErrorMessage(candidate, 'business access role conflict'),
+        message: 'Этот email уже привязан к другому типу аккаунта. Проверьте заявку вручную.'
+      },
+      {
+        matches: (candidate) => hasErrorMessage(candidate, 'business access already active'),
+        message: 'Доступ для этого email уже активирован.'
+      },
+      {
+        matches: (candidate) => hasErrorMessage(candidate, 'business access is blocked'),
+        message: 'Для этого доступа установлен блок. Снимите блокировку перед новой активацией.'
+      }
+    ],
+    fallbackMessage: 'Не удалось сохранить заявку. Проверьте данные и повторите попытку.'
+  });
 }

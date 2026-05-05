@@ -5,6 +5,7 @@ import { FormField } from '@/components/ui/form-field';
 import { InlineAlert } from '@/components/ui/inline-alert';
 import { Input } from '@/components/ui/input';
 import { Panel } from '@/components/ui/panel';
+import { SubmitButton } from '@/components/ui/submit-button';
 import { findActiveBusinessAccessInvite, parseBusinessAccessRequestPayload } from '@/lib/auth/business-access';
 import { displayFont } from '@/lib/fonts';
 
@@ -52,7 +53,7 @@ export default async function ActivateBusinessAccessPage({ searchParams }: Activ
           </p>
           {companyName ? (
             <Panel className="mt-8" padding="sm">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Подключаемый доступ</p>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Доступ для компании</p>
               <p className="mt-3 text-sm leading-6 text-[var(--muted)]">
                 {companyName}
                 {invite?.user.email ? ` / ${invite.user.email}` : ''}
@@ -88,9 +89,9 @@ export default async function ActivateBusinessAccessPage({ searchParams }: Activ
                   <Input id="confirmPassword" name="confirmPassword" type="password" minLength={8} autoComplete="new-password" required />
                 </FormField>
                 <ActionRow>
-                  <Button className="rounded-[var(--radius-md)]" size="lg" type="submit">
+                  <SubmitButton className="rounded-[var(--radius-md)]" size="lg">
                     Активировать доступ
-                  </Button>
+                  </SubmitButton>
                   <Button className="rounded-[var(--radius-md)]" href="/auth/login" size="lg" variant="secondary">
                     Уже есть вход
                   </Button>

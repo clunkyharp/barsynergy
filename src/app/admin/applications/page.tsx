@@ -1,11 +1,15 @@
+import { ApplicationStatus, ApplicationType, type Prisma } from '@prisma/client';
 import { AdminPagination } from '@/components/admin/content-admin-controls';
 import { AdminPageIntro } from '@/components/admin/admin-page-intro';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import {
   DataTable,
+  DataTableActionsCell,
+  DataTableActionsHeaderCell,
   DataTableBody,
   DataTableCell,
+  DataTableClamp,
   DataTableFrame,
   DataTableHead,
   DataTableHeaderCell,
@@ -13,6 +17,7 @@ import {
 } from '@/components/ui/data-table';
 import { EmptyState } from '@/components/ui/empty-state';
 import { FormField } from '@/components/ui/form-field';
+import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
 import { StatusBadge } from '@/components/ui/status-badge';
 import {
@@ -46,18 +51,76 @@ const dateTimeFormatter = new Intl.DateTimeFormat('ru-RU', {
   minute: '2-digit'
 });
 
+const quickStatusFilters = [
+  { label: 'Новые', status: ApplicationStatus.NEW },
+  { label: 'На проверке', status: ApplicationStatus.IN_REVIEW },
+  { label: 'Одобрены', status: ApplicationStatus.APPROVED },
+  { label: 'Завершены', status: ApplicationStatus.COMPLETED }
+] as const;
+
 type AdminApplicationsPageProps = {
   searchParams?: Promise<AdminContentSearchParams>;
 };
+
+function applicationActionLabel(application: {
+  type: ApplicationType;
+  status: ApplicationStatus;
+  vacancy: { title: string; slug: string } | null;
+  resumeFileId: string | null;
+  consentAcceptedAt: Date | null;
+}) {
+  if (application.status === ApplicationStatus.NEW && application.type === ApplicationType.BUSINESS_ACCOUNT_REQUEST) {
+    return 'Проверить бизнес-заявку';
+  }
+
+  if (application.status === ApplicationStatus.NEW && application.type === ApplicationType.VACANCY_RESPONSE && application.resumeFileId) {
+    return 'Проверить отклик';
+  }
+
+  if (application.status === ApplicationStatus.NEW) {
+    return 'Назначить следующий статус';
+  }
+
+  if (application.status === ApplicationStatus.IN_REVIEW) {
+    return 'Завершить проверку';
+  }
+
+  if (application.status === ApplicationStatus.PAYMENT_PENDING) {
+    return 'Проверить оплату';
+  }
+
+  if (application.type === ApplicationType.VACANCY_SUBMISSION && application.status === ApplicationStatus.APPROVED && !application.vacancy) {
+    return 'Создать черновик вакансии';
+  }
+
+  if (!application.consentAcceptedAt && application.type !== ApplicationType.CONTACT_MESSAGE) {
+    return 'Проверить согласие';
+  }
+
+  return 'Контроль не требуется';
+}
 
 export default async function AdminApplicationsPage({ searchParams }: AdminApplicationsPageProps) {
   await requireAdminSectionAccess('applications');
 
   const params = (await searchParams) ?? {};
   const page = getAdminPage(params);
+  const search = firstParam(params.search)?.trim() ?? '';
   const selectedType = parseApplicationType(firstParam(params.type));
   const selectedStatus = parseApplicationStatus(firstParam(params.status));
-  const where = {
+  const searchWhere: Prisma.ApplicationWhereInput = search
+    ? {
+        OR: [
+          { subject: { contains: search, mode: 'insensitive' } },
+          { name: { contains: search, mode: 'insensitive' } },
+          { email: { contains: search, mode: 'insensitive' } },
+          { phone: { contains: search, mode: 'insensitive' } },
+          { telegram: { contains: search, mode: 'insensitive' } }
+        ]
+      }
+    : {};
+  const where: Prisma.ApplicationWhereInput = {
+    ...searchWhere,
     ...(selectedType ? { type: selectedType } : {}),
     ...(selectedStatus ? { status: selectedStatus } : {})
   };
@@ -74,6 +137,7 @@ export default async function AdminApplicationsPage({ searchParams }: AdminAppli
         type: true,
         status: true,
         subject: true,
+        name: true,
         email: true,
         phone: true,
         telegram: true,
@@ -96,7 +160,10 @@ export default async function AdminApplicationsPage({ searchParams }: AdminAppli
       />
 
       <Card className="p-5">
-        <form className="grid gap-4 md:grid-cols-[1fr_1fr_auto]" method="get">
+        <form className="grid gap-4 lg:grid-cols-[1.3fr_1fr_1fr_auto]" method="get">
+          <FormField htmlFor="search" label="Поиск">
+            <Input id="search" name="search" defaultValue={search} placeholder="Имя, компания, email, Telegram" />
+          </FormField>
           <FormField htmlFor="type" label="Тип">
             <Select id="type" name="type" defaultValue={selectedType ?? ''}>
               <option value="">Все типы</option>
@@ -126,6 +193,22 @@ export default async function AdminApplicationsPage({ searchParams }: AdminAppli
         </form>
       </Card>
 
+      <div className="flex flex-wrap gap-2">
+        <Button href={ADMIN_APPLICATIONS_PATH} size="sm" variant={!selectedStatus ? 'primary' : 'secondary'}>
+          Все
+        </Button>
+        {quickStatusFilters.map((item) => (
+          <Button
+            href={`${ADMIN_APPLICATIONS_PATH}?status=${encodeURIComponent(item.status)}`}
+            key={item.status}
+            size="sm"
+            variant={selectedStatus === item.status ? 'primary' : 'secondary'}
+          >
+            {item.label}
+          </Button>
+        ))}
+      </div>
+
       <section className="space-y-4">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
           <div>
@@ -138,33 +221,28 @@ export default async function AdminApplicationsPage({ searchParams }: AdminAppli
           <EmptyState title="Заявок пока нет" />
         ) : (
           <DataTableFrame>
-            <DataTable minWidth={1000}>
+            <DataTable minWidth={980}>
               <DataTableHead>
                 <tr>
                   <DataTableHeaderCell>Заявка</DataTableHeaderCell>
                   <DataTableHeaderCell>Статус</DataTableHeaderCell>
-                  <DataTableHeaderCell>Связи</DataTableHeaderCell>
-                  <DataTableHeaderCell>Приватные поля</DataTableHeaderCell>
+                  <DataTableHeaderCell>Город</DataTableHeaderCell>
+                  <DataTableHeaderCell>Файлы</DataTableHeaderCell>
+                  <DataTableHeaderCell>Требует действия</DataTableHeaderCell>
                   <DataTableHeaderCell>Создана</DataTableHeaderCell>
-                  <DataTableHeaderCell>Действия</DataTableHeaderCell>
+                  <DataTableActionsHeaderCell>Действия</DataTableActionsHeaderCell>
                 </tr>
               </DataTableHead>
               <DataTableBody>
                 {applications.map((application) => {
-                  const privateFlags = [
-                    application.email ? 'email' : null,
-                    application.phone ? 'телефон' : null,
-                    application.telegram ? 'telegram' : null,
-                    application.resumeFileId ? 'резюме' : null,
-                    application.consentAcceptedAt ? 'согласие' : null
-                  ].filter(Boolean);
+                  const actionLabel = applicationActionLabel(application);
 
                   return (
                     <DataTableRow key={application.id}>
                       <DataTableCell className="max-w-[320px]">
-                        <div className="font-semibold">
-                          {application.subject?.trim() || applicationTypeLabels[application.type]}
-                        </div>
+                        <DataTableClamp className="font-semibold">
+                          {application.subject?.trim() || application.name?.trim() || applicationTypeLabels[application.type]}
+                        </DataTableClamp>
                         <div className="mt-1 text-xs text-[var(--muted)]">{applicationTypeLabels[application.type]}</div>
                       </DataTableCell>
                       <DataTableCell>
@@ -175,22 +253,34 @@ export default async function AdminApplicationsPage({ searchParams }: AdminAppli
                       <DataTableCell className="text-[var(--muted)]">
                         <div>{application.city?.name ?? 'Город не указан'}</div>
                         {application.vacancy ? (
-                          <div className="mt-1 text-xs">
+                          <DataTableClamp className="mt-1 text-xs">
                             Вакансия: {application.vacancy.title} /{application.vacancy.slug}
-                          </div>
+                          </DataTableClamp>
                         ) : null}
                       </DataTableCell>
-                      <DataTableCell className="text-[var(--muted)]">
-                        {privateFlags.length > 0 ? privateFlags.join(', ') : 'Не зафиксированы'}
+                      <DataTableCell>
+                        <div className="flex flex-wrap gap-1.5">
+                          {application.resumeFileId ? <StatusBadge variant="neutral">Резюме</StatusBadge> : null}
+                          {application.consentAcceptedAt ? <StatusBadge variant="success">Согласие</StatusBadge> : null}
+                          {application.email || application.phone || application.telegram ? <StatusBadge variant="neutral">Контакты</StatusBadge> : null}
+                          {!application.resumeFileId && !application.consentAcceptedAt && !application.email && !application.phone && !application.telegram ? (
+                            <span className="text-sm text-[var(--muted)]">Нет</span>
+                          ) : null}
+                        </div>
+                      </DataTableCell>
+                      <DataTableCell>
+                        <DataTableClamp className={actionLabel === 'Контроль не требуется' ? 'text-[var(--muted)]' : 'font-medium'}>
+                          {actionLabel}
+                        </DataTableClamp>
                       </DataTableCell>
                       <DataTableCell className="text-[var(--muted)]">
                         {dateTimeFormatter.format(application.createdAt)}
                       </DataTableCell>
-                      <DataTableCell>
+                      <DataTableActionsCell>
                         <Button className="min-h-9 px-3 py-1.5 text-xs" href={`/admin/applications/${application.id}`} variant="secondary">
                           Открыть
                         </Button>
-                      </DataTableCell>
+                      </DataTableActionsCell>
                     </DataTableRow>
                   );
                 })}

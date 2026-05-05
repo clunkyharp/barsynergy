@@ -71,7 +71,7 @@ export default async function ProfileResponsesPage() {
     <div className="space-y-6">
       <PageHeader
         eyebrow="История активности"
-        description="История ваших откликов на вакансии и заявок на другие услуги платформы."
+        description="История ваших откликов на вакансии и других заявок."
         title="Мои отклики"
       />
 

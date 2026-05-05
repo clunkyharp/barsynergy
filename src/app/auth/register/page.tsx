@@ -9,6 +9,7 @@ import { InlineAlert } from '@/components/ui/inline-alert';
 import { InlineLink } from '@/components/ui/inline-link';
 import { Panel } from '@/components/ui/panel';
 import { Select } from '@/components/ui/select';
+import { SubmitButton } from '@/components/ui/submit-button';
 import { Textarea } from '@/components/ui/textarea';
 import { arePublicApplicationFormsEnabled } from '@/lib/applications/public-forms';
 import { prisma } from '@/lib/db/prisma';
@@ -64,7 +65,7 @@ export default async function RegisterPage({ searchParams }: RegisterPageProps) 
               </li>
               <li className="grid grid-cols-[0.5rem_minmax(0,1fr)] gap-3">
                 <span className="mt-2 h-2 w-2 rounded-full bg-[var(--accent)]" />
-                <span>Короткое описание бизнеса и задачи, с которой вы хотите работать через кабинет.</span>
+                <span>Коротко: чем занимается компания и какие заявки нужны в кабинете.</span>
               </li>
             </ul>
           </div>
@@ -81,7 +82,7 @@ export default async function RegisterPage({ searchParams }: RegisterPageProps) 
                 </p>
                 <div className="mt-6 grid gap-3 md:grid-cols-2">
                   <Panel className="bg-white/70 text-sm leading-6 text-[var(--muted)]" padding="sm">
-                    Для связи и обсуждения подключения используйте страницу контактов.
+                    Для связи по доступу используйте страницу контактов.
                   </Panel>
                   <Panel className="bg-white/70 text-sm leading-6 text-[var(--muted)]" padding="sm">
                     Когда форма снова откроется, заявку можно будет оставить на этой же странице.
@@ -157,9 +158,9 @@ export default async function RegisterPage({ searchParams }: RegisterPageProps) 
                       Укажите рабочий email и хотя бы один удобный контакт для ответа.
                     </p>
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-                      <Button className="rounded-[var(--radius-md)]" size="lg" type="submit">
+                      <SubmitButton className="rounded-[var(--radius-md)]" size="lg">
                         Отправить заявку
-                      </Button>
+                      </SubmitButton>
                       <Button className="rounded-[var(--radius-md)]" href="/auth/login" size="lg" variant="secondary">
                         Уже есть доступ
                       </Button>
