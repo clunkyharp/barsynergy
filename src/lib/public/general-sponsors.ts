@@ -69,22 +69,22 @@ function splitLoose(value?: string | null) {
     .filter(Boolean);
 }
 
-export function normalizeRussianPhoneWhatsappHref(phone: string) {
+export function normalizeRussianPhoneHref(phone: string) {
   const digits = phone.replace(/\D/g, '');
 
   if (digits.length === 11 && digits.startsWith('8')) {
-    return `https://wa.me/7${digits.slice(1)}`;
+    return `tel:+7${digits.slice(1)}`;
   }
 
   if (digits.length === 10 && digits.startsWith('9')) {
-    return `https://wa.me/7${digits}`;
+    return `tel:+7${digits}`;
   }
 
   if (digits.length > 0) {
-    return `https://wa.me/${digits}`;
+    return `tel:+${digits}`;
   }
 
-  return undefined;
+  return `tel:${phone}`;
 }
 
 function normalizeExternalHref(value: string) {
@@ -200,17 +200,11 @@ export async function getPublishedGeneralSponsors(limit?: number): Promise<Gener
     const brands = splitList(sponsor.representedBrands);
     const names = splitLoose(sponsor.contactName);
     const phones = splitLoose(sponsor.contactPhone);
-    const contacts = phones.flatMap((phone, index) => {
-      const href = normalizeRussianPhoneWhatsappHref(phone);
-
-      return href
-        ? [{
-            name: names[index] ?? names[0] ?? 'Контакт',
-            phone,
-            href
-          }]
-        : [];
-    });
+    const contacts = phones.map((phone, index) => ({
+      name: names[index] ?? names[0] ?? 'Контакт',
+      phone,
+      href: normalizeRussianPhoneHref(phone)
+    }));
     const links = [
       sponsorLink('telegram', 'Telegram', sponsor.telegramUrl, sponsor.telegramUrl ? normalizeTelegramHref(sponsor.telegramUrl) : undefined),
       sponsorLink('whatsapp', 'WhatsApp', sponsor.whatsappUrl, sponsor.whatsappUrl ? normalizeWhatsappHref(sponsor.whatsappUrl) : undefined),
