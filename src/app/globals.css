@@ -1461,16 +1461,19 @@ footer {
   border-color: transparent !important;
 }
 
-:root[data-theme="dark"] .general-sponsor-logo-image {
-  filter: invert(1) contrast(1.08);
-  mix-blend-mode: lighten;
-}
-
+.general-sponsor-logo-image,
+.general-sponsor-brand-logo-image,
+:root[data-theme="dark"] .general-sponsor-logo-image,
+:root[data-theme="dark"] .general-sponsor-brand-logo-image,
 .background-zone-graphite .general-sponsor-logo-image,
+.background-zone-graphite .general-sponsor-brand-logo-image,
 .background-zone-sponsor .general-sponsor-logo-image,
+.background-zone-sponsor .general-sponsor-brand-logo-image,
 .background-zone-cta .general-sponsor-logo-image,
-.background-zone-tool .general-sponsor-logo-image {
-  filter: grayscale(0.08) contrast(1.02);
+.background-zone-cta .general-sponsor-brand-logo-image,
+.background-zone-tool .general-sponsor-logo-image,
+.background-zone-tool .general-sponsor-brand-logo-image {
+  filter: none;
   mix-blend-mode: normal;
 }
 

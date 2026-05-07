@@ -16,9 +16,11 @@ type GeneralSponsorCardProps = {
 function SponsorPhoneCard({ contact }: { contact: GeneralSponsor['contacts'][number] }) {
   return (
     <a
-      aria-label={`Позвонить: ${contact.name}, ${contact.phone}`}
+      aria-label={`Открыть WhatsApp: ${contact.name}, ${contact.phone}`}
       className="group grid min-h-[5.5rem] grid-cols-[auto_minmax(0,1fr)] gap-3 rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--surface-wash)] p-3 transition hover:border-[var(--accent)]/32 hover:bg-[var(--surface-wash-strong)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:items-center sm:p-4"
       href={contact.href}
+      rel="noreferrer"
+      target="_blank"
     >
       <span className="grid size-10 shrink-0 place-items-center rounded-[var(--radius-sm)] border border-[var(--accent)]/24 bg-[var(--accent-soft)] text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--accent)]">
         <Phone aria-hidden size={17} strokeWidth={1.8} />
@@ -34,7 +36,7 @@ function SponsorPhoneCard({ contact }: { contact: GeneralSponsor['contacts'][num
         </span>
       </span>
       <span className="col-span-2 inline-flex w-fit items-center gap-2 whitespace-nowrap text-sm font-semibold text-[var(--accent)] sm:col-span-1 sm:justify-self-end">
-        Позвонить
+        WhatsApp
         <ArrowUpRight className="transition-transform group-hover:translate-x-1" size={16} strokeWidth={1.8} />
       </span>
     </a>
@@ -158,7 +160,7 @@ export function GeneralSponsorCard({ priority = false, sponsor }: GeneralSponsor
                   {sponsor.brandLogos.map((logo) => (
                     <Image
                       alt={logo.alt}
-                      className="h-auto w-full max-w-[240px] rounded-[var(--radius-sm)] object-contain md:max-w-[300px]"
+                      className="general-sponsor-brand-logo-image h-auto w-full max-w-[240px] rounded-[var(--radius-sm)] object-contain md:max-w-[300px]"
                       height={440}
                       key={logo.src}
                       sizes="(min-width: 1024px) 20rem, 74vw"
