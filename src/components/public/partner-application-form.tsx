@@ -1,5 +1,6 @@
 import { submitPartnerApplication } from '@/app/(public)/partners/actions';
 import {
+  ContactChannelFieldset,
   HiddenUtmFields,
   HoneypotField,
   PublicFormShellFooter,
@@ -7,34 +8,41 @@ import {
   type PublicApplicationFormProps
 } from '@/components/public/application-form-section';
 import { PublicBodyText, PublicDisplayTitle, PublicEyebrow } from '@/components/public/public-primitives';
-import { Button } from '@/components/ui/button';
 import { ConsentField } from '@/components/ui/consent-field';
 import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
 import { InlineLink } from '@/components/ui/inline-link';
 import { MetaChip } from '@/components/ui/meta-chip';
 import { Select } from '@/components/ui/select';
+import { SubmitButton } from '@/components/ui/submit-button';
 import { Textarea } from '@/components/ui/textarea';
 
-export function PartnerApplicationForm({ enabled, result, utm, cities }: PublicApplicationFormProps) {
+export function PartnerApplicationForm({ enabled, result, utm, cities, defaults = {} }: PublicApplicationFormProps) {
   const highlights = [
-    'Образовательные коллаборации',
-    'Спецпроекты для заведений',
-    'Партнерские интеграции',
-    'Размещение и поддержка событий'
+    'Образовательные проекты',
+    'События для заведений',
+    'Партнёрские материалы',
+    'Поддержка событий'
   ];
 
   const preparationNotes = [
-    'Кто вы и какой формат сотрудничества хотите обсудить.',
-    'Какую задачу должен решить проект: обучение, мероприятие, размещение или запуск.',
-    'Ссылку на сайт, Telegram или материалы, если они уже готовы.'
+    'Кто вы и что хотите сделать вместе с BARSYNERGY.',
+    'Какая задача: обучение, событие, запуск, размещение или контакт с заведениями.',
+    'Ссылку на сайт, Telegram или материалы, если их уже можно посмотреть.'
   ];
 
   return (
     <PublicApplicationSection
-      eyebrow="Партнеры / Заявка"
-      title="Обсудить партнерство"
-      description="Для брендов, школ и заведений: совместный проект, событие, размещение или программа."
+      eyebrow="Партнёрство / Заявка"
+      title="Обсудить партнёрство"
+      description="Для брендов, школ, заведений и сервисных команд: совместный проект, событие, размещение или программа."
+      disclosureAliases={['applications']}
+      disclosureFocusSelector="#partnerCompanyName"
+      disclosureId="partner-request"
+      disclosureOpenLabel="Открыть заявку"
+      disclosureTitle="Обсудить партнёрство"
+      disclosureDescription="Укажите компанию, формат, город, ссылку и короткое описание задачи."
+      disclosureDefaultOpen={Boolean(defaults.partnerType)}
       enabled={enabled}
       result={result}
     >
@@ -45,10 +53,10 @@ export function PartnerApplicationForm({ enabled, result, utm, cities }: PublicA
           <div className="relative border-b border-white/10 bg-[var(--graphite)] px-5 py-6 text-white md:px-6 md:py-7 lg:border-b-0 lg:border-r lg:border-white/10">
             <PublicEyebrow tone="inverse">Совместный проект</PublicEyebrow>
             <PublicDisplayTitle as="h3" className="mt-3 text-white" size="card">
-              Формат для брендов, школ и заведений
+              Заявка для брендов, школ и заведений
             </PublicDisplayTitle>
             <PublicBodyText className="mt-4 max-w-md" tone="inverse">
-              Коротко опишите идею. С этого сообщения начнётся разговор.
+              Коротко опишите задачу и идею. Этого достаточно, чтобы начать разговор по делу.
             </PublicBodyText>
 
             <div className="mt-6 flex flex-wrap gap-2">
@@ -80,15 +88,7 @@ export function PartnerApplicationForm({ enabled, result, utm, cities }: PublicA
               <FormField htmlFor="partnerContactName" label="Контактное лицо">
                 <Input id="partnerContactName" name="contactName" required maxLength={160} minLength={2} />
               </FormField>
-              <FormField htmlFor="partnerEmail" label="Email">
-                <Input id="partnerEmail" name="email" type="email" maxLength={180} />
-              </FormField>
-              <FormField htmlFor="partnerPhone" label="Телефон">
-                <Input id="partnerPhone" name="phone" maxLength={80} />
-              </FormField>
-              <FormField htmlFor="partnerTelegram" label="Telegram">
-                <Input id="partnerTelegram" name="telegram" maxLength={80} />
-              </FormField>
+              <ContactChannelFieldset className="md:col-span-2" emailId="partnerEmail" phoneId="partnerPhone" telegramId="partnerTelegram" />
               <FormField htmlFor="partnerCityId" label="Город">
                 <Select id="partnerCityId" name="cityId" defaultValue="">
                   <option value="">Не указан</option>
@@ -99,8 +99,8 @@ export function PartnerApplicationForm({ enabled, result, utm, cities }: PublicA
                   ))}
                 </Select>
               </FormField>
-              <FormField htmlFor="partnerType" label="Тип партнерства">
-                <Input id="partnerType" name="partnerType" required maxLength={160} minLength={2} />
+              <FormField htmlFor="partnerType" label="Тип партнёрства">
+                <Input id="partnerType" name="partnerType" defaultValue={defaults.partnerType} required maxLength={160} minLength={2} />
               </FormField>
               <FormField htmlFor="partnerWebsiteUrl" label="Сайт">
                 <Input id="partnerWebsiteUrl" name="websiteUrl" type="url" maxLength={500} />
@@ -119,13 +119,12 @@ export function PartnerApplicationForm({ enabled, result, utm, cities }: PublicA
               </div>
               <div className="md:col-span-2 border-t border-black/10 pt-1">
                 <ConsentField>
-                  Даю согласие на обработку персональных данных для этой заявки. Полный текст{' '}
-                  <InlineLink href="/legal/personal-data-consent">согласия</InlineLink>
-                  .
+                  Согласен с <InlineLink href="/legal/privacy">политикой обработки персональных данных</InlineLink> и даю{' '}
+                  <InlineLink href="/legal/personal-data-consent">согласие на обработку персональных данных</InlineLink> для этой заявки.
                 </ConsentField>
               </div>
-              <PublicFormShellFooter className="md:col-span-2" note="После отправки напишем вам и обсудим детали.">
-                <Button type="submit">Отправить заявку</Button>
+              <PublicFormShellFooter className="md:col-span-2" note="После отправки свяжемся и обсудим следующий шаг.">
+                <SubmitButton>Отправить заявку</SubmitButton>
               </PublicFormShellFooter>
             </div>
           </div>

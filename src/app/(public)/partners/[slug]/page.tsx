@@ -8,6 +8,23 @@ type PartnerDetailPageProps = {
   params: Promise<{ slug: string }>;
 };
 
+function partnerContactHref(input: { title: string; companyName?: string; label?: string; externalUrl?: string }) {
+  const params = new URLSearchParams({
+    topic: 'partnership',
+    companyName: input.companyName ?? input.title
+  });
+
+  if (input.label) {
+    params.set('partnerType', input.label);
+  }
+
+  if (input.externalUrl) {
+    params.set('websiteUrl', input.externalUrl);
+  }
+
+  return `/contacts?${params.toString()}#contact-form`;
+}
+
 export default async function PartnerDetailPage({ params }: PartnerDetailPageProps) {
   const { slug } = await params;
   const [partner, related] = await Promise.all([getPublishedPartnerDetail(slug), getPublishedPartners({ pageSize: '4' })]);
@@ -21,14 +38,14 @@ export default async function PartnerDetailPage({ params }: PartnerDetailPagePro
     <>
       <PublicContentDetailPage
         backHref="/partners"
-        backLabel="Ко всем партнерам"
+        backLabel="Ко всем партнёрам"
         body={partner.body}
-        eyebrow="Партнеры"
+        eyebrow="Партнёры"
         facts={partner.facts}
         imageUrl={partner.imageUrl}
         label={partner.label}
         meta={partner.meta}
-        primaryLink={{ href: '/contacts', label: 'Обсудить партнерство' }}
+        primaryLink={{ href: partnerContactHref(partner), label: 'Обсудить партнёрство' }}
         secondaryLink={
           partner.externalUrl && partner.externalUrlLabel
             ? { href: partner.externalUrl, label: partner.externalUrlLabel, external: true }
@@ -40,7 +57,7 @@ export default async function PartnerDetailPage({ params }: PartnerDetailPagePro
       <PublicRelatedContentSection
         basePath="/partners"
         items={relatedItems}
-        title="Другие партнеры"
+        title="Другие партнёры"
       />
     </>
   );

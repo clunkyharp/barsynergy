@@ -1,16 +1,18 @@
-import { ContentStatus } from '@prisma/client';
 import { deleteCourseDraft, updateCourseStatus } from '@/app/admin/courses/actions';
 import {
   AdminActionAlert,
+  AdminContentRowActions,
   AdminPagination,
-  HiddenRedirect
 } from '@/components/admin/content-admin-controls';
 import { AdminPageIntro } from '@/components/admin/admin-page-intro';
 import { Button } from '@/components/ui/button';
 import {
   AdminTable,
+  AdminTableActionsCell,
+  AdminTableActionsHeaderCell,
   AdminTableBody,
   AdminTableCell,
+  AdminTableClamp,
   AdminTableFrame,
   AdminTableHead,
   AdminTableHeaderCell,
@@ -22,7 +24,10 @@ import {
   ADMIN_CONTENT_PAGE_SIZE,
   contentStatusBadgeVariants,
   contentStatusLabels,
+  courseFormatOptions,
+  courseLevelOptions,
   getAdminCurrentPath,
+  getAdminOptionLabel,
   getAdminPage,
   getAdminTotalPages,
   type AdminContentSearchParams
@@ -85,7 +90,12 @@ export default async function AdminCoursesPage({ searchParams }: AdminCoursesPag
         </div>
 
         {courses.length === 0 ? (
-          <EmptyState title="Курсов пока нет" />
+          <EmptyState
+            actionHref={`${ADMIN_COURSES_PATH}/create`}
+            actionLabel="Создать курс"
+            description="Добавьте программу, интенсив или другой учебный формат для публикации в разделе образования."
+            title="Курсов пока нет"
+          />
         ) : (
           <AdminTableFrame>
             <AdminTable minWidth={1040}>
@@ -96,14 +106,14 @@ export default async function AdminCoursesPage({ searchParams }: AdminCoursesPag
                   <AdminTableHeaderCell>Город</AdminTableHeaderCell>
                   <AdminTableHeaderCell>Статус</AdminTableHeaderCell>
                   <AdminTableHeaderCell>Обновлено</AdminTableHeaderCell>
-                  <AdminTableHeaderCell>Действия</AdminTableHeaderCell>
+                  <AdminTableActionsHeaderCell>Действия</AdminTableActionsHeaderCell>
                 </AdminTableRow>
               </AdminTableHead>
               <AdminTableBody>
                 {courses.map((course) => (
                   <AdminTableRow key={course.id}>
                     <AdminTableCell className="max-w-[320px]">
-                      <div className="font-semibold">{course.title}</div>
+                      <AdminTableClamp className="font-semibold">{course.title}</AdminTableClamp>
                       <div className="mt-1 truncate text-xs text-[var(--muted)]">/{course.slug}</div>
                       <div className="mt-1 text-xs text-[var(--muted)]">{course.category?.name ?? 'Без категории'}</div>
                       {course.coverImage?.originalName ? (
@@ -111,9 +121,11 @@ export default async function AdminCoursesPage({ searchParams }: AdminCoursesPag
                       ) : null}
                     </AdminTableCell>
                     <AdminTableCell className="text-[var(--muted)]">
-                      <div>{course.format ?? 'Формат не указан'}</div>
+                      <div>{getAdminOptionLabel(courseFormatOptions, course.format, 'Формат не указан')}</div>
                       {course.durationLabel ? <div className="mt-1 text-xs">{course.durationLabel}</div> : null}
-                      {course.level ? <div className="mt-1 text-xs">{course.level}</div> : null}
+                      {course.level ? (
+                        <div className="mt-1 text-xs">{getAdminOptionLabel(courseLevelOptions, course.level)}</div>
+                      ) : null}
                       {course.priceLabel ? <div className="mt-1 text-xs">{course.priceLabel}</div> : null}
                     </AdminTableCell>
                     <AdminTableCell className="text-[var(--muted)]">{course.city?.name ?? '-'}</AdminTableCell>
@@ -124,42 +136,18 @@ export default async function AdminCoursesPage({ searchParams }: AdminCoursesPag
                       <div>{dateFormatter.format(course.updatedAt)}</div>
                       {course.updatedBy?.email ? <div className="mt-1 text-xs">{course.updatedBy.email}</div> : null}
                     </AdminTableCell>
-                    <AdminTableCell>
-                      <div className="flex flex-wrap gap-2">
-                        <Button className="min-h-9 px-3 py-1.5 text-xs" variant="secondary" href={`/admin/courses/${course.id}`}>
-                          Изменить
-                        </Button>
-                        {course.status !== ContentStatus.PUBLISHED ? (
-                          <form action={updateCourseStatus}>
-                            <HiddenRedirect value={currentPath} />
-                            <input name="courseId" type="hidden" value={course.id} />
-                            <input name="status" type="hidden" value={ContentStatus.PUBLISHED} />
-                            <Button className="min-h-9 px-3 py-1.5 text-xs" type="submit">
-                              Опубликовать
-                            </Button>
-                          </form>
-                        ) : null}
-                        {course.status !== ContentStatus.ARCHIVED ? (
-                          <form action={updateCourseStatus}>
-                            <HiddenRedirect value={currentPath} />
-                            <input name="courseId" type="hidden" value={course.id} />
-                            <input name="status" type="hidden" value={ContentStatus.ARCHIVED} />
-                            <Button className="min-h-9 px-3 py-1.5 text-xs" type="submit" variant="secondary">
-                              В архив
-                            </Button>
-                          </form>
-                        ) : null}
-                        {course.status !== ContentStatus.PUBLISHED ? (
-                          <form action={deleteCourseDraft}>
-                            <HiddenRedirect value={currentPath} />
-                            <input name="courseId" type="hidden" value={course.id} />
-                            <Button className="min-h-9 px-3 py-1.5 text-xs" type="submit" variant="ghost">
-                              Удалить
-                            </Button>
-                          </form>
-                        ) : null}
-                      </div>
-                    </AdminTableCell>
+                    <AdminTableActionsCell>
+                      <AdminContentRowActions
+                        currentPath={currentPath}
+                        deleteAction={deleteCourseDraft}
+                        editHref={`${ADMIN_COURSES_PATH}/${course.id}`}
+                        idName="courseId"
+                        idValue={course.id}
+                        publicHref={`/education/${course.slug}`}
+                        status={course.status}
+                        updateStatusAction={updateCourseStatus}
+                      />
+                    </AdminTableActionsCell>
                   </AdminTableRow>
                 ))}
               </AdminTableBody>

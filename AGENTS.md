@@ -63,6 +63,8 @@ For implementation batches, define goal, scope, out of scope, ownership, done cr
 Treat a bare `continue by plan` / `продолжай по плану` request as under-specified. Before coding, restate the current phase or checkpoint, what is already done, exact in-scope work for this batch, out of scope, done condition, and validation path.
 After any large multi-file code change or structurally meaningful remediation batch, run a separate `QA` code review pass before considering the batch stable. That review must check architecture, reliability, maintainability, DX and predictable further development.
 For `QA` review work, label the intent explicitly: `discovery`, `control audit`, or `sign-off`.
+For broad screenshot, photo, or visual-reference redesign requests, first freeze a short visual contract: target screens, reusable tokens/components, source assets, out of scope, and validation viewports. Implement one coherent screen group per batch.
+For orchestrated project reviews, stop after ranked synthesis unless remediation was explicitly requested. Do not turn parallel reviewer output into implementation work before deduplication and prioritization.
 
 Keep changes minimal. Preserve existing architecture, naming, routing, styling, and file organization unless the task explicitly asks for refactoring.
 
@@ -110,9 +112,10 @@ Validation:
 ```bash
 npm run lint
 npm run typecheck
-npm run build
 npx prisma validate
 ```
+
+`npm run build` is mandatory only before creating a commit. For ordinary implementation checks, run it only when the task explicitly needs production-build, deploy or standalone-runtime validation.
 
 Prisma:
 
@@ -122,7 +125,7 @@ npm run prisma:migrate:dev -- --name <migration_name>
 npm run prisma:migrate:deploy
 ```
 
-Run build and typecheck sequentially. Next.js type generation can make parallel build/typecheck runs flaky.
+When both build and typecheck are required, run them sequentially. Next.js type generation can make parallel build/typecheck runs flaky.
 
 ## Environment And Data Safety
 
@@ -140,7 +143,10 @@ Run build and typecheck sequentially. Next.js type generation can make parallel 
 - Keep server data access, route handlers, and client components clearly separated.
 - Prefer existing components in `src/components/ui`, `src/components/layout`, and `src/components/public`.
 - Keep public UI responsive and check mobile behavior for visible page changes.
+- Keep public and user-facing Russian copy simple, literal and easy to scan. Avoid vague promo wording, internal workflow jargon and text that sounds machine-generated.
+- When editing or rewriting connected Russian user-facing prose, apply the `humanizer-ru` cleanup principle by default. Do not apply it to code, logs, commands, schemas or exact quotations.
 - For small visible UI fixes, prefer concrete browser diff evidence, screenshot notes, page URL, and target element over a generic `поправь дизайн` prompt.
+- For visual QA, state which tool actually verified the screen: built-in browser, Playwright screenshot, HTML/source smoke, or an explicit unverified visual gap.
 - Use Prisma migrations for schema changes. Do not edit generated Prisma client files.
 - Keep validation close to boundaries using existing Zod/env patterns.
 - Do not introduce new libraries unless they are necessary and consistent with the stack.

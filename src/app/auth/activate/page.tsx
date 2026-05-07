@@ -1,3 +1,6 @@
+import { ArrowLeft } from 'lucide-react';
+import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
 import { activateBusinessAccessAction } from '@/app/auth/actions';
 import { ActionRow } from '@/components/ui/action-row';
 import { Button } from '@/components/ui/button';
@@ -5,7 +8,13 @@ import { FormField } from '@/components/ui/form-field';
 import { InlineAlert } from '@/components/ui/inline-alert';
 import { Input } from '@/components/ui/input';
 import { Panel } from '@/components/ui/panel';
-import { findActiveBusinessAccessInvite, parseBusinessAccessRequestPayload } from '@/lib/auth/business-access';
+import { SubmitButton } from '@/components/ui/submit-button';
+import {
+  BUSINESS_ACCESS_ACTIVATION_COOKIE_NAME,
+  findActiveBusinessAccessInvite,
+  parseBusinessAccessRequestPayload
+} from '@/lib/auth/business-access';
+import { displayFont } from '@/lib/fonts';
 
 const errorMessages: Record<string, string> = {
   invalid: 'Ссылка активации недействительна или уже использована.',
@@ -24,7 +33,14 @@ function firstParam(value: string | string[] | undefined) {
 
 export default async function ActivateBusinessAccessPage({ searchParams }: ActivatePageProps) {
   const params = (await searchParams) ?? {};
-  const token = firstParam(params.token) ?? '';
+  const tokenParam = firstParam(params.token);
+
+  if (tokenParam) {
+    redirect(`/auth/activate/consume?token=${encodeURIComponent(tokenParam)}`);
+  }
+
+  const cookieStore = await cookies();
+  const token = cookieStore.get(BUSINESS_ACCESS_ACTIVATION_COOKIE_NAME)?.value ?? '';
   const error = firstParam(params.error);
   const invite = token ? await findActiveBusinessAccessInvite(token) : null;
   const requestProfile = (() => {
@@ -44,14 +60,20 @@ export default async function ActivateBusinessAccessPage({ searchParams }: Activ
     <div className="container max-w-5xl py-10 md:py-14">
       <div className="grid gap-6 lg:grid-cols-[0.42fr_0.58fr] lg:items-start">
         <section className="editorial-form-shell p-6 md:p-8">
+          <div className="mb-8 flex justify-end">
+            <Button className="rounded-[var(--radius-md)] px-4" href="/" size="sm" variant="ghost">
+              <ArrowLeft aria-hidden size={15} strokeWidth={1.8} />
+              Вернуться на сайт
+            </Button>
+          </div>
           <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Бизнес-аккаунт</p>
-          <h1 className="mt-4 text-4xl font-semibold leading-tight md:text-5xl">Завершить подключение</h1>
+          <h1 className={`${displayFont.className} display-tight mt-4 text-[40px] md:text-[54px]`}>Завершить подключение</h1>
           <p className="mt-4 max-w-md text-base leading-7 text-[var(--muted)]">
             Установите пароль для первого входа в кабинет компании. Ссылка действует ограниченное время и используется один раз.
           </p>
           {companyName ? (
             <Panel className="mt-8" padding="sm">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Подключаемый доступ</p>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Доступ для компании</p>
               <p className="mt-3 text-sm leading-6 text-[var(--muted)]">
                 {companyName}
                 {invite?.user.email ? ` / ${invite.user.email}` : ''}
@@ -61,9 +83,9 @@ export default async function ActivateBusinessAccessPage({ searchParams }: Activ
         </section>
 
         <section className="editorial-form-shell overflow-hidden">
-          <div className="border-b border-black/10 bg-[linear-gradient(135deg,rgba(255,255,255,0.86),rgba(255,255,255,0.58))] px-5 py-5 md:px-6 md:py-6">
+          <div className="border-b border-black/10 bg-[var(--surface-wash)] px-5 py-5 md:px-6 md:py-6">
             <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Активация</p>
-            <h2 className="mt-3 text-2xl font-semibold uppercase leading-8">Создайте пароль</h2>
+            <h2 className={`${displayFont.className} mt-3 text-[2rem] font-semibold leading-none`}>Создайте пароль</h2>
             <p className="mt-3 max-w-xl text-sm leading-7 text-[var(--muted)]">
               После активации вы сразу попадёте в кабинет и сможете продолжить работу с заявками компании.
             </p>
@@ -87,10 +109,10 @@ export default async function ActivateBusinessAccessPage({ searchParams }: Activ
                   <Input id="confirmPassword" name="confirmPassword" type="password" minLength={8} autoComplete="new-password" required />
                 </FormField>
                 <ActionRow>
-                  <Button className="rounded-full" size="lg" type="submit">
+                  <SubmitButton className="rounded-[var(--radius-md)]" size="lg">
                     Активировать доступ
-                  </Button>
-                  <Button className="rounded-full" href="/auth/login" size="lg" variant="secondary">
+                  </SubmitButton>
+                  <Button className="rounded-[var(--radius-md)]" href="/auth/login" size="lg" variant="secondary">
                     Уже есть вход
                   </Button>
                 </ActionRow>

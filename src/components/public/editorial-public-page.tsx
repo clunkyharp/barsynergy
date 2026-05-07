@@ -36,16 +36,19 @@ export function EditorialPublicPage({
   title,
   description,
   summary,
+  summaryHeading = 'Коротко',
+  metrics,
+  rows,
+  rowsHeading = 'Разделы',
   primaryLink,
   secondaryLink
 }: EditorialPublicPageProps) {
+  const hasDetails = metrics.length > 0 || rows.length > 0;
+  const detailsTitle = rowsHeading === 'Разделы' ? 'Что здесь можно сделать' : rowsHeading;
+
   return (
     <div>
-      <section className="relative overflow-hidden border-b border-black/12 py-10 md:py-14">
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_18%,rgba(153,44,38,0.08),transparent_18%),radial-gradient(circle_at_82%_26%,rgba(255,255,255,0.54),transparent_18%),radial-gradient(circle_at_74%_80%,rgba(20,20,18,0.05),transparent_24%)]"
-        />
+      <section className="background-zone background-zone-hero border-b border-[var(--line)] py-10 md:py-14">
         <div className="container relative grid gap-8 xl:grid-cols-[1fr_0.58fr] xl:items-start">
           <div className="min-w-0 xl:pt-4">
             <PublicEyebrow tone="muted">{eyebrow}</PublicEyebrow>
@@ -53,16 +56,17 @@ export function EditorialPublicPage({
               {title}
             </PublicDisplayTitle>
           </div>
-          <div className="min-w-0 border-l border-black/20 pl-5 xl:pt-4">
-            <PublicBodyText className="max-w-[36rem]" size="md">
+          <div className="min-w-0 border-t border-[var(--line)] pt-5 xl:border-l xl:border-t-0 xl:pl-5 xl:pt-4">
+            <PublicEyebrow tone="muted">{summaryHeading}</PublicEyebrow>
+            <PublicBodyText className="mt-3 max-w-[36rem] text-[var(--text)]" size="md" tone="default">
               {description}
             </PublicBodyText>
-            <PublicBodyText className="mt-5 max-w-[36rem] text-[var(--muted)]" size="sm">
+            <PublicBodyText className="mt-5 max-w-[36rem]" size="sm">
               {summary}
             </PublicBodyText>
             <PublicActionRow>
               <Button
-                className="min-h-12 w-full max-w-full border-[var(--graphite)] bg-[var(--graphite)] px-5 leading-5 tracking-[0.06em] hover:bg-black sm:w-auto"
+                className="min-h-12 w-full max-w-full rounded-[var(--radius-md)] px-5 leading-5 tracking-normal sm:w-auto"
                 href={primaryLink.href}
               >
                 {primaryLink.label}
@@ -70,7 +74,7 @@ export function EditorialPublicPage({
               </Button>
               {secondaryLink ? (
                 <Button
-                  className="min-h-12 w-full max-w-full border-black/25 px-5 leading-5 tracking-[0.06em] sm:w-auto"
+                  className="min-h-12 w-full max-w-full rounded-[var(--radius-md)] px-5 leading-5 tracking-normal sm:w-auto"
                   href={secondaryLink.href}
                   variant="secondary"
                 >
@@ -81,6 +85,50 @@ export function EditorialPublicPage({
           </div>
         </div>
       </section>
+      {hasDetails ? (
+        <section className="background-zone background-zone-ivory border-b border-[var(--line)] py-8 md:py-10">
+          <div className="container">
+            <div className="mb-5 flex flex-wrap items-end justify-between gap-4">
+              <div className="min-w-0">
+                <PublicEyebrow tone="muted">{summaryHeading}</PublicEyebrow>
+                <PublicDisplayTitle as="h2" className="mt-3 max-w-3xl !text-[clamp(1.85rem,3vw,2.8rem)]" size="card">
+                  {detailsTitle}
+                </PublicDisplayTitle>
+              </div>
+              {metrics.length > 0 ? (
+                <dl className="flex max-w-3xl flex-wrap gap-2">
+                  {metrics.map((metric) => (
+                    <div
+                      className="min-w-[9rem] rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--surface-wash)] px-3 py-2"
+                      key={`${metric.value}-${metric.label}`}
+                    >
+                      <dt className="text-[11px] font-semibold uppercase tracking-[0.13em] text-[var(--muted)]">{metric.label}</dt>
+                      <dd className="mt-1 text-lg font-semibold leading-6 text-[var(--text)]">{metric.value}</dd>
+                    </div>
+                  ))}
+                </dl>
+              ) : null}
+            </div>
+
+            {rows.length > 0 ? (
+              <div className="grid gap-3 md:grid-cols-3">
+                {rows.map((row) => (
+                  <article
+                    className="flex min-h-[12rem] flex-col rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--surface-wash)] p-4"
+                    key={`${row.label}-${row.title}`}
+                  >
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--accent)]">{row.label}</p>
+                    <h2 className="mt-4 text-lg font-semibold leading-7 text-[var(--text)]">{row.title}</h2>
+                    <PublicBodyText className="mt-2 max-w-3xl" size="sm">
+                      {row.description}
+                    </PublicBodyText>
+                  </article>
+                ))}
+              </div>
+            ) : null}
+          </div>
+        </section>
+      ) : null}
     </div>
   );
 }

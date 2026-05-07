@@ -9,7 +9,7 @@ export function ActionRow({ className, align = 'start', ...props }: ActionRowPro
   return (
     <div
       className={cn(
-        'flex flex-col gap-3 border-t border-black/10 pt-5 sm:flex-row sm:items-center',
+        'form-actions',
         align === 'between' && 'sm:justify-between',
         className
       )}

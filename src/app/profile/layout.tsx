@@ -20,7 +20,7 @@ export default async function ProfileLayout({ children }: { children: ReactNode 
         <div className="space-y-4">
           <ProfileSidebar />
           <form action={logoutAction}>
-            <Button className="w-full rounded-full" type="submit" variant="secondary">
+            <Button className="w-full rounded-[var(--radius-md)]" type="submit" variant="secondary">
               Выйти
             </Button>
           </form>

@@ -14,9 +14,15 @@ Important production values:
 NODE_ENV=production
 APP_URL=https://barsynergy.ru
 DATABASE_URL=postgresql://barsynergy:<password>@postgres:5432/barsynergy
+SESSION_SECRET=<long-random-secret>
+NEXT_SERVER_ACTIONS_ENCRYPTION_KEY=<base64-aes-key>
 STORAGE_DRIVER=s3
 S3_ENDPOINT=https://s3.twcstorage.ru
 S3_REGION=ru-1
+S3_BUCKET_PUBLIC=<public-bucket>
+S3_BUCKET_PRIVATE=<private-bucket>
+S3_ACCESS_KEY_ID=<access-key>
+S3_SECRET_ACCESS_KEY=<secret-key>
 APPLICATION_FORMS_ENABLED=false
 POSTGRES_DB=barsynergy
 POSTGRES_USER=barsynergy
@@ -24,6 +30,22 @@ POSTGRES_PASSWORD=<password>
 ```
 
 `DATABASE_URL` for production compose must use `postgres` host from Docker network, not `localhost`.
+
+`NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` must stay stable across production builds and app instances. Use a base64-encoded AES key with 16, 24 or 32 bytes.
+
+`APP_DEPLOYMENT_ID` is optional but recommended for self-hosted deploys. Use a release-specific value such as a commit SHA or deploy tag so stale client pages are less likely to hit Server Action version skew after deploys.
+
+## Production Runtime Validation
+
+Runtime validation is defined in `src/lib/validation/env.ts`.
+
+For `NODE_ENV=production`, the app validates different required variables by storage mode:
+
+- `STORAGE_DRIVER=s3`: `DATABASE_URL`, `SESSION_SECRET`, `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY`, `S3_ENDPOINT`, `S3_REGION`, `S3_BUCKET_PUBLIC`, `S3_BUCKET_PRIVATE`, `S3_ACCESS_KEY_ID` and `S3_SECRET_ACCESS_KEY` are required.
+- `STORAGE_DRIVER=local`: `DATABASE_URL`, `SESSION_SECRET` and `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` are required, and this mode is allowed only when `ALLOW_LOCAL_STORAGE_IN_PRODUCTION=true`.
+- `APPLICATION_FORMS_ENABLED=true`: legal operator details and readiness flags become required at startup. See "Legal Operator Fields" below.
+
+Keep `.env.production.example` aligned with this list whenever env validation changes.
 
 ## Storage Rule
 
@@ -39,6 +61,28 @@ Use this only when the launch must run on one host without ready external object
 - Local development can use `APPLICATION_FORMS_ENABLED=true`.
 - Production must keep `APPLICATION_FORMS_ENABLED=false` until owner/legal approval is complete.
 - If the variable is omitted, production disables these forms by default and non-production keeps them enabled.
+
+## Legal Operator Fields
+
+Public legal pages and personal-data collection need operator details in env:
+
+- `LEGAL_OPERATOR_TYPE=legal_entity` or `individual_entrepreneur`
+- `LEGAL_OPERATOR_NAME`
+- `LEGAL_OPERATOR_EMAIL`
+- `LEGAL_OPERATOR_ADDRESS`
+- `LEGAL_OPERATOR_TAX_ID`
+- `LEGAL_OPERATOR_REGISTRATION_ID`
+- `LEGAL_OPERATOR_CONFIRMED`
+- `PERSONAL_DATA_LEGAL_REVIEW_APPROVED`
+- `PERSONAL_DATA_RKN_NOTIFICATION_CONFIRMED`
+- `PERSONAL_DATA_PROCESSOR_AGREEMENTS_CONFIRMED`
+- `PERSONAL_DATA_RETENTION_RULE_APPROVED`
+
+Production rule:
+
+- if `APPLICATION_FORMS_ENABLED=true`, then `LEGAL_OPERATOR_NAME`, `LEGAL_OPERATOR_EMAIL`, `LEGAL_OPERATOR_ADDRESS`, `LEGAL_OPERATOR_TAX_ID` and `LEGAL_OPERATOR_REGISTRATION_ID` become required at startup;
+- the confirmation flags above must be set to `true` before production forms can start;
+- this is meant to prevent enabling public personal-data forms before the operator, legal review, Roskomnadzor notification decision, processor agreements and retention rule are actually confirmed.
 
 ## Optional Notifications
 

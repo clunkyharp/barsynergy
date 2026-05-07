@@ -1,5 +1,15 @@
 import { ApplicationStatus, ApplicationType } from '@prisma/client';
-import { ZodError } from 'zod';
+import { hasErrorMessage, resolveServerActionError } from '../actions/server-action-errors';
+import {
+  courseFormatOptions,
+  courseLevelOptions,
+  eventFormatOptions,
+  eventRegistrationModeOptions,
+  getAdminOptionLabel,
+  partnerTypeOptions,
+  vacancyEmploymentTypeOptions,
+  vacancyExperienceOptions
+} from '@/lib/admin/content-labels';
 
 export const applicationTypeValues = [
   ApplicationType.BUSINESS_ACCOUNT_REQUEST,
@@ -35,7 +45,7 @@ export const applicationTypeLabels: Record<ApplicationType, string> = {
   [ApplicationType.VACANCY_SUBMISSION]: 'Размещение вакансии',
   [ApplicationType.VACANCY_RESPONSE]: 'Отклик на вакансию',
   [ApplicationType.SUPPLIER_SUBMISSION]: 'Заявка поставщика',
-  [ApplicationType.PARTNER_APPLICATION]: 'Партнерская заявка',
+  [ApplicationType.PARTNER_APPLICATION]: 'Партнёрская заявка',
   [ApplicationType.CONTACT_MESSAGE]: 'Контактное сообщение',
   [ApplicationType.CORPORATE_TRAINING_APPLICATION]: 'Корпоративное обучение',
   [ApplicationType.CERTIFICATE_ORDER]: 'Заказ сертификата'
@@ -80,38 +90,131 @@ export function parseApplicationStatus(value?: string) {
   return applicationStatusValues.find((status) => status === value);
 }
 
+export const applicationPayloadFieldLabels: Record<string, string> = {
+  amountLabel: 'Сумма / формат',
+  companyName: 'Компания',
+  details: 'Описание',
+  employerCompanyName: 'Компания',
+  employmentType: 'Тип занятости',
+  eventDate: 'Дата события',
+  experienceLabel: 'Опыт',
+  format: 'Формат',
+  formatLabel: 'Формат',
+  level: 'Уровень',
+  partnerType: 'Тип партнёрства',
+  position: 'Позиция',
+  recipientName: 'Получатель',
+  registrationMode: 'Регистрация',
+  registrationUrl: 'Ссылка регистрации',
+  resumeUrl: 'Ссылка на резюме',
+  roleSummary: 'Кратко о кандидате',
+  salaryLabel: 'Оплата',
+  serviceArea: 'География работы',
+  shortDescription: 'Краткое описание',
+  source: 'Источник',
+  teamSize: 'Размер команды',
+  title: 'Название',
+  websiteUrl: 'Сайт'
+};
+
+const applicationPayloadValueLabels: Record<string, Record<string, string>> = {
+  source: {
+    business_cabinet: 'Бизнес-кабинет',
+    public_form: 'Публичная форма'
+  }
+};
+
+export function getApplicationPayloadFieldLabel(key: string) {
+  return applicationPayloadFieldLabels[key] ?? key;
+}
+
+export function formatApplicationPayloadValue(key: string, value: unknown) {
+  if (typeof value === 'boolean') {
+    return value ? 'Да' : 'Нет';
+  }
+
+  if (typeof value === 'number') {
+    return String(value);
+  }
+
+  if (typeof value !== 'string') {
+    return JSON.stringify(value);
+  }
+
+  const normalizedValue = value.trim();
+
+  if (!normalizedValue) {
+    return '';
+  }
+
+  const directLabel = applicationPayloadValueLabels[key]?.[normalizedValue];
+
+  if (directLabel) {
+    return directLabel;
+  }
+
+  if (key === 'employmentType') {
+    return getAdminOptionLabel(vacancyEmploymentTypeOptions, normalizedValue, normalizedValue);
+  }
+
+  if (key === 'experienceLabel') {
+    return getAdminOptionLabel(vacancyExperienceOptions, normalizedValue, normalizedValue);
+  }
+
+  if (key === 'partnerType') {
+    return getAdminOptionLabel(partnerTypeOptions, normalizedValue, normalizedValue);
+  }
+
+  if (key === 'registrationMode') {
+    return getAdminOptionLabel(eventRegistrationModeOptions, normalizedValue, normalizedValue);
+  }
+
+  if (key === 'level') {
+    return getAdminOptionLabel(courseLevelOptions, normalizedValue, normalizedValue);
+  }
+
+  if (key === 'format' || key === 'formatLabel') {
+    return getAdminOptionLabel([...eventFormatOptions, ...courseFormatOptions], normalizedValue, normalizedValue);
+  }
+
+  return normalizedValue;
+}
+
 export function formatApplicationActionError(error: unknown) {
-  if (error instanceof ZodError) {
-    return 'Проверьте обязательные поля и формат значений.';
-  }
-
-  if (error instanceof Error && error.message.includes('forwarding requires')) {
-    return 'Передача работодателю доступна только для отклика на вакансию с зафиксированным согласием.';
-  }
-
-  if (error instanceof Error && error.message.includes('vacancy draft')) {
-    return 'Черновик вакансии можно создать только из заявки на размещение вакансии с полными данными и согласием.';
-  }
-
-  if (error instanceof Error && error.message.includes('business access request is invalid')) {
-    return 'Ссылка доступа доступна только для заявок на бизнес-подключение.';
-  }
-
-  if (error instanceof Error && error.message.includes('business access email is missing')) {
-    return 'В заявке не указан email для подготовки доступа.';
-  }
-
-  if (error instanceof Error && error.message.includes('business access role conflict')) {
-    return 'Этот email уже привязан к другому типу аккаунта. Проверьте заявку вручную.';
-  }
-
-  if (error instanceof Error && error.message.includes('business access already active')) {
-    return 'Доступ для этого email уже активирован.';
-  }
-
-  if (error instanceof Error && error.message.includes('business access is blocked')) {
-    return 'Для этого доступа установлен блок. Снимите блокировку перед новой активацией.';
-  }
-
-  return 'Не удалось сохранить заявку. Проверьте данные и повторите попытку.';
+  return resolveServerActionError({
+    action: 'admin:applications',
+    error,
+    zodMessage: 'Проверьте обязательные поля и формат значений.',
+    known: [
+      {
+        matches: (candidate) => hasErrorMessage(candidate, 'forwarding requires'),
+        message: 'Передача работодателю доступна только для отклика на вакансию с зафиксированным согласием.'
+      },
+      {
+        matches: (candidate) => hasErrorMessage(candidate, 'vacancy draft'),
+        message: 'Черновик вакансии можно создать только из заявки на размещение вакансии с полными данными и согласием.'
+      },
+      {
+        matches: (candidate) => hasErrorMessage(candidate, 'business access request is invalid'),
+        message: 'Ссылка доступа доступна только для заявок на бизнес-подключение.'
+      },
+      {
+        matches: (candidate) => hasErrorMessage(candidate, 'business access email is missing'),
+        message: 'В заявке не указан email для подготовки доступа.'
+      },
+      {
+        matches: (candidate) => hasErrorMessage(candidate, 'business access role conflict'),
+        message: 'Этот email уже привязан к другому типу аккаунта. Проверьте заявку вручную.'
+      },
+      {
+        matches: (candidate) => hasErrorMessage(candidate, 'business access already active'),
+        message: 'Доступ для этого email уже активирован.'
+      },
+      {
+        matches: (candidate) => hasErrorMessage(candidate, 'business access is blocked'),
+        message: 'Для этого доступа установлен блок. Снимите блокировку перед новой активацией.'
+      }
+    ],
+    fallbackMessage: 'Не удалось сохранить заявку. Проверьте данные и повторите попытку.'
+  });
 }

@@ -5,7 +5,11 @@ import { redirect } from 'next/navigation';
 import { ApplicationStatus, ApplicationType, BusinessAccountStatus, UserRole, UserStatus } from '@prisma/client';
 import { z } from 'zod';
 import { getString, nullableString, optionalString } from '@/lib/admin/content-utils';
-import { findActiveBusinessAccessInvite } from '@/lib/auth/business-access';
+import {
+  BUSINESS_ACCESS_ACTIVATION_COOKIE_NAME,
+  findActiveBusinessAccessInvite,
+  getBusinessAccessActivationCookieOptions
+} from '@/lib/auth/business-access';
 import { hasErrorMessage, resolveServerActionError } from '@/lib/actions/server-action-errors';
 import { arePublicApplicationFormsEnabled } from '@/lib/applications/public-forms';
 import { AuthRateLimitError, assertAuthAttemptAllowed } from '@/lib/auth/auth-rate-limit';
@@ -58,15 +62,32 @@ function redirectWithAuthResult(path: string, result: { type: 'success' | 'error
   redirect(authResultPath(path, result));
 }
 
-function activationResultPath(token: string, result: { type: 'error'; code: string }) {
+function activationResultPath(result: { type: 'error'; code: string }) {
   const url = new URL('/auth/activate', 'http://localhost');
-  url.searchParams.set('token', token);
   url.searchParams.set('error', result.code);
   return `${url.pathname}${url.search}`;
 }
 
-function redirectWithActivationResult(token: string, result: { type: 'error'; code: string }): never {
-  redirect(activationResultPath(token, result));
+function redirectWithActivationResult(result: { type: 'error'; code: string }): never {
+  redirect(activationResultPath(result));
+}
+
+async function preserveBusinessAccessActivationCookie(token: string) {
+  const normalizedToken = token.trim();
+
+  if (!/^[A-Za-z0-9_-]{20,200}$/.test(normalizedToken)) {
+    return;
+  }
+
+  const cookieStore = await cookies();
+  cookieStore.set(BUSINESS_ACCESS_ACTIVATION_COOKIE_NAME, normalizedToken, getBusinessAccessActivationCookieOptions());
+}
+
+function clearBusinessAccessActivationCookie(cookieStore: Awaited<ReturnType<typeof cookies>>) {
+  cookieStore.set(BUSINESS_ACCESS_ACTIVATION_COOKIE_NAME, '', {
+    ...getBusinessAccessActivationCookieOptions(),
+    maxAge: 0
+  });
 }
 
 function getPostLoginPath(role: UserRole) {
@@ -290,7 +311,8 @@ export async function createBusinessAccountRequestAction(formData: FormData) {
             description: parsed.data.description || null
           },
           consentAcceptedAt: new Date(),
-          consentText: 'Согласие на обработку персональных данных для рассмотрения заявки на бизнес-доступ.'
+          consentText:
+            'Пользователь согласился с политикой обработки персональных данных и дал согласие на обработку персональных данных для рассмотрения заявки на бизнес-доступ.'
         }
       });
     });
@@ -319,7 +341,8 @@ export async function activateBusinessAccessAction(formData: FormData) {
       confirmPassword: getString(formData, 'confirmPassword')
     });
   } catch (error) {
-    redirectWithActivationResult(token, {
+    await preserveBusinessAccessActivationCookie(token);
+    redirectWithActivationResult({
       type: 'error',
       code: resolveBusinessAccessActivationErrorCode(error)
     });
@@ -385,9 +408,11 @@ export async function activateBusinessAccessAction(formData: FormData) {
 
     const cookieStore = await cookies();
     cookieStore.set(SESSION_COOKIE_NAME, sessionToken, getSessionCookieOptions());
+    clearBusinessAccessActivationCookie(cookieStore);
     redirect('/business?success=Доступ%20подключен.%20Теперь%20можно%20работать%20в%20кабинете.');
   } catch (error) {
-    redirectWithActivationResult(parsed.token, {
+    await preserveBusinessAccessActivationCookie(parsed.token);
+    redirectWithActivationResult({
       type: 'error',
       code: resolveBusinessAccessActivationErrorCode(error)
     });

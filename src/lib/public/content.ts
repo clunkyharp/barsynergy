@@ -1,4 +1,13 @@
 import { CategoryType, ContentStatus, FileVisibility, type Prisma } from '@prisma/client';
+import {
+  courseFormatOptions,
+  courseLevelOptions,
+  eventFormatOptions,
+  getAdminOptionLabel,
+  partnerTypeOptions,
+  vacancyEmploymentTypeOptions,
+  vacancyExperienceOptions
+} from '@/lib/admin/content-labels';
 import { prisma } from '@/lib/db/prisma';
 import { getPublicFileUrl } from '@/lib/storage/public-url';
 
@@ -21,8 +30,9 @@ export type PublishedContentItem = {
   label?: string;
   meta: string[];
   imageUrl?: string;
-  kind?: 'default' | 'vacancy';
+  kind?: 'default' | 'vacancy' | 'supplier' | 'partner';
   subtitle?: string;
+  dateIso?: string;
   metaGroups?: PublishedContentMetaGroup[];
   statusLabel?: string;
   updatedLabel?: string;
@@ -50,6 +60,21 @@ export type VacancyApplicationFormOptions = {
     cityName?: string;
   }[];
 };
+
+export function hasActivePublicContentParams(
+  params: PublicContentSearchParams,
+  keys: readonly string[] = ['q', 'category', 'city', 'format', 'level', 'period', 'partnerType', 'featured', 'verified', 'employmentType']
+) {
+  return keys.some((key) => {
+    const value = params[key];
+
+    if (Array.isArray(value)) {
+      return value.some((item) => item.trim().length > 0);
+    }
+
+    return Boolean(value?.trim());
+  });
+}
 
 function firstParam(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] : value;
@@ -158,6 +183,33 @@ function formatUpdatedLabel(date: Date) {
   return `обновлено ${date.toLocaleDateString('ru-RU')}`;
 }
 
+function formatDateTimeLabel(date: Date) {
+  return date.toLocaleString('ru-RU', {
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    month: 'short'
+  });
+}
+
+function eventPlaceLabel(locationName?: string | null, cityName?: string | null) {
+  if (locationName && cityName) {
+    return `${locationName}, ${cityName}`;
+  }
+
+  return locationName ?? cityName ?? 'Место уточняется';
+}
+
+function compactLabel(value: string, maxLength = 72) {
+  const normalized = value.replace(/\s+/g, ' ').trim();
+
+  if (normalized.length <= maxLength) {
+    return normalized;
+  }
+
+  return `${normalized.slice(0, maxLength - 1).trim()}…`;
+}
+
 export async function getPublishedArticles(params: PublicContentSearchParams = {}) {
   const page = getPage(params);
   const pageSize = getPageSize(params);
@@ -167,7 +219,9 @@ export async function getPublishedArticles(params: PublicContentSearchParams = {
     ...textSearch(q),
     category: optionalParam(params, 'category') ? { slug: optionalParam(params, 'category'), type: CategoryType.ARTICLE } : undefined,
     city: optionalParam(params, 'city') ? { slug: optionalParam(params, 'city') } : undefined,
-    tags: optionalParam(params, 'tag') ? { some: { tag: { slug: optionalParam(params, 'tag'), type: CategoryType.ARTICLE } } } : undefined
+    tags: optionalParam(params, 'tag')
+      ? { some: { tag: { slug: optionalParam(params, 'tag'), type: CategoryType.ARTICLE, isActive: true } } }
+      : undefined
   };
   const [total, articles] = await Promise.all([
     prisma.article.count({ where }),
@@ -179,7 +233,12 @@ export async function getPublishedArticles(params: PublicContentSearchParams = {
       include: {
         category: { select: { name: true } },
         city: { select: { name: true } },
-        coverImage: { select: { fileKey: true, bucket: true, visibility: true } }
+        coverImage: { select: { fileKey: true, bucket: true, visibility: true } },
+        tags: {
+          where: { tag: { isActive: true, type: CategoryType.ARTICLE } },
+          orderBy: { tag: { sortOrder: 'asc' } },
+          select: { tag: { select: { name: true } } }
+        }
       }
     })
   ]);
@@ -196,9 +255,14 @@ export async function getPublishedArticles(params: PublicContentSearchParams = {
       slug: article.slug,
       summary: article.summary,
       label: article.category?.name,
-      meta: [article.city?.name, article.authorName, article.readingTimeMinutes ? `${article.readingTimeMinutes} мин` : undefined].filter(
-        Boolean
-      ) as string[],
+      meta: [
+        article.city?.name,
+        article.authorName,
+        article.readingTimeMinutes ? `${article.readingTimeMinutes} мин` : undefined,
+        ...article.tags.map((entry) => entry.tag.name)
+      ].filter(Boolean) as string[],
+      dateIso: (article.publishedAt ?? article.createdAt).toISOString(),
+      updatedLabel: (article.publishedAt ?? article.createdAt).toLocaleDateString('ru-RU'),
       imageUrl: publicImageUrl(article.coverImage)
     }))
   });
@@ -244,7 +308,19 @@ export async function getPublishedEvents(params: PublicContentSearchParams = {})
       slug: event.slug,
       summary: event.summary,
       label: event.category?.name,
-      meta: [event.city?.name, event.locationName, event.format, event.startsAt.toLocaleDateString('ru-RU')].filter(Boolean) as string[],
+      dateIso: event.startsAt.toISOString(),
+      meta: [
+        event.city?.name,
+        event.locationName,
+        getAdminOptionLabel(eventFormatOptions, event.format, ''),
+        event.startsAt.toLocaleDateString('ru-RU')
+      ].filter(Boolean) as string[],
+      metaGroups: [
+        { label: 'Дата', value: formatDateTimeLabel(event.startsAt), tone: 'accent' },
+        { label: 'Место', value: eventPlaceLabel(event.locationName, event.city?.name) },
+        event.format ? { label: 'Формат', value: getAdminOptionLabel(eventFormatOptions, event.format) } : undefined,
+        { label: 'Аудитория', value: 'специалисты и команды' }
+      ].filter(Boolean) as PublishedContentMetaGroup[],
       imageUrl: publicImageUrl(event.coverImage)
     }))
   });
@@ -289,7 +365,13 @@ export async function getPublishedCourses(params: PublicContentSearchParams = {}
       slug: course.slug,
       summary: course.summary,
       label: course.category?.name,
-      meta: [course.city?.name, course.format, course.level, course.durationLabel, course.priceLabel].filter(Boolean) as string[],
+      meta: [
+        course.city?.name,
+        getAdminOptionLabel(courseFormatOptions, course.format, ''),
+        getAdminOptionLabel(courseLevelOptions, course.level, ''),
+        course.durationLabel,
+        course.priceLabel
+      ].filter(Boolean) as string[],
       imageUrl: publicImageUrl(course.coverImage)
     }))
   });
@@ -337,11 +419,18 @@ export async function getPublishedVacancies(params: PublicContentSearchParams = 
       kind: 'vacancy',
       label: vacancy.category?.name,
       subtitle: vacancy.companyName,
-      meta: [vacancy.city?.name, vacancy.companyName, vacancy.employmentType, vacancy.salaryLabel].filter(Boolean) as string[],
+      meta: [
+        vacancy.city?.name,
+        vacancy.companyName,
+        getAdminOptionLabel(vacancyEmploymentTypeOptions, vacancy.employmentType, ''),
+        vacancy.salaryLabel
+      ].filter(Boolean) as string[],
       metaGroups: [
         vacancy.city?.name ? { label: 'Город', value: vacancy.city.name } : undefined,
         vacancy.companyName ? { label: 'Компания', value: vacancy.companyName } : undefined,
-        vacancy.employmentType ? { label: 'Формат', value: vacancy.employmentType } : undefined,
+        vacancy.employmentType ? { label: 'График', value: getAdminOptionLabel(vacancyEmploymentTypeOptions, vacancy.employmentType) } : undefined,
+        vacancy.category?.name ? { label: 'Формат', value: vacancy.category.name } : undefined,
+        vacancy.experienceLabel ? { label: 'Опыт', value: getAdminOptionLabel(vacancyExperienceOptions, vacancy.experienceLabel) } : undefined,
         vacancy.salaryLabel ? { label: 'Оплата', value: vacancy.salaryLabel, tone: 'accent' } : undefined
       ].filter(Boolean) as PublishedContentMetaGroup[],
       statusLabel: 'Открыта',
@@ -420,8 +509,20 @@ export async function getPublishedSuppliers(params: PublicContentSearchParams = 
       title: supplier.title,
       slug: supplier.slug,
       summary: supplier.summary,
+      kind: 'supplier',
       label: supplier.category?.name,
+      subtitle: supplier.companyName,
       meta: [supplier.city?.name, supplier.companyName, supplier.isVerified ? 'Проверен' : undefined, supplier.serviceArea].filter(Boolean) as string[],
+      metaGroups: [
+        supplier.category?.name ? { label: 'Категория', value: supplier.category.name } : undefined,
+        supplier.city?.name ? { label: 'Город', value: supplier.city.name } : undefined,
+        supplier.serviceArea ? { label: 'География', value: supplier.serviceArea } : undefined,
+        { label: 'Условия', value: 'по запросу' },
+        { label: 'Продукты / услуги', value: compactLabel(supplier.summary) },
+        supplier.isVerified ? { value: 'Проверен BARSYNERGY', tone: 'accent' } : { value: 'Контакт для уточнения' }
+      ].filter(Boolean) as PublishedContentMetaGroup[],
+      statusLabel: supplier.isVerified ? 'Проверен' : 'Контакт для уточнения',
+      updatedLabel: formatUpdatedLabel(supplier.publishedAt ?? supplier.createdAt),
       imageUrl: publicImageUrl(supplier.coverImage)
     }))
   });
@@ -464,8 +565,19 @@ export async function getPublishedPartners(params: PublicContentSearchParams = {
       title: partner.title,
       slug: partner.slug,
       summary: partner.summary,
+      kind: 'partner',
       label: partner.category?.name,
-      meta: [partner.companyName, partner.partnerType, partner.isFeatured ? 'В подборке' : undefined].filter(Boolean) as string[],
+      subtitle: partner.companyName,
+      meta: [
+        partner.companyName,
+        getAdminOptionLabel(partnerTypeOptions, partner.partnerType, ''),
+        partner.isFeatured ? 'В подборке' : undefined
+      ].filter(Boolean) as string[],
+      metaGroups: [
+        partner.companyName ? { label: 'Компания', value: partner.companyName } : undefined,
+        partner.partnerType ? { label: 'Формат', value: getAdminOptionLabel(partnerTypeOptions, partner.partnerType) } : undefined,
+        partner.isFeatured ? { value: 'В подборке', tone: 'accent' } : undefined
+      ].filter(Boolean) as PublishedContentMetaGroup[],
       imageUrl: publicImageUrl(partner.coverImage)
     }))
   });

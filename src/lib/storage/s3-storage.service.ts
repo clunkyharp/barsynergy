@@ -1,7 +1,8 @@
-import { DeleteObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import { DeleteObjectCommand, PutObjectCommand, type S3Client } from '@aws-sdk/client-s3';
 import { randomUUID } from 'node:crypto';
 import path from 'node:path';
 import type { AppEnv } from '@/lib/validation/env';
+import { getS3Client } from './s3-client';
 import {
   MAX_UPLOAD_FILE_SIZE_BYTES,
   type DeleteFileInput,
@@ -15,15 +16,7 @@ export class S3StorageService implements StorageService {
   private readonly client: S3Client;
 
   constructor(private readonly env: AppEnv) {
-    this.client = new S3Client({
-      endpoint: env.S3_ENDPOINT,
-      region: env.S3_REGION,
-      credentials: {
-        accessKeyId: env.S3_ACCESS_KEY_ID ?? '',
-        secretAccessKey: env.S3_SECRET_ACCESS_KEY ?? ''
-      },
-      forcePathStyle: true
-    });
+    this.client = getS3Client(env);
   }
 
   async uploadFile(input: UploadFileInput): Promise<UploadedFileResult> {

@@ -35,15 +35,38 @@ http://localhost:3000
 
 Local PostgreSQL from Docker is exposed on `localhost:55432` to avoid conflicts with existing local databases.
 
+## Local Admin Access
+
+Create or reset a local admin account:
+
+```bash
+npm run admin:upsert:local
+```
+
+Default email:
+
+```txt
+admin@barsynergy.local
+```
+
+The script only allows local database hosts, creates the admin if it does not exist, resets the password if it already exists, marks the account as `ACTIVE`, deletes existing sessions for that user and prints the password once.
+
+Safer custom-password example without putting the password into the repo:
+
+```bash
+printf '%s\n' 'YourStrongPassword123!' | npm run admin:upsert:local -- --email admin@barsynergy.local --password-stdin
+```
+
 ## Validation
 
 ```bash
 npm run lint
 npm test
 npm run typecheck
-npm run build
 npx prisma validate
 ```
+
+`npm run build` is mandatory before creating a commit. During ordinary local checks, run it only for production-build, deployment or standalone-runtime changes.
 
 ## Production Build
 
@@ -99,11 +122,14 @@ Production releases go `dev -> validation -> prod` only after owner confirmation
 
 - [Design system](DESIGN.md)
 - [Design tokens](design-tokens.json)
-- [Design consistency check](docs/design-consistency-check.md)
+- [Design system status](docs/design-system-status.md)
+- [Design system component matrix](docs/design-system-component-matrix.md)
+- [Final design consistency audit](docs/design-system-consistency-audit-final-2026-04-29.md)
 - [Project status](PROJECT_STATUS.md)
 - [Project plan](docs/project-plan.md)
 - [AI agent workflow](docs/agent-workflow.md)
 - [Project audit workflow](docs/audit-workflow.md)
+- [Homepage data-source audit](docs/homepage-data-source-audit.md)
 - [Remediation plan](docs/remediation-plan.md)
 - [Phase plan](docs/phase-plan.md)
 - [Obsidian Kanban sync](docs/kanban-sync.md)
@@ -113,9 +139,11 @@ Production releases go `dev -> validation -> prod` only after owner confirmation
 - [Services specialists mini-spec](docs/services-specialists-spec.md)
 - [Setup](docs/setup.md)
 - [Deploy](docs/deploy.md)
+- [Scheduler runbook](docs/scheduler-runbook.md)
 - [Environment](docs/env.md)
 - [Backup](docs/backup.md)
 - [Security](docs/security.md)
+- [Personal data launch checklist](docs/personal-data-launch-checklist.md)
 - [Features](docs/features.md)
 - [Monetization](docs/monetization.md)
 - [Git workflow](docs/git-workflow.md)

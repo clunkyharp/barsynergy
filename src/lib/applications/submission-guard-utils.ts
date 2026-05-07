@@ -13,11 +13,11 @@ export { getClientIpFromHeaders };
 export function getApplicationThrottleKeyHash(input: {
   applicationType: ApplicationType;
   ip: string;
-  userAgent: string;
+  userAgent?: string;
   secret?: string;
 }) {
   const secret = input.secret ?? process.env.SESSION_SECRET ?? DEVELOPMENT_THROTTLE_SECRET;
   return createHmac('sha256', secret)
-    .update([input.applicationType, input.ip, input.userAgent.slice(0, 240)].join(':'))
+    .update([input.applicationType, input.ip].join(':'))
     .digest('hex');
 }

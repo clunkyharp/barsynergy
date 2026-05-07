@@ -70,7 +70,7 @@ function getApplicationSubject(input: { type: ApplicationType; companyName: stri
   }
 
   if (input.type === ApplicationType.PARTNER_APPLICATION) {
-    return `Партнерство: ${input.companyName}`;
+    return `Партнёрство: ${input.companyName}`;
   }
 
   if (input.type === ApplicationType.CORPORATE_TRAINING_APPLICATION) {
@@ -137,6 +137,10 @@ function resolveBusinessActionError(
         ? [
             {
               matches: (candidate: Error) => hasErrorMessage(candidate, 'application is invalid'),
+              message: messages.application
+            },
+            {
+              matches: (candidate: Error) => hasErrorMessage(candidate, 'draft type cannot be changed'),
               message: messages.application
             }
           ]
@@ -259,11 +263,15 @@ export async function updateBusinessDraftApplication(formData: FormData) {
         businessAccountId: businessAccount.id,
         status: ApplicationStatus.DRAFT
       },
-      select: { id: true }
+      select: { id: true, type: true }
     });
 
     if (!existing) {
       throw new Error('draft is invalid');
+    }
+
+    if (existing.type !== parsed.type) {
+      throw new Error('draft type cannot be changed');
     }
 
     await prisma.application.update({
@@ -298,6 +306,7 @@ export async function updateBusinessDraftApplication(formData: FormData) {
         zod: 'Не удалось обновить заявку. Проверьте обязательные поля.',
         city: 'Этот город сейчас недоступен для выбора.',
         draft: 'Черновик не найден или уже недоступен.',
+        application: 'Тип черновика нельзя изменить. Создайте новую заявку другого типа.',
         fallback: 'Не удалось обновить заявку. Попробуйте позже.'
       })
     };

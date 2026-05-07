@@ -17,7 +17,7 @@ export function PublicEyebrow({
   return (
     <p
       className={cn(
-        'text-[11px] font-semibold uppercase tracking-[0.16em]',
+        'text-[11px] font-bold uppercase tracking-[0.16em]',
         tone === 'accent' && 'text-[var(--accent)]',
         tone === 'muted' && 'text-[var(--muted)]',
         tone === 'inverse' && 'text-white/58',
@@ -43,11 +43,11 @@ export function PublicDisplayTitle({
     <Component
       className={cn(
         displayFont.className,
-        'display-tight',
-        size === 'hero' && 'max-w-6xl text-[clamp(2.7rem,5vw,5.5rem)]',
-        size === 'section' && 'text-[44px] md:text-[58px]',
-        size === 'card' && 'text-[34px] md:text-[44px]',
-        size === 'legal' && 'max-w-3xl break-words text-[34px] sm:text-[42px] md:text-[44px]',
+        'display-tight font-semibold text-[var(--text)]',
+        size === 'hero' && 'max-w-6xl text-[clamp(3.1rem,6.2vw,6.85rem)]',
+        size === 'section' && 'text-[44px] md:text-[64px]',
+        size === 'card' && 'text-[32px] md:text-[42px]',
+        size === 'legal' && 'max-w-3xl break-words text-[34px] sm:text-[42px] md:text-[50px]',
         className
       )}
       {...props}

@@ -7,9 +7,11 @@
   },
   "scripts": {
     "dev": "./node_modules/.bin/next dev",
-    "build": "./node_modules/.bin/prisma generate && ./node_modules/.bin/next build",
+    "build": "./node_modules/.bin/prisma generate && ./node_modules/.bin/next build && node ./scripts/sync-standalone-assets.mjs && node ./scripts/verify-standalone-runtime.mjs",
     "start": "./node_modules/.bin/next start",
+    "admin:upsert:local": "node ./scripts/upsert-local-admin.mjs",
     "auth:cleanup:throttles": "node ./scripts/cleanup-auth-attempt-throttles.mjs",
+    "business-access:cleanup:invites": "node ./scripts/cleanup-business-access-invites.mjs",
     "lint": "./node_modules/.bin/eslint .",
     "test": "node --experimental-strip-types --test tests/*.test.mjs",
     "typecheck": "./node_modules/.bin/next typegen && ./node_modules/.bin/tsc --noEmit",
@@ -45,11 +47,14 @@
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "eslint": "^9.39.2",
-    "postcss": "^8.5.6",
+    "postcss": "^8.5.14",
     "prisma": "^6.19.0",
     "tailwindcss": "^4.2.4",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.50.0"
+  },
+  "overrides": {
+    "postcss": "^8.5.14"
   },
   "keywords": [],
   "author": "",

@@ -57,8 +57,21 @@ const vacancyResponseSchema = baseContactSchema
   })
   .refine((data) => data.email || data.phone || data.telegram, { message: 'contact is required' });
 
-function redirectWithApplicationResult(result: { type: 'success' | 'error'; message: string }): never {
-  redirect(getPublicApplicationResultPath(VACANCIES_PATH, result));
+function getVacancyReturnPath(formData: FormData) {
+  const returnPath = getString(formData, 'returnPath');
+
+  if (returnPath === VACANCIES_PATH || returnPath.startsWith(`${VACANCIES_PATH}/`)) {
+    return returnPath;
+  }
+
+  return VACANCIES_PATH;
+}
+
+function redirectWithApplicationResult(
+  result: { type: 'success' | 'error'; message: string },
+  basePath = VACANCIES_PATH
+): never {
+  redirect(getPublicApplicationResultPath(basePath, result));
 }
 
 export async function submitVacancyPlacementApplication(formData: FormData) {
@@ -130,13 +143,14 @@ export async function submitVacancyPlacementApplication(formData: FormData) {
 export async function submitVacancyResponseApplication(formData: FormData) {
   let result: { type: 'success' | 'error'; message: string };
   let uploadedResumeFileId: string | null = null;
+  const returnPath = getVacancyReturnPath(formData);
 
   try {
     assertPublicApplicationFormsEnabled();
 
     if (hasHoneypotValue(getString(formData, 'website'))) {
       result = { type: 'success', message: 'Отклик отправлен.' };
-      redirectWithApplicationResult(result);
+      redirectWithApplicationResult(result, returnPath);
     }
 
     const parsed = vacancyResponseSchema.parse({
@@ -202,5 +216,5 @@ export async function submitVacancyResponseApplication(formData: FormData) {
     result = { type: 'error', message: resolvePublicApplicationActionError('public:vacancy-response', error) };
   }
 
-  redirectWithApplicationResult(result);
+  redirectWithApplicationResult(result, returnPath);
 }

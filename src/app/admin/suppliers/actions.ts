@@ -7,12 +7,12 @@ import {
   assertActiveContentRelations,
   contentStatusValues,
   deleteUploadedFileIfUnused,
-  findUniqueSlug,
   formatAdminActionError,
   getString,
   initialPublicationDates,
   nullableString,
   optionalString,
+  persistWithUniqueSlugRetry,
   redirectWithAdminActionResult,
   resolveCoverImageId,
   safeAdminRedirectPath,
@@ -31,6 +31,7 @@ const supplierFormSchema = z.object({
   summary: z.string().trim().min(10).max(500),
   description: z.string().trim().min(20),
   status: z.enum(contentStatusValues).default(ContentStatus.DRAFT),
+  coverImageAlt: z.string().trim().max(180).optional(),
   categoryId: z.string().trim().optional(),
   cityId: z.string().trim().optional(),
   companyName: z.string().trim().min(2).max(180),
@@ -62,6 +63,7 @@ export async function createSupplier(formData: FormData) {
       summary: getString(formData, 'summary'),
       description: getString(formData, 'description'),
       status: getString(formData, 'status') || ContentStatus.DRAFT,
+      coverImageAlt: optionalString(getString(formData, 'coverImageAlt')),
       categoryId: optionalString(getString(formData, 'categoryId')),
       cityId: optionalString(getString(formData, 'cityId')),
       companyName: getString(formData, 'companyName'),
@@ -84,43 +86,45 @@ export async function createSupplier(formData: FormData) {
       cityId: parsed.cityId
     });
 
-    const [uniqueSlug, coverImageId] = await Promise.all([
-      findUniqueSlug(slug, async (candidate) =>
+    const coverImageId = await resolveCoverImageId({
+      formData,
+      userId: user.id,
+      onUploadedImageId: (fileId) => {
+        uploadedCoverImageId = fileId;
+      }
+    });
+
+    await persistWithUniqueSlugRetry({
+      baseSlug: slug,
+      exists: async (candidate) =>
         Boolean(
           await prisma.supplier.findFirst({
             where: { slug: candidate },
             select: { id: true }
           })
-        )
-      ),
-      resolveCoverImageId({
-        formData,
-        userId: user.id,
-        onUploadedImageId: (fileId) => {
-          uploadedCoverImageId = fileId;
-        }
-      })
-    ]);
-
-    await prisma.supplier.create({
-      data: {
-        title: parsed.title,
-        slug: uniqueSlug,
-        summary: parsed.summary,
-        description: parsed.description,
-        status: parsed.status,
-        coverImageId,
-        categoryId: nullableString(parsed.categoryId),
-        cityId: nullableString(parsed.cityId),
-        companyName: parsed.companyName,
-        websiteUrl: nullableString(websiteUrl),
-        contactLabel: nullableString(parsed.contactLabel),
-        isVerified: parsed.isVerified,
-        serviceArea: nullableString(parsed.serviceArea),
-        createdById: user.id,
-        updatedById: user.id,
-        ...initialPublicationDates(parsed.status)
-      }
+        ),
+      persist: (uniqueSlug) =>
+        prisma.supplier.create({
+          data: {
+            title: parsed.title,
+            slug: uniqueSlug,
+            summary: parsed.summary,
+            description: parsed.description,
+            status: parsed.status,
+            coverImageId,
+            coverImageAlt: nullableString(parsed.coverImageAlt),
+            categoryId: nullableString(parsed.categoryId),
+            cityId: nullableString(parsed.cityId),
+            companyName: parsed.companyName,
+            websiteUrl: nullableString(websiteUrl),
+            contactLabel: nullableString(parsed.contactLabel),
+            isVerified: parsed.isVerified,
+            serviceArea: nullableString(parsed.serviceArea),
+            createdById: user.id,
+            updatedById: user.id,
+            ...initialPublicationDates(parsed.status)
+          }
+        })
     });
 
     revalidatePath(ADMIN_SUPPLIERS_PATH);
@@ -152,6 +156,7 @@ export async function updateSupplier(formData: FormData) {
         summary: getString(formData, 'summary'),
         description: getString(formData, 'description'),
         status: getString(formData, 'status') || ContentStatus.DRAFT,
+        coverImageAlt: optionalString(getString(formData, 'coverImageAlt')),
         categoryId: optionalString(getString(formData, 'categoryId')),
         cityId: optionalString(getString(formData, 'cityId')),
         companyName: getString(formData, 'companyName'),
@@ -180,44 +185,46 @@ export async function updateSupplier(formData: FormData) {
       cityId: parsed.cityId
     });
 
-    const [uniqueSlug, coverImageId] = await Promise.all([
-      findUniqueSlug(slug, async (candidate) =>
+    const coverImageId = await resolveCoverImageId({
+      formData,
+      userId: user.id,
+      currentCoverImageId: existingSupplier.coverImageId,
+      onUploadedImageId: (fileId) => {
+        uploadedCoverImageId = fileId;
+      }
+    });
+
+    await persistWithUniqueSlugRetry({
+      baseSlug: slug,
+      exists: async (candidate) =>
         Boolean(
           await prisma.supplier.findFirst({
             where: { slug: candidate, id: { not: parsed.supplierId } },
             select: { id: true }
           })
-        )
-      ),
-      resolveCoverImageId({
-        formData,
-        userId: user.id,
-        currentCoverImageId: existingSupplier.coverImageId,
-        onUploadedImageId: (fileId) => {
-          uploadedCoverImageId = fileId;
-        }
-      })
-    ]);
-
-    await prisma.supplier.update({
-      where: { id: parsed.supplierId },
-      data: {
-        title: parsed.title,
-        slug: uniqueSlug,
-        summary: parsed.summary,
-        description: parsed.description,
-        status: parsed.status,
-        coverImageId,
-        categoryId: nullableString(parsed.categoryId),
-        cityId: nullableString(parsed.cityId),
-        companyName: parsed.companyName,
-        websiteUrl: nullableString(websiteUrl),
-        contactLabel: nullableString(parsed.contactLabel),
-        isVerified: parsed.isVerified,
-        serviceArea: nullableString(parsed.serviceArea),
-        updatedById: user.id,
-        ...statusTransitionDates(parsed.status, existingSupplier.publishedAt)
-      }
+        ),
+      persist: (uniqueSlug) =>
+        prisma.supplier.update({
+          where: { id: parsed.supplierId },
+          data: {
+            title: parsed.title,
+            slug: uniqueSlug,
+            summary: parsed.summary,
+            description: parsed.description,
+            status: parsed.status,
+            coverImageId,
+            coverImageAlt: nullableString(parsed.coverImageAlt),
+            categoryId: nullableString(parsed.categoryId),
+            cityId: nullableString(parsed.cityId),
+            companyName: parsed.companyName,
+            websiteUrl: nullableString(websiteUrl),
+            contactLabel: nullableString(parsed.contactLabel),
+            isVerified: parsed.isVerified,
+            serviceArea: nullableString(parsed.serviceArea),
+            updatedById: user.id,
+            ...statusTransitionDates(parsed.status, existingSupplier.publishedAt)
+          }
+        })
     });
 
     if (previousCoverImageId !== coverImageId) {
@@ -281,27 +288,25 @@ export async function deleteSupplierDraft(formData: FormData) {
     });
 
     const deletedSupplier = await prisma.$transaction(async (tx) => {
-      const supplier = await tx.supplier.findFirst({
+      const supplier = await tx.supplier.findUnique({
         where: {
-          id: parsed.supplierId,
-          status: { not: ContentStatus.PUBLISHED }
+          id: parsed.supplierId
         },
         select: { coverImageId: true }
       });
 
       if (!supplier) {
-        throw new Error('draft is invalid');
+        throw new Error('record is invalid');
       }
 
       const deletion = await tx.supplier.deleteMany({
         where: {
-          id: parsed.supplierId,
-          status: { not: ContentStatus.PUBLISHED }
+          id: parsed.supplierId
         }
       });
 
       if (deletion.count !== 1) {
-        throw new Error('draft is invalid');
+        throw new Error('record is invalid');
       }
 
       return supplier;
@@ -310,7 +315,7 @@ export async function deleteSupplierDraft(formData: FormData) {
     await deleteUploadedFileIfUnused(deletedSupplier.coverImageId);
 
     revalidatePath(ADMIN_SUPPLIERS_PATH);
-    result = { type: 'success', message: 'Черновик поставщика удален.' };
+    result = { type: 'success', message: 'Поставщик удален.' };
   } catch (error) {
     result = { type: 'error', message: formatAdminActionError(error) };
   }

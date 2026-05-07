@@ -1,9 +1,11 @@
 'use client';
 
-import { ArrowUpRight } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { ArrowUpRight, UserRound } from 'lucide-react';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { MobileSiteMenu } from '@/components/layout/mobile-site-menu';
+import { ThemeToggle } from '@/components/layout/theme-toggle';
 import { cn } from '@/lib/utils';
 
 const navItems = [
@@ -13,13 +15,13 @@ const navItems = [
   { label: 'Знания', href: '/articles' },
   { label: 'Вакансии', href: '/vacancies' },
   { label: 'Поставщики', href: '/suppliers' },
-  { label: 'Партнеры', href: '/partners' },
-  { label: 'Спонсоры', href: '/general-sponsors' },
+  { label: 'Для партнёров', href: '/partners' },
+  { label: 'Спонсорство', href: '/general-sponsors' },
   { label: 'Войти', href: '/auth/login' },
   { label: 'Контакты', href: '/contacts' }
 ];
 
-const desktopNavItems = navItems.filter((item) => item.href !== '/contacts' && item.href !== '/auth/login');
+const desktopNavItems = navItems.filter((item) => !['/contacts', '/auth/login'].includes(item.href));
 
 function isWorkspacePath(pathname: string | null) {
   return Boolean(pathname?.startsWith('/admin') || pathname?.startsWith('/business') || pathname?.startsWith('/auth'));
@@ -39,35 +41,64 @@ function isActiveItem(pathname: string, href: string) {
 
 export function SiteHeader() {
   const pathname = usePathname();
-  const isHomePage = pathname === '/';
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const isFixedMobileHeader = isMobileMenuOpen;
+  const focusClassName = 'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]';
+
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+  }, [pathname]);
 
   if (isWorkspacePath(pathname)) {
     return null;
   }
 
   return (
-    <header className={cn('sticky top-0 z-50 px-4 pt-4', isHomePage && '-mb-[98px]')}>
+    <header
+      className={cn(
+        'border-b border-[var(--line)] bg-[var(--header-bg)] backdrop-blur-[16px]',
+        isFixedMobileHeader ? 'fixed inset-x-0 top-0 z-[60] lg:sticky lg:top-0 lg:z-50' : 'sticky top-0 z-50'
+      )}
+    >
       <div className="container">
-        <div className="relative z-10 flex min-h-[78px] items-center justify-between gap-2 rounded-full border border-black/10 bg-[color-mix(in_oklab,var(--surface),white_46%)]/90 px-3 shadow-[0_18px_50px_rgba(20,20,18,0.08)] backdrop-blur lg:grid lg:grid-cols-[176px_minmax(0,1fr)_172px] lg:items-center lg:gap-3 lg:px-4 xl:grid-cols-[208px_minmax(0,1fr)_236px] xl:gap-4 2xl:grid-cols-[224px_minmax(0,1fr)_252px] 2xl:gap-5">
-          <a className="flex min-h-12 shrink-0 items-center pl-1 lg:w-[176px] xl:w-[208px] 2xl:w-[224px]" href="/" aria-label="BARSYNERGY">
+        <div className="relative z-10 flex min-h-[76px] items-center justify-between gap-3 px-0 text-[var(--text)] lg:grid lg:grid-cols-[180px_minmax(0,1fr)_180px] lg:items-center lg:gap-2 xl:grid-cols-[190px_minmax(0,1fr)_220px] xl:gap-3 2xl:grid-cols-[220px_minmax(0,1fr)_248px] 2xl:gap-5">
+          <a
+            aria-label="BARSYNERGY"
+            className={cn(
+              'flex min-h-12 shrink-0 items-center rounded-[var(--radius-md)] pr-1 lg:w-full lg:pr-0',
+              isMobileMenuOpen && 'sm:pl-3',
+              focusClassName
+            )}
+            href="/"
+            onClick={() => setIsMobileMenuOpen(false)}
+          >
             <Image
               alt="BARSYNERGY"
-              className="h-9 w-auto sm:h-10 lg:h-11"
+              className="theme-logo-light h-10 w-auto object-contain sm:h-11 lg:h-10 2xl:h-11"
               height={44}
               priority
               src="/brand/barsynergy-lockup.svg"
               width={162}
             />
+            <Image
+              alt="BARSYNERGY"
+              className="theme-logo-dark h-10 w-auto object-contain sm:h-11 lg:h-10 2xl:h-11"
+              height={44}
+              priority
+              src="/brand/barsynergy-lockup-light.svg"
+              width={162}
+            />
           </a>
-          <nav className="hidden min-w-0 items-center justify-center gap-0 px-1 text-[10px] font-semibold uppercase tracking-[0.04em] text-[var(--text)] lg:flex xl:px-2 xl:text-[10px] 2xl:gap-0.5 2xl:px-4 2xl:text-[11px]">
+          <nav className="hidden min-w-0 items-center justify-center gap-2.5 px-0.5 text-[11px] font-semibold text-[var(--text)] lg:flex lg:justify-self-center xl:gap-3.5 2xl:gap-5 2xl:text-[12px]">
             {desktopNavItems.map((item) => {
               const isActive = pathname ? isActiveItem(pathname, item.href) : false;
 
               return (
                 <a
                   className={cn(
-                    'inline-flex min-h-10 items-center whitespace-nowrap rounded-full px-1.5 opacity-80 transition hover:bg-white hover:opacity-100 xl:px-2.5 2xl:min-h-11 2xl:px-3',
-                    isActive && 'bg-[var(--graphite)] text-white opacity-100 hover:bg-[var(--graphite)]'
+                    'relative inline-flex min-h-9 items-center whitespace-nowrap rounded-[var(--radius-sm)] px-1.5 opacity-86 transition after:absolute after:inset-x-1.5 after:bottom-1 after:h-px after:origin-left after:scale-x-0 after:bg-[var(--accent)] after:transition-transform hover:text-[var(--text)] hover:opacity-100 hover:after:scale-x-100 2xl:px-2',
+                    focusClassName,
+                    isActive && 'text-[var(--accent)] opacity-100 after:scale-x-100'
                   )}
                   key={item.href}
                   href={item.href}
@@ -77,22 +108,32 @@ export function SiteHeader() {
               );
             })}
           </nav>
-          <div className="hidden items-center justify-end gap-1.5 lg:flex lg:w-[172px] xl:w-[236px] 2xl:w-[252px]">
+          <div className="hidden items-center justify-end gap-1.5 lg:flex lg:w-full">
+            <ThemeToggle compact />
             <a
-              className="hidden min-h-10 items-center whitespace-nowrap rounded-full px-2.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)] transition hover:text-[var(--accent)] xl:inline-flex 2xl:min-h-11 2xl:px-4 2xl:text-[11px]"
+              className={cn(
+                'inline-flex min-h-10 w-10 shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-[var(--radius-md)] px-0 text-[12px] font-semibold text-[var(--accent)] transition hover:bg-[var(--accent-soft)] hover:text-[var(--accent-strong)] 2xl:min-h-11 2xl:w-auto 2xl:px-4',
+                focusClassName
+              )}
               href="/auth/login"
+              aria-label="Войти в кабинет"
             >
-              Войти
+              <UserRound size={16} strokeWidth={1.8} />
+              <span className="hidden 2xl:inline">Войти</span>
             </a>
             <a
-              className="inline-flex min-h-10 shrink-0 items-center gap-2 whitespace-nowrap rounded-full border border-[var(--graphite)] bg-[var(--graphite)] px-3 text-[10px] font-semibold uppercase tracking-[0.06em] text-white transition hover:bg-black xl:px-3.5 xl:text-[11px] 2xl:min-h-11 2xl:gap-3 2xl:px-5 2xl:text-[12px]"
+              className={cn(
+                'inline-flex min-h-10 shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-[var(--radius-md)] border border-[var(--accent)] px-2.5 text-[12px] font-semibold text-[var(--accent)] transition-colors duration-200 hover:bg-[var(--accent)] hover:text-[var(--accent-contrast)] xl:px-3.5 2xl:min-h-11 2xl:gap-3 2xl:px-5',
+                focusClassName
+              )}
               href="/contacts"
+              aria-label="Связаться"
             >
-              <span className="text-white">Связаться</span>
-              <ArrowUpRight className="text-white" size={18} />
+              <span className="hidden xl:inline">Связаться</span>
+              <ArrowUpRight size={18} />
             </a>
           </div>
-          <MobileSiteMenu navItems={navItems} pathname={pathname} />
+          <MobileSiteMenu isOpen={isMobileMenuOpen} navItems={navItems} onOpenChange={setIsMobileMenuOpen} />
         </div>
       </div>
     </header>

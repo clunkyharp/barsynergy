@@ -1,6 +1,8 @@
+import { execSync } from 'node:child_process';
 import type { NextConfig } from 'next';
 
 const tunnelOrigins = [
+  '127.0.0.1',
   '*.ngrok-free.app',
   '*.ngrok-free.dev',
   '*.ngrok.app',
@@ -12,7 +14,22 @@ const tunnelOrigins = [
 
 const shouldAllowTunnelServerActions = process.env.NODE_ENV === 'development';
 
+const readDeploymentId = () => {
+  if (process.env.APP_DEPLOYMENT_ID) {
+    return process.env.APP_DEPLOYMENT_ID;
+  }
+
+  try {
+    return execSync('git rev-parse --verify HEAD', { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
+  } catch {
+    return undefined;
+  }
+};
+
+const deploymentId = readDeploymentId();
+
 const nextConfig: NextConfig = {
+  deploymentId,
   allowedDevOrigins: tunnelOrigins,
   experimental: {
     ...(shouldAllowTunnelServerActions

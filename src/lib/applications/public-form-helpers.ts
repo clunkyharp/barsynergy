@@ -4,9 +4,9 @@ import { prisma } from '@/lib/db/prisma';
 import type { PublicContentSearchParams } from '@/lib/public/content';
 
 export const PERSONAL_DATA_CONSENT_TEXT =
-  'Согласие на обработку персональных данных для обработки заявки через BARSYNERGY.';
+  'Пользователь согласился с политикой обработки персональных данных и дал согласие на обработку персональных данных для обработки выбранной заявки через BARSYNERGY.';
 export const VACANCY_RESPONSE_CONSENT_TEXT =
-  'Согласие на обработку персональных данных и передачу отклика работодателю по выбранной вакансии после проверки BARSYNERGY.';
+  'Пользователь согласился с политикой обработки персональных данных и дал согласие на обработку персональных данных и передачу отклика работодателю по выбранной вакансии после проверки BARSYNERGY.';
 
 export type PublicApplicationResult = {
   type: 'success' | 'error';

@@ -6,18 +6,28 @@ type EmptyStateProps = {
   description?: string;
   actionLabel?: string;
   actionHref?: string;
+  context?: string;
 };
 
-export function EmptyState({ title, description, actionLabel, actionHref }: EmptyStateProps) {
+export function ContextualEmptyState({ actionHref, actionLabel, context = 'Список', description, title }: EmptyStateProps) {
   return (
-    <Card className="p-8 text-center">
-      <h2 className="text-xl font-semibold">{title}</h2>
-      {description ? <p className="mx-auto mt-3 max-w-xl text-[var(--muted)]">{description}</p> : null}
-      {actionLabel && actionHref ? (
-        <div className="mt-6 flex justify-center">
-          <Button href={actionHref}>{actionLabel}</Button>
+    <Card className="border-l-[3px] border-l-[var(--accent)] p-5">
+      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">{context}</p>
+      <div className="mt-3 grid gap-3 sm:grid-cols-[1fr_auto] sm:items-end">
+        <div>
+          <h2 className="text-lg font-semibold">{title}</h2>
+          {description ? <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--muted)]">{description}</p> : null}
         </div>
-      ) : null}
+        {actionLabel && actionHref ? (
+          <Button className="w-full sm:w-auto" href={actionHref}>
+            {actionLabel}
+          </Button>
+        ) : null}
+      </div>
     </Card>
   );
+}
+
+export function EmptyState(props: EmptyStateProps) {
+  return <ContextualEmptyState {...props} />;
 }

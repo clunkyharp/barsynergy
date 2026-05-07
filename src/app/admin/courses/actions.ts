@@ -7,12 +7,12 @@ import {
   assertActiveContentRelations,
   contentStatusValues,
   deleteUploadedFileIfUnused,
-  findUniqueSlug,
   formatAdminActionError,
   getString,
   initialPublicationDates,
   nullableString,
   optionalString,
+  persistWithUniqueSlugRetry,
   redirectWithAdminActionResult,
   resolveCoverImageId,
   safeAdminRedirectPath,
@@ -30,6 +30,7 @@ const courseFormSchema = z.object({
   summary: z.string().trim().min(10).max(500),
   program: z.string().trim().min(20),
   status: z.enum(contentStatusValues).default(ContentStatus.DRAFT),
+  coverImageAlt: z.string().trim().max(180).optional(),
   categoryId: z.string().trim().optional(),
   cityId: z.string().trim().optional(),
   format: z.string().trim().max(80).optional(),
@@ -61,6 +62,7 @@ export async function createCourse(formData: FormData) {
       summary: getString(formData, 'summary'),
       program: getString(formData, 'program'),
       status: getString(formData, 'status') || ContentStatus.DRAFT,
+      coverImageAlt: optionalString(getString(formData, 'coverImageAlt')),
       categoryId: optionalString(getString(formData, 'categoryId')),
       cityId: optionalString(getString(formData, 'cityId')),
       format: optionalString(getString(formData, 'format')),
@@ -82,43 +84,45 @@ export async function createCourse(formData: FormData) {
       cityId: parsed.cityId
     });
 
-    const [uniqueSlug, coverImageId] = await Promise.all([
-      findUniqueSlug(slug, async (candidate) =>
+    const coverImageId = await resolveCoverImageId({
+      formData,
+      userId: user.id,
+      onUploadedImageId: (fileId) => {
+        uploadedCoverImageId = fileId;
+      }
+    });
+
+    await persistWithUniqueSlugRetry({
+      baseSlug: slug,
+      exists: async (candidate) =>
         Boolean(
           await prisma.course.findFirst({
             where: { slug: candidate },
             select: { id: true }
           })
-        )
-      ),
-      resolveCoverImageId({
-        formData,
-        userId: user.id,
-        onUploadedImageId: (fileId) => {
-          uploadedCoverImageId = fileId;
-        }
-      })
-    ]);
-
-    await prisma.course.create({
-      data: {
-        title: parsed.title,
-        slug: uniqueSlug,
-        summary: parsed.summary,
-        program: parsed.program,
-        status: parsed.status,
-        coverImageId,
-        categoryId: nullableString(parsed.categoryId),
-        cityId: nullableString(parsed.cityId),
-        format: nullableString(parsed.format),
-        durationLabel: nullableString(parsed.durationLabel),
-        level: nullableString(parsed.level),
-        priceLabel: nullableString(parsed.priceLabel),
-        instructorName: nullableString(parsed.instructorName),
-        createdById: user.id,
-        updatedById: user.id,
-        ...initialPublicationDates(parsed.status)
-      }
+        ),
+      persist: (uniqueSlug) =>
+        prisma.course.create({
+          data: {
+            title: parsed.title,
+            slug: uniqueSlug,
+            summary: parsed.summary,
+            program: parsed.program,
+            status: parsed.status,
+            coverImageId,
+            coverImageAlt: nullableString(parsed.coverImageAlt),
+            categoryId: nullableString(parsed.categoryId),
+            cityId: nullableString(parsed.cityId),
+            format: nullableString(parsed.format),
+            durationLabel: nullableString(parsed.durationLabel),
+            level: nullableString(parsed.level),
+            priceLabel: nullableString(parsed.priceLabel),
+            instructorName: nullableString(parsed.instructorName),
+            createdById: user.id,
+            updatedById: user.id,
+            ...initialPublicationDates(parsed.status)
+          }
+        })
     });
 
     revalidatePath(ADMIN_COURSES_PATH);
@@ -150,6 +154,7 @@ export async function updateCourse(formData: FormData) {
         summary: getString(formData, 'summary'),
         program: getString(formData, 'program'),
         status: getString(formData, 'status') || ContentStatus.DRAFT,
+        coverImageAlt: optionalString(getString(formData, 'coverImageAlt')),
         categoryId: optionalString(getString(formData, 'categoryId')),
         cityId: optionalString(getString(formData, 'cityId')),
         format: optionalString(getString(formData, 'format')),
@@ -177,44 +182,46 @@ export async function updateCourse(formData: FormData) {
       cityId: parsed.cityId
     });
 
-    const [uniqueSlug, coverImageId] = await Promise.all([
-      findUniqueSlug(slug, async (candidate) =>
+    const coverImageId = await resolveCoverImageId({
+      formData,
+      userId: user.id,
+      currentCoverImageId: existingCourse.coverImageId,
+      onUploadedImageId: (fileId) => {
+        uploadedCoverImageId = fileId;
+      }
+    });
+
+    await persistWithUniqueSlugRetry({
+      baseSlug: slug,
+      exists: async (candidate) =>
         Boolean(
           await prisma.course.findFirst({
             where: { slug: candidate, id: { not: parsed.courseId } },
             select: { id: true }
           })
-        )
-      ),
-      resolveCoverImageId({
-        formData,
-        userId: user.id,
-        currentCoverImageId: existingCourse.coverImageId,
-        onUploadedImageId: (fileId) => {
-          uploadedCoverImageId = fileId;
-        }
-      })
-    ]);
-
-    await prisma.course.update({
-      where: { id: parsed.courseId },
-      data: {
-        title: parsed.title,
-        slug: uniqueSlug,
-        summary: parsed.summary,
-        program: parsed.program,
-        status: parsed.status,
-        coverImageId,
-        categoryId: nullableString(parsed.categoryId),
-        cityId: nullableString(parsed.cityId),
-        format: nullableString(parsed.format),
-        durationLabel: nullableString(parsed.durationLabel),
-        level: nullableString(parsed.level),
-        priceLabel: nullableString(parsed.priceLabel),
-        instructorName: nullableString(parsed.instructorName),
-        updatedById: user.id,
-        ...statusTransitionDates(parsed.status, existingCourse.publishedAt)
-      }
+        ),
+      persist: (uniqueSlug) =>
+        prisma.course.update({
+          where: { id: parsed.courseId },
+          data: {
+            title: parsed.title,
+            slug: uniqueSlug,
+            summary: parsed.summary,
+            program: parsed.program,
+            status: parsed.status,
+            coverImageId,
+            coverImageAlt: nullableString(parsed.coverImageAlt),
+            categoryId: nullableString(parsed.categoryId),
+            cityId: nullableString(parsed.cityId),
+            format: nullableString(parsed.format),
+            durationLabel: nullableString(parsed.durationLabel),
+            level: nullableString(parsed.level),
+            priceLabel: nullableString(parsed.priceLabel),
+            instructorName: nullableString(parsed.instructorName),
+            updatedById: user.id,
+            ...statusTransitionDates(parsed.status, existingCourse.publishedAt)
+          }
+        })
     });
 
     if (previousCoverImageId !== coverImageId) {
@@ -278,27 +285,25 @@ export async function deleteCourseDraft(formData: FormData) {
     });
 
     const deletedCourse = await prisma.$transaction(async (tx) => {
-      const course = await tx.course.findFirst({
+      const course = await tx.course.findUnique({
         where: {
-          id: parsed.courseId,
-          status: { not: ContentStatus.PUBLISHED }
+          id: parsed.courseId
         },
         select: { coverImageId: true }
       });
 
       if (!course) {
-        throw new Error('draft is invalid');
+        throw new Error('record is invalid');
       }
 
       const deletion = await tx.course.deleteMany({
         where: {
-          id: parsed.courseId,
-          status: { not: ContentStatus.PUBLISHED }
+          id: parsed.courseId
         }
       });
 
       if (deletion.count !== 1) {
-        throw new Error('draft is invalid');
+        throw new Error('record is invalid');
       }
 
       return course;
@@ -307,7 +312,7 @@ export async function deleteCourseDraft(formData: FormData) {
     await deleteUploadedFileIfUnused(deletedCourse.coverImageId);
 
     revalidatePath(ADMIN_COURSES_PATH);
-    result = { type: 'success', message: 'Черновик курса удален.' };
+    result = { type: 'success', message: 'Курс удален.' };
   } catch (error) {
     result = { type: 'error', message: formatAdminActionError(error) };
   }

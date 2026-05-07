@@ -1,15 +1,19 @@
-import { ContentStatus } from '@prisma/client';
+import { CategoryType, ContentStatus, type Prisma } from '@prisma/client';
 import { deleteVacancyDraft, updateVacancyStatus } from '@/app/admin/vacancies/actions';
 import {
   AdminActionAlert,
-  AdminPagination,
-  HiddenRedirect
+  AdminContentRowActions,
+  AdminListFilters,
+  AdminPagination
 } from '@/components/admin/content-admin-controls';
 import { AdminPageIntro } from '@/components/admin/admin-page-intro';
 import {
   AdminTable,
+  AdminTableActionsCell,
+  AdminTableActionsHeaderCell,
   AdminTableBody,
   AdminTableCell,
+  AdminTableClamp,
   AdminTableFrame,
   AdminTableHead,
   AdminTableHeaderCell,
@@ -25,7 +29,11 @@ import {
   contentStatusLabels,
   getAdminCurrentPath,
   getAdminPage,
+  getAdminSearchQuery,
+  getAdminStringFilter,
+  getAdminStatusFilter,
   getAdminTotalPages,
+  vacancyEmploymentTypeOptions,
   type AdminContentSearchParams
 } from '@/lib/admin/content-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
@@ -51,10 +59,34 @@ export default async function AdminVacanciesPage({ searchParams }: AdminVacancie
   const params = (await searchParams) ?? {};
   const page = getAdminPage(params);
   const currentPath = getAdminCurrentPath(ADMIN_VACANCIES_PATH, params);
+  const q = getAdminSearchQuery(params);
+  const status = getAdminStatusFilter(params);
+  const categoryId = getAdminStringFilter(params, 'categoryId');
+  const cityId = getAdminStringFilter(params, 'cityId');
+  const employmentType = getAdminStringFilter(params, 'employmentType');
+  const searchWhere: Prisma.VacancyWhereInput = q
+    ? {
+        OR: [
+          { title: { contains: q, mode: 'insensitive' as const } },
+          { summary: { contains: q, mode: 'insensitive' as const } },
+          { slug: { contains: q, mode: 'insensitive' as const } },
+          { companyName: { contains: q, mode: 'insensitive' as const } },
+          { position: { contains: q, mode: 'insensitive' as const } }
+        ]
+      }
+    : {};
+  const where: Prisma.VacancyWhereInput = {
+    status,
+    categoryId,
+    cityId,
+    employmentType,
+    ...searchWhere
+  };
 
-  const [total, vacancies, vacancyStatusCounts] = await Promise.all([
-    prisma.vacancy.count(),
+  const [total, vacancies, vacancyStatusCounts, categories, cities] = await Promise.all([
+    prisma.vacancy.count({ where }),
     prisma.vacancy.findMany({
+      where,
       orderBy: [{ createdAt: 'desc' }],
       skip: (page - 1) * ADMIN_CONTENT_PAGE_SIZE,
       take: ADMIN_CONTENT_PAGE_SIZE,
@@ -67,17 +99,29 @@ export default async function AdminVacanciesPage({ searchParams }: AdminVacancie
     }),
     prisma.vacancy.groupBy({
       by: ['status'],
+      where: searchWhere,
       _count: { _all: true }
+    }),
+    prisma.category.findMany({
+      where: { type: CategoryType.VACANCY, isActive: true },
+      orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
+      select: { id: true, name: true }
+    }),
+    prisma.city.findMany({
+      where: { isActive: true },
+      orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
+      select: { id: true, name: true }
     })
   ]);
   const totalPages = getAdminTotalPages(total);
   const vacancyCountByStatus = new Map(vacancyStatusCounts.map((item) => [item.status, item._count._all] as const));
+  const hasActiveFilters = Boolean(q || status || categoryId || cityId || employmentType);
 
   return (
     <div className="space-y-8">
       <AdminPageIntro
         action={
-          <Button href={`${ADMIN_VACANCIES_PATH}/create`} variant="secondary">
+          <Button href={`${ADMIN_VACANCIES_PATH}/create`}>
             Новая вакансия
           </Button>
         }
@@ -87,6 +131,16 @@ export default async function AdminVacanciesPage({ searchParams }: AdminVacancie
       />
 
       <AdminActionAlert params={params} />
+      <AdminListFilters
+        basePath={ADMIN_VACANCIES_PATH}
+        filters={[
+          { name: 'categoryId', label: 'Категория', allLabel: 'Все категории', options: categories.map((category) => ({ value: category.id, label: category.name })) },
+          { name: 'cityId', label: 'Город', allLabel: 'Все города', options: cities.map((city) => ({ value: city.id, label: city.name })) },
+          { name: 'employmentType', label: 'Тип занятости', allLabel: 'Все типы', options: [...vacancyEmploymentTypeOptions] }
+        ]}
+        params={params}
+        searchPlaceholder="Поиск по названию"
+      />
 
       <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard label="Всего" value={total} />
@@ -104,7 +158,12 @@ export default async function AdminVacanciesPage({ searchParams }: AdminVacancie
         </div>
 
         {vacancies.length === 0 ? (
-          <EmptyState title="Вакансий пока нет" />
+          <EmptyState
+            actionHref={hasActiveFilters ? ADMIN_VACANCIES_PATH : `${ADMIN_VACANCIES_PATH}/create`}
+            actionLabel={hasActiveFilters ? 'Сбросить фильтры' : 'Создать вакансию'}
+            description={hasActiveFilters ? 'По текущим фильтрам вакансий нет.' : 'Добавьте первую вакансию и настройте её публикацию.'}
+            title={hasActiveFilters ? 'Вакансии не найдены' : 'Вакансий пока нет'}
+          />
         ) : (
           <AdminTableFrame>
             <AdminTable>
@@ -115,14 +174,14 @@ export default async function AdminVacanciesPage({ searchParams }: AdminVacancie
                   <AdminTableHeaderCell>Город</AdminTableHeaderCell>
                   <AdminTableHeaderCell>Статус</AdminTableHeaderCell>
                   <AdminTableHeaderCell>Обновлено</AdminTableHeaderCell>
-                  <AdminTableHeaderCell>Действия</AdminTableHeaderCell>
+                  <AdminTableActionsHeaderCell>Действия</AdminTableActionsHeaderCell>
                 </tr>
               </AdminTableHead>
               <AdminTableBody>
                 {vacancies.map((vacancy) => (
                   <AdminTableRow key={vacancy.id}>
                     <AdminTableCell className="max-w-[320px]">
-                      <div className="font-semibold">{vacancy.title}</div>
+                      <AdminTableClamp className="font-semibold">{vacancy.title}</AdminTableClamp>
                       <div className="mt-1 truncate text-xs text-[var(--muted)]">/{vacancy.slug}</div>
                       <div className="mt-1 text-xs text-[var(--muted)]">{vacancy.category?.name ?? 'Без категории'}</div>
                       {vacancy.coverImage?.originalName ? (
@@ -142,42 +201,18 @@ export default async function AdminVacanciesPage({ searchParams }: AdminVacancie
                       <div>{dateFormatter.format(vacancy.updatedAt)}</div>
                       {vacancy.updatedBy?.email ? <div className="mt-1 text-xs">{vacancy.updatedBy.email}</div> : null}
                     </AdminTableCell>
-                    <AdminTableCell>
-                      <div className="flex flex-wrap gap-2">
-                        <Button href={`${ADMIN_VACANCIES_PATH}/${vacancy.id}`} size="sm" variant="secondary">
-                          Изменить
-                        </Button>
-                        {vacancy.status !== ContentStatus.PUBLISHED ? (
-                          <form action={updateVacancyStatus}>
-                            <HiddenRedirect value={currentPath} />
-                            <input name="vacancyId" type="hidden" value={vacancy.id} />
-                            <input name="status" type="hidden" value={ContentStatus.PUBLISHED} />
-                            <Button size="sm" type="submit">
-                              Опубликовать
-                            </Button>
-                          </form>
-                        ) : null}
-                        {vacancy.status !== ContentStatus.ARCHIVED ? (
-                          <form action={updateVacancyStatus}>
-                            <HiddenRedirect value={currentPath} />
-                            <input name="vacancyId" type="hidden" value={vacancy.id} />
-                            <input name="status" type="hidden" value={ContentStatus.ARCHIVED} />
-                            <Button size="sm" type="submit" variant="secondary">
-                              В архив
-                            </Button>
-                          </form>
-                        ) : null}
-                        {vacancy.status !== ContentStatus.PUBLISHED ? (
-                          <form action={deleteVacancyDraft}>
-                            <HiddenRedirect value={currentPath} />
-                            <input name="vacancyId" type="hidden" value={vacancy.id} />
-                            <Button size="sm" type="submit" variant="ghost">
-                              Удалить
-                            </Button>
-                          </form>
-                        ) : null}
-                      </div>
-                    </AdminTableCell>
+                    <AdminTableActionsCell>
+                      <AdminContentRowActions
+                        currentPath={currentPath}
+                        deleteAction={deleteVacancyDraft}
+                        editHref={`${ADMIN_VACANCIES_PATH}/${vacancy.id}`}
+                        idName="vacancyId"
+                        idValue={vacancy.id}
+                        publicHref={`/vacancies/${vacancy.slug}`}
+                        status={vacancy.status}
+                        updateStatusAction={updateVacancyStatus}
+                      />
+                    </AdminTableActionsCell>
                   </AdminTableRow>
                 ))}
               </AdminTableBody>

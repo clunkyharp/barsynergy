@@ -1,24 +1,10 @@
+import type { Metadata } from 'next';
 import { LegalDraftPage } from '@/components/public/legal-draft-page';
+import { buildLegalMetadata, getPrivacyDocument } from '@/lib/legal/legal-documents';
+
+const privacyDocument = getPrivacyDocument();
+export const metadata: Metadata = buildLegalMetadata(privacyDocument);
 
 export default function PrivacyPage() {
-  return (
-    <LegalDraftPage
-      title="Политика конфиденциальности"
-      description="Правила обработки данных для публичных форм, регистрации, заявок и обратной связи."
-      sections={[
-        {
-          title: 'Какие данные могут обрабатываться',
-          items: ['Имя, контакты, город, роль, организация и содержание обращения.', 'Технические данные сайта: IP-адрес, user-agent, cookies и серверные логи после подключения аналитики.']
-        },
-        {
-          title: 'Для чего нужны данные',
-          items: ['Обработка заявок, обратная связь, регистрация и сопровождение участия в проектах BARSYNERGY.', 'Защита сайта, диагностика ошибок и улучшение публичных разделов.']
-        },
-        {
-          title: 'Условия обработки',
-          items: ['Формы с персональными данными запускаются только при наличии прозрачного согласия и понятной цели обработки.', 'Хранение персональных данных должно использовать российскую инфраструктуру проекта.']
-        }
-      ]}
-    />
-  );
+  return <LegalDraftPage document={privacyDocument} />;
 }

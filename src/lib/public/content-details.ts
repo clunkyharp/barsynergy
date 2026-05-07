@@ -1,4 +1,14 @@
-import { ContentStatus, FileVisibility } from '@prisma/client';
+import { CategoryType, ContentStatus, FileVisibility } from '@prisma/client';
+import {
+  courseFormatOptions,
+  courseLevelOptions,
+  eventFormatOptions,
+  eventRegistrationModeOptions,
+  getAdminOptionLabel,
+  partnerTypeOptions,
+  vacancyEmploymentTypeOptions,
+  vacancyExperienceOptions
+} from '@/lib/admin/content-labels';
 import { prisma } from '@/lib/db/prisma';
 import { getPublicFileUrl } from '@/lib/storage/public-url';
 import { getRenderableExternalUrl } from '@/lib/validation/external-url';
@@ -8,17 +18,31 @@ export type PublicContentDetailFact = {
   value: string;
 };
 
+export type PublicContentDetailSection = {
+  title: string;
+  items: string[];
+};
+
+export type PublicContentImage = {
+  src: string;
+  alt: string;
+};
+
 export type PublicContentDetail = {
+  id: string;
   title: string;
   slug: string;
   summary: string;
   label?: string;
   meta: string[];
   body?: string;
-  imageUrl?: string;
+  imageUrl?: PublicContentImage;
   facts: PublicContentDetailFact[];
   externalUrl?: string;
   externalUrlLabel?: string;
+  companyName?: string;
+  cityName?: string;
+  sections?: PublicContentDetailSection[];
 };
 
 function publicImageUrl(
@@ -35,8 +59,35 @@ function publicImageUrl(
   });
 }
 
+function publicImage(
+  file: { fileKey: string; bucket: string | null; visibility: FileVisibility } | null | undefined,
+  alt: string | null | undefined,
+  fallbackAlt: string
+): PublicContentImage | undefined {
+  const src = publicImageUrl(file);
+
+  if (!src) {
+    return undefined;
+  }
+
+  return {
+    src,
+    alt: alt?.trim() || fallbackAlt
+  };
+}
+
 function compact(values: Array<string | null | undefined>) {
   return values.filter((value): value is string => Boolean(value && value.trim().length > 0));
+}
+
+function cleanPublicDetailText(value: string) {
+  return value
+    .replace(/(^|\s)[Дд]емо[-\s]+/g, '$1')
+    .replace(/^поставщик\b/u, 'Поставщик')
+    .replace(/^материал\b/u, 'Материал')
+    .replace(/^событие\b/u, 'Событие')
+    .replace(/^вакансия\b/u, 'Вакансия')
+    .trim();
 }
 
 function formatDate(value: Date | null | undefined) {
@@ -47,13 +98,40 @@ function formatDate(value: Date | null | undefined) {
   return value.toLocaleDateString('ru-RU');
 }
 
+function formatDateTime(value: Date | null | undefined) {
+  if (!value) {
+    return undefined;
+  }
+
+  return value.toLocaleString('ru-RU', {
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    month: 'long',
+    year: 'numeric'
+  });
+}
+
+function eventPlaceLabel(locationName?: string | null, cityName?: string | null) {
+  if (locationName && cityName) {
+    return `${locationName}, ${cityName}`;
+  }
+
+  return locationName ?? cityName ?? 'место уточняется';
+}
+
 export async function getPublishedArticleDetail(slug: string): Promise<PublicContentDetail | null> {
   const article = await prisma.article.findFirst({
     where: { slug, status: ContentStatus.PUBLISHED },
     include: {
       category: { select: { name: true } },
       city: { select: { name: true } },
-      coverImage: { select: { fileKey: true, bucket: true, visibility: true } }
+      coverImage: { select: { fileKey: true, bucket: true, visibility: true } },
+      tags: {
+        where: { tag: { isActive: true, type: CategoryType.ARTICLE } },
+        orderBy: { tag: { sortOrder: 'asc' } },
+        select: { tag: { select: { name: true } } }
+      }
     }
   });
 
@@ -62,13 +140,19 @@ export async function getPublishedArticleDetail(slug: string): Promise<PublicCon
   }
 
   return {
+    id: article.id,
     title: article.title,
     slug: article.slug,
-    summary: article.summary,
-    body: article.body,
+    summary: cleanPublicDetailText(article.summary),
+    body: article.body ? cleanPublicDetailText(article.body) : article.body,
     label: article.category?.name,
-    meta: compact([article.city?.name, article.authorName, article.readingTimeMinutes ? `${article.readingTimeMinutes} мин` : undefined]),
-    imageUrl: publicImageUrl(article.coverImage),
+    meta: compact([
+      article.city?.name,
+      article.authorName,
+      article.readingTimeMinutes ? `${article.readingTimeMinutes} мин` : undefined,
+      ...article.tags.map((entry) => entry.tag.name)
+    ]),
+    imageUrl: publicImage(article.coverImage, article.coverImageAlt, article.title),
     facts: compact([
       article.sourceLabel ? `Источник: ${article.sourceLabel}` : undefined,
       formatDate(article.publishedAt) ? `Опубликовано: ${formatDate(article.publishedAt)}` : undefined
@@ -97,26 +181,55 @@ export async function getPublishedEventDetail(slug: string): Promise<PublicConte
   }
 
   return {
+    id: event.id,
     title: event.title,
     slug: event.slug,
-    summary: event.summary,
+    summary: cleanPublicDetailText(event.summary),
     label: event.category?.name,
-    meta: compact([event.city?.name, event.format, formatDate(event.startsAt)]),
-    imageUrl: publicImageUrl(event.coverImage),
+    meta: compact([event.city?.name, getAdminOptionLabel(eventFormatOptions, event.format, ''), formatDate(event.startsAt)]),
+    imageUrl: publicImage(event.coverImage, event.coverImageAlt, event.title),
     facts: compact([
-      formatDate(event.startsAt) ? `Дата начала: ${formatDate(event.startsAt)}` : undefined,
-      formatDate(event.endsAt) ? `Дата окончания: ${formatDate(event.endsAt)}` : undefined,
-      event.locationName ? `Площадка: ${event.locationName}` : undefined,
+      event.city?.name ? `Город: ${event.city.name}` : undefined,
+      formatDateTime(event.startsAt) ? `Дата и время: ${formatDateTime(event.startsAt)}` : undefined,
+      formatDateTime(event.endsAt) ? `Окончание: ${formatDateTime(event.endsAt)}` : undefined,
+      event.locationName ? `Место: ${event.locationName}` : undefined,
       event.address ? `Адрес: ${event.address}` : undefined,
-      event.registrationMode ? `Регистрация: ${event.registrationMode}` : undefined,
-      typeof event.capacity === 'number' ? `Вместимость: ${event.capacity}` : undefined
+      event.format ? `Формат: ${getAdminOptionLabel(eventFormatOptions, event.format)}` : undefined,
+      'Для кого: специалисты, команды и партнёры индустрии',
+      event.registrationMode
+        ? `Регистрация: ${getAdminOptionLabel(eventRegistrationModeOptions, event.registrationMode)}`
+        : 'Регистрация: заявки принимаются через BARSYNERGY',
+      'Участие: бесплатно или по условиям организатора',
+      'Организатор: BARSYNERGY / партнёры',
+      typeof event.capacity === 'number' ? `Мест: ${event.capacity}` : undefined
     ]).map((entry) => {
       const [label, ...rest] = entry.split(': ');
       return {
         label,
         value: rest.join(': ')
       };
-    })
+    }),
+    sections: [
+      {
+        title: 'Перед участием',
+        items: compact([
+          formatDateTime(event.startsAt) ? `Дата и время: ${formatDateTime(event.startsAt)}.` : undefined,
+          event.locationName || event.city?.name ? `Место: ${eventPlaceLabel(event.locationName, event.city?.name)}.` : undefined,
+          event.format ? `Формат: ${getAdminOptionLabel(eventFormatOptions, event.format)}.` : undefined,
+          event.registrationMode
+            ? `Регистрация: ${getAdminOptionLabel(eventRegistrationModeOptions, event.registrationMode)}.`
+            : 'Регистрация проходит через форму BARSYNERGY.'
+        ])
+      },
+      {
+        title: 'Кому подходит',
+        items: [
+          'Барменам, бар-менеджерам и управляющим, которым нужны практические примеры.',
+          'Заведениям, которым нужен контакт с экспертами, брендами или поставщиками.',
+          'Брендам и партнёрам, которые хотят понять аудиторию СКФО.'
+        ]
+      }
+    ]
   };
 }
 
@@ -135,13 +248,19 @@ export async function getPublishedCourseDetail(slug: string): Promise<PublicCont
   }
 
   return {
+    id: course.id,
     title: course.title,
     slug: course.slug,
-    summary: course.summary,
-    body: course.program,
+    summary: cleanPublicDetailText(course.summary),
+    body: course.program ? cleanPublicDetailText(course.program) : course.program,
     label: course.category?.name,
-    meta: compact([course.city?.name, course.format, course.level, course.durationLabel]),
-    imageUrl: publicImageUrl(course.coverImage),
+    meta: compact([
+      course.city?.name,
+      getAdminOptionLabel(courseFormatOptions, course.format, ''),
+      getAdminOptionLabel(courseLevelOptions, course.level, ''),
+      course.durationLabel
+    ]),
+    imageUrl: publicImage(course.coverImage, course.coverImageAlt, course.title),
     facts: compact([
       course.priceLabel ? `Стоимость: ${course.priceLabel}` : undefined,
       course.instructorName ? `Преподаватель: ${course.instructorName}` : undefined,
@@ -171,18 +290,29 @@ export async function getPublishedVacancyDetail(slug: string): Promise<PublicCon
   }
 
   return {
+    id: vacancy.id,
     title: vacancy.title,
     slug: vacancy.slug,
-    summary: vacancy.summary,
-    body: vacancy.description,
+    summary: cleanPublicDetailText(vacancy.summary),
+    body: vacancy.description ? cleanPublicDetailText(vacancy.description) : vacancy.description,
     label: vacancy.category?.name,
-    meta: compact([vacancy.city?.name, vacancy.companyName, vacancy.employmentType, vacancy.salaryLabel]),
-    imageUrl: publicImageUrl(vacancy.coverImage),
+    meta: compact([
+      vacancy.city?.name,
+      vacancy.companyName,
+      getAdminOptionLabel(vacancyEmploymentTypeOptions, vacancy.employmentType, ''),
+      vacancy.salaryLabel
+    ]),
+    imageUrl: publicImage(vacancy.coverImage, vacancy.coverImageAlt, vacancy.title),
+    companyName: vacancy.companyName,
+    cityName: vacancy.city?.name,
     facts: compact([
       `Компания: ${vacancy.companyName}`,
       `Позиция: ${vacancy.position}`,
-      vacancy.experienceLabel ? `Опыт: ${vacancy.experienceLabel}` : undefined,
-      vacancy.contactMode ? `Контакт: ${vacancy.contactMode}` : undefined
+      vacancy.salaryLabel ? `Зарплата: ${vacancy.salaryLabel}` : undefined,
+      vacancy.employmentType ? `График: ${getAdminOptionLabel(vacancyEmploymentTypeOptions, vacancy.employmentType)}` : undefined,
+      vacancy.experienceLabel ? `Опыт: ${getAdminOptionLabel(vacancyExperienceOptions, vacancy.experienceLabel)}` : undefined,
+      vacancy.contactMode ? `Контакт: ${vacancy.contactMode}` : undefined,
+      formatDate(vacancy.publishedAt ?? vacancy.createdAt) ? `Обновлено: ${formatDate(vacancy.publishedAt ?? vacancy.createdAt)}` : undefined
     ]).map((entry) => {
       const [label, ...rest] = entry.split(': ');
       return {
@@ -210,17 +340,23 @@ export async function getPublishedSupplierDetail(slug: string): Promise<PublicCo
   const externalUrl = getRenderableExternalUrl(supplier.websiteUrl);
 
   return {
+    id: supplier.id,
     title: supplier.title,
     slug: supplier.slug,
-    summary: supplier.summary,
-    body: supplier.description,
+    summary: cleanPublicDetailText(supplier.summary),
+    body: cleanPublicDetailText(supplier.description),
     label: supplier.category?.name,
     meta: compact([supplier.city?.name, supplier.companyName, supplier.isVerified ? 'Проверенный поставщик' : undefined]),
-    imageUrl: publicImageUrl(supplier.coverImage),
+    imageUrl: publicImage(supplier.coverImage, supplier.coverImageAlt, supplier.title),
+    companyName: supplier.companyName,
     facts: compact([
       `Компания: ${supplier.companyName}`,
+      supplier.category?.name ? `Категория: ${supplier.category.name}` : undefined,
+      supplier.city?.name ? `Город: ${supplier.city.name}` : undefined,
       supplier.serviceArea ? `Поставка: ${supplier.serviceArea}` : undefined,
-      supplier.contactLabel ? `Контакт: ${supplier.contactLabel}` : undefined
+      supplier.contactLabel ? `Контакт: ${supplier.contactLabel}` : undefined,
+      supplier.isVerified ? 'Статус: проверен BARSYNERGY' : 'Статус: контакт для уточнения',
+      'Условия: уточняйте у компании'
     ]).map((entry) => {
       const [label, ...rest] = entry.split(': ');
       return {
@@ -249,16 +385,22 @@ export async function getPublishedPartnerDetail(slug: string): Promise<PublicCon
   const externalUrl = getRenderableExternalUrl(partner.websiteUrl);
 
   return {
+    id: partner.id,
     title: partner.title,
     slug: partner.slug,
-    summary: partner.summary,
-    body: partner.description,
+    summary: cleanPublicDetailText(partner.summary),
+    body: partner.description ? cleanPublicDetailText(partner.description) : partner.description,
     label: partner.category?.name,
-    meta: compact([partner.companyName, partner.partnerType, partner.isFeatured ? 'В подборке' : undefined]),
-    imageUrl: publicImageUrl(partner.coverImage),
+    meta: compact([
+      partner.companyName,
+      getAdminOptionLabel(partnerTypeOptions, partner.partnerType, ''),
+      partner.isFeatured ? 'В подборке' : undefined
+    ]),
+    imageUrl: publicImage(partner.coverImage, partner.coverImageAlt, partner.title),
+    companyName: partner.companyName,
     facts: compact([
       `Компания: ${partner.companyName}`,
-      partner.partnerType ? `Тип партнерства: ${partner.partnerType}` : undefined,
+      partner.partnerType ? `Тип партнёрства: ${getAdminOptionLabel(partnerTypeOptions, partner.partnerType)}` : undefined,
       partner.isFeatured ? 'Статус: В подборке' : undefined
     ]).map((entry) => {
       const [label, ...rest] = entry.split(': ');
@@ -268,6 +410,6 @@ export async function getPublishedPartnerDetail(slug: string): Promise<PublicCon
       };
     }),
     externalUrl,
-    externalUrlLabel: externalUrl ? 'Сайт партнера' : undefined
+    externalUrlLabel: externalUrl ? 'Сайт партнёра' : undefined
   };
 }

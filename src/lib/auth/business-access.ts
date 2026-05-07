@@ -4,6 +4,7 @@ import { getEnv } from '@/lib/validation/env';
 import { createSessionToken, getSessionCookieOptions, hashSessionToken } from '@/lib/auth/session';
 
 export const BUSINESS_ACCESS_PREVIEW_COOKIE_NAME = 'barsynergy_business_access_preview';
+export const BUSINESS_ACCESS_ACTIVATION_COOKIE_NAME = 'barsynergy_business_access_activation';
 const BUSINESS_ACCESS_INVITE_TTL_HOURS = 72;
 
 const businessAccessRequestPayloadSchema = z.object({
@@ -26,7 +27,7 @@ export function getBusinessAccessInviteExpiresAt() {
 }
 
 export function buildBusinessAccessActivationUrl(token: string) {
-  return new URL(`/auth/activate?token=${encodeURIComponent(token)}`, getEnv().APP_URL).toString();
+  return new URL(`/auth/activate/consume?token=${encodeURIComponent(token)}`, getEnv().APP_URL).toString();
 }
 
 export function getBusinessAccessPreviewCookieOptions() {
@@ -34,6 +35,14 @@ export function getBusinessAccessPreviewCookieOptions() {
     ...getSessionCookieOptions(),
     maxAge: 60 * 10,
     path: '/admin/applications'
+  };
+}
+
+export function getBusinessAccessActivationCookieOptions() {
+  return {
+    ...getSessionCookieOptions(),
+    maxAge: 60 * 10,
+    path: '/auth/activate'
   };
 }
 

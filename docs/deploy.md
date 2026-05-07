@@ -14,13 +14,15 @@ Production target is a Russian VPS/cloud, with Timeweb Cloud VPS as the primary 
 - Next.js app
 - Timeweb Cloud Object Storage for files
 
-Single-node fallback for first launch when external object storage or edge proxy is not ready:
+Single-node fallback for first launch when an external edge proxy is not ready:
 
 - direct TLS on the same host;
-- local MinIO as the S3-compatible storage backend;
-- one public app host that serves both the site and `/storage/*`.
+- one public app host that serves the site;
+- Timeweb Cloud Object Storage remains the production file storage backend.
 
 ## Production Flow
+
+Before enabling public forms that collect personal data, complete [Personal data launch checklist](personal-data-launch-checklist.md).
 
 ```bash
 cp .env.production.example .env.production
@@ -30,31 +32,36 @@ docker compose --env-file .env.production -f docker-compose.production.yml exec 
 
 Migration command must run inside the `app` container because production `DATABASE_URL` resolves `postgres` inside Docker network, not on the host.
 
+If the app is deployed from a host checkout with `barsynergy.service` running `node .next/standalone/server.js`, the build step must also sync `public/` and `.next/static/` into `.next/standalone/`. The repository `npm run build` command now does this automatically through `scripts/sync-standalone-assets.mjs`.
+
 ## Supported Ingress Contract (Current Repository State)
 
-Current repository state supports one ingress mode only:
+Current repository state supports the single-node ingress mode:
 
-- `docker-compose.production.yml` publishes `80`;
-- `docker/nginx/nginx.conf` listens only on `80`;
-- TLS terminates on one trusted external edge proxy or load balancer;
-- the external edge forwards `X-Forwarded-For` and `X-Forwarded-Proto`;
-- app-side Nginx stays on private HTTP and appends its hop with `$proxy_add_x_forwarded_for`;
-- Next.js and server actions treat the first IP in `X-Forwarded-For` as the client IP for throttling and request identity.
+- `docker-compose.production.yml` publishes `80` and `443`;
+- `docker/nginx/nginx.conf` terminates TLS on the app host;
+- app-side Nginx sets `X-Real-IP` and `X-Forwarded-For` to `$remote_addr`;
+- inbound client-supplied forwarding chains are overwritten before they reach Next.js;
+- Next.js and server actions prefer `X-Real-IP` for throttling and request identity, then fall back to `X-Forwarded-For`.
 
-Unsupported production mode for the current repo:
+Unsupported production mode for the current repo without a separate ingress review:
 
-- exposing this compose Nginx directly to the public internet without a trusted edge in front of it.
+- putting a trusted external edge in front of this compose Nginx and expecting the current Nginx config to preserve the original client IP;
+- trusting `CF-Connecting-IP` or another provider-specific header without locking traffic to that provider.
+
+Status note, 2026-05-05: this single-node Nginx/TLS contract is the current launch-readiness target. Older notes about a trusted external edge are historical unless the owner explicitly reopens that architecture.
 
 ## Single-Node Fallback Contract
 
-For a temporary one-server launch, the repository also supports this narrower fallback:
+For a temporary one-server launch, the repository supports this narrower fallback:
 
 - Nginx listens on `80` and `443` directly on the app host;
 - Let's Encrypt terminates on the same host;
-- public S3-style file URLs are proxied through `https://<app-host>/storage/<bucket>/<fileKey>`;
-- MinIO runs inside the same Docker Compose stack and uses the same S3 credentials as the app.
+- production files are stored in Timeweb Cloud Object Storage with `STORAGE_DRIVER=s3`;
+- public file URLs are generated from `S3_ENDPOINT`, `S3_BUCKET_PUBLIC` and the stored file key;
+- `docker-compose.production.yml` does not run local MinIO, and `docker/nginx/nginx.conf` does not proxy `/storage/*`.
 
-This fallback keeps the app compatible with `STORAGE_DRIVER=s3`, but it is less isolated than the preferred external edge + external object storage production shape.
+This fallback keeps the app compatible with `STORAGE_DRIVER=s3`, but it is less isolated than the preferred external edge + external object storage production shape because Nginx and the app run on the same host.
 
 If S3-compatible storage is still unavailable, the last-resort launch path is:
 
@@ -64,9 +71,9 @@ If S3-compatible storage is still unavailable, the last-resort launch path is:
 
 Before production sign-off, verify on the real host that:
 
-- public traffic cannot bypass the trusted edge and hit the compose Nginx directly;
-- the trusted edge preserves `X-Forwarded-For`;
-- application logs and throttling see the real client IP instead of the edge proxy IP.
+- public HTTP redirects to HTTPS;
+- application logs and throttling see the real client IP from `X-Real-IP`;
+- spoofed inbound `X-Forwarded-For` and `CF-Connecting-IP` headers do not change the throttling identity.
 
 ## Future Multi-Server And HA Plan
 
@@ -116,7 +123,7 @@ Operational rules for multi-server mode:
 - PostgreSQL must stay private and must not expose `5432` to the public internet;
 - production files must not depend on local app-server disks;
 - Prisma migrations must run once per release from a controlled migration step, not independently on every app server;
-- scheduled jobs, such as expired session cleanup, must run in one controlled place only;
+- scheduled cleanup jobs must run in one controlled place only, following [Scheduler runbook](scheduler-runbook.md);
 - database backups must be automated and restore must be tested before public launch.
 
 Connection pooling should be reviewed before running many app instances. Each Next.js app process can open PostgreSQL connections through Prisma; with multiple app servers and traffic spikes, this can exhaust the database connection limit. Use managed pooling or PgBouncer when app instance count, request volume or Prisma connection count starts approaching the PostgreSQL limit.
@@ -125,6 +132,7 @@ Connection pooling should be reviewed before running many app instances. Each Ne
 
 - [Remediation plan](remediation-plan.md)
 - [Project audit workflow](audit-workflow.md)
+- [Scheduler runbook](scheduler-runbook.md)
 
 ## Restrictions
 

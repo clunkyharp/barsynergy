@@ -7,6 +7,11 @@ import {
 import type { ApplicationNotificationInput } from '@/lib/notifications/application-notification-dispatch';
 import { getEnv, type AppEnv } from '@/lib/validation/env';
 
+const TELEGRAM_NOTIFICATION_TIMEOUT_MS = 10_000;
+const SMTP_CONNECTION_TIMEOUT_MS = 10_000;
+const SMTP_GREETING_TIMEOUT_MS = 10_000;
+const SMTP_SOCKET_TIMEOUT_MS = 30_000;
+
 let smtpTransporter: nodemailer.Transporter | null = null;
 
 function getSmtpTransporter(env: AppEnv) {
@@ -15,6 +20,9 @@ function getSmtpTransporter(env: AppEnv) {
       host: env.SMTP_HOST,
       port: env.SMTP_PORT,
       secure: env.SMTP_PORT === 465,
+      connectionTimeout: SMTP_CONNECTION_TIMEOUT_MS,
+      greetingTimeout: SMTP_GREETING_TIMEOUT_MS,
+      socketTimeout: SMTP_SOCKET_TIMEOUT_MS,
       auth: env.SMTP_USER && env.SMTP_PASSWORD ? { user: env.SMTP_USER, pass: env.SMTP_PASSWORD } : undefined
     });
   }
@@ -22,21 +30,38 @@ function getSmtpTransporter(env: AppEnv) {
   return smtpTransporter;
 }
 
-async function sendAdminTelegramNotification(env: AppEnv, input: ApplicationNotificationInput) {
-  const response = await fetch(`https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN}/sendMessage`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      chat_id: env.TELEGRAM_ADMIN_CHAT_ID,
-      text: buildAdminApplicationTelegramMessage(input, env.APP_URL),
-      disable_web_page_preview: true
-    })
-  });
+function createTimeoutSignal(timeoutMs: number) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
 
-  if (!response.ok) {
-    throw new Error(`telegram notification failed with status ${response.status}`);
+  return {
+    signal: controller.signal,
+    clear: () => clearTimeout(timeout)
+  };
+}
+
+async function sendAdminTelegramNotification(env: AppEnv, input: ApplicationNotificationInput) {
+  const timeout = createTimeoutSignal(TELEGRAM_NOTIFICATION_TIMEOUT_MS);
+
+  try {
+    const response = await fetch(`https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN}/sendMessage`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      signal: timeout.signal,
+      body: JSON.stringify({
+        chat_id: env.TELEGRAM_ADMIN_CHAT_ID,
+        text: buildAdminApplicationTelegramMessage(input, env.APP_URL),
+        disable_web_page_preview: true
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`telegram notification failed with status ${response.status}`);
+    }
+  } finally {
+    timeout.clear();
   }
 }
 

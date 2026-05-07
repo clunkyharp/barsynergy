@@ -8,6 +8,23 @@ type SupplierDetailPageProps = {
   params: Promise<{ slug: string }>;
 };
 
+function supplierContactHref(input: { title: string; companyName?: string; label?: string; externalUrl?: string }) {
+  const params = new URLSearchParams({
+    topic: 'supplier',
+    companyName: input.companyName ?? input.title
+  });
+
+  if (input.label) {
+    params.set('supplierCategory', input.label);
+  }
+
+  if (input.externalUrl) {
+    params.set('websiteUrl', input.externalUrl);
+  }
+
+  return `/contacts?${params.toString()}#contact-form`;
+}
+
 export default async function SupplierDetailPage({ params }: SupplierDetailPageProps) {
   const { slug } = await params;
   const [supplier, related] = await Promise.all([getPublishedSupplierDetail(slug), getPublishedSuppliers({ pageSize: '4' })]);
@@ -28,7 +45,7 @@ export default async function SupplierDetailPage({ params }: SupplierDetailPageP
         imageUrl={supplier.imageUrl}
         label={supplier.label}
         meta={supplier.meta}
-        primaryLink={{ href: '/contacts', label: 'Связаться' }}
+        primaryLink={{ href: supplierContactHref(supplier), label: 'Написать поставщику' }}
         secondaryLink={
           supplier.externalUrl && supplier.externalUrlLabel
             ? { href: supplier.externalUrl, label: supplier.externalUrlLabel, external: true }

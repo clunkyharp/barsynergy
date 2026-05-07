@@ -8,11 +8,11 @@ type AdminPlaceholderPageProps = {
 export function AdminPlaceholderPage({ title }: AdminPlaceholderPageProps) {
   return (
     <div className="space-y-6">
-      <AdminPageIntro eyebrow="Админка / Справочники" title={title} description="Раздел виден в структуре админки, но CRUD для него еще не подключен." />
+      <AdminPageIntro eyebrow="Админка / Справочники" title={title} description="Раздел уже есть в админке, но просмотр и редактирование ещё не подключены." />
       <div>
         <EmptyState
           title="Раздел в подготовке"
-          description="Это не пустой каталог данных. Для этого раздела еще не включены просмотр, создание и редактирование записей."
+          description="Просмотр, создание и редактирование для этого раздела появятся позже."
           actionLabel="Вернуться в админку"
           actionHref="/admin"
         />

@@ -7,12 +7,12 @@ import {
   assertActiveContentRelations,
   contentStatusValues,
   deleteUploadedFileIfUnused,
-  findUniqueSlug,
   formatAdminActionError,
   getString,
   initialPublicationDates,
   nullableString,
   optionalString,
+  persistWithUniqueSlugRetry,
   redirectWithAdminActionResult,
   resolveCoverImageId,
   safeAdminRedirectPath,
@@ -31,6 +31,7 @@ const partnerFormSchema = z.object({
   summary: z.string().trim().min(10).max(500),
   description: z.string().trim().min(20),
   status: z.enum(contentStatusValues).default(ContentStatus.DRAFT),
+  coverImageAlt: z.string().trim().max(180).optional(),
   categoryId: z.string().trim().optional(),
   companyName: z.string().trim().min(2).max(180),
   websiteUrl: z.string().trim().max(240).optional(),
@@ -60,6 +61,7 @@ export async function createPartner(formData: FormData) {
       summary: getString(formData, 'summary'),
       description: getString(formData, 'description'),
       status: getString(formData, 'status') || ContentStatus.DRAFT,
+      coverImageAlt: optionalString(getString(formData, 'coverImageAlt')),
       categoryId: optionalString(getString(formData, 'categoryId')),
       companyName: getString(formData, 'companyName'),
       websiteUrl: optionalString(getString(formData, 'websiteUrl')),
@@ -79,45 +81,47 @@ export async function createPartner(formData: FormData) {
       categoryType: CategoryType.PARTNER
     });
 
-    const [uniqueSlug, coverImageId] = await Promise.all([
-      findUniqueSlug(slug, async (candidate) =>
+    const coverImageId = await resolveCoverImageId({
+      formData,
+      userId: user.id,
+      onUploadedImageId: (fileId) => {
+        uploadedCoverImageId = fileId;
+      }
+    });
+
+    await persistWithUniqueSlugRetry({
+      baseSlug: slug,
+      exists: async (candidate) =>
         Boolean(
           await prisma.partner.findFirst({
             where: { slug: candidate },
             select: { id: true }
           })
-        )
-      ),
-      resolveCoverImageId({
-        formData,
-        userId: user.id,
-        onUploadedImageId: (fileId) => {
-          uploadedCoverImageId = fileId;
-        }
-      })
-    ]);
-
-    await prisma.partner.create({
-      data: {
-        title: parsed.title,
-        slug: uniqueSlug,
-        summary: parsed.summary,
-        description: parsed.description,
-        status: parsed.status,
-        coverImageId,
-        categoryId: nullableString(parsed.categoryId),
-        companyName: parsed.companyName,
-        websiteUrl: nullableString(websiteUrl),
-        partnerType: nullableString(parsed.partnerType),
-        isFeatured: parsed.isFeatured,
-        createdById: user.id,
-        updatedById: user.id,
-        ...initialPublicationDates(parsed.status)
-      }
+        ),
+      persist: (uniqueSlug) =>
+        prisma.partner.create({
+          data: {
+            title: parsed.title,
+            slug: uniqueSlug,
+            summary: parsed.summary,
+            description: parsed.description,
+            status: parsed.status,
+            coverImageId,
+            coverImageAlt: nullableString(parsed.coverImageAlt),
+            categoryId: nullableString(parsed.categoryId),
+            companyName: parsed.companyName,
+            websiteUrl: nullableString(websiteUrl),
+            partnerType: nullableString(parsed.partnerType),
+            isFeatured: parsed.isFeatured,
+            createdById: user.id,
+            updatedById: user.id,
+            ...initialPublicationDates(parsed.status)
+          }
+        })
     });
 
     revalidatePath(ADMIN_PARTNERS_PATH);
-    result = { type: 'success', message: 'Партнер создан.' };
+    result = { type: 'success', message: 'Партнёр создан.' };
   } catch (error) {
     await deleteUploadedFileIfUnused(uploadedCoverImageId);
     result = { type: 'error', message: formatAdminActionError(error) };
@@ -145,6 +149,7 @@ export async function updatePartner(formData: FormData) {
         summary: getString(formData, 'summary'),
         description: getString(formData, 'description'),
         status: getString(formData, 'status') || ContentStatus.DRAFT,
+        coverImageAlt: optionalString(getString(formData, 'coverImageAlt')),
         categoryId: optionalString(getString(formData, 'categoryId')),
         companyName: getString(formData, 'companyName'),
         websiteUrl: optionalString(getString(formData, 'websiteUrl')),
@@ -170,42 +175,44 @@ export async function updatePartner(formData: FormData) {
       categoryType: CategoryType.PARTNER
     });
 
-    const [uniqueSlug, coverImageId] = await Promise.all([
-      findUniqueSlug(slug, async (candidate) =>
+    const coverImageId = await resolveCoverImageId({
+      formData,
+      userId: user.id,
+      currentCoverImageId: existingPartner.coverImageId,
+      onUploadedImageId: (fileId) => {
+        uploadedCoverImageId = fileId;
+      }
+    });
+
+    await persistWithUniqueSlugRetry({
+      baseSlug: slug,
+      exists: async (candidate) =>
         Boolean(
           await prisma.partner.findFirst({
             where: { slug: candidate, id: { not: parsed.partnerId } },
             select: { id: true }
           })
-        )
-      ),
-      resolveCoverImageId({
-        formData,
-        userId: user.id,
-        currentCoverImageId: existingPartner.coverImageId,
-        onUploadedImageId: (fileId) => {
-          uploadedCoverImageId = fileId;
-        }
-      })
-    ]);
-
-    await prisma.partner.update({
-      where: { id: parsed.partnerId },
-      data: {
-        title: parsed.title,
-        slug: uniqueSlug,
-        summary: parsed.summary,
-        description: parsed.description,
-        status: parsed.status,
-        coverImageId,
-        categoryId: nullableString(parsed.categoryId),
-        companyName: parsed.companyName,
-        websiteUrl: nullableString(websiteUrl),
-        partnerType: nullableString(parsed.partnerType),
-        isFeatured: parsed.isFeatured,
-        updatedById: user.id,
-        ...statusTransitionDates(parsed.status, existingPartner.publishedAt)
-      }
+        ),
+      persist: (uniqueSlug) =>
+        prisma.partner.update({
+          where: { id: parsed.partnerId },
+          data: {
+            title: parsed.title,
+            slug: uniqueSlug,
+            summary: parsed.summary,
+            description: parsed.description,
+            status: parsed.status,
+            coverImageId,
+            coverImageAlt: nullableString(parsed.coverImageAlt),
+            categoryId: nullableString(parsed.categoryId),
+            companyName: parsed.companyName,
+            websiteUrl: nullableString(websiteUrl),
+            partnerType: nullableString(parsed.partnerType),
+            isFeatured: parsed.isFeatured,
+            updatedById: user.id,
+            ...statusTransitionDates(parsed.status, existingPartner.publishedAt)
+          }
+        })
     });
 
     if (previousCoverImageId !== coverImageId) {
@@ -213,7 +220,7 @@ export async function updatePartner(formData: FormData) {
     }
 
     revalidatePath(ADMIN_PARTNERS_PATH);
-    result = { type: 'success', message: 'Партнер обновлен.' };
+    result = { type: 'success', message: 'Партнёр обновлён.' };
   } catch (error) {
     await deleteUploadedFileIfUnused(uploadedCoverImageId);
     result = { type: 'error', message: formatAdminActionError(error) };
@@ -250,7 +257,7 @@ export async function updatePartnerStatus(formData: FormData) {
     });
 
     revalidatePath(ADMIN_PARTNERS_PATH);
-    result = { type: 'success', message: 'Статус партнера обновлен.' };
+    result = { type: 'success', message: 'Статус партнёра обновлён.' };
   } catch (error) {
     result = { type: 'error', message: formatAdminActionError(error) };
   }
@@ -269,27 +276,25 @@ export async function deletePartnerDraft(formData: FormData) {
     });
 
     const deletedPartner = await prisma.$transaction(async (tx) => {
-      const partner = await tx.partner.findFirst({
+      const partner = await tx.partner.findUnique({
         where: {
-          id: parsed.partnerId,
-          status: { not: ContentStatus.PUBLISHED }
+          id: parsed.partnerId
         },
         select: { coverImageId: true }
       });
 
       if (!partner) {
-        throw new Error('draft is invalid');
+        throw new Error('record is invalid');
       }
 
       const deletion = await tx.partner.deleteMany({
         where: {
-          id: parsed.partnerId,
-          status: { not: ContentStatus.PUBLISHED }
+          id: parsed.partnerId
         }
       });
 
       if (deletion.count !== 1) {
-        throw new Error('draft is invalid');
+        throw new Error('record is invalid');
       }
 
       return partner;
@@ -298,7 +303,7 @@ export async function deletePartnerDraft(formData: FormData) {
     await deleteUploadedFileIfUnused(deletedPartner.coverImageId);
 
     revalidatePath(ADMIN_PARTNERS_PATH);
-    result = { type: 'success', message: 'Черновик партнера удален.' };
+    result = { type: 'success', message: 'Партнёр удалён.' };
   } catch (error) {
     result = { type: 'error', message: formatAdminActionError(error) };
   }

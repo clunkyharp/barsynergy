@@ -25,8 +25,7 @@ export async function assertPublicApplicationSubmissionAllowed(applicationType: 
   const headerList = await headers();
   const keyHash = getApplicationThrottleKeyHash({
     applicationType,
-    ip: getClientIpFromHeaders(headerList),
-    userAgent: headerList.get('user-agent')?.trim() ?? 'unknown'
+    ip: getClientIpFromHeaders(headerList)
   });
   const now = new Date();
   const windowBoundary = new Date(now.getTime() - THROTTLE_WINDOW_MS);

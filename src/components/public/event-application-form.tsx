@@ -1,5 +1,6 @@
 import { submitEventApplication } from '@/app/(public)/events/actions';
 import {
+  ContactChannelFieldset,
   HiddenUtmFields,
   HoneypotField,
   PublicApplicationSection,
@@ -7,30 +8,38 @@ import {
   PublicFormShellHeader,
   type PublicApplicationFormProps
 } from '@/components/public/application-form-section';
-import { Button } from '@/components/ui/button';
 import { ConsentField } from '@/components/ui/consent-field';
 import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
 import { InlineLink } from '@/components/ui/inline-link';
 import { Select } from '@/components/ui/select';
+import { SubmitButton } from '@/components/ui/submit-button';
 import { Textarea } from '@/components/ui/textarea';
 
-export function EventApplicationForm({ enabled, result, utm, cities }: PublicApplicationFormProps) {
+export function EventApplicationForm({ enabled, result, utm, cities, defaults = {} }: PublicApplicationFormProps) {
+  const hasEventContext = Boolean(defaults.eventTitle);
+
   return (
     <PublicApplicationSection
       eyebrow="События / Заявка"
-      title="Участие в событии или своё предложение"
-      description="Можно записаться на событие или предложить свой формат."
+      title={hasEventContext ? 'Заявка на выбранное событие' : 'Записаться или предложить событие'}
+      description={hasEventContext ? 'Название события уже подставлено в форму.' : 'Можно записаться или предложить новую встречу.'}
+      disclosureAliases={['applications']}
+      disclosureFocusSelector={hasEventContext ? '#eventName' : '#eventTitle'}
+      disclosureId="event-request"
+      disclosureOpenLabel={hasEventContext ? 'Записаться' : 'Предложить событие'}
+      disclosureTitle={hasEventContext ? 'Запись на событие' : 'Заявка на событие'}
+      disclosureDescription="Оставьте контакт для участия или добавьте событие в афишу."
       enabled={enabled}
       result={result}
     >
-      <form action={submitEventApplication} className="editorial-form-shell overflow-hidden">
+      <form action={submitEventApplication} className="editorial-form-shell">
         <HiddenUtmFields utm={utm} />
         <HoneypotField id="event-application-website" />
         <PublicFormShellHeader
-          eyebrow="Участие и предложение"
-          title="Заявка на событие"
-          description="Для участия, новой темы, коллаборации или события в календаре."
+          eyebrow="Событие"
+          title={hasEventContext ? defaults.eventTitle! : 'Заявка на событие'}
+          description={hasEventContext ? 'Оставьте контакт и короткий комментарий по участию.' : 'Укажите тему, город, дату, площадку и контакт организатора.'}
         />
         <div className="relative p-5 md:p-6">
           <div className="grid gap-4 md:grid-cols-2">
@@ -38,17 +47,9 @@ export function EventApplicationForm({ enabled, result, utm, cities }: PublicApp
               <Input id="eventName" name="name" required maxLength={160} minLength={2} />
             </FormField>
             <FormField htmlFor="eventTitle" label="Событие или тема">
-              <Input id="eventTitle" name="eventTitle" required maxLength={180} minLength={2} />
+              <Input id="eventTitle" name="eventTitle" defaultValue={defaults.eventTitle} required maxLength={180} minLength={2} />
             </FormField>
-            <FormField htmlFor="eventEmail" label="Email">
-              <Input id="eventEmail" name="email" type="email" maxLength={180} />
-            </FormField>
-            <FormField htmlFor="eventPhone" label="Телефон">
-              <Input id="eventPhone" name="phone" maxLength={80} />
-            </FormField>
-            <FormField htmlFor="eventTelegram" label="Telegram">
-              <Input id="eventTelegram" name="telegram" maxLength={80} />
-            </FormField>
+            <ContactChannelFieldset className="md:col-span-2" emailId="eventEmail" phoneId="eventPhone" telegramId="eventTelegram" />
             <FormField htmlFor="eventCityId" label="Город">
               <Select id="eventCityId" name="cityId" defaultValue="">
                 <option value="">Не указан</option>
@@ -66,16 +67,15 @@ export function EventApplicationForm({ enabled, result, utm, cities }: PublicApp
             </div>
             <div className="md:col-span-2">
               <ConsentField>
-                Даю согласие на обработку персональных данных для этой заявки. Полный текст{' '}
-                <InlineLink href="/legal/personal-data-consent">согласия</InlineLink>
-                .
+                Согласен с <InlineLink href="/legal/privacy">политикой обработки персональных данных</InlineLink> и даю{' '}
+                <InlineLink href="/legal/personal-data-consent">согласие на обработку персональных данных</InlineLink> для этой заявки.
               </ConsentField>
             </div>
           </div>
           <PublicFormShellFooter note="Если предлагаете своё событие, напишите, где оно пройдёт, о чём будет и кто придёт.">
-            <Button className="min-h-12 rounded-full px-6 tracking-[0.12em] sm:self-start" type="submit">
+            <SubmitButton className="min-h-12 rounded-[var(--radius-md)] px-6 tracking-normal sm:self-start">
               Отправить заявку
-            </Button>
+            </SubmitButton>
           </PublicFormShellFooter>
         </div>
       </form>

@@ -6,10 +6,14 @@ type StatCardProps = HTMLAttributes<HTMLDivElement> & {
   label: string;
   value: ReactNode;
   description?: ReactNode;
+  status?: ReactNode;
+  delta?: ReactNode;
   tone?: 'default' | 'inverse';
   valueClassName?: string;
   labelClassName?: string;
   descriptionClassName?: string;
+  statusClassName?: string;
+  deltaClassName?: string;
 };
 
 export function StatCard({
@@ -17,43 +21,61 @@ export function StatCard({
   label,
   value,
   description,
+  status,
+  delta,
   tone = 'default',
   valueClassName,
   labelClassName,
   descriptionClassName,
+  statusClassName,
+  deltaClassName,
   ...props
 }: StatCardProps) {
+  const isInverse = tone === 'inverse';
+
   return (
     <Panel
       className={cn(
-        'relative overflow-hidden space-y-4 shadow-[0_24px_70px_rgba(20,20,18,0.08),inset_0_1px_0_rgba(255,255,255,0.6)]',
-        tone === 'default' && 'bg-[linear-gradient(135deg,rgba(255,255,255,0.92)_0%,rgba(247,240,228,0.92)_54%,rgba(153,44,38,0.08)_100%)]',
+        'space-y-3 border-[var(--border-default)] shadow-none',
+        isInverse ? 'bg-[var(--surface-inverse)]' : 'bg-[var(--surface)]',
         className
       )}
       padding="md"
-      tone={tone === 'inverse' ? 'inverse' : 'default'}
+      tone={isInverse ? 'inverse' : 'default'}
       {...props}
     >
-      {tone === 'default' ? (
-        <div aria-hidden="true" className="pointer-events-none absolute -right-14 -top-16 h-44 w-44 rounded-full bg-[rgba(153,44,38,0.12)] blur-3xl" />
-      ) : null}
-      <div className="relative">
+      <div className="flex min-w-0 items-start justify-between gap-3">
         <p
           className={cn(
             'text-[11px] font-semibold uppercase tracking-[0.16em]',
-            tone === 'inverse' ? 'text-white/58' : 'text-[var(--muted)]',
+            isInverse ? 'text-white/58' : 'text-[var(--muted)]',
             labelClassName
           )}
         >
           {label}
         </p>
-        <div className={cn('mt-4 text-4xl font-semibold tracking-[-0.04em]', valueClassName)}>{value}</div>
-        {description ? (
-          <div className={cn(tone === 'inverse' ? 'mt-4 text-sm leading-6 text-white/72' : 'mt-4 text-sm leading-6 text-[var(--muted)]', descriptionClassName)}>
-            {description}
+        {status ? (
+          <div className={cn(isInverse ? 'text-xs font-semibold text-white/72' : 'text-xs font-semibold text-[var(--muted)]', statusClassName)}>
+            {status}
           </div>
         ) : null}
       </div>
+      <div className={cn('h-px w-full', isInverse ? 'bg-white/14' : 'bg-[var(--line)]')} />
+      <div className="flex min-w-0 items-baseline justify-between gap-3">
+        <div className={cn('min-w-0 text-2xl font-semibold tracking-normal text-[var(--text)]', isInverse && 'text-white', valueClassName)}>
+          {value}
+        </div>
+        {delta ? (
+          <div className={cn(isInverse ? 'text-xs font-semibold text-white/72' : 'text-xs font-semibold text-[var(--muted)]', deltaClassName)}>
+            {delta}
+          </div>
+        ) : null}
+      </div>
+      {description ? (
+        <div className={cn(isInverse ? 'text-sm leading-6 text-white/72' : 'text-sm leading-6 text-[var(--muted)]', descriptionClassName)}>
+          {description}
+        </div>
+      ) : null}
     </Panel>
   );
 }
