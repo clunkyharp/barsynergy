@@ -1,10 +1,10 @@
 import { ApplicationStatus, ApplicationType, type Prisma } from '@prisma/client';
-import { AdminPagination } from '@/components/admin/content-admin-controls';
+import { AdminFilterBar, AdminPagination } from '@/components/admin/content-admin-controls';
 import { AdminPageIntro } from '@/components/admin/admin-page-intro';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import {
   DataTable,
+  DataTableActionRow,
   DataTableActionsCell,
   DataTableActionsHeaderCell,
   DataTableBody,
@@ -19,7 +19,7 @@ import { EmptyState } from '@/components/ui/empty-state';
 import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
-import { StatusBadge } from '@/components/ui/status-badge';
+import { AdminStatusChip } from '@/components/ui/status-badge';
 import {
   applicationStatusBadgeVariants,
   applicationStatusLabels,
@@ -57,6 +57,12 @@ const quickStatusFilters = [
   { label: 'Одобрены', status: ApplicationStatus.APPROVED },
   { label: 'Завершены', status: ApplicationStatus.COMPLETED }
 ] as const;
+
+const activeQuickFilterStyle = {
+  background: 'var(--admin-filter-active-bg)',
+  borderColor: 'var(--admin-filter-active-border)',
+  color: 'var(--admin-filter-active-text)'
+};
 
 type AdminApplicationsPageProps = {
   searchParams?: Promise<AdminContentSearchParams>;
@@ -100,6 +106,40 @@ function applicationActionLabel(application: {
   return 'Контроль не требуется';
 }
 
+function getPayloadText(payload: Prisma.JsonValue | null, keys: string[]) {
+  if (!payload || Array.isArray(payload) || typeof payload !== 'object') {
+    return null;
+  }
+
+  for (const key of keys) {
+    const value = (payload as Record<string, Prisma.JsonValue>)[key];
+
+    if (typeof value === 'string' && value.trim()) {
+      return value.trim();
+    }
+  }
+
+  return null;
+}
+
+function applicationPersonOrCompany(application: {
+  businessAccount: { companyName: string } | null;
+  email: string | null;
+  name: string | null;
+  payload: Prisma.JsonValue | null;
+  phone: string | null;
+  subject: string | null;
+  telegram: string | null;
+}) {
+  const companyName = application.businessAccount?.companyName ?? getPayloadText(application.payload, ['companyName', 'employerCompanyName']);
+  const primary = companyName ?? application.name?.trim() ?? application.subject?.trim() ?? application.email ?? 'Не указано';
+  const secondary = [application.name && companyName ? application.name : null, application.email, application.phone, application.telegram]
+    .filter(Boolean)
+    .join(' / ');
+
+  return { primary, secondary };
+}
+
 export default async function AdminApplicationsPage({ searchParams }: AdminApplicationsPageProps) {
   await requireAdminSectionAccess('applications');
 
@@ -141,15 +181,18 @@ export default async function AdminApplicationsPage({ searchParams }: AdminAppli
         email: true,
         phone: true,
         telegram: true,
+        payload: true,
         resumeFileId: true,
         consentAcceptedAt: true,
         createdAt: true,
         city: { select: { name: true } },
-        vacancy: { select: { title: true, slug: true } }
+        vacancy: { select: { title: true, slug: true } },
+        businessAccount: { select: { companyName: true } }
       }
     })
   ]);
   const totalPages = getAdminTotalPages(total);
+  const hasActiveFilters = Boolean(search || selectedType || selectedStatus);
 
   return (
     <div className="space-y-8">
@@ -159,42 +202,51 @@ export default async function AdminApplicationsPage({ searchParams }: AdminAppli
         title="Заявки"
       />
 
-      <Card className="p-5">
-        <form className="grid gap-4 lg:grid-cols-[1.3fr_1fr_1fr_auto]" method="get">
-          <FormField htmlFor="search" label="Поиск">
-            <Input id="search" name="search" defaultValue={search} placeholder="Имя, компания, email, Telegram" />
-          </FormField>
-          <FormField htmlFor="type" label="Тип">
-            <Select id="type" name="type" defaultValue={selectedType ?? ''}>
-              <option value="">Все типы</option>
-              {applicationTypeValues.map((type) => (
-                <option key={type} value={type}>
-                  {applicationTypeLabels[type]}
-                </option>
-              ))}
-            </Select>
-          </FormField>
-          <FormField htmlFor="status" label="Статус">
-            <Select id="status" name="status" defaultValue={selectedStatus ?? ''}>
-              <option value="">Все статусы</option>
-              {applicationStatusValues.map((status) => (
-                <option key={status} value={status}>
-                  {applicationStatusLabels[status]}
-                </option>
-              ))}
-            </Select>
-          </FormField>
-          <div className="flex items-end gap-3">
-            <Button type="submit">Фильтр</Button>
-            <Button href={ADMIN_APPLICATIONS_PATH} type="button" variant="secondary">
-              Сбросить
-            </Button>
-          </div>
-        </form>
-      </Card>
+      <AdminFilterBar
+        action={ADMIN_APPLICATIONS_PATH}
+        summary="Поиск по входящим заявкам, типам и рабочим статусам."
+      >
+        <FormField htmlFor="search" label="Поиск">
+          <Input id="search" name="search" defaultValue={search} placeholder="Поиск по заявке" />
+        </FormField>
+        <FormField htmlFor="type" label="Тип">
+          <Select id="type" name="type" defaultValue={selectedType ?? ''}>
+            <option value="">Все типы</option>
+            {applicationTypeValues.map((type) => (
+              <option key={type} value={type}>
+                {applicationTypeLabels[type]}
+              </option>
+            ))}
+          </Select>
+        </FormField>
+        <FormField htmlFor="status" label="Статус">
+          <Select id="status" name="status" defaultValue={selectedStatus ?? ''}>
+            <option value="">Все статусы</option>
+            {applicationStatusValues.map((status) => (
+              <option key={status} value={status}>
+                {applicationStatusLabels[status]}
+              </option>
+            ))}
+          </Select>
+        </FormField>
+        <DataTableActionRow className="justify-start xl:col-span-full">
+          <Button type="submit" variant="secondary">
+            Применить
+          </Button>
+          <Button href={ADMIN_APPLICATIONS_PATH} type="button" variant="ghost">
+            Сбросить
+          </Button>
+        </DataTableActionRow>
+      </AdminFilterBar>
 
-      <div className="flex flex-wrap gap-2">
-        <Button href={ADMIN_APPLICATIONS_PATH} size="sm" variant={!selectedStatus ? 'primary' : 'secondary'}>
+      <DataTableActionRow className="justify-start">
+        <Button
+          className={!selectedStatus ? 'admin-filter-active' : undefined}
+          href={ADMIN_APPLICATIONS_PATH}
+          size="sm"
+          style={!selectedStatus ? activeQuickFilterStyle : undefined}
+          variant="secondary"
+        >
           Все
         </Button>
         {quickStatusFilters.map((item) => (
@@ -202,12 +254,14 @@ export default async function AdminApplicationsPage({ searchParams }: AdminAppli
             href={`${ADMIN_APPLICATIONS_PATH}?status=${encodeURIComponent(item.status)}`}
             key={item.status}
             size="sm"
-            variant={selectedStatus === item.status ? 'primary' : 'secondary'}
+            className={selectedStatus === item.status ? 'admin-filter-active' : undefined}
+            style={selectedStatus === item.status ? activeQuickFilterStyle : undefined}
+            variant="secondary"
           >
             {item.label}
           </Button>
         ))}
-      </div>
+      </DataTableActionRow>
 
       <section className="space-y-4">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
@@ -218,63 +272,73 @@ export default async function AdminApplicationsPage({ searchParams }: AdminAppli
         </div>
 
         {applications.length === 0 ? (
-          <EmptyState title="Заявок пока нет" />
+          <EmptyState
+            actionHref={hasActiveFilters ? ADMIN_APPLICATIONS_PATH : undefined}
+            actionLabel={hasActiveFilters ? 'Сбросить фильтры' : undefined}
+            description={hasActiveFilters ? 'По текущим фильтрам заявок нет.' : 'Когда пользователи отправят формы, заявки появятся в этой очереди.'}
+            title={hasActiveFilters ? 'Заявки не найдены' : 'Заявок пока нет'}
+          />
         ) : (
           <DataTableFrame>
-            <DataTable minWidth={980}>
+            <DataTable minWidth={1320}>
               <DataTableHead>
                 <tr>
-                  <DataTableHeaderCell>Заявка</DataTableHeaderCell>
-                  <DataTableHeaderCell>Статус</DataTableHeaderCell>
+                  <DataTableHeaderCell>Тип заявки</DataTableHeaderCell>
+                  <DataTableHeaderCell>Имя / компания</DataTableHeaderCell>
                   <DataTableHeaderCell>Город</DataTableHeaderCell>
-                  <DataTableHeaderCell>Файлы</DataTableHeaderCell>
-                  <DataTableHeaderCell>Требует действия</DataTableHeaderCell>
+                  <DataTableHeaderCell>Статус</DataTableHeaderCell>
+                  <DataTableHeaderCell>Файлы / согласия</DataTableHeaderCell>
                   <DataTableHeaderCell>Создана</DataTableHeaderCell>
+                  <DataTableHeaderCell>Следующий шаг</DataTableHeaderCell>
                   <DataTableActionsHeaderCell>Действия</DataTableActionsHeaderCell>
                 </tr>
               </DataTableHead>
               <DataTableBody>
                 {applications.map((application) => {
                   const actionLabel = applicationActionLabel(application);
+                  const identity = applicationPersonOrCompany(application);
 
                   return (
                     <DataTableRow key={application.id}>
-                      <DataTableCell className="max-w-[320px]">
-                        <DataTableClamp className="font-semibold">
-                          {application.subject?.trim() || application.name?.trim() || applicationTypeLabels[application.type]}
-                        </DataTableClamp>
-                        <div className="mt-1 text-xs text-[var(--muted)]">{applicationTypeLabels[application.type]}</div>
+                      <DataTableCell className="max-w-[240px]">
+                        <DataTableClamp className="font-semibold">{applicationTypeLabels[application.type]}</DataTableClamp>
+                        {application.subject ? <DataTableClamp className="mt-1 text-xs text-[var(--muted)]">{application.subject}</DataTableClamp> : null}
                       </DataTableCell>
-                      <DataTableCell>
-                        <StatusBadge variant={applicationStatusBadgeVariants[application.status]}>
-                          {applicationStatusLabels[application.status]}
-                        </StatusBadge>
+                      <DataTableCell className="max-w-[300px]">
+                        <DataTableClamp className="font-semibold">{identity.primary}</DataTableClamp>
+                        {identity.secondary ? <DataTableClamp className="mt-1 text-xs text-[var(--muted)]">{identity.secondary}</DataTableClamp> : null}
                       </DataTableCell>
                       <DataTableCell className="text-[var(--muted)]">
                         <div>{application.city?.name ?? 'Город не указан'}</div>
                         {application.vacancy ? (
-                          <DataTableClamp className="mt-1 text-xs">
-                            Вакансия: {application.vacancy.title} /{application.vacancy.slug}
-                          </DataTableClamp>
+                          <div className="mt-1 text-xs">
+                            <DataTableClamp>Вакансия: {application.vacancy.title}</DataTableClamp>
+                            <DataTableClamp className="mt-1 text-[var(--muted)]">/{application.vacancy.slug}</DataTableClamp>
+                          </div>
                         ) : null}
                       </DataTableCell>
                       <DataTableCell>
+                        <AdminStatusChip variant={applicationStatusBadgeVariants[application.status]}>
+                          {applicationStatusLabels[application.status]}
+                        </AdminStatusChip>
+                      </DataTableCell>
+                      <DataTableCell>
                         <div className="flex flex-wrap gap-1.5">
-                          {application.resumeFileId ? <StatusBadge variant="neutral">Резюме</StatusBadge> : null}
-                          {application.consentAcceptedAt ? <StatusBadge variant="success">Согласие</StatusBadge> : null}
-                          {application.email || application.phone || application.telegram ? <StatusBadge variant="neutral">Контакты</StatusBadge> : null}
+                          {application.resumeFileId ? <AdminStatusChip variant="neutral">Резюме</AdminStatusChip> : null}
+                          {application.consentAcceptedAt ? <AdminStatusChip variant="success">Согласие</AdminStatusChip> : null}
+                          {application.email || application.phone || application.telegram ? <AdminStatusChip variant="neutral">Контакты</AdminStatusChip> : null}
                           {!application.resumeFileId && !application.consentAcceptedAt && !application.email && !application.phone && !application.telegram ? (
                             <span className="text-sm text-[var(--muted)]">Нет</span>
                           ) : null}
                         </div>
                       </DataTableCell>
-                      <DataTableCell>
+                      <DataTableCell className="text-[var(--muted)]">
+                        {dateTimeFormatter.format(application.createdAt)}
+                      </DataTableCell>
+                      <DataTableCell className="max-w-[260px]">
                         <DataTableClamp className={actionLabel === 'Контроль не требуется' ? 'text-[var(--muted)]' : 'font-medium'}>
                           {actionLabel}
                         </DataTableClamp>
-                      </DataTableCell>
-                      <DataTableCell className="text-[var(--muted)]">
-                        {dateTimeFormatter.format(application.createdAt)}
                       </DataTableCell>
                       <DataTableActionsCell>
                         <Button className="min-h-9 px-3 py-1.5 text-xs" href={`/admin/applications/${application.id}`} variant="secondary">

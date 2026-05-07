@@ -115,12 +115,13 @@ export default async function AdminVacanciesPage({ searchParams }: AdminVacancie
   ]);
   const totalPages = getAdminTotalPages(total);
   const vacancyCountByStatus = new Map(vacancyStatusCounts.map((item) => [item.status, item._count._all] as const));
+  const hasActiveFilters = Boolean(q || status || categoryId || cityId || employmentType);
 
   return (
     <div className="space-y-8">
       <AdminPageIntro
         action={
-          <Button href={`${ADMIN_VACANCIES_PATH}/create`} variant="secondary">
+          <Button href={`${ADMIN_VACANCIES_PATH}/create`}>
             Новая вакансия
           </Button>
         }
@@ -138,7 +139,7 @@ export default async function AdminVacanciesPage({ searchParams }: AdminVacancie
           { name: 'employmentType', label: 'Тип занятости', allLabel: 'Все типы', options: [...vacancyEmploymentTypeOptions] }
         ]}
         params={params}
-        searchPlaceholder="Поиск по вакансии, компании или позиции"
+        searchPlaceholder="Поиск по названию"
       />
 
       <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
@@ -157,7 +158,12 @@ export default async function AdminVacanciesPage({ searchParams }: AdminVacancie
         </div>
 
         {vacancies.length === 0 ? (
-          <EmptyState title="Вакансий пока нет" />
+          <EmptyState
+            actionHref={hasActiveFilters ? ADMIN_VACANCIES_PATH : `${ADMIN_VACANCIES_PATH}/create`}
+            actionLabel={hasActiveFilters ? 'Сбросить фильтры' : 'Создать вакансию'}
+            description={hasActiveFilters ? 'По текущим фильтрам вакансий нет.' : 'Добавьте первую вакансию и настройте её публикацию.'}
+            title={hasActiveFilters ? 'Вакансии не найдены' : 'Вакансий пока нет'}
+          />
         ) : (
           <AdminTableFrame>
             <AdminTable>

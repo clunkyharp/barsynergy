@@ -1,9 +1,9 @@
 import { notFound } from 'next/navigation';
 import { CategoryType, ContentStatus } from '@prisma/client';
 import { deleteArticleDraft, updateArticle } from '@/app/admin/articles/actions';
+import { AdminCmsActions, AdminCmsAdvancedSection, AdminCmsForm, AdminCmsGrid, AdminCmsSection, AdminCmsSummary } from '@/components/admin/admin-cms-form';
 import { AdminActionAlert, CoverImageField, HiddenRedirect } from '@/components/admin/content-admin-controls';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import { CheckboxField } from '@/components/ui/checkbox-field';
 import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
@@ -73,16 +73,37 @@ export default async function AdminArticleDetailPage({ params, searchParams }: A
 
       <AdminActionAlert params={query} />
 
-      <Card className="p-5">
-        <form action={updateArticle} className="grid gap-5 lg:grid-cols-2">
+      <AdminCmsForm action={updateArticle}>
           <HiddenRedirect value={currentPath} />
           <input name="articleId" type="hidden" value={article.id} />
+          <AdminCmsSummary
+            items={[
+              { label: 'Статус', value: contentStatusLabels[article.status] },
+              { label: 'Адрес', value: `/${article.slug}` },
+              { label: 'Автор', value: article.authorName ?? 'Не указан' },
+              { label: 'Теги', value: article.tags.length }
+            ]}
+            actions={
+              article.status === ContentStatus.PUBLISHED ? (
+                <Button href={`/articles/${article.slug}`} size="sm" variant="secondary">
+                  Открыть страницу
+                </Button>
+              ) : null
+            }
+          />
+          <AdminCmsSection title="Публикация" description="Название и адрес материала.">
+            <AdminCmsGrid>
           <FormField htmlFor="article-title" label="Заголовок">
             <Input id="article-title" name="title" required minLength={2} maxLength={160} defaultValue={article.title} />
           </FormField>
           <FormField htmlFor="article-slug" label="Адрес страницы">
             <Input id="article-slug" name="slug" maxLength={180} defaultValue={article.slug} />
           </FormField>
+            </AdminCmsGrid>
+          </AdminCmsSection>
+
+          <AdminCmsSection title="Классификация" description="Рубрика и город для публичных фильтров.">
+            <AdminCmsGrid>
           <FormField htmlFor="article-categoryId" label="Категория">
             <Select id="article-categoryId" name="categoryId" defaultValue={article.categoryId ?? ''}>
               <option value="">Без категории</option>
@@ -103,6 +124,15 @@ export default async function AdminArticleDetailPage({ params, searchParams }: A
               ))}
             </Select>
           </FormField>
+            </AdminCmsGrid>
+          </AdminCmsSection>
+
+          <AdminCmsAdvancedSection
+            defaultOpen={Boolean(article.authorName || article.sourceLabel || article.readingTimeMinutes)}
+            title="Редакционные данные"
+            description="Автор, источник и время чтения. Вторичные поля раскрыты только если уже заполнены."
+          >
+            <AdminCmsGrid>
           <FormField htmlFor="article-authorName" label="Автор">
             <Input id="article-authorName" name="authorName" maxLength={120} defaultValue={article.authorName ?? ''} />
           </FormField>
@@ -119,7 +149,17 @@ export default async function AdminArticleDetailPage({ params, searchParams }: A
               defaultValue={article.readingTimeMinutes ?? ''}
             />
           </FormField>
+            </AdminCmsGrid>
+          </AdminCmsAdvancedSection>
+
+          <AdminCmsSection title="Медиа" description="Обложка и alt-текст для карточки и страницы материала.">
+            <AdminCmsGrid>
           <CoverImageField id="article-coverImage" currentName={article.coverImage?.originalName} currentAlt={article.coverImageAlt} />
+            </AdminCmsGrid>
+          </AdminCmsSection>
+
+          <AdminCmsSection title="Статус и настройки" description="Публикационный статус и теги материала.">
+            <AdminCmsGrid>
           <FormField htmlFor="article-status" label="Статус">
             <Select id="article-status" name="status" defaultValue={article.status}>
               {Object.values(ContentStatus).map((status) => (
@@ -147,12 +187,14 @@ export default async function AdminArticleDetailPage({ params, searchParams }: A
               </div>
             </div>
           ) : null}
-          <div className="lg:col-span-2">
+            </AdminCmsGrid>
+          </AdminCmsSection>
+
+          <AdminCmsSection title="Контент" description="Короткое описание для списков и основной текст материала.">
+            <div className="grid gap-4">
             <FormField htmlFor="article-summary" label="Краткое описание">
               <Textarea id="article-summary" name="summary" required minLength={10} maxLength={500} defaultValue={article.summary} />
             </FormField>
-          </div>
-          <div className="lg:col-span-2">
             <FormField htmlFor="article-body" label="Текст">
               <Textarea
                 id="article-body"
@@ -164,12 +206,16 @@ export default async function AdminArticleDetailPage({ params, searchParams }: A
                 defaultValue={article.body}
               />
             </FormField>
-          </div>
-          <div className="lg:col-span-2">
+            </div>
+          </AdminCmsSection>
+
+          <AdminCmsActions>
+            <Button href={ADMIN_ARTICLES_PATH} type="button" variant="secondary">
+              Отмена
+            </Button>
             <Button type="submit">Сохранить статью</Button>
-          </div>
-        </form>
-      </Card>
+          </AdminCmsActions>
+      </AdminCmsForm>
 
       {article.status !== ContentStatus.PUBLISHED ? (
         <form action={deleteArticleDraft}>

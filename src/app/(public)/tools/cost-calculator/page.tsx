@@ -11,10 +11,10 @@ export default function CostCalculatorPage() {
   return (
     <>
       <EditorialPublicPage
-        description="Быстрый расчёт себестоимости напитка или позиции меню: ингредиенты, итоговая себестоимость и рекомендованная цена продажи."
+        description="Рабочий расчёт для напитка или позиции меню: ингредиенты, итоговая себестоимость и ориентир по цене продажи."
         eyebrow="Инструменты"
         metrics={[
-          { value: 'Быстрый расчёт', label: 'без сохранения данных' },
+          { value: 'Быстрый расчёт', label: 'для меню' },
           { value: '₽', label: 'расчёт в рублях' },
           { value: '%', label: 'целевая доля себестоимости' }
         ]}
@@ -38,11 +38,11 @@ export default function CostCalculatorPage() {
         ]}
         rowsHeading="Как считать"
         secondaryLink={{ label: 'К знаниям', href: '/articles' }}
-        summary="Инструмент работает на странице и не требует регистрации. Сохранение расчётов, база ингредиентов и экспорт остаются для следующих этапов."
+        summary="Подходит для предварительной проверки меню, обучения команды и расчёта новой позиции."
         summaryHeading="Для меню и обучения"
         title="Калькулятор себестоимости"
       />
-      <div id="calculator">
+      <div className="scroll-mt-24 md:scroll-mt-28" id="calculator">
         <CostCalculatorClient />
       </div>
     </>

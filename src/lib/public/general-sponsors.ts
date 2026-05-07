@@ -8,9 +8,13 @@ export type GeneralSponsorContact = {
   href: string;
 };
 
+export type GeneralSponsorLinkKind = 'email' | 'instagram' | 'telegram' | 'website' | 'whatsapp';
+
 export type GeneralSponsorLink = {
+  kind: GeneralSponsorLinkKind;
   label: string;
   href: string;
+  value: string;
 };
 
 export type GeneralSponsor = {
@@ -27,6 +31,10 @@ export type GeneralSponsor = {
   links: GeneralSponsorLink[];
   logoSrc?: string;
   logoAlt: string;
+  brandLogos: {
+    src: string;
+    alt: string;
+  }[];
 };
 
 type SponsorFile = {
@@ -61,11 +69,15 @@ function splitLoose(value?: string | null) {
     .filter(Boolean);
 }
 
-function phoneHref(phone: string) {
+export function normalizeRussianPhoneHref(phone: string) {
   const digits = phone.replace(/\D/g, '');
 
   if (digits.length === 11 && digits.startsWith('8')) {
     return `tel:+7${digits.slice(1)}`;
+  }
+
+  if (digits.length === 10 && digits.startsWith('9')) {
+    return `tel:+7${digits}`;
   }
 
   if (digits.length > 0) {
@@ -75,12 +87,102 @@ function phoneHref(phone: string) {
   return `tel:${phone}`;
 }
 
+function normalizeExternalHref(value: string) {
+  const trimmed = value.trim();
+
+  if (!trimmed) {
+    return undefined;
+  }
+
+  if (/^(https?:|mailto:|tel:)/i.test(trimmed)) {
+    return trimmed;
+  }
+
+  return `https://${trimmed}`;
+}
+
+function normalizeInstagramHref(value: string) {
+  const trimmed = value.trim();
+
+  if (/^https?:\/\//i.test(trimmed)) {
+    return trimmed;
+  }
+
+  const handle = trimmed.replace(/^@/, '').replace(/^instagram\.com\//i, '').replace(/\/$/, '');
+
+  return handle ? `https://instagram.com/${handle}` : undefined;
+}
+
+function normalizeTelegramHref(value: string) {
+  const trimmed = value.trim();
+
+  if (/^https?:\/\//i.test(trimmed)) {
+    return trimmed;
+  }
+
+  const handle = trimmed.replace(/^@/, '').replace(/^t\.me\//i, '').replace(/\/$/, '');
+
+  return handle ? `https://t.me/${handle}` : undefined;
+}
+
+function normalizeWhatsappHref(value: string) {
+  const trimmed = value.trim();
+
+  if (/^https?:\/\//i.test(trimmed)) {
+    return trimmed;
+  }
+
+  const digits = trimmed.replace(/\D/g, '');
+
+  if (digits.length === 11 && digits.startsWith('8')) {
+    return `https://wa.me/7${digits.slice(1)}`;
+  }
+
+  if (digits.length === 10 && digits.startsWith('9')) {
+    return `https://wa.me/7${digits}`;
+  }
+
+  if (digits.length > 0) {
+    return `https://wa.me/${digits}`;
+  }
+
+  return undefined;
+}
+
+function sponsorLink(kind: GeneralSponsorLinkKind, label: string, rawValue?: string | null, href?: string) {
+  const value = rawValue?.trim();
+  const normalizedHref = href?.trim();
+
+  if (!value || !normalizedHref) {
+    return undefined;
+  }
+
+  return { kind, label, href: normalizedHref, value };
+}
+
 function sponsorTitle(brands: string[]) {
   if (brands.length === 0) {
     return 'Генеральный партнёр BARSYNERGY';
   }
 
   return `Официальные представители ${brands.slice(0, 2).join(' и ')}`;
+}
+
+const representedBrandLogos: Record<string, { src: string; alt: string }> = {
+  agrobar: {
+    src: '/brand/sponsors/agrobar-logo.png',
+    alt: 'Логотип Agrobar'
+  }
+};
+
+function brandLogoKey(brand: string) {
+  return brand.toLocaleLowerCase('ru').replace(/[^a-zа-яё0-9]+/gi, '');
+}
+
+function resolveRepresentedBrandLogos(brands: string[]) {
+  return brands
+    .map((brand) => representedBrandLogos[brandLogoKey(brand)])
+    .filter(Boolean);
 }
 
 export async function getPublishedGeneralSponsors(limit?: number): Promise<GeneralSponsor[]> {
@@ -99,16 +201,16 @@ export async function getPublishedGeneralSponsors(limit?: number): Promise<Gener
     const names = splitLoose(sponsor.contactName);
     const phones = splitLoose(sponsor.contactPhone);
     const contacts = phones.map((phone, index) => ({
-      name: names[index] ?? sponsor.contactName ?? 'Контакт',
+      name: names[index] ?? names[0] ?? 'Контакт',
       phone,
-      href: phoneHref(phone)
+      href: normalizeRussianPhoneHref(phone)
     }));
     const links = [
-      sponsor.websiteUrl ? { label: 'Сайт', href: sponsor.websiteUrl } : undefined,
-      sponsor.instagramUrl ? { label: 'Instagram', href: sponsor.instagramUrl } : undefined,
-      sponsor.whatsappUrl ? { label: 'WhatsApp', href: sponsor.whatsappUrl } : undefined,
-      sponsor.telegramUrl ? { label: 'Telegram', href: sponsor.telegramUrl } : undefined,
-      sponsor.contactEmail ? { label: 'Email', href: `mailto:${sponsor.contactEmail}` } : undefined
+      sponsorLink('telegram', 'Telegram', sponsor.telegramUrl, sponsor.telegramUrl ? normalizeTelegramHref(sponsor.telegramUrl) : undefined),
+      sponsorLink('whatsapp', 'WhatsApp', sponsor.whatsappUrl, sponsor.whatsappUrl ? normalizeWhatsappHref(sponsor.whatsappUrl) : undefined),
+      sponsorLink('email', 'Email', sponsor.contactEmail, sponsor.contactEmail ? `mailto:${sponsor.contactEmail.trim()}` : undefined),
+      sponsorLink('website', 'Сайт', sponsor.websiteUrl, sponsor.websiteUrl ? normalizeExternalHref(sponsor.websiteUrl) : undefined),
+      sponsorLink('instagram', 'Instagram', sponsor.instagramUrl, sponsor.instagramUrl ? normalizeInstagramHref(sponsor.instagramUrl) : undefined)
     ].filter(Boolean) as GeneralSponsorLink[];
 
     return {
@@ -124,7 +226,8 @@ export async function getPublishedGeneralSponsors(limit?: number): Promise<Gener
       contacts,
       links,
       logoSrc: publicImageUrl(sponsor.logoImage, sponsor.logoPath),
-      logoAlt: `Логотип ${sponsor.name}`
+      logoAlt: `Логотип ${sponsor.name}`,
+      brandLogos: resolveRepresentedBrandLogos(brands)
     };
   });
 }

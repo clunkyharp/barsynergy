@@ -288,27 +288,25 @@ export async function deleteSupplierDraft(formData: FormData) {
     });
 
     const deletedSupplier = await prisma.$transaction(async (tx) => {
-      const supplier = await tx.supplier.findFirst({
+      const supplier = await tx.supplier.findUnique({
         where: {
-          id: parsed.supplierId,
-          status: { not: ContentStatus.PUBLISHED }
+          id: parsed.supplierId
         },
         select: { coverImageId: true }
       });
 
       if (!supplier) {
-        throw new Error('draft is invalid');
+        throw new Error('record is invalid');
       }
 
       const deletion = await tx.supplier.deleteMany({
         where: {
-          id: parsed.supplierId,
-          status: { not: ContentStatus.PUBLISHED }
+          id: parsed.supplierId
         }
       });
 
       if (deletion.count !== 1) {
-        throw new Error('draft is invalid');
+        throw new Error('record is invalid');
       }
 
       return supplier;
@@ -317,7 +315,7 @@ export async function deleteSupplierDraft(formData: FormData) {
     await deleteUploadedFileIfUnused(deletedSupplier.coverImageId);
 
     revalidatePath(ADMIN_SUPPLIERS_PATH);
-    result = { type: 'success', message: 'Черновик поставщика удален.' };
+    result = { type: 'success', message: 'Поставщик удален.' };
   } catch (error) {
     result = { type: 'error', message: formatAdminActionError(error) };
   }

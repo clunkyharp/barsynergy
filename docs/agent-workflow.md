@@ -123,7 +123,8 @@ Before accepting subagent work, the central agent checks:
 - visual system consistency;
 - mobile behavior for public UI;
 - migration safety for database changes;
-- lint/typecheck/build results when applicable;
+- lint, typecheck and targeted test results when applicable;
+- `npm run build` result before commit, or an explicit note that no commit is being made;
 - remaining risks.
 
 Subagent output is advisory until the central agent verifies it.

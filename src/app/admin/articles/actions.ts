@@ -344,27 +344,25 @@ export async function deleteArticleDraft(formData: FormData) {
     });
 
     const deletedArticle = await prisma.$transaction(async (tx) => {
-      const article = await tx.article.findFirst({
+      const article = await tx.article.findUnique({
         where: {
-          id: parsed.articleId,
-          status: { not: ContentStatus.PUBLISHED }
+          id: parsed.articleId
         },
         select: { coverImageId: true }
       });
 
       if (!article) {
-        throw new Error('draft is invalid');
+        throw new Error('record is invalid');
       }
 
       const deletion = await tx.article.deleteMany({
         where: {
-          id: parsed.articleId,
-          status: { not: ContentStatus.PUBLISHED }
+          id: parsed.articleId
         }
       });
 
       if (deletion.count !== 1) {
-        throw new Error('draft is invalid');
+        throw new Error('record is invalid');
       }
 
       return article;
@@ -373,7 +371,7 @@ export async function deleteArticleDraft(formData: FormData) {
     await deleteUploadedFileIfUnused(deletedArticle.coverImageId);
 
     revalidatePath(ADMIN_ARTICLES_PATH);
-    result = { type: 'success', message: 'Черновик статьи удален.' };
+    result = { type: 'success', message: 'Статья удалена.' };
   } catch (error) {
     result = { type: 'error', message: formatAdminActionError(error) };
   }

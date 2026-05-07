@@ -24,7 +24,10 @@ import {
   ADMIN_CONTENT_PAGE_SIZE,
   contentStatusBadgeVariants,
   contentStatusLabels,
+  courseFormatOptions,
+  courseLevelOptions,
   getAdminCurrentPath,
+  getAdminOptionLabel,
   getAdminPage,
   getAdminTotalPages,
   type AdminContentSearchParams
@@ -87,7 +90,12 @@ export default async function AdminCoursesPage({ searchParams }: AdminCoursesPag
         </div>
 
         {courses.length === 0 ? (
-          <EmptyState title="Курсов пока нет" />
+          <EmptyState
+            actionHref={`${ADMIN_COURSES_PATH}/create`}
+            actionLabel="Создать курс"
+            description="Добавьте программу, интенсив или другой учебный формат для публикации в разделе образования."
+            title="Курсов пока нет"
+          />
         ) : (
           <AdminTableFrame>
             <AdminTable minWidth={1040}>
@@ -113,9 +121,11 @@ export default async function AdminCoursesPage({ searchParams }: AdminCoursesPag
                       ) : null}
                     </AdminTableCell>
                     <AdminTableCell className="text-[var(--muted)]">
-                      <div>{course.format ?? 'Формат не указан'}</div>
+                      <div>{getAdminOptionLabel(courseFormatOptions, course.format, 'Формат не указан')}</div>
                       {course.durationLabel ? <div className="mt-1 text-xs">{course.durationLabel}</div> : null}
-                      {course.level ? <div className="mt-1 text-xs">{course.level}</div> : null}
+                      {course.level ? (
+                        <div className="mt-1 text-xs">{getAdminOptionLabel(courseLevelOptions, course.level)}</div>
+                      ) : null}
                       {course.priceLabel ? <div className="mt-1 text-xs">{course.priceLabel}</div> : null}
                     </AdminTableCell>
                     <AdminTableCell className="text-[var(--muted)]">{course.city?.name ?? '-'}</AdminTableCell>

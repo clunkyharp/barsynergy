@@ -1,4 +1,5 @@
 import { cloneElement, isValidElement, type ReactElement, type ReactNode } from 'react';
+import { formActionsClassName, formSectionClassName } from '@/components/ui/field-styles';
 import { cn } from '@/lib/utils';
 
 type FormFieldProps = {
@@ -8,43 +9,101 @@ type FormFieldProps = {
   hint?: string;
   className?: string;
   children: ReactNode;
+  required?: boolean;
+  success?: string;
 };
 
-export function FormField({ label, htmlFor, error, hint, className, children }: FormFieldProps) {
+export function FieldLabel({
+  children,
+  className,
+  htmlFor,
+  required
+}: {
+  children: ReactNode;
+  className?: string;
+  htmlFor: string;
+  required?: boolean;
+}) {
+  return (
+    <label className={cn('field-label', className)} htmlFor={htmlFor}>
+      {children}
+      {required ? <span aria-hidden="true" className="text-[var(--accent)]"> *</span> : null}
+    </label>
+  );
+}
+
+export function FieldHint({ children, className, id }: { children: ReactNode; className?: string; id?: string }) {
+  return (
+    <p className={cn('field-hint', className)} id={id}>
+      {children}
+    </p>
+  );
+}
+
+export function FieldError({ children, className, id }: { children: ReactNode; className?: string; id?: string }) {
+  return (
+    <p className={cn('field-error', className)} id={id}>
+      {children}
+    </p>
+  );
+}
+
+export function FormField({ label, htmlFor, error, hint, className, children, required, success }: FormFieldProps) {
   const errorId = `${htmlFor}-error`;
   const hintId = `${htmlFor}-hint`;
+  const successId = `${htmlFor}-success`;
+  const isRequired = required ?? (isValidElement(children) ? Boolean((children as ReactElement<{ required?: boolean }>).props.required) : false);
   let field = children;
 
-  if ((error || hint) && isValidElement(children)) {
+  if ((error || hint || success) && isValidElement(children)) {
     const child = children as ReactElement<{
       'aria-describedby'?: string;
       'aria-invalid'?: boolean;
+      'data-state'?: string;
     }>;
 
     field = cloneElement(child, {
-      'aria-describedby': [child.props['aria-describedby'], hint ? hintId : null, error ? errorId : null]
+      'aria-describedby': [child.props['aria-describedby'], hint ? hintId : null, error ? errorId : null, success ? successId : null]
         .filter(Boolean)
         .join(' '),
-      'aria-invalid': error ? true : child.props['aria-invalid']
+      'aria-invalid': error ? true : child.props['aria-invalid'],
+      'data-state': error ? 'error' : success ? 'success' : child.props['data-state']
     });
   }
 
   return (
-    <div className={cn('space-y-2.5', className)}>
-      <label className="block text-[12px] font-semibold uppercase tracking-[0.12em] text-[var(--muted)]" htmlFor={htmlFor}>
-        {label}
-      </label>
+    <div className={cn('form-field', className)} data-state={error ? 'error' : success ? 'success' : undefined}>
+      <FieldLabel htmlFor={htmlFor} required={isRequired}>{label}</FieldLabel>
       {field}
-      {hint ? (
-        <p className="text-sm leading-6 text-[var(--muted)]" id={hintId}>
-          {hint}
-        </p>
-      ) : null}
-      {error ? (
-        <p className="text-sm leading-6 text-[var(--danger)]" id={errorId}>
-          {error}
-        </p>
-      ) : null}
+      {hint ? <FieldHint id={hintId}>{hint}</FieldHint> : null}
+      {success ? <p className="field-success" id={successId}>{success}</p> : null}
+      {error ? <FieldError id={errorId}>{error}</FieldError> : null}
     </div>
   );
+}
+
+export function FormSection({
+  children,
+  className,
+  description,
+  title
+}: {
+  children: ReactNode;
+  className?: string;
+  description?: string;
+  title: string;
+}) {
+  return (
+    <section className={cn(formSectionClassName, className)}>
+      <div className="form-section-header">
+        <h3 className="form-section-title">{title}</h3>
+        {description ? <p className="form-section-description">{description}</p> : null}
+      </div>
+      <div className="form-section-body">{children}</div>
+    </section>
+  );
+}
+
+export function FormActions({ children, className }: { children: ReactNode; className?: string }) {
+  return <div className={cn(formActionsClassName, className)}>{children}</div>;
 }

@@ -285,27 +285,25 @@ export async function deleteCourseDraft(formData: FormData) {
     });
 
     const deletedCourse = await prisma.$transaction(async (tx) => {
-      const course = await tx.course.findFirst({
+      const course = await tx.course.findUnique({
         where: {
-          id: parsed.courseId,
-          status: { not: ContentStatus.PUBLISHED }
+          id: parsed.courseId
         },
         select: { coverImageId: true }
       });
 
       if (!course) {
-        throw new Error('draft is invalid');
+        throw new Error('record is invalid');
       }
 
       const deletion = await tx.course.deleteMany({
         where: {
-          id: parsed.courseId,
-          status: { not: ContentStatus.PUBLISHED }
+          id: parsed.courseId
         }
       });
 
       if (deletion.count !== 1) {
-        throw new Error('draft is invalid');
+        throw new Error('record is invalid');
       }
 
       return course;
@@ -314,7 +312,7 @@ export async function deleteCourseDraft(formData: FormData) {
     await deleteUploadedFileIfUnused(deletedCourse.coverImageId);
 
     revalidatePath(ADMIN_COURSES_PATH);
-    result = { type: 'success', message: 'Черновик курса удален.' };
+    result = { type: 'success', message: 'Курс удален.' };
   } catch (error) {
     result = { type: 'error', message: formatAdminActionError(error) };
   }

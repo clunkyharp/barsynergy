@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { MetaChip } from '@/components/ui/meta-chip';
 import { Panel } from '@/components/ui/panel';
 import { displayFont } from '@/lib/fonts';
-import type { PublishedContentList, PublishedContentMetaGroup } from '@/lib/public/content';
+import type { PublishedContentList } from '@/lib/public/content';
 import { cn } from '@/lib/utils';
 
 type LinkAction = {
@@ -50,7 +50,7 @@ export function PlatformActionCard({
         </div>
 
         <div className="min-w-0 rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--surface-wash)] p-4">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Как это работает</p>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Шаги</p>
           <ol className="mt-4 grid gap-0">
             {steps.map((step, index) => (
               <li className="grid min-h-[3.7rem] grid-cols-[2rem_minmax(0,1fr)] gap-3" key={step}>
@@ -210,9 +210,9 @@ export function DateBlock({ date }: { date: string }) {
   const weekday = isValid ? value.toLocaleDateString('ru-RU', { weekday: 'short' }).replace('.', '') : '';
 
   return (
-    <div className="w-full rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--surface-wash)] p-3 text-center md:w-20">
+    <div className="flex w-20 flex-col self-start rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--surface-wash)] p-3 text-left md:justify-center md:text-center">
       <span className="block text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">{weekday}</span>
-      <span className="mt-1 block text-[2rem] font-semibold leading-none text-[var(--text)]">{day}</span>
+      <span className="mt-1 block text-[1.65rem] font-semibold leading-none text-[var(--text)] md:text-[2rem]">{day}</span>
       {month ? <span className="mt-1 block text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--accent)]">{month}</span> : null}
     </div>
   );
@@ -229,23 +229,57 @@ export type ToolTeaserContent = {
   actionHref: string;
 };
 
+function cleanCalculatorTeaserText(value: string) {
+  return value
+    .replace(/\s*без регистрации и сохранения данных/giu, '')
+    .replace(/\s*без регистрации/giu, '')
+    .replace(/\s*и сохранения данных/giu, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 export function ToolTeaser({ teaser }: { teaser: ToolTeaserContent }) {
+  const steps = teaser.steps.slice(0, 3);
+  const description = cleanCalculatorTeaserText(teaser.description);
+
   return (
-    <section className="background-zone background-zone-tool editorial-grid border-b border-[var(--line)] py-10 md:py-14">
-      <div className="container grid gap-8 xl:grid-cols-[minmax(16rem,0.58fr)_minmax(0,1.42fr)]">
-        <div className="min-w-0">
-          <PublicEyebrow>{teaser.eyebrow}</PublicEyebrow>
-          <PublicDisplayTitle className="mt-3 max-w-[22rem] !text-[clamp(2rem,3vw,2.85rem)] [overflow-wrap:normal] [word-break:normal]">
-            {teaser.title}
-          </PublicDisplayTitle>
-        </div>
-        <PlatformActionCard
-          action={{ href: teaser.actionHref, label: teaser.actionLabel }}
-          description={teaser.description}
-          eyebrow={teaser.cardEyebrow}
-          steps={teaser.steps}
-          title={teaser.cardTitle}
-        />
+    <section className="background-zone background-zone-tool editorial-grid scroll-mt-28 border-b border-[var(--line)] py-10 md:py-14" id="home-calculator">
+      <div className="container">
+        <article className="mx-auto max-w-6xl overflow-hidden rounded-[var(--radius-xl)] border border-[var(--border-default)] bg-[var(--surface-wash)] shadow-[var(--shadow-panel)]">
+          <div className="grid gap-6 p-5 md:p-7 xl:grid-cols-[minmax(0,0.82fr)_minmax(18rem,0.46fr)] xl:items-center">
+            <div className="min-w-0">
+              <PublicDisplayTitle className="max-w-3xl !text-[clamp(2.2rem,4.8vw,4.6rem)] [overflow-wrap:normal] [word-break:normal]">
+                {teaser.title}
+              </PublicDisplayTitle>
+              <PublicBodyText className="mt-4 max-w-2xl" size="md">
+                {description}
+              </PublicBodyText>
+            </div>
+            <div className="min-w-0 rounded-[var(--radius-lg)] border border-[var(--border-inverse-soft)] bg-[var(--surface-inverse-card)] p-4 md:p-5">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--editorial-dark-muted)]">Практическая польза</p>
+              <p className="mt-3 text-sm leading-6 text-[var(--editorial-dark-text)]">{teaser.cardTitle}</p>
+              <Button className="mt-5 w-full rounded-[var(--radius-md)] px-5 sm:w-fit" href={teaser.actionHref}>
+                {teaser.actionLabel}
+                <ArrowUpRight size={16} />
+              </Button>
+            </div>
+          </div>
+          {steps.length > 0 ? (
+            <div className="border-t border-[var(--line)] px-5 py-4 md:px-7">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Как считать</p>
+              <ol className="mt-4 grid divide-y divide-[var(--line)] border-y border-[var(--line)] md:grid-cols-3 md:divide-x md:divide-y-0">
+                {steps.map((step, index) => (
+                  <li className="grid grid-cols-[2rem_minmax(0,1fr)] gap-3 py-3 md:px-4 md:first:pl-0 md:last:pr-0" key={step}>
+                    <span className="flex size-8 items-center justify-center rounded-[var(--radius-sm)] border border-[var(--accent)]/22 bg-[var(--accent-soft)] text-[11px] font-semibold tabular-nums text-[var(--accent)]">
+                      {String(index + 1).padStart(2, '0')}
+                    </span>
+                    <span className="pt-1 text-sm leading-6 text-[var(--text)]">{step}</span>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          ) : null}
+        </article>
       </div>
     </section>
   );
@@ -285,23 +319,6 @@ function monthLabel(dateIso?: string) {
   }
 
   return value.toLocaleDateString('ru-RU', { month: 'long', year: 'numeric' });
-}
-
-function renderEntityMeta(entry: PublishedContentMetaGroup) {
-  return (
-    <span
-      className={cn(
-        'inline-flex max-w-full items-center gap-2 rounded-[var(--radius-sm)] border px-3 py-1.5 text-[11px] leading-5 text-[var(--text)]',
-        entry.tone === 'accent'
-          ? 'border-[rgba(101,32,27,0.22)] bg-[rgba(101,32,27,0.05)] font-semibold text-[var(--accent)]'
-          : 'border-[var(--border-default)] bg-[var(--surface-wash)]'
-      )}
-      key={`${entry.label ?? 'meta'}-${entry.value}`}
-    >
-      {entry.label ? <span className="font-semibold uppercase tracking-[0.12em] text-[var(--muted)]">{entry.label}</span> : null}
-      <span className="break-words">{entry.value}</span>
-    </span>
-  );
 }
 
 export function EventAgendaSection({
@@ -350,7 +367,7 @@ export function EventAgendaSection({
               <Button href="/events" variant="secondary">
                 Сбросить фильтры
               </Button>
-              <Button href="/events?intent=proposal#applications">Предложить событие</Button>
+              <Button href="/events?intent=proposal#event-request">Предложить событие</Button>
             </div>
           </Panel>
         ) : (
@@ -365,7 +382,7 @@ export function EventAgendaSection({
                 <div className="grid gap-4">
                   {group.items.map((item) => (
                     <article
-                      className="grid gap-5 rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[color-mix(in_oklab,var(--surface),white_18%)] p-4 shadow-[0_12px_34px_rgba(20,20,18,0.03)] transition hover:border-[var(--accent)]/28 hover:bg-[color-mix(in_oklab,var(--surface),white_24%)] md:grid-cols-[5.5rem_minmax(0,1fr)_minmax(13rem,0.34fr)_9rem] md:items-center md:p-5"
+                      className="grid gap-4 rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[color-mix(in_oklab,var(--surface),white_18%)] p-4 shadow-[0_12px_34px_rgba(20,20,18,0.03)] transition hover:border-[var(--accent)]/28 hover:bg-[color-mix(in_oklab,var(--surface),white_24%)] md:grid-cols-[5.5rem_minmax(0,1fr)_minmax(12rem,0.32fr)] md:p-5"
                       key={item.id}
                     >
                       <DateBlock date={item.dateIso ?? ''} />
@@ -374,19 +391,23 @@ export function EventAgendaSection({
                           <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">
                             {item.label ?? 'Событие'}
                           </p>
-                          {item.statusLabel ? (
-                            <span className="rounded-[var(--radius-sm)] border border-[var(--accent)]/20 bg-[var(--accent-soft)] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--accent)]">
-                              {item.statusLabel}
-                            </span>
-                          ) : null}
                         </div>
-                        <h3 className={`${displayFont.className} mt-2 text-[1.65rem] font-semibold leading-none text-[var(--text)] md:text-[2.2rem]`}>
+                        <h3 className={`${displayFont.className} mt-2 text-[1.45rem] font-semibold leading-none text-[var(--text)] sm:text-[1.65rem] md:text-[2.2rem]`}>
                           {item.title}
                         </h3>
                         {item.metaGroups && item.metaGroups.length > 0 ? (
-                          <div className="mt-4 flex flex-wrap gap-2.5">
-                            {item.metaGroups.map((entry) => renderEntityMeta(entry))}
-                          </div>
+                          <dl className="mt-4 grid gap-x-4 gap-y-2 sm:grid-cols-2">
+                            {item.metaGroups.map((entry) => (
+                              <div className="min-w-0 border-t border-[var(--line)] pt-2.5" key={`${entry.label ?? 'meta'}-${entry.value}`}>
+                                {entry.label ? (
+                                  <dt className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--muted)]">{entry.label}</dt>
+                                ) : null}
+                                <dd className={cn('mt-1 text-sm leading-5 text-[var(--text)]', entry.tone === 'accent' && 'font-semibold text-[var(--accent)]')}>
+                                  {entry.value}
+                                </dd>
+                              </div>
+                            ))}
+                          </dl>
                         ) : (
                           <div className="mt-3 flex flex-wrap gap-2">
                             {(item.meta ?? []).slice(0, 4).map((entry) => (
@@ -398,29 +419,37 @@ export function EventAgendaSection({
                         )}
                         <PublicBodyText className="mt-3 max-w-2xl">{item.summary}</PublicBodyText>
                       </div>
-                      <a
-                        aria-label={`Открыть событие: ${item.title}`}
-                        className="group relative min-h-[150px] overflow-hidden rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[rgba(20,20,18,0.08)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
-                        href={`/events/${item.slug}`}
-                      >
-                        {item.imageUrl ? (
-                          <span
-                            aria-hidden="true"
-                            className="absolute inset-0 bg-cover bg-center grayscale-[0.18] transition-transform duration-700 group-hover:scale-[1.04]"
-                            style={{ backgroundImage: `url("${item.imageUrl}")` }}
-                          />
-                        ) : (
-                          <span aria-hidden="true" className="absolute inset-0 bg-[linear-gradient(135deg,rgba(153,44,38,0.14),rgba(20,20,18,0.08))]" />
-                        )}
-                      </a>
-                      <div className="flex flex-col gap-3">
-                        <Button className="rounded-[var(--radius-md)] px-5" href={`/events/${item.slug}`} size="sm">
-                          Подробнее
-                        </Button>
-                        <Button className="rounded-[var(--radius-md)] px-5" href={`/events/${item.slug}#applications`} size="sm" variant="secondary">
-                          Записаться
-                        </Button>
-                      </div>
+                      <aside className="flex flex-col border-t border-[var(--line)] pt-4 md:col-span-1 md:min-h-full md:border-l md:border-t-0 md:pl-4 md:pt-0">
+                        <div className="grid gap-3">
+                          <div>
+                            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--accent)]">Следующий шаг</p>
+                            <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
+                              Детали, регистрация и контакт организатора открываются на странице события.
+                            </p>
+                          </div>
+                          {item.metaGroups?.[2] ? (
+                            <dl className="border-t border-[var(--line)] pt-3">
+                              <dt className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--muted)]">
+                                {item.metaGroups[2].label}
+                              </dt>
+                              <dd className="mt-1 text-sm font-semibold leading-5 text-[var(--text)]">{item.metaGroups[2].value}</dd>
+                            </dl>
+                          ) : null}
+                        </div>
+                        <div className="mt-4 grid grid-cols-2 gap-2 md:mt-auto md:grid-cols-1 md:pt-5">
+                          <Button className="rounded-[var(--radius-md)] px-4 md:px-5" href={`/events/${item.slug}`} size="sm">
+                            Открыть событие
+                          </Button>
+                          <Button
+                            className="rounded-[var(--radius-md)] px-4 md:px-5"
+                            href={`/events/${item.slug}#event-request`}
+                            size="sm"
+                            variant="secondary"
+                          >
+                            Записаться
+                          </Button>
+                        </div>
+                      </aside>
                     </article>
                   ))}
                 </div>

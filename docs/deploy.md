@@ -14,11 +14,11 @@ Production target is a Russian VPS/cloud, with Timeweb Cloud VPS as the primary 
 - Next.js app
 - Timeweb Cloud Object Storage for files
 
-Single-node fallback for first launch when external object storage or edge proxy is not ready:
+Single-node fallback for first launch when an external edge proxy is not ready:
 
 - direct TLS on the same host;
-- local MinIO as the S3-compatible storage backend;
-- one public app host that serves both the site and `/storage/*`.
+- one public app host that serves the site;
+- Timeweb Cloud Object Storage remains the production file storage backend.
 
 ## Production Flow
 
@@ -53,14 +53,15 @@ Status note, 2026-05-05: this single-node Nginx/TLS contract is the current laun
 
 ## Single-Node Fallback Contract
 
-For a temporary one-server launch, the repository also supports this narrower fallback:
+For a temporary one-server launch, the repository supports this narrower fallback:
 
 - Nginx listens on `80` and `443` directly on the app host;
 - Let's Encrypt terminates on the same host;
-- public S3-style file URLs are proxied through `https://<app-host>/storage/<bucket>/<fileKey>`;
-- MinIO runs inside the same Docker Compose stack and uses the same S3 credentials as the app.
+- production files are stored in Timeweb Cloud Object Storage with `STORAGE_DRIVER=s3`;
+- public file URLs are generated from `S3_ENDPOINT`, `S3_BUCKET_PUBLIC` and the stored file key;
+- `docker-compose.production.yml` does not run local MinIO, and `docker/nginx/nginx.conf` does not proxy `/storage/*`.
 
-This fallback keeps the app compatible with `STORAGE_DRIVER=s3`, but it is less isolated than the preferred external edge + external object storage production shape.
+This fallback keeps the app compatible with `STORAGE_DRIVER=s3`, but it is less isolated than the preferred external edge + external object storage production shape because Nginx and the app run on the same host.
 
 If S3-compatible storage is still unavailable, the last-resort launch path is:
 

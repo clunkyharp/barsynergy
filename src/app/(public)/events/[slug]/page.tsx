@@ -39,7 +39,7 @@ export default async function EventDetailPage({ params, searchParams }: EventDet
         imageUrl={event.imageUrl}
         label={event.label}
         meta={event.meta}
-        primaryLink={{ href: '#applications', label: 'Подать заявку' }}
+        primaryLink={{ href: '#event-request', label: 'Записаться' }}
         secondaryLink={{ href: '/events', label: 'Вернуться в афишу' }}
         sections={event.sections}
         summary={event.summary}

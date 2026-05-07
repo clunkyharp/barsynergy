@@ -6,6 +6,7 @@ import {
   updateBusinessDraftApplication
 } from '@/app/business/actions';
 import { AdminActionAlert } from '@/components/admin/content-admin-controls';
+import { NextActionPanel } from '@/components/business/business-cabinet';
 import { ActionRow } from '@/components/ui/action-row';
 import { Button } from '@/components/ui/button';
 import { CheckboxField } from '@/components/ui/checkbox-field';
@@ -225,11 +226,24 @@ export default async function BusinessRequestDetailPage({ params, searchParams }
           )}
         </Panel>
 
-        <div className="space-y-4">
-          {canEdit ? (
-            <Panel padding="md" tone="elevated">
-              <h2 className="text-lg font-semibold">Действия</h2>
-              <div className="mt-5 grid gap-3">
+        <NextActionPanel
+          description={
+            canEdit
+              ? 'Черновик можно сохранить, отправить на проверку или перенести в архив.'
+              : 'Заявка уже отправлена. Здесь доступен возврат к журналу компании.'
+          }
+          items={[
+            {
+              label: applicationStatusLabels[application.status],
+              detail: canEdit ? 'Заполните обязательные поля и отправьте заявку.' : 'Статус обновляется командой BARSYNERGY.',
+              status: canEdit ? 'черновик' : 'отправлена'
+            }
+          ]}
+          title="Действия по заявке"
+        >
+          <div className="grid gap-3">
+            {canEdit ? (
+              <>
                 <form action={submitBusinessDraftApplication}>
                   <input name="applicationId" type="hidden" value={application.id} />
                   <SubmitButton className="w-full">
@@ -242,13 +256,13 @@ export default async function BusinessRequestDetailPage({ params, searchParams }
                     Перенести в архив
                   </SubmitButton>
                 </form>
-              </div>
-            </Panel>
-          ) : null}
-          <Button href="/business/requests" variant="ghost">
-            Вернуться к заявкам
-          </Button>
-        </div>
+              </>
+            ) : null}
+            <Button href="/business/requests" variant="ghost">
+              Вернуться к заявкам
+            </Button>
+          </div>
+        </NextActionPanel>
       </div>
     </div>
   );

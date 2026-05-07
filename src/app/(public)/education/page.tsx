@@ -3,9 +3,9 @@ import { Suspense } from 'react';
 import { CategoryType } from '@prisma/client';
 import { Building2, ClipboardList, Gift, GraduationCap, Headphones, MonitorPlay, Zap } from 'lucide-react';
 import { EducationApplicationForms } from '@/components/public/education-application-forms';
+import { ProgramFormatMatrix } from '@/components/public/editorial-display-primitives';
 import { EditorialPublicPage } from '@/components/public/editorial-public-page';
 import { PublishedContentSection } from '@/components/public/published-content-section';
-import { PlatformFormatCard } from '@/components/public/platform-ui';
 import { PublicFeaturedContent } from '@/components/public/public-featured-content';
 import { PublicFilters } from '@/components/public/public-filters';
 import { PublicPrelaunchSection } from '@/components/public/public-prelaunch-section';
@@ -16,7 +16,6 @@ import {
   getPublicApplicationUtm,
   stripPublicApplicationResultParams
 } from '@/lib/applications/public-form-helpers';
-import { displayFont } from '@/lib/fonts';
 import { getPublishedCourses, hasActivePublicContentParams, type PublicContentSearchParams } from '@/lib/public/content';
 import { getCourseFilterOptions, getPublicCategoryOptions, getPublicCityFilterOptions } from '@/lib/public/filter-options';
 import { getEnv } from '@/lib/validation/env';
@@ -27,7 +26,7 @@ type EducationPageProps = {
 
 export const metadata: Metadata = {
   title: 'Образование',
-  description: 'Программы, интенсивы и практические занятия BARSYNERGY.'
+  description: 'Практические форматы обучения для специалистов и команд барной индустрии.'
 };
 
 type EducationFormType = 'course' | 'corporate' | 'certificate';
@@ -37,7 +36,7 @@ const educationFormats = [
     label: 'Интенсив',
     title: 'Интенсив для специалистов',
     description: 'Короткий практический формат по сервису, меню, технике и работе с гостем.',
-    audience: 'Для специалистов и руководителей, которым нужен быстрый результат.',
+    audience: 'Для специалистов и руководителей, которым нужно быстро разобрать рабочую тему.',
     outcome: 'Концентрированная программа и работа над реальным кейсом.',
     icon: Zap,
     formType: 'course',
@@ -46,9 +45,9 @@ const educationFormats = [
   {
     label: 'Лекция',
     title: 'Лекция или разбор',
-    description: 'Встреча по одной теме: продукт, команда, сезон, сервис или операционная задача.',
+    description: 'Встреча по одной теме: продукт, команда, сезон, сервис или задача заведения.',
     audience: 'Для тех, кому нужен короткий разбор одной рабочей темы.',
-    outcome: 'Короткая встреча с понятной темой и ответами на вопросы.',
+    outcome: 'Короткая встреча по выбранной теме и ответы на вопросы.',
     icon: MonitorPlay,
     formType: 'course',
     meta: []
@@ -68,7 +67,7 @@ const educationFormats = [
     title: 'Разбор меню',
     description: 'Практическая сессия по напиткам, себестоимости, сезонным позициям и подаче.',
     audience: 'Для шефов, бар-менеджеров и концепт-команд.',
-    outcome: 'Разбор меню и список понятных правок.',
+    outcome: 'Разбор меню и список правок для запуска.',
     icon: ClipboardList,
     formType: 'course',
     meta: []
@@ -76,7 +75,7 @@ const educationFormats = [
   {
     label: 'Сервис',
     title: 'Сервисная сессия',
-    description: 'Работа со стандартами, гостевым опытом, сменой и понятными действиями команды.',
+    description: 'Работа со стандартами, гостевым опытом, сменой и действиями команды.',
     audience: 'Для команд зала и сервиса, которым нужно выровнять работу смены.',
     outcome: 'Разбор сервиса, стандартов и действий в смене.',
     icon: Headphones,
@@ -88,7 +87,7 @@ const educationFormats = [
     title: 'Программа для управляющих',
     description: 'Программа для управляющих: команда, закупки, деньги и процессы.',
     audience: 'Для управляющих ресторанов и тех, кто отвечает за работу точки.',
-    outcome: 'Понятный план по команде, закупкам, деньгам и процессам.',
+    outcome: 'План по команде, закупкам, деньгам и процессам.',
     icon: GraduationCap,
     formType: 'course',
     meta: []
@@ -97,7 +96,7 @@ const educationFormats = [
     label: 'Подарок',
     title: 'Сертификат на обучение',
     description: 'Подарочный сертификат на занятие, интенсив или программу для команды.',
-    audience: 'Для тех, кто хочет подарить обучение специалисту или команде.',
+    audience: 'Для подарка специалисту или команде.',
     outcome: 'Сертификат под нужный формат и сумму.',
     icon: Gift,
     formType: 'certificate',
@@ -139,7 +138,7 @@ function getEducationApplicationHref(format: (typeof educationFormats)[number]) 
     params.set('trainingRequest', `Нужно обучение для команды: ${format.title}.`);
   }
 
-  return `/education?${params.toString()}#applications`;
+  return `/education?${params.toString()}#education-request`;
 }
 
 export default async function EducationPage({ searchParams }: EducationPageProps) {
@@ -159,7 +158,6 @@ export default async function EducationPage({ searchParams }: EducationPageProps
   const courseTitle = firstParam(params.courseTitle);
   const trainingRequest = firstParam(params.trainingRequest);
   const formType = getEducationFormType(params.formType, courseTitle);
-  const hasSelectedEducationFormat = Boolean(formType || applicationResult);
   const isEmpty = content.total === 0;
   const hasActiveFilters = hasActivePublicContentParams(contentParams, ['q', 'category', 'city', 'format', 'level']);
   const isPrelaunchEmpty = isEmpty && !hasActiveFilters;
@@ -169,10 +167,10 @@ export default async function EducationPage({ searchParams }: EducationPageProps
       <EditorialPublicPage
         eyebrow="Образование"
         title="Программы, интенсивы и практические занятия"
-        description="Обучение для специалистов и команд: от мастер-классов до корпоративных программ."
+        description="Практические форматы для специалистов и команд: занятие, разбор, интенсив или программа под задачу заведения."
         summary="Можно выбрать очные занятия, материалы для самостоятельной работы или обучение под команду."
         metrics={[
-          { value: '3', label: 'формата обучения' },
+          { value: String(educationFormats.length), label: 'форматов обучения' },
           { value: 'СКФО', label: 'региональный фокус' },
           { value: 'Практика', label: 'работа с задачами' }
         ]}
@@ -197,70 +195,76 @@ export default async function EducationPage({ searchParams }: EducationPageProps
         secondaryLink={{ label: 'Посмотреть события', href: '/events' }}
       />
       <section className="background-zone background-zone-beige editorial-grid border-b border-[var(--line)] py-10 md:py-14" id="education-formats">
-        <div className="container grid gap-8 xl:grid-cols-[minmax(16rem,0.58fr)_minmax(0,1.42fr)]">
-          <div className="xl:sticky xl:top-24 xl:self-start">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Форматы</p>
-            <h2 className={`${displayFont.className} mt-4 max-w-sm text-[2.8rem] font-semibold leading-none tracking-normal text-[var(--text)]`}>
-              Какие форматы есть
-            </h2>
-          </div>
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {educationFormats.map((format) => (
-              <PlatformFormatCard
-                key={format.title}
-                {...format}
-                action={{
-                  href: getEducationApplicationHref(format),
-                  label: 'Запросить'
-                }}
-              />
-            ))}
-          </div>
+        <div className="container">
+          <ProgramFormatMatrix
+            className="border-0 py-0"
+            eyebrow="Форматы"
+            items={educationFormats.map((format) => ({
+              format: format.title,
+              audience: format.audience,
+              includes: format.description,
+              result: format.outcome,
+              status: 'Заявки принимаются',
+              action: {
+                href: getEducationApplicationHref(format),
+                label:
+                  format.formType === 'corporate'
+                    ? 'Описать задачу'
+                    : format.formType === 'certificate'
+                      ? 'Запросить сертификат'
+                      : 'Запросить формат'
+              }
+            }))}
+            title="Какие форматы есть"
+          />
         </div>
       </section>
       {isPrelaunchEmpty ? (
         <PublicPrelaunchSection
           actions={[
             { href: getEducationApplicationHref(educationFormats[0]), label: 'Запросить интенсив' },
-            { href: '/contacts?topic=education-program', label: 'Предложить тему', variant: 'secondary' },
-            { href: '/events', label: 'Посмотреть события', variant: 'ghost' }
+            { href: getEducationApplicationHref(educationFormats[2]), label: 'Обучение для команды', variant: 'secondary' },
+            { href: '/education?formType=course&courseTitle=%D0%9F%D1%80%D0%B5%D0%B4%D0%BB%D0%BE%D0%B6%D0%B8%D1%82%D1%8C%20%D1%82%D0%B5%D0%BC%D1%83#education-request', label: 'Предложить тему', variant: 'ghost' }
           ]}
           badges={[]}
           cards={[
             {
-              title: 'Интенсивы для специалистов',
+              title: 'Запросить интенсив',
               description: 'Практические занятия по сервису, меню, технике и работе с гостем.',
               details: [
                 { label: 'Формат', value: 'интенсив' },
                 { label: 'Для кого', value: 'специалисты и руководители смен' },
                 { label: 'Статус', value: 'принимаем запросы' }
               ],
-              hint: 'Можно запросить тему и город.'
+              hint: 'Можно запросить тему и город.',
+              action: { href: getEducationApplicationHref(educationFormats[0]), label: 'Запросить' }
             },
             {
-              title: 'Корпоративное обучение для команд',
+              title: 'Обучение для команды',
               description: 'Программа под конкретное заведение, смену, запуск или внутреннюю задачу.',
               details: [
                 { label: 'Формат', value: 'командная программа' },
                 { label: 'Для кого', value: 'заведения и барные команды' },
                 { label: 'Статус', value: 'собираем задачи' }
               ],
-              hint: 'Опишите задачу команды.'
+              hint: 'Опишите задачу команды.',
+              action: { href: getEducationApplicationHref(educationFormats[2]), label: 'Описать задачу' }
             },
             {
-              title: 'Лекции и разборы',
-              description: 'Короткие встречи с экспертами и практиками индустрии.',
+              title: 'Предложить тему',
+              description: 'Тема для лекции, разбора меню, сервиса, закупок или управления командой.',
               details: [
-                { label: 'Формат', value: 'лекция или разбор' },
-                { label: 'Для кого', value: 'специалисты и владельцы' },
-                { label: 'Статус', value: 'принимаем темы' }
+                { label: 'Формат', value: 'лекция, разбор или материал' },
+                { label: 'Для кого', value: 'специалисты, владельцы и команды' },
+                { label: 'Статус', value: 'тему можно отправить' }
               ],
-              hint: 'Предложите тему для запуска.'
+              hint: 'Предложите тему для запуска.',
+              action: { href: '/education?formType=course&courseTitle=%D0%9F%D1%80%D0%B5%D0%B4%D0%BB%D0%BE%D0%B6%D0%B8%D1%82%D1%8C%20%D1%82%D0%B5%D0%BC%D1%83#education-request', label: 'Предложить тему' }
             }
           ]}
-          description="Сейчас мы собираем первые программы. Пока можно оставить заявку, описать задачу команды или предложить тему для запуска."
-          eyebrow="Раздел готовится"
-          title="Раздел уже принимает запросы"
+          description="Выберите ближайший сценарий: одно занятие, обучение для команды или новая тема."
+          eyebrow="Заявки"
+          title="Что можно запросить"
         />
       ) : (
         <>
@@ -296,8 +300,8 @@ export default async function EducationPage({ searchParams }: EducationPageProps
             countLabel="Программ в списке"
             emptyDescription="Список пока пуст. Можно сразу написать, какое обучение вам нужно."
             emptyActions={[
-              { href: '/contacts?topic=education-program', label: 'Предложить программу' },
-              { href: '/contacts?topic=education-launch', label: 'Получить уведомление о запуске', variant: 'secondary' },
+              { href: '/contacts?topic=education-program#contact-form', label: 'Предложить программу' },
+              { href: '/contacts?topic=education-launch#contact-form', label: 'Написать о запуске', variant: 'secondary' },
               { href: '/contacts', label: 'Связаться с командой', variant: 'secondary' }
             ]}
             emptyTitle="Программ пока нет"
@@ -308,15 +312,13 @@ export default async function EducationPage({ searchParams }: EducationPageProps
           />
         </>
       )}
-      {hasSelectedEducationFormat ? (
-        <EducationApplicationForms
-          cities={cities}
-          defaults={{ courseTitle, formType, trainingRequest }}
-          enabled={applicationFormsEnabled}
-          result={applicationResult}
-          utm={applicationUtm}
-        />
-      ) : null}
+      <EducationApplicationForms
+        cities={cities}
+        defaults={{ courseTitle, formType, trainingRequest }}
+        enabled={applicationFormsEnabled}
+        result={applicationResult}
+        utm={applicationUtm}
+      />
     </>
   );
 }

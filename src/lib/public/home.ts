@@ -87,6 +87,7 @@ export type HomepageData = {
   course: HomepageLiveCard;
   event: HomepageLiveCard;
   article: HomepageLiveCard;
+  secondaryArticle?: HomepageLiveCard;
   vacancy: HomepageLiveCard;
   supplier: HomepageLiveCard;
   generalSponsors: GeneralSponsor[];
@@ -107,19 +108,22 @@ export type HomepageData = {
 const fallbackHero: HomepageHeroBlock = {
   eyebrow: 'Обучение, события, вакансии',
   title: 'BARSYNERGY',
-  description: 'Обучение, события, вакансии и поставщики для барной индустрии СКФО.',
+  description: 'Обучение, события, вакансии, поставщики и партнёрские предложения для барной индустрии СКФО.',
   signals: [],
   isFallback: true
 };
+
+const HOMEPAGE_AUDIENCE_CARD_LIMIT = 3;
+const HOMEPAGE_SOCIAL_BLOCK_LIMIT = 3;
 
 const fallbackCards: Record<HomepageCardKind, Omit<HomepageLiveCard, 'kind'>> = {
   course: {
     eyebrow: 'Образование',
     title: 'Обучение для команд и специалистов',
-    summary: 'Здесь собраны интенсивы, корпоративные программы и материалы, к которым можно возвращаться в работе.',
+    summary: 'Интенсивы, командные программы и материалы для задач сервиса, меню и смены.',
     meta: ['Очные и онлайн-занятия', 'СКФО'],
     href: '/education',
-    actionLabel: 'Запросить обучение',
+    actionLabel: 'Выбрать формат',
     isFallback: true
   },
   event: {
@@ -137,7 +141,8 @@ const fallbackCards: Record<HomepageCardKind, Omit<HomepageLiveCard, 'kind'>> = 
     summary: 'Тексты о сервисе, команде, меню, управлении и том, что реально работает в регионе.',
     meta: ['Редакция BARSYNERGY', 'Открытый доступ'],
     href: '/articles',
-    actionLabel: 'Открыть материалы',
+    actionLabel: 'Читать материалы',
+    imageUrl: '/images/generated/content-service.jpg',
     isFallback: true
   },
   vacancy: {
@@ -151,11 +156,11 @@ const fallbackCards: Record<HomepageCardKind, Omit<HomepageLiveCard, 'kind'>> = 
   },
   supplier: {
     eyebrow: 'Поставщики',
-    title: 'Каталог компаний, сервисов и полезных контактов',
-    summary: 'Компании и сервисы для закупок, расходников и оборудования по региону.',
+    title: 'Каталог компаний, сервисов и контактов',
+    summary: 'Компании для закупок, расходников, оборудования и сервисных задач по региону.',
     meta: ['Закупки и сервис', 'Для заведений'],
     href: '/suppliers',
-    actionLabel: 'Найти поставщика',
+    actionLabel: 'Открыть каталог',
     isFallback: true
   }
 };
@@ -213,7 +218,7 @@ function toHomepageCard(
     meta: item.meta.slice(0, 3),
     href,
     actionLabel,
-    imageUrl: item.imageUrl,
+    imageUrl: item.imageUrl ?? fallbackCards[kind].imageUrl,
     isFallback: false
   };
 }
@@ -237,7 +242,7 @@ export async function getHomepageData(): Promise<HomepageData> {
     getPublishedCourses({ pageSize: '1' }),
     getPublishedEvents({ pageSize: '1', period: 'upcoming' }),
     getPublishedEvents({ pageSize: '1' }),
-    getPublishedArticles({ pageSize: '1' }),
+    getPublishedArticles({ pageSize: '2' }),
     getPublishedVacancies({ pageSize: '1' }),
     getPublishedSuppliers({ pageSize: '1', verified: 'true' }),
     getPublishedPartners({ pageSize: '6', featured: 'true' }),
@@ -248,11 +253,13 @@ export async function getHomepageData(): Promise<HomepageData> {
     }),
     prisma.homepageAudienceCard.findMany({
       where: { status: ContentStatus.PUBLISHED },
-      orderBy: [{ priority: 'asc' }, { publishedAt: 'desc' }, { updatedAt: 'desc' }]
+      orderBy: [{ priority: 'asc' }, { publishedAt: 'desc' }, { updatedAt: 'desc' }],
+      take: HOMEPAGE_AUDIENCE_CARD_LIMIT
     }),
     prisma.homepageSocialBlock.findMany({
       where: { status: ContentStatus.PUBLISHED },
-      orderBy: [{ priority: 'asc' }, { publishedAt: 'desc' }, { updatedAt: 'desc' }]
+      orderBy: [{ priority: 'asc' }, { publishedAt: 'desc' }, { updatedAt: 'desc' }],
+      take: HOMEPAGE_SOCIAL_BLOCK_LIMIT
     }),
     prisma.homepageCtaBlock.findFirst({
       where: { status: ContentStatus.PUBLISHED },
@@ -269,7 +276,7 @@ export async function getHomepageData(): Promise<HomepageData> {
   const partnerSignals =
     partners.items.length > 0
       ? partners.items.map((item) => item.title)
-      : ['Партнёрские программы', 'Локальные бренды', 'Школы и площадки', 'Совместные проекты'];
+      : ['События с партнёрами', 'Локальные бренды', 'Школы и площадки', 'Совместные проекты'];
 
   return {
     hero: homepageHero
@@ -291,17 +298,20 @@ export async function getHomepageData(): Promise<HomepageData> {
       imagePath: card.imagePath ?? undefined,
       iconKey: card.iconKey ?? undefined
     })),
-    course: toHomepageCard(courses.items[0], 'course', '/education', 'Открыть обучение', 'Образование'),
+    course: toHomepageCard(courses.items[0], 'course', '/education', 'Выбрать формат', 'Образование'),
     event: toHomepageCard(featuredEvent, 'event', '/events', 'Смотреть афишу', 'Ближайшее событие'),
     article: toHomepageCard(
       articles.items[0],
       'article',
       articles.items[0] ? `/articles/${articles.items[0].slug}` : '/articles',
-      'Открыть материал',
+      'Читать материал',
       'Редакция BARSYNERGY'
     ),
+    secondaryArticle: articles.items[1]
+      ? toHomepageCard(articles.items[1], 'article', `/articles/${articles.items[1].slug}`, 'Читать материал', 'Материал')
+      : undefined,
     vacancy: toHomepageCard(vacancies.items[0], 'vacancy', '/vacancies', 'Смотреть вакансии', 'Открытая вакансия'),
-    supplier: toHomepageCard(featuredSupplier, 'supplier', '/suppliers', 'Найти поставщика', 'Поставщик недели'),
+    supplier: toHomepageCard(featuredSupplier, 'supplier', '/suppliers', 'Открыть каталог', 'Поставщик'),
     generalSponsors,
     socialBlocks: socialBlocks.map((block) => ({
       id: block.id,

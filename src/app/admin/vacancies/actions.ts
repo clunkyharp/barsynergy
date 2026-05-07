@@ -291,27 +291,25 @@ export async function deleteVacancyDraft(formData: FormData) {
     });
 
     const deletedVacancy = await prisma.$transaction(async (tx) => {
-      const vacancy = await tx.vacancy.findFirst({
+      const vacancy = await tx.vacancy.findUnique({
         where: {
-          id: parsed.vacancyId,
-          status: { not: ContentStatus.PUBLISHED }
+          id: parsed.vacancyId
         },
         select: { coverImageId: true }
       });
 
       if (!vacancy) {
-        throw new Error('draft is invalid');
+        throw new Error('record is invalid');
       }
 
       const deletion = await tx.vacancy.deleteMany({
         where: {
-          id: parsed.vacancyId,
-          status: { not: ContentStatus.PUBLISHED }
+          id: parsed.vacancyId
         }
       });
 
       if (deletion.count !== 1) {
-        throw new Error('draft is invalid');
+        throw new Error('record is invalid');
       }
 
       return vacancy;
@@ -320,7 +318,7 @@ export async function deleteVacancyDraft(formData: FormData) {
     await deleteUploadedFileIfUnused(deletedVacancy.coverImageId);
 
     revalidatePath(ADMIN_VACANCIES_PATH);
-    result = { type: 'success', message: 'Черновик вакансии удален.' };
+    result = { type: 'success', message: 'Вакансия удалена.' };
   } catch (error) {
     result = { type: 'error', message: formatAdminActionError(error) };
   }

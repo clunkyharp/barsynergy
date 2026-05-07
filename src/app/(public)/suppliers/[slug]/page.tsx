@@ -22,7 +22,7 @@ function supplierContactHref(input: { title: string; companyName?: string; label
     params.set('websiteUrl', input.externalUrl);
   }
 
-  return `/contacts?${params.toString()}`;
+  return `/contacts?${params.toString()}#contact-form`;
 }
 
 export default async function SupplierDetailPage({ params }: SupplierDetailPageProps) {
@@ -45,7 +45,7 @@ export default async function SupplierDetailPage({ params }: SupplierDetailPageP
         imageUrl={supplier.imageUrl}
         label={supplier.label}
         meta={supplier.meta}
-        primaryLink={{ href: supplierContactHref(supplier), label: 'Связаться с поставщиком' }}
+        primaryLink={{ href: supplierContactHref(supplier), label: 'Написать поставщику' }}
         secondaryLink={
           supplier.externalUrl && supplier.externalUrlLabel
             ? { href: supplier.externalUrl, label: supplier.externalUrlLabel, external: true }

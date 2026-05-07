@@ -1,15 +1,13 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import { CategoryType } from '@prisma/client';
-import { ArrowUpRight, CalendarDays } from 'lucide-react';
+import { ArrowUpRight } from 'lucide-react';
 import { EventApplicationForm } from '@/components/public/event-application-form';
 import { EventAgendaSection } from '@/components/public/platform-ui';
 import { PublicBodyText, PublicDisplayTitle } from '@/components/public/public-primitives';
 import { PublicFilters } from '@/components/public/public-filters';
 import { PublicPrelaunchSection } from '@/components/public/public-prelaunch-section';
-import { IconBadge } from '@/components/public/public-ui-adaptation';
 import { Button } from '@/components/ui/button';
-import { Panel } from '@/components/ui/panel';
 import { getApplicationCityOptions } from '@/lib/applications/form-options';
 import { arePublicApplicationFormsEnabled } from '@/lib/applications/public-forms';
 import {
@@ -17,9 +15,9 @@ import {
   getPublicApplicationUtm,
   stripPublicApplicationResultParams
 } from '@/lib/applications/public-form-helpers';
-import { getPublishedEvents, type PublicContentSearchParams } from '@/lib/public/content';
-import { getEventFilterOptions, getPublicCategoryOptions, getPublicCityFilterOptions } from '@/lib/public/filter-options';
 import { displayFont } from '@/lib/fonts';
+import { getPublishedEvents, hasActivePublicContentParams, type PublicContentSearchParams } from '@/lib/public/content';
+import { getEventFilterOptions, getPublicCategoryOptions, getPublicCityFilterOptions } from '@/lib/public/filter-options';
 import { getEnv } from '@/lib/validation/env';
 
 type EventsPageProps = {
@@ -28,11 +26,46 @@ type EventsPageProps = {
 
 export const metadata: Metadata = {
   title: 'События',
-  description: 'Афиша встреч, лекций и индустриальных событий BARSYNERGY.'
+  description: 'Рабочая афиша встреч, лекций и событий для барной индустрии СКФО.'
 };
 
 function firstParam(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] : value;
+}
+
+function EventSubmissionNotice() {
+  return (
+    <section className="background-zone background-zone-cta border-b border-[var(--line)] py-10 md:py-14" id="event-proposal">
+      <div className="container">
+        <div className="rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--surface-wash)] p-5 md:grid md:grid-cols-[minmax(0,0.62fr)_minmax(0,1fr)_auto] md:items-center md:gap-6 md:p-6">
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Предложение события</p>
+            <h2 className={`${displayFont.className} mt-3 text-[1.75rem] font-semibold leading-none text-[var(--text)] md:text-[2.25rem]`}>
+              Добавить событие в афишу
+            </h2>
+          </div>
+          <dl className="mt-5 grid gap-2 text-sm leading-6 md:mt-0 md:grid-cols-3">
+            <div className="rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--surface-wash)] px-3 py-2.5">
+          <dt className="text-[11px] font-semibold uppercase tracking-[0.13em] text-[var(--muted)]">Подходит, если</dt>
+          <dd className="text-[var(--text)]">Событие связано с барами, HoReCa или обучением команд в СКФО.</dd>
+        </div>
+            <div className="rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--surface-wash)] px-3 py-2.5">
+          <dt className="text-[11px] font-semibold uppercase tracking-[0.13em] text-[var(--muted)]">Кто</dt>
+          <dd className="text-[var(--text)]">Заведение, бренд, школа, организатор или команда.</dd>
+        </div>
+            <div className="rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--surface-wash)] px-3 py-2.5">
+          <dt className="text-[11px] font-semibold uppercase tracking-[0.13em] text-[var(--muted)]">Что указать</dt>
+          <dd className="text-[var(--text)]">Тему, город, дату, площадку и контакт организатора.</dd>
+        </div>
+      </dl>
+          <Button className="mt-5 rounded-[var(--radius-md)] px-5 md:mt-0" href="/events?intent=proposal#event-request" size="sm" variant="secondary">
+            Предложить событие
+            <ArrowUpRight size={16} />
+          </Button>
+        </div>
+      </div>
+    </section>
+  );
 }
 
 export default async function EventsPage({ searchParams }: EventsPageProps) {
@@ -49,14 +82,16 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
   const applicationResult = getPublicApplicationResult(params);
   const applicationUtm = getPublicApplicationUtm(params);
   const eventTitle = firstParam(params.eventTitle);
+  const eventSlug = firstParam(params.event);
   const isEventProposal = firstParam(params.intent) === 'proposal';
-  const shouldShowEventForm = Boolean(eventTitle?.trim() || isEventProposal || applicationResult);
   const isEmpty = content.total === 0;
+  const hasActiveFilters = hasActivePublicContentParams(contentParams, ['q', 'category', 'city', 'format', 'period']);
+  const isPrelaunchEmpty = isEmpty && !hasActiveFilters;
 
   return (
     <>
       <section className="background-zone background-zone-hero border-b border-[var(--line)] py-10 md:py-14">
-        <div className="container grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(20rem,0.48fr)] lg:items-center">
+        <div className="container">
           <div className="min-w-0">
             <p className="text-sm leading-6 text-[var(--muted)]">
               <a className="muted-link" href="/">Главная</a> <span aria-hidden="true">›</span> События
@@ -64,30 +99,16 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
             <PublicDisplayTitle as="h1" className="mt-6" size="hero">
               События
             </PublicDisplayTitle>
-            <h2 className={`${displayFont.className} mt-3 text-[2.1rem] font-semibold leading-none text-[var(--text)] md:text-[2.8rem]`}>
-              Афиша барной индустрии СКФО
-            </h2>
             <PublicBodyText className="mt-5 max-w-3xl" size="md">
-              Встречи, лекции и другие события для специалистов и команд.
+              Афиша встреч, лекций, дегустаций и гостевых смен для специалистов и команд.
             </PublicBodyText>
           </div>
-          <Panel className="border-[var(--border-default)] bg-[var(--surface-wash)]" padding="lg">
-            <IconBadge icon={CalendarDays} size="lg" tone="accent" />
-            <h2 className={`${displayFont.className} mt-5 text-[2rem] font-semibold leading-none text-[var(--text)]`}>Добавьте своё событие</h2>
-            <p className="mt-3 text-sm leading-7 text-[var(--muted)]">
-              Добавьте событие для специалистов и команд СКФО.
-            </p>
-            <Button className="mt-6 rounded-[var(--radius-md)] px-5" href="/events?intent=proposal#applications" variant="ghost">
-              Предложить событие
-              <ArrowUpRight size={16} />
-            </Button>
-          </Panel>
         </div>
       </section>
-      {isEmpty ? (
+      {isPrelaunchEmpty ? (
         <PublicPrelaunchSection
           actions={[
-            { href: '/events?intent=proposal#applications', label: 'Предложить событие' },
+            { href: '/events?intent=proposal#event-request', label: 'Предложить событие' },
             { href: '/partners', label: 'Обсудить партнёрство', variant: 'secondary' }
           ]}
           badges={['Афиша собирается', 'Можно предложить свой формат']}
@@ -101,13 +122,13 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
               description: 'Практические события с экспертами, брендами и рабочими темами для специалистов.'
             },
             {
-              title: 'Профессиональные встречи',
-              description: 'Встречи для специалистов, заведений и брендов по одной рабочей теме.'
+              title: 'Встречи по рабочей теме',
+              description: 'Формат для специалистов, заведений и брендов: одна тема, дата, площадка и контакт организатора.'
             }
           ]}
-          description="Раздел уже принимает предложения по событиям и новым темам, даже если афиша ещё не заполнена."
-          eyebrow="Раздел готовится"
-          title="Первые события ещё собираются"
+          description="Пока афиша собирается. Можно предложить событие, площадку или тему для встречи."
+          eyebrow="Афиша"
+          title="Первые события собираются"
         />
       ) : (
         <Suspense
@@ -123,36 +144,45 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
             content={content}
             filters={
               <PublicFilters
+                activeSummaryLabel="Выбрано в афише"
                 categories={categories}
+                categoryAllLabel="Все типы"
+                categoryLabel="Тип события"
                 cities={filterCities}
-                description="Найдите ближайшие встречи по городу, формату и дате."
+                cityAllLabel="Все города"
+                cityLabel="Город"
+                contextItems={[{ label: 'Аудитория', value: 'специалисты и команды' }]}
+                description="Фильтр по городу, дате и формату события."
                 embedded
+                compact
                 extraFilters={[
-                  { name: 'format', label: 'Все форматы', options: filterOptions.formats },
+                  { name: 'format', label: 'Формат', allLabel: 'Все форматы', options: filterOptions.formats },
                   {
                     name: 'period',
-                    label: 'Все даты',
+                    label: 'Дата',
+                    allLabel: 'Любая дата',
                     options: [
                       { value: 'upcoming', label: 'Предстоящие' },
                       { value: 'past', label: 'Прошедшие' }
                     ]
                   }
                 ]}
+                placeholder="Название, площадка или тема"
+                tone="directory"
                 variant="toolbar"
               />
             }
           />
         </Suspense>
       )}
-      {shouldShowEventForm ? (
-        <EventApplicationForm
-          cities={cities}
-          defaults={{ eventTitle: eventTitle ?? (isEventProposal ? 'Предложение события' : undefined) }}
-          enabled={applicationFormsEnabled}
-          result={applicationResult}
-          utm={applicationUtm}
-        />
-      ) : null}
+      <EventSubmissionNotice />
+      <EventApplicationForm
+        cities={cities}
+        defaults={{ eventTitle: eventTitle ?? eventSlug ?? (isEventProposal ? 'Предложение события' : undefined) }}
+        enabled={applicationFormsEnabled}
+        result={applicationResult}
+        utm={applicationUtm}
+      />
     </>
   );
 }

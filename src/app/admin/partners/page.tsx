@@ -32,6 +32,7 @@ import {
   getAdminSearchQuery,
   getAdminStringFilter,
   getAdminStatusFilter,
+  getAdminOptionLabel,
   getAdminTotalPages,
   partnerTypeOptions,
   type AdminContentSearchParams
@@ -63,6 +64,7 @@ export default async function AdminPartnersPage({ searchParams }: AdminPartnersP
   const status = getAdminStatusFilter(params);
   const categoryId = getAdminStringFilter(params, 'categoryId');
   const partnerType = getAdminStringFilter(params, 'partnerType');
+  const featuredFilter = getAdminStringFilter(params, 'featured');
   const isFeatured = getAdminBooleanFilter(params, 'featured');
   const where: Prisma.PartnerWhereInput = {
     status,
@@ -102,6 +104,7 @@ export default async function AdminPartnersPage({ searchParams }: AdminPartnersP
     })
   ]);
   const totalPages = getAdminTotalPages(total);
+  const hasActiveFilters = Boolean(q || status || categoryId || partnerType || featuredFilter);
 
   return (
     <div className="space-y-8">
@@ -121,7 +124,7 @@ export default async function AdminPartnersPage({ searchParams }: AdminPartnersP
           {
             name: 'featured',
             label: 'Подборка',
-            allLabel: 'Любой статус',
+            allLabel: 'Любая подборка',
             options: [
               { value: 'true', label: 'В подборке' },
               { value: 'false', label: 'Не в подборке' }
@@ -129,7 +132,7 @@ export default async function AdminPartnersPage({ searchParams }: AdminPartnersP
           }
         ]}
         params={params}
-        searchPlaceholder="Поиск по партнёру, компании или типу"
+        searchPlaceholder="Поиск по названию"
       />
 
       <section className="space-y-4">
@@ -139,14 +142,19 @@ export default async function AdminPartnersPage({ searchParams }: AdminPartnersP
         </div>
 
         {partners.length === 0 ? (
-          <EmptyState title="Партнёров пока нет" />
+          <EmptyState
+            actionHref={hasActiveFilters ? ADMIN_PARTNERS_PATH : `${ADMIN_PARTNERS_PATH}/create`}
+            actionLabel={hasActiveFilters ? 'Сбросить фильтры' : 'Создать партнёра'}
+            description={hasActiveFilters ? 'По текущим фильтрам партнёров нет.' : 'Добавьте партнёра, тип сотрудничества и статус публикации.'}
+            title={hasActiveFilters ? 'Партнёры не найдены' : 'Партнёров пока нет'}
+          />
         ) : (
           <AdminTableFrame>
             <AdminTable minWidth={980}>
               <AdminTableHead>
                 <AdminTableRow>
                   <AdminTableHeaderCell>Партнёр</AdminTableHeaderCell>
-                  <AdminTableHeaderCell>Контекст</AdminTableHeaderCell>
+                  <AdminTableHeaderCell>Компания и тип</AdminTableHeaderCell>
                   <AdminTableHeaderCell>Статус</AdminTableHeaderCell>
                   <AdminTableHeaderCell>Обновлено</AdminTableHeaderCell>
                   <AdminTableActionsHeaderCell>Действия</AdminTableActionsHeaderCell>
@@ -165,7 +173,9 @@ export default async function AdminPartnersPage({ searchParams }: AdminPartnersP
                     </AdminTableCell>
                     <AdminTableCell className="text-[var(--muted)]">
                       <div>{partner.companyName}</div>
-                      {partner.partnerType ? <div className="mt-1 text-xs">{partner.partnerType}</div> : null}
+                      {partner.partnerType ? (
+                        <div className="mt-1 text-xs">{getAdminOptionLabel(partnerTypeOptions, partner.partnerType)}</div>
+                      ) : null}
                       {partner.isFeatured ? <div className="mt-1 text-xs">В подборке</div> : null}
                     </AdminTableCell>
                     <AdminTableCell>

@@ -62,7 +62,8 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
         eyebrow="Контакты"
         title="Связь с командой"
         description="Пишите по обучению, событиям, партнёрствам, вакансиям и поставщикам."
-        summary="После выбора темы форма покажет нужные поля, чтобы команда сразу получила нормальный рабочий запрос."
+        summary="Выберите тему обращения. Так команда быстрее поймёт, кто должен ответить и какие детали нужны."
+        summaryHeading="Каналы связи"
         metrics={[
           { value: 'Почта', label: 'основной канал связи' },
           { value: 'Форма', label: 'для рабочих запросов' },
@@ -85,7 +86,8 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
             description: 'Если запрос связан с регистрацией или персональными данными, ссылки на документы собраны здесь.'
           }
         ]}
-        primaryLink={{ label: 'Открыть форму', href: '#applications' }}
+        rowsHeading="Что можно отправить"
+        primaryLink={{ label: 'Открыть форму', href: '#contact-form' }}
         secondaryLink={{ label: 'Политика ПДн', href: '/legal/privacy' }}
       />
       <ContactApplicationForm

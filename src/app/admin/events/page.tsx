@@ -108,12 +108,13 @@ export default async function AdminEventsPage({ searchParams }: AdminEventsPageP
     })
   ]);
   const totalPages = getAdminTotalPages(total);
+  const hasActiveFilters = Boolean(q || status || categoryId || cityId || format);
 
   return (
     <div className="space-y-8">
       <AdminPageIntro
         action={
-          <Button href={`${ADMIN_EVENTS_PATH}/create`} variant="secondary">
+          <Button href={`${ADMIN_EVENTS_PATH}/create`}>
             Новое событие
           </Button>
         }
@@ -131,7 +132,7 @@ export default async function AdminEventsPage({ searchParams }: AdminEventsPageP
           { name: 'format', label: 'Формат', allLabel: 'Все форматы', options: [...eventFormatOptions] }
         ]}
         params={params}
-        searchPlaceholder="Поиск по названию, месту или описанию"
+        searchPlaceholder="Поиск по названию"
       />
 
       <section className="space-y-4">
@@ -141,7 +142,12 @@ export default async function AdminEventsPage({ searchParams }: AdminEventsPageP
         </div>
 
         {events.length === 0 ? (
-          <EmptyState title="Событий пока нет" />
+          <EmptyState
+            actionHref={hasActiveFilters ? ADMIN_EVENTS_PATH : `${ADMIN_EVENTS_PATH}/create`}
+            actionLabel={hasActiveFilters ? 'Сбросить фильтры' : 'Создать событие'}
+            description={hasActiveFilters ? 'По текущим фильтрам записей нет.' : 'Добавьте событие с датой, городом и статусом публикации.'}
+            title={hasActiveFilters ? 'События не найдены' : 'Событий пока нет'}
+          />
         ) : (
           <AdminTableFrame>
             <AdminTable minWidth={1040}>

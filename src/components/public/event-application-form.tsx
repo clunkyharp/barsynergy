@@ -24,16 +24,22 @@ export function EventApplicationForm({ enabled, result, utm, cities, defaults = 
       eyebrow="События / Заявка"
       title={hasEventContext ? 'Заявка на выбранное событие' : 'Записаться или предложить событие'}
       description={hasEventContext ? 'Название события уже подставлено в форму.' : 'Можно записаться или предложить новую встречу.'}
+      disclosureAliases={['applications']}
+      disclosureFocusSelector={hasEventContext ? '#eventName' : '#eventTitle'}
+      disclosureId="event-request"
+      disclosureOpenLabel={hasEventContext ? 'Записаться' : 'Предложить событие'}
+      disclosureTitle={hasEventContext ? 'Запись на событие' : 'Заявка на событие'}
+      disclosureDescription="Оставьте контакт для участия или добавьте событие в афишу."
       enabled={enabled}
       result={result}
     >
-      <form action={submitEventApplication} className="editorial-form-shell overflow-hidden">
+      <form action={submitEventApplication} className="editorial-form-shell">
         <HiddenUtmFields utm={utm} />
         <HoneypotField id="event-application-website" />
         <PublicFormShellHeader
           eyebrow="Событие"
           title={hasEventContext ? defaults.eventTitle! : 'Заявка на событие'}
-          description={hasEventContext ? 'Оставьте контакт и короткий комментарий по участию.' : 'Для участия, новой темы или события в календаре.'}
+          description={hasEventContext ? 'Оставьте контакт и короткий комментарий по участию.' : 'Укажите тему, город, дату, площадку и контакт организатора.'}
         />
         <div className="relative p-5 md:p-6">
           <div className="grid gap-4 md:grid-cols-2">

@@ -88,7 +88,7 @@ function renderOpportunityChip(entry: PublishedContentMetaGroup) {
       className={cn(
         'inline-flex max-w-full items-center gap-2 rounded-[var(--radius-sm)] border px-3 py-1.5 text-[11px] leading-5 text-[var(--text)]',
         entry.tone === 'accent'
-          ? 'border-[rgba(101,32,27,0.22)] bg-[rgba(101,32,27,0.05)] font-semibold text-[var(--accent)]'
+          ? 'border-[var(--accent)]/22 bg-[var(--accent-soft)] font-semibold text-[var(--accent)]'
           : 'border-[var(--border-default)] bg-[var(--surface-wash)]'
       )}
       key={`${entry.label ?? 'meta'}-${entry.value}`}
@@ -99,6 +99,64 @@ function renderOpportunityChip(entry: PublishedContentMetaGroup) {
   );
 }
 
+function metaGroupValue(item: PublishedContentItem, label: string) {
+  return item.metaGroups?.find((entry) => entry.label === label)?.value;
+}
+
+function renderVacancyFacts(item: PublishedContentItem) {
+  const company = metaGroupValue(item, 'Компания') ?? item.subtitle;
+  const city = metaGroupValue(item, 'Город');
+  const facts = [
+    { label: 'Компания / город', value: [company, city].filter(Boolean).join(' / ') || 'уточняется' },
+    { label: 'График', value: metaGroupValue(item, 'График') ?? 'уточняется' },
+    { label: 'Опыт', value: metaGroupValue(item, 'Опыт') ?? 'уточняется' },
+    { label: 'Оплата', value: metaGroupValue(item, 'Оплата') ?? 'по договорённости' }
+  ];
+
+  return (
+    <dl className="grid divide-y divide-[var(--line)] border-y border-[var(--line)]">
+      {facts.map((fact) => (
+        <div className="grid gap-1 py-2.5 sm:grid-cols-[8rem_minmax(0,1fr)] sm:gap-3" key={fact.label}>
+          <dt className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--muted)]">{fact.label}</dt>
+          <dd className="text-sm leading-6 text-[var(--text)]">{fact.value}</dd>
+        </div>
+      ))}
+    </dl>
+  );
+}
+
+function compactMetaEntries(metaGroups: PublishedContentMetaGroup[], rowVariant: 'default' | 'opportunity' | 'directory') {
+  if (rowVariant === 'opportunity') {
+    return metaGroups.filter((entry) => ['Компания', 'Город', 'График', 'Опыт', 'Оплата'].includes(entry.label ?? '')).slice(0, 4);
+  }
+
+  if (rowVariant === 'directory') {
+    return metaGroups
+      .filter((entry) => !['Продукты / услуги', 'География'].includes(entry.label ?? ''))
+      .slice(0, 3);
+  }
+
+  return metaGroups.slice(0, 3);
+}
+
+function renderCompactMetaLine(entries: PublishedContentMetaGroup[]) {
+  if (entries.length === 0) {
+    return null;
+  }
+
+  return (
+    <p className="line-clamp-2 text-[12px] font-medium leading-5 text-[var(--muted)] sm:hidden">
+      {entries.map((entry, index) => (
+        <span className={entry.tone === 'accent' ? 'font-semibold text-[var(--accent)]' : undefined} key={`${entry.label ?? 'meta'}-${entry.value}`}>
+          {index > 0 ? <span className="px-1.5 text-[var(--line-strong)]">/</span> : null}
+          {entry.label ? <span className="uppercase tracking-[0.1em]">{entry.label}: </span> : null}
+          {entry.value}
+        </span>
+      ))}
+    </p>
+  );
+}
+
 function buildLabel(item: PublishedContentItem, rowVariant: 'default' | 'opportunity' | 'directory') {
   if (rowVariant === 'opportunity') {
     const city = item.metaGroups?.find((entry) => entry.label === 'Город')?.value;
@@ -106,7 +164,7 @@ function buildLabel(item: PublishedContentItem, rowVariant: 'default' | 'opportu
     return (
       <div className="flex flex-wrap items-center gap-2.5">
         <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">{item.label ?? 'Вакансия'}</span>
-        {city ? <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--muted)]">{city}</span> : null}
+        {city ? <span className="text-[11px] font-medium uppercase tracking-[0.12em] text-[var(--muted)]">{city}</span> : null}
       </div>
     );
   }
@@ -115,7 +173,11 @@ function buildLabel(item: PublishedContentItem, rowVariant: 'default' | 'opportu
 }
 
 function buildLabelMeta(item: PublishedContentItem, rowVariant: 'default' | 'opportunity' | 'directory') {
-  if (rowVariant !== 'opportunity' && rowVariant !== 'directory') {
+  if (rowVariant === 'opportunity') {
+    return item.updatedLabel ? <span className="text-[11px] font-medium uppercase tracking-[0.12em] text-[var(--muted)]">{item.updatedLabel}</span> : null;
+  }
+
+  if (rowVariant !== 'directory') {
     return null;
   }
 
@@ -138,8 +200,19 @@ function buildLabelMeta(item: PublishedContentItem, rowVariant: 'default' | 'opp
 }
 
 function buildMeta(item: PublishedContentItem, rowVariant: 'default' | 'opportunity' | 'directory') {
-  if ((rowVariant === 'opportunity' || rowVariant === 'directory') && item.metaGroups && item.metaGroups.length > 0) {
-    return <div className="flex flex-wrap gap-2.5">{item.metaGroups.map((entry) => renderOpportunityChip(entry))}</div>;
+  if (rowVariant === 'opportunity') {
+    return renderVacancyFacts(item);
+  }
+
+  if (rowVariant === 'directory' && item.metaGroups && item.metaGroups.length > 0) {
+    const compactEntries = compactMetaEntries(item.metaGroups, rowVariant);
+
+    return (
+      <div>
+        {renderCompactMetaLine(compactEntries)}
+        <div className="hidden flex-wrap gap-2.5 sm:flex">{item.metaGroups.map((entry) => renderOpportunityChip(entry))}</div>
+      </div>
+    );
   }
 
   if (item.meta.length === 0) {
@@ -169,7 +242,7 @@ function titleInitials(title: string) {
 function buildListMedia(item: PublishedContentItem, rowVariant: 'default' | 'opportunity' | 'directory') {
   if (rowVariant === 'opportunity') {
     return (
-      <div className="grid h-16 w-16 place-items-center overflow-hidden rounded-[var(--radius-md)] border border-black/10 bg-[rgba(255,252,248,0.88)] text-lg font-semibold uppercase text-[var(--text)]">
+      <div className="grid h-14 w-14 place-items-center overflow-hidden rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--surface-wash)] text-base font-semibold uppercase text-[var(--text)] md:h-16 md:w-16 md:text-lg">
         {item.imageUrl ? (
           <span aria-hidden="true" className="h-full w-full bg-cover bg-center" style={{ backgroundImage: `url("${item.imageUrl}")` }} />
         ) : (
@@ -181,9 +254,9 @@ function buildListMedia(item: PublishedContentItem, rowVariant: 'default' | 'opp
 
   if (rowVariant === 'directory') {
     return (
-      <div className="grid min-h-28 w-full place-items-center overflow-hidden rounded-[var(--radius-md)] border border-black/10 bg-[rgba(255,252,248,0.82)] px-4 text-center text-lg font-semibold uppercase tracking-[0.08em] text-[var(--text)]">
+      <div className="grid h-14 min-h-14 w-14 place-items-center overflow-hidden rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--surface-wash)] px-2 text-center text-sm font-semibold uppercase tracking-[0.08em] text-[var(--text)] md:h-auto md:min-h-28 md:w-full md:px-4 md:text-lg">
         {item.imageUrl ? (
-          <span aria-hidden="true" className="h-full min-h-28 w-full bg-contain bg-center bg-no-repeat" style={{ backgroundImage: `url("${item.imageUrl}")` }} />
+          <span aria-hidden="true" className="h-full min-h-14 w-full bg-contain bg-center bg-no-repeat md:min-h-28" style={{ backgroundImage: `url("${item.imageUrl}")` }} />
         ) : (
           <span>{titleInitials(item.subtitle ?? item.title)}</span>
         )}
@@ -195,7 +268,7 @@ function buildListMedia(item: PublishedContentItem, rowVariant: 'default' | 'opp
     return (
       <div
         aria-hidden="true"
-        className="aspect-[4/3] overflow-hidden rounded-[var(--radius-lg)] border border-black/10 bg-cover bg-center transition-transform duration-700 ease-out group-hover:scale-[1.02]"
+        className="aspect-[4/3] overflow-hidden rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-cover bg-center transition-transform duration-700 ease-out group-hover:scale-[1.02]"
         style={{ backgroundImage: `url("${item.imageUrl}")` }}
       />
     );
@@ -220,24 +293,24 @@ export function PublishedContentSection({
   listAction,
   sortLabel,
   rowVariant = 'default',
-  rowActionLabel = 'Подробнее'
+  rowActionLabel = 'Открыть запись'
 }: PublishedContentSectionProps) {
   const visibleItems = content.items.filter((item) => !excludedItemIds.includes(item.id));
   const resolvedEmptyActions = emptyActions ?? (emptyAction ? [emptyAction] : []);
   const hasActiveFilters = Object.keys(content.params).length > 0;
   const noResultsTitle = hasActiveFilters ? 'По этим параметрам ничего не найдено' : emptyTitle;
   const noResultsDescription = hasActiveFilters
-    ? 'Сбросьте фильтры или попробуйте более широкий запрос. Полный список позиций и материалов доступен без ограничений.'
+    ? 'Сбросьте фильтры или измените запрос. Так можно вернуться к полному списку.'
     : emptyDescription;
   const emptyStateActions = buildEmptyActions(basePath, hasActiveFilters, resolvedEmptyActions);
 
   return (
-    <section className="background-zone background-zone-ivory editorial-grid border-b border-[var(--line)] py-10 md:py-14" id={sectionId}>
-      <div className="container grid gap-8 xl:grid-cols-[minmax(16rem,0.58fr)_minmax(0,1.42fr)] xl:gap-10">
+    <section className="background-zone background-zone-ivory editorial-grid border-b border-[var(--line)] py-8 md:py-14" id={sectionId}>
+      <div className="container grid gap-6 md:gap-8 xl:grid-cols-[minmax(16rem,0.58fr)_minmax(0,1.42fr)] xl:gap-10">
         <div className="xl:sticky xl:top-24 xl:self-start">
           <PublicDisplayTitle className="max-w-sm">{title}</PublicDisplayTitle>
           <div className="mt-5 flex flex-wrap gap-2">
-            <MetaChip className="border-black/10 bg-[rgba(255,249,242,0.88)] text-[var(--text)]" variant="filter">
+            <MetaChip className="border-[var(--border-default)] bg-[var(--surface-wash)] text-[var(--text)]" variant="filter">
               {countLabel}: {content.total}
             </MetaChip>
           </div>
@@ -245,7 +318,7 @@ export function PublishedContentSection({
         </div>
 
         {content.items.length === 0 ? (
-          <Panel className="space-y-4 border-black/10 bg-[rgba(255,250,244,0.72)]" padding="lg">
+          <Panel className="space-y-4 border-[var(--border-default)] bg-[var(--surface-wash)]" padding="lg">
             <div>
               <PublicEyebrow tone="muted">{listLabel}</PublicEyebrow>
               <h3 className="mt-3 text-2xl font-semibold leading-8">{noResultsTitle}</h3>
@@ -267,7 +340,7 @@ export function PublishedContentSection({
             ) : null}
           </Panel>
         ) : visibleItems.length === 0 ? (
-          <Panel className="space-y-4 border-black/10 bg-[rgba(255,250,244,0.72)]" padding="lg">
+          <Panel className="space-y-4 border-[var(--border-default)] bg-[var(--surface-wash)]" padding="lg">
             <h3 className="text-xl font-semibold leading-7">Других записей пока нет</h3>
             <PublicBodyText className="max-w-2xl">
               Главная рекомендация уже показана выше. Когда появятся новые записи с такими фильтрами, они будут здесь.
@@ -289,7 +362,7 @@ export function PublishedContentSection({
               ) : null}
             </div>
 
-            <div className="flex flex-col gap-4">
+            <div className="divide-y divide-[var(--line)] border-y border-[var(--line)] md:flex md:flex-col md:gap-4 md:divide-y-0 md:border-y-0">
               {visibleItems.map((item) => (
                 <EditorialListRow
                   actionLabel={rowActionLabel}
@@ -309,7 +382,7 @@ export function PublishedContentSection({
             </div>
 
             <div className="mt-4 flex flex-wrap items-center justify-between gap-3 pt-3">
-              <MetaChip className="border-black/10 bg-transparent text-[var(--muted)]" variant="default">
+              <MetaChip className="border-[var(--border-default)] bg-transparent text-[var(--muted)]" variant="default">
                 Страница {content.page} из {content.totalPages}
               </MetaChip>
               {content.totalPages > 1 ? (

@@ -25,15 +25,15 @@ export function PublicFeaturedContent({
   eyebrow,
   title,
   description,
-  actionLabel = 'Подробнее'
+  actionLabel = 'Открыть запись'
 }: PublicFeaturedContentProps) {
   if (!item) {
     return null;
   }
 
   return (
-    <section className="border-b border-black/20 bg-[var(--surface)] py-10 md:py-14">
-      <div className="container grid gap-8 xl:grid-cols-[0.72fr_1.28fr] xl:items-stretch">
+    <section className="border-b border-[var(--line)] bg-[var(--surface)] py-8 md:py-14">
+      <div className="container grid gap-6 md:gap-8 xl:grid-cols-[0.72fr_1.28fr] xl:items-stretch">
         <div>
           <PublicEyebrow>{eyebrow}</PublicEyebrow>
           <PublicDisplayTitle className="mt-4">{title}</PublicDisplayTitle>
@@ -44,19 +44,19 @@ export function PublicFeaturedContent({
           {item.imageUrl ? (
             <div
               aria-hidden="true"
-              className="min-h-[260px] border-b border-black/10 bg-cover bg-center md:min-h-full md:border-b-0 md:border-r"
+              className="min-h-[128px] border-b border-[var(--line)] bg-cover bg-center md:min-h-full md:border-b-0 md:border-r"
               style={{ backgroundImage: `url("${item.imageUrl}")` }}
             />
           ) : (
-            <div className="min-h-[220px] border-b border-black/10 bg-[linear-gradient(135deg,var(--surface-muted),white)] md:min-h-full md:border-b-0 md:border-r" />
+            <div className="min-h-[112px] border-b border-[var(--line)] bg-[linear-gradient(135deg,var(--surface-muted),var(--surface-wash))] md:min-h-full md:border-b-0 md:border-r" />
           )}
-          <div className="flex flex-col gap-5 p-5 md:p-7">
+          <div className="flex flex-col gap-4 p-4 md:gap-5 md:p-7">
             <div>
               <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">
                 {item.label ?? 'Рекомендуем'}
               </p>
-              <h3 className={`${displayFont.className} mt-3 text-[2rem] font-semibold leading-none md:text-[2.6rem]`}>{item.title}</h3>
-              <PublicBodyText className="mt-4 max-w-2xl">{item.summary}</PublicBodyText>
+              <h3 className={`${displayFont.className} mt-2 text-[1.55rem] font-semibold leading-none md:mt-3 md:text-[2.6rem]`}>{item.title}</h3>
+              <PublicBodyText className="mt-3 max-w-2xl leading-6 md:mt-4 md:leading-7">{item.summary}</PublicBodyText>
             </div>
 
             {item.meta.length > 0 ? (

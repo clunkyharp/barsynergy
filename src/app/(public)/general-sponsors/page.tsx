@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
-import { ArrowUpRight, BookOpen, GraduationCap, Handshake, Megaphone, Star, Users } from 'lucide-react';
+import { SponsorBenefitSheet, SponsorPackageComparison } from '@/components/public/editorial-display-primitives';
 import { GeneralSponsorCard } from '@/components/public/general-sponsor-card';
 import { PublicBodyText, PublicDisplayTitle, PublicEyebrow } from '@/components/public/public-primitives';
-import { FeatureItem, IconBadge, SectionCtaPanel } from '@/components/public/public-ui-adaptation';
+import { SectionCtaPanel } from '@/components/public/public-ui-adaptation';
 import { Button } from '@/components/ui/button';
 import { Panel } from '@/components/ui/panel';
 import { displayFont } from '@/lib/fonts';
@@ -15,50 +15,60 @@ export const metadata: Metadata = {
 
 export const dynamic = 'force-dynamic';
 
-const benefits = [
+const sponsorBenefits = [
   {
-    icon: Users,
-    title: 'Выход к аудитории',
-    description: 'Бармены, владельцы, менеджеры и поставщики СКФО.'
+    area: 'Аудитория',
+    summary: 'Бармены, владельцы, менеджеры и поставщики СКФО видят бренд в контексте событий, обучения и материалов.',
+    detail: 'Сначала фиксируются места размещения: сайт, события, материалы и контакты.',
+    touchpoint: 'События, материалы сайта и прямые переходы к контакту.'
   },
   {
-    icon: Megaphone,
-    title: 'Несколько мест для упоминания',
-    description: 'Упоминания в событиях, материалах сайта и рассылках.'
+    area: 'Размещения',
+    summary: 'Упоминания распределяются между страницами событий, материалами сайта, рассылками и социальными анонсами.',
+    detail: 'Пакет можно собрать под отдельную встречу, сезонную серию или генеральную позицию на период.',
+    touchpoint: 'Страница события, анонсы, соцсети, рассылка.'
   },
   {
-    icon: Star,
-    title: 'Понятная роль бренда',
-    description: 'Показываем, чем бренд полезен специалистам, заведениям и партнёрам.'
+    area: 'Материалы и события',
+    summary: 'Бренд можно связать с темой: продуктом, экспертом, кейсом, обучением или встречей.',
+    detail: 'Карточка или материал показывает, чем бренд полезен специалистам, заведениям и партнёрам.',
+    touchpoint: 'Интервью, приветственное слово, материал или совместная тема.'
   },
   {
-    icon: GraduationCap,
-    title: 'Совместные форматы',
-    description: 'Можно запустить событие, материал, обучение или сезонную программу.'
+    area: 'Следующий шаг',
+    summary: 'После размещения можно выбрать следующий материал, событие или контакт.',
+    detail: 'Подходит брендам, которым нужен не разовый логотип, а план размещения на выбранный период.',
+    touchpoint: 'Итоговый разбор, следующий формат, контакт с командой.'
   }
 ] as const;
 
 const packageLevels = [
   {
-    title: 'Партнёр события',
-    description: 'Поддержка отдельной встречи или проекта.',
-    price: 'Цена по запросу',
-    recommended: false,
-    items: ['Логотип на странице события', 'Упоминание в анонсах', 'Пост в социальных сетях', 'Материалы на площадке']
+    packageName: 'Партнёр события',
+    scope: 'Поддержка отдельной встречи или проекта.',
+    visibility: 'Размещение на странице события, в анонсах и материалах площадки.',
+    periodStatus: 'Разовый запуск.',
+    includedPlacements: 'Логотип на странице события, упоминание в анонсах, пост в социальных сетях, материалы на площадке.',
+    requiredAssets: 'Логотип, короткое описание, ссылка, материалы для площадки.',
+    recommended: false
   },
   {
-    title: 'Сезонный партнёр',
-    description: 'Участие в серии событий сезона.',
-    price: 'Цена по запросу',
-    recommended: false,
-    items: ['Всё из пакета события', 'Логотип на событиях сезона', '2 публикации в социальных сетях', 'Упоминание в email-рассылке']
+    packageName: 'Сезонный партнёр',
+    scope: 'Участие в серии событий сезона.',
+    visibility: 'Размещение в нескольких событиях и анонсах сезона.',
+    periodStatus: 'Сезонная серия.',
+    includedPlacements: 'Всё из пакета события, логотип на событиях сезона, 2 публикации в социальных сетях, упоминание в email-рассылке.',
+    requiredAssets: 'Логотип, описание бренда, сезонная тема, материалы для анонсов.',
+    recommended: false
   },
   {
-    title: 'Генеральный спонсор',
-    description: 'Главная партнёрская позиция на сезон.',
-    price: 'Цена по запросу',
-    recommended: true,
-    items: ['Эксклюзивная категория в сезон', 'Главный логотип на площадках', 'Приветственное слово или интервью', 'Совместные события и материалы']
+    packageName: 'Генеральный спонсор',
+    scope: 'Главная партнёрская позиция на сезон.',
+    visibility: 'Карточка бренда в разделе спонсоров и выбранных публичных разделах сайта.',
+    periodStatus: 'Сезон / категория согласуется отдельно.',
+    includedPlacements: 'Категория и период согласуются отдельно, логотип на площадках, приветственное слово или интервью, совместные события и материалы.',
+    requiredAssets: 'Логотип, бренд-гайд, контакты, тема размещения и материалы для редакции или площадки.',
+    recommended: true
   }
 ] as const;
 
@@ -78,13 +88,13 @@ export default async function GeneralSponsorsPage() {
               Спонсорство BARSYNERGY
             </PublicDisplayTitle>
             <PublicBodyText className="mt-6 max-w-2xl" size="md">
-              Бренд может поддержать события, обучение и материалы для барной индустрии СКФО. Мы покажем его там, где его увидят специалисты и заведения.
+              Бренд может поддержать события, обучение и материалы для барной индустрии СКФО. Формат, период, места размещения и материалы согласуются отдельно.
             </PublicBodyText>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <Button className="rounded-[var(--radius-md)] px-7" href="/contacts?topic=sponsorship" size="lg">
+              <Button className="rounded-[var(--radius-md)] px-7" href="/contacts?topic=sponsorship#contact-form" size="lg">
                 Запросить условия
               </Button>
-              <Button className="rounded-[var(--radius-md)] px-7" href="/contacts?topic=sponsorship-presentation" size="lg" variant="secondary">
+              <Button className="rounded-[var(--radius-md)] px-7" href="/contacts?topic=sponsorship-presentation#contact-form" size="lg" variant="secondary">
                 Запросить презентацию
               </Button>
             </div>
@@ -98,60 +108,37 @@ export default async function GeneralSponsorsPage() {
 
       <section className="background-zone background-zone-beige border-b border-[var(--line)] py-10 md:py-14">
         <div className="container">
-          <PublicEyebrow>Что получает бренд</PublicEyebrow>
-          <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-            {benefits.map((benefit) => (
-              <Panel className="border-[var(--border-default)] bg-[var(--surface-wash)]" key={benefit.title} padding="lg">
-                <IconBadge icon={benefit.icon} size="md" tone="accent" />
-                <h2 className={`${displayFont.className} mt-5 text-[1.7rem] font-semibold leading-none text-[var(--text)]`}>{benefit.title}</h2>
-                <p className="mt-3 text-sm leading-7 text-[var(--muted)]">{benefit.description}</p>
-              </Panel>
-            ))}
-          </div>
+          <SponsorBenefitSheet
+            className="border-0 py-0"
+            eyebrow="Спонсорский лист"
+            items={sponsorBenefits}
+            title="Что получает бренд"
+          />
         </div>
       </section>
 
       <section className="background-zone background-zone-ivory border-b border-[var(--line)] py-10 md:py-14">
         <div className="container">
-          <PublicEyebrow>Пакеты спонсорства</PublicEyebrow>
-          <div className="mt-6 grid gap-5 lg:grid-cols-3">
-            {packageLevels.map((level) => (
-              <Panel
-                className={
-                  level.recommended
-                    ? 'relative flex h-full flex-col border-[var(--accent)]/52 bg-[var(--accent-soft)]'
-                    : 'flex h-full flex-col border-[var(--border-default)] bg-[var(--surface-wash)]'
-                }
-                key={level.title}
-                padding="lg"
-              >
-                {level.recommended ? (
-                  <span className="absolute -top-3 left-6 rounded-[var(--radius-sm)] bg-[var(--accent)] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--accent-contrast)]">
-                    Рекомендуем
-                  </span>
-                ) : null}
-                <h2 className={`${displayFont.className} text-[2rem] font-semibold leading-none text-[var(--text)]`}>{level.title}</h2>
-                <p className="mt-4 text-sm leading-7 text-[var(--muted)]">{level.description}</p>
-                <div className="mt-6 grid flex-1 content-start gap-3">
-                  {level.items.map((item) => (
-                    <FeatureItem icon={BookOpen} key={item} title={item} />
-                  ))}
-                </div>
-                <div className="mt-8 flex items-center justify-between gap-4 border-t border-[var(--line)] pt-5">
-                  <p className="text-lg font-semibold text-[var(--text)]">{level.price}</p>
-                  <Button
-                    className="px-0 text-sm tracking-normal"
-                    href={`/contacts?topic=sponsorship&partnerType=${encodeURIComponent(level.title)}`}
-                    size="sm"
-                    variant="ghost"
-                  >
-                    Подробнее
-                    <ArrowUpRight size={16} />
-                  </Button>
-                </div>
-              </Panel>
-            ))}
-          </div>
+          <SponsorPackageComparison
+            className="border-0 py-0"
+            description="Выберите уровень участия по задаче бренда: отдельное событие, сезонная серия или генеральная позиция."
+            eyebrow="Пакеты спонсорства"
+            items={packageLevels.map((level) => ({
+              packageName: level.packageName,
+              scope: level.scope,
+              visibility: level.visibility,
+              periodStatus: level.periodStatus,
+              includedPlacements: level.includedPlacements,
+              requiredAssets: level.requiredAssets,
+              recommended: level.recommended,
+              priceStatus: 'по запросу',
+              action: {
+                href: `/contacts?topic=sponsorship&partnerType=${encodeURIComponent(level.packageName)}#contact-form`,
+                label: 'Запросить условия'
+              }
+            }))}
+            title="Пакеты спонсорства"
+          />
         </div>
       </section>
 
@@ -160,17 +147,17 @@ export default async function GeneralSponsorsPage() {
           <PublicEyebrow>Генеральный спонсор сезона</PublicEyebrow>
           <div className="mt-6 grid gap-5">
             {generalSponsors.length > 0 ? (
-              generalSponsors.map((sponsor) => <GeneralSponsorCard key={sponsor.id} sponsor={sponsor} />)
+              generalSponsors.map((sponsor, index) => <GeneralSponsorCard key={sponsor.id} priority={index === 0} sponsor={sponsor} />)
             ) : (
               <Panel className="border-[var(--border-default)] bg-[var(--surface-wash)]" padding="lg">
                 <h2 className={`${displayFont.className} text-[2rem] font-semibold leading-none text-[var(--text)]`}>
                   Опубликованного генерального спонсора пока нет
                 </h2>
                 <p className="mt-4 max-w-2xl text-sm leading-7 text-[var(--muted)]">
-                  Когда команда опубликует запись в админке, карточка появится здесь и на главной странице.
+                  Когда появится опубликованный спонсор, карточка будет здесь и на главной странице.
                 </p>
                 <div className="mt-6">
-                  <Button className="rounded-[var(--radius-md)] px-7" href="/contacts?topic=sponsorship">
+                  <Button className="rounded-[var(--radius-md)] px-7" href="/contacts?topic=sponsorship#contact-form">
                     Обсудить спонсорство
                   </Button>
                 </div>
@@ -183,10 +170,11 @@ export default async function GeneralSponsorsPage() {
       <section className="background-zone background-zone-cta border-b border-[var(--line)] py-10 md:py-14">
         <div className="container">
           <SectionCtaPanel
-            description="Расскажите, какую задачу нужно решить, и команда предложит формат партнёрства."
-            icon={Handshake}
-            primary={{ href: '/contacts?topic=sponsorship', label: 'Оставить заявку' }}
-            secondary={{ href: '/contacts?topic=sponsorship-presentation', label: 'Запросить презентацию' }}
+            brandGlyph="partnership-route"
+            brandIconVariant="dark"
+            description="Расскажите, какую задачу нужно решить, какой период интересен и какие материалы уже готовы."
+            primary={{ href: '/contacts?topic=sponsorship#contact-form', label: 'Оставить заявку' }}
+            secondary={{ href: '/contacts?topic=sponsorship-presentation#contact-form', label: 'Запросить презентацию' }}
             title="Запросить условия"
           />
         </div>

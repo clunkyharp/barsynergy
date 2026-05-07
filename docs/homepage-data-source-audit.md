@@ -7,16 +7,16 @@ Purpose: keep public homepage UI changes CMS/admin-first. New homepage content m
 | Public block | Model/source | Admin path | Public status filter | Fallback / remaining hardcode |
 | --- | --- | --- | --- | --- |
 | Hero title, intro copy and launch signals | `HomepageHero` | `/admin/homepage` | `status = PUBLISHED`; first by priority | Minimal `BARSYNERGY` fallback if no published hero exists |
-| Main section entry cards | Hardcoded route map in `homepage-client.tsx` | None | None | Needs menu/navigation settings editor |
+| Main route index | Hardcoded route map in `homepage-client.tsx` | None | None | Needs menu/navigation settings editor |
 | Audience cards | `HomepageAudienceCard` | `/admin/homepage` | `status = PUBLISHED`; ordered by priority | Hidden if no published cards exist |
 | Course spotlight | `Course` | `/admin/courses` | `status = PUBLISHED` | No separate featured selector |
 | Event spotlight | `Event` | `/admin/events` | `status = PUBLISHED` | No separate featured selector |
-| Article spotlight | `Article` + active `ArticleTag` | `/admin/articles`, `/admin/taxonomy/tags` | `status = PUBLISHED`; tags require `isActive = true` | No separate featured selector |
+| Article spotlight | `Article` + active `ArticleTag` | `/admin/articles`, `/admin/tags` | `status = PUBLISHED`; tags require `isActive = true` | No separate featured selector |
 | Vacancy spotlight | `Vacancy` | `/admin/vacancies` | `status = PUBLISHED` | No separate featured selector |
 | Supplier spotlight | `Supplier` | `/admin/suppliers` | `status = PUBLISHED`; homepage prefers verified suppliers | No separate featured selector |
 | Partner signal list | `Partner` | `/admin/partners` | `status = PUBLISHED`; featured flag can narrow lists | Fallback text and ordering are not editable |
 | General sponsor block | `GeneralSponsor` | `/admin/general-sponsors` | `status = PUBLISHED` | No separate homepage placement settings |
-| Taxonomy filters | `Category`, `City`, `Tag` | `/admin/categories`, `/admin/cities`, `/admin/taxonomy/tags` | Taxonomy options require `isActive = true` | Public menu/filter labels still partly depend on page code |
+| Taxonomy filters | `Category`, `City`, `Tag` | `/admin/categories`, `/admin/cities`, `/admin/tags` | Taxonomy options require `isActive = true` | Public menu/filter labels still partly depend on page code |
 | Social cards | `HomepageSocialBlock` | `/admin/homepage` | `status = PUBLISHED`; ordered by priority | Section hidden if no published social cards exist; section heading still lives in component |
 | Cost calculator teaser | `HomepageCalculatorTeaser` | `/admin/homepage` | `status = PUBLISHED`; first by priority | Hidden if no published teaser exists |
 | Final/about CTA sections | `HomepageCtaBlock` | `/admin/homepage` | `status = PUBLISHED`; first by priority | Hidden if no published CTA exists |
@@ -32,7 +32,7 @@ Current rule:
 
 Still hardcoded after this batch:
 
-- main homepage section entry cards and route map;
+- main homepage route index and route map;
 - social section heading copy;
 - main menu/navigation settings;
 - site settings, social links and legal operator display settings;

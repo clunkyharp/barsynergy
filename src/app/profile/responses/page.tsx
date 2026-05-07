@@ -1,52 +1,13 @@
 import { redirect } from 'next/navigation';
-import type { ApplicationStatus, ApplicationType } from '@prisma/client';
 import { MetaChip } from '@/components/ui/meta-chip';
 import { PageHeader } from '@/components/ui/page-header';
 import { Panel } from '@/components/ui/panel';
-import { StatusBadge, type StatusBadgeVariant } from '@/components/ui/status-badge';
+import { StatusBadge } from '@/components/ui/status-badge';
+import { applicationStatusBadgeVariants, applicationStatusLabels, applicationTypeLabels } from '@/lib/admin/application-utils';
 import { getCurrentUser } from '@/lib/auth/current-user';
 import { prisma } from '@/lib/db/prisma';
 
-const applicationTypeLabels: Record<ApplicationType, string> = {
-  BUSINESS_ACCOUNT_REQUEST: 'Запрос бизнес-аккаунта',
-  COURSE_APPLICATION: 'Заявка на курс',
-  EVENT_APPLICATION: 'Заявка на событие',
-  VACANCY_SUBMISSION: 'Подача вакансии',
-  VACANCY_RESPONSE: 'Отклик на вакансию',
-  SUPPLIER_SUBMISSION: 'Подача поставщика',
-  PARTNER_APPLICATION: 'Заявка на партнёрство',
-  CONTACT_MESSAGE: 'Сообщение из контактов',
-  CORPORATE_TRAINING_APPLICATION: 'Заявка на корпоративное обучение',
-  CERTIFICATE_ORDER: 'Заказ сертификата'
-};
-
-const statusVariants: Record<ApplicationStatus, StatusBadgeVariant> = {
-  DRAFT: 'neutral',
-  NEW: 'pending',
-  IN_REVIEW: 'warning',
-  CONTACTED: 'success',
-  FORWARDED_TO_EMPLOYER: 'success',
-  PAYMENT_PENDING: 'warning',
-  PAID_MANUALLY: 'success',
-  APPROVED: 'success',
-  REJECTED: 'danger',
-  COMPLETED: 'success',
-  ARCHIVED: 'neutral'
-};
-
-const statusLabels: Record<ApplicationStatus, string> = {
-  DRAFT: 'Черновик',
-  NEW: 'Новая',
-  IN_REVIEW: 'На рассмотрении',
-  CONTACTED: 'Связались',
-  FORWARDED_TO_EMPLOYER: 'Передано работодателю',
-  PAYMENT_PENDING: 'Ожидает оплаты',
-  PAID_MANUALLY: 'Оплачено (вручную)',
-  APPROVED: 'Одобрено',
-  REJECTED: 'Отклонено',
-  COMPLETED: 'Завершено',
-  ARCHIVED: 'В архиве'
-};
+const PROFILE_RESPONSES_PAGE_SIZE = 20;
 
 export default async function ProfileResponsesPage() {
   const user = await getCurrentUser();
@@ -59,12 +20,23 @@ export default async function ProfileResponsesPage() {
     where: {
       email: user.email
     },
-    include: {
-      vacancy: true
+    select: {
+      id: true,
+      type: true,
+      status: true,
+      createdAt: true,
+      subject: true,
+      message: true,
+      vacancy: {
+        select: {
+          title: true
+        }
+      }
     },
     orderBy: {
       createdAt: 'desc'
-    }
+    },
+    take: PROFILE_RESPONSES_PAGE_SIZE
   });
 
   return (
@@ -101,8 +73,8 @@ export default async function ProfileResponsesPage() {
                 )}
               </div>
               <div className="flex items-center gap-4">
-                <StatusBadge variant={statusVariants[response.status]}>
-                  {statusLabels[response.status]}
+                <StatusBadge variant={applicationStatusBadgeVariants[response.status]}>
+                  {applicationStatusLabels[response.status]}
                 </StatusBadge>
               </div>
             </Panel>

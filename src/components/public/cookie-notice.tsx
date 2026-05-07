@@ -33,12 +33,12 @@ export function CookieNotice() {
       <div className="rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--paper)] p-4 shadow-[0_18px_50px_rgba(22,20,18,0.18)]">
         <div className={cn('flex items-start gap-4', isCostCalculatorPage && 'gap-3')}>
           <p className="min-w-0 text-sm leading-6 text-[var(--muted)]">
-            Сайт использует технические cookies для входа, защиты форм и стабильной работы. Подробнее: <InlineLink href="/legal/cookies">куки</InlineLink> и{' '}
+            Сайт использует технические cookies для входа, защиты форм и стабильной работы. Документы: <InlineLink href="/legal/cookies">куки</InlineLink> и{' '}
             <InlineLink href="/legal/privacy">политика данных</InlineLink>.
           </p>
           <button
             aria-label="Закрыть уведомление о cookies"
-            className="inline-flex size-9 shrink-0 items-center justify-center rounded-[var(--radius-md)] border border-[var(--border-default)] text-[var(--text)] transition hover:bg-[var(--accent)] hover:text-[var(--accent-contrast)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
+            className="inline-flex size-11 shrink-0 items-center justify-center rounded-[var(--radius-md)] border border-[var(--border-default)] text-[var(--text)] transition hover:bg-[var(--accent)] hover:text-[var(--accent-contrast)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
             onClick={() => {
               window.localStorage.setItem(cookieNoticeStorageKey, 'true');
               setIsVisible(false);

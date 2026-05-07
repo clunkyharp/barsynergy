@@ -1,4 +1,5 @@
 import { PublicBodyText, PublicDisplayTitle, PublicEyebrow } from '@/components/public/public-primitives';
+import { RequestDisclosure } from '@/components/public/request-disclosure';
 import { Button } from '@/components/ui/button';
 import { EditorialShell } from '@/components/ui/editorial-shell';
 import { FormField } from '@/components/ui/form-field';
@@ -20,6 +21,17 @@ type PublicApplicationSectionProps = {
     href: string;
     label: string;
   };
+  disclosureAliases?: string[];
+  disclosureClosedContent?: React.ReactNode;
+  disclosureDefaultOpen?: boolean;
+  disclosureDescription?: string;
+  disclosureFocusSelector?: string;
+  disclosureId?: string;
+  disclosureOpenLabel?: string;
+  disclosureShowDefaultTrigger?: boolean;
+  disclosureTitle?: string;
+  introVariant?: 'side' | 'compact';
+  sectionId?: string;
 };
 
 export type PublicApplicationFormProps = {
@@ -61,13 +73,15 @@ export function ContactChannelFieldset({
   telegramId: string;
   className?: string;
 }) {
+  const hintId = `${emailId}-contact-channel-hint`;
+
   return (
-    <fieldset className={cn('grid gap-4 rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--surface-wash)] p-4 md:grid-cols-3', className)}>
-      <legend className="px-1 text-[12px] font-semibold uppercase tracking-[0.12em] text-[var(--muted)]">
-        Способ связи
+    <fieldset aria-describedby={hintId} aria-required="true" className={cn('form-choice-group grid gap-4 md:grid-cols-3', className)}>
+      <legend className="field-label px-1">
+        Способ связи <span aria-hidden="true" className="text-[var(--accent)]">*</span>
       </legend>
-      <p className="text-sm leading-6 text-[var(--muted)] md:col-span-3">
-        Укажите хотя бы один канал: email, телефон или Telegram.
+      <p className="field-hint md:col-span-3" id={hintId}>
+        Обязательное поле: укажите email, телефон или Telegram.
       </p>
       <FormField htmlFor={emailId} label="Email">
         <Input autoComplete="email" id={emailId} name="email" spellCheck={false} type="email" maxLength={180} />
@@ -156,10 +170,76 @@ export function PublicApplicationSection({
   result,
   children,
   disabledDescription,
-  disabledLink
+  disabledLink,
+  disclosureAliases,
+  disclosureClosedContent,
+  disclosureDefaultOpen,
+  disclosureDescription,
+  disclosureFocusSelector,
+  disclosureId,
+  disclosureOpenLabel,
+  disclosureShowDefaultTrigger,
+  disclosureTitle,
+  introVariant = 'side',
+  sectionId = 'applications'
 }: PublicApplicationSectionProps) {
+  const content = disclosureId ? (
+    <RequestDisclosure
+      aliases={disclosureAliases}
+      closedContent={disclosureClosedContent}
+      defaultOpen={Boolean(disclosureDefaultOpen || result)}
+      description={disclosureDescription}
+      focusSelector={disclosureFocusSelector}
+      id={disclosureId}
+      openLabel={disclosureOpenLabel}
+      showDefaultTrigger={disclosureShowDefaultTrigger}
+      title={disclosureTitle}
+    >
+      {children}
+    </RequestDisclosure>
+  ) : (
+    children
+  );
+
+  if (introVariant === 'compact') {
+    return (
+      <section className="relative overflow-visible border-b border-[var(--line)] bg-[var(--surface)] py-12 md:py-14" id={sectionId}>
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_24%,var(--accent-soft),transparent_18%),radial-gradient(circle_at_72%_82%,rgba(20,20,18,0.05),transparent_22%)]"
+        />
+        <div className="container relative">
+          <div className="mb-5 max-w-3xl">
+            <PublicEyebrow>{eyebrow}</PublicEyebrow>
+            <PublicDisplayTitle className="mt-3 max-w-4xl !text-[clamp(2rem,3vw,3.1rem)] [overflow-wrap:normal] [word-break:normal]">
+              {title}
+            </PublicDisplayTitle>
+            <PublicBodyText className="mt-3 max-w-2xl">{description}</PublicBodyText>
+            {result ? (
+              <InlineAlert className="mt-5" tone={result.type === 'error' ? 'error' : 'success'}>
+                {result.message}
+              </InlineAlert>
+            ) : null}
+          </div>
+
+          {!enabled ? (
+            <EditorialShell className="p-5 md:p-6">
+              <h3 className="text-lg font-semibold leading-7">Формы сейчас закрыты</h3>
+              <p className="mt-3 text-sm leading-7 text-[var(--muted)]">
+                {disabledDescription ?? 'Публичные формы временно закрыты. Напишите нам через страницу контактов.'}
+              </p>
+              <Button className="mt-6 rounded-[var(--radius-md)] sm:self-start" href={disabledLink?.href ?? '/contacts'} size="lg" variant="secondary">
+                {disabledLink?.label ?? 'Открыть контакты'}
+              </Button>
+            </EditorialShell>
+          ) : content}
+        </div>
+      </section>
+    );
+  }
+
   return (
-    <section className="relative overflow-hidden border-b border-[var(--line)] bg-[var(--surface)] py-14 md:py-18" id="applications">
+    <section className="relative overflow-visible border-b border-[var(--line)] bg-[var(--surface)] py-14 md:py-18" id={sectionId}>
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_24%,var(--accent-soft),transparent_18%),radial-gradient(circle_at_72%_82%,rgba(20,20,18,0.05),transparent_22%)]"
@@ -184,15 +264,13 @@ export function PublicApplicationSection({
           <EditorialShell className="p-5 md:p-6">
             <h3 className="text-lg font-semibold leading-7">Формы сейчас закрыты</h3>
             <p className="mt-3 text-sm leading-7 text-[var(--muted)]">
-              {disabledDescription ?? 'Сейчас форму использовать нельзя. Напишите нам через страницу контактов.'}
+              {disabledDescription ?? 'Публичные формы временно закрыты. Напишите нам через страницу контактов.'}
             </p>
             <Button className="mt-6 rounded-[var(--radius-md)] sm:self-start" href={disabledLink?.href ?? '/contacts'} size="lg" variant="secondary">
               {disabledLink?.label ?? 'Открыть контакты'}
             </Button>
           </EditorialShell>
-        ) : (
-          children
-        )}
+        ) : content}
       </div>
     </section>
   );

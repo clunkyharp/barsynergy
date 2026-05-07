@@ -1,14 +1,19 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { FileUpload } from '@/components/ui/file-upload';
 
 type CoverImageInputProps = {
   id: string;
   name?: string;
 };
 
+const ALLOWED_IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/avif']);
+const MAX_IMAGE_SIZE_BYTES = 8 * 1024 * 1024;
+
 export function CoverImageInput({ id, name = 'coverImage' }: CoverImageInputProps) {
   const [fileName, setFileName] = useState('Файл не выбран');
+  const [error, setError] = useState<string | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   useEffect(() => {
@@ -29,22 +34,44 @@ export function CoverImageInput({ id, name = 'coverImage' }: CoverImageInputProp
           style={{ backgroundImage: `url("${previewUrl}")` }}
         />
       ) : null}
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-        <label
-          className="inline-flex min-h-11 cursor-pointer items-center justify-center rounded-md border border-[var(--line)] bg-white px-4 text-sm font-semibold text-[var(--text)] transition hover:border-[var(--accent)]"
-          htmlFor={id}
-        >
-          Выбрать файл
-        </label>
-        <span className="text-sm text-[var(--muted)]">{fileName}</span>
-      </div>
-      <input
+      <FileUpload
         accept="image/jpeg,image/png,image/webp,image/avif"
-        className="sr-only"
         id={id}
+        meta={fileName}
         name={name}
         onChange={(event) => {
           const file = event.currentTarget.files?.[0];
+
+          setError(null);
+
+          if (file && !ALLOWED_IMAGE_TYPES.has(file.type)) {
+            event.currentTarget.value = '';
+            setFileName('Файл не выбран');
+            setError('Выберите JPEG, PNG, WebP или AVIF.');
+            setPreviewUrl((current) => {
+              if (current) {
+                URL.revokeObjectURL(current);
+              }
+
+              return null;
+            });
+            return;
+          }
+
+          if (file && file.size > MAX_IMAGE_SIZE_BYTES) {
+            event.currentTarget.value = '';
+            setFileName('Файл не выбран');
+            setError('Размер изображения должен быть до 8 МБ.');
+            setPreviewUrl((current) => {
+              if (current) {
+                URL.revokeObjectURL(current);
+              }
+
+              return null;
+            });
+            return;
+          }
+
           setFileName(file?.name ?? 'Файл не выбран');
           setPreviewUrl((current) => {
             if (current) {
@@ -54,8 +81,10 @@ export function CoverImageInput({ id, name = 'coverImage' }: CoverImageInputProp
             return file ? URL.createObjectURL(file) : null;
           });
         }}
-        type="file"
+        title="Выбрать изображение"
+        description="JPEG, PNG, WebP или AVIF. После выбора появится предпросмотр."
       />
+      {error ? <p className="field-error">{error}</p> : null}
     </div>
   );
 }

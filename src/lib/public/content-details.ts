@@ -1,4 +1,14 @@
 import { CategoryType, ContentStatus, FileVisibility } from '@prisma/client';
+import {
+  courseFormatOptions,
+  courseLevelOptions,
+  eventFormatOptions,
+  eventRegistrationModeOptions,
+  getAdminOptionLabel,
+  partnerTypeOptions,
+  vacancyEmploymentTypeOptions,
+  vacancyExperienceOptions
+} from '@/lib/admin/content-labels';
 import { prisma } from '@/lib/db/prisma';
 import { getPublicFileUrl } from '@/lib/storage/public-url';
 import { getRenderableExternalUrl } from '@/lib/validation/external-url';
@@ -13,6 +23,11 @@ export type PublicContentDetailSection = {
   items: string[];
 };
 
+export type PublicContentImage = {
+  src: string;
+  alt: string;
+};
+
 export type PublicContentDetail = {
   id: string;
   title: string;
@@ -21,7 +36,7 @@ export type PublicContentDetail = {
   label?: string;
   meta: string[];
   body?: string;
-  imageUrl?: string;
+  imageUrl?: PublicContentImage;
   facts: PublicContentDetailFact[];
   externalUrl?: string;
   externalUrlLabel?: string;
@@ -44,8 +59,35 @@ function publicImageUrl(
   });
 }
 
+function publicImage(
+  file: { fileKey: string; bucket: string | null; visibility: FileVisibility } | null | undefined,
+  alt: string | null | undefined,
+  fallbackAlt: string
+): PublicContentImage | undefined {
+  const src = publicImageUrl(file);
+
+  if (!src) {
+    return undefined;
+  }
+
+  return {
+    src,
+    alt: alt?.trim() || fallbackAlt
+  };
+}
+
 function compact(values: Array<string | null | undefined>) {
   return values.filter((value): value is string => Boolean(value && value.trim().length > 0));
+}
+
+function cleanPublicDetailText(value: string) {
+  return value
+    .replace(/(^|\s)[Дд]емо[-\s]+/g, '$1')
+    .replace(/^поставщик\b/u, 'Поставщик')
+    .replace(/^материал\b/u, 'Материал')
+    .replace(/^событие\b/u, 'Событие')
+    .replace(/^вакансия\b/u, 'Вакансия')
+    .trim();
 }
 
 function formatDate(value: Date | null | undefined) {
@@ -68,6 +110,14 @@ function formatDateTime(value: Date | null | undefined) {
     month: 'long',
     year: 'numeric'
   });
+}
+
+function eventPlaceLabel(locationName?: string | null, cityName?: string | null) {
+  if (locationName && cityName) {
+    return `${locationName}, ${cityName}`;
+  }
+
+  return locationName ?? cityName ?? 'место уточняется';
 }
 
 export async function getPublishedArticleDetail(slug: string): Promise<PublicContentDetail | null> {
@@ -93,8 +143,8 @@ export async function getPublishedArticleDetail(slug: string): Promise<PublicCon
     id: article.id,
     title: article.title,
     slug: article.slug,
-    summary: article.summary,
-    body: article.body,
+    summary: cleanPublicDetailText(article.summary),
+    body: article.body ? cleanPublicDetailText(article.body) : article.body,
     label: article.category?.name,
     meta: compact([
       article.city?.name,
@@ -102,7 +152,7 @@ export async function getPublishedArticleDetail(slug: string): Promise<PublicCon
       article.readingTimeMinutes ? `${article.readingTimeMinutes} мин` : undefined,
       ...article.tags.map((entry) => entry.tag.name)
     ]),
-    imageUrl: publicImageUrl(article.coverImage),
+    imageUrl: publicImage(article.coverImage, article.coverImageAlt, article.title),
     facts: compact([
       article.sourceLabel ? `Источник: ${article.sourceLabel}` : undefined,
       formatDate(article.publishedAt) ? `Опубликовано: ${formatDate(article.publishedAt)}` : undefined
@@ -134,19 +184,21 @@ export async function getPublishedEventDetail(slug: string): Promise<PublicConte
     id: event.id,
     title: event.title,
     slug: event.slug,
-    summary: event.summary,
+    summary: cleanPublicDetailText(event.summary),
     label: event.category?.name,
-    meta: compact([event.city?.name, event.format, formatDate(event.startsAt)]),
-    imageUrl: publicImageUrl(event.coverImage),
+    meta: compact([event.city?.name, getAdminOptionLabel(eventFormatOptions, event.format, ''), formatDate(event.startsAt)]),
+    imageUrl: publicImage(event.coverImage, event.coverImageAlt, event.title),
     facts: compact([
       event.city?.name ? `Город: ${event.city.name}` : undefined,
       formatDateTime(event.startsAt) ? `Дата и время: ${formatDateTime(event.startsAt)}` : undefined,
       formatDateTime(event.endsAt) ? `Окончание: ${formatDateTime(event.endsAt)}` : undefined,
       event.locationName ? `Место: ${event.locationName}` : undefined,
       event.address ? `Адрес: ${event.address}` : undefined,
-      event.format ? `Формат: ${event.format}` : undefined,
+      event.format ? `Формат: ${getAdminOptionLabel(eventFormatOptions, event.format)}` : undefined,
       'Для кого: специалисты, команды и партнёры индустрии',
-      event.registrationMode ? `Регистрация: ${event.registrationMode}` : 'Регистрация: заявки принимаются через BARSYNERGY',
+      event.registrationMode
+        ? `Регистрация: ${getAdminOptionLabel(eventRegistrationModeOptions, event.registrationMode)}`
+        : 'Регистрация: заявки принимаются через BARSYNERGY',
       'Участие: бесплатно или по условиям организатора',
       'Организатор: BARSYNERGY / партнёры',
       typeof event.capacity === 'number' ? `Мест: ${event.capacity}` : undefined
@@ -159,12 +211,15 @@ export async function getPublishedEventDetail(slug: string): Promise<PublicConte
     }),
     sections: [
       {
-        title: 'Программа',
-        items: [
-          'Вступительная часть и знакомство с темой события.',
-          'Практический блок: разбор продукта, сервиса, команды или запуска.',
-          'Вопросы участников и короткий обмен контактами после основной части.'
-        ]
+        title: 'Перед участием',
+        items: compact([
+          formatDateTime(event.startsAt) ? `Дата и время: ${formatDateTime(event.startsAt)}.` : undefined,
+          event.locationName || event.city?.name ? `Место: ${eventPlaceLabel(event.locationName, event.city?.name)}.` : undefined,
+          event.format ? `Формат: ${getAdminOptionLabel(eventFormatOptions, event.format)}.` : undefined,
+          event.registrationMode
+            ? `Регистрация: ${getAdminOptionLabel(eventRegistrationModeOptions, event.registrationMode)}.`
+            : 'Регистрация проходит через форму BARSYNERGY.'
+        ])
       },
       {
         title: 'Кому подходит',
@@ -173,28 +228,6 @@ export async function getPublishedEventDetail(slug: string): Promise<PublicConte
           'Заведениям, которым нужен контакт с экспертами, брендами или поставщиками.',
           'Брендам и партнёрам, которые хотят понять аудиторию СКФО.'
         ]
-      },
-      {
-        title: 'Что получит участник',
-        items: [
-          'Понятную тему встречи и контакты людей, с которыми можно продолжить разговор.',
-          'Практические идеи для меню, сервиса, закупок, команды или продвижения.',
-          'Понимание локального рынка без длинной теории.'
-        ]
-      },
-      {
-        title: 'Условия участия',
-        items: [
-          event.registrationMode
-            ? `Регистрация: ${event.registrationMode}.`
-            : 'Регистрация проходит через форму BARSYNERGY или контакт команды.',
-          'Если формат ограничен по местам, команда подтвердит участие отдельно.',
-          'Стоимость и специальные условия указываются организатором события.'
-        ]
-      },
-      {
-        title: 'Партнёры',
-        items: ['Если событие проходит вместе с брендом или площадкой, их роль указывается в анонсе и материалах события.']
       }
     ]
   };
@@ -218,11 +251,16 @@ export async function getPublishedCourseDetail(slug: string): Promise<PublicCont
     id: course.id,
     title: course.title,
     slug: course.slug,
-    summary: course.summary,
-    body: course.program,
+    summary: cleanPublicDetailText(course.summary),
+    body: course.program ? cleanPublicDetailText(course.program) : course.program,
     label: course.category?.name,
-    meta: compact([course.city?.name, course.format, course.level, course.durationLabel]),
-    imageUrl: publicImageUrl(course.coverImage),
+    meta: compact([
+      course.city?.name,
+      getAdminOptionLabel(courseFormatOptions, course.format, ''),
+      getAdminOptionLabel(courseLevelOptions, course.level, ''),
+      course.durationLabel
+    ]),
+    imageUrl: publicImage(course.coverImage, course.coverImageAlt, course.title),
     facts: compact([
       course.priceLabel ? `Стоимость: ${course.priceLabel}` : undefined,
       course.instructorName ? `Преподаватель: ${course.instructorName}` : undefined,
@@ -255,19 +293,24 @@ export async function getPublishedVacancyDetail(slug: string): Promise<PublicCon
     id: vacancy.id,
     title: vacancy.title,
     slug: vacancy.slug,
-    summary: vacancy.summary,
-    body: vacancy.description,
+    summary: cleanPublicDetailText(vacancy.summary),
+    body: vacancy.description ? cleanPublicDetailText(vacancy.description) : vacancy.description,
     label: vacancy.category?.name,
-    meta: compact([vacancy.city?.name, vacancy.companyName, vacancy.employmentType, vacancy.salaryLabel]),
-    imageUrl: publicImageUrl(vacancy.coverImage),
+    meta: compact([
+      vacancy.city?.name,
+      vacancy.companyName,
+      getAdminOptionLabel(vacancyEmploymentTypeOptions, vacancy.employmentType, ''),
+      vacancy.salaryLabel
+    ]),
+    imageUrl: publicImage(vacancy.coverImage, vacancy.coverImageAlt, vacancy.title),
     companyName: vacancy.companyName,
     cityName: vacancy.city?.name,
     facts: compact([
       `Компания: ${vacancy.companyName}`,
       `Позиция: ${vacancy.position}`,
       vacancy.salaryLabel ? `Зарплата: ${vacancy.salaryLabel}` : undefined,
-      vacancy.employmentType ? `График: ${vacancy.employmentType}` : undefined,
-      vacancy.experienceLabel ? `Опыт: ${vacancy.experienceLabel}` : undefined,
+      vacancy.employmentType ? `График: ${getAdminOptionLabel(vacancyEmploymentTypeOptions, vacancy.employmentType)}` : undefined,
+      vacancy.experienceLabel ? `Опыт: ${getAdminOptionLabel(vacancyExperienceOptions, vacancy.experienceLabel)}` : undefined,
       vacancy.contactMode ? `Контакт: ${vacancy.contactMode}` : undefined,
       formatDate(vacancy.publishedAt ?? vacancy.createdAt) ? `Обновлено: ${formatDate(vacancy.publishedAt ?? vacancy.createdAt)}` : undefined
     ]).map((entry) => {
@@ -300,11 +343,11 @@ export async function getPublishedSupplierDetail(slug: string): Promise<PublicCo
     id: supplier.id,
     title: supplier.title,
     slug: supplier.slug,
-    summary: supplier.summary,
-    body: supplier.description,
+    summary: cleanPublicDetailText(supplier.summary),
+    body: cleanPublicDetailText(supplier.description),
     label: supplier.category?.name,
     meta: compact([supplier.city?.name, supplier.companyName, supplier.isVerified ? 'Проверенный поставщик' : undefined]),
-    imageUrl: publicImageUrl(supplier.coverImage),
+    imageUrl: publicImage(supplier.coverImage, supplier.coverImageAlt, supplier.title),
     companyName: supplier.companyName,
     facts: compact([
       `Компания: ${supplier.companyName}`,
@@ -312,8 +355,8 @@ export async function getPublishedSupplierDetail(slug: string): Promise<PublicCo
       supplier.city?.name ? `Город: ${supplier.city.name}` : undefined,
       supplier.serviceArea ? `Поставка: ${supplier.serviceArea}` : undefined,
       supplier.contactLabel ? `Контакт: ${supplier.contactLabel}` : undefined,
-      supplier.isVerified ? 'Статус: проверен BARSYNERGY' : 'Статус: данные уточняются',
-      'Минимальный заказ: по запросу у компании'
+      supplier.isVerified ? 'Статус: проверен BARSYNERGY' : 'Статус: контакт для уточнения',
+      'Условия: уточняйте у компании'
     ]).map((entry) => {
       const [label, ...rest] = entry.split(': ');
       return {
@@ -345,15 +388,19 @@ export async function getPublishedPartnerDetail(slug: string): Promise<PublicCon
     id: partner.id,
     title: partner.title,
     slug: partner.slug,
-    summary: partner.summary,
-    body: partner.description,
+    summary: cleanPublicDetailText(partner.summary),
+    body: partner.description ? cleanPublicDetailText(partner.description) : partner.description,
     label: partner.category?.name,
-    meta: compact([partner.companyName, partner.partnerType, partner.isFeatured ? 'В подборке' : undefined]),
-    imageUrl: publicImageUrl(partner.coverImage),
+    meta: compact([
+      partner.companyName,
+      getAdminOptionLabel(partnerTypeOptions, partner.partnerType, ''),
+      partner.isFeatured ? 'В подборке' : undefined
+    ]),
+    imageUrl: publicImage(partner.coverImage, partner.coverImageAlt, partner.title),
     companyName: partner.companyName,
     facts: compact([
       `Компания: ${partner.companyName}`,
-      partner.partnerType ? `Тип партнёрства: ${partner.partnerType}` : undefined,
+      partner.partnerType ? `Тип партнёрства: ${getAdminOptionLabel(partnerTypeOptions, partner.partnerType)}` : undefined,
       partner.isFeatured ? 'Статус: В подборке' : undefined
     ]).map((entry) => {
       const [label, ...rest] = entry.split(': ');

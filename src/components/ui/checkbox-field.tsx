@@ -10,8 +10,8 @@ type CheckboxFieldProps = InputHTMLAttributes<HTMLInputElement> & {
 
 export function CheckboxField({ children, className, labelClassName, disabled, ...props }: CheckboxFieldProps) {
   return (
-    <label className={cn('flex items-start gap-3 text-sm leading-6 text-[var(--muted)]', disabled && 'opacity-70', className)}>
-      <Checkbox className="mt-[0.2rem]" disabled={disabled} {...props} />
+    <label className={cn('checkbox-field', disabled && 'opacity-70', className)}>
+      <Checkbox disabled={disabled} {...props} />
       <span className={cn('min-w-0', labelClassName)}>{children}</span>
     </label>
   );

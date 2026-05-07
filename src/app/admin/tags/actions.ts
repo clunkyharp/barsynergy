@@ -16,7 +16,7 @@ import {
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
 import { prisma } from '@/lib/db/prisma';
 
-const ADMIN_TAGS_PATH = '/admin/taxonomy/tags';
+const ADMIN_TAGS_PATH = '/admin/tags';
 
 const tagFormSchema = z.object({
   name: z.string().trim().min(2).max(120),
@@ -31,13 +31,27 @@ const tagUpdateSchema = tagFormSchema.extend({
   tagId: z.string().trim().min(1)
 });
 
-function readTagForm(formData: FormData) {
+function readBooleanFormValue(formData: FormData, key: string, fallback: boolean) {
+  const value = getString(formData, key);
+
+  if (value === 'true') {
+    return true;
+  }
+
+  if (value === 'false') {
+    return false;
+  }
+
+  return fallback;
+}
+
+function readTagForm(formData: FormData, defaultIsActive = true) {
   const parsed = tagFormSchema.parse({
     name: getString(formData, 'name'),
     slug: optionalString(getString(formData, 'slug')),
     type: getString(formData, 'type') || CategoryType.ARTICLE,
     description: optionalString(getString(formData, 'description')),
-    isActive: getString(formData, 'isActive') === 'true',
+    isActive: readBooleanFormValue(formData, 'isActive', defaultIsActive),
     sortOrder: getString(formData, 'sortOrder') || '0'
   });
   const slug = slugify(parsed.slug ?? parsed.name);

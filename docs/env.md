@@ -14,10 +14,15 @@ Important production values:
 NODE_ENV=production
 APP_URL=https://barsynergy.ru
 DATABASE_URL=postgresql://barsynergy:<password>@postgres:5432/barsynergy
+SESSION_SECRET=<long-random-secret>
 NEXT_SERVER_ACTIONS_ENCRYPTION_KEY=<base64-aes-key>
 STORAGE_DRIVER=s3
 S3_ENDPOINT=https://s3.twcstorage.ru
 S3_REGION=ru-1
+S3_BUCKET_PUBLIC=<public-bucket>
+S3_BUCKET_PRIVATE=<private-bucket>
+S3_ACCESS_KEY_ID=<access-key>
+S3_SECRET_ACCESS_KEY=<secret-key>
 APPLICATION_FORMS_ENABLED=false
 POSTGRES_DB=barsynergy
 POSTGRES_USER=barsynergy
@@ -29,6 +34,18 @@ POSTGRES_PASSWORD=<password>
 `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` must stay stable across production builds and app instances. Use a base64-encoded AES key with 16, 24 or 32 bytes.
 
 `APP_DEPLOYMENT_ID` is optional but recommended for self-hosted deploys. Use a release-specific value such as a commit SHA or deploy tag so stale client pages are less likely to hit Server Action version skew after deploys.
+
+## Production Runtime Validation
+
+Runtime validation is defined in `src/lib/validation/env.ts`.
+
+For `NODE_ENV=production`, the app validates different required variables by storage mode:
+
+- `STORAGE_DRIVER=s3`: `DATABASE_URL`, `SESSION_SECRET`, `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY`, `S3_ENDPOINT`, `S3_REGION`, `S3_BUCKET_PUBLIC`, `S3_BUCKET_PRIVATE`, `S3_ACCESS_KEY_ID` and `S3_SECRET_ACCESS_KEY` are required.
+- `STORAGE_DRIVER=local`: `DATABASE_URL`, `SESSION_SECRET` and `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` are required, and this mode is allowed only when `ALLOW_LOCAL_STORAGE_IN_PRODUCTION=true`.
+- `APPLICATION_FORMS_ENABLED=true`: legal operator details and readiness flags become required at startup. See "Legal Operator Fields" below.
+
+Keep `.env.production.example` aligned with this list whenever env validation changes.
 
 ## Storage Rule
 

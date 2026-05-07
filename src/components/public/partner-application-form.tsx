@@ -27,7 +27,7 @@ export function PartnerApplicationForm({ enabled, result, utm, cities, defaults 
 
   const preparationNotes = [
     'Кто вы и что хотите сделать вместе с BARSYNERGY.',
-    'Какая задача: обучение, событие, запуск, размещение или новые контакты.',
+    'Какая задача: обучение, событие, запуск, размещение или контакт с заведениями.',
     'Ссылку на сайт, Telegram или материалы, если их уже можно посмотреть.'
   ];
 
@@ -36,6 +36,13 @@ export function PartnerApplicationForm({ enabled, result, utm, cities, defaults 
       eyebrow="Партнёрство / Заявка"
       title="Обсудить партнёрство"
       description="Для брендов, школ, заведений и сервисных команд: совместный проект, событие, размещение или программа."
+      disclosureAliases={['applications']}
+      disclosureFocusSelector="#partnerCompanyName"
+      disclosureId="partner-request"
+      disclosureOpenLabel="Открыть заявку"
+      disclosureTitle="Обсудить партнёрство"
+      disclosureDescription="Укажите компанию, формат, город, ссылку и короткое описание задачи."
+      disclosureDefaultOpen={Boolean(defaults.partnerType)}
       enabled={enabled}
       result={result}
     >

@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { Clock, Mail, MapPin, Send } from 'lucide-react';
+import { Clock, Mail, MapPin, Send, type LucideIcon } from 'lucide-react';
 import { submitContactMessage } from '@/app/(public)/contacts/actions';
 import {
   HiddenUtmFields,
@@ -11,7 +11,8 @@ import {
   PublicFormShellHeader,
   type PublicApplicationFormProps
 } from '@/components/public/application-form-section';
-import { IconBadge } from '@/components/public/public-ui-adaptation';
+import { ContactActionRow } from '@/components/public/contact-action-row';
+import { RequestDisclosure } from '@/components/public/request-disclosure';
 import { Button } from '@/components/ui/button';
 import { ConsentField } from '@/components/ui/consent-field';
 import { EditorialShell } from '@/components/ui/editorial-shell';
@@ -22,6 +23,45 @@ import { InlineLink } from '@/components/ui/inline-link';
 import { Select } from '@/components/ui/select';
 import { SubmitButton } from '@/components/ui/submit-button';
 import { Textarea } from '@/components/ui/textarea';
+import { cn } from '@/lib/utils';
+
+const contactMethods: {
+  type: string;
+  name: string;
+  value: string;
+  href?: string;
+  actionLabel?: string;
+  icon: LucideIcon;
+}[] = [
+  {
+    type: 'Email',
+    name: 'Основная почта',
+    value: 'hello@barsynergy.ru',
+    href: 'mailto:hello@barsynergy.ru',
+    actionLabel: 'Написать',
+    icon: Mail
+  },
+  {
+    type: 'Telegram',
+    name: 'Короткая связь',
+    value: '@barsynergy',
+    href: 'https://t.me/barsynergy',
+    actionLabel: 'Открыть Telegram',
+    icon: Send
+  },
+  {
+    type: 'Регион',
+    name: 'Город / регион',
+    value: 'Махачкала, Республика Дагестан, Россия',
+    icon: MapPin
+  },
+  {
+    type: 'Ответ',
+    name: 'Время ответа',
+    value: 'В рабочие дни. Обычно — в течение 24 часов.',
+    icon: Clock
+  }
+];
 
 const contactTopicOptions = [
   {
@@ -68,10 +108,41 @@ const contactTopicOptions = [
 
 type ContactTopicValue = (typeof contactTopicOptions)[number]['value'];
 
+function ContactTopicGrid({ selectedTopic }: { selectedTopic?: ContactTopicValue }) {
+  return (
+    <EditorialShell className="p-6 md:p-8">
+      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Темы обращения</p>
+      <div className="mt-5 grid gap-2 sm:grid-cols-2">
+        {contactTopicOptions.map((option) => {
+          const isSelected = option.value === selectedTopic;
+
+          return (
+            <a
+              aria-current={isSelected ? 'true' : undefined}
+              aria-label={`Открыть форму: ${option.label}`}
+              className={cn(
+                'group grid min-h-[9.75rem] content-between rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--surface-wash)] p-4 text-left transition duration-200 hover:border-[var(--accent-muted)] hover:bg-[var(--surface-wash-strong)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)]',
+                isSelected && 'border-[var(--accent-muted)] bg-[var(--surface)]'
+              )}
+              href={`/contacts?topic=${option.value}#contact-form`}
+              key={option.value}
+            >
+              <span>
+                <span className="block text-sm font-semibold leading-5 text-[var(--text)]">{option.label}</span>
+                <span className="mt-2 block text-sm leading-6 text-[var(--muted)]">{option.description}</span>
+              </span>
+              <span className="mt-4 text-sm font-semibold leading-5 text-[var(--accent)]">Открыть форму</span>
+            </a>
+          );
+        })}
+      </div>
+    </EditorialShell>
+  );
+}
+
 export function ContactApplicationForm({ enabled, result, utm, cities, defaultTopic, defaults = {} }: PublicApplicationFormProps) {
-  const initialTopic = contactTopicOptions.some((option) => option.value === defaultTopic)
-    ? (defaultTopic as ContactTopicValue)
-    : 'other';
+  const hasDefaultTopic = contactTopicOptions.some((option) => option.value === defaultTopic);
+  const initialTopic = hasDefaultTopic ? (defaultTopic as ContactTopicValue) : 'other';
   const [topic, setTopic] = useState<ContactTopicValue>(initialTopic);
   const selectedTopic = useMemo(
     () => contactTopicOptions.find((option) => option.value === topic) ?? contactTopicOptions.at(-1)!,
@@ -87,7 +158,7 @@ export function ContactApplicationForm({ enabled, result, utm, cities, defaultTo
           : topic === 'partnership'
             ? 'Какой формат партнёрства хотите обсудить'
             : topic === 'sponsorship'
-              ? 'Что хотите получить от спонсорства'
+              ? 'Какие условия спонсорства нужны'
               : topic === 'article-topic'
                 ? 'О чём должен быть материал'
                 : topic === 'education-program'
@@ -95,7 +166,7 @@ export function ContactApplicationForm({ enabled, result, utm, cities, defaultTo
                   : 'Сообщение';
 
   const form = enabled ? (
-      <form action={submitContactMessage} className="editorial-form-shell overflow-hidden">
+      <form action={submitContactMessage} className="editorial-form-shell">
         <HiddenUtmFields utm={utm} />
         <HoneypotField id="contact-message-website" />
         <PublicFormShellHeader
@@ -233,7 +304,7 @@ export function ContactApplicationForm({ enabled, result, utm, cities, defaultTo
               </ConsentField>
             </div>
           </div>
-          <PublicFormShellFooter note="Поля меняются после выбора темы. Ответ придёт по указанному способу связи.">
+          <PublicFormShellFooter note="После отправки команда ответит по указанному способу связи.">
             <SubmitButton className="min-h-12 rounded-[var(--radius-md)] px-6 tracking-normal sm:self-start">
               Отправить сообщение
             </SubmitButton>
@@ -253,48 +324,28 @@ export function ContactApplicationForm({ enabled, result, utm, cities, defaultTo
   );
 
   return (
-    <section className="relative overflow-hidden border-b border-[var(--line)] bg-[var(--surface)] py-14 md:py-18" id="applications">
+    <section className="relative overflow-visible border-b border-[var(--line)] bg-[var(--surface)] py-14 md:py-18" id="applications">
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_24%,var(--accent-soft),transparent_18%),radial-gradient(circle_at_78%_22%,var(--surface-muted),transparent_20%)]"
       />
-      <div className="container relative grid gap-6 xl:grid-cols-[0.72fr_1.28fr] xl:items-start">
-        <div className="grid gap-5">
+      <div className="container relative grid gap-6">
+        <div className="grid gap-5 xl:grid-cols-[0.82fr_1.18fr] xl:items-start">
           <EditorialShell className="p-6 md:p-8">
             <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Контакты</p>
-            <div className="mt-7 grid gap-6">
-              <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-4">
-                <IconBadge icon={Mail} size="md" tone="soft" />
-                <div>
-                  <h3 className="text-lg font-semibold leading-7 text-[var(--text)]">Email</h3>
-                  <a className="mt-1 block text-sm font-semibold text-[var(--accent)]" href="mailto:hello@barsynergy.ru">
-                    hello@barsynergy.ru
-                  </a>
-                </div>
-              </div>
-              <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-4">
-                <IconBadge icon={Send} size="md" tone="soft" />
-                <div>
-                  <h3 className="text-lg font-semibold leading-7 text-[var(--text)]">Telegram</h3>
-                  <a className="mt-1 block text-sm font-semibold text-[var(--accent)]" href="https://t.me/barsynergy">
-                    @barsynergy
-                  </a>
-                </div>
-              </div>
-              <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-4">
-                <IconBadge icon={MapPin} size="md" tone="soft" />
-                <div>
-                  <h3 className="text-lg font-semibold leading-7 text-[var(--text)]">Город / регион</h3>
-                  <p className="mt-1 text-sm leading-6 text-[var(--muted)]">Махачкала, Республика Дагестан, Россия</p>
-                </div>
-              </div>
-              <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-4">
-                <IconBadge icon={Clock} size="md" tone="soft" />
-                <div>
-                  <h3 className="text-lg font-semibold leading-7 text-[var(--text)]">Время ответа</h3>
-                  <p className="mt-1 text-sm leading-6 text-[var(--muted)]">В рабочие дни. Обычно — в течение 24 часов.</p>
-                </div>
-              </div>
+            <div className="mt-5 grid gap-2">
+              {contactMethods.map((method) => (
+                <ContactActionRow
+                  actionLabel={method.actionLabel}
+                  descriptor={method.value}
+                  href={method.href}
+                  icon={method.icon}
+                  key={method.type}
+                  serviceName={method.name}
+                  typeLabel={method.type}
+                  wrapDescriptor
+                />
+              ))}
             </div>
             {result ? (
               <InlineAlert className="mt-8" tone={result.type === 'error' ? 'error' : 'success'}>
@@ -302,8 +353,19 @@ export function ContactApplicationForm({ enabled, result, utm, cities, defaultTo
               </InlineAlert>
             ) : null}
           </EditorialShell>
+          <ContactTopicGrid selectedTopic={hasDefaultTopic ? topic : undefined} />
         </div>
-        {form}
+        <RequestDisclosure
+          aliases={['applications']}
+          defaultOpen={Boolean(result)}
+          focusSelector="#contactName"
+          id="contact-form"
+          openLabel="Открыть форму"
+          title="Форма сообщения"
+          description="Выберите тему, оставьте контакт и коротко опишите задачу."
+        >
+          {form}
+        </RequestDisclosure>
       </div>
     </section>
   );

@@ -149,7 +149,9 @@ Update on 2026-04-26:
 - Dependencies: completed remediation changes.
 - Verification: README/docs/env/deploy/phase-plan describe current behavior.
 
-## Remaining Remediation Order
+## Historical Remaining Remediation Order
+
+The order below belongs to the 2026-04-26 audit cycle. It is preserved for traceability only and must not be treated as the active release queue.
 
 ### Phase 1 - Launch Blockers
 
@@ -157,7 +159,7 @@ Update on 2026-04-26:
 2. Configure one production scheduler for `npm run session:cleanup:expired`.
 3. Get owner/legal approval for legal texts before collecting personal data.
 
-### Phase 2 - Content/Admin Implementation
+### Phase 2 - Content/Admin Implementation (superseded)
 
 1. Add Phase 2 Prisma models from `docs/phase-2-content-admin-spec.md`.
 2. Add migrations and indexes for published content queries.
@@ -170,7 +172,9 @@ Update on 2026-04-26:
 2. Re-run lint, typecheck, build and Prisma validate after code changes.
 3. Re-run public screenshot QA after real content data is connected.
 
-## Step-By-Step Implementation Plan
+## Historical Step-By-Step Implementation Plan
+
+The steps below are not current instructions. Use the operational docs listed in "Current Use" for active work.
 
 ### Step 1 - Admin Guard
 

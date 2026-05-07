@@ -17,6 +17,34 @@ function itemHref(basePath: string, slug: string) {
   return `${basePath}/${slug}`;
 }
 
+function relatedActionLabel(basePath: string) {
+  if (basePath === '/articles') {
+    return 'Читать материал';
+  }
+
+  if (basePath === '/events') {
+    return 'Открыть событие';
+  }
+
+  if (basePath === '/vacancies') {
+    return 'Открыть вакансию';
+  }
+
+  if (basePath === '/suppliers') {
+    return 'Открыть профиль';
+  }
+
+  if (basePath === '/education') {
+    return 'Открыть программу';
+  }
+
+  if (basePath === '/partners') {
+    return 'Открыть партнёра';
+  }
+
+  return 'Открыть запись';
+}
+
 export function PublicRelatedContentSection({
   items,
   basePath,
@@ -29,7 +57,7 @@ export function PublicRelatedContentSection({
   }
 
   return (
-    <section className="border-b border-black/20 py-10 md:py-14">
+    <section className="border-b border-[var(--line)] py-10 md:py-14">
       <div className="container grid gap-8 xl:grid-cols-[0.58fr_1.42fr]">
         <div>
           <PublicEyebrow>{eyebrow}</PublicEyebrow>
@@ -37,9 +65,9 @@ export function PublicRelatedContentSection({
           {description ? <PublicBodyText className="mt-5 max-w-md">{description}</PublicBodyText> : null}
         </div>
 
-        <div className="border-y border-black/15">
+        <div className="border-y border-[var(--line)]">
           {items.map((item, index) => (
-            <article className="grid gap-4 border-b border-black/10 py-5 last:border-b-0 md:grid-cols-[auto_minmax(0,1fr)_auto] md:items-start md:gap-6" key={item.id}>
+            <article className="grid gap-4 border-b border-[var(--line)] py-5 last:border-b-0 md:grid-cols-[auto_minmax(0,1fr)_auto] md:items-start md:gap-6" key={item.id}>
               <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">
                 {String(index + 1).padStart(2, '0')}
               </p>
@@ -60,7 +88,7 @@ export function PublicRelatedContentSection({
               </div>
 
               <InlineLink className="inline-flex items-center gap-2 md:mt-1 md:self-start" href={itemHref(basePath, item.slug)}>
-                Открыть
+                {relatedActionLabel(basePath)}
                 <ArrowUpRight size={16} />
               </InlineLink>
             </article>

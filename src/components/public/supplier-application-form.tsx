@@ -21,17 +21,24 @@ export function SupplierApplicationForm({ enabled, result, utm, cities }: Public
     <PublicApplicationSection
       eyebrow="Поставщики / Заявка"
       title="Подать заявку в каталог"
-      description="Укажите компанию, города работы, условия поставки и контакт для заведений."
+      description="Заполните данные компании, географию работы и контакт для заведений."
+      disclosureAliases={['applications']}
+      disclosureFocusSelector="#supplierCompanyName"
+      disclosureId="supplier-request"
+      disclosureOpenLabel="Добавить компанию"
+      disclosureTitle="Заявка поставщика"
+      disclosureDescription="Укажите компанию, категорию, географию работы, продукты или услуги и контакт для заведений."
       enabled={enabled}
+      introVariant="compact"
       result={result}
     >
-      <form action={submitSupplierApplication} className="editorial-form-shell overflow-hidden">
+      <form action={submitSupplierApplication} className="editorial-form-shell">
         <HiddenUtmFields utm={utm} />
         <HoneypotField id="supplier-application-website" />
         <PublicFormShellHeader
           eyebrow="Компания и поставка"
           title="Заявка поставщика"
-          description="Укажите категорию, продукты или услуги, минимальные условия заказа, если они есть, и рабочий контакт."
+          description="Категория, продукты или услуги, условия заказа и рабочий контакт."
         />
         <div className="relative p-5 md:p-6">
           <div className="grid gap-4 md:grid-cols-2">

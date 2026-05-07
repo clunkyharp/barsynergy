@@ -1,9 +1,11 @@
 import type { Metadata } from 'next';
 import { CategoryType } from '@prisma/client';
 import { ArrowUpRight } from 'lucide-react';
+import { ProcessStepsInline } from '@/components/public/editorial-display-primitives';
 import { PublicActionRow, PublicBodyText, PublicDisplayTitle, PublicEyebrow } from '@/components/public/public-primitives';
 import { PublishedContentSection } from '@/components/public/published-content-section';
 import { PublicFilters } from '@/components/public/public-filters';
+import { RequestDisclosureTrigger } from '@/components/public/request-disclosure';
 import { VacancyApplicationForms } from '@/components/public/vacancy-application-forms';
 import { Button } from '@/components/ui/button';
 import { arePublicApplicationFormsEnabled } from '@/lib/applications/public-forms';
@@ -30,7 +32,28 @@ export const metadata: Metadata = {
   description: 'Вакансии для баров, кофеен и команд Северного Кавказа.'
 };
 
-const moderationSteps = ['Отправка', 'Проверка', 'Уточнение', 'Публикация', 'Отклики'] as const;
+const moderationSteps = [
+  {
+    title: 'Отправка',
+    description: 'Работодатель отправляет роль, условия, город, график и контакт для связи.'
+  },
+  {
+    title: 'Проверка',
+    description: 'Команда смотрит, хватает ли кандидату данных о роли, графике, условиях и контакте.'
+  },
+  {
+    title: 'Уточнение',
+    description: 'Если нужно, просим добавить зарплатный диапазон, обязанности или формат занятости.'
+  },
+  {
+    title: 'Публикация',
+    description: 'После проверки вакансия появляется в списке и получает отдельную страницу.'
+  },
+  {
+    title: 'Отклики',
+    description: 'Кандидаты откликаются с привязкой к конкретной роли, без повторного выбора вакансии.'
+  }
+] as const;
 
 export default async function VacanciesPage({ searchParams }: VacanciesPageProps) {
   const params = (await searchParams) ?? {};
@@ -63,16 +86,16 @@ export default async function VacanciesPage({ searchParams }: VacanciesPageProps
                 Смотреть вакансии
                 <ArrowUpRight size={18} />
               </Button>
-              <Button
+              <RequestDisclosureTrigger
                 className="min-h-12 w-full max-w-[15rem] rounded-[var(--radius-md)] px-6 tracking-normal sm:w-auto"
-                href="#vacancy-submission"
+                targetId="submit-vacancy"
                 variant="secondary"
               >
                 Разместить вакансию
-              </Button>
+              </RequestDisclosureTrigger>
             </PublicActionRow>
-            <div className="mt-8 grid gap-4 lg:grid-cols-2">
-              <div className="rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--surface-wash)] p-5">
+            <div className="mt-8 grid divide-y divide-[var(--line)] border-y border-[var(--line)] lg:grid-cols-2 lg:divide-x lg:divide-y-0">
+              <div className="py-5 lg:pr-6">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Я ищу работу</p>
                 <h2 className={`${displayFont.className} mt-4 text-[1.8rem] font-semibold leading-none text-[var(--text)]`}>
                   Смотреть роли и откликнуться
@@ -86,18 +109,18 @@ export default async function VacanciesPage({ searchParams }: VacanciesPageProps
                   </Button>
                 </div>
               </div>
-              <div className="rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--surface-wash)] p-5">
+              <div className="py-5 lg:pl-6">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Я ищу сотрудника</p>
                 <h2 className={`${displayFont.className} mt-4 text-[1.8rem] font-semibold leading-none text-[var(--text)]`}>
-                  Разместить вакансию и получить отклики
+                  Разместить вакансию для кандидатов
                 </h2>
                 <p className="mt-3 max-w-[34ch] text-sm leading-7 text-[var(--muted)]">
                   Отправьте роль, условия и контакт. Если понадобится, команда поможет уточнить детали перед публикацией.
                 </p>
                 <div className="mt-5 flex flex-wrap gap-3">
-                  <Button className="w-full max-w-[14rem] rounded-[var(--radius-md)] px-5 sm:w-auto" href="#vacancy-submission" size="sm">
+                  <RequestDisclosureTrigger className="w-full max-w-[14rem] rounded-[var(--radius-md)] px-5 sm:w-auto" size="sm" targetId="submit-vacancy">
                     Разместить вакансию
-                  </Button>
+                  </RequestDisclosureTrigger>
                 </div>
               </div>
             </div>
@@ -108,7 +131,7 @@ export default async function VacanciesPage({ searchParams }: VacanciesPageProps
         basePath="/vacancies"
         content={content}
         emptyActions={[
-          { href: '#vacancy-submission', label: 'Разместить вакансию' },
+          { href: '#submit-vacancy', label: 'Разместить вакансию' },
           { href: '/contacts', label: 'Написать команде', variant: 'secondary' }
         ]}
         emptyDescription="Сейчас открытых вакансий нет. Но можно уже отправить вакансию для публикации или написать команде."
@@ -125,7 +148,7 @@ export default async function VacanciesPage({ searchParams }: VacanciesPageProps
           />
         }
         sectionId="vacancy-list"
-        listAction={{ href: '#vacancy-submission', label: 'Разместить вакансию', variant: 'ghost' }}
+        listAction={{ href: '#submit-vacancy', label: 'Разместить вакансию', variant: 'ghost' }}
         listLabel="Вакансии индустрии"
         rowVariant="opportunity"
         rowActionLabel="Откликнуться"
@@ -133,29 +156,14 @@ export default async function VacanciesPage({ searchParams }: VacanciesPageProps
         title="Открытые вакансии"
       />
       <section className="background-zone background-zone-beige border-b border-[var(--line)] py-10 md:py-14">
-        <div className="container grid gap-8 xl:grid-cols-[minmax(16rem,0.58fr)_minmax(0,1.42fr)]">
-          <div>
-            <PublicEyebrow>Проверка вакансий</PublicEyebrow>
-            <h2 className={`${displayFont.className} mt-4 max-w-sm text-[2.6rem] font-semibold leading-none text-[var(--text)] md:text-[3.15rem]`}>
-              Как вакансия попадает на сайт
-            </h2>
-            <PublicBodyText className="mt-4 max-w-md">
-              Команда проверяет карточку перед публикацией, чтобы кандидат видел понятные условия, а заведение получало подходящие отклики.
-            </PublicBodyText>
-          </div>
-          <div className="grid gap-3 md:grid-cols-5">
-            {moderationSteps.map((step, index) => (
-              <div
-                className="rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--surface-wash)] p-4"
-                key={step}
-              >
-                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">
-                  {String(index + 1).padStart(2, '0')}
-                </p>
-                <h3 className={`${displayFont.className} mt-4 text-[1.55rem] font-semibold leading-none text-[var(--text)]`}>{step}</h3>
-              </div>
-            ))}
-          </div>
+        <div className="container">
+          <ProcessStepsInline
+            className="border-0 py-0"
+            description="Команда проверяет карточку перед публикацией, чтобы кандидат видел роль, город, график, условия и контакт."
+            eyebrow="Проверка вакансий"
+            steps={moderationSteps}
+            title="Как вакансия попадает на сайт"
+          />
         </div>
       </section>
       <VacancyApplicationForms

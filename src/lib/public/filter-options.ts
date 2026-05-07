@@ -1,5 +1,13 @@
 import { CategoryType, ContentStatus } from '@prisma/client';
 import { prisma } from '@/lib/db/prisma';
+import {
+  courseFormatOptions,
+  courseLevelOptions,
+  eventFormatOptions,
+  getAdminOptionLabel,
+  partnerTypeOptions,
+  vacancyEmploymentTypeOptions
+} from '@/lib/admin/content-labels';
 
 export type PublicTaxonomyOption = {
   id: string;
@@ -12,7 +20,10 @@ export type PublicSelectOption = {
   label: string;
 };
 
-function uniqueTextOptions(values: Array<string | null | undefined>): PublicSelectOption[] {
+function uniqueTextOptions(
+  values: Array<string | null | undefined>,
+  getLabel: (value: string) => string = (value) => value
+): PublicSelectOption[] {
   const uniqueValues = Array.from(
     new Set(
       values
@@ -22,8 +33,8 @@ function uniqueTextOptions(values: Array<string | null | undefined>): PublicSele
   );
 
   return uniqueValues
-    .sort((left, right) => left.localeCompare(right, 'ru'))
-    .map((value) => ({ value, label: value }));
+    .map((value) => ({ value, label: getLabel(value) }))
+    .sort((left, right) => left.label.localeCompare(right.label, 'ru'));
 }
 
 export async function getPublicCategoryOptions(type: CategoryType): Promise<PublicTaxonomyOption[]> {
@@ -57,8 +68,12 @@ export async function getCourseFilterOptions() {
   ]);
 
   return {
-    formats: uniqueTextOptions(formats.map((course) => course.format)),
-    levels: uniqueTextOptions(levels.map((course) => course.level))
+    formats: uniqueTextOptions(formats.map((course) => course.format), (value) =>
+      getAdminOptionLabel(courseFormatOptions, value, value)
+    ),
+    levels: uniqueTextOptions(levels.map((course) => course.level), (value) =>
+      getAdminOptionLabel(courseLevelOptions, value, value)
+    )
   };
 }
 
@@ -70,7 +85,9 @@ export async function getEventFilterOptions() {
   });
 
   return {
-    formats: uniqueTextOptions(events.map((event) => event.format))
+    formats: uniqueTextOptions(events.map((event) => event.format), (value) =>
+      getAdminOptionLabel(eventFormatOptions, value, value)
+    )
   };
 }
 
@@ -82,7 +99,9 @@ export async function getVacancyFilterOptions() {
   });
 
   return {
-    employmentTypes: uniqueTextOptions(vacancies.map((vacancy) => vacancy.employmentType))
+    employmentTypes: uniqueTextOptions(vacancies.map((vacancy) => vacancy.employmentType), (value) =>
+      getAdminOptionLabel(vacancyEmploymentTypeOptions, value, value)
+    )
   };
 }
 
@@ -94,6 +113,8 @@ export async function getPartnerFilterOptions() {
   });
 
   return {
-    partnerTypes: uniqueTextOptions(partners.map((partner) => partner.partnerType))
+    partnerTypes: uniqueTextOptions(partners.map((partner) => partner.partnerType), (value) =>
+      getAdminOptionLabel(partnerTypeOptions, value, value)
+    )
   };
 }

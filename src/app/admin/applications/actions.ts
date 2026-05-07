@@ -52,6 +52,13 @@ const businessNotesFormSchema = z.object({
   businessNotes: z.string().trim().max(2000).optional()
 });
 
+const processingFormSchema = z.object({
+  applicationId: z.string().trim().min(1),
+  status: z.enum(applicationStatusValues),
+  businessNotes: z.string().trim().max(2000).optional(),
+  internalNotes: z.string().trim().max(4000).optional()
+});
+
 const vacancyDraftFormSchema = z.object({
   applicationId: z.string().trim().min(1)
 });
@@ -159,6 +166,54 @@ export async function updateApplicationBusinessNotes(formData: FormData) {
     revalidatePath('/business');
     revalidatePath('/business/requests');
     result = { type: 'success', message: 'Комментарий для бизнеса сохранен.' };
+  } catch (error) {
+    result = { type: 'error', message: formatApplicationActionError(error) };
+  }
+
+  redirectWithAdminActionResult(redirectTo, result);
+}
+
+export async function updateApplicationProcessing(formData: FormData) {
+  const fallbackPath = applicationDetailPath(getString(formData, 'applicationId'));
+  const redirectTo = safeAdminRedirectPath(formData, fallbackPath);
+  let result: { type: 'success' | 'error'; message: string };
+
+  try {
+    const user = await requireAdminSectionAccess('applications');
+    const parsed = processingFormSchema.parse({
+      applicationId: getString(formData, 'applicationId'),
+      status: getString(formData, 'status'),
+      businessNotes: optionalString(getString(formData, 'businessNotes')),
+      internalNotes: optionalString(getString(formData, 'internalNotes'))
+    });
+    const application = await prisma.application.findUniqueOrThrow({
+      where: { id: parsed.applicationId },
+      select: {
+        type: true,
+        status: true,
+        vacancyId: true,
+        consentAcceptedAt: true
+      }
+    });
+
+    await prisma.application.update({
+      where: { id: parsed.applicationId },
+      data: {
+        ...getApplicationStatusUpdate({
+          application,
+          nextStatus: parsed.status,
+          userId: user.id
+        }),
+        businessNotes: parsed.businessNotes ?? null,
+        internalNotes: parsed.internalNotes ?? null
+      }
+    });
+
+    revalidatePath(ADMIN_APPLICATIONS_PATH);
+    revalidatePath(applicationDetailPath(parsed.applicationId));
+    revalidatePath('/business');
+    revalidatePath('/business/requests');
+    result = { type: 'success', message: 'Обработка заявки сохранена.' };
   } catch (error) {
     result = { type: 'error', message: formatApplicationActionError(error) };
   }

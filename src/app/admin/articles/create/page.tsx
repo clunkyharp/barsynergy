@@ -1,8 +1,8 @@
 import { CategoryType, ContentStatus } from '@prisma/client';
 import { createArticle } from '@/app/admin/articles/actions';
+import { AdminCmsActions, AdminCmsAdvancedSection, AdminCmsForm, AdminCmsGrid, AdminCmsSection } from '@/components/admin/admin-cms-form';
 import { CoverImageField, HiddenRedirect } from '@/components/admin/content-admin-controls';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import { CheckboxField } from '@/components/ui/checkbox-field';
 import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
@@ -50,19 +50,31 @@ export default async function AdminArticlesCreatePage() {
         </Button>
       </header>
 
-      <Card className="p-5">
-        <form action={createArticle} className="grid gap-8">
+      <AdminCmsForm action={createArticle}>
           <HiddenRedirect value={ADMIN_ARTICLES_PATH} />
           
-          <section>
-            <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-[var(--muted)]">Основная информация</h3>
-            <div className="grid gap-5 lg:grid-cols-2">
+          <AdminCmsSection title="Публикация" description="Название, адрес и первичный статус материала.">
+            <AdminCmsGrid>
               <FormField htmlFor="title" label="Заголовок">
                 <Input id="title" name="title" required minLength={2} maxLength={160} />
               </FormField>
               <FormField htmlFor="slug" label="Адрес страницы">
                 <Input id="slug" name="slug" maxLength={180} placeholder="Если пусто, будет создан из заголовка" />
               </FormField>
+              <FormField htmlFor="status" label="Статус">
+                <Select id="status" name="status" defaultValue={ContentStatus.DRAFT}>
+                  {Object.values(ContentStatus).map((status) => (
+                    <option key={status} value={status}>
+                      {contentStatusLabels[status]}
+                    </option>
+                  ))}
+                </Select>
+              </FormField>
+            </AdminCmsGrid>
+          </AdminCmsSection>
+
+          <AdminCmsSection title="Классификация" description="Рубрики, город и теги для публичных фильтров и редакционного поиска.">
+            <AdminCmsGrid>
               <FormField htmlFor="categoryId" label="Категория">
                 <Select id="categoryId" name="categoryId" defaultValue="">
                   <option value="">Без категории</option>
@@ -79,15 +91,6 @@ export default async function AdminArticlesCreatePage() {
                   {cities.map((city) => (
                     <option key={city.id} value={city.id}>
                       {city.name}
-                    </option>
-                  ))}
-                </Select>
-              </FormField>
-              <FormField htmlFor="status" label="Статус">
-                <Select id="status" name="status" defaultValue={ContentStatus.DRAFT}>
-                  {Object.values(ContentStatus).map((status) => (
-                    <option key={status} value={status}>
-                      {contentStatusLabels[status]}
                     </option>
                   ))}
                 </Select>
@@ -109,12 +112,11 @@ export default async function AdminArticlesCreatePage() {
                   </div>
                 </div>
               ) : null}
-            </div>
-          </section>
+            </AdminCmsGrid>
+          </AdminCmsSection>
 
-          <section>
-            <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-[var(--muted)]">Дополнительные поля</h3>
-            <div className="grid gap-5 lg:grid-cols-2">
+          <AdminCmsAdvancedSection title="Редакционные данные" description="Автор, источник и время чтения. Заполняйте, если эти данные нужно показать в материале.">
+            <AdminCmsGrid>
               <FormField htmlFor="authorName" label="Автор">
                 <Input id="authorName" name="authorName" maxLength={120} />
               </FormField>
@@ -124,31 +126,33 @@ export default async function AdminArticlesCreatePage() {
               <FormField htmlFor="readingTimeMinutes" label="Время чтения, минут">
                 <Input id="readingTimeMinutes" name="readingTimeMinutes" min={1} max={240} type="number" />
               </FormField>
-            </div>
-          </section>
+            </AdminCmsGrid>
+          </AdminCmsAdvancedSection>
 
-          <section>
-            <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-[var(--muted)]">Медиа и контент</h3>
-            <div className="grid gap-5 lg:grid-cols-2">
+          <AdminCmsSection title="Медиа" description="Обложка и alt-текст для карточки и страницы материала.">
+            <AdminCmsGrid>
               <CoverImageField id="article-coverImage" />
-              <div className="lg:col-span-2">
+            </AdminCmsGrid>
+          </AdminCmsSection>
+
+          <AdminCmsSection title="Контент" description="Короткое описание для списков и основной текст материала.">
+            <div className="grid gap-4">
                 <FormField htmlFor="summary" label="Краткое описание">
                   <Textarea id="summary" name="summary" required minLength={10} maxLength={500} />
                 </FormField>
-              </div>
-              <div className="lg:col-span-2">
                 <FormField htmlFor="body" label="Текст">
                   <Textarea id="body" name="body" required minLength={20} maxLength={ARTICLE_BODY_MAX_LENGTH} className="min-h-64" />
                 </FormField>
-              </div>
             </div>
-          </section>
+          </AdminCmsSection>
 
-          <div>
+          <AdminCmsActions>
+            <Button href={ADMIN_ARTICLES_PATH} type="button" variant="secondary">
+              Отмена
+            </Button>
             <Button type="submit">Создать статью</Button>
-          </div>
-        </form>
-      </Card>
+          </AdminCmsActions>
+      </AdminCmsForm>
     </div>
   );
 }

@@ -1,18 +1,25 @@
+import type { HTMLAttributes, ReactNode } from 'react';
 import { ContentStatus } from '@prisma/client';
 import { CoverImageInput } from '@/components/admin/cover-image-input';
 import { Button } from '@/components/ui/button';
+import { CheckboxField } from '@/components/ui/checkbox-field';
 import {
   AdminActionMenu,
   AdminActionMenuButton,
   AdminActionMenuContent,
   AdminActionMenuLink,
-  AdminActionMenuTrigger
+  AdminActionRow,
+  AdminActionMenuTrigger,
+  AdminRowActions
 } from '@/components/ui/admin-table';
 import { Input } from '@/components/ui/input';
 import { InlineAlert } from '@/components/ui/inline-alert';
+import { FieldHint, FieldLabel, FormField } from '@/components/ui/form-field';
+import { SearchInput } from '@/components/ui/search-input';
 import { Select } from '@/components/ui/select';
 import type { AdminContentSearchParams } from '@/lib/admin/content-utils';
 import { contentStatusLabels, firstParam } from '@/lib/admin/content-utils';
+import { cn } from '@/lib/utils';
 
 type AdminActionAlertProps = {
   params: AdminContentSearchParams;
@@ -52,6 +59,14 @@ type AdminListFiltersProps = {
     options: { value: string; label: string }[];
   }[];
   searchPlaceholder?: string;
+};
+
+type AdminFilterBarProps = HTMLAttributes<HTMLFormElement> & {
+  action: string;
+  children: ReactNode;
+  method?: 'get' | 'post';
+  summary?: string;
+  title?: string;
 };
 
 type AdminContentRowActionsProps = {
@@ -115,25 +130,25 @@ export function AdminActionAlert({ params }: AdminActionAlertProps) {
 export function AdminPagination({ basePath, params, page, totalPages, total, pageSize }: AdminPaginationProps) {
   if (totalPages <= 1) {
     return (
-      <p className="text-sm text-[var(--muted)]">
-        Показано {total} из {total}. Размер страницы: {pageSize}.
+      <p className="rounded-[var(--radius-sm)] border border-[var(--line)] bg-[var(--surface)] px-3 py-2 text-sm text-[var(--muted)]">
+        Записей: {total}. Размер страницы: {pageSize}.
       </p>
     );
   }
 
   return (
-    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <div className="flex flex-col gap-3 rounded-[var(--radius-sm)] border border-[var(--line)] bg-[var(--surface)] px-3 py-3 sm:flex-row sm:items-center sm:justify-between">
       <p className="text-sm text-[var(--muted)]">
-        Показано до {pageSize} записей на странице. Всего: {total}. Страница {page} из {totalPages}.
+        Записей: {total}. Страница {page} из {totalPages}. На странице до {pageSize}.
       </p>
-      <div className="flex flex-wrap gap-3">
+      <AdminActionRow className="justify-start sm:justify-end">
         <Button disabled={page <= 1} href={adminPageHref(basePath, params, page - 1)} variant="secondary">
           Назад
         </Button>
         <Button disabled={page >= totalPages} href={adminPageHref(basePath, params, page + 1)} variant="secondary">
           Вперед
         </Button>
-      </div>
+      </AdminActionRow>
     </div>
   );
 }
@@ -154,20 +169,18 @@ export function CoverImageField({
 }: CoverImageFieldProps) {
   return (
     <div className="space-y-3">
-      <label className="text-sm font-semibold" htmlFor={id}>
+      <FieldLabel htmlFor={id}>
         {label}
-      </label>
+      </FieldLabel>
       {currentName ? <p className="text-xs text-[var(--muted)]">Текущий файл: {currentName}</p> : null}
       <CoverImageInput id={id} name={inputName} />
       {currentName ? (
-        <label className="flex items-center gap-2 text-sm text-[var(--muted)]">
-          <input className="h-4 w-4 accent-[var(--accent)]" name={removeName} type="checkbox" value="true" />
+        <CheckboxField name={removeName} value="true">
           Удалить обложку без замены
-        </label>
+        </CheckboxField>
       ) : null}
-      <p className="text-xs text-[var(--muted)]">JPEG, PNG, WebP или AVIF до 8 МБ.</p>
-      <label className="grid gap-2 text-sm font-semibold" htmlFor={`${id}-alt`}>
-        {altLabel}
+      <FieldHint>JPEG, PNG, WebP или AVIF до 8 МБ.</FieldHint>
+      <FormField htmlFor={`${id}-alt`} label={altLabel}>
         <Input
           id={`${id}-alt`}
           name={altName}
@@ -175,24 +188,52 @@ export function CoverImageField({
           defaultValue={currentAlt ?? ''}
           placeholder="Короткое описание изображения"
         />
-      </label>
+      </FormField>
     </div>
   );
 }
 
-export function AdminListFilters({ basePath, params, filters = [], searchPlaceholder = 'Поиск по названию или описанию' }: AdminListFiltersProps) {
+export function AdminFilterBar({
+  action,
+  children,
+  className,
+  method = 'get',
+  summary = 'Поиск и отбор записей без изменения данных.',
+  title = 'Фильтр списка',
+  ...props
+}: AdminFilterBarProps) {
+  return (
+    <form
+      action={action}
+      className={cn(
+        'rounded-[var(--radius-md)] border border-[var(--line)] border-l-[3px] border-l-[var(--admin-structure-accent)] bg-[var(--surface)] p-4 shadow-none',
+        className
+      )}
+      method={method}
+      {...props}
+    >
+      <div className="grid gap-1 border-b border-[var(--line)] pb-3">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--admin-label)]">{title}</p>
+        <p className="text-xs leading-5 text-[var(--muted)]">{summary}</p>
+      </div>
+      <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-[minmax(220px,1fr)_repeat(4,minmax(150px,220px))] xl:items-end">
+        {children}
+      </div>
+    </form>
+  );
+}
+
+export function AdminListFilters({ basePath, params, filters = [], searchPlaceholder = 'Поиск по названию' }: AdminListFiltersProps) {
   const q = firstParam(params.q) ?? '';
   const status = firstParam(params.status) ?? '';
 
   return (
-    <form action={basePath} className="grid gap-3 rounded-[var(--radius-lg)] border border-[var(--line)] bg-[var(--surface-muted)] p-4 md:grid-cols-2 xl:grid-cols-[minmax(220px,1fr)_repeat(4,minmax(150px,220px))] xl:items-end">
-      <label className="grid gap-2 text-sm font-semibold">
-        Поиск
-        <Input name="q" placeholder={searchPlaceholder} defaultValue={q} />
-      </label>
-      <label className="grid gap-2 text-sm font-semibold">
-        Статус
-        <Select name="status" defaultValue={status}>
+    <AdminFilterBar action={basePath}>
+      <FormField htmlFor="admin-filter-q" label="Поиск">
+        <SearchInput id="admin-filter-q" name="q" placeholder={searchPlaceholder} defaultValue={q} />
+      </FormField>
+      <FormField htmlFor="admin-filter-status" label="Статус">
+        <Select id="admin-filter-status" name="status" defaultValue={status}>
           <option value="">Все статусы</option>
           {Object.values(ContentStatus).map((item) => (
             <option key={item} value={item}>
@@ -200,11 +241,10 @@ export function AdminListFilters({ basePath, params, filters = [], searchPlaceho
             </option>
           ))}
         </Select>
-      </label>
+      </FormField>
       {filters.map((filter) => (
-        <label className="grid gap-2 text-sm font-semibold" key={filter.name}>
-          {filter.label}
-          <Select name={filter.name} defaultValue={firstParam(params[filter.name]) ?? ''}>
+        <FormField htmlFor={`admin-filter-${filter.name}`} label={filter.label} key={filter.name}>
+          <Select id={`admin-filter-${filter.name}`} name={filter.name} defaultValue={firstParam(params[filter.name]) ?? ''}>
             <option value="">{filter.allLabel}</option>
             {filter.options.map((option) => (
               <option key={option.value} value={option.value}>
@@ -212,17 +252,17 @@ export function AdminListFilters({ basePath, params, filters = [], searchPlaceho
               </option>
             ))}
           </Select>
-        </label>
+        </FormField>
       ))}
-      <div className="flex items-end gap-3 xl:col-span-full">
+      <AdminActionRow className="justify-start xl:col-span-full">
         <Button type="submit" variant="secondary">
           Применить
         </Button>
         <Button href={basePath} variant="ghost">
           Сбросить
         </Button>
-      </div>
-    </form>
+      </AdminActionRow>
+    </AdminFilterBar>
   );
 }
 
@@ -236,20 +276,34 @@ export function AdminContentRowActions({
   status,
   updateStatusAction
 }: AdminContentRowActionsProps) {
+  const isPublished = status === ContentStatus.PUBLISHED;
+  const isArchived = status === ContentStatus.ARCHIVED;
+  const canPublish = status === ContentStatus.DRAFT || status === ContentStatus.REVIEW;
+  const canArchive = !isArchived;
+  const canDelete = !isPublished;
+
   return (
-    <div className="flex flex-wrap gap-2">
+    <AdminRowActions>
       <Button className="min-h-9 px-3 py-1.5 text-xs" href={editHref} variant="secondary">
         Изменить
       </Button>
       <AdminActionMenu>
         <AdminActionMenuTrigger />
         <AdminActionMenuContent>
-          {publicHref && status === ContentStatus.PUBLISHED ? (
+          {publicHref && isPublished ? (
             <AdminActionMenuLink href={publicHref} target="_blank" rel="noreferrer">
               Открыть публичную страницу
             </AdminActionMenuLink>
           ) : null}
-          {status !== ContentStatus.PUBLISHED ? (
+          {isArchived ? (
+            <form action={updateStatusAction}>
+              <HiddenRedirect value={currentPath} />
+              <input name={idName} type="hidden" value={idValue} />
+              <input name="status" type="hidden" value={ContentStatus.DRAFT} />
+              <AdminActionMenuButton>Восстановить</AdminActionMenuButton>
+            </form>
+          ) : null}
+          {canPublish ? (
             <form action={updateStatusAction}>
               <HiddenRedirect value={currentPath} />
               <input name={idName} type="hidden" value={idValue} />
@@ -257,23 +311,36 @@ export function AdminContentRowActions({
               <AdminActionMenuButton>Опубликовать</AdminActionMenuButton>
             </form>
           ) : null}
-          {status !== ContentStatus.ARCHIVED ? (
+          {canArchive ? (
             <form action={updateStatusAction}>
               <HiddenRedirect value={currentPath} />
               <input name={idName} type="hidden" value={idValue} />
               <input name="status" type="hidden" value={ContentStatus.ARCHIVED} />
-              <AdminActionMenuButton>В архив</AdminActionMenuButton>
+              <AdminActionMenuButton
+                confirmActionLabel="В архив"
+                confirmText={isPublished ? 'Она пропадёт с публичной страницы.' : undefined}
+                confirmTitle={isPublished ? 'Перенести запись в архив?' : undefined}
+              >
+                В архив
+              </AdminActionMenuButton>
             </form>
           ) : null}
-          {status !== ContentStatus.PUBLISHED ? (
+          {canDelete ? (
             <form action={deleteAction}>
               <HiddenRedirect value={currentPath} />
               <input name={idName} type="hidden" value={idValue} />
-              <AdminActionMenuButton tone="danger">Удалить</AdminActionMenuButton>
+              <AdminActionMenuButton
+                confirmActionLabel="Удалить"
+                confirmText="Это действие нельзя отменить."
+                confirmTitle="Удалить запись?"
+                tone="danger"
+              >
+                Удалить
+              </AdminActionMenuButton>
             </form>
           ) : null}
         </AdminActionMenuContent>
       </AdminActionMenu>
-    </div>
+    </AdminRowActions>
   );
 }

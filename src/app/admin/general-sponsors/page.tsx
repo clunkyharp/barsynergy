@@ -64,6 +64,7 @@ export default async function AdminGeneralSponsorsPage({ searchParams }: AdminGe
   const q = getAdminSearchQuery(params);
   const status = getAdminStatusFilter(params);
   const cityId = getAdminStringFilter(params, 'cityId');
+  const featuredFilter = getAdminStringFilter(params, 'featured');
   const isFeatured = getAdminBooleanFilter(params, 'featured');
   const where: Prisma.GeneralSponsorWhereInput = {
     status,
@@ -101,6 +102,7 @@ export default async function AdminGeneralSponsorsPage({ searchParams }: AdminGe
     })
   ]);
   const totalPages = getAdminTotalPages(total);
+  const hasActiveFilters = Boolean(q || status || cityId || featuredFilter);
 
   return (
     <div className="space-y-8">
@@ -119,7 +121,7 @@ export default async function AdminGeneralSponsorsPage({ searchParams }: AdminGe
           {
             name: 'featured',
             label: 'Приоритет',
-            allLabel: 'Любой статус',
+            allLabel: 'Любой приоритет',
             options: [
               { value: 'true', label: 'Приоритетный' },
               { value: 'false', label: 'Обычный' }
@@ -127,7 +129,7 @@ export default async function AdminGeneralSponsorsPage({ searchParams }: AdminGe
           }
         ]}
         params={params}
-        searchPlaceholder="Поиск по названию или описанию"
+        searchPlaceholder="Поиск по названию"
       />
 
       <section className="space-y-4">
@@ -137,14 +139,19 @@ export default async function AdminGeneralSponsorsPage({ searchParams }: AdminGe
         </div>
 
         {sponsors.length === 0 ? (
-          <EmptyState title="Генеральных спонсоров пока нет" />
+          <EmptyState
+            actionHref={hasActiveFilters ? ADMIN_GENERAL_SPONSORS_PATH : `${ADMIN_GENERAL_SPONSORS_PATH}/new`}
+            actionLabel={hasActiveFilters ? 'Сбросить фильтры' : 'Создать спонсора'}
+            description={hasActiveFilters ? 'По текущим фильтрам спонсоров нет.' : 'Добавьте генерального спонсора, город и параметры показа.'}
+            title={hasActiveFilters ? 'Генеральные спонсоры не найдены' : 'Генеральных спонсоров пока нет'}
+          />
         ) : (
           <AdminTableFrame>
             <AdminTable minWidth={1040}>
               <AdminTableHead>
                 <AdminTableRow>
                   <AdminTableHeaderCell>Спонсор</AdminTableHeaderCell>
-                  <AdminTableHeaderCell>Контекст</AdminTableHeaderCell>
+                  <AdminTableHeaderCell>Город и приоритет</AdminTableHeaderCell>
                   <AdminTableHeaderCell>Статус</AdminTableHeaderCell>
                   <AdminTableHeaderCell>Обновлено</AdminTableHeaderCell>
                   <AdminTableActionsHeaderCell>Действия</AdminTableActionsHeaderCell>

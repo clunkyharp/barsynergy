@@ -117,7 +117,7 @@ test('public submission guard helpers detect honeypots and stable throttle keys'
   const hashB = getApplicationThrottleKeyHash({
     applicationType: ApplicationType.VACANCY_RESPONSE,
     ip: '203.0.113.10',
-    userAgent: 'test-agent',
+    userAgent: 'rotated-agent',
     secret: 'test-secret'
   });
   assert.equal(hashA, hashB);

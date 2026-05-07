@@ -1,9 +1,9 @@
 import { notFound } from 'next/navigation';
 import { CategoryType, ContentStatus } from '@prisma/client';
 import { updateEvent } from '@/app/admin/events/actions';
+import { AdminCmsActions, AdminCmsForm, AdminCmsGrid, AdminCmsSection, AdminCmsSummary } from '@/components/admin/admin-cms-form';
 import { CoverImageField, HiddenRedirect } from '@/components/admin/content-admin-controls';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
@@ -12,6 +12,7 @@ import {
   contentStatusLabels,
   eventFormatOptions,
   eventRegistrationModeOptions,
+  getAdminOptionLabel,
   withCurrentValueOption
 } from '@/lib/admin/content-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
@@ -20,6 +21,10 @@ import { prisma } from '@/lib/db/prisma';
 export const dynamic = 'force-dynamic';
 
 const ADMIN_EVENTS_PATH = '/admin/events';
+const dateTimeFormatter = new Intl.DateTimeFormat('ru-RU', {
+  dateStyle: 'medium',
+  timeStyle: 'short'
+});
 
 function dateTimeLocalValue(value: Date | null) {
   if (!value) {
@@ -58,6 +63,7 @@ export default async function AdminEventEditPage({ params }: AdminEventEditPageP
   if (!event) {
     notFound();
   }
+  const cityName = cities.find((city) => city.id === event.cityId)?.name ?? 'Город не указан';
 
   return (
     <div className="space-y-8">
@@ -71,14 +77,27 @@ export default async function AdminEventEditPage({ params }: AdminEventEditPageP
         </Button>
       </header>
 
-      <Card className="p-5">
-        <form action={updateEvent} className="grid gap-8">
+      <AdminCmsForm action={updateEvent}>
           <HiddenRedirect value={ADMIN_EVENTS_PATH} />
           <input name="eventId" type="hidden" value={event.id} />
+          <AdminCmsSummary
+            items={[
+              { label: 'Статус', value: contentStatusLabels[event.status] },
+              { label: 'Начало', value: dateTimeFormatter.format(event.startsAt) },
+              { label: 'Город', value: cityName },
+              { label: 'Формат', value: getAdminOptionLabel(eventFormatOptions, event.format) }
+            ]}
+            actions={
+              event.status === ContentStatus.PUBLISHED ? (
+                <Button href={`/events/${event.slug}`} size="sm" variant="secondary">
+                  Публичная страница
+                </Button>
+              ) : null
+            }
+          />
           
-          <section>
-            <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-[var(--muted)]">Основная информация</h3>
-            <div className="grid gap-5 lg:grid-cols-2">
+          <AdminCmsSection title="Публикация" description="Название, адрес, категория и статус события.">
+            <AdminCmsGrid>
               <FormField htmlFor="event-title" label="Название">
                 <Input id="event-title" name="title" required minLength={2} maxLength={160} defaultValue={event.title} />
               </FormField>
@@ -104,12 +123,11 @@ export default async function AdminEventEditPage({ params }: AdminEventEditPageP
                   ))}
                 </Select>
               </FormField>
-            </div>
-          </section>
+            </AdminCmsGrid>
+          </AdminCmsSection>
 
-          <section>
-            <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-[var(--muted)]">Локация и условия</h3>
-            <div className="grid gap-5 lg:grid-cols-2">
+          <AdminCmsSection title="Классификация" description="Город, площадка, формат и условия регистрации.">
+            <AdminCmsGrid>
               <FormField htmlFor="event-cityId" label="Город">
                 <Select id="event-cityId" name="cityId" defaultValue={event.cityId ?? ''}>
                   <option value="">Без города</option>
@@ -149,17 +167,18 @@ export default async function AdminEventEditPage({ params }: AdminEventEditPageP
                   ))}
                 </Select>
               </FormField>
-            </div>
-          </section>
+            </AdminCmsGrid>
+          </AdminCmsSection>
 
-          <section>
-            <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-[var(--muted)]">Время проведения</h3>
-            <div className="grid gap-5 lg:grid-cols-2">
-              <FormField htmlFor="event-startsAt" label="Начало" hint="Дата отображается в русском формате: дд.мм.гггг, чч:мм.">
+          <AdminCmsSection title="Расписание" description="Дата начала и окончание, если событие длится несколько часов или дней.">
+            <AdminCmsGrid>
+              <FormField htmlFor="event-startsAt" label="Начало" hint="Введите дату и время. После сохранения в списках будет формат дд.мм.гггг, чч:мм.">
                 <Input
                   id="event-startsAt"
+                  lang="ru-RU"
                   name="startsAt"
                   required
+                  title="дд.мм.гггг, чч:мм"
                   type="datetime-local"
                   defaultValue={dateTimeLocalValue(event.startsAt)}
                 />
@@ -167,31 +186,37 @@ export default async function AdminEventEditPage({ params }: AdminEventEditPageP
               <FormField htmlFor="event-endsAt" label="Окончание" hint="Заполните, если событие длится несколько часов или дней.">
                 <Input
                   id="event-endsAt"
+                  lang="ru-RU"
                   name="endsAt"
+                  title="дд.мм.гггг, чч:мм"
                   type="datetime-local"
                   defaultValue={dateTimeLocalValue(event.endsAt)}
                 />
               </FormField>
-            </div>
-          </section>
+            </AdminCmsGrid>
+          </AdminCmsSection>
 
-          <section>
-            <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-[var(--muted)]">Медиа и описание</h3>
-            <div className="grid gap-5 lg:grid-cols-2">
+          <AdminCmsSection title="Медиа" description="Обложка события для карточек и публичной страницы.">
+            <AdminCmsGrid>
               <CoverImageField id="event-coverImage" currentName={event.coverImage?.originalName} currentAlt={event.coverImageAlt} />
-              <div className="lg:col-span-2">
+            </AdminCmsGrid>
+          </AdminCmsSection>
+
+          <AdminCmsSection title="Контент" description="Краткое описание события для публичных списков.">
+            <div className="grid gap-4">
                 <FormField htmlFor="event-summary" label="Краткое описание">
                   <Textarea id="event-summary" name="summary" required minLength={10} maxLength={500} defaultValue={event.summary} />
                 </FormField>
-              </div>
             </div>
-          </section>
+          </AdminCmsSection>
 
-          <div>
+          <AdminCmsActions>
+            <Button href={ADMIN_EVENTS_PATH} type="button" variant="secondary">
+              Отмена
+            </Button>
             <Button type="submit">Сохранить изменения</Button>
-          </div>
-        </form>
-      </Card>
+          </AdminCmsActions>
+      </AdminCmsForm>
     </div>
   );
 }

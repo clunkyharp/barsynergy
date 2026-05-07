@@ -1,6 +1,8 @@
+import { createHmac } from 'node:crypto';
 import { Prisma } from '@prisma/client';
 
 type QueryClient = Pick<Prisma.TransactionClient, '$queryRaw'>;
+const DEVELOPMENT_PERSISTENT_THROTTLE_SECRET = 'barsynergy-development-persistent-throttle';
 
 const throttleTableNames = {
   authAttempt: Prisma.raw('"AuthAttemptThrottle"'),
@@ -16,6 +18,13 @@ type ConsumeThrottleWindowInput = {
   windowBoundary: Date;
   maxAttempts: number;
 };
+
+export function getPersistentThrottleKeyHash(input: { scope: string; identifier: string; secret?: string }) {
+  const secret = input.secret ?? process.env.SESSION_SECRET ?? DEVELOPMENT_PERSISTENT_THROTTLE_SECRET;
+  return createHmac('sha256', secret)
+    .update([input.scope.trim().toLowerCase(), input.identifier.trim().toLowerCase()].join(':'))
+    .digest('hex');
+}
 
 export async function consumeThrottleWindowAtomically(client: QueryClient, input: ConsumeThrottleWindowInput) {
   const tableName = throttleTableNames[input.table];

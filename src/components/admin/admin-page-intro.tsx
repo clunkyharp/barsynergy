@@ -15,7 +15,7 @@ export function AdminPageIntro({ eyebrow, title, description, action, className 
   return (
     <Panel className={cn('grid gap-4 md:grid-cols-[1fr_auto] md:items-end', className)} padding="lg" tone="elevated">
       <div className="min-w-0">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">{eyebrow}</p>
+        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--admin-label)]">{eyebrow}</p>
         <h1 className={`${displayFont.className} mt-3 text-[2.3rem] font-semibold leading-none tracking-normal md:text-[3rem]`}>{title}</h1>
         {description ? <p className="mt-3 max-w-2xl text-sm leading-6 text-[var(--muted)]">{description}</p> : null}
       </div>

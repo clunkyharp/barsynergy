@@ -8,7 +8,7 @@ Current status: `v0.3 photo-reference redesign`.
 
 The project is being aligned to the supplied photo references: warm off-white pages, serif editorial headlines, burgundy actions, thin dividers, low-radius cards and compact product screens. The goal is to keep that visual direction while preserving current routes, data, auth, applications and admin permissions.
 
-Latest background update: public pages use a quiet editorial background system with a warm ivory paper base, low-opacity grain, subtle burgundy/graphite radial accents and reusable `background-zone-*` section bands. Square grids, index-map lines, dot matrices and tech patterns are not part of the runtime background contract.
+Latest background update: public pages use a quiet editorial background system with a warm ivory paper base, low-opacity grain, subtle burgundy/graphite radial accents and reusable `background-zone-*` section bands. Dark theme uses a separate warm graphite editorial stack instead of a direct inversion of the light palette: graphite page, panel and elevated surfaces, warm low-opacity borders, ivory text and restrained burgundy focus/action states. Square grids, index-map lines, dot matrices and tech patterns are not part of the runtime background contract.
 
 ## Source Of Truth
 
@@ -124,6 +124,43 @@ Field surfaces:
 - `--field-bg`
 - `--field-bg-hover`
 - `--field-bg-disabled`
+- `--field-surface`
+- `--field-surface-hover`
+- `--field-surface-filled`
+- `--field-surface-disabled`
+- `--field-border`
+- `--field-border-hover`
+- `--field-border-focus`
+- `--field-border-error`
+- `--field-border-success`
+- `--field-label`
+- `--field-hint`
+- `--field-placeholder`
+- `--field-focus-ring`
+- `--field-focus-line`
+
+Light field hover, focus and active states use neutral graphite values from the runtime contract: `--field-border-hover: rgba(48, 40, 35, 0.26)`, `--field-border-focus: rgba(48, 40, 35, 0.42)`, `--field-focus-ring: rgba(48, 40, 35, 0.1)` and `--field-focus-line: rgba(48, 40, 35, 0.48)`. Burgundy is reserved for actions, selected states and errors where the semantic token calls for it.
+
+Dark theme contract:
+
+- page graphite: `#11100e`;
+- panel graphite: `#191612`;
+- elevated graphite: `rgba(34, 29, 24, 0.96)`;
+- warm dark borders: low-opacity ivory, usually `rgba(229, 210, 188, 0.07-0.20)`;
+- primary text: warm ivory `#f3ecdf`;
+- secondary text: muted warm clay `#b3a795`;
+- accent: restrained burgundy `#b46967`, used sparingly for actions, active states and short labels;
+- dark separation should rely on dividers and surface shifts before shadows, glow or blur.
+
+Dark mode still keeps a scoped legacy bridge in `src/app/globals.css` for older arbitrary light utility classes inside `.site-shell`. New components should use semantic tokens or shared primitives instead of depending on class-substring overrides; a full removal is deferred to a separate cleanup batch.
+
+Dark form fields:
+
+- use flat editorial graphite surfaces, not glossy or metallic gradients;
+- keep thin warm borders in default state;
+- use one neutral border signal for normal focus/active states;
+- keep danger/error states visually separate from neutral focus through danger border, error text and error shadow/line treatment;
+- avoid large glow rings, heavy shadows and bright CTA repetition on dense forms.
 
 Selection/loading surfaces:
 
@@ -307,6 +344,8 @@ Rules:
 - `md`
 - `lg`
 
+All `Button` sizes keep at least the 44px minimum interactive height. `sm` is compact in padding and text size, not a shorter touch target.
+
 ### Fields
 
 Source files:
@@ -318,14 +357,23 @@ Source files:
 - `src/components/ui/form-field.tsx`
 - `src/components/ui/checkbox-field.tsx`
 - `src/components/ui/consent-field.tsx`
+- `src/components/ui/file-upload.tsx`
+- `src/components/ui/search-input.tsx`
+- `src/components/ui/radio-field.tsx`
 
 Rules:
 
-- `Input`, `Select` and `Textarea` share one field base contract.
-- Labels and errors should go through `FormField`.
-- `CheckboxField` is the generic checkbox + label primitive.
+- `Input`, `Select`, `Textarea` and `SearchInput` share one field base contract.
+- `Select` is a custom branded trigger/listbox that preserves the current form `name`/value contract and keeps a visually hidden native `select` for browser required validation.
+- Labels, hints, errors and success text should go through `FormField` and its `FieldLabel`, `FieldHint` and `FieldError` helpers.
+- Long forms should group related fields with `FormSection` and end with `FormActions` or the existing page-level form footer.
+- `CheckboxField` and `RadioField` are the generic custom mark + label primitives.
 - Consent blocks should use `ConsentField` or a thin wrapper over it.
+- Uploads should use `FileUpload`; raw browser file buttons are not part of the branded form system.
 - Repeated field styling must not be redefined in page-local className chains.
+- Required states keep the native input attributes and add a visible label marker.
+- Focus uses a neutral graphite border/inner line in light mode and a warm neutral border in dark mode, not the browser blue outline.
+- Error and success states use structured inline text and field state attributes; they should not depend on placeholder-only guidance.
 
 ### Alerts / Notices
 
@@ -389,6 +437,38 @@ Rules:
 - page-local raw table shells should not be duplicated;
 - document either overflow strategy or mobile stack strategy per table family.
 - public/editorial repeating rows should use `EditorialListRow` instead of local grid copies.
+
+### Public Display Primitives
+
+Source: `src/components/public/editorial-display-primitives.tsx`
+
+Components:
+
+- `RouteIndexPanel`
+- `EditorialReadingQueue`
+- `ProgramFormatMatrix`
+- `PartnerFormatTable`
+- `SponsorPackageComparison`
+- `ProcessStepsInline`
+
+Rules:
+
+- use these primitives to replace repeated equal public card grids;
+- keep public route, article, education, partner, sponsor and process blocks content-first;
+- prefer dividers, row rhythm, metadata and compact mobile rows over tall card stacks;
+- use `ProcessStepsInline` for operational flows such as vacancy moderation instead of numbered process cards;
+- do not change data models, forms or route behavior when adopting these primitives;
+- keep icons out of these primitives except small action arrows.
+
+### Public Filters
+
+Source: `src/components/public/public-filters.tsx`
+
+Rules:
+
+- use the default filter tone for general public listings;
+- use the `directory` tone when a listing acts as a curated catalog, with route-specific labels and active filter summary;
+- keep filtering logic, URL parameters and pagination behavior in the shared component instead of page-local controls.
 
 ### Chips And Status
 

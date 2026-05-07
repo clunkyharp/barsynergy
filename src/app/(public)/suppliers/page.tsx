@@ -22,7 +22,7 @@ type SuppliersPageProps = {
 
 export const metadata: Metadata = {
   title: 'Поставщики',
-  description: 'Каталог поставщиков, сервисов и контактов BARSYNERGY.'
+  description: 'Каталог поставщиков, оборудования, сервисов и контактов для заведений.'
 };
 
 export default async function SuppliersPage({ searchParams }: SuppliersPageProps) {
@@ -45,9 +45,9 @@ export default async function SuppliersPage({ searchParams }: SuppliersPageProps
     <>
       <EditorialPublicPage
         eyebrow="Поставщики"
-        title="Поставщики, сервисы и полезные контакты"
+        title="Поставщики, сервисы и рабочие контакты"
         description="Каталог для заведений: поставки, сервис, оборудование и контакты компаний, с которыми можно обсудить рабочие условия."
-        summary="Карточка поставщика показывает категорию, географию, статус проверки и понятный способ связаться с компанией."
+        summary="Карточка поставщика показывает категорию, географию, статус проверки и прямой контакт компании."
         summaryHeading="В фокусе"
         metrics={[
           { value: 'СКФО', label: 'региональный фокус' },
@@ -63,7 +63,7 @@ export default async function SuppliersPage({ searchParams }: SuppliersPageProps
           {
             label: 'Оборудование',
             title: 'Техника, инвентарь и оснащение',
-            description: 'Барный и кофейный инвентарь, техника, лед, оборудование для запуска и обновления точки.'
+            description: 'Барный и кофейный инвентарь, техника, лёд и оборудование для запуска или обновления точки.'
           },
           {
             label: 'Сервис',
@@ -72,33 +72,33 @@ export default async function SuppliersPage({ searchParams }: SuppliersPageProps
           }
         ]}
         rowsHeading="По задачам"
-        primaryLink={{ label: isEmpty ? 'Добавить компанию' : 'Найти поставщика', href: isEmpty ? '#applications' : '#suppliers-list' }}
-        secondaryLink={{ label: isEmpty ? 'Написать команде' : 'Добавить компанию', href: isEmpty ? '/contacts?topic=supplier' : '#applications' }}
+        primaryLink={{ label: isEmpty ? 'Добавить компанию' : 'Найти поставщика', href: isEmpty ? '#supplier-request' : '#suppliers-list' }}
+        secondaryLink={{ label: isEmpty ? 'Написать команде' : 'Добавить компанию', href: isEmpty ? '/contacts?topic=supplier#contact-form' : '#supplier-request' }}
       />
       {isPrelaunchEmpty ? (
         <PublicPrelaunchSection
           actions={[
-            { href: '#applications', label: 'Добавить компанию' },
-            { href: '/contacts?topic=supplier', label: 'Написать команде', variant: 'secondary' }
+            { href: '#supplier-request', label: 'Добавить компанию' },
+            { href: '/contacts?topic=supplier#contact-form', label: 'Написать команде', variant: 'secondary' }
           ]}
           badges={['Каталог уже принимает заявки', 'Подходит для поставок, сервиса и оборудования']}
           cards={[
             {
-              title: 'Ингредиенты и расходники',
+              title: 'Ингредиенты',
               description: 'Поставки для ежедневной работы бара, кофейни или ресторанной команды.'
             },
             {
-              title: 'Оборудование и инвентарь',
+              title: 'Оборудование',
               description: 'Техника, оснащение и рабочие решения для запуска и обновления точки.'
             },
             {
-              title: 'Сервисные команды',
+              title: 'Сервис',
               description: 'Подрядчики, обслуживание и поддержка там, где нужен прямой контакт.'
             }
           ]}
-          description="Каталог формируется, но заявки на добавление компаний уже открыты. Укажите категорию, географию работы, условия поставки и контакт для заведений."
-          eyebrow="Раздел готовится"
-          title="Сейчас мы собираем первую подборку"
+          description="Добавьте компанию, если она поставляет продукты, оборудование или сервис для заведений."
+          eyebrow="Каталог"
+          title="Какие компании можно добавить"
         />
       ) : (
         <PublishedContentSection
@@ -108,19 +108,37 @@ export default async function SuppliersPage({ searchParams }: SuppliersPageProps
           emptyTitle="Поставщиков пока нет"
           filters={
             <PublicFilters
+              activeSummaryLabel="Параметры каталога"
               categories={categories}
+              categoryAllLabel="Все направления"
+              categoryLabel="Направление"
               cities={filterCities}
-              description="Выберите категорию поставок, город работы и статус компании."
+              cityAllLabel="Все города работы"
+              cityLabel="Город работы"
+              contextItems={[
+                { label: 'Каталог', value: 'поставки, сервис, оборудование' },
+                { label: 'Для кого', value: 'заведения и бар-команды' }
+              ]}
+              description="Соберите список по направлению, городу работы и статусу проверки."
               embedded
-              extraFilters={[{ name: 'verified', label: 'Все статусы', options: [{ value: 'true', label: 'Только проверенные' }] }]}
-              placeholder="Поиск по компании, поставке или описанию…"
+              extraFilters={[
+                {
+                  name: 'verified',
+                  label: 'Статус',
+                  allLabel: 'Любой статус',
+                  options: [{ value: 'true', label: 'Проверенные компании' }]
+                }
+              ]}
+              placeholder="Компания или поставка…"
+              title="Фильтр каталога"
+              tone="directory"
               variant="sidebar"
             />
           }
-          listAction={{ href: '#applications', label: 'Добавить компанию', variant: 'ghost' }}
+          listAction={{ href: '#supplier-request', label: 'Добавить компанию', variant: 'ghost' }}
           listLabel="Поставщики"
           rowVariant="directory"
-          rowActionLabel="Связаться"
+          rowActionLabel="Открыть профиль"
           sectionId="suppliers-list"
           title="Каталог"
         />

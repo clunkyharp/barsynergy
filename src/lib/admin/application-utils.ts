@@ -1,5 +1,15 @@
 import { ApplicationStatus, ApplicationType } from '@prisma/client';
 import { hasErrorMessage, resolveServerActionError } from '../actions/server-action-errors';
+import {
+  courseFormatOptions,
+  courseLevelOptions,
+  eventFormatOptions,
+  eventRegistrationModeOptions,
+  getAdminOptionLabel,
+  partnerTypeOptions,
+  vacancyEmploymentTypeOptions,
+  vacancyExperienceOptions
+} from '@/lib/admin/content-labels';
 
 export const applicationTypeValues = [
   ApplicationType.BUSINESS_ACCOUNT_REQUEST,
@@ -78,6 +88,96 @@ export function parseApplicationType(value?: string) {
 
 export function parseApplicationStatus(value?: string) {
   return applicationStatusValues.find((status) => status === value);
+}
+
+export const applicationPayloadFieldLabels: Record<string, string> = {
+  amountLabel: 'Сумма / формат',
+  companyName: 'Компания',
+  details: 'Описание',
+  employerCompanyName: 'Компания',
+  employmentType: 'Тип занятости',
+  eventDate: 'Дата события',
+  experienceLabel: 'Опыт',
+  format: 'Формат',
+  formatLabel: 'Формат',
+  level: 'Уровень',
+  partnerType: 'Тип партнёрства',
+  position: 'Позиция',
+  recipientName: 'Получатель',
+  registrationMode: 'Регистрация',
+  registrationUrl: 'Ссылка регистрации',
+  resumeUrl: 'Ссылка на резюме',
+  roleSummary: 'Кратко о кандидате',
+  salaryLabel: 'Оплата',
+  serviceArea: 'География работы',
+  shortDescription: 'Краткое описание',
+  source: 'Источник',
+  teamSize: 'Размер команды',
+  title: 'Название',
+  websiteUrl: 'Сайт'
+};
+
+const applicationPayloadValueLabels: Record<string, Record<string, string>> = {
+  source: {
+    business_cabinet: 'Бизнес-кабинет',
+    public_form: 'Публичная форма'
+  }
+};
+
+export function getApplicationPayloadFieldLabel(key: string) {
+  return applicationPayloadFieldLabels[key] ?? key;
+}
+
+export function formatApplicationPayloadValue(key: string, value: unknown) {
+  if (typeof value === 'boolean') {
+    return value ? 'Да' : 'Нет';
+  }
+
+  if (typeof value === 'number') {
+    return String(value);
+  }
+
+  if (typeof value !== 'string') {
+    return JSON.stringify(value);
+  }
+
+  const normalizedValue = value.trim();
+
+  if (!normalizedValue) {
+    return '';
+  }
+
+  const directLabel = applicationPayloadValueLabels[key]?.[normalizedValue];
+
+  if (directLabel) {
+    return directLabel;
+  }
+
+  if (key === 'employmentType') {
+    return getAdminOptionLabel(vacancyEmploymentTypeOptions, normalizedValue, normalizedValue);
+  }
+
+  if (key === 'experienceLabel') {
+    return getAdminOptionLabel(vacancyExperienceOptions, normalizedValue, normalizedValue);
+  }
+
+  if (key === 'partnerType') {
+    return getAdminOptionLabel(partnerTypeOptions, normalizedValue, normalizedValue);
+  }
+
+  if (key === 'registrationMode') {
+    return getAdminOptionLabel(eventRegistrationModeOptions, normalizedValue, normalizedValue);
+  }
+
+  if (key === 'level') {
+    return getAdminOptionLabel(courseLevelOptions, normalizedValue, normalizedValue);
+  }
+
+  if (key === 'format' || key === 'formatLabel') {
+    return getAdminOptionLabel([...eventFormatOptions, ...courseFormatOptions], normalizedValue, normalizedValue);
+  }
+
+  return normalizedValue;
 }
 
 export function formatApplicationActionError(error: unknown) {

@@ -1,4 +1,13 @@
 import { CategoryType, ContentStatus, FileVisibility, type Prisma } from '@prisma/client';
+import {
+  courseFormatOptions,
+  courseLevelOptions,
+  eventFormatOptions,
+  getAdminOptionLabel,
+  partnerTypeOptions,
+  vacancyEmploymentTypeOptions,
+  vacancyExperienceOptions
+} from '@/lib/admin/content-labels';
 import { prisma } from '@/lib/db/prisma';
 import { getPublicFileUrl } from '@/lib/storage/public-url';
 
@@ -183,6 +192,14 @@ function formatDateTimeLabel(date: Date) {
   });
 }
 
+function eventPlaceLabel(locationName?: string | null, cityName?: string | null) {
+  if (locationName && cityName) {
+    return `${locationName}, ${cityName}`;
+  }
+
+  return locationName ?? cityName ?? 'Место уточняется';
+}
+
 function compactLabel(value: string, maxLength = 72) {
   const normalized = value.replace(/\s+/g, ' ').trim();
 
@@ -292,17 +309,18 @@ export async function getPublishedEvents(params: PublicContentSearchParams = {})
       summary: event.summary,
       label: event.category?.name,
       dateIso: event.startsAt.toISOString(),
-      meta: [event.city?.name, event.locationName, event.format, event.startsAt.toLocaleDateString('ru-RU')].filter(Boolean) as string[],
+      meta: [
+        event.city?.name,
+        event.locationName,
+        getAdminOptionLabel(eventFormatOptions, event.format, ''),
+        event.startsAt.toLocaleDateString('ru-RU')
+      ].filter(Boolean) as string[],
       metaGroups: [
-        event.city?.name ? { label: 'Город', value: event.city.name } : undefined,
         { label: 'Дата', value: formatDateTimeLabel(event.startsAt), tone: 'accent' },
-        event.locationName ? { label: 'Место', value: event.locationName } : undefined,
-        event.format ? { label: 'Формат', value: event.format } : undefined,
-        { label: 'Для кого', value: 'специалисты и команды' },
-        { label: 'Участие', value: 'по условиям организатора' },
-        { label: 'Организатор', value: 'BARSYNERGY / партнёры' }
+        { label: 'Место', value: eventPlaceLabel(event.locationName, event.city?.name) },
+        event.format ? { label: 'Формат', value: getAdminOptionLabel(eventFormatOptions, event.format) } : undefined,
+        { label: 'Аудитория', value: 'специалисты и команды' }
       ].filter(Boolean) as PublishedContentMetaGroup[],
-      statusLabel: event.registrationMode ?? 'Заявки принимаются',
       imageUrl: publicImageUrl(event.coverImage)
     }))
   });
@@ -347,7 +365,13 @@ export async function getPublishedCourses(params: PublicContentSearchParams = {}
       slug: course.slug,
       summary: course.summary,
       label: course.category?.name,
-      meta: [course.city?.name, course.format, course.level, course.durationLabel, course.priceLabel].filter(Boolean) as string[],
+      meta: [
+        course.city?.name,
+        getAdminOptionLabel(courseFormatOptions, course.format, ''),
+        getAdminOptionLabel(courseLevelOptions, course.level, ''),
+        course.durationLabel,
+        course.priceLabel
+      ].filter(Boolean) as string[],
       imageUrl: publicImageUrl(course.coverImage)
     }))
   });
@@ -395,13 +419,18 @@ export async function getPublishedVacancies(params: PublicContentSearchParams = 
       kind: 'vacancy',
       label: vacancy.category?.name,
       subtitle: vacancy.companyName,
-      meta: [vacancy.city?.name, vacancy.companyName, vacancy.employmentType, vacancy.salaryLabel].filter(Boolean) as string[],
+      meta: [
+        vacancy.city?.name,
+        vacancy.companyName,
+        getAdminOptionLabel(vacancyEmploymentTypeOptions, vacancy.employmentType, ''),
+        vacancy.salaryLabel
+      ].filter(Boolean) as string[],
       metaGroups: [
         vacancy.city?.name ? { label: 'Город', value: vacancy.city.name } : undefined,
         vacancy.companyName ? { label: 'Компания', value: vacancy.companyName } : undefined,
-        vacancy.employmentType ? { label: 'График', value: vacancy.employmentType } : undefined,
+        vacancy.employmentType ? { label: 'График', value: getAdminOptionLabel(vacancyEmploymentTypeOptions, vacancy.employmentType) } : undefined,
         vacancy.category?.name ? { label: 'Формат', value: vacancy.category.name } : undefined,
-        vacancy.experienceLabel ? { label: 'Опыт', value: vacancy.experienceLabel } : undefined,
+        vacancy.experienceLabel ? { label: 'Опыт', value: getAdminOptionLabel(vacancyExperienceOptions, vacancy.experienceLabel) } : undefined,
         vacancy.salaryLabel ? { label: 'Оплата', value: vacancy.salaryLabel, tone: 'accent' } : undefined
       ].filter(Boolean) as PublishedContentMetaGroup[],
       statusLabel: 'Открыта',
@@ -490,9 +519,9 @@ export async function getPublishedSuppliers(params: PublicContentSearchParams = 
         supplier.serviceArea ? { label: 'География', value: supplier.serviceArea } : undefined,
         { label: 'Условия', value: 'по запросу' },
         { label: 'Продукты / услуги', value: compactLabel(supplier.summary) },
-        supplier.isVerified ? { value: 'Проверен BARSYNERGY', tone: 'accent' } : undefined
+        supplier.isVerified ? { value: 'Проверен BARSYNERGY', tone: 'accent' } : { value: 'Контакт для уточнения' }
       ].filter(Boolean) as PublishedContentMetaGroup[],
-      statusLabel: supplier.isVerified ? 'Проверен' : 'Данные уточняются',
+      statusLabel: supplier.isVerified ? 'Проверен' : 'Контакт для уточнения',
       updatedLabel: formatUpdatedLabel(supplier.publishedAt ?? supplier.createdAt),
       imageUrl: publicImageUrl(supplier.coverImage)
     }))
@@ -539,10 +568,14 @@ export async function getPublishedPartners(params: PublicContentSearchParams = {
       kind: 'partner',
       label: partner.category?.name,
       subtitle: partner.companyName,
-      meta: [partner.companyName, partner.partnerType, partner.isFeatured ? 'В подборке' : undefined].filter(Boolean) as string[],
+      meta: [
+        partner.companyName,
+        getAdminOptionLabel(partnerTypeOptions, partner.partnerType, ''),
+        partner.isFeatured ? 'В подборке' : undefined
+      ].filter(Boolean) as string[],
       metaGroups: [
         partner.companyName ? { label: 'Компания', value: partner.companyName } : undefined,
-        partner.partnerType ? { label: 'Формат', value: partner.partnerType } : undefined,
+        partner.partnerType ? { label: 'Формат', value: getAdminOptionLabel(partnerTypeOptions, partner.partnerType) } : undefined,
         partner.isFeatured ? { value: 'В подборке', tone: 'accent' } : undefined
       ].filter(Boolean) as PublishedContentMetaGroup[],
       imageUrl: publicImageUrl(partner.coverImage)

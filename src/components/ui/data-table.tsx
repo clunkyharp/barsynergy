@@ -1,10 +1,12 @@
 export {
-  AdminTable as DataTable,
+  AdminDataTable as DataTable,
   AdminActionMenu as DataTableActionMenu,
   AdminActionMenuButton as DataTableActionMenuButton,
   AdminActionMenuContent as DataTableActionMenuContent,
   AdminActionMenuLink as DataTableActionMenuLink,
   AdminActionMenuTrigger as DataTableActionMenuTrigger,
+  AdminActionRow as DataTableActionRow,
+  AdminDataTable,
   AdminTableBody as DataTableBody,
   AdminTableActionsCell as DataTableActionsCell,
   AdminTableActionsHeaderCell as DataTableActionsHeaderCell,

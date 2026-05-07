@@ -12,7 +12,8 @@ import {
 import { Button } from '@/components/ui/button';
 import { ConsentField } from '@/components/ui/consent-field';
 import { EditorialShell } from '@/components/ui/editorial-shell';
-import { FormField } from '@/components/ui/form-field';
+import { FileUpload } from '@/components/ui/file-upload';
+import { FormField, FormSection } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
 import { InlineLink } from '@/components/ui/inline-link';
 import { Select } from '@/components/ui/select';
@@ -76,7 +77,7 @@ function VacancyResponseForm({
   }
 
   return (
-    <form action={submitVacancyResponseApplication} className="editorial-form-shell overflow-hidden" id="vacancy-response">
+    <form action={submitVacancyResponseApplication} className="editorial-form-shell" id="vacancy-response-form">
       <HiddenUtmFields utm={utm} />
       <HoneypotField id="vacancy-response-website" />
       {selectedVacancy ? <input name="vacancyId" type="hidden" value={selectedVacancy.id} /> : null}
@@ -92,7 +93,7 @@ function VacancyResponseForm({
       />
       <div className="relative p-5 md:p-6">
         {selectedVacancy ? (
-          <EditorialShell className="mb-5 border-black/10 bg-[rgba(255,250,244,0.72)] p-4 shadow-none">
+          <EditorialShell className="mb-5 border-[var(--line)] bg-[var(--surface-wash)] p-4 shadow-none">
             <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Вы откликаетесь на</p>
             <p className="mt-2 text-base font-semibold leading-7 text-[var(--text)]">
               {selectedVacancy.title} / {selectedVacancy.companyName}
@@ -112,44 +113,58 @@ function VacancyResponseForm({
             </Select>
           </FormField>
         )}
-        <div className="mt-4 grid gap-4">
-          <FormField htmlFor="candidateName" label="Имя">
-            <Input id="candidateName" name="candidateName" required maxLength={160} minLength={2} />
-          </FormField>
-          <ContactChannelFieldset emailId="responseEmail" phoneId="responsePhone" telegramId="responseTelegram" />
-          <div className="grid gap-4 sm:grid-cols-2">
-            <FormField htmlFor="responseCityId" label="Город">
-              <Select id="responseCityId" name="cityId" defaultValue="">
-                <option value="">Не указан</option>
-                {options.cities.map((city) => (
-                  <option key={city.id} value={city.id}>
-                    {city.name}
-                  </option>
-                ))}
-              </Select>
-            </FormField>
-          </div>
-          <FormField htmlFor="roleSummary" label="Опыт и текущая роль">
-            <Textarea id="roleSummary" name="roleSummary" required maxLength={500} minLength={4} />
-          </FormField>
-          <FormField htmlFor="responseMessage" label="Сообщение работодателю">
-            <Textarea id="responseMessage" name="message" required className="min-h-40" maxLength={3000} minLength={10} />
-          </FormField>
-          <FormField htmlFor="resumeUrl" label="Ссылка на резюме">
-            <Input id="resumeUrl" name="resumeUrl" maxLength={500} type="url" />
-          </FormField>
-          <FormField
-            htmlFor="resumeFile"
-            label="Файл резюме"
-            hint="Поддерживаются PDF, DOC, DOCX, RTF и ODT. Можно приложить файл или оставить ссылку выше."
+        <div className="mt-5 grid gap-6">
+          <FormSection
+            title="Контакт"
+            description="Укажите имя и любой удобный канал связи. Email, телефон и Telegram можно заполнить не все сразу."
           >
-            <Input
-              id="resumeFile"
-              name="resumeFile"
-              type="file"
-              accept=".pdf,.doc,.docx,.rtf,.odt,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/rtf,text/rtf,application/vnd.oasis.opendocument.text"
-            />
-          </FormField>
+            <div className="grid gap-4 md:grid-cols-2">
+              <FormField htmlFor="candidateName" label="Имя">
+                <Input id="candidateName" name="candidateName" required maxLength={160} minLength={2} />
+              </FormField>
+              <FormField htmlFor="responseCityId" label="Город">
+                <Select id="responseCityId" name="cityId" defaultValue="">
+                  <option value="">Не указан</option>
+                  {options.cities.map((city) => (
+                    <option key={city.id} value={city.id}>
+                      {city.name}
+                    </option>
+                  ))}
+                </Select>
+              </FormField>
+            </div>
+            <ContactChannelFieldset emailId="responseEmail" phoneId="responsePhone" telegramId="responseTelegram" />
+          </FormSection>
+
+          <FormSection title="Опыт" description="Коротко опишите текущую роль и то, что важно передать работодателю.">
+            <FormField htmlFor="roleSummary" label="Опыт и текущая роль">
+              <Textarea id="roleSummary" name="roleSummary" required maxLength={500} minLength={4} />
+            </FormField>
+            <FormField htmlFor="responseMessage" label="Сообщение работодателю">
+              <Textarea id="responseMessage" name="message" required className="min-h-40" maxLength={3000} minLength={10} />
+            </FormField>
+          </FormSection>
+
+          <FormSection title="Резюме" description="Можно оставить ссылку, приложить файл или использовать оба варианта.">
+            <FormField htmlFor="resumeUrl" label="Ссылка на резюме">
+              <Input id="resumeUrl" name="resumeUrl" maxLength={500} type="url" />
+            </FormField>
+            <FormField
+              htmlFor="resumeFile"
+              label="Файл резюме"
+              hint="PDF, DOC, DOCX, RTF или ODT. Максимальный размер — 8 МБ."
+            >
+              <FileUpload
+                id="resumeFile"
+                name="resumeFile"
+                title="Приложить резюме"
+                description="Выберите документ с резюме или оставьте поле пустым."
+                meta="PDF, DOC, DOCX, RTF, ODT / до 8 МБ"
+                accept=".pdf,.doc,.docx,.rtf,.odt,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/rtf,text/rtf,application/vnd.oasis.opendocument.text"
+              />
+            </FormField>
+          </FormSection>
+
           <ConsentField>
             Согласен с <InlineLink href="/legal/privacy">политикой обработки персональных данных</InlineLink> и даю{' '}
             <InlineLink href="/legal/personal-data-consent">согласие на обработку персональных данных</InlineLink>, включая передачу отклика работодателю после проверки.
@@ -173,7 +188,7 @@ function VacancySubmissionForm({
   utm: VacancyApplicationFormsProps['utm'];
 }) {
   return (
-    <form action={submitVacancyPlacementApplication} className="editorial-form-shell overflow-hidden" id="vacancy-submission">
+    <form action={submitVacancyPlacementApplication} className="editorial-form-shell" id="vacancy-submission-form">
       <HiddenUtmFields utm={utm} />
       <HoneypotField id="vacancy-submission-website" />
       <PublicFormShellHeader
@@ -258,6 +273,12 @@ export function VacancyApplicationForms({
         eyebrow="Вакансии / Отклик"
         title="Откликнуться на вакансию"
         description="Форма привязана к конкретной вакансии."
+        disclosureAliases={['applications']}
+        disclosureFocusSelector="#candidateName"
+        disclosureId="vacancy-response"
+        disclosureOpenLabel="Открыть отклик"
+        disclosureTitle="Отклик на вакансию"
+        disclosureDescription="Оставьте контакт, опыт, сообщение работодателю и ссылку или файл резюме."
         enabled={enabled}
         result={result}
       >
@@ -273,6 +294,12 @@ export function VacancyApplicationForms({
       eyebrow="Вакансии / Заявки"
       title="Разместить вакансию"
       description="Заполните роль, условия и контакты компании. После проверки команда подготовит вакансию к публикации."
+      disclosureAliases={['applications', 'vacancy-submission', 'vacancy-forms']}
+      disclosureFocusSelector="#companyName"
+      disclosureId="submit-vacancy"
+      disclosureOpenLabel="Заполнить вакансию"
+      disclosureTitle="Заявка на публикацию"
+      disclosureDescription="Укажите роль, город, график, условия, требования и контакт для отклика."
       enabled={enabled}
       result={result}
     >

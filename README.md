@@ -63,9 +63,10 @@ printf '%s\n' 'YourStrongPassword123!' | npm run admin:upsert:local -- --email a
 npm run lint
 npm test
 npm run typecheck
-npm run build
 npx prisma validate
 ```
+
+`npm run build` is mandatory before creating a commit. During ordinary local checks, run it only for production-build, deployment or standalone-runtime changes.
 
 ## Production Build
 
@@ -121,7 +122,9 @@ Production releases go `dev -> validation -> prod` only after owner confirmation
 
 - [Design system](DESIGN.md)
 - [Design tokens](design-tokens.json)
-- [Design consistency check](docs/design-consistency-check.md)
+- [Design system status](docs/design-system-status.md)
+- [Design system component matrix](docs/design-system-component-matrix.md)
+- [Final design consistency audit](docs/design-system-consistency-audit-final-2026-04-29.md)
 - [Project status](PROJECT_STATUS.md)
 - [Project plan](docs/project-plan.md)
 - [AI agent workflow](docs/agent-workflow.md)

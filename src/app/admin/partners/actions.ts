@@ -276,27 +276,25 @@ export async function deletePartnerDraft(formData: FormData) {
     });
 
     const deletedPartner = await prisma.$transaction(async (tx) => {
-      const partner = await tx.partner.findFirst({
+      const partner = await tx.partner.findUnique({
         where: {
-          id: parsed.partnerId,
-          status: { not: ContentStatus.PUBLISHED }
+          id: parsed.partnerId
         },
         select: { coverImageId: true }
       });
 
       if (!partner) {
-        throw new Error('draft is invalid');
+        throw new Error('record is invalid');
       }
 
       const deletion = await tx.partner.deleteMany({
         where: {
-          id: parsed.partnerId,
-          status: { not: ContentStatus.PUBLISHED }
+          id: parsed.partnerId
         }
       });
 
       if (deletion.count !== 1) {
-        throw new Error('draft is invalid');
+        throw new Error('record is invalid');
       }
 
       return partner;
@@ -305,7 +303,7 @@ export async function deletePartnerDraft(formData: FormData) {
     await deleteUploadedFileIfUnused(deletedPartner.coverImageId);
 
     revalidatePath(ADMIN_PARTNERS_PATH);
-    result = { type: 'success', message: 'Черновик партнёра удалён.' };
+    result = { type: 'success', message: 'Партнёр удалён.' };
   } catch (error) {
     result = { type: 'error', message: formatAdminActionError(error) };
   }

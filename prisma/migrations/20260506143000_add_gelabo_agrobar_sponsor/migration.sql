@@ -1,0 +1,123 @@
+INSERT INTO "Category" (
+    "id",
+    "name",
+    "slug",
+    "type",
+    "description",
+    "isActive",
+    "sortOrder",
+    "updatedAt"
+) VALUES (
+    'category-supplier-ingredients',
+    'Ингредиенты',
+    'ingredients',
+    'supplier',
+    'Поставки продуктов, ингредиентов и расходных позиций для заведений.',
+    true,
+    1,
+    CURRENT_TIMESTAMP
+)
+ON CONFLICT ("slug", "type") DO UPDATE SET
+    "name" = EXCLUDED."name",
+    "description" = EXCLUDED."description",
+    "isActive" = true,
+    "sortOrder" = LEAST("Category"."sortOrder", EXCLUDED."sortOrder"),
+    "updatedAt" = CURRENT_TIMESTAMP;
+
+INSERT INTO "GeneralSponsor" (
+    "id",
+    "name",
+    "slug",
+    "status",
+    "logoPath",
+    "shortDescription",
+    "fullDescription",
+    "seasonLabel",
+    "priority",
+    "isFeatured",
+    "contactName",
+    "contactPhone",
+    "representedBrands",
+    "benefitsForVenues",
+    "publishedAt",
+    "updatedAt"
+) VALUES (
+    'general-sponsor-gelabo',
+    'Gelabo',
+    'gelabo',
+    'published',
+    '/brand/sponsors/gelabo-logo-blue.png',
+    'Мастерская мороженого и официальный поставщик Agrobar для заведений.',
+    'Gelabo — генеральный спонсор BARSYNERGY и официальный поставщик Agrobar. Компания работает с заведениями и помогает подобрать продукты под меню, формат точки и объём заказа.',
+    'Генеральный спонсор сезона',
+    2,
+    true,
+    'Загир / Офис',
+    '8 928 057 77 13 / 8 967 936 05 50',
+    E'Gelabo\nAgrobar',
+    E'Gelabo — мастерская мороженого для кафе, ресторанов, баров и кофеен. Можно обсудить ассортимент, поставку и условия работы.\nAgrobar — бренд продуктов для заведений, доступный через официального поставщика Gelabo. Детали по ассортименту, заказу и географии поставки уточняются напрямую.',
+    CURRENT_TIMESTAMP,
+    CURRENT_TIMESTAMP
+)
+ON CONFLICT ("slug") DO UPDATE SET
+    "name" = EXCLUDED."name",
+    "status" = EXCLUDED."status",
+    "logoPath" = EXCLUDED."logoPath",
+    "shortDescription" = EXCLUDED."shortDescription",
+    "fullDescription" = EXCLUDED."fullDescription",
+    "seasonLabel" = EXCLUDED."seasonLabel",
+    "priority" = EXCLUDED."priority",
+    "isFeatured" = EXCLUDED."isFeatured",
+    "contactName" = EXCLUDED."contactName",
+    "contactPhone" = EXCLUDED."contactPhone",
+    "representedBrands" = EXCLUDED."representedBrands",
+    "benefitsForVenues" = EXCLUDED."benefitsForVenues",
+    "publishedAt" = COALESCE("GeneralSponsor"."publishedAt", CURRENT_TIMESTAMP),
+    "archivedAt" = NULL,
+    "updatedAt" = CURRENT_TIMESTAMP;
+
+INSERT INTO "Supplier" (
+    "id",
+    "title",
+    "slug",
+    "summary",
+    "status",
+    "categoryId",
+    "sortOrder",
+    "publishedAt",
+    "companyName",
+    "description",
+    "contactLabel",
+    "isVerified",
+    "serviceArea",
+    "updatedAt"
+) VALUES (
+    'supplier-agrobar-gelabo',
+    'Agrobar: поставка через Gelabo',
+    'agrobar-gelabo',
+    'Agrobar доступен через Gelabo. Ассортимент, цены и сроки поставки уточняются напрямую у контактов компании.',
+    'published',
+    (SELECT "id" FROM "Category" WHERE "slug" = 'ingredients' AND "type" = 'supplier' LIMIT 1),
+    1,
+    CURRENT_TIMESTAMP,
+    'Gelabo',
+    'Agrobar — поставляемый бренд Gelabo. Сейчас подтверждены контакты для связи: Загир и офис. По ассортименту, ценам, минимальному заказу и географии поставки нужно уточнять напрямую у компании.',
+    'Загир: 8 928 057 77 13 / Офис: 8 967 936 05 50',
+    false,
+    'Условия и география поставки уточняются',
+    CURRENT_TIMESTAMP
+)
+ON CONFLICT ("slug") DO UPDATE SET
+    "title" = EXCLUDED."title",
+    "summary" = EXCLUDED."summary",
+    "status" = EXCLUDED."status",
+    "categoryId" = EXCLUDED."categoryId",
+    "sortOrder" = EXCLUDED."sortOrder",
+    "publishedAt" = COALESCE("Supplier"."publishedAt", CURRENT_TIMESTAMP),
+    "archivedAt" = NULL,
+    "companyName" = EXCLUDED."companyName",
+    "description" = EXCLUDED."description",
+    "contactLabel" = EXCLUDED."contactLabel",
+    "isVerified" = EXCLUDED."isVerified",
+    "serviceArea" = EXCLUDED."serviceArea",
+    "updatedAt" = CURRENT_TIMESTAMP;

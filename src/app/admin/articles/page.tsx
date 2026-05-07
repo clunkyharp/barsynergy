@@ -1,20 +1,15 @@
-import { CategoryType, ContentStatus, type Prisma } from '@prisma/client';
+import { CategoryType, type Prisma } from '@prisma/client';
 import { deleteArticleDraft, updateArticleStatus } from '@/app/admin/articles/actions';
 import {
   AdminActionAlert,
+  AdminContentRowActions,
   AdminListFilters,
-  AdminPagination,
-  HiddenRedirect
+  AdminPagination
 } from '@/components/admin/content-admin-controls';
 import { AdminPageIntro } from '@/components/admin/admin-page-intro';
 import { Button } from '@/components/ui/button';
 import {
   AdminTable,
-  AdminActionMenu,
-  AdminActionMenuButton,
-  AdminActionMenuContent,
-  AdminActionMenuLink,
-  AdminActionMenuTrigger,
   AdminTableActionsCell,
   AdminTableActionsHeaderCell,
   AdminTableBody,
@@ -117,6 +112,7 @@ export default async function AdminArticlesPage({ searchParams }: AdminArticlesP
     })
   ]);
   const totalPages = getAdminTotalPages(total);
+  const hasActiveFilters = Boolean(q || status || categoryId || cityId);
 
   return (
     <div className="space-y-8">
@@ -135,7 +131,7 @@ export default async function AdminArticlesPage({ searchParams }: AdminArticlesP
           { name: 'cityId', label: 'Город', allLabel: 'Все города', options: cities.map((city) => ({ value: city.id, label: city.name })) }
         ]}
         params={params}
-        searchPlaceholder="Поиск по названию, slug или описанию"
+        searchPlaceholder="Поиск по названию"
       />
 
       <section className="space-y-4">
@@ -147,7 +143,12 @@ export default async function AdminArticlesPage({ searchParams }: AdminArticlesP
         </div>
 
         {articles.length === 0 ? (
-          <EmptyState title="Статей пока нет" />
+          <EmptyState
+            actionHref={hasActiveFilters ? ADMIN_ARTICLES_PATH : `${ADMIN_ARTICLES_PATH}/create`}
+            actionLabel={hasActiveFilters ? 'Сбросить фильтры' : 'Создать статью'}
+            description={hasActiveFilters ? 'По текущим фильтрам записей нет.' : 'Добавьте первый редакционный материал и сохраните его как черновик или публикацию.'}
+            title={hasActiveFilters ? 'Статьи не найдены' : 'Статей пока нет'}
+          />
         ) : (
           <AdminTableFrame>
             <AdminTable minWidth={980}>
@@ -190,44 +191,16 @@ export default async function AdminArticlesPage({ searchParams }: AdminArticlesP
                       {article.updatedBy?.email ? <div className="mt-1 text-xs">{article.updatedBy.email}</div> : null}
                     </AdminTableCell>
                     <AdminTableActionsCell>
-                      <div className="flex flex-wrap gap-2">
-                        <Button className="min-h-9 px-3 py-1.5 text-xs" href={`${ADMIN_ARTICLES_PATH}/${article.id}`} variant="secondary">
-                          Изменить
-                        </Button>
-                        <AdminActionMenu>
-                          <AdminActionMenuTrigger />
-                          <AdminActionMenuContent>
-                            {article.status === ContentStatus.PUBLISHED ? (
-                              <AdminActionMenuLink href={`/articles/${article.slug}`} target="_blank" rel="noreferrer">
-                                Открыть публичную страницу
-                              </AdminActionMenuLink>
-                            ) : null}
-                            {article.status !== ContentStatus.PUBLISHED ? (
-                              <form action={updateArticleStatus}>
-                                <HiddenRedirect value={currentPath} />
-                                <input name="articleId" type="hidden" value={article.id} />
-                                <input name="status" type="hidden" value={ContentStatus.PUBLISHED} />
-                                <AdminActionMenuButton>Опубликовать</AdminActionMenuButton>
-                              </form>
-                            ) : null}
-                            {article.status !== ContentStatus.ARCHIVED ? (
-                              <form action={updateArticleStatus}>
-                                <HiddenRedirect value={currentPath} />
-                                <input name="articleId" type="hidden" value={article.id} />
-                                <input name="status" type="hidden" value={ContentStatus.ARCHIVED} />
-                                <AdminActionMenuButton>В архив</AdminActionMenuButton>
-                              </form>
-                            ) : null}
-                            {article.status !== ContentStatus.PUBLISHED ? (
-                              <form action={deleteArticleDraft}>
-                                <HiddenRedirect value={currentPath} />
-                                <input name="articleId" type="hidden" value={article.id} />
-                                <AdminActionMenuButton tone="danger">Удалить</AdminActionMenuButton>
-                              </form>
-                            ) : null}
-                          </AdminActionMenuContent>
-                        </AdminActionMenu>
-                      </div>
+                      <AdminContentRowActions
+                        currentPath={currentPath}
+                        deleteAction={deleteArticleDraft}
+                        editHref={`${ADMIN_ARTICLES_PATH}/${article.id}`}
+                        idName="articleId"
+                        idValue={article.id}
+                        publicHref={`/articles/${article.slug}`}
+                        status={article.status}
+                        updateStatusAction={updateArticleStatus}
+                      />
                     </AdminTableActionsCell>
                   </AdminTableRow>
                 ))}

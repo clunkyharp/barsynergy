@@ -182,7 +182,7 @@
 - authenticated smoke для `/profile`, `/business`, `/business/requests`, `/admin`, `/admin/applications`, `/admin/articles`;
 - mobile menu open/close, active nav, visible focus state, calculator interaction, contact form enabled/disabled shell and horizontal overflow checks.
 - Browser Use/in-app browser follow-up: после `allowedDevOrigins` для `127.0.0.1` HMR снова работает в локальном браузере, а основные публичные маршруты после перезапуска dev-сервера возвращают `200`.
-- финальный dark/light pass после UI consistency batch: `/`, `/education`, `/events`, `/general-sponsors`, `/tools/cost-calculator`, `/contacts`, `/auth/login` проверены на `390x844`, `1280x900`, `1366x768`, `1440x813`; подтверждены reload persistence темы, отсутствие горизонтального скролла, отсутствие видимого `Страница загружается` и старого `Напишите команде BARSYNERGY`; screenshots сохранены в `output/playwright/theme-audit-2026-05-04/final-pass`.
+- финальный dark/light pass после UI consistency batch: `/`, `/education`, `/events`, `/general-sponsors`, `/tools/cost-calculator`, `/contacts`, `/auth/login` проверены на `390x844`, `1280x900`, `1366x768`, `1440x813`; подтверждены reload persistence темы, отсутствие горизонтального скролла, отсутствие видимого `Страница загружается` и старого `Напишите команде BARSYNERGY`. Исторические скриншоты из `docs/output/` удалены во время release-prep cleanup 2026-05-07 после согласования; для нового sign-off нужно сгенерировать свежие артефакты.
 
 ## Документация
 

@@ -64,6 +64,20 @@ function revalidateTaxonomyPaths() {
   ].forEach((path) => revalidatePath(path));
 }
 
+function readBooleanFormValue(formData: FormData, key: string, fallback: boolean) {
+  const value = getString(formData, key);
+
+  if (value === 'true') {
+    return true;
+  }
+
+  if (value === 'false') {
+    return false;
+  }
+
+  return fallback;
+}
+
 export async function createCategory(formData: FormData) {
   const redirectTo = safeAdminRedirectPath(formData, ADMIN_CATEGORIES_PATH);
   let result: { type: 'success' | 'error'; message: string };
@@ -75,7 +89,7 @@ export async function createCategory(formData: FormData) {
       slug: optionalString(getString(formData, 'slug')),
       type: getString(formData, 'type'),
       description: optionalString(getString(formData, 'description')),
-      isActive: getString(formData, 'isActive') === 'true',
+      isActive: readBooleanFormValue(formData, 'isActive', true),
       sortOrder: getString(formData, 'sortOrder') || '0'
     });
     const slug = readSlug(parsed.slug, parsed.name, 'Category');
@@ -112,7 +126,7 @@ export async function updateCategory(formData: FormData) {
       slug: optionalString(getString(formData, 'slug')),
       type: getString(formData, 'type'),
       description: optionalString(getString(formData, 'description')),
-      isActive: getString(formData, 'isActive') === 'true',
+      isActive: readBooleanFormValue(formData, 'isActive', true),
       sortOrder: getString(formData, 'sortOrder') || '0'
     });
     const slug = readSlug(parsed.slug, parsed.name, 'Category');
@@ -156,7 +170,7 @@ export async function createCity(formData: FormData) {
       name: getString(formData, 'name'),
       slug: optionalString(getString(formData, 'slug')),
       region: optionalString(getString(formData, 'region')),
-      isActive: getString(formData, 'isActive') === 'true',
+      isActive: readBooleanFormValue(formData, 'isActive', true),
       sortOrder: getString(formData, 'sortOrder') || '0'
     });
     const slug = readSlug(parsed.slug, parsed.name, 'City');
@@ -191,7 +205,7 @@ export async function updateCity(formData: FormData) {
       name: getString(formData, 'name'),
       slug: optionalString(getString(formData, 'slug')),
       region: optionalString(getString(formData, 'region')),
-      isActive: getString(formData, 'isActive') === 'true',
+      isActive: readBooleanFormValue(formData, 'isActive', true),
       sortOrder: getString(formData, 'sortOrder') || '0'
     });
     const slug = readSlug(parsed.slug, parsed.name, 'City');

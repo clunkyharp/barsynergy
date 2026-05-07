@@ -6,7 +6,7 @@ export type ButtonSize = 'sm' | 'md' | 'lg';
 
 const variants: Record<ButtonVariant, string> = {
   primary:
-    'border-[var(--accent)] bg-[var(--accent)] text-[var(--accent-contrast)] shadow-[0_12px_28px_rgba(157,9,14,0.16)] hover:border-[var(--accent-strong)] hover:bg-[var(--accent-strong)]',
+    'border-[var(--accent)] bg-[var(--accent)] text-[var(--accent-contrast)] shadow-[var(--shadow-action)] hover:border-[var(--accent-strong)] hover:bg-[var(--accent-strong)]',
   secondary: 'border-[var(--accent)] bg-transparent text-[var(--accent)] hover:bg-[var(--accent)] hover:text-[var(--accent-contrast)]',
   ghost: 'border-transparent bg-transparent text-[var(--muted)] hover:text-[var(--accent)]',
   destructive: 'border-[var(--danger)] bg-[var(--danger)] text-white hover:bg-[#842726]',
@@ -14,7 +14,7 @@ const variants: Record<ButtonVariant, string> = {
 };
 
 const sizes: Record<ButtonSize, string> = {
-  sm: 'min-h-9 px-3 py-1.5 text-xs tracking-normal',
+  sm: 'min-h-11 px-3 py-1.5 text-xs tracking-normal',
   md: 'min-h-11 px-5 py-2.5 text-sm tracking-normal',
   lg: 'min-h-12 px-6 py-3 text-sm tracking-normal'
 };
@@ -71,6 +71,8 @@ export function Button(props: ButtonProps | LinkProps) {
         aria-busy={loading || undefined}
         aria-disabled={isDisabled || undefined}
         className={classes}
+        data-button-size={size}
+        data-button-variant={variant}
         tabIndex={isDisabled ? -1 : linkRest.tabIndex}
       >
         {content}
@@ -81,7 +83,14 @@ export function Button(props: ButtonProps | LinkProps) {
   const { disabled, ...buttonRest } = rest;
 
   return (
-    <button aria-busy={loading || undefined} className={classes} disabled={disabled || loading} {...buttonRest}>
+    <button
+      aria-busy={loading || undefined}
+      className={classes}
+      data-button-size={size}
+      data-button-variant={variant}
+      disabled={disabled || loading}
+      {...buttonRest}
+    >
       {content}
     </button>
   );

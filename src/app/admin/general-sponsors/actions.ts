@@ -375,27 +375,25 @@ export async function deleteGeneralSponsorDraft(formData: FormData) {
     });
 
     const deletedSponsor = await prisma.$transaction(async (tx) => {
-      const sponsor = await tx.generalSponsor.findFirst({
+      const sponsor = await tx.generalSponsor.findUnique({
         where: {
-          id: parsed.sponsorId,
-          status: { not: ContentStatus.PUBLISHED }
+          id: parsed.sponsorId
         },
         select: { logoImageId: true, coverImageId: true }
       });
 
       if (!sponsor) {
-        throw new Error('draft is invalid');
+        throw new Error('record is invalid');
       }
 
       const deletion = await tx.generalSponsor.deleteMany({
         where: {
-          id: parsed.sponsorId,
-          status: { not: ContentStatus.PUBLISHED }
+          id: parsed.sponsorId
         }
       });
 
       if (deletion.count !== 1) {
-        throw new Error('draft is invalid');
+        throw new Error('record is invalid');
       }
 
       return sponsor;
@@ -407,7 +405,7 @@ export async function deleteGeneralSponsorDraft(formData: FormData) {
     ]);
 
     revalidateGeneralSponsorPaths();
-    result = { type: 'success', message: 'Черновик генерального спонсора удален.' };
+    result = { type: 'success', message: 'Генеральный спонсор удален.' };
   } catch (error) {
     result = { type: 'error', message: formatAdminActionError(error) };
   }

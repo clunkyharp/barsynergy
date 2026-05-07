@@ -22,7 +22,7 @@ function partnerContactHref(input: { title: string; companyName?: string; label?
     params.set('websiteUrl', input.externalUrl);
   }
 
-  return `/contacts?${params.toString()}`;
+  return `/contacts?${params.toString()}#contact-form`;
 }
 
 export default async function PartnerDetailPage({ params }: PartnerDetailPageProps) {

@@ -17,10 +17,10 @@ const adminLinks: { label: string; href: string; section: AdminSection; availabl
   { label: 'Генспонсоры', href: '/admin/general-sponsors', section: 'generalSponsors', available: true },
   { label: 'Главная сайта', href: '/admin/homepage', section: 'homepage', available: true },
   { label: 'Заявки', href: '/admin/applications', section: 'applications', available: true },
-  { label: 'Пользователи', href: '/admin/users', section: 'users', available: true },
+  { label: 'Бизнес-доступы', href: '/admin/users', section: 'users', available: true },
   { label: 'Категории', href: '/admin/categories', section: 'categories', available: true },
   { label: 'Города', href: '/admin/cities', section: 'cities', available: true },
-  { label: 'Теги', href: '/admin/taxonomy/tags', section: 'tags', available: true }
+  { label: 'Теги', href: '/admin/tags', section: 'tags', available: true }
 ];
 
 type AdminSidebarProps = {
@@ -42,7 +42,16 @@ export function AdminSidebar({ role }: AdminSidebarProps) {
           const isActive = item.href === '/admin' ? pathname === item.href : pathname === item.href || pathname?.startsWith(`${item.href}/`);
 
           return (
-            <NavLink active={isActive} className={!isActive ? 'text-[var(--muted)]' : undefined} href={item.href} key={item.href}>
+            <NavLink
+              active={isActive}
+              className={
+                isActive
+                  ? 'border border-[var(--admin-nav-active-border)] bg-[var(--admin-nav-active-bg)] text-[var(--admin-nav-active-text)] hover:bg-[var(--admin-nav-active-hover)] hover:text-[var(--admin-nav-active-text)]'
+                  : 'text-[var(--muted)]'
+              }
+              href={item.href}
+              key={item.href}
+            >
               {item.label}
             </NavLink>
           );

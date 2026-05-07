@@ -112,9 +112,10 @@ Validation:
 ```bash
 npm run lint
 npm run typecheck
-npm run build
 npx prisma validate
 ```
+
+`npm run build` is mandatory only before creating a commit. For ordinary implementation checks, run it only when the task explicitly needs production-build, deploy or standalone-runtime validation.
 
 Prisma:
 
@@ -124,7 +125,7 @@ npm run prisma:migrate:dev -- --name <migration_name>
 npm run prisma:migrate:deploy
 ```
 
-Run build and typecheck sequentially. Next.js type generation can make parallel build/typecheck runs flaky.
+When both build and typecheck are required, run them sequentially. Next.js type generation can make parallel build/typecheck runs flaky.
 
 ## Environment And Data Safety
 

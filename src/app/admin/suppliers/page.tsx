@@ -63,6 +63,7 @@ export default async function AdminSuppliersPage({ searchParams }: AdminSupplier
   const status = getAdminStatusFilter(params);
   const categoryId = getAdminStringFilter(params, 'categoryId');
   const cityId = getAdminStringFilter(params, 'cityId');
+  const verifiedFilter = getAdminStringFilter(params, 'verified');
   const isVerified = getAdminBooleanFilter(params, 'verified');
   const searchWhere: Prisma.SupplierWhereInput = q
     ? {
@@ -115,12 +116,13 @@ export default async function AdminSuppliersPage({ searchParams }: AdminSupplier
   ]);
   const totalPages = getAdminTotalPages(total);
   const supplierCountByStatus = new Map(supplierStatusCounts.map((item) => [item.status, item._count._all] as const));
+  const hasActiveFilters = Boolean(q || status || categoryId || cityId || verifiedFilter);
 
   return (
     <div className="space-y-8">
       <AdminPageIntro
         action={
-          <Button href={`${ADMIN_SUPPLIERS_PATH}/create`} variant="secondary">
+          <Button href={`${ADMIN_SUPPLIERS_PATH}/create`}>
             Новый поставщик
           </Button>
         }
@@ -138,7 +140,7 @@ export default async function AdminSuppliersPage({ searchParams }: AdminSupplier
           {
             name: 'verified',
             label: 'Проверка',
-            allLabel: 'Любой статус',
+            allLabel: 'Любая проверка',
             options: [
               { value: 'true', label: 'Проверен' },
               { value: 'false', label: 'Не проверен' }
@@ -146,7 +148,7 @@ export default async function AdminSuppliersPage({ searchParams }: AdminSupplier
           }
         ]}
         params={params}
-        searchPlaceholder="Поиск по поставщику, компании или географии"
+        searchPlaceholder="Поиск по названию"
       />
 
       <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
@@ -165,14 +167,19 @@ export default async function AdminSuppliersPage({ searchParams }: AdminSupplier
         </div>
 
         {suppliers.length === 0 ? (
-          <EmptyState title="Поставщиков пока нет" />
+          <EmptyState
+            actionHref={hasActiveFilters ? ADMIN_SUPPLIERS_PATH : `${ADMIN_SUPPLIERS_PATH}/create`}
+            actionLabel={hasActiveFilters ? 'Сбросить фильтры' : 'Создать поставщика'}
+            description={hasActiveFilters ? 'По текущим фильтрам поставщиков нет.' : 'Добавьте компанию, географию работы и статус проверки.'}
+            title={hasActiveFilters ? 'Поставщики не найдены' : 'Поставщиков пока нет'}
+          />
         ) : (
           <AdminTableFrame>
             <AdminTable minWidth={1040}>
               <AdminTableHead>
                 <tr>
                   <AdminTableHeaderCell>Поставщик</AdminTableHeaderCell>
-                  <AdminTableHeaderCell>Контекст</AdminTableHeaderCell>
+                  <AdminTableHeaderCell>Компания</AdminTableHeaderCell>
                   <AdminTableHeaderCell>Город</AdminTableHeaderCell>
                   <AdminTableHeaderCell>Статус</AdminTableHeaderCell>
                   <AdminTableHeaderCell>Обновлено</AdminTableHeaderCell>
@@ -192,7 +199,11 @@ export default async function AdminSuppliersPage({ searchParams }: AdminSupplier
                     </AdminTableCell>
                     <AdminTableCell className="text-[var(--muted)]">
                       <div>{supplier.companyName}</div>
-                      {supplier.isVerified ? <div className="mt-1 text-xs">Проверен</div> : null}
+                      <div className="mt-1">
+                        <StatusBadge variant={supplier.isVerified ? 'success' : 'warning'}>
+                          {supplier.isVerified ? 'Проверен' : 'Не проверен'}
+                        </StatusBadge>
+                      </div>
                       {supplier.serviceArea ? <div className="mt-1 text-xs">{supplier.serviceArea}</div> : null}
                     </AdminTableCell>
                     <AdminTableCell className="text-[var(--muted)]">{supplier.city?.name ?? '-'}</AdminTableCell>

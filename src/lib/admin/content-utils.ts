@@ -5,6 +5,17 @@ import { prisma } from '@/lib/db/prisma';
 import { isAllowedPublicImageUpload } from '@/lib/storage/file-signatures';
 import { MAX_UPLOAD_FILE_SIZE_BYTES } from '@/lib/storage/storage.types';
 
+export {
+  courseFormatOptions,
+  courseLevelOptions,
+  eventFormatOptions,
+  eventRegistrationModeOptions,
+  getAdminOptionLabel,
+  partnerTypeOptions,
+  vacancyEmploymentTypeOptions,
+  vacancyExperienceOptions
+} from '@/lib/admin/content-labels';
+
 export type AdminContentSearchParams = Record<string, string | string[] | undefined>;
 
 export const ADMIN_CONTENT_PAGE_SIZE = 12;
@@ -29,59 +40,6 @@ export const contentStatusBadgeVariants: Record<ContentStatus, 'neutral' | 'succ
   [ContentStatus.PUBLISHED]: 'success',
   [ContentStatus.ARCHIVED]: 'danger'
 };
-
-export const eventFormatOptions = [
-  { value: 'offline', label: 'Оффлайн' },
-  { value: 'online', label: 'Онлайн' },
-  { value: 'hybrid', label: 'Гибрид' }
-] as const;
-
-export const eventRegistrationModeOptions = [
-  { value: 'not_required', label: 'Не требуется' },
-  { value: 'open', label: 'Открыта' },
-  { value: 'soon', label: 'Скоро' },
-  { value: 'closed', label: 'Закрыта' },
-  { value: 'external', label: 'Внешняя ссылка' }
-] as const;
-
-export const courseFormatOptions = [
-  { value: 'intensive', label: 'Интенсив' },
-  { value: 'online_lecture', label: 'Онлайн-лекция' },
-  { value: 'corporate', label: 'Корпоративное обучение' },
-  { value: 'program', label: 'Программа' }
-] as const;
-
-export const courseLevelOptions = [
-  { value: 'beginner', label: 'Новичок' },
-  { value: 'middle', label: 'Средний' },
-  { value: 'pro', label: 'Профи' },
-  { value: 'manager', label: 'Управляющий' }
-] as const;
-
-export const vacancyEmploymentTypeOptions = [
-  { value: 'full_time', label: 'Полная занятость' },
-  { value: 'part_time', label: 'Частичная занятость' },
-  { value: 'shift', label: 'Сменный график' },
-  { value: 'project', label: 'Проектная работа' },
-  { value: 'internship', label: 'Стажировка' }
-] as const;
-
-export const vacancyExperienceOptions = [
-  { value: 'no_experience', label: 'Без опыта' },
-  { value: 'one_year', label: 'От 1 года' },
-  { value: 'three_years', label: 'От 3 лет' },
-  { value: 'manager', label: 'Управленческий опыт' }
-] as const;
-
-export const partnerTypeOptions = [
-  { value: 'brand', label: 'Бренд' },
-  { value: 'venue', label: 'Площадка' },
-  { value: 'education', label: 'Образовательный партнёр' },
-  { value: 'media', label: 'Информационный партнёр' },
-  { value: 'supplier', label: 'Поставщик' },
-  { value: 'sponsor', label: 'Спонсор' },
-  { value: 'expert', label: 'Эксперт' }
-] as const;
 
 export function firstParam(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] : value;

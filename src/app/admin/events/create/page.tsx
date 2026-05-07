@@ -1,8 +1,8 @@
 import { CategoryType, ContentStatus } from '@prisma/client';
 import { createEvent } from '@/app/admin/events/actions';
+import { AdminCmsActions, AdminCmsForm, AdminCmsGrid, AdminCmsSection } from '@/components/admin/admin-cms-form';
 import { CoverImageField, HiddenRedirect } from '@/components/admin/content-admin-controls';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
@@ -43,13 +43,11 @@ export default async function AdminEventsCreatePage() {
         </Button>
       </header>
 
-      <Card className="p-5">
-        <form action={createEvent} className="grid gap-8">
+      <AdminCmsForm action={createEvent}>
           <HiddenRedirect value={ADMIN_EVENTS_PATH} />
           
-          <section>
-            <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-[var(--muted)]">Основная информация</h3>
-            <div className="grid gap-5 lg:grid-cols-2">
+          <AdminCmsSection title="Публикация" description="Название, адрес, категория и статус события.">
+            <AdminCmsGrid>
               <FormField htmlFor="event-title" label="Название">
                 <Input id="event-title" name="title" required minLength={2} maxLength={160} />
               </FormField>
@@ -75,12 +73,11 @@ export default async function AdminEventsCreatePage() {
                   ))}
                 </Select>
               </FormField>
-            </div>
-          </section>
+            </AdminCmsGrid>
+          </AdminCmsSection>
 
-          <section>
-            <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-[var(--muted)]">Локация и условия</h3>
-            <div className="grid gap-5 lg:grid-cols-2">
+          <AdminCmsSection title="Классификация" description="Город, площадка, формат и условия регистрации.">
+            <AdminCmsGrid>
               <FormField htmlFor="event-cityId" label="Город">
                 <Select id="event-cityId" name="cityId" defaultValue="">
                   <option value="">Без города</option>
@@ -120,38 +117,41 @@ export default async function AdminEventsCreatePage() {
                   ))}
                 </Select>
               </FormField>
-            </div>
-          </section>
+            </AdminCmsGrid>
+          </AdminCmsSection>
 
-          <section>
-            <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-[var(--muted)]">Время проведения</h3>
-            <div className="grid gap-5 lg:grid-cols-2">
-              <FormField htmlFor="event-startsAt" label="Начало" hint="Дата отображается в русском формате: дд.мм.гггг, чч:мм.">
-                <Input id="event-startsAt" name="startsAt" required type="datetime-local" />
+          <AdminCmsSection title="Расписание" description="Дата начала и окончание, если событие длится несколько часов или дней.">
+            <AdminCmsGrid>
+              <FormField htmlFor="event-startsAt" label="Начало" hint="Введите дату и время. После сохранения в списках будет формат дд.мм.гггг, чч:мм.">
+                <Input id="event-startsAt" name="startsAt" lang="ru-RU" required title="дд.мм.гггг, чч:мм" type="datetime-local" />
               </FormField>
               <FormField htmlFor="event-endsAt" label="Окончание" hint="Заполните, если событие длится несколько часов или дней.">
-                <Input id="event-endsAt" name="endsAt" type="datetime-local" />
+                <Input id="event-endsAt" name="endsAt" lang="ru-RU" title="дд.мм.гггг, чч:мм" type="datetime-local" />
               </FormField>
-            </div>
-          </section>
+            </AdminCmsGrid>
+          </AdminCmsSection>
 
-          <section>
-            <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-[var(--muted)]">Медиа и описание</h3>
-            <div className="grid gap-5 lg:grid-cols-2">
+          <AdminCmsSection title="Медиа" description="Обложка события для карточек и публичной страницы.">
+            <AdminCmsGrid>
               <CoverImageField id="event-coverImage" />
-              <div className="lg:col-span-2">
+            </AdminCmsGrid>
+          </AdminCmsSection>
+
+          <AdminCmsSection title="Контент" description="Краткое описание события для публичных списков.">
+            <div className="grid gap-4">
                 <FormField htmlFor="event-summary" label="Краткое описание">
                   <Textarea id="event-summary" name="summary" required minLength={10} maxLength={500} />
                 </FormField>
-              </div>
             </div>
-          </section>
+          </AdminCmsSection>
 
-          <div>
+          <AdminCmsActions>
+            <Button href={ADMIN_EVENTS_PATH} type="button" variant="secondary">
+              Отмена
+            </Button>
             <Button type="submit">Создать событие</Button>
-          </div>
-        </form>
-      </Card>
+          </AdminCmsActions>
+      </AdminCmsForm>
     </div>
   );
 }

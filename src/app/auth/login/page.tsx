@@ -1,6 +1,7 @@
 import Image from 'next/image';
-import { FileText, Headphones, Lock, Mail, Settings2 } from 'lucide-react';
+import { ArrowLeft, Headphones, Lock } from 'lucide-react';
 import { loginAction } from '@/app/auth/actions';
+import { FeatureCard } from '@/components/public/public-card-patterns';
 import { Button } from '@/components/ui/button';
 import { InlineAlert } from '@/components/ui/inline-alert';
 import { FormField } from '@/components/ui/form-field';
@@ -22,6 +23,25 @@ const successMessages: Record<string, string> = {
   'logged-out': 'Вы вышли из аккаунта.'
 };
 
+const accessRoles = [
+  {
+    role: 'Участник',
+    description: 'личный доступ к материалам, заявкам и своим откликам.'
+  },
+  {
+    role: 'Бизнес',
+    description: 'кабинет компании: профиль, заявки, статусы и комментарии команды.'
+  },
+  {
+    role: 'Редакция/команда',
+    description: 'подготовка материалов, событий и публичных разделов.'
+  },
+  {
+    role: 'Администратор',
+    description: 'права, публикации, пользователи и служебные разделы.'
+  }
+];
+
 type LoginPageProps = {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 };
@@ -37,12 +57,23 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
 
   return (
     <div className="container max-w-[1220px] py-10 md:py-14 xl:py-20">
+      <header className="mb-8 flex flex-wrap items-center gap-x-4 gap-y-3 md:mb-10">
+        <a className="inline-flex shrink-0 w-fit focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]" href="/">
+          <Image alt="BARSYNERGY" className="theme-logo-light h-auto w-[220px] md:w-[250px]" height={70} priority src="/brand/barsynergy-lockup.svg" width={360} />
+          <Image alt="BARSYNERGY" className="theme-logo-dark h-auto w-[220px] md:w-[250px]" height={70} priority src="/brand/barsynergy-lockup-light.svg" width={360} />
+        </a>
+        <span aria-hidden="true" className="hidden h-9 w-px bg-[var(--line)] sm:block" />
+        <a
+          className="inline-flex min-h-11 items-center gap-2 rounded-[var(--radius-md)] px-3 text-sm font-semibold leading-5 text-[var(--muted)] transition-colors hover:bg-[var(--surface-wash)] hover:text-[var(--accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
+          href="/"
+        >
+          <ArrowLeft aria-hidden size={15} strokeWidth={1.8} />
+          Вернуться на сайт
+        </a>
+      </header>
       <div className="grid gap-8 xl:grid-cols-[minmax(0,0.82fr)_minmax(380px,0.72fr)] xl:items-center">
         <aside className="min-w-0">
-          <a className="inline-flex w-fit focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]" href="/">
-            <Image alt="BARSYNERGY" className="h-auto w-[250px]" height={70} priority src="/brand/barsynergy-lockup.svg" width={360} />
-          </a>
-          <h1 className={`${displayFont.className} display-tight mt-12 max-w-[13ch] text-[40px] md:text-[54px]`}>
+          <h1 className={`${displayFont.className} display-tight max-w-[13ch] text-[40px] md:text-[54px]`}>
             Кабинет BARSYNERGY для барной индустрии СКФО
           </h1>
           <span className="mt-7 block h-1 w-20 bg-[var(--accent)]" />
@@ -53,54 +84,19 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
             <Button className="rounded-[var(--radius-md)] px-6" href="/auth/register" size="lg">
               Запросить доступ
             </Button>
-            <Button className="rounded-[var(--radius-md)] px-6" href="/" size="lg" variant="secondary">
-              Вернуться на сайт
-            </Button>
           </div>
 
-          <div className="mt-10 hidden gap-5 md:grid">
-            {[
-              {
-                icon: Settings2,
-                title: 'Кабинет компании',
-                description: 'Обновляйте карточку компании, создавайте заявки и смотрите ответы команды.'
-              },
-              {
-                icon: FileText,
-                title: 'Работа с заявками',
-                description: 'Проверяйте статусы, комментарии и следующие шаги без переписки в разных каналах.'
-              },
-              {
-                icon: Mail,
-                title: 'Доступ команды',
-                description: 'Команда BARSYNERGY управляет материалами, событиями и публичными разделами.'
-              }
-            ].map((item) => {
-              const Icon = item.icon;
+          <AccessRoleList />
 
-              return (
-                <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-4" key={item.title}>
-                  <span className="grid h-14 w-14 place-items-center rounded-full border border-[rgba(157,9,14,0.16)] bg-[var(--accent-soft)] text-[var(--accent)]">
-                    <Icon size={23} strokeWidth={1.7} />
-                  </span>
-                  <span className="pt-1">
-                    <span className="block text-base font-semibold text-[var(--text)]">{item.title}</span>
-                    <span className="mt-1 block max-w-md text-sm leading-6 text-[var(--muted)]">{item.description}</span>
-                  </span>
-                </div>
-              );
-            })}
-          </div>
-
-          <Panel className="mt-10 hidden max-w-xl border-[rgba(191,168,143,0.42)] bg-[rgba(255,253,249,0.74)] md:block" padding="md">
+          <Panel className="mt-10 hidden max-w-xl border-[var(--border-default)] bg-[var(--surface-wash)] md:block" padding="md">
             <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-4">
               <span className="grid h-11 w-11 place-items-center rounded-[var(--radius-md)] border border-[rgba(157,9,14,0.16)] bg-[var(--accent-soft)] text-[var(--accent)]">
                 <Lock size={19} strokeWidth={1.7} />
               </span>
               <div>
-                <p className="text-sm font-semibold text-[var(--text)]">Безопасный доступ</p>
+                <p className="text-sm font-semibold text-[var(--text)]">Порядок доступа</p>
                 <p className="mt-1 text-sm leading-6 text-[var(--muted)]">
-                  Вход доступен только для аккаунтов, которым команда уже открыла кабинет.
+                  Права выдаются вручную: заявка, проверка роли, затем доступ только к нужному разделу.
                 </p>
               </div>
             </div>
@@ -109,8 +105,9 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
 
         <section className="editorial-form-shell overflow-hidden">
           <div className="px-5 pt-9 text-center md:px-8 md:pt-11">
-            <div className="mx-auto grid h-16 w-16 place-items-center rounded-full border border-[rgba(157,9,14,0.16)] bg-[var(--accent-soft)] text-[var(--accent)]">
-              <Lock size={25} strokeWidth={1.7} />
+            <div className="mx-auto inline-flex items-center gap-2 rounded-[var(--radius-pill)] border border-[var(--border-default)] bg-[var(--surface-wash)] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">
+              <Lock size={14} strokeWidth={1.8} />
+              Закрытый доступ
             </div>
             <h2 className={`${displayFont.className} display-tight mt-7 text-[34px] leading-[0.96] md:text-[42px]`}>
               Вход в кабинет
@@ -134,7 +131,6 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
               <form action={loginAction} className="grid gap-4">
                 <FormField className="space-y-2" htmlFor="email" label="Email">
                   <Input
-                    className="px-4 py-3 text-[14px] leading-6"
                     id="email"
                     name="email"
                     type="email"
@@ -144,7 +140,6 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
                 </FormField>
                 <FormField className="space-y-2" htmlFor="password" label="Пароль">
                   <Input
-                    className="px-4 py-3 text-[14px] leading-6"
                     id="password"
                     name="password"
                     type="password"
@@ -160,10 +155,6 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
                 </Button>
                 <Button className="rounded-[var(--radius-md)]" href="/contacts?topic=other" size="lg" variant="ghost">
                   Восстановить доступ через команду
-                </Button>
-                <Button className="rounded-[var(--radius-md)]" href="/" size="lg" variant="ghost">
-                  Вернуться на сайт
-                  <ArrowRightMark />
                 </Button>
               </form>
               <div className="mt-7 border-t border-black/10 pt-6">
@@ -186,6 +177,23 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   );
 }
 
-function ArrowRightMark() {
-  return <span aria-hidden="true">→</span>;
+function AccessRoleList() {
+  return (
+    <div className="mt-10 hidden max-w-xl md:block">
+      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Роли доступа</p>
+      <ul className="mt-4 grid gap-3 sm:grid-cols-2">
+        {accessRoles.map((item, index) => (
+          <li key={item.role}>
+            <FeatureCard
+              className="min-h-[10.5rem] rounded-[var(--radius-md)] p-4"
+              code={String(index + 1).padStart(2, '0')}
+              description={item.description}
+              eyebrow="Роль"
+              title={item.role}
+            />
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
 }

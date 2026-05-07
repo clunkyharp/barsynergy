@@ -4,9 +4,7 @@ import { ApplicationStatus, ApplicationType, BusinessAccountStatus, UserStatus }
 import {
   createVacancyDraftFromApplication,
   prepareBusinessAccessAction,
-  updateApplicationBusinessNotes,
-  updateApplicationInternalNotes,
-  updateApplicationStatus
+  updateApplicationProcessing
 } from '@/app/admin/applications/actions';
 import { AdminActionAlert, HiddenRedirect } from '@/components/admin/content-admin-controls';
 import { Button } from '@/components/ui/button';
@@ -20,7 +18,9 @@ import {
   applicationStatusBadgeVariants,
   applicationStatusLabels,
   applicationStatusValues,
-  applicationTypeLabels
+  applicationTypeLabels,
+  formatApplicationPayloadValue,
+  getApplicationPayloadFieldLabel
 } from '@/lib/admin/application-utils';
 import type { AdminContentSearchParams } from '@/lib/admin/content-utils';
 import { BUSINESS_ACCESS_PREVIEW_COOKIE_NAME } from '@/lib/auth/business-access';
@@ -39,6 +39,19 @@ const dateTimeFormatter = new Intl.DateTimeFormat('ru-RU', {
   minute: '2-digit'
 });
 
+const businessStatusLabels: Record<BusinessAccountStatus, string> = {
+  [BusinessAccountStatus.PENDING]: 'Ожидает активации',
+  [BusinessAccountStatus.ACTIVE]: 'Активен',
+  [BusinessAccountStatus.BLOCKED]: 'Заблокирован',
+  [BusinessAccountStatus.ARCHIVED]: 'Архив'
+};
+
+const userStatusLabels: Record<UserStatus, string> = {
+  [UserStatus.ACTIVE]: 'Активен',
+  [UserStatus.BLOCKED]: 'Заблокирован',
+  [UserStatus.PENDING]: 'Ожидает'
+};
+
 type AdminApplicationDetailPageProps = {
   params: Promise<{ applicationId: string }>;
   searchParams?: Promise<AdminContentSearchParams>;
@@ -52,12 +65,16 @@ function payloadEntries(payload: unknown) {
   return Object.entries(payload).filter(([, value]) => value !== null && value !== undefined && value !== '');
 }
 
-function formatPayloadValue(value: unknown) {
-  if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
-    return String(value);
+function formatFileSize(bytes: number) {
+  if (bytes < 1024) {
+    return `${bytes} байт`;
   }
 
-  return JSON.stringify(value);
+  if (bytes < 1024 * 1024) {
+    return `${Math.round(bytes / 1024)} КБ`;
+  }
+
+  return `${(bytes / 1024 / 1024).toFixed(1)} МБ`;
 }
 
 export default async function AdminApplicationDetailPage({ params, searchParams }: AdminApplicationDetailPageProps) {
@@ -91,7 +108,7 @@ export default async function AdminApplicationDetailPage({ params, searchParams 
     where: { id: applicationId },
     include: {
       city: { select: { name: true } },
-      vacancy: { select: { title: true, slug: true, companyName: true } },
+      vacancy: { select: { id: true, title: true, slug: true, companyName: true } },
       resumeFile: { select: { originalName: true, mimeType: true, size: true } },
       forwardedBy: { select: { email: true } },
       businessAccount: {
@@ -136,88 +153,122 @@ export default async function AdminApplicationDetailPage({ params, searchParams 
       <AdminActionAlert params={query} />
 
       <div className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
-        <Card className="p-5">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <h2 className="text-lg font-semibold">Данные заявки</h2>
-            <StatusBadge variant={applicationStatusBadgeVariants[application.status]}>{applicationStatusLabels[application.status]}</StatusBadge>
-          </div>
+        <div className="space-y-6">
+          <Card className="p-5">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <h2 className="text-lg font-semibold">Данные заявки</h2>
+              <StatusBadge variant={applicationStatusBadgeVariants[application.status]}>{applicationStatusLabels[application.status]}</StatusBadge>
+            </div>
 
-          <dl className="mt-5 grid gap-4 text-sm sm:grid-cols-2">
-            <div>
-              <dt className="font-semibold">Имя</dt>
-              <dd className="mt-1 text-[var(--muted)]">{application.name ?? '-'}</dd>
-            </div>
-            <div>
-              <dt className="font-semibold">Город</dt>
-              <dd className="mt-1 text-[var(--muted)]">{application.city?.name ?? '-'}</dd>
-            </div>
-            <div>
-              <dt className="font-semibold">Email</dt>
-              <dd className="mt-1 text-[var(--muted)]">{application.email ?? '-'}</dd>
-            </div>
-            <div>
-              <dt className="font-semibold">Телефон</dt>
-              <dd className="mt-1 text-[var(--muted)]">{application.phone ?? '-'}</dd>
-            </div>
-            <div>
-              <dt className="font-semibold">Telegram</dt>
-              <dd className="mt-1 text-[var(--muted)]">{application.telegram ?? '-'}</dd>
-            </div>
-            <div>
-              <dt className="font-semibold">Согласие</dt>
-              <dd className="mt-1 text-[var(--muted)]">
-                {application.consentAcceptedAt ? dateTimeFormatter.format(application.consentAcceptedAt) : 'Не зафиксировано'}
-              </dd>
-            </div>
-          </dl>
+            <dl className="mt-5 grid gap-4 text-sm sm:grid-cols-2">
+              <div>
+                <dt className="font-semibold">Имя</dt>
+                <dd className="mt-1 text-[var(--muted)]">{application.name ?? '-'}</dd>
+              </div>
+              <div>
+                <dt className="font-semibold">Город</dt>
+                <dd className="mt-1 text-[var(--muted)]">{application.city?.name ?? '-'}</dd>
+              </div>
+              <div>
+                <dt className="font-semibold">Email</dt>
+                <dd className="mt-1 text-[var(--muted)]">{application.email ?? '-'}</dd>
+              </div>
+              <div>
+                <dt className="font-semibold">Телефон</dt>
+                <dd className="mt-1 text-[var(--muted)]">{application.phone ?? '-'}</dd>
+              </div>
+              <div>
+                <dt className="font-semibold">Telegram</dt>
+                <dd className="mt-1 text-[var(--muted)]">{application.telegram ?? '-'}</dd>
+              </div>
+              <div>
+                <dt className="font-semibold">Согласие</dt>
+                <dd className="mt-1 text-[var(--muted)]">
+                  {application.consentAcceptedAt ? dateTimeFormatter.format(application.consentAcceptedAt) : 'Не зафиксировано'}
+                </dd>
+              </div>
+            </dl>
 
-          {application.vacancy ? (
-            <div className="mt-5 border-t border-[var(--line)] pt-5 text-sm">
-              <h3 className="font-semibold">Связанная вакансия</h3>
-              <p className="mt-2 text-[var(--muted)]">
-                {application.vacancy.title} / {application.vacancy.companyName} /{application.vacancy.slug}
-              </p>
-            </div>
-          ) : null}
+            {application.message ? (
+              <div className="mt-5 border-t border-[var(--line)] pt-5 text-sm">
+                <h3 className="font-semibold">Сообщение</h3>
+                <p className="mt-2 whitespace-pre-wrap leading-7 text-[var(--muted)]">{application.message}</p>
+              </div>
+            ) : null}
 
-          {application.message ? (
-            <div className="mt-5 border-t border-[var(--line)] pt-5 text-sm">
-              <h3 className="font-semibold">Сообщение</h3>
-              <p className="mt-2 whitespace-pre-wrap leading-7 text-[var(--muted)]">{application.message}</p>
-            </div>
-          ) : null}
+            {entries.length > 0 ? (
+              <div className="mt-5 border-t border-[var(--line)] pt-5 text-sm">
+                <h3 className="font-semibold">Дополнительные поля</h3>
+                <dl className="mt-3 grid gap-3">
+                  {entries.map(([key, value]) => (
+                    <div className="grid gap-1 sm:grid-cols-[180px_1fr]" key={key}>
+                      <dt className="font-semibold">{getApplicationPayloadFieldLabel(key)}</dt>
+                      <dd className="text-[var(--muted)]">{formatApplicationPayloadValue(key, value)}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </div>
+            ) : null}
+          </Card>
 
-          {entries.length > 0 ? (
-            <div className="mt-5 border-t border-[var(--line)] pt-5 text-sm">
-              <h3 className="font-semibold">Дополнительные поля</h3>
-              <dl className="mt-3 grid gap-3">
-                {entries.map(([key, value]) => (
-                  <div className="grid gap-1 sm:grid-cols-[180px_1fr]" key={key}>
-                    <dt className="font-semibold">{key}</dt>
-                    <dd className="text-[var(--muted)]">{formatPayloadValue(value)}</dd>
-                  </div>
-                ))}
+          <Card className="p-5">
+            <h2 className="text-lg font-semibold">Связанная запись</h2>
+            {application.vacancy ? (
+              <div className="mt-4 grid gap-3 text-sm">
+                <p className="font-medium text-[var(--text)]">{application.vacancy.title}</p>
+                <p className="text-[var(--muted)]">
+                  {application.vacancy.companyName} / {application.vacancy.slug}
+                </p>
+                <Button className="w-fit" href={`/admin/vacancies/${application.vacancy.id}`} size="sm" variant="secondary">
+                  Открыть вакансию
+                </Button>
+              </div>
+            ) : application.businessAccount ? (
+              <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
+                <div>
+                  <dt className="font-semibold">Компания</dt>
+                  <dd className="mt-1 text-[var(--muted)]">{application.businessAccount.companyName}</dd>
+                </div>
+                <div>
+                  <dt className="font-semibold">Статус доступа</dt>
+                  <dd className="mt-1 text-[var(--muted)]">{businessStatusLabels[application.businessAccount.status]}</dd>
+                </div>
+                <div>
+                  <dt className="font-semibold">Владелец</dt>
+                  <dd className="mt-1 text-[var(--muted)]">{application.businessAccount.owner.email}</dd>
+                </div>
+                <div>
+                  <dt className="font-semibold">Статус аккаунта</dt>
+                  <dd className="mt-1 text-[var(--muted)]">{userStatusLabels[application.businessAccount.owner.status]}</dd>
+                </div>
               </dl>
-            </div>
-          ) : null}
+            ) : (
+              <p className="mt-3 text-sm text-[var(--muted)]">Связанная вакансия, компания или кабинет не найдены.</p>
+            )}
+          </Card>
 
-          {application.resumeFile ? (
-            <div className="mt-5 border-t border-[var(--line)] pt-5 text-sm">
-              <h3 className="font-semibold">Файл резюме</h3>
-              <p className="mt-2 text-[var(--muted)]">
-                {application.resumeFile.originalName} / {application.resumeFile.mimeType} / {application.resumeFile.size} bytes
-              </p>
-              <Button className="mt-4" href={`${currentPath}/resume`} variant="secondary">
-                Скачать файл
-              </Button>
-            </div>
-          ) : null}
-        </Card>
+          <Card className="p-5">
+            <h2 className="text-lg font-semibold">Файл резюме</h2>
+            {application.resumeFile ? (
+              <div className="mt-4 grid gap-3 text-sm">
+                <p className="font-medium text-[var(--text)]">{application.resumeFile.originalName}</p>
+                <p className="text-[var(--muted)]">
+                  {application.resumeFile.mimeType} / {formatFileSize(application.resumeFile.size)}
+                </p>
+                <Button className="w-fit" href={`${currentPath}/resume`} variant="secondary">
+                  Скачать резюме
+                </Button>
+              </div>
+            ) : (
+              <p className="mt-3 text-sm text-[var(--muted)]">Файл не приложен.</p>
+            )}
+          </Card>
+        </div>
 
         <div className="space-y-6">
           <Card className="p-5">
             <h2 className="text-lg font-semibold">Обработка</h2>
-            <form action={updateApplicationStatus} className="mt-5 grid gap-4">
+            <form action={updateApplicationProcessing} className="mt-5 grid gap-4">
               <HiddenRedirect value={currentPath} />
               <input name="applicationId" type="hidden" value={application.id} />
               <FormField htmlFor="status" label="Статус">
@@ -230,7 +281,25 @@ export default async function AdminApplicationDetailPage({ params, searchParams 
                 </Select>
               </FormField>
               {forwardedInfo ? <p className="text-sm text-[var(--muted)]">Передача отмечена: {forwardedInfo}</p> : null}
-              <Button type="submit">Сохранить статус</Button>
+              <FormField htmlFor="businessNotes" label="Видимый комментарий">
+                <Textarea
+                  className="min-h-32"
+                  defaultValue={application.businessNotes ?? ''}
+                  id="businessNotes"
+                  maxLength={2000}
+                  name="businessNotes"
+                />
+              </FormField>
+              <FormField htmlFor="internalNotes" label="Внутренняя заметка">
+                <Textarea
+                  className="min-h-40"
+                  defaultValue={application.internalNotes ?? ''}
+                  id="internalNotes"
+                  maxLength={4000}
+                  name="internalNotes"
+                />
+              </FormField>
+              <Button type="submit">Сохранить обработку</Button>
             </form>
           </Card>
 
@@ -307,46 +376,6 @@ export default async function AdminApplicationDetailPage({ params, searchParams 
               ) : null}
             </Card>
           ) : null}
-
-          <Card className="p-5">
-            <h2 className="text-lg font-semibold">Комментарий для бизнеса</h2>
-            <form action={updateApplicationBusinessNotes} className="mt-5 grid gap-4">
-              <HiddenRedirect value={currentPath} />
-              <input name="applicationId" type="hidden" value={application.id} />
-              <FormField htmlFor="businessNotes" label="Видимый комментарий">
-                <Textarea
-                  className="min-h-32"
-                  defaultValue={application.businessNotes ?? ''}
-                  id="businessNotes"
-                  maxLength={2000}
-                  name="businessNotes"
-                />
-              </FormField>
-              <Button type="submit" variant="secondary">
-                Сохранить комментарий
-              </Button>
-            </form>
-          </Card>
-
-          <Card className="p-5">
-            <h2 className="text-lg font-semibold">Внутренняя заметка</h2>
-            <form action={updateApplicationInternalNotes} className="mt-5 grid gap-4">
-              <HiddenRedirect value={currentPath} />
-              <input name="applicationId" type="hidden" value={application.id} />
-              <FormField htmlFor="internalNotes" label="Заметка">
-                <Textarea
-                  className="min-h-40"
-                  defaultValue={application.internalNotes ?? ''}
-                  id="internalNotes"
-                  maxLength={4000}
-                  name="internalNotes"
-                />
-              </FormField>
-              <Button type="submit" variant="secondary">
-                Сохранить заметку
-              </Button>
-            </form>
-          </Card>
 
           <Button href={ADMIN_APPLICATIONS_PATH} variant="ghost">
             Вернуться к списку

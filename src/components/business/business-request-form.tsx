@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { ApplicationType } from '@prisma/client';
 import { createBusinessApplication } from '@/app/business/actions';
 import { ActionRow } from '@/components/ui/action-row';
-import { Card } from '@/components/ui/card';
 import { ConsentField } from '@/components/ui/consent-field';
 import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
@@ -70,8 +69,8 @@ export function BusinessRequestForm({ cities, defaultCityId }: BusinessRequestFo
   const selectedRequest = requestCards.find((card) => card.type === selectedType) ?? requestCards[0];
 
   return (
-    <Card className="overflow-hidden p-0">
-      <div className="border-b border-black/10 px-5 py-5 md:px-6">
+    <section className="overflow-hidden rounded-[var(--radius-lg)] border border-[var(--line)] bg-[var(--surface-elevated)] shadow-[var(--shadow-panel)]">
+      <div className="border-b border-[var(--line)] px-5 py-5 md:px-6">
         <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Новая заявка</p>
         <h2 className={`${displayFont.className} mt-3 text-[2rem] font-semibold leading-none tracking-normal`}>Выберите тип заявки</h2>
       </div>
@@ -208,6 +207,6 @@ export function BusinessRequestForm({ cities, defaultCityId }: BusinessRequestFo
           </SubmitButton>
         </ActionRow>
       </form>
-    </Card>
+    </section>
   );
 }
