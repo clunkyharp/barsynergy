@@ -266,7 +266,7 @@ Business-access invite activation is backed by migration `20260430225454_phase4_
 
 1. Finish the current local preview-branch checkpoint: review the large dirty tree, split or commit it by coherent scope, then merge through `dev` only after owner approval.
 2. Owner should check the Phase 4 business-cabinet flow: login, profile, requests, admin approval/blocking and business-visible admin notes.
-3. Keep owner/legal approval and Roskomnadzor/operator-readiness confirmation as blockers before enabling `APPLICATION_FORMS_ENABLED=true` in production.
+3. Production public forms may run temporarily for owner-approved admin intake with `ALLOW_PUBLIC_FORMS_WITH_PENDING_LEGAL_REVIEW=true`; real operator details, legal approval and Roskomnadzor/operator-readiness confirmation remain required follow-up work.
 4. Verify the current single-node production ingress on the real host before security sign-off: HTTP to HTTPS redirect, real client IP through `X-Real-IP`, and spoofed forwarding headers ignored.
 5. Start Phase 5 filters/search/directory-quality work, including the separate service-specialist catalog, only after the current Phase 1-4/CMS branch is checkpointed and accepted.
 

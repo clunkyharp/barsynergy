@@ -44,7 +44,7 @@ For `NODE_ENV=production`, the app validates different required variables by sto
 
 - `STORAGE_DRIVER=s3`: `DATABASE_URL`, `SESSION_SECRET`, `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY`, `S3_ENDPOINT`, `S3_REGION`, `S3_BUCKET_PUBLIC`, `S3_BUCKET_PRIVATE`, `S3_ACCESS_KEY_ID` and `S3_SECRET_ACCESS_KEY` are required.
 - `STORAGE_DRIVER=local`: `DATABASE_URL`, `SESSION_SECRET` and `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` are required, and this mode is allowed only when `ALLOW_LOCAL_STORAGE_IN_PRODUCTION=true`.
-- `APPLICATION_FORMS_ENABLED=true`: legal operator details and readiness flags become required at startup. See "Legal Operator Fields" below.
+- `APPLICATION_FORMS_ENABLED=true`: legal operator details and readiness flags become required at startup unless `ALLOW_PUBLIC_FORMS_WITH_PENDING_LEGAL_REVIEW=true` is set for temporary owner-approved intake. See "Legal Operator Fields" below.
 
 Keep `.env.production.example` aligned with this list whenever env validation changes.
 
@@ -62,6 +62,7 @@ Use this only when the launch must run on one host without ready external object
 - Local development can use `APPLICATION_FORMS_ENABLED=true`.
 - Production must keep `APPLICATION_FORMS_ENABLED=false` until owner/legal approval is complete.
 - If the variable is omitted, production disables these forms by default and non-production keeps them enabled.
+- Temporary owner-approved production intake can use `ALLOW_PUBLIC_FORMS_WITH_PENDING_LEGAL_REVIEW=true` together with `APPLICATION_FORMS_ENABLED=true`. This keeps forms open for admin moderation while legal operator fields remain a tracked follow-up.
 
 ## Legal Operator Fields
 
@@ -83,6 +84,7 @@ Production rule:
 
 - if `APPLICATION_FORMS_ENABLED=true`, then `LEGAL_OPERATOR_NAME`, `LEGAL_OPERATOR_EMAIL`, `LEGAL_OPERATOR_ADDRESS`, `LEGAL_OPERATOR_TAX_ID` and `LEGAL_OPERATOR_REGISTRATION_ID` become required at startup;
 - the confirmation flags above must be set to `true` before production forms can start;
+- `ALLOW_PUBLIC_FORMS_WITH_PENDING_LEGAL_REVIEW=true` is a temporary override for owner-approved intake before final operator details are filled;
 - this is meant to prevent enabling public personal-data forms before the operator, legal review, Roskomnadzor notification decision, processor agreements and retention rule are actually confirmed.
 
 ## Optional Notifications

@@ -40,6 +40,17 @@ APPLICATION_FORMS_ENABLED=true
 
 Do not set readiness flags to `true` just to bypass startup validation.
 
+## Temporary Production Intake Override
+
+If the owner explicitly asks to collect website requests in the admin queue before final legal/operator details are filled, use:
+
+```txt
+APPLICATION_FORMS_ENABLED=true
+ALLOW_PUBLIC_FORMS_WITH_PENDING_LEGAL_REVIEW=true
+```
+
+This is a temporary operations mode. Keep the real operator details, readiness confirmations and retention decision as open follow-up work.
+
 ## Owner / Legal Decisions
 
 The owner or legal reviewer must confirm:

@@ -55,6 +55,7 @@ const envSchema = z
     PERSONAL_DATA_RKN_NOTIFICATION_CONFIRMED: optionalBooleanFlag,
     PERSONAL_DATA_PROCESSOR_AGREEMENTS_CONFIRMED: optionalBooleanFlag,
     PERSONAL_DATA_RETENTION_RULE_APPROVED: optionalBooleanFlag,
+    ALLOW_PUBLIC_FORMS_WITH_PENDING_LEGAL_REVIEW: optionalBooleanFlag,
     APPLICATION_FORMS_ENABLED: optionalBooleanFlag
   })
   .superRefine((env, ctx) => {
@@ -115,7 +116,11 @@ const envSchema = z
       }
     }
 
-    if (isProductionRuntime && env.APPLICATION_FORMS_ENABLED === true) {
+    if (
+      isProductionRuntime &&
+      env.APPLICATION_FORMS_ENABLED === true &&
+      env.ALLOW_PUBLIC_FORMS_WITH_PENDING_LEGAL_REVIEW !== true
+    ) {
       for (const key of [
         'LEGAL_OPERATOR_NAME',
         'LEGAL_OPERATOR_EMAIL',
