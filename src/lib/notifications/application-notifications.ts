@@ -1,6 +1,8 @@
 import nodemailer from 'nodemailer';
 import {
+  buildAdminApplicationEmailText,
   buildAdminApplicationTelegramMessage,
+  hasAdminEmailNotificationConfig,
   hasSmtpNotificationConfig,
   hasTelegramAdminNotificationConfig
 } from '@/lib/notifications/application-notification-format';
@@ -65,6 +67,18 @@ async function sendAdminTelegramNotification(env: AppEnv, input: ApplicationNoti
   }
 }
 
+async function sendAdminEmailNotification(env: AppEnv, input: ApplicationNotificationInput) {
+  const transporter = getSmtpTransporter(env);
+
+  await transporter.sendMail({
+    from: env.SMTP_FROM,
+    to: env.ADMIN_NOTIFICATION_EMAIL,
+    replyTo: input.userEmail,
+    subject: `BARSYNERGY: новая заявка — ${input.applicationTypeLabel}`,
+    text: buildAdminApplicationEmailText(input, env.APP_URL)
+  });
+}
+
 async function sendUserConfirmationEmail(env: AppEnv, input: ApplicationNotificationInput) {
   const transporter = getSmtpTransporter(env);
   const greeting = input.userName ? `Здравствуйте, ${input.userName}.` : 'Здравствуйте.';
@@ -93,6 +107,10 @@ export async function notifyOnApplicationCreated(input: ApplicationNotificationI
 
   if (hasTelegramAdminNotificationConfig(env)) {
     tasks.push(sendAdminTelegramNotification(env, input));
+  }
+
+  if (hasAdminEmailNotificationConfig(env)) {
+    tasks.push(sendAdminEmailNotification(env, input));
   }
 
   if (input.userEmail && hasSmtpNotificationConfig(env)) {

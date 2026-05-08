@@ -40,6 +40,7 @@ const envSchema = z
     SMTP_USER: optionalString,
     SMTP_PASSWORD: optionalString,
     SMTP_FROM: optionalString,
+    ADMIN_NOTIFICATION_EMAIL: optionalEmail,
     TELEGRAM_BOT_TOKEN: optionalString,
     TELEGRAM_ADMIN_CHAT_ID: optionalString,
     YANDEX_METRIKA_ID: optionalString,

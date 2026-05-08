@@ -23,6 +23,8 @@ const successMessages: Record<string, string> = {
   'logged-out': 'Вы вышли из аккаунта.'
 };
 
+const PUBLIC_CONTACT_EMAIL = 'Rushgroupbar@gmail.com';
+
 const accessRoles = [
   {
     role: 'Участник',
@@ -162,8 +164,8 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
                   <Headphones className="mt-1 text-[var(--accent)]" size={22} strokeWidth={1.7} />
                   <p className="text-sm leading-6 text-[var(--muted)]">
                     Нужна помощь? Напишите на{' '}
-                    <a className="font-semibold text-[var(--accent)] hover:text-[var(--accent-strong)]" href="mailto:hello@barsynergy.ru">
-                      hello@barsynergy.ru
+                    <a className="font-semibold text-[var(--accent)] hover:text-[var(--accent-strong)]" href={`mailto:${PUBLIC_CONTACT_EMAIL}`}>
+                      {PUBLIC_CONTACT_EMAIL}
                     </a>
                     .
                   </p>

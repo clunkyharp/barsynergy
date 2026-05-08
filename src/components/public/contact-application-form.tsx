@@ -25,6 +25,8 @@ import { SubmitButton } from '@/components/ui/submit-button';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
 
+const PUBLIC_CONTACT_EMAIL = 'Rushgroupbar@gmail.com';
+
 const contactMethods: {
   type: string;
   name: string;
@@ -36,8 +38,8 @@ const contactMethods: {
   {
     type: 'Email',
     name: 'Основная почта',
-    value: 'hello@barsynergy.ru',
-    href: 'mailto:hello@barsynergy.ru',
+    value: PUBLIC_CONTACT_EMAIL,
+    href: `mailto:${PUBLIC_CONTACT_EMAIL}`,
     actionLabel: 'Написать',
     icon: Mail
   },
@@ -317,7 +319,7 @@ export function ContactApplicationForm({ enabled, result, utm, cities, defaultTo
       <p className="mt-3 text-sm leading-7 text-[var(--muted)]">
         Если вопрос срочный, напишите на email команды.
       </p>
-      <Button className="mt-6 rounded-[var(--radius-md)] sm:self-start" href="mailto:hello@barsynergy.ru" size="lg" variant="secondary">
+      <Button className="mt-6 rounded-[var(--radius-md)] sm:self-start" href={`mailto:${PUBLIC_CONTACT_EMAIL}`} size="lg" variant="secondary">
         Написать на почту
       </Button>
     </EditorialShell>

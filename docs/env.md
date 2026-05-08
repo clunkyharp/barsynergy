@@ -24,6 +24,7 @@ S3_BUCKET_PRIVATE=<private-bucket>
 S3_ACCESS_KEY_ID=<access-key>
 S3_SECRET_ACCESS_KEY=<secret-key>
 APPLICATION_FORMS_ENABLED=false
+ADMIN_NOTIFICATION_EMAIL=<team-inbox>
 POSTGRES_DB=barsynergy
 POSTGRES_USER=barsynergy
 POSTGRES_PASSWORD=<password>
@@ -89,6 +90,7 @@ Production rule:
 Public application notifications are optional and env-driven.
 
 - User confirmation emails are sent only when `SMTP_HOST`, `SMTP_PORT` and `SMTP_FROM` are configured. `SMTP_USER` and `SMTP_PASSWORD` are used when the SMTP server requires auth.
+- Admin email notifications for new public applications are sent to `ADMIN_NOTIFICATION_EMAIL` only when SMTP is configured.
 - Short Telegram admin notifications are sent only when both `TELEGRAM_BOT_TOKEN` and `TELEGRAM_ADMIN_CHAT_ID` are configured.
 - Missing notification env must not block public form submission.
 
