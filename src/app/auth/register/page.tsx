@@ -17,9 +17,12 @@ import { prisma } from '@/lib/db/prisma';
 import { displayFont } from '@/lib/fonts';
 import { getEnv } from '@/lib/validation/env';
 
+const PUBLIC_CONTACT_EMAIL = 'Rushgroupbar@gmail.com';
+const PUBLIC_CONTACT_MAILTO = `mailto:${PUBLIC_CONTACT_EMAIL}`;
+
 const errorMessages: Record<string, string> = {
   invalid: 'Проверьте обязательные поля, email и сайт.',
-  disabled: 'Форма сейчас недоступна. Если доступ нужен, свяжитесь с командой.',
+  disabled: `Форма сейчас недоступна. Если доступ нужен, напишите на ${PUBLIC_CONTACT_EMAIL}.`,
   failed: 'Не удалось отправить заявку прямо сейчас. Попробуйте позже.',
   'rate-limited': 'Слишком много заявок за короткое время. Повторите позже.'
 };
@@ -88,19 +91,19 @@ export default async function RegisterPage({ searchParams }: RegisterPageProps) 
                 <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--warning)]">Доступ временно закрыт</p>
                 <h2 className="mt-4 text-3xl font-semibold leading-tight md:text-4xl">Форма заявок сейчас недоступна</h2>
                 <p className="mt-4 max-w-2xl text-sm leading-7 text-[var(--muted)]">
-                  Сейчас новые заявки через эту форму не принимаются. Если доступ нужен уже сейчас, напишите команде напрямую.
+                  Сейчас новые заявки через эту форму не принимаются. Если доступ нужен уже сейчас, напишите на {PUBLIC_CONTACT_EMAIL}.
                 </p>
                 <div className="mt-6 grid gap-3 md:grid-cols-2">
                   <Panel className="bg-[var(--surface-wash)] text-sm leading-6 text-[var(--muted)]" padding="sm">
-                    Для связи по доступу используйте страницу контактов.
+                    Для связи по доступу используйте временную почту команды.
                   </Panel>
                   <Panel className="bg-[var(--surface-wash)] text-sm leading-6 text-[var(--muted)]" padding="sm">
                     Когда форма снова откроется, заявку можно будет оставить на этой же странице.
                   </Panel>
                 </div>
                 <ActionRow className="mt-7 border-t-0 pt-0">
-                  <Button className="rounded-[var(--radius-md)]" href="/contacts" size="lg">
-                    Связаться с командой
+                  <Button className="rounded-[var(--radius-md)]" href={PUBLIC_CONTACT_MAILTO} size="lg">
+                    Написать на почту
                   </Button>
                   <Button className="rounded-[var(--radius-md)]" href="/auth/login" size="lg" variant="secondary">
                     Уже есть доступ

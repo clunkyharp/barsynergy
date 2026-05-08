@@ -9,6 +9,9 @@ import type { ApplicationCityOption } from '@/lib/applications/form-options';
 import type { PublicApplicationResult, PublicApplicationUtm } from '@/lib/applications/public-form-helpers';
 import { cn } from '@/lib/utils';
 
+const PUBLIC_CONTACT_EMAIL = 'Rushgroupbar@gmail.com';
+const PUBLIC_CONTACT_MAILTO = `mailto:${PUBLIC_CONTACT_EMAIL}`;
+
 type PublicApplicationSectionProps = {
   eyebrow: string;
   title: string;
@@ -226,10 +229,10 @@ export function PublicApplicationSection({
             <EditorialShell className="p-5 md:p-6">
               <h3 className="text-lg font-semibold leading-7">Формы сейчас закрыты</h3>
               <p className="mt-3 text-sm leading-7 text-[var(--muted)]">
-                {disabledDescription ?? 'Публичные формы временно закрыты. Напишите нам через страницу контактов.'}
+                {disabledDescription ?? `Публичные формы временно закрыты. Напишите нам на ${PUBLIC_CONTACT_EMAIL}.`}
               </p>
-              <Button className="mt-6 rounded-[var(--radius-md)] sm:self-start" href={disabledLink?.href ?? '/contacts'} size="lg" variant="secondary">
-                {disabledLink?.label ?? 'Открыть контакты'}
+              <Button className="mt-6 rounded-[var(--radius-md)] sm:self-start" href={disabledLink?.href ?? PUBLIC_CONTACT_MAILTO} size="lg" variant="secondary">
+                {disabledLink?.label ?? 'Написать на почту'}
               </Button>
             </EditorialShell>
           ) : content}
@@ -264,10 +267,10 @@ export function PublicApplicationSection({
           <EditorialShell className="p-5 md:p-6">
             <h3 className="text-lg font-semibold leading-7">Формы сейчас закрыты</h3>
             <p className="mt-3 text-sm leading-7 text-[var(--muted)]">
-              {disabledDescription ?? 'Публичные формы временно закрыты. Напишите нам через страницу контактов.'}
+              {disabledDescription ?? `Публичные формы временно закрыты. Напишите нам на ${PUBLIC_CONTACT_EMAIL}.`}
             </p>
-            <Button className="mt-6 rounded-[var(--radius-md)] sm:self-start" href={disabledLink?.href ?? '/contacts'} size="lg" variant="secondary">
-              {disabledLink?.label ?? 'Открыть контакты'}
+            <Button className="mt-6 rounded-[var(--radius-md)] sm:self-start" href={disabledLink?.href ?? PUBLIC_CONTACT_MAILTO} size="lg" variant="secondary">
+              {disabledLink?.label ?? 'Написать на почту'}
             </Button>
           </EditorialShell>
         ) : content}
