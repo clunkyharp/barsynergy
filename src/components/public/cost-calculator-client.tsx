@@ -65,7 +65,7 @@ function numberValue(value: string): number | null {
 }
 
 function money(value: number) {
-  const safeValue = Number.isFinite(value) && value >= 0 ? value : 0;
+  const safeValue = Number.isFinite(value) ? value : 0;
 
   return new Intl.NumberFormat('ru-RU', {
     maximumFractionDigits: 2,
@@ -76,7 +76,7 @@ function money(value: number) {
 }
 
 function percent(value: number) {
-  const safeValue = Number.isFinite(value) && value > 0 ? value : 0;
+  const safeValue = Number.isFinite(value) ? value : 0;
   return `${safeValue.toLocaleString('ru-RU', { maximumFractionDigits: 1, minimumFractionDigits: 0 })} %`;
 }
 
@@ -260,6 +260,7 @@ function UnitField({
 export function CostCalculatorClient() {
   const [itemName, setItemName] = useState('Ванильный латте');
   const [foodCostPercent, setFoodCostPercent] = useState('30');
+  const [salePrice, setSalePrice] = useState('');
   const [ingredients, setIngredients] = useState<Ingredient[]>(demoIngredients);
   const [copyState, setCopyState] = useState<'idle' | 'copied' | 'failed'>('idle');
 
@@ -272,15 +273,23 @@ export function CostCalculatorClient() {
   const foodCostInput = numberValue(foodCostPercent);
   const foodCostError = foodCostPercent.trim() && (foodCostInput === null || foodCostInput <= 0) ? 'Целевая доля себестоимости должна быть больше нуля.' : null;
   const foodCost = foodCostInput && foodCostInput > 0 ? foodCostInput / 100 : 0;
-  const canShowRecommendedPrice = rowErrors.length === 0 && totalCost > 0 && foodCost > 0;
+  const manualSalePriceInput = numberValue(salePrice);
+  const salePriceError = salePrice.trim() && (manualSalePriceInput === null || manualSalePriceInput <= 0) ? 'Цена продажи должна быть больше нуля.' : null;
+  const manualSalePrice = manualSalePriceInput && manualSalePriceInput > 0 ? manualSalePriceInput : 0;
+  const hasManualSalePrice = manualSalePrice > 0 && !salePriceError;
+  const canShowRecommendedPrice = rowErrors.length === 0 && totalCost > 0 && !foodCostError && foodCost > 0;
   const recommendedPrice = canShowRecommendedPrice ? totalCost / foodCost : 0;
-  const grossProfit = recommendedPrice > totalCost ? recommendedPrice - totalCost : 0;
-  const grossMargin = recommendedPrice > 0 ? (grossProfit / recommendedPrice) * 100 : 0;
-  const markup = totalCost > 0 ? recommendedPrice / totalCost : 0;
+  const activeSalePrice = hasManualSalePrice ? manualSalePrice : recommendedPrice;
+  const canShowSalePrice = rowErrors.length === 0 && totalCost > 0 && !salePriceError && activeSalePrice > 0 && (hasManualSalePrice || canShowRecommendedPrice);
+  const actualFoodCostPercent = canShowSalePrice ? (totalCost / activeSalePrice) * 100 : 0;
+  const grossProfit = canShowSalePrice ? activeSalePrice - totalCost : 0;
+  const grossMargin = canShowSalePrice && activeSalePrice > 0 ? (grossProfit / activeSalePrice) * 100 : 0;
+  const markup = canShowSalePrice && totalCost > 0 ? activeSalePrice / totalCost : 0;
   const completedRows = rows.filter((ingredient) => ingredient.isComplete).length;
   const hasAnyInput = Boolean(
     itemName.trim() ||
       foodCostPercent.trim() ||
+      salePrice.trim() ||
       rows.some((ingredient) =>
         [ingredient.name, ingredient.packagePrice, ingredient.packageAmount, ingredient.recipeAmount].some((value) => value.trim().length > 0)
       )
@@ -293,10 +302,12 @@ export function CostCalculatorClient() {
     ? 'Исправьте ошибки в составе рецепта, чтобы получить итоговую цену.'
     : totalCost <= 0
       ? 'Введите ингредиенты, чтобы увидеть расчёт.'
-      : foodCostError
-        ? foodCostError
-        : foodCost <= 0
-          ? 'Укажите целевую долю себестоимости, чтобы увидеть цену продажи.'
+      : salePriceError
+        ? salePriceError
+        : foodCostError && !hasManualSalePrice
+          ? foodCostError
+          : !hasManualSalePrice && foodCost <= 0
+            ? 'Укажите цену продажи или целевую долю себестоимости.'
           : null;
   const rowStatusText = rowErrors.length
     ? 'В составе есть ошибки, итоговая цена пока не считается.'
@@ -332,6 +343,7 @@ export function CostCalculatorClient() {
   function clearCalculator() {
     setItemName('');
     setFoodCostPercent('');
+    setSalePrice('');
     setIngredients([createEmptyIngredient('ingredient-empty')]);
     setCopyState('idle');
   }
@@ -339,23 +351,25 @@ export function CostCalculatorClient() {
   function fillDemo() {
     setItemName('Ванильный латте');
     setFoodCostPercent('30');
+    setSalePrice('');
     setIngredients(demoIngredients);
     setCopyState('idle');
   }
 
   async function copyResult() {
-    if (!canShowRecommendedPrice) {
+    if (!canShowSalePrice) {
       return;
     }
 
     const resultText = [
       `Позиция: ${itemName.trim() || 'Позиция меню'}`,
       `Себестоимость: ${money(totalCost)}`,
-      `Целевая доля себестоимости: ${percent(foodCost * 100)}`,
-      `Рекомендованная цена продажи: ${money(recommendedPrice)}`,
+      hasManualSalePrice ? `Цена продажи задана вручную: ${money(activeSalePrice)}` : `Цена продажи по целевой доле: ${money(activeSalePrice)}`,
+      `Доля себестоимости: ${percent(actualFoodCostPercent)}`,
+      foodCost > 0 ? `Целевая доля себестоимости: ${percent(foodCost * 100)}` : null,
       `Валовая прибыль: ${money(grossProfit)}`,
       `Валовая маржа: ${percent(grossMargin)}`
-    ].join('\n');
+    ].filter(Boolean).join('\n');
 
     try {
       await navigator.clipboard.writeText(resultText);
@@ -393,7 +407,7 @@ export function CostCalculatorClient() {
                   value={itemName}
                 />
               </FormField>
-              <FormField htmlFor="calculatorFoodCost" hint="Ориентир: 25-35%." label="Доля себестоимости, %">
+              <FormField error={foodCostError ?? undefined} htmlFor="calculatorFoodCost" hint="Ориентир: 25-35%." label="Доля себестоимости, %">
                 <Input
                   aria-invalid={foodCostError ? true : undefined}
                   className="h-10 text-sm tabular-nums"
@@ -402,6 +416,23 @@ export function CostCalculatorClient() {
                   maxLength={8}
                   onChange={(event) => setFoodCostPercent(event.target.value)}
                   value={foodCostPercent}
+                />
+              </FormField>
+              <FormField
+                error={salePriceError ?? undefined}
+                htmlFor="calculatorSalePrice"
+                hint="Если заполнить, итог будет считаться от этой цены."
+                label="Цена продажи, ₽"
+              >
+                <Input
+                  aria-invalid={salePriceError ? true : undefined}
+                  className="h-10 text-sm tabular-nums"
+                  id="calculatorSalePrice"
+                  inputMode="decimal"
+                  maxLength={12}
+                  onChange={(event) => setSalePrice(event.target.value)}
+                  placeholder={canShowRecommendedPrice ? decimal(recommendedPrice) : '190'}
+                  value={salePrice}
                 />
               </FormField>
             </div>
@@ -423,7 +454,7 @@ export function CostCalculatorClient() {
               </p>
               <p>
                 <span className="block font-semibold text-[var(--text)]">Цена продажи</span>
-                Итоговая себестоимость <DivisionSign /> целевая доля.
+                Задайте вручную или рассчитайте через целевую долю.
               </p>
             </div>
           </details>
@@ -439,7 +470,7 @@ export function CostCalculatorClient() {
             </p>
             <p>
               <span className="block font-semibold text-[var(--text)]">Цена продажи</span>
-              Итоговая себестоимость <DivisionSign /> целевая доля.
+              Задайте вручную или рассчитайте через целевую долю.
             </p>
           </div>
 
@@ -617,26 +648,41 @@ export function CostCalculatorClient() {
                 <dd className="text-base font-semibold tabular-nums text-[var(--text)]">{rowErrors.length ? '—' : money(totalCost)}</dd>
               </div>
               <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-4 border-b border-[var(--line)] px-4 py-3">
-                <dt className="text-sm leading-6 text-[var(--muted)]">Целевая доля</dt>
-                <dd className="text-base font-semibold tabular-nums text-[var(--text)]">{percent(foodCost * 100)}</dd>
+                <dt className="text-sm leading-6 text-[var(--muted)]">Доля себестоимости</dt>
+                <dd className="text-base font-semibold tabular-nums text-[var(--text)]">{canShowSalePrice ? percent(actualFoodCostPercent) : percent(foodCost * 100)}</dd>
               </div>
               <div className="border-b border-[var(--line)] bg-[var(--accent-soft)] px-4 py-4">
                 <dt className="text-sm leading-6 text-[var(--muted)]">Цена продажи</dt>
-                <dd className="mt-1 text-[2rem] font-semibold leading-none tabular-nums text-[var(--text)]">{canShowRecommendedPrice ? money(recommendedPrice) : '—'}</dd>
+                <dd className="mt-1 text-[2rem] font-semibold leading-none tabular-nums text-[var(--text)]">{canShowSalePrice ? money(activeSalePrice) : '—'}</dd>
+                {canShowSalePrice ? (
+                  <p className="mt-2 text-xs font-semibold uppercase tracking-[0.1em] text-[var(--muted)]">
+                    {hasManualSalePrice ? 'Задана вручную' : 'Рассчитана по целевой доле'}
+                  </p>
+                ) : null}
               </div>
               {resultMessage ? (
                 <div className={cn('border-b border-[var(--line)] px-4 py-3 text-sm leading-6', rowErrors.length || foodCostError ? 'bg-[var(--danger-bg)] text-[var(--danger-text)]' : 'text-[var(--muted)]')}>
                   {resultMessage}
                 </div>
               ) : null}
-              {canShowRecommendedPrice ? (
+              {canShowSalePrice ? (
                 <div className="grid gap-0">
                   <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-3 border-b border-[var(--line)] px-4 py-3 text-sm leading-6">
-                    <dt className="text-[var(--muted)]">Формула</dt>
+                    <dt className="text-[var(--muted)]">{hasManualSalePrice ? 'Источник цены' : 'Формула'}</dt>
                     <dd className="text-right font-semibold tabular-nums text-[var(--text)]">
-                      {formulaMoney(totalCost)} <DivisionSign /> {decimal(foodCost)}
+                      {hasManualSalePrice ? 'вручную' : (
+                        <>
+                          {formulaMoney(totalCost)} <DivisionSign /> {decimal(foodCost)}
+                        </>
+                      )}
                     </dd>
                   </div>
+                  {hasManualSalePrice && canShowRecommendedPrice ? (
+                    <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-3 border-b border-[var(--line)] px-4 py-3 text-sm leading-6">
+                      <dt className="text-[var(--muted)]">Ориентир по целевой доле</dt>
+                      <dd className="font-semibold tabular-nums text-[var(--text)]">{money(recommendedPrice)}</dd>
+                    </div>
+                  ) : null}
                   <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-3 border-b border-[var(--line)] px-4 py-3 text-sm leading-6">
                     <dt className="text-[var(--muted)]">Валовая прибыль</dt>
                     <dd className="font-semibold tabular-nums text-[var(--text)]">{money(grossProfit)}</dd>
@@ -656,7 +702,7 @@ export function CostCalculatorClient() {
             <div className="grid gap-2 p-4">
               <Button
                 className="w-full rounded-[var(--radius-sm)]"
-                disabled={!canShowRecommendedPrice}
+                disabled={!canShowSalePrice}
                 onClick={copyResult}
                 type="button"
                 variant="secondary"
@@ -670,7 +716,7 @@ export function CostCalculatorClient() {
             </div>
 
             <div className="border-t border-[var(--line)] px-4 py-3 text-xs leading-5 text-[var(--muted)]">
-              Пример: 57,45 ₽ <DivisionSign /> 0,30 = 191,50 ₽.
+              Если цена не заполнена, пример расчёта: 57,45 ₽ <DivisionSign /> 0,30 = 191,50 ₽.
             </div>
           </div>
         </aside>
