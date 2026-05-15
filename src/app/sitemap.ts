@@ -8,6 +8,8 @@ const staticRoutes = [
   '/events',
   '/articles',
   '/vacancies',
+  '/business',
+  '/consulting',
   '/suppliers',
   '/partners',
   '/general-sponsors',

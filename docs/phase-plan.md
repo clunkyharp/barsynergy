@@ -73,6 +73,8 @@ In scope:
 - events;
 - articles/knowledge;
 - vacancies;
+- business solutions;
+- consulting;
 - suppliers;
 - partners;
 - general sponsors;
@@ -93,6 +95,7 @@ Done when:
 Current status:
 
 - public routes are implemented, and legal pages now have project-specific working texts for the current MVP flows;
+- public `/business` and `/consulting` are implemented as public request pages and stay separate from the private business cabinet at `/business/cabinet`;
 - personal-data launch checklist is documented in `docs/personal-data-launch-checklist.md`;
 - shared header, footer and public page templates are implemented;
 - `/general-sponsors` is implemented as a separate visible public screen with homepage and navigation entry points;
@@ -220,7 +223,8 @@ Current status:
 - public application throttling is backed by migration `20260428123000_phase3_application_guards`;
 - stale public application throttle records can be cleaned with `npm run application:cleanup:throttles`;
 - public `/vacancies` supports `vacancy_submission` and `vacancy_response` forms with consent, UTM capture and private resume file upload;
-- public `/education`, `/events`, `/suppliers`, `/partners` and `/contacts` now write the remaining MVP request types into `Application`;
+- public `/education`, `/events`, `/suppliers`, `/partners`, `/business`, `/consulting` and `/contacts` now write the remaining MVP request types into `Application`;
+- `ApplicationType.BUSINESS_SOLUTION` and `ApplicationType.CONSULTING_REQUEST` are backed by migration `20260515120000_business_consulting_application_types`;
 - production public forms are disabled by default through `APPLICATION_FORMS_ENABLED`;
 - public forms include a honeypot and per-client rate limit;
 - admin `/admin/applications` supports queue-style list/detail review, readable payload labels, private resume download, related-record cards, unified status/business-note/internal-note processing and manual `forwarded_to_employer` metadata;
@@ -281,11 +285,11 @@ Current status:
 - `/admin/applications/[applicationId]` can prepare a one-time activation link for a reviewed business-access request;
 - `/auth/activate` lets the business owner set a password and finish the first activation from that one-time link;
 - `/admin/users` can block business access and reopen already prepared accounts;
-- `/business` is guarded for active business users and supports company profile editing;
-- `/business/requests` supports business-owned drafts and submissions for vacancy placement, supplier placement, partner application, corporate training and certificate order;
-- `/business/requests/[applicationId]` lets businesses view only their own requests, edit drafts, submit drafts for review and archive drafts;
+- `/business/cabinet` is guarded for active business users and supports company profile editing;
+- `/business/cabinet/requests` supports business-owned drafts and submissions for vacancy placement, supplier placement, partner application, corporate training and certificate order;
+- `/business/cabinet/requests/[applicationId]` lets businesses view only their own requests, edit drafts, submit drafts for review and archive drafts;
 - auth, business and specialist-profile screens have an additional shared-UI consistency pass: page headers, action rows, stat blocks, sidebars and helper panels are normalized around the internal UI kit without changing the Phase 4 business logic;
-- focused browser smoke is rerun for `/business` and `/business/requests` after activating local demo access for QA only;
+- focused browser smoke is rerun for `/business/cabinet` and `/business/cabinet/requests` after activating local demo access for QA only;
 - admin application detail can store business-visible notes inside the unified processing block;
 - email-based password reset is deferred until production email is configured, but one-time admin-prepared activation links are implemented for the current Phase 4 flow.
 

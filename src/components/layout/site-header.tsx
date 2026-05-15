@@ -14,6 +14,8 @@ const navItems = [
   { label: 'События', href: '/events' },
   { label: 'Знания', href: '/articles' },
   { label: 'Вакансии', href: '/vacancies' },
+  { label: 'Для бизнеса', href: '/business' },
+  { label: 'Консалтинг', href: '/consulting' },
   { label: 'Поставщики', href: '/suppliers' },
   { label: 'Для партнёров', href: '/partners' },
   { label: 'Спонсорство', href: '/general-sponsors' },
@@ -24,7 +26,7 @@ const navItems = [
 const desktopNavItems = navItems.filter((item) => !['/contacts', '/auth/login'].includes(item.href));
 
 function isWorkspacePath(pathname: string | null) {
-  return Boolean(pathname?.startsWith('/admin') || pathname?.startsWith('/business') || pathname?.startsWith('/auth'));
+  return Boolean(pathname?.startsWith('/admin') || pathname?.startsWith('/business/cabinet') || pathname?.startsWith('/auth'));
 }
 
 function isActiveItem(pathname: string, href: string) {
@@ -61,7 +63,7 @@ export function SiteHeader() {
       )}
     >
       <div className="container">
-        <div className="relative z-10 flex min-h-[76px] items-center justify-between gap-3 px-0 text-[var(--text)] lg:grid lg:grid-cols-[180px_minmax(0,1fr)_180px] lg:items-center lg:gap-2 xl:grid-cols-[190px_minmax(0,1fr)_220px] xl:gap-3 2xl:grid-cols-[220px_minmax(0,1fr)_248px] 2xl:gap-5">
+        <div className="relative z-10 flex min-h-[76px] items-center justify-between gap-3 px-0 text-[var(--text)] lg:grid lg:grid-cols-[164px_minmax(0,1fr)_136px] lg:items-center lg:gap-2 xl:grid-cols-[176px_minmax(0,1fr)_184px] xl:gap-2.5 2xl:grid-cols-[220px_minmax(0,1fr)_248px] 2xl:gap-5">
           <a
             aria-label="BARSYNERGY"
             className={cn(
@@ -89,14 +91,14 @@ export function SiteHeader() {
               width={162}
             />
           </a>
-          <nav className="hidden min-w-0 items-center justify-center gap-2.5 px-0.5 text-[11px] font-semibold text-[var(--text)] lg:flex lg:justify-self-center xl:gap-3.5 2xl:gap-5 2xl:text-[12px]">
+          <nav className="hidden min-w-0 items-center justify-center gap-1 px-0 text-[10px] font-semibold text-[var(--text)] lg:flex lg:justify-self-center xl:gap-1.5 xl:text-[11px] 2xl:gap-5 2xl:text-[12px]">
             {desktopNavItems.map((item) => {
               const isActive = pathname ? isActiveItem(pathname, item.href) : false;
 
               return (
                 <a
                   className={cn(
-                    'relative inline-flex min-h-9 items-center whitespace-nowrap rounded-[var(--radius-sm)] px-1.5 opacity-86 transition after:absolute after:inset-x-1.5 after:bottom-1 after:h-px after:origin-left after:scale-x-0 after:bg-[var(--accent)] after:transition-transform hover:text-[var(--text)] hover:opacity-100 hover:after:scale-x-100 2xl:px-2',
+                    'relative inline-flex min-h-9 items-center whitespace-nowrap rounded-[var(--radius-sm)] px-1 opacity-86 transition after:absolute after:inset-x-1 after:bottom-1 after:h-px after:origin-left after:scale-x-0 after:bg-[var(--accent)] after:transition-transform hover:text-[var(--text)] hover:opacity-100 hover:after:scale-x-100 2xl:px-2 2xl:after:inset-x-1.5',
                     focusClassName,
                     isActive && 'text-[var(--accent)] opacity-100 after:scale-x-100'
                   )}

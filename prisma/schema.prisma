@@ -63,6 +63,8 @@ enum ApplicationType {
   VACANCY_RESPONSE               @map("vacancy_response")
   SUPPLIER_SUBMISSION            @map("supplier_submission")
   PARTNER_APPLICATION            @map("partner_application")
+  BUSINESS_SOLUTION              @map("business_solution")
+  CONSULTING_REQUEST             @map("consulting_request")
   CONTACT_MESSAGE                @map("contact_message")
   CORPORATE_TRAINING_APPLICATION @map("corporate_training_application")
   CERTIFICATE_ORDER              @map("certificate_order")

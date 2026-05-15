@@ -1,5 +1,5 @@
 import { ApplicationStatus } from '@prisma/client';
-import { updateBusinessProfile } from '@/app/business/actions';
+import { updateBusinessProfile } from '@/lib/business/actions';
 import { AdminActionAlert } from '@/components/admin/content-admin-controls';
 import {
   BusinessProfileSheet,
@@ -94,16 +94,16 @@ export default async function BusinessDashboardPage({ searchParams }: BusinessDa
               {
                 label: 'Создать заявку',
                 detail: 'Вакансия, поставщик, партнёрство, обучение или сертификат.',
-                href: '/business/requests'
+                href: '/business/cabinet/requests'
               },
               {
                 label: 'Проверить журнал',
                 detail: 'Откройте последнюю запись, если изменился статус или появился комментарий.',
-                href: latestApplications[0] ? `/business/requests/${latestApplications[0].id}` : '/business/requests',
+                href: latestApplications[0] ? `/business/cabinet/requests/${latestApplications[0].id}` : '/business/cabinet/requests',
                 status: activeRequestCount > 0 ? 'есть работа' : 'нет активных'
               }
             ]}
-            primaryAction={{ href: '/business/requests', label: 'Открыть журнал заявок' }}
+            primaryAction={{ href: '/business/cabinet/requests', label: 'Открыть журнал заявок' }}
           />
         </div>
       </section>

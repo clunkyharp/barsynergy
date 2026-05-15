@@ -10,6 +10,14 @@ import {
   vacancyEmploymentTypeOptions,
   vacancyExperienceOptions
 } from '@/lib/admin/content-labels';
+import {
+  businessSolutionTypeOptions,
+  consultingBusinessTypeOptions,
+  consultingDirectionOptions,
+  consultingExpertOptions,
+  consultingProjectStageOptions,
+  getOptionLabel
+} from '@/lib/applications/b2b-request-options';
 
 export const applicationTypeValues = [
   ApplicationType.BUSINESS_ACCOUNT_REQUEST,
@@ -19,6 +27,8 @@ export const applicationTypeValues = [
   ApplicationType.VACANCY_RESPONSE,
   ApplicationType.SUPPLIER_SUBMISSION,
   ApplicationType.PARTNER_APPLICATION,
+  ApplicationType.BUSINESS_SOLUTION,
+  ApplicationType.CONSULTING_REQUEST,
   ApplicationType.CONTACT_MESSAGE,
   ApplicationType.CORPORATE_TRAINING_APPLICATION,
   ApplicationType.CERTIFICATE_ORDER
@@ -46,6 +56,8 @@ export const applicationTypeLabels: Record<ApplicationType, string> = {
   [ApplicationType.VACANCY_RESPONSE]: 'Отклик на вакансию',
   [ApplicationType.SUPPLIER_SUBMISSION]: 'Заявка поставщика',
   [ApplicationType.PARTNER_APPLICATION]: 'Партнёрская заявка',
+  [ApplicationType.BUSINESS_SOLUTION]: 'Бизнес-решение',
+  [ApplicationType.CONSULTING_REQUEST]: 'Консалтинг',
   [ApplicationType.CONTACT_MESSAGE]: 'Контактное сообщение',
   [ApplicationType.CORPORATE_TRAINING_APPLICATION]: 'Корпоративное обучение',
   [ApplicationType.CERTIFICATE_ORDER]: 'Заказ сертификата'
@@ -93,6 +105,13 @@ export function parseApplicationStatus(value?: string) {
 export const applicationPayloadFieldLabels: Record<string, string> = {
   amountLabel: 'Сумма / формат',
   companyName: 'Компания',
+  businessType: 'Тип бизнеса',
+  businessTypeLabel: 'Тип бизнеса',
+  comment: 'Комментарий',
+  consultingDirection: 'Направление консалтинга',
+  consultingDirectionLabel: 'Направление консалтинга',
+  preferredExpert: 'Предпочтительный эксперт',
+  preferredExpertLabel: 'Предпочтительный эксперт',
   details: 'Описание',
   employerCompanyName: 'Компания',
   employmentType: 'Тип занятости',
@@ -103,6 +122,9 @@ export const applicationPayloadFieldLabels: Record<string, string> = {
   level: 'Уровень',
   partnerType: 'Тип партнёрства',
   position: 'Позиция',
+  projectName: 'Проект / заведение',
+  projectStage: 'Стадия проекта',
+  projectStageLabel: 'Стадия проекта',
   recipientName: 'Получатель',
   registrationMode: 'Регистрация',
   registrationUrl: 'Ссылка регистрации',
@@ -111,7 +133,10 @@ export const applicationPayloadFieldLabels: Record<string, string> = {
   salaryLabel: 'Оплата',
   serviceArea: 'География работы',
   shortDescription: 'Краткое описание',
+  solutionType: 'Тип решения',
+  solutionTypeLabel: 'Тип решения',
   source: 'Источник',
+  taskDescription: 'Описание задачи',
   teamSize: 'Размер команды',
   title: 'Название',
   websiteUrl: 'Сайт'
@@ -163,6 +188,26 @@ export function formatApplicationPayloadValue(key: string, value: unknown) {
 
   if (key === 'partnerType') {
     return getAdminOptionLabel(partnerTypeOptions, normalizedValue, normalizedValue);
+  }
+
+  if (key === 'solutionType') {
+    return getOptionLabel(businessSolutionTypeOptions, normalizedValue) ?? normalizedValue;
+  }
+
+  if (key === 'businessType') {
+    return getOptionLabel(consultingBusinessTypeOptions, normalizedValue) ?? normalizedValue;
+  }
+
+  if (key === 'projectStage') {
+    return getOptionLabel(consultingProjectStageOptions, normalizedValue) ?? normalizedValue;
+  }
+
+  if (key === 'consultingDirection') {
+    return getOptionLabel(consultingDirectionOptions, normalizedValue) ?? normalizedValue;
+  }
+
+  if (key === 'preferredExpert') {
+    return getOptionLabel(consultingExpertOptions, normalizedValue) ?? normalizedValue;
   }
 
   if (key === 'registrationMode') {

@@ -18,7 +18,7 @@ export function CookieNotice() {
     setIsVisible(window.localStorage.getItem(cookieNoticeStorageKey) !== 'true');
   }, []);
 
-  if (!isVisible || pathname?.startsWith('/admin') || pathname?.startsWith('/business') || pathname?.startsWith('/auth')) {
+  if (!isVisible || pathname?.startsWith('/admin') || pathname?.startsWith('/business/cabinet') || pathname?.startsWith('/auth')) {
     return null;
   }
 

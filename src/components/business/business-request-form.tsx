@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { ApplicationType } from '@prisma/client';
-import { createBusinessApplication } from '@/app/business/actions';
+import { createBusinessApplication } from '@/lib/business/actions';
 import { ActionRow } from '@/components/ui/action-row';
 import { ConsentField } from '@/components/ui/consent-field';
 import { FormField } from '@/components/ui/form-field';

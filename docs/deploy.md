@@ -24,6 +24,15 @@ Single-node fallback for first launch when an external edge proxy is not ready:
 
 Before enabling public forms that collect personal data, complete [Personal data launch checklist](personal-data-launch-checklist.md).
 
+The repository supports two deploy shapes:
+
+- Docker Compose stack, useful for a container-managed production-like setup;
+- current verified production host checkout, where the app is built in `/opt/barsynergy` and restarted through `systemd`.
+
+Use only one shape for a release. Do not mix Compose app containers with the host `barsynergy.service` runtime.
+
+### Docker Compose Path
+
 ```bash
 cp .env.production.example .env.production
 docker compose --env-file .env.production -f docker-compose.production.yml up -d --build
@@ -34,15 +43,184 @@ Migration command must run inside the `app` container because production `DATABA
 
 If the app is deployed from a host checkout with `barsynergy.service` running `node .next/standalone/server.js`, the build step must also sync `public/` and `.next/static/` into `.next/standalone/`. The repository `npm run build` command now does this automatically through `scripts/sync-standalone-assets.mjs`.
 
+### Current Verified Production Host-Checkout Path
+
+Verified on `2026-05-07`:
+
+- project checkout: `/opt/barsynergy`;
+- branch: `prod`;
+- app runtime: `barsynergy.service`;
+- app command: `node .next/standalone/server.js`;
+- runtime user/group: `barsynergy:barsynergy`;
+- PostgreSQL runtime: host `postgresql.service`, listening locally;
+- ingress: host `nginx`, proxying HTTPS traffic to `127.0.0.1:3000`;
+- cleanup scheduler: `barsynergy-cleanup.timer`;
+- Docker is installed, but no Compose app container is active for the current production runtime.
+
+Deploy sequence for this mode:
+
+```bash
+ssh <server>
+cd /opt/barsynergy
+
+git status --short
+git branch --show-current
+git fetch origin --prune
+git checkout prod
+git pull --ff-only origin prod
+
+npm ci
+npm run build
+```
+
+Before restart, validate Prisma and apply migrations with production env values loaded. The Prisma CLI reads `.env` by default, not `.env.production`, so do not run a plain `./node_modules/.bin/prisma validate` on the host unless `DATABASE_URL` is already exported.
+
+Safe pattern:
+
+```bash
+PRISMA_COMMAND=validate node <<'NODE'
+const fs = require('fs');
+const { spawnSync } = require('child_process');
+
+function readEnv(path) {
+  const env = { ...process.env };
+  for (const raw of fs.readFileSync(path, 'utf8').split(/\r?\n/)) {
+    const line = raw.trim();
+    if (!line || line.startsWith('#')) continue;
+    const index = line.indexOf('=');
+    if (index < 0) continue;
+    const key = line.slice(0, index).trim();
+    let value = line.slice(index + 1).trim();
+    if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
+      value = value.slice(1, -1);
+    }
+    env[key] = value;
+  }
+  return env;
+}
+
+const env = readEnv('/opt/barsynergy/.env.production');
+const command = process.env.PRISMA_COMMAND ?? 'validate';
+const args = command === 'migrate-deploy' ? ['migrate', 'deploy'] : ['validate'];
+const result = spawnSync('./node_modules/.bin/prisma', args, {
+  cwd: '/opt/barsynergy',
+  env,
+  stdio: 'inherit'
+});
+process.exit(result.status ?? 1);
+NODE
+```
+
+For migrations, rerun the same heredoc with `PRISMA_COMMAND=migrate-deploy`, or save that helper as a temporary local server script and run it with this environment variable:
+
+```bash
+PRISMA_COMMAND=migrate-deploy node /tmp/run-prisma-production-env.mjs
+```
+
+Back up the database before `migrate deploy`. Load `DATABASE_URL` from `/opt/barsynergy/.env.production` without printing or pasting it into shell history.
+
+```bash
+DEPLOY_BACKUP_DIR="/var/backups/barsynergy/deploy-$(date -u +%Y%m%dT%H%M%SZ)"
+mkdir -p "$DEPLOY_BACKUP_DIR"
+
+DEPLOY_BACKUP_FILE="$DEPLOY_BACKUP_DIR/db-before-migrate.dump" node <<'NODE'
+const fs = require('fs');
+const { spawnSync } = require('child_process');
+
+function readEnv(path) {
+  const env = { ...process.env };
+  for (const raw of fs.readFileSync(path, 'utf8').split(/\r?\n/)) {
+    const line = raw.trim();
+    if (!line || line.startsWith('#')) continue;
+    const index = line.indexOf('=');
+    if (index < 0) continue;
+    const key = line.slice(0, index).trim();
+    let value = line.slice(index + 1).trim();
+    if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
+      value = value.slice(1, -1);
+    }
+    env[key] = value;
+  }
+  return env;
+}
+
+const env = readEnv('/opt/barsynergy/.env.production');
+const backupFile = process.env.DEPLOY_BACKUP_FILE;
+const result = spawnSync('pg_dump', ['-Fc', '--file', backupFile, env.DATABASE_URL], {
+  stdio: 'inherit'
+});
+process.exit(result.status ?? 1);
+NODE
+
+chmod 600 "$DEPLOY_BACKUP_DIR/db-before-migrate.dump"
+```
+
+After build, Prisma validation and migrations pass:
+
+```bash
+chown -R barsynergy:barsynergy /opt/barsynergy
+systemctl restart barsynergy.service
+systemctl is-active --quiet barsynergy.service
+```
+
+Post-deploy smoke:
+
+```bash
+curl -I https://barsynergy.ru/
+curl -I https://barsynergy.ru/auth/login
+curl -I https://barsynergy.ru/admin
+journalctl -u barsynergy.service --since '10 minutes ago' --no-pager -p err..alert
+```
+
+Expected smoke behavior:
+
+- `/` returns `200`;
+- `/auth/login` returns `200`;
+- `/admin` redirects unauthenticated users to `/auth/login`;
+- service logs have no fresh `err..alert` entries.
+
+Host-checkout nuances:
+
+- `npm run build` intentionally syncs `public/` and `.next/static/` into `.next/standalone/`;
+- `next-env.d.ts` may change after local `next typegen` or build; do not commit or preserve that as a server-local patch;
+- if `next.config.ts` or another tracked file is dirty on the server, inspect and save a patch before `git restore` or `git pull`;
+- do not edit `.env.production` during deploy unless the owner explicitly approved the env change;
+- stop the deploy before restart if `npm ci`, `npm run build`, Prisma validation or migrations fail.
+
+Rollback plan for this mode:
+
+```bash
+cd /opt/barsynergy
+git reset --hard <previous-prod-commit>
+npm ci
+npm run build
+systemctl restart barsynergy.service
+```
+
+If migrations changed production data or schema, restore the pre-migration dump only after a separate owner confirmation:
+
+```bash
+pg_restore --clean --if-exists --dbname "$DATABASE_URL" /var/backups/barsynergy/<deploy-folder>/db-before-migrate.dump
+```
+
 ## Supported Ingress Contract (Current Repository State)
 
-Current repository state supports the single-node ingress mode:
+Current repository state supports the single-node ingress mode in two variants.
+
+Compose-managed variant:
 
 - `docker-compose.production.yml` publishes `80` and `443`;
 - `docker/nginx/nginx.conf` terminates TLS on the app host;
 - app-side Nginx sets `X-Real-IP` and `X-Forwarded-For` to `$remote_addr`;
 - inbound client-supplied forwarding chains are overwritten before they reach Next.js;
 - Next.js and server actions prefer `X-Real-IP` for throttling and request identity, then fall back to `X-Forwarded-For`.
+
+Current host-checkout production variant:
+
+- host Nginx listens on `80` and `443`;
+- TLS certificates are managed by Let's Encrypt on the host;
+- Nginx proxies app traffic to `127.0.0.1:3000`;
+- app runtime is `barsynergy.service`, not a Compose app container.
 
 Unsupported production mode for the current repo without a separate ingress review:
 

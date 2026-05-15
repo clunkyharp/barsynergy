@@ -244,7 +244,7 @@ export function RequestLedger({
                 <StatusBadge variant={applicationStatusBadgeVariants[application.status]}>
                   {applicationStatusLabels[application.status]}
                 </StatusBadge>
-                <Button href={`/business/requests/${application.id}`} size="sm" variant="secondary">
+                <Button href={`/business/cabinet/requests/${application.id}`} size="sm" variant="secondary">
                   Открыть
                 </Button>
               </div>

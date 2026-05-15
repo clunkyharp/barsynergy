@@ -5,12 +5,15 @@ import { Check, Copy, CopyPlus, Plus, RotateCcw, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
+import { SegmentedControl } from '@/components/ui/segmented-control';
 import { Select } from '@/components/ui/select';
+import { parseCalculatorNumberInput } from '@/lib/calculator/number-input';
 import { displayFont } from '@/lib/fonts';
 import { cn } from '@/lib/utils';
 
 type Unit = 'ml' | 'l' | 'g' | 'kg' | 'pcs';
 type UnitKind = 'volume' | 'weight' | 'piece';
+type PricingMode = 'auto' | 'manual';
 
 type Ingredient = {
   id: string;
@@ -55,15 +58,6 @@ function createEmptyIngredient(id = `ingredient-${Date.now()}`): Ingredient {
   };
 }
 
-function numberValue(value: string): number | null {
-  if (!value.trim()) {
-    return null;
-  }
-
-  const parsed = Number.parseFloat(value.replace(',', '.').trim());
-  return Number.isFinite(parsed) ? parsed : null;
-}
-
 function money(value: number) {
   const safeValue = Number.isFinite(value) ? value : 0;
 
@@ -78,11 +72,6 @@ function money(value: number) {
 function percent(value: number) {
   const safeValue = Number.isFinite(value) ? value : 0;
   return `${safeValue.toLocaleString('ru-RU', { maximumFractionDigits: 1, minimumFractionDigits: 0 })} %`;
-}
-
-function multiplier(value: number) {
-  const safeValue = Number.isFinite(value) && value > 0 ? value : 0;
-  return `${safeValue.toLocaleString('ru-RU', { maximumFractionDigits: 2, minimumFractionDigits: 0 })}×`;
 }
 
 function decimal(value: number) {
@@ -120,9 +109,9 @@ function DivisionSign() {
 }
 
 function ingredientCost(ingredient: Ingredient): IngredientRow {
-  const packagePrice = numberValue(ingredient.packagePrice);
-  const packageAmount = numberValue(ingredient.packageAmount);
-  const recipeAmount = numberValue(ingredient.recipeAmount);
+  const packagePrice = parseCalculatorNumberInput(ingredient.packagePrice);
+  const packageAmount = parseCalculatorNumberInput(ingredient.packageAmount);
+  const recipeAmount = parseCalculatorNumberInput(ingredient.recipeAmount);
   const unitsMatch = unitsCompatible(ingredient.packageUnit, ingredient.recipeUnit);
 
   if (!unitsMatch) {
@@ -260,6 +249,7 @@ function UnitField({
 export function CostCalculatorClient() {
   const [itemName, setItemName] = useState('Ванильный латте');
   const [foodCostPercent, setFoodCostPercent] = useState('30');
+  const [pricingMode, setPricingMode] = useState<PricingMode>('auto');
   const [salePrice, setSalePrice] = useState('');
   const [ingredients, setIngredients] = useState<Ingredient[]>(demoIngredients);
   const [copyState, setCopyState] = useState<'idle' | 'copied' | 'failed'>('idle');
@@ -270,21 +260,26 @@ export function CostCalculatorClient() {
   );
   const rowErrors = rows.filter((ingredient) => ingredient.error);
   const totalCost = rows.reduce((sum, ingredient) => sum + (ingredient.cost ?? 0), 0);
-  const foodCostInput = numberValue(foodCostPercent);
-  const foodCostError = foodCostPercent.trim() && (foodCostInput === null || foodCostInput <= 0) ? 'Целевая доля себестоимости должна быть больше нуля.' : null;
-  const foodCost = foodCostInput && foodCostInput > 0 ? foodCostInput / 100 : 0;
-  const manualSalePriceInput = numberValue(salePrice);
-  const salePriceError = salePrice.trim() && (manualSalePriceInput === null || manualSalePriceInput <= 0) ? 'Цена продажи должна быть больше нуля.' : null;
+  const foodCostInput = parseCalculatorNumberInput(foodCostPercent);
+  const foodCostError = foodCostPercent.trim() && (foodCostInput === null || foodCostInput <= 0 || foodCostInput > 100)
+    ? 'Целевая доля себестоимости должна быть больше 0 и не выше 100 %.'
+    : null;
+  const foodCost = foodCostInput && foodCostInput > 0 && foodCostInput <= 100 ? foodCostInput / 100 : 0;
+  const isManualMode = pricingMode === 'manual';
+  const manualSalePriceInput = parseCalculatorNumberInput(salePrice);
+  const salePriceError = isManualMode && (salePrice.trim() === '' || manualSalePriceInput === null || manualSalePriceInput <= 0)
+    ? 'В ручном режиме цена продажи должна быть больше нуля.'
+    : null;
   const manualSalePrice = manualSalePriceInput && manualSalePriceInput > 0 ? manualSalePriceInput : 0;
-  const hasManualSalePrice = manualSalePrice > 0 && !salePriceError;
+  const hasManualSalePrice = isManualMode && manualSalePrice > 0 && !salePriceError;
   const canShowRecommendedPrice = rowErrors.length === 0 && totalCost > 0 && !foodCostError && foodCost > 0;
   const recommendedPrice = canShowRecommendedPrice ? totalCost / foodCost : 0;
-  const activeSalePrice = hasManualSalePrice ? manualSalePrice : recommendedPrice;
-  const canShowSalePrice = rowErrors.length === 0 && totalCost > 0 && !salePriceError && activeSalePrice > 0 && (hasManualSalePrice || canShowRecommendedPrice);
+  const activeSalePrice = isManualMode ? manualSalePrice : recommendedPrice;
+  const canShowSalePrice = rowErrors.length === 0 && totalCost > 0 && (isManualMode ? hasManualSalePrice : canShowRecommendedPrice);
   const actualFoodCostPercent = canShowSalePrice ? (totalCost / activeSalePrice) * 100 : 0;
   const grossProfit = canShowSalePrice ? activeSalePrice - totalCost : 0;
   const grossMargin = canShowSalePrice && activeSalePrice > 0 ? (grossProfit / activeSalePrice) * 100 : 0;
-  const markup = canShowSalePrice && totalCost > 0 ? activeSalePrice / totalCost : 0;
+  const markupPercent = canShowSalePrice && totalCost > 0 ? (grossProfit / totalCost) * 100 : 0;
   const completedRows = rows.filter((ingredient) => ingredient.isComplete).length;
   const hasAnyInput = Boolean(
     itemName.trim() ||
@@ -304,10 +299,10 @@ export function CostCalculatorClient() {
       ? 'Введите ингредиенты, чтобы увидеть расчёт.'
       : salePriceError
         ? salePriceError
-        : foodCostError && !hasManualSalePrice
+        : foodCostError && !isManualMode
           ? foodCostError
-          : !hasManualSalePrice && foodCost <= 0
-            ? 'Укажите цену продажи или целевую долю себестоимости.'
+          : !isManualMode && foodCost <= 0
+            ? 'Укажите целевую долю себестоимости для автоматической цены.'
           : null;
   const rowStatusText = rowErrors.length
     ? 'В составе есть ошибки, итоговая цена пока не считается.'
@@ -343,6 +338,7 @@ export function CostCalculatorClient() {
   function clearCalculator() {
     setItemName('');
     setFoodCostPercent('');
+    setPricingMode('auto');
     setSalePrice('');
     setIngredients([createEmptyIngredient('ingredient-empty')]);
     setCopyState('idle');
@@ -351,6 +347,7 @@ export function CostCalculatorClient() {
   function fillDemo() {
     setItemName('Ванильный латте');
     setFoodCostPercent('30');
+    setPricingMode('auto');
     setSalePrice('');
     setIngredients(demoIngredients);
     setCopyState('idle');
@@ -364,11 +361,13 @@ export function CostCalculatorClient() {
     const resultText = [
       `Позиция: ${itemName.trim() || 'Позиция меню'}`,
       `Себестоимость: ${money(totalCost)}`,
-      hasManualSalePrice ? `Цена продажи задана вручную: ${money(activeSalePrice)}` : `Цена продажи по целевой доле: ${money(activeSalePrice)}`,
+      isManualMode ? `Цена продажи задана вручную: ${money(activeSalePrice)}` : `Цена продажи по целевой доле: ${money(activeSalePrice)}`,
+      canShowRecommendedPrice ? `Рекомендованная цена по цели: ${money(recommendedPrice)}` : null,
       `Доля себестоимости: ${percent(actualFoodCostPercent)}`,
       foodCost > 0 ? `Целевая доля себестоимости: ${percent(foodCost * 100)}` : null,
       `Валовая прибыль: ${money(grossProfit)}`,
-      `Валовая маржа: ${percent(grossMargin)}`
+      `Маржа: ${percent(grossMargin)}`,
+      `Наценка: ${percent(markupPercent)}`
     ].filter(Boolean).join('\n');
 
     try {
@@ -396,6 +395,23 @@ export function CostCalculatorClient() {
               </p>
             </div>
             <div className="grid gap-3">
+              <SegmentedControl
+                items={[
+                  {
+                    value: 'auto',
+                    label: 'Автоматически',
+                    description: 'Цена считается от целевой доли себестоимости.'
+                  },
+                  {
+                    value: 'manual',
+                    label: 'Вручную',
+                    description: 'Метрики считаются от вашей цены продажи.'
+                  }
+                ]}
+                onChange={setPricingMode}
+                value={pricingMode}
+                variant="compact"
+              />
               <FormField htmlFor="calculatorItemName" label="Позиция">
                 <Input
                   autoComplete="off"
@@ -407,7 +423,7 @@ export function CostCalculatorClient() {
                   value={itemName}
                 />
               </FormField>
-              <FormField error={foodCostError ?? undefined} htmlFor="calculatorFoodCost" hint="Ориентир: 25-35%." label="Доля себестоимости, %">
+              <FormField error={foodCostError ?? undefined} htmlFor="calculatorFoodCost" hint="Нужно для автоматической цены и ориентира. Ориентир: 25-35%." label="Целевая доля себестоимости, %">
                 <Input
                   aria-invalid={foodCostError ? true : undefined}
                   className="h-10 text-sm tabular-nums"
@@ -421,12 +437,13 @@ export function CostCalculatorClient() {
               <FormField
                 error={salePriceError ?? undefined}
                 htmlFor="calculatorSalePrice"
-                hint="Если заполнить, итог будет считаться от этой цены."
-                label="Цена продажи, ₽"
+                hint={isManualMode ? 'В ручном режиме от этой цены считаются прибыль, маржа и наценка.' : 'Поле используется только в ручном режиме.'}
+                label="Ручная цена продажи, ₽"
               >
                 <Input
                   aria-invalid={salePriceError ? true : undefined}
                   className="h-10 text-sm tabular-nums"
+                  disabled={!isManualMode}
                   id="calculatorSalePrice"
                   inputMode="decimal"
                   maxLength={12}
@@ -454,7 +471,7 @@ export function CostCalculatorClient() {
               </p>
               <p>
                 <span className="block font-semibold text-[var(--text)]">Цена продажи</span>
-                Задайте вручную или рассчитайте через целевую долю.
+                Выберите автоматический расчёт или ручную цену.
               </p>
             </div>
           </details>
@@ -470,7 +487,7 @@ export function CostCalculatorClient() {
             </p>
             <p>
               <span className="block font-semibold text-[var(--text)]">Цена продажи</span>
-              Задайте вручную или рассчитайте через целевую долю.
+              Выберите автоматический расчёт или ручную цену.
             </p>
           </div>
 
@@ -668,18 +685,18 @@ export function CostCalculatorClient() {
               {canShowSalePrice ? (
                 <div className="grid gap-0">
                   <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-3 border-b border-[var(--line)] px-4 py-3 text-sm leading-6">
-                    <dt className="text-[var(--muted)]">{hasManualSalePrice ? 'Источник цены' : 'Формула'}</dt>
+                    <dt className="text-[var(--muted)]">{isManualMode ? 'Источник цены' : 'Формула'}</dt>
                     <dd className="text-right font-semibold tabular-nums text-[var(--text)]">
-                      {hasManualSalePrice ? 'вручную' : (
+                      {isManualMode ? 'ручной режим' : (
                         <>
                           {formulaMoney(totalCost)} <DivisionSign /> {decimal(foodCost)}
                         </>
                       )}
                     </dd>
                   </div>
-                  {hasManualSalePrice && canShowRecommendedPrice ? (
+                  {canShowRecommendedPrice ? (
                     <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-3 border-b border-[var(--line)] px-4 py-3 text-sm leading-6">
-                      <dt className="text-[var(--muted)]">Ориентир по целевой доле</dt>
+                      <dt className="text-[var(--muted)]">Рекомендованная цена по цели</dt>
                       <dd className="font-semibold tabular-nums text-[var(--text)]">{money(recommendedPrice)}</dd>
                     </div>
                   ) : null}
@@ -688,12 +705,12 @@ export function CostCalculatorClient() {
                     <dd className="font-semibold tabular-nums text-[var(--text)]">{money(grossProfit)}</dd>
                   </div>
                   <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-3 border-b border-[var(--line)] px-4 py-3 text-sm leading-6">
-                    <dt className="text-[var(--muted)]">Валовая маржа</dt>
+                    <dt className="text-[var(--muted)]">Маржа</dt>
                     <dd className="font-semibold tabular-nums text-[var(--text)]">{percent(grossMargin)}</dd>
                   </div>
                   <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-3 border-b border-[var(--line)] px-4 py-3 text-sm leading-6">
                     <dt className="text-[var(--muted)]">Наценка</dt>
-                    <dd className="font-semibold tabular-nums text-[var(--text)]">{multiplier(markup)}</dd>
+                    <dd className="font-semibold tabular-nums text-[var(--text)]">{percent(markupPercent)}</dd>
                   </div>
                 </div>
               ) : null}

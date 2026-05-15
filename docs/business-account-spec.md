@@ -114,11 +114,13 @@ Implemented on 2026-04-28:
 - `/admin/applications/[applicationId]` one-time activation-link preparation for approved business-access requests;
 - `/auth/activate` password setup and first activation through a one-time link;
 - `/admin/users` blocking and reopening already prepared business access;
-- guarded `/business` cabinet for active business users;
+- guarded `/business/cabinet` cabinet for active business users;
 - company profile editing;
-- `/business/requests` request creation, draft saving and submission for vacancy placement with the fixed MVP positions `Бариста`, `Управляющий`, `Менеджер`, supplier placement, partner application, corporate training and certificate order;
-- `/business/requests/[applicationId]` own-request detail, draft editing, draft submission and draft archiving;
+- `/business/cabinet/requests` request creation, draft saving and submission for vacancy placement with the fixed MVP positions `Бариста`, `Управляющий`, `Менеджер`, supplier placement, partner application, corporate training and certificate order;
+- `/business/cabinet/requests/[applicationId]` own-request detail, draft editing, draft submission and draft archiving;
 - business request list/detail never exposes candidate personal data.
+
+Public `/business` is now a separate B2B services page. It creates `ApplicationType.BUSINESS_SOLUTION` requests through the public form and does not grant business-cabinet access by itself.
 
 Current limitations:
 

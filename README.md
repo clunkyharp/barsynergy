@@ -91,6 +91,16 @@ docker compose --env-file .env.production -f docker-compose.production.yml up -d
 docker compose --env-file .env.production -f docker-compose.production.yml exec app npm run prisma:migrate:deploy
 ```
 
+Current production server uses the host-checkout path instead of the Compose app container:
+
+- code checkout: `/opt/barsynergy`;
+- branch: `prod`;
+- runtime: `barsynergy.service`;
+- ingress: host Nginx proxying to `127.0.0.1:3000`;
+- database: host PostgreSQL service.
+
+Use [Deploy](docs/deploy.md) for the full production runbook, including `.env.production` handling for Prisma, database backup, service restart, smoke checks and rollback.
+
 Production must use:
 
 ```txt
@@ -108,7 +118,7 @@ npm run prisma:migrate:dev -- --name <migration_name>
 npm run prisma:migrate:deploy
 ```
 
-Current schema includes the Phase 4 business-account MVP. Apply migrations before testing `/auth/register`, `/auth/login`, `/admin/users`, `/business` or `/business/requests`.
+Current schema includes the Phase 4 business-account MVP and the public B2B request types. Apply migrations before testing `/auth/register`, `/auth/login`, `/admin/users`, `/business`, `/consulting` or `/business/cabinet/requests`.
 
 ## Branches
 

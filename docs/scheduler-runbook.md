@@ -39,11 +39,12 @@ docker compose --env-file .env.production -f docker-compose.production.yml exec 
 
 Use `-T` so the command is safe for cron, systemd timers and other non-interactive schedulers.
 
-Verified current production host mode on `2026-05-02`:
+Verified current production host mode on `2026-05-07`:
 
 - checkout path: `/opt/barsynergy`;
 - app runtime: `barsynergy.service`;
-- scheduler runtime: host-level `systemd`, not `docker compose exec`.
+- scheduler runtime: host-level `systemd`, not `docker compose exec`;
+- production env file: `/opt/barsynergy/.env.production`.
 
 Host-checkout command pattern for this mode:
 

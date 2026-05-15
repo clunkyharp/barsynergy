@@ -160,6 +160,8 @@ MVP public routes:
 - events;
 - articles/knowledge;
 - vacancies;
+- business solutions;
+- consulting;
 - suppliers;
 - partners;
 - general sponsors;
@@ -272,6 +274,8 @@ MVP forms:
 - vacancy submission;
 - supplier submission;
 - partner application;
+- business solution request;
+- consulting request;
 - contact message;
 - corporate training application;
 - certificate order.

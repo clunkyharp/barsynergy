@@ -131,7 +131,7 @@ function applicationPersonOrCompany(application: {
   subject: string | null;
   telegram: string | null;
 }) {
-  const companyName = application.businessAccount?.companyName ?? getPayloadText(application.payload, ['companyName', 'employerCompanyName']);
+  const companyName = application.businessAccount?.companyName ?? getPayloadText(application.payload, ['projectName', 'companyName', 'employerCompanyName']);
   const primary = companyName ?? application.name?.trim() ?? application.subject?.trim() ?? application.email ?? 'Не указано';
   const secondary = [application.name && companyName ? application.name : null, application.email, application.phone, application.telegram]
     .filter(Boolean)

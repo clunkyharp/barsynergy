@@ -4,7 +4,7 @@ import {
   archiveBusinessDraftApplication,
   submitBusinessDraftApplication,
   updateBusinessDraftApplication
-} from '@/app/business/actions';
+} from '@/lib/business/actions';
 import { AdminActionAlert } from '@/components/admin/content-admin-controls';
 import { NextActionPanel } from '@/components/business/business-cabinet';
 import { ActionRow } from '@/components/ui/action-row';
@@ -258,7 +258,7 @@ export default async function BusinessRequestDetailPage({ params, searchParams }
                 </form>
               </>
             ) : null}
-            <Button href="/business/requests" variant="ghost">
+            <Button href="/business/cabinet/requests" variant="ghost">
               Вернуться к заявкам
             </Button>
           </div>

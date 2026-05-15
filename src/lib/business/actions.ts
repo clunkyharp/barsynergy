@@ -14,8 +14,8 @@ import { PERSONAL_DATA_CONSENT_TEXT } from '@/lib/applications/public-form-helpe
 import { requireBusinessAccountAccess } from '@/lib/auth/require-business-account';
 import { prisma } from '@/lib/db/prisma';
 
-const BUSINESS_PATH = '/business';
-const BUSINESS_REQUESTS_PATH = '/business/requests';
+const BUSINESS_PATH = '/business/cabinet';
+const BUSINESS_REQUESTS_PATH = '/business/cabinet/requests';
 
 const businessProfileSchema = z.object({
   companyName: z.string().trim().min(2).max(160),

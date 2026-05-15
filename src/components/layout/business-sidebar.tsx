@@ -10,8 +10,8 @@ type BusinessSidebarProps = {
 };
 
 const links = [
-  { href: '/business', label: 'Компания' },
-  { href: '/business/requests', label: 'Заявки' }
+  { href: '/business/cabinet', label: 'Компания' },
+  { href: '/business/cabinet/requests', label: 'Заявки' }
 ];
 
 export function BusinessSidebar({ companyName }: BusinessSidebarProps) {

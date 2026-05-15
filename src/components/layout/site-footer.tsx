@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 export function SiteFooter() {
   const pathname = usePathname();
   const isWorkspacePath =
-    pathname?.startsWith('/admin') || pathname?.startsWith('/business') || pathname?.startsWith('/auth');
+    pathname?.startsWith('/admin') || pathname?.startsWith('/business/cabinet') || pathname?.startsWith('/auth');
   const aboutHref = pathname === '/' ? '#home-about' : '/#home-about';
   const footerLinkClassName =
     'flex items-center rounded-[var(--radius-sm)] py-0.5 transition hover:text-[var(--accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]';
@@ -42,6 +42,12 @@ export function SiteFooter() {
             </a>
             <a className={footerLinkClassName} href="/vacancies">
               Вакансии
+            </a>
+            <a className={footerLinkClassName} href="/business">
+              Для бизнеса
+            </a>
+            <a className={footerLinkClassName} href="/consulting">
+              Консалтинг
             </a>
           </nav>
           <nav className="grid gap-0.5 text-sm leading-6 text-[var(--muted)] md:justify-items-start">

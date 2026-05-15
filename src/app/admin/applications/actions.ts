@@ -4,7 +4,10 @@ import { cookies } from 'next/headers';
 import { revalidatePath } from 'next/cache';
 import { ApplicationStatus, ApplicationType, BusinessAccountStatus, UserRole, UserStatus } from '@prisma/client';
 import { z } from 'zod';
-import { getApplicationStatusUpdate } from '@/lib/admin/application-transitions';
+import {
+  canUpdateApplicationBusinessNotes,
+  getApplicationStatusUpdate
+} from '@/lib/admin/application-transitions';
 import {
   applicationStatusValues,
   formatApplicationActionError
@@ -154,6 +157,15 @@ export async function updateApplicationBusinessNotes(formData: FormData) {
     });
 
     await requireAdminSectionAccess('applications');
+    const application = await prisma.application.findUniqueOrThrow({
+      where: { id: parsed.applicationId },
+      select: { businessAccountId: true }
+    });
+
+    if (!canUpdateApplicationBusinessNotes(application)) {
+      throw new Error('business notes require linked business account');
+    }
+
     await prisma.application.update({
       where: { id: parsed.applicationId },
       data: {
@@ -163,8 +175,8 @@ export async function updateApplicationBusinessNotes(formData: FormData) {
 
     revalidatePath(ADMIN_APPLICATIONS_PATH);
     revalidatePath(applicationDetailPath(parsed.applicationId));
-    revalidatePath('/business');
-    revalidatePath('/business/requests');
+    revalidatePath('/business/cabinet');
+    revalidatePath('/business/cabinet/requests');
     result = { type: 'success', message: 'Комментарий для бизнеса сохранен.' };
   } catch (error) {
     result = { type: 'error', message: formatApplicationActionError(error) };
@@ -192,9 +204,13 @@ export async function updateApplicationProcessing(formData: FormData) {
         type: true,
         status: true,
         vacancyId: true,
-        consentAcceptedAt: true
+        consentAcceptedAt: true,
+        businessAccountId: true
       }
     });
+    const businessNotesUpdate = canUpdateApplicationBusinessNotes(application)
+      ? { businessNotes: parsed.businessNotes ?? null }
+      : {};
 
     await prisma.application.update({
       where: { id: parsed.applicationId },
@@ -204,15 +220,15 @@ export async function updateApplicationProcessing(formData: FormData) {
           nextStatus: parsed.status,
           userId: user.id
         }),
-        businessNotes: parsed.businessNotes ?? null,
+        ...businessNotesUpdate,
         internalNotes: parsed.internalNotes ?? null
       }
     });
 
     revalidatePath(ADMIN_APPLICATIONS_PATH);
     revalidatePath(applicationDetailPath(parsed.applicationId));
-    revalidatePath('/business');
-    revalidatePath('/business/requests');
+    revalidatePath('/business/cabinet');
+    revalidatePath('/business/cabinet/requests');
     result = { type: 'success', message: 'Обработка заявки сохранена.' };
   } catch (error) {
     result = { type: 'error', message: formatApplicationActionError(error) };

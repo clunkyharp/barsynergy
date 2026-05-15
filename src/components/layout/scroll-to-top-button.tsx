@@ -5,7 +5,7 @@ import { ArrowUp } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 
 function isWorkspacePath(pathname: string | null) {
-  return Boolean(pathname?.startsWith('/admin') || pathname?.startsWith('/business') || pathname?.startsWith('/auth'));
+  return Boolean(pathname?.startsWith('/admin') || pathname?.startsWith('/business/cabinet') || pathname?.startsWith('/auth'));
 }
 
 export function ScrollToTopButton() {

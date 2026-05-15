@@ -7,22 +7,52 @@ type ApplicationTransitionRecord = {
   consentAcceptedAt: Date | null;
 };
 
+export function canForwardApplicationToEmployer(application: ApplicationTransitionRecord) {
+  return (
+    application.type === ApplicationType.VACANCY_RESPONSE &&
+    Boolean(application.vacancyId) &&
+    Boolean(application.consentAcceptedAt)
+  );
+}
+
+export function getAvailableApplicationStatuses(
+  application: ApplicationTransitionRecord,
+  statusValues: readonly ApplicationStatus[]
+) {
+  return statusValues.filter(
+    (status) =>
+      status === application.status ||
+      status !== ApplicationStatus.FORWARDED_TO_EMPLOYER ||
+      canForwardApplicationToEmployer(application)
+  );
+}
+
+export function canUpdateApplicationBusinessNotes(application: { businessAccountId: string | null }) {
+  return Boolean(application.businessAccountId);
+}
+
 export function getApplicationStatusUpdate(input: {
   application: ApplicationTransitionRecord;
   nextStatus: ApplicationStatus;
   userId: string;
   now?: Date;
 }) {
+  if (input.nextStatus === input.application.status) {
+    return {
+      status: input.nextStatus
+    };
+  }
+
   if (input.nextStatus === ApplicationStatus.FORWARDED_TO_EMPLOYER) {
-    if (input.application.type !== ApplicationType.VACANCY_RESPONSE) {
-      throw new Error('forwarding requires vacancy response application');
-    }
+    if (!canForwardApplicationToEmployer(input.application)) {
+      if (input.application.type !== ApplicationType.VACANCY_RESPONSE) {
+        throw new Error('forwarding requires vacancy response application');
+      }
 
-    if (!input.application.vacancyId) {
-      throw new Error('forwarding requires linked vacancy');
-    }
+      if (!input.application.vacancyId) {
+        throw new Error('forwarding requires linked vacancy');
+      }
 
-    if (!input.application.consentAcceptedAt) {
       throw new Error('forwarding requires candidate consent');
     }
 

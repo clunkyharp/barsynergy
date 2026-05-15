@@ -2,7 +2,11 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { ApplicationStatus, ApplicationType } from '@prisma/client';
 
-const { getApplicationStatusUpdate } = await import('../src/lib/admin/application-transitions.ts');
+const {
+  canUpdateApplicationBusinessNotes,
+  getApplicationStatusUpdate,
+  getAvailableApplicationStatuses
+} = await import('../src/lib/admin/application-transitions.ts');
 const { appendApplicationInternalNote, getVacancyDraftFieldsFromApplication } = await import(
   '../src/lib/admin/vacancy-application-drafts.ts'
 );
@@ -70,6 +74,91 @@ test('forwarding is allowed only for vacancy responses with consent and vacancy 
       }),
     /forwarding requires vacancy response application/
   );
+});
+
+test('available statuses hide employer forwarding when transition policy rejects it', () => {
+  const statuses = [
+    ApplicationStatus.NEW,
+    ApplicationStatus.IN_REVIEW,
+    ApplicationStatus.FORWARDED_TO_EMPLOYER,
+    ApplicationStatus.APPROVED
+  ];
+
+  assert.deepEqual(
+    getAvailableApplicationStatuses(
+      {
+        type: ApplicationType.BUSINESS_SOLUTION,
+        status: ApplicationStatus.NEW,
+        vacancyId: null,
+        consentAcceptedAt: null
+      },
+      statuses
+    ),
+    [ApplicationStatus.NEW, ApplicationStatus.IN_REVIEW, ApplicationStatus.APPROVED]
+  );
+
+  assert.deepEqual(
+    getAvailableApplicationStatuses(
+      {
+        type: ApplicationType.VACANCY_RESPONSE,
+        status: ApplicationStatus.IN_REVIEW,
+        vacancyId: 'vacancy-1',
+        consentAcceptedAt: new Date('2026-04-28T10:00:00.000Z')
+      },
+      statuses
+    ),
+    statuses
+  );
+});
+
+test('available statuses keep current employer forwarding status for no-op saves', () => {
+  const statuses = [
+    ApplicationStatus.NEW,
+    ApplicationStatus.IN_REVIEW,
+    ApplicationStatus.FORWARDED_TO_EMPLOYER,
+    ApplicationStatus.APPROVED
+  ];
+
+  assert.deepEqual(
+    getAvailableApplicationStatuses(
+      {
+        type: ApplicationType.VACANCY_RESPONSE,
+        status: ApplicationStatus.FORWARDED_TO_EMPLOYER,
+        vacancyId: null,
+        consentAcceptedAt: null
+      },
+      statuses
+    ),
+    [
+      ApplicationStatus.NEW,
+      ApplicationStatus.IN_REVIEW,
+      ApplicationStatus.FORWARDED_TO_EMPLOYER,
+      ApplicationStatus.APPROVED
+    ]
+  );
+});
+
+test('saving the current status does not re-run transition requirements', () => {
+  assert.deepEqual(
+    getApplicationStatusUpdate({
+      application: {
+        type: ApplicationType.VACANCY_RESPONSE,
+        status: ApplicationStatus.FORWARDED_TO_EMPLOYER,
+        vacancyId: null,
+        consentAcceptedAt: null
+      },
+      nextStatus: ApplicationStatus.FORWARDED_TO_EMPLOYER,
+      userId: 'admin-1'
+    }),
+    {
+      status: ApplicationStatus.FORWARDED_TO_EMPLOYER
+    }
+  );
+});
+
+test('business notes are editable only for applications linked to a business account', () => {
+  assert.equal(canUpdateApplicationBusinessNotes({ businessAccountId: 'business-1' }), true);
+  assert.equal(canUpdateApplicationBusinessNotes({ businessAccountId: null }), false);
 });
 
 test('forwarding metadata is cleared when status moves back', () => {

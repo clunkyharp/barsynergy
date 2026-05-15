@@ -22,6 +22,10 @@ import {
   formatApplicationPayloadValue,
   getApplicationPayloadFieldLabel
 } from '@/lib/admin/application-utils';
+import {
+  canUpdateApplicationBusinessNotes,
+  getAvailableApplicationStatuses
+} from '@/lib/admin/application-transitions';
 import type { AdminContentSearchParams } from '@/lib/admin/content-utils';
 import { BUSINESS_ACCESS_PREVIEW_COOKIE_NAME } from '@/lib/auth/business-access';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
@@ -133,12 +137,20 @@ export default async function AdminApplicationDetailPage({ params, searchParams 
   }
 
   const entries = payloadEntries(application.payload);
+  const messageTitle =
+    application.type === ApplicationType.BUSINESS_SOLUTION
+      ? 'Комментарий'
+      : application.type === ApplicationType.CONSULTING_REQUEST
+        ? 'Описание задачи'
+        : 'Сообщение';
   const forwardedInfo =
     application.status === ApplicationStatus.FORWARDED_TO_EMPLOYER
       ? [application.forwardedAt ? dateTimeFormatter.format(application.forwardedAt) : null, application.forwardedBy?.email]
           .filter(Boolean)
           .join(' / ')
       : null;
+  const availableStatuses = getAvailableApplicationStatuses(application, applicationStatusValues);
+  const canEditBusinessNotes = canUpdateApplicationBusinessNotes(application);
 
   return (
     <div className="space-y-8">
@@ -191,7 +203,7 @@ export default async function AdminApplicationDetailPage({ params, searchParams 
 
             {application.message ? (
               <div className="mt-5 border-t border-[var(--line)] pt-5 text-sm">
-                <h3 className="font-semibold">Сообщение</h3>
+                <h3 className="font-semibold">{messageTitle}</h3>
                 <p className="mt-2 whitespace-pre-wrap leading-7 text-[var(--muted)]">{application.message}</p>
               </div>
             ) : null}
@@ -273,7 +285,7 @@ export default async function AdminApplicationDetailPage({ params, searchParams 
               <input name="applicationId" type="hidden" value={application.id} />
               <FormField htmlFor="status" label="Статус">
                 <Select id="status" name="status" defaultValue={application.status}>
-                  {applicationStatusValues.map((status) => (
+                  {availableStatuses.map((status) => (
                     <option key={status} value={status}>
                       {applicationStatusLabels[status]}
                     </option>
@@ -281,15 +293,17 @@ export default async function AdminApplicationDetailPage({ params, searchParams 
                 </Select>
               </FormField>
               {forwardedInfo ? <p className="text-sm text-[var(--muted)]">Передача отмечена: {forwardedInfo}</p> : null}
-              <FormField htmlFor="businessNotes" label="Видимый комментарий">
-                <Textarea
-                  className="min-h-32"
-                  defaultValue={application.businessNotes ?? ''}
-                  id="businessNotes"
-                  maxLength={2000}
-                  name="businessNotes"
-                />
-              </FormField>
+              {canEditBusinessNotes ? (
+                <FormField htmlFor="businessNotes" label="Видимый комментарий">
+                  <Textarea
+                    className="min-h-32"
+                    defaultValue={application.businessNotes ?? ''}
+                    id="businessNotes"
+                    maxLength={2000}
+                    name="businessNotes"
+                  />
+                </FormField>
+              ) : null}
               <FormField htmlFor="internalNotes" label="Внутренняя заметка">
                 <Textarea
                   className="min-h-40"
