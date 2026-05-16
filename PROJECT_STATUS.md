@@ -1,12 +1,12 @@
 # BARSYNERGY Project Status
 
-Last updated: 2026-05-15
+Last updated: 2026-05-16
 
 ## Current Branch
 
-- Active branch: `codex/calculator-manual-sale-price`
+- Active branch: `prod`
 - Production branch: `prod`
-- Current work mode: `QA + IMPLEMENTATION`
+- Current work mode: `IMPLEMENTATION`
 
 ## Current Phase
 
@@ -19,6 +19,7 @@ Release-readiness documentation notes, 2026-05-06:
 
 Current local follow-up completed on the current branch:
 
+- homepage service-block restore is applied locally on `prod`: the block about sites, Telegram bots, Mini Apps and process automation is present on `/` directly after the hero, with four numbered service cards and one `Обсудить задачу` CTA to `/contacts?topic=other#contact-form`; the mobile cookie notice is shorter and respects safe-area spacing, the unused legacy `SocialCard` promo surface is removed, shared touch handling is enabled for interactive controls and the scroll-to-top button respects mobile safe-area; CMS data, public routes, forms, Prisma schema, auth, admin and dependencies were kept; validation is green with `git diff --check`, `npm run lint`, `npm run typecheck`, `./node_modules/.bin/prisma validate`, `npm test`, `npm run build` and Playwright fallback checks for `/` at `390x844` and `1440x900` with the service block present, four service cards, CTA present, no horizontal overflow and no console errors;
 - scoped product improvements are applied locally: `/tools/cost-calculator` now has explicit automatic/manual pricing, manual sale price input, recommended price, profit, margin, markup and cost-share metrics; public `/business` and `/consulting` pages now explain concrete B2B/consulting tasks and submit into the existing `Application` model; the private business cabinet moved from `/business` to `/business/cabinet`; `ApplicationType.BUSINESS_SOLUTION` and `ApplicationType.CONSULTING_REQUEST` are backed by migration `20260515120000_business_consulting_application_types`; admin application list/detail can filter and read the new request types with existing status and internal-note handling;
 - review remediation follow-up is applied locally: admin application processing now hides and server-guards business-visible comments unless an application is linked to a business account, status options no longer offer employer forwarding when transition rules reject it, calculator numeric input rejects partial values such as `100abc`, public `/business` and `/consulting` copy no longer exposes internal English costing terms, the public design-system preview matches the current font contract, and production Nginx CSP no longer allows `unsafe-eval`; validation is green with `git diff --check`, `npm test`, `./node_modules/.bin/prisma validate`, `npm run lint`, `npm run typecheck`, `npm run build` and standalone HTTP smoke for `/business`, `/consulting` and `/tools/cost-calculator`;
 - calculator manual sale price batch is applied locally: `/tools/cost-calculator` now lets the user set sale price manually; when the field is filled, the result panel uses that price for food-cost share, gross profit, margin, markup and copied result text, while the old target-food-cost calculation remains as the fallback recommendation; validation passed with lint, type checks, diff check and Playwright CLI desktop/mobile smoke;

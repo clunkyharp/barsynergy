@@ -218,6 +218,16 @@
 
 html {
   scroll-behavior: smooth;
+  -webkit-tap-highlight-color: rgba(157, 9, 14, 0.14);
+}
+
+a,
+button,
+input,
+select,
+textarea,
+summary {
+  touch-action: manipulation;
 }
 
 @media (prefers-reduced-motion: reduce) {
