@@ -25,6 +25,7 @@ const navItems = [
 ];
 
 const desktopNavItems = navItems.filter((item) => !['/contacts', '/auth/login'].includes(item.href));
+const wideOnlyDesktopItems = new Set(['/general-sponsors']);
 
 function isWorkspacePath(pathname: string | null) {
   return Boolean(pathname?.startsWith('/admin') || pathname?.startsWith('/business/cabinet') || pathname?.startsWith('/auth'));
@@ -63,8 +64,8 @@ export function SiteHeader() {
         isFixedMobileHeader ? 'fixed inset-x-0 top-0 z-[60] xl:sticky xl:top-0 xl:z-50' : 'sticky top-0 z-50'
       )}
     >
-      <div className="container">
-        <div className="relative z-10 flex min-h-[76px] items-center justify-between gap-3 px-0 text-[var(--text)] xl:grid xl:grid-cols-[176px_minmax(0,1fr)_184px] xl:items-center xl:gap-2.5 2xl:grid-cols-[220px_minmax(0,1fr)_248px] 2xl:gap-5">
+      <div className="mx-auto w-[min(1840px,calc(100vw-40px))]">
+        <div className="relative z-10 flex min-h-[76px] items-center justify-between gap-3 px-0 text-[var(--text)] xl:grid xl:grid-cols-[176px_minmax(0,1fr)_176px] xl:items-center xl:gap-2.5 2xl:grid-cols-[220px_minmax(0,1fr)_248px] 2xl:gap-5">
           <AppLink
             aria-label="BARSYNERGY"
             className={cn(
@@ -92,14 +93,15 @@ export function SiteHeader() {
               width={162}
             />
           </AppLink>
-          <nav className="hidden min-w-0 items-center justify-center gap-1.5 px-0 text-[11px] font-semibold text-[var(--text)] xl:flex xl:justify-self-center 2xl:gap-5 2xl:text-[12px]">
+          <nav className="hidden min-w-0 items-center justify-center gap-1.5 px-0 text-[11px] font-semibold text-[var(--text)] xl:flex xl:justify-self-center 2xl:gap-2.5 2xl:text-[12px]">
             {desktopNavItems.map((item) => {
               const isActive = pathname ? isActiveItem(pathname, item.href) : false;
 
               return (
                 <AppLink
                   className={cn(
-                    'relative inline-flex min-h-9 items-center whitespace-nowrap rounded-[var(--radius-sm)] px-1 opacity-86 transition after:absolute after:inset-x-1 after:bottom-1 after:h-px after:origin-left after:scale-x-0 after:bg-[var(--accent)] after:transition-transform hover:text-[var(--text)] hover:opacity-100 hover:after:scale-x-100 2xl:px-2 2xl:after:inset-x-1.5',
+                    'relative inline-flex min-h-9 items-center whitespace-nowrap rounded-[var(--radius-sm)] px-1 opacity-86 transition after:absolute after:inset-x-1 after:bottom-1 after:h-px after:origin-left after:scale-x-0 after:bg-[var(--accent)] after:transition-transform hover:text-[var(--text)] hover:opacity-100 hover:after:scale-x-100 2xl:px-1.5 2xl:after:inset-x-1.5',
+                    wideOnlyDesktopItems.has(item.href) && 'hidden min-[1700px]:inline-flex',
                     focusClassName,
                     isActive && 'text-[var(--accent)] opacity-100 after:scale-x-100'
                   )}
@@ -122,17 +124,16 @@ export function SiteHeader() {
               aria-label="Войти в кабинет"
             >
               <UserRound size={16} strokeWidth={1.8} />
-              <span className="hidden 2xl:inline">Войти</span>
             </AppLink>
             <AppLink
               className={cn(
-                'inline-flex min-h-10 shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-[var(--radius-md)] border border-[var(--accent)] px-2.5 text-[12px] font-semibold text-[var(--accent)] transition-colors duration-200 hover:bg-[var(--accent)] hover:text-[var(--accent-contrast)] xl:px-3.5 2xl:min-h-11 2xl:gap-3 2xl:px-5',
+                'inline-flex min-h-10 w-10 shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-[var(--radius-md)] border border-[var(--accent)] px-0 text-[12px] font-semibold text-[var(--accent)] transition-colors duration-200 hover:bg-[var(--accent)] hover:text-[var(--accent-contrast)] 2xl:min-h-11 min-[1700px]:w-auto min-[1700px]:gap-3 min-[1700px]:px-5',
                 focusClassName
               )}
               href="/contacts"
               aria-label="Связаться"
             >
-              <span className="hidden xl:inline">Связаться</span>
+              <span className="hidden min-[1700px]:inline">Связаться</span>
               <ArrowUpRight size={18} />
             </AppLink>
           </div>
