@@ -289,7 +289,8 @@ export async function deletePartnerDraft(formData: FormData) {
 
       const deletion = await tx.partner.deleteMany({
         where: {
-          id: parsed.partnerId
+          id: parsed.partnerId,
+          status: ContentStatus.DRAFT
         }
       });
 

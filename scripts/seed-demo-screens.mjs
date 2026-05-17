@@ -1,3 +1,4 @@
+import { pathToFileURL } from 'node:url';
 import bcrypt from 'bcryptjs';
 import {
   ApplicationStatus,
@@ -9,6 +10,7 @@ import {
   UserRole,
   UserStatus
 } from '@prisma/client';
+import { getDemoSeedConfig } from './demo-seed-guard.mjs';
 
 const prisma = new PrismaClient();
 
@@ -33,7 +35,8 @@ async function upsertCategory({ name, slug, type, sortOrder }) {
 }
 
 async function main() {
-  const passwordHash = await bcrypt.hash('DemoPass123', 10);
+  const { demoBusinessPassword } = getDemoSeedConfig();
+  const passwordHash = await bcrypt.hash(demoBusinessPassword, 10);
 
   await prisma.city.updateMany({
     where: { slug: { in: ['stavropol', 'pyatigorsk', 'nalchik'] } },
@@ -631,11 +634,13 @@ async function main() {
   console.log(`Draft content: ${articleOne.slug}, ${articleTwo.slug}, ${eventOne.slug}, ${eventTwo.slug}`);
 }
 
-main()
-  .catch((error) => {
-    console.error(error);
-    process.exitCode = 1;
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  main()
+    .catch((error) => {
+      console.error(error);
+      process.exitCode = 1;
+    })
+    .finally(async () => {
+      await prisma.$disconnect();
+    });
+}

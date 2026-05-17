@@ -3,6 +3,7 @@ import { SponsorBenefitSheet, SponsorPackageComparison } from '@/components/publ
 import { GeneralSponsorCard } from '@/components/public/general-sponsor-card';
 import { PublicBodyText, PublicDisplayTitle, PublicEyebrow } from '@/components/public/public-primitives';
 import { SectionCtaPanel } from '@/components/public/public-ui-adaptation';
+import { AppLink } from '@/components/ui/app-link';
 import { Button } from '@/components/ui/button';
 import { Panel } from '@/components/ui/panel';
 import { displayFont } from '@/lib/fonts';
@@ -81,7 +82,7 @@ export default async function GeneralSponsorsPage() {
         <div className="container grid gap-8 lg:grid-cols-[minmax(0,0.95fr)_minmax(20rem,0.72fr)] lg:items-center">
           <div className="min-w-0">
             <p className="text-sm leading-6 text-[var(--muted)]">
-              <a className="muted-link" href="/">Главная</a> <span aria-hidden="true">›</span> Спонсорство
+              <AppLink className="muted-link" href="/">Главная</AppLink> <span aria-hidden="true">›</span> Спонсорство
             </p>
             <PublicEyebrow className="mt-8">Спонсорство</PublicEyebrow>
             <PublicDisplayTitle as="h1" className="mt-5" size="hero">

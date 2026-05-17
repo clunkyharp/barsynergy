@@ -14,6 +14,7 @@ import { ToolTeaser } from './platform-ui';
 import { RoleTaskCard } from './public-card-patterns';
 import { SocialLinkCard } from './social-card';
 import { Button } from '@/components/ui/button';
+import { MetaChip } from '@/components/ui/meta-chip';
 import { accentFont, displayFont } from '@/lib/fonts';
 import type { HomepageAudienceCardBlock, HomepageData, HomepageLiveCard, HomepageSocialBlock } from '@/lib/public/home';
 
@@ -183,6 +184,89 @@ function RouteIndexPanel({ data }: { data: HomepageData }) {
                   ))}
                 </div>
               </section>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+const businessDigitalServices = [
+  {
+    label: 'Сайты и лендинги',
+    pain: 'Нужно быстро показать событие, набор, партнёрский проект или новое меню без долгой разработки.',
+    result: 'Страница с понятной структурой, формой заявки, аналитикой и базовой SEO-подготовкой.'
+  },
+  {
+    label: 'Telegram-боты',
+    pain: 'Заявки, записи, напоминания и первичные ответы собираются вручную в личных чатах.',
+    result: 'Бот принимает обращения, задаёт нужные вопросы и передаёт данные команде в рабочем формате.'
+  },
+  {
+    label: 'Mini Apps',
+    pain: 'Гостю, участнику или партнёру нужен короткий сценарий внутри Telegram без отдельной регистрации.',
+    result: 'Мини-приложение для записи, каталога, анкеты, личного статуса или простой программы события.'
+  },
+  {
+    label: 'Автоматизация процессов',
+    pain: 'Команда тратит время на повторяющиеся проверки, таблицы, пересылки и ручные статусы.',
+    result: 'Связка форм, уведомлений, таблиц, CRM или внутренних панелей без лишнего ручного контроля.'
+  }
+] as const;
+
+function BusinessDigitalSolutionsSection() {
+  return (
+    <section className="background-zone background-zone-ivory scroll-mt-28 border-b border-[var(--line)] py-10 md:py-14" id="home-digital-solutions">
+      <div className="container">
+        <div className="grid gap-8 lg:grid-cols-[minmax(0,0.88fr)_minmax(0,1.12fr)] lg:items-start">
+          <div className="max-w-3xl">
+            <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--accent)]">Цифровые решения</p>
+            <h2 className={`${displayFont.className} mt-3 text-[2.1rem] font-semibold leading-[1.04] text-[var(--text)] md:text-[2.85rem]`}>
+              Сайты, боты и автоматизация для барных проектов
+            </h2>
+            <p className="mt-4 text-sm leading-7 text-[var(--muted)] md:text-[15px]">
+              Помогаем барам, школам, поставщикам и партнёрам быстро собрать рабочий цифровой сценарий: от страницы мероприятия до Telegram-бота или внутренней заявки.
+            </p>
+            <div className="mt-6 flex flex-wrap gap-2">
+              {['сайт', 'бот', 'Mini App', 'процесс'].map((item) => (
+                <MetaChip className="bg-[var(--surface-wash)] text-[var(--text)]" key={item} variant="filter">
+                  {item}
+                </MetaChip>
+              ))}
+            </div>
+            <Button className="mt-7 w-full max-w-[17rem] rounded-[var(--radius-md)]" href="/contacts?topic=other#contact-form">
+              Обсудить задачу
+              <ArrowUpRight size={16} />
+            </Button>
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-2">
+            {businessDigitalServices.map((service, index) => (
+              <article
+                className="flex min-h-[16rem] flex-col rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[color-mix(in_oklab,var(--surface),white_18%)] p-4 shadow-[0_12px_34px_rgba(20,20,18,0.028)] md:p-5"
+                key={service.label}
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <span className="inline-flex min-h-7 items-center rounded-[var(--radius-sm)] border border-[var(--border-default)] bg-[var(--surface-wash)] px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--muted)]">
+                    Услуга
+                  </span>
+                  <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--accent)]">D{String(index + 1).padStart(2, '0')}</span>
+                </div>
+                <h3 className={`${displayFont.className} mt-4 text-[1.55rem] font-semibold leading-[1.04] text-[var(--text)]`}>
+                  {service.label}
+                </h3>
+                <dl className="mt-4 grid gap-3 border-t border-[var(--line)] pt-4">
+                  <div>
+                    <dt className="text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--muted)]">Задача</dt>
+                    <dd className="mt-1 text-sm leading-6 text-[var(--text)]">{service.pain}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--muted)]">Результат</dt>
+                    <dd className="mt-1 text-sm leading-6 text-[var(--muted)]">{service.result}</dd>
+                  </div>
+                </dl>
+              </article>
             ))}
           </div>
         </div>
@@ -502,6 +586,8 @@ export function HomepageClient({ data }: HomepageClientProps) {
       ) : null}
 
       {data.socialBlocks.length > 0 ? <CommunityChannelRows channels={data.socialBlocks} /> : null}
+
+      <BusinessDigitalSolutionsSection />
 
       {data.ctaBlock ? (
         <section className="background-zone background-zone-cta border-b border-[var(--line)] py-10 md:py-14" id="home-about">

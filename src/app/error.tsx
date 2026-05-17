@@ -1,5 +1,6 @@
 'use client';
 
+import { AppLink } from '@/components/ui/app-link';
 import { displayFont } from '@/lib/fonts';
 
 type ErrorProps = {
@@ -26,12 +27,12 @@ export default function Error({ reset }: ErrorProps) {
           >
             Повторить
           </button>
-          <a
+          <AppLink
             className="inline-flex min-h-12 items-center justify-center border border-black/25 px-5 text-sm font-semibold uppercase tracking-[0.06em] transition hover:border-[var(--accent)] hover:text-[var(--accent)]"
             href="/contacts"
           >
             Контакты
-          </a>
+          </AppLink>
         </div>
       </section>
     </main>

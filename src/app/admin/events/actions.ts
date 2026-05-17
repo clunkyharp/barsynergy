@@ -311,7 +311,8 @@ export async function deleteEventDraft(formData: FormData) {
 
       const deletion = await tx.event.deleteMany({
         where: {
-          id: parsed.eventId
+          id: parsed.eventId,
+          status: ContentStatus.DRAFT
         }
       });
 

@@ -1,6 +1,7 @@
 import type { HTMLAttributes, ReactNode } from 'react';
 import { ArrowUpRight } from 'lucide-react';
 import { PublicBodyText, PublicDisplayTitle, PublicEyebrow } from '@/components/public/public-primitives';
+import { AppLink } from '@/components/ui/app-link';
 import { displayFont } from '@/lib/fonts';
 import { cn } from '@/lib/utils';
 
@@ -88,7 +89,7 @@ export type ProcessStepInlineItem = {
 
 function InlineAction({ action, className }: { action: EditorialAction; className?: string }) {
   return (
-    <a
+    <AppLink
       aria-label={action.ariaLabel}
       className={cn(
         'inline-flex min-h-10 w-fit items-center gap-2 rounded-[var(--radius-sm)] text-sm font-semibold text-[var(--accent)] transition hover:text-[var(--accent-strong)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)]',
@@ -99,7 +100,7 @@ function InlineAction({ action, className }: { action: EditorialAction; classNam
     >
       <span>{action.label}</span>
       <ArrowUpRight className="shrink-0" size={16} strokeWidth={1.8} />
-    </a>
+    </AppLink>
   );
 }
 
@@ -235,7 +236,7 @@ export function RouteIndexPanel({ items, className, ...props }: PrimitiveShellPr
     <PrimitiveShell className={className} {...props}>
       <div className="divide-y divide-[var(--line)] border-y border-[var(--line)]">
         {items.map((item, index) => (
-          <a
+          <AppLink
             aria-label={item.ariaLabel}
             className="group grid gap-4 py-4 transition hover:bg-[var(--surface-wash)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] focus-visible:ring-inset md:grid-cols-[4.5rem_minmax(0,1fr)_minmax(9rem,0.28fr)] md:px-3"
             href={item.href}
@@ -264,7 +265,7 @@ export function RouteIndexPanel({ items, className, ...props }: PrimitiveShellPr
                 <ArrowUpRight className="transition group-hover:translate-x-1" size={16} strokeWidth={1.8} />
               </span>
             </div>
-          </a>
+          </AppLink>
         ))}
       </div>
     </PrimitiveShell>

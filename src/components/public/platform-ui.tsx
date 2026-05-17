@@ -2,6 +2,7 @@ import type { ComponentType, ReactNode } from 'react';
 import { ArrowUpRight } from 'lucide-react';
 import { PublicBodyText, PublicDisplayTitle, PublicEyebrow } from '@/components/public/public-primitives';
 import { CardActionRow, IconBadge } from '@/components/public/public-ui-adaptation';
+import { AppLink } from '@/components/ui/app-link';
 import { Button } from '@/components/ui/button';
 import { MetaChip } from '@/components/ui/meta-chip';
 import { Panel } from '@/components/ui/panel';
@@ -191,9 +192,9 @@ export function LogoGrid({ items, emptyText }: { items: LogoGridItem[]; emptyTex
         );
 
         return item.href ? (
-          <a className="group rounded-[var(--radius-md)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]" href={item.href} key={item.name}>
+          <AppLink className="group rounded-[var(--radius-md)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]" href={item.href} key={item.name}>
             {content}
-          </a>
+          </AppLink>
         ) : (
           <div key={item.name}>{content}</div>
         );

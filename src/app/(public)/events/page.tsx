@@ -7,6 +7,7 @@ import { EventAgendaSection } from '@/components/public/platform-ui';
 import { PublicBodyText, PublicDisplayTitle } from '@/components/public/public-primitives';
 import { PublicFilters } from '@/components/public/public-filters';
 import { PublicPrelaunchSection } from '@/components/public/public-prelaunch-section';
+import { AppLink } from '@/components/ui/app-link';
 import { Button } from '@/components/ui/button';
 import { getApplicationCityOptions } from '@/lib/applications/form-options';
 import { arePublicApplicationFormsEnabled } from '@/lib/applications/public-forms';
@@ -94,7 +95,7 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
         <div className="container">
           <div className="min-w-0">
             <p className="text-sm leading-6 text-[var(--muted)]">
-              <a className="muted-link" href="/">Главная</a> <span aria-hidden="true">›</span> События
+              <AppLink className="muted-link" href="/">Главная</AppLink> <span aria-hidden="true">›</span> События
             </p>
             <PublicDisplayTitle as="h1" className="mt-6" size="hero">
               События

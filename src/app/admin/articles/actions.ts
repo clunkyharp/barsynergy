@@ -357,7 +357,8 @@ export async function deleteArticleDraft(formData: FormData) {
 
       const deletion = await tx.article.deleteMany({
         where: {
-          id: parsed.articleId
+          id: parsed.articleId,
+          status: ContentStatus.DRAFT
         }
       });
 

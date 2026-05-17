@@ -171,6 +171,7 @@ Current status:
 - public read queries are connected to articles, events, education, vacancies, suppliers and partners and return only `published` records with pagination that preserves active filters;
 - public content image upload route is implemented at `/admin/uploads/content-image`;
 - Phase 2 admin UX follow-up is implemented: edit forms, cover image upload slots, admin list pagination and admin action success/error states;
+- admin/public filter navigation follow-up is applied locally on the current branch: shared internal button/nav/chip/action-menu links use Next.js client navigation, remaining plain internal anchors in shared public/admin UI now route through `AppLink`, and admin GET filter bars update search params through `router.push` without a full document reload;
 - key admin screens now share a calmer global header and a unified intro pattern across dashboard-adjacent list and placeholder pages;
 - article full editing is implemented on a dedicated `/admin/articles/[articleId]` screen so the list page does not render long article bodies inline;
 - final Phase 2 runtime/admin review passed on 2026-04-27 with authenticated Playwright create smoke for all content sections, cover-image upload smoke, public route smoke and article publish/archive public-visibility smoke;
@@ -226,6 +227,7 @@ Current status:
 - admin `/admin/applications` supports queue-style list/detail review, readable payload labels, private resume download, related-record cards, unified status/business-note/internal-note processing and manual `forwarded_to_employer` metadata;
 - employer-forwarding status is guarded so only consented vacancy responses can be marked as forwarded;
 - admins can create a draft `Vacancy` from a `vacancy_submission` application and keep publication manual;
+- admins can explicitly publish a vacancy, supplier or partner from an approved/reviewed application; the created public record is linked back to `Application.vacancyId`, `Application.supplierId` or `Application.partnerId`;
 - admin-only private resume download is available at `/admin/applications/[applicationId]/resume`;
 - user confirmation emails are sent when `SMTP_*` is configured, and short Telegram admin notifications are sent when Telegram env config is present;
 - Phase 3 is complete at source level for the current MVP applications contract;

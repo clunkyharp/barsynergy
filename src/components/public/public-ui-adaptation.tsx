@@ -1,5 +1,6 @@
 import type { ComponentType, HTMLAttributes, ReactNode } from 'react';
 import { ArrowUpRight, X } from 'lucide-react';
+import { AppLink } from '@/components/ui/app-link';
 import { Button } from '@/components/ui/button';
 import { displayFont } from '@/lib/fonts';
 import { cn } from '@/lib/utils';
@@ -177,10 +178,10 @@ export function FilterChip({
 
   if (href) {
     return (
-      <a className={chipClassName} href={href}>
+      <AppLink className={chipClassName} href={href}>
         {children}
         <ArrowUpRight size={14} strokeWidth={1.8} />
-      </a>
+      </AppLink>
     );
   }
 

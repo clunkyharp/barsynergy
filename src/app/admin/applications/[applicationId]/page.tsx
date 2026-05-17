@@ -4,6 +4,7 @@ import { ApplicationStatus, ApplicationType, BusinessAccountStatus, UserStatus }
 import {
   createVacancyDraftFromApplication,
   prepareBusinessAccessAction,
+  publishContentFromApplication,
   updateApplicationProcessing
 } from '@/app/admin/applications/actions';
 import { AdminActionAlert, HiddenRedirect } from '@/components/admin/content-admin-controls';
@@ -22,8 +23,12 @@ import {
   formatApplicationPayloadValue,
   getApplicationPayloadFieldLabel
 } from '@/lib/admin/application-utils';
+import { isApplicationPublicationStatusAllowed } from '@/lib/admin/application-publication';
 import type { AdminContentSearchParams } from '@/lib/admin/content-utils';
-import { BUSINESS_ACCESS_PREVIEW_COOKIE_NAME } from '@/lib/auth/business-access';
+import {
+  BUSINESS_ACCESS_PREVIEW_COOKIE_NAME,
+  isBusinessAccessInvitePreparationStatusAllowed
+} from '@/lib/auth/business-access';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
 import { prisma } from '@/lib/db/prisma';
 
@@ -109,6 +114,8 @@ export default async function AdminApplicationDetailPage({ params, searchParams 
     include: {
       city: { select: { name: true } },
       vacancy: { select: { id: true, title: true, slug: true, companyName: true } },
+      supplier: { select: { id: true, title: true, slug: true, companyName: true } },
+      partner: { select: { id: true, title: true, slug: true, companyName: true } },
       resumeFile: { select: { originalName: true, mimeType: true, size: true } },
       forwardedBy: { select: { email: true } },
       businessAccount: {
@@ -139,6 +146,15 @@ export default async function AdminApplicationDetailPage({ params, searchParams 
           .filter(Boolean)
           .join(' / ')
       : null;
+  const isBusinessAccessActive =
+    application.businessAccount?.owner.status === UserStatus.ACTIVE &&
+    application.businessAccount.status === BusinessAccountStatus.ACTIVE;
+  const canPrepareBusinessAccessInvite =
+    application.type === ApplicationType.BUSINESS_ACCOUNT_REQUEST &&
+    !isBusinessAccessActive &&
+    isBusinessAccessInvitePreparationStatusAllowed(application.status);
+  const hasPublicationConsent = Boolean(application.consentAcceptedAt);
+  const canPublishApplicationContent = isApplicationPublicationStatusAllowed(application.status) && hasPublicationConsent;
 
   return (
     <div className="space-y-8">
@@ -223,6 +239,26 @@ export default async function AdminApplicationDetailPage({ params, searchParams 
                   Открыть вакансию
                 </Button>
               </div>
+            ) : application.supplier ? (
+              <div className="mt-4 grid gap-3 text-sm">
+                <p className="font-medium text-[var(--text)]">{application.supplier.title}</p>
+                <p className="text-[var(--muted)]">
+                  {application.supplier.companyName} / {application.supplier.slug}
+                </p>
+                <Button className="w-fit" href={`/admin/suppliers/${application.supplier.id}`} size="sm" variant="secondary">
+                  Открыть поставщика
+                </Button>
+              </div>
+            ) : application.partner ? (
+              <div className="mt-4 grid gap-3 text-sm">
+                <p className="font-medium text-[var(--text)]">{application.partner.title}</p>
+                <p className="text-[var(--muted)]">
+                  {application.partner.companyName} / {application.partner.slug}
+                </p>
+                <Button className="w-fit" href={`/admin/partners/${application.partner.id}`} size="sm" variant="secondary">
+                  Открыть партнёра
+                </Button>
+              </div>
             ) : application.businessAccount ? (
               <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
                 <div>
@@ -243,7 +279,7 @@ export default async function AdminApplicationDetailPage({ params, searchParams 
                 </div>
               </dl>
             ) : (
-              <p className="mt-3 text-sm text-[var(--muted)]">Связанная вакансия, компания или кабинет не найдены.</p>
+              <p className="mt-3 text-sm text-[var(--muted)]">Связанная вакансия, поставщик, партнёр, компания или кабинет не найдены.</p>
             )}
           </Card>
 
@@ -316,11 +352,86 @@ export default async function AdminApplicationDetailPage({ params, searchParams 
                   </Button>
                 </div>
               ) : (
-                <form action={createVacancyDraftFromApplication} className="mt-4 grid gap-4">
+                <div className="mt-4 grid gap-4">
+                  {!canPublishApplicationContent ? (
+                    <p className="text-sm text-[var(--muted)]">
+                      Для быстрой публикации нужен рабочий статус заявки и зафиксированное согласие.
+                    </p>
+                  ) : null}
+                  <form action={publishContentFromApplication} className="grid gap-4">
+                    <HiddenRedirect value={currentPath} />
+                    <input name="applicationId" type="hidden" value={application.id} />
+                    <input name="target" type="hidden" value="vacancy" />
+                    <Button type="submit" disabled={!canPublishApplicationContent}>
+                      Опубликовать вакансию
+                    </Button>
+                  </form>
+                  <form action={createVacancyDraftFromApplication} className="grid gap-4">
+                    <HiddenRedirect value={currentPath} />
+                    <input name="applicationId" type="hidden" value={application.id} />
+                    <Button type="submit" variant="secondary">
+                      Создать черновик вакансии
+                    </Button>
+                  </form>
+                </div>
+              )}
+            </Card>
+          ) : null}
+
+          {application.type === ApplicationType.SUPPLIER_SUBMISSION ? (
+            <Card className="p-5">
+              <h2 className="text-lg font-semibold">Поставщик из заявки</h2>
+              {application.supplierId ? (
+                <div className="mt-4 grid gap-4 text-sm">
+                  <p className="text-[var(--muted)]">
+                    Поставщик уже связан с заявкой: {application.supplier?.title ?? application.supplierId}.
+                  </p>
+                  <Button href="/admin/suppliers" variant="secondary">
+                    Открыть поставщиков
+                  </Button>
+                </div>
+              ) : (
+                <form action={publishContentFromApplication} className="mt-4 grid gap-4">
+                  {!canPublishApplicationContent ? (
+                    <p className="text-sm text-[var(--muted)]">
+                      Для публикации нужен рабочий статус заявки и зафиксированное согласие.
+                    </p>
+                  ) : null}
                   <HiddenRedirect value={currentPath} />
                   <input name="applicationId" type="hidden" value={application.id} />
-                  <Button type="submit" variant="secondary">
-                    Создать вакансию из заявки
+                  <input name="target" type="hidden" value="supplier" />
+                  <Button type="submit" disabled={!canPublishApplicationContent}>
+                    Опубликовать поставщика
+                  </Button>
+                </form>
+              )}
+            </Card>
+          ) : null}
+
+          {application.type === ApplicationType.PARTNER_APPLICATION ? (
+            <Card className="p-5">
+              <h2 className="text-lg font-semibold">Партнёр из заявки</h2>
+              {application.partnerId ? (
+                <div className="mt-4 grid gap-4 text-sm">
+                  <p className="text-[var(--muted)]">
+                    Партнёр уже связан с заявкой: {application.partner?.title ?? application.partnerId}.
+                  </p>
+                  <Button href="/admin/partners" variant="secondary">
+                    Открыть партнёров
+                  </Button>
+                </div>
+              ) : (
+                <form action={publishContentFromApplication} className="mt-4 grid gap-4">
+                  {!canPublishApplicationContent ? (
+                    <p className="text-sm text-[var(--muted)]">
+                      Для публикации нужен рабочий статус заявки и зафиксированное согласие.
+                    </p>
+                  ) : null}
+                  <HiddenRedirect value={currentPath} />
+                  <input name="applicationId" type="hidden" value={application.id} />
+                  <input name="target" type="hidden" value="partner" />
+                  <Button type="submit" disabled={!canPublishApplicationContent}>
+                    Опубликовать партнёра
                   </Button>
                 </form>
               )}
@@ -337,10 +448,11 @@ export default async function AdminApplicationDetailPage({ params, searchParams 
                 {application.businessAccount ? (
                   <p className="text-[var(--muted)]">
                     Связанный кабинет: {application.businessAccount.companyName} / {application.businessAccount.owner.email} /{' '}
-                    {application.businessAccount.owner.status === UserStatus.ACTIVE && application.businessAccount.status === BusinessAccountStatus.ACTIVE
-                      ? 'доступ уже активирован'
-                      : 'доступ ожидает активации'}
+                    {isBusinessAccessActive ? 'доступ уже активирован' : 'доступ ожидает активации'}
                   </p>
+                ) : null}
+                {!isBusinessAccessInvitePreparationStatusAllowed(application.status) ? (
+                  <p className="text-[var(--muted)]">Подготовка ссылки недоступна для текущего статуса заявки.</p>
                 ) : null}
               </div>
 
@@ -350,10 +462,7 @@ export default async function AdminApplicationDetailPage({ params, searchParams 
                 <Button
                   type="submit"
                   variant="secondary"
-                  disabled={
-                    application.businessAccount?.owner.status === UserStatus.ACTIVE &&
-                    application.businessAccount.status === BusinessAccountStatus.ACTIVE
-                  }
+                  disabled={!canPrepareBusinessAccessInvite}
                 >
                   {application.businessAccount ? 'Пересоздать ссылку активации' : 'Подготовить доступ и получить ссылку'}
                 </Button>

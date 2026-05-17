@@ -2,6 +2,7 @@
 
 import { usePathname } from 'next/navigation';
 import type { UserRole } from '@prisma/client';
+import { AppLink } from '@/components/ui/app-link';
 import { NavLink } from '@/components/ui/nav-link';
 import { Panel } from '@/components/ui/panel';
 import { type AdminSection, canAccessAdminSection } from '@/lib/auth/permissions';
@@ -34,9 +35,9 @@ export function AdminSidebar({ role }: AdminSidebarProps) {
 
   return (
     <Panel className="backdrop-blur" padding="md" tone="elevated">
-      <a className="block text-lg font-bold tracking-normal" href="/admin">
+      <AppLink className="block text-lg font-bold tracking-normal" href="/admin">
         Админка BARSYNERGY
-      </a>
+      </AppLink>
       <nav className="mt-5 grid gap-1.5 text-sm">
         {visibleLinks.map((item) => {
           const isActive = item.href === '/admin' ? pathname === item.href : pathname === item.href || pathname?.startsWith(`${item.href}/`);

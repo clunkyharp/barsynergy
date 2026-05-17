@@ -1,4 +1,5 @@
 import type { AnchorHTMLAttributes, ButtonHTMLAttributes, ReactNode } from 'react';
+import { AppLink } from '@/components/ui/app-link';
 import { cn } from '@/lib/utils';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'destructive' | 'inverse';
@@ -29,7 +30,7 @@ type CommonProps = {
 };
 
 export type ButtonProps = CommonProps & ButtonHTMLAttributes<HTMLButtonElement>;
-type LinkProps = CommonProps &
+type ButtonLinkProps = CommonProps &
   AnchorHTMLAttributes<HTMLAnchorElement> & {
     href: string;
     disabled?: boolean;
@@ -44,7 +45,7 @@ function LoadingMark() {
   );
 }
 
-export function Button(props: ButtonProps | LinkProps) {
+export function Button(props: ButtonProps | ButtonLinkProps) {
   const { children, variant = 'primary', size = 'md', className, loading = false, loadingText, ...rest } = props;
   const classes = cn(
     'inline-flex items-center justify-center gap-2.5 whitespace-nowrap rounded-[var(--radius-md)] border text-center font-semibold transition focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--background)] active:translate-y-px disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-55 aria-disabled:pointer-events-none aria-disabled:cursor-not-allowed aria-disabled:opacity-55 aria-busy:cursor-wait',
@@ -66,7 +67,7 @@ export function Button(props: ButtonProps | LinkProps) {
     const isDisabled = disabled || loading;
 
     return (
-      <a
+      <AppLink
         {...linkRest}
         aria-busy={loading || undefined}
         aria-disabled={isDisabled || undefined}
@@ -76,7 +77,7 @@ export function Button(props: ButtonProps | LinkProps) {
         tabIndex={isDisabled ? -1 : linkRest.tabIndex}
       >
         {content}
-      </a>
+      </AppLink>
     );
   }
 

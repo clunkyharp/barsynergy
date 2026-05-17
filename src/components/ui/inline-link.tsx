@@ -1,6 +1,11 @@
 import type { AnchorHTMLAttributes } from 'react';
+import { AppLink } from '@/components/ui/app-link';
 import { cn } from '@/lib/utils';
 
-export function InlineLink({ className, ...props }: AnchorHTMLAttributes<HTMLAnchorElement>) {
-  return <a className={cn('font-semibold text-[var(--accent)] underline-offset-4 hover:underline', className)} {...props} />;
+type InlineLinkProps = Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> & {
+  href: string;
+};
+
+export function InlineLink({ className, ...props }: InlineLinkProps) {
+  return <AppLink className={cn('font-semibold text-[var(--accent)] underline-offset-4 hover:underline', className)} {...props} />;
 }

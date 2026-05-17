@@ -6,6 +6,7 @@ import { EditorialPublicPage } from '@/components/public/editorial-public-page';
 import { FeatureCard } from '@/components/public/public-card-patterns';
 import { PublicFeaturedContent } from '@/components/public/public-featured-content';
 import { FilterChip } from '@/components/public/public-ui-adaptation';
+import { AppLink } from '@/components/ui/app-link';
 import { Button } from '@/components/ui/button';
 import { MetaChip } from '@/components/ui/meta-chip';
 import { Panel } from '@/components/ui/panel';
@@ -179,7 +180,7 @@ function ArticleGridSection({ content, excludedItemId }: { content: PublishedCon
               className="group transition md:overflow-hidden md:rounded-[var(--radius-lg)] md:border md:border-black/10 md:bg-[rgba(255,250,244,0.76)] md:hover:border-[var(--accent)]/26 md:hover:bg-white/72"
               key={item.id}
             >
-              <a className="grid grid-cols-[4.5rem_minmax(0,1fr)] gap-3 py-4 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] md:block md:py-0" href={`/articles/${item.slug}`}>
+              <AppLink className="grid grid-cols-[4.5rem_minmax(0,1fr)] gap-3 py-4 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] md:block md:py-0" href={`/articles/${item.slug}`}>
                 <div
                   aria-hidden="true"
                   className="h-16 rounded-[var(--radius-md)] border border-black/10 bg-[linear-gradient(135deg,var(--surface-muted),white)] bg-cover bg-center grayscale-[0.15] transition-transform duration-700 group-hover:scale-[1.02] md:h-auto md:min-h-[220px] md:rounded-none md:border-x-0 md:border-t-0"
@@ -212,7 +213,7 @@ function ArticleGridSection({ content, excludedItemId }: { content: PublishedCon
                     <ArrowUpRight className="transition group-hover:translate-x-1" size={16} />
                   </span>
                 </div>
-              </a>
+              </AppLink>
             </article>
           ))}
         </div>

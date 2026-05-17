@@ -19,6 +19,7 @@ import {
 } from '@/components/admin/admin-cms-form';
 import { AdminActionAlert, HiddenRedirect } from '@/components/admin/content-admin-controls';
 import { AdminPageIntro } from '@/components/admin/admin-page-intro';
+import { AppLink } from '@/components/ui/app-link';
 import { Button } from '@/components/ui/button';
 import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
@@ -297,7 +298,7 @@ function HomepageOverviewCard({
   title: string;
 }) {
   return (
-    <a
+    <AppLink
       className="group grid gap-4 rounded-[var(--radius-md)] border border-[var(--line)] bg-[var(--surface)] p-4 transition hover:border-[var(--border-strong)] hover:bg-[var(--surface-muted)]"
       href={`${homepageSectionPath(id)}#${id}`}
     >
@@ -307,7 +308,7 @@ function HomepageOverviewCard({
       </div>
       {status ? <ExternalSectionStats {...status} /> : <SectionStats records={records ?? []} />}
       <span className="text-sm font-semibold text-[var(--accent)] transition group-hover:text-[var(--accent-strong)]">Открыть секцию</span>
-    </a>
+    </AppLink>
   );
 }
 

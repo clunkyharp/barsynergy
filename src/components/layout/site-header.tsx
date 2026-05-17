@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { MobileSiteMenu } from '@/components/layout/mobile-site-menu';
 import { ThemeToggle } from '@/components/layout/theme-toggle';
+import { AppLink } from '@/components/ui/app-link';
 import { cn } from '@/lib/utils';
 
 const navItems = [
@@ -57,15 +58,15 @@ export function SiteHeader() {
     <header
       className={cn(
         'border-b border-[var(--line)] bg-[var(--header-bg)] backdrop-blur-[16px]',
-        isFixedMobileHeader ? 'fixed inset-x-0 top-0 z-[60] lg:sticky lg:top-0 lg:z-50' : 'sticky top-0 z-50'
+        isFixedMobileHeader ? 'fixed inset-x-0 top-0 z-[60] xl:sticky xl:top-0 xl:z-50' : 'sticky top-0 z-50'
       )}
     >
       <div className="container">
-        <div className="relative z-10 flex min-h-[76px] items-center justify-between gap-3 px-0 text-[var(--text)] lg:grid lg:grid-cols-[180px_minmax(0,1fr)_180px] lg:items-center lg:gap-2 xl:grid-cols-[190px_minmax(0,1fr)_220px] xl:gap-3 2xl:grid-cols-[220px_minmax(0,1fr)_248px] 2xl:gap-5">
-          <a
+        <div className="relative z-10 flex min-h-[76px] items-center justify-between gap-3 px-0 text-[var(--text)] xl:grid xl:grid-cols-[190px_minmax(0,1fr)_220px] xl:items-center xl:gap-3 2xl:grid-cols-[220px_minmax(0,1fr)_248px] 2xl:gap-5">
+          <AppLink
             aria-label="BARSYNERGY"
             className={cn(
-              'flex min-h-12 shrink-0 items-center rounded-[var(--radius-md)] pr-1 lg:w-full lg:pr-0',
+              'flex min-h-12 shrink-0 items-center rounded-[var(--radius-md)] pr-1 xl:w-full xl:pr-0',
               isMobileMenuOpen && 'sm:pl-3',
               focusClassName
             )}
@@ -74,7 +75,7 @@ export function SiteHeader() {
           >
             <Image
               alt="BARSYNERGY"
-              className="theme-logo-light h-10 w-auto object-contain sm:h-11 lg:h-10 2xl:h-11"
+              className="theme-logo-light h-10 w-auto object-contain sm:h-11 xl:h-10 2xl:h-11"
               height={44}
               priority
               src="/brand/barsynergy-lockup.svg"
@@ -82,19 +83,19 @@ export function SiteHeader() {
             />
             <Image
               alt="BARSYNERGY"
-              className="theme-logo-dark h-10 w-auto object-contain sm:h-11 lg:h-10 2xl:h-11"
+              className="theme-logo-dark h-10 w-auto object-contain sm:h-11 xl:h-10 2xl:h-11"
               height={44}
               priority
               src="/brand/barsynergy-lockup-light.svg"
               width={162}
             />
-          </a>
-          <nav className="hidden min-w-0 items-center justify-center gap-2.5 px-0.5 text-[11px] font-semibold text-[var(--text)] lg:flex lg:justify-self-center xl:gap-3.5 2xl:gap-5 2xl:text-[12px]">
+          </AppLink>
+          <nav className="hidden min-w-0 items-center justify-center gap-3.5 px-0.5 text-[11px] font-semibold text-[var(--text)] xl:flex xl:justify-self-center 2xl:gap-5 2xl:text-[12px]">
             {desktopNavItems.map((item) => {
               const isActive = pathname ? isActiveItem(pathname, item.href) : false;
 
               return (
-                <a
+                <AppLink
                   className={cn(
                     'relative inline-flex min-h-9 items-center whitespace-nowrap rounded-[var(--radius-sm)] px-1.5 opacity-86 transition after:absolute after:inset-x-1.5 after:bottom-1 after:h-px after:origin-left after:scale-x-0 after:bg-[var(--accent)] after:transition-transform hover:text-[var(--text)] hover:opacity-100 hover:after:scale-x-100 2xl:px-2',
                     focusClassName,
@@ -104,13 +105,13 @@ export function SiteHeader() {
                   href={item.href}
                 >
                   {item.label}
-                </a>
+                </AppLink>
               );
             })}
           </nav>
-          <div className="hidden items-center justify-end gap-1.5 lg:flex lg:w-full">
+          <div className="hidden items-center justify-end gap-1.5 xl:flex xl:w-full">
             <ThemeToggle compact />
-            <a
+            <AppLink
               className={cn(
                 'inline-flex min-h-10 w-10 shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-[var(--radius-md)] px-0 text-[12px] font-semibold text-[var(--accent)] transition hover:bg-[var(--accent-soft)] hover:text-[var(--accent-strong)] 2xl:min-h-11 2xl:w-auto 2xl:px-4',
                 focusClassName
@@ -120,8 +121,8 @@ export function SiteHeader() {
             >
               <UserRound size={16} strokeWidth={1.8} />
               <span className="hidden 2xl:inline">Войти</span>
-            </a>
-            <a
+            </AppLink>
+            <AppLink
               className={cn(
                 'inline-flex min-h-10 shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-[var(--radius-md)] border border-[var(--accent)] px-2.5 text-[12px] font-semibold text-[var(--accent)] transition-colors duration-200 hover:bg-[var(--accent)] hover:text-[var(--accent-contrast)] xl:px-3.5 2xl:min-h-11 2xl:gap-3 2xl:px-5',
                 focusClassName
@@ -131,7 +132,7 @@ export function SiteHeader() {
             >
               <span className="hidden xl:inline">Связаться</span>
               <ArrowUpRight size={18} />
-            </a>
+            </AppLink>
           </div>
           <MobileSiteMenu isOpen={isMobileMenuOpen} navItems={navItems} onOpenChange={setIsMobileMenuOpen} />
         </div>

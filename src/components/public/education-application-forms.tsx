@@ -12,8 +12,9 @@ import {
   PublicFormShellHeader,
   type PublicApplicationFormProps
 } from '@/components/public/application-form-section';
-import { ConsentField } from '@/components/ui/consent-field';
+import { AppLink } from '@/components/ui/app-link';
 import { Button } from '@/components/ui/button';
+import { ConsentField } from '@/components/ui/consent-field';
 import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
 import { InlineLink } from '@/components/ui/inline-link';
@@ -71,14 +72,14 @@ export function EducationApplicationForms({ enabled, result, utm, cities, defaul
           </div>
           <div className="mt-5 grid gap-3 md:grid-cols-2">
             {requestOptions.map((option) => (
-              <a
+              <AppLink
                 className="group rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--surface)] p-4 transition hover:border-[var(--accent)]/30 hover:bg-[var(--surface-wash-strong)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)]"
                 href={option.href}
                 key={option.label}
               >
                 <span className="text-sm font-semibold leading-6 text-[var(--text)] group-hover:text-[var(--accent)]">{option.label}</span>
                 <span className="mt-1 block text-sm leading-6 text-[var(--muted)]">{option.description}</span>
-              </a>
+              </AppLink>
             ))}
           </div>
           <div className="mt-5">

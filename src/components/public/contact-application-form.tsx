@@ -13,6 +13,7 @@ import {
 } from '@/components/public/application-form-section';
 import { ContactActionRow } from '@/components/public/contact-action-row';
 import { RequestDisclosure } from '@/components/public/request-disclosure';
+import { AppLink } from '@/components/ui/app-link';
 import { Button } from '@/components/ui/button';
 import { ConsentField } from '@/components/ui/consent-field';
 import { EditorialShell } from '@/components/ui/editorial-shell';
@@ -117,7 +118,7 @@ function ContactTopicGrid({ selectedTopic }: { selectedTopic?: ContactTopicValue
           const isSelected = option.value === selectedTopic;
 
           return (
-            <a
+            <AppLink
               aria-current={isSelected ? 'true' : undefined}
               aria-label={`Открыть форму: ${option.label}`}
               className={cn(
@@ -132,7 +133,7 @@ function ContactTopicGrid({ selectedTopic }: { selectedTopic?: ContactTopicValue
                 <span className="mt-2 block text-sm leading-6 text-[var(--muted)]">{option.description}</span>
               </span>
               <span className="mt-4 text-sm font-semibold leading-5 text-[var(--accent)]">Открыть форму</span>
-            </a>
+            </AppLink>
           );
         })}
       </div>

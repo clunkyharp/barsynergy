@@ -8,7 +8,8 @@ import { getString, nullableString, optionalString } from '@/lib/admin/content-u
 import {
   BUSINESS_ACCESS_ACTIVATION_COOKIE_NAME,
   findActiveBusinessAccessInvite,
-  getBusinessAccessActivationCookieOptions
+  getBusinessAccessActivationCookieOptions,
+  isBusinessAccessInviteActivationEligible
 } from '@/lib/auth/business-access';
 import { hasErrorMessage, resolveServerActionError } from '@/lib/actions/server-action-errors';
 import { arePublicApplicationFormsEnabled } from '@/lib/applications/public-forms';
@@ -362,40 +363,65 @@ export async function activateBusinessAccessAction(formData: FormData) {
       throw new Error('business access invite is blocked');
     }
 
+    if (
+      !isBusinessAccessInviteActivationEligible({
+        applicationStatus: invite.application.status,
+        userStatus: invite.user.status,
+        businessAccountStatus: invite.application.businessAccount.status
+      })
+    ) {
+      throw new Error('business access invite is invalid');
+    }
+
     const businessAccountId = invite.application.businessAccount.id;
+    const now = new Date();
+    const passwordHash = await hashPassword(parsed.password);
     const sessionToken = createSessionToken();
     const sessionExpiresAt = getSessionExpiresAt();
 
     await prisma.$transaction(async (tx) => {
-      await tx.user.update({
-        where: { id: invite.user.id },
+      const userUpdate = await tx.user.updateMany({
+        where: { id: invite.user.id, role: UserRole.BUSINESS, status: UserStatus.PENDING },
         data: {
-          passwordHash: await hashPassword(parsed.password),
-          role: UserRole.BUSINESS,
+          passwordHash,
           status: UserStatus.ACTIVE
         }
       });
 
-      await tx.businessAccount.update({
-        where: { id: businessAccountId },
+      const accountUpdate = await tx.businessAccount.updateMany({
+        where: { id: businessAccountId, status: BusinessAccountStatus.PENDING },
         data: {
           status: BusinessAccountStatus.ACTIVE
         }
       });
 
-      await tx.businessAccessInvite.update({
-        where: { id: invite.id },
+      const inviteUpdate = await tx.businessAccessInvite.updateMany({
+        where: { id: invite.id, usedAt: null, expiresAt: { gt: now } },
         data: {
-          usedAt: new Date()
+          usedAt: now
         }
       });
 
-      await tx.application.update({
-        where: { id: invite.application.id },
+      const applicationUpdate = await tx.application.updateMany({
+        where: {
+          id: invite.application.id,
+          type: ApplicationType.BUSINESS_ACCOUNT_REQUEST,
+          status: ApplicationStatus.APPROVED,
+          businessAccountId
+        },
         data: {
           status: ApplicationStatus.COMPLETED
         }
       });
+
+      if (
+        userUpdate.count !== 1 ||
+        accountUpdate.count !== 1 ||
+        inviteUpdate.count !== 1 ||
+        applicationUpdate.count !== 1
+      ) {
+        throw new Error('business access invite is invalid');
+      }
 
       await tx.session.create({
         data: {
