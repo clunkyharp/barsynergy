@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { ArrowUpRight } from 'lucide-react';
 import { ThemeToggle } from '@/components/layout/theme-toggle';
+import { AppLink } from '@/components/ui/app-link';
 import { displayFont } from '@/lib/fonts';
 import { cn } from '@/lib/utils';
 
@@ -83,7 +84,7 @@ export function MobileSiteMenu({ isOpen, navItems, onOpenChange }: MobileSiteMen
   }, [isRendered, onOpenChange]);
 
   useEffect(() => {
-    const mediaQuery = window.matchMedia('(min-width: 1024px)');
+    const mediaQuery = window.matchMedia('(min-width: 1280px)');
 
     const handleChange = (event: MediaQueryListEvent | MediaQueryList) => {
       if (event.matches) {
@@ -117,7 +118,7 @@ export function MobileSiteMenu({ isOpen, navItems, onOpenChange }: MobileSiteMen
               id={overlayId}
               style={{ background: 'var(--mobile-menu-bg)' }}
               className={cn(
-                'mobile-menu-overlay fixed inset-0 z-[45] overflow-y-auto overscroll-contain text-[var(--text)] transition-opacity duration-[240ms] ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none lg:hidden',
+                'mobile-menu-overlay fixed inset-0 z-[45] overflow-y-auto overscroll-contain text-[var(--text)] transition-opacity duration-[240ms] ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none xl:hidden',
                 isOpen ? 'opacity-100' : 'pointer-events-none opacity-0'
               )}
             >
@@ -135,7 +136,7 @@ export function MobileSiteMenu({ isOpen, navItems, onOpenChange }: MobileSiteMen
                   <ThemeToggle className="w-fit" />
                   <div className="grid gap-2 border-t border-[var(--line)] pt-2">
                     {navItems.map((item) => (
-                      <a
+                      <AppLink
                         className="group/link grid min-h-20 grid-cols-[minmax(0,1fr)_auto] items-center gap-5 rounded-[var(--radius-lg)] border border-transparent px-4 py-3 text-[var(--text)] transition-[background-color,border-color,color] duration-[240ms] ease-[cubic-bezier(0.22,1,0.36,1)] hover:border-[var(--line)] hover:bg-[var(--surface-wash)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] motion-reduce:transition-none sm:min-h-[88px] sm:px-5"
                         href={item.href}
                         key={item.href}
@@ -148,17 +149,17 @@ export function MobileSiteMenu({ isOpen, navItems, onOpenChange }: MobileSiteMen
                           className="text-[var(--accent)] transition duration-[240ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover/link:-translate-y-1 group-hover/link:translate-x-1 motion-reduce:transition-none"
                           size={24}
                         />
-                      </a>
+                      </AppLink>
                     ))}
                   </div>
-                  <a
+                  <AppLink
                     className="mt-4 inline-flex min-h-14 w-fit items-center gap-3 rounded-[var(--radius-md)] border border-[var(--accent)] px-6 text-sm font-semibold text-[var(--accent)] transition-[background-color,color,border-color] duration-[240ms] ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-[var(--accent)] hover:text-[var(--accent-contrast)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] motion-reduce:transition-none"
                     href="/contacts"
                     onClick={() => onOpenChange(false)}
                   >
                     Написать команде
                     <ArrowUpRight size={18} />
-                  </a>
+                  </AppLink>
                 </nav>
               </div>
             </div>,
@@ -184,7 +185,7 @@ function MenuToggle({
       aria-expanded={isOpen}
       aria-label={isOpen ? 'Закрыть меню' : 'Открыть меню'}
       className={cn(
-        'group inline-flex shrink-0 items-center justify-center rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--surface-elevated)] text-[var(--text)] shadow-[0_12px_24px_rgba(20,20,18,0.08)] backdrop-blur-[12px] transition-[background-color,border-color,box-shadow,color] duration-[240ms] ease-[cubic-bezier(0.22,1,0.36,1)] hover:border-[var(--accent)]/30 hover:bg-[var(--surface)] hover:shadow-[0_16px_28px_rgba(20,20,18,0.1)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] motion-reduce:transition-none lg:hidden',
+        'group inline-flex shrink-0 items-center justify-center rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--surface-elevated)] text-[var(--text)] shadow-[0_12px_24px_rgba(20,20,18,0.08)] backdrop-blur-[12px] transition-[background-color,border-color,box-shadow,color] duration-[240ms] ease-[cubic-bezier(0.22,1,0.36,1)] hover:border-[var(--accent)]/30 hover:bg-[var(--surface)] hover:shadow-[0_16px_28px_rgba(20,20,18,0.1)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] motion-reduce:transition-none xl:hidden',
         MENU_TOGGLE_SIZE_CLASS
       )}
       onClick={onClick}

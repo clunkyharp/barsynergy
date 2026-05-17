@@ -1,5 +1,6 @@
-import type { HTMLAttributes, ReactNode } from 'react';
+import type { FormHTMLAttributes, ReactNode } from 'react';
 import { ContentStatus } from '@prisma/client';
+import { AdminFilterForm } from '@/components/admin/admin-filter-form';
 import { CoverImageInput } from '@/components/admin/cover-image-input';
 import { Button } from '@/components/ui/button';
 import { CheckboxField } from '@/components/ui/checkbox-field';
@@ -61,7 +62,7 @@ type AdminListFiltersProps = {
   searchPlaceholder?: string;
 };
 
-type AdminFilterBarProps = HTMLAttributes<HTMLFormElement> & {
+type AdminFilterBarProps = Omit<FormHTMLAttributes<HTMLFormElement>, 'action' | 'method'> & {
   action: string;
   children: ReactNode;
   method?: 'get' | 'post';
@@ -202,16 +203,12 @@ export function AdminFilterBar({
   title = 'Фильтр списка',
   ...props
 }: AdminFilterBarProps) {
-  return (
-    <form
-      action={action}
-      className={cn(
-        'rounded-[var(--radius-md)] border border-[var(--line)] border-l-[3px] border-l-[var(--admin-structure-accent)] bg-[var(--surface)] p-4 shadow-none',
-        className
-      )}
-      method={method}
-      {...props}
-    >
+  const classNames = cn(
+    'rounded-[var(--radius-md)] border border-[var(--line)] border-l-[3px] border-l-[var(--admin-structure-accent)] bg-[var(--surface)] p-4 shadow-none',
+    className
+  );
+  const content = (
+    <>
       <div className="grid gap-1 border-b border-[var(--line)] pb-3">
         <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--admin-label)]">{title}</p>
         <p className="text-xs leading-5 text-[var(--muted)]">{summary}</p>
@@ -219,6 +216,25 @@ export function AdminFilterBar({
       <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-[minmax(220px,1fr)_repeat(4,minmax(150px,220px))] xl:items-end">
         {children}
       </div>
+    </>
+  );
+
+  if (method === 'get') {
+    return (
+      <AdminFilterForm action={action} className={classNames} {...props}>
+        {content}
+      </AdminFilterForm>
+    );
+  }
+
+  return (
+    <form
+      action={action}
+      className={classNames}
+      method={method}
+      {...props}
+    >
+      {content}
     </form>
   );
 }

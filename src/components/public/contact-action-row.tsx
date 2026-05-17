@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import type { CSSProperties } from 'react';
 import { ArrowUpRight, type LucideIcon } from 'lucide-react';
+import { AppLink } from '@/components/ui/app-link';
 import { cn } from '@/lib/utils';
 
 type ContactActionRowProps = {
@@ -161,8 +162,8 @@ export function ContactActionRow({
   }
 
   return (
-    <a className={rowClassName} href={href} rel={isExternal ? 'noreferrer' : undefined} style={style} target={isExternal ? '_blank' : undefined}>
+    <AppLink className={rowClassName} href={href} rel={isExternal ? 'noreferrer' : undefined} style={style} target={isExternal ? '_blank' : undefined}>
       {content}
-    </a>
+    </AppLink>
   );
 }

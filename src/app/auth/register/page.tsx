@@ -2,6 +2,7 @@ import Image from 'next/image';
 import { ArrowLeft } from 'lucide-react';
 import { createBusinessAccountRequestAction } from '@/app/auth/actions';
 import { ActionRow } from '@/components/ui/action-row';
+import { AppLink } from '@/components/ui/app-link';
 import { Button } from '@/components/ui/button';
 import { ConsentField } from '@/components/ui/consent-field';
 import { FormField } from '@/components/ui/form-field';
@@ -53,10 +54,10 @@ export default async function RegisterPage({ searchParams }: RegisterPageProps) 
       <div className="grid gap-6 xl:grid-cols-[0.42fr_0.58fr] xl:items-start">
         <section className="editorial-form-shell p-6 md:p-8">
           <div className="flex flex-wrap items-start justify-between gap-4">
-            <a className="inline-flex w-fit focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]" href="/">
+            <AppLink className="inline-flex w-fit focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]" href="/">
               <Image alt="BARSYNERGY" className="theme-logo-light h-auto w-[220px]" height={70} priority src="/brand/barsynergy-lockup.svg" width={360} />
               <Image alt="BARSYNERGY" className="theme-logo-dark h-auto w-[220px]" height={70} priority src="/brand/barsynergy-lockup-light.svg" width={360} />
-            </a>
+            </AppLink>
             <Button className="rounded-[var(--radius-md)] px-4" href="/" size="sm" variant="ghost">
               <ArrowLeft aria-hidden size={15} strokeWidth={1.8} />
               Вернуться на сайт

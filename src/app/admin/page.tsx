@@ -1,4 +1,5 @@
 import { ApplicationStatus, ApplicationType, BusinessAccountStatus, ContentStatus, UserRole } from '@prisma/client';
+import { AppLink } from '@/components/ui/app-link';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import {
@@ -445,7 +446,7 @@ function PublishingStatusRail({ className, items }: { className?: string; items:
       </div>
       <div className="mt-5 divide-y divide-[var(--line)]">
         {items.map((item) => (
-          <a
+          <AppLink
             className="grid gap-3 py-3 transition hover:text-[var(--accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)]"
             href={item.href}
             key={item.label}
@@ -462,7 +463,7 @@ function PublishingStatusRail({ className, items }: { className?: string; items:
                 variant={contentStatusBadgeVariants[ContentStatus.PUBLISHED]}
               />
             </div>
-          </a>
+          </AppLink>
         ))}
       </div>
     </Card>

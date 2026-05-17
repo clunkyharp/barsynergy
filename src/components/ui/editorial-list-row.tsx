@@ -1,5 +1,6 @@
 import type { HTMLAttributes, ReactNode } from 'react';
 import { ArrowUpRight } from 'lucide-react';
+import { AppLink } from '@/components/ui/app-link';
 import { displayFont } from '@/lib/fonts';
 import { cn } from '@/lib/utils';
 
@@ -135,7 +136,7 @@ export function EditorialListRow({
         )}
         {...props}
       >
-        <a
+        <AppLink
           className={cn(
             'group grid gap-3 rounded-[var(--radius-xl)] py-4 transition-colors duration-300 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] focus-visible:ring-inset md:gap-5 md:py-7',
             variant === 'default' && columns === 'default' && 'md:grid-cols-[0.24fr_0.5fr_0.7fr]',
@@ -147,7 +148,7 @@ export function EditorialListRow({
           href={href}
         >
           {variant === 'opportunity' ? opportunityContent : variant === 'directory' ? directoryContent : defaultContent}
-        </a>
+        </AppLink>
       </article>
     );
   }

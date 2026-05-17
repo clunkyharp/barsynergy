@@ -72,6 +72,8 @@ function applicationActionLabel(application: {
   type: ApplicationType;
   status: ApplicationStatus;
   vacancy: { title: string; slug: string } | null;
+  supplier: { title: string; slug: string } | null;
+  partner: { title: string; slug: string } | null;
   resumeFileId: string | null;
   consentAcceptedAt: Date | null;
 }) {
@@ -96,7 +98,15 @@ function applicationActionLabel(application: {
   }
 
   if (application.type === ApplicationType.VACANCY_SUBMISSION && application.status === ApplicationStatus.APPROVED && !application.vacancy) {
-    return 'Создать черновик вакансии';
+    return 'Опубликовать вакансию';
+  }
+
+  if (application.type === ApplicationType.SUPPLIER_SUBMISSION && application.status === ApplicationStatus.APPROVED && !application.supplier) {
+    return 'Опубликовать поставщика';
+  }
+
+  if (application.type === ApplicationType.PARTNER_APPLICATION && application.status === ApplicationStatus.APPROVED && !application.partner) {
+    return 'Опубликовать партнёра';
   }
 
   if (!application.consentAcceptedAt && application.type !== ApplicationType.CONTACT_MESSAGE) {
@@ -187,6 +197,8 @@ export default async function AdminApplicationsPage({ searchParams }: AdminAppli
         createdAt: true,
         city: { select: { name: true } },
         vacancy: { select: { title: true, slug: true } },
+        supplier: { select: { title: true, slug: true } },
+        partner: { select: { title: true, slug: true } },
         businessAccount: { select: { companyName: true } }
       }
     })
@@ -314,6 +326,18 @@ export default async function AdminApplicationsPage({ searchParams }: AdminAppli
                           <div className="mt-1 text-xs">
                             <DataTableClamp>Вакансия: {application.vacancy.title}</DataTableClamp>
                             <DataTableClamp className="mt-1 text-[var(--muted)]">/{application.vacancy.slug}</DataTableClamp>
+                          </div>
+                        ) : null}
+                        {application.supplier ? (
+                          <div className="mt-1 text-xs">
+                            <DataTableClamp>Поставщик: {application.supplier.title}</DataTableClamp>
+                            <DataTableClamp className="mt-1 text-[var(--muted)]">/{application.supplier.slug}</DataTableClamp>
+                          </div>
+                        ) : null}
+                        {application.partner ? (
+                          <div className="mt-1 text-xs">
+                            <DataTableClamp>Партнёр: {application.partner.title}</DataTableClamp>
+                            <DataTableClamp className="mt-1 text-[var(--muted)]">/{application.partner.slug}</DataTableClamp>
                           </div>
                         ) : null}
                       </DataTableCell>

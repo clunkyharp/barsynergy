@@ -7,6 +7,7 @@ This document freezes the Phase 3 application workflow before schema and form im
 Implementation note:
 
 - The final implementation covers the unified `Application` schema, all planned public form types, public `vacancy_submission` and `vacancy_response` forms on `/vacancies`, admin list/detail review, status changes, internal notes, manual `forwarded_to_employer` metadata, private resume upload plus admin-only download, optional SMTP user confirmations, optional Telegram admin notifications and the shortcut that turns a `vacancy_submission` application into a draft `Vacancy`.
+- Follow-up on 2026-05-17 adds explicit admin publish actions for `vacancy_submission`, `supplier_submission` and `partner_application`; the created `Vacancy`, `Supplier` or `Partner` is linked back to the source `Application`.
 - Production form rendering still stays behind `APPLICATION_FORMS_ENABLED=false` until legal approval is complete.
 
 ## Goal
@@ -224,6 +225,7 @@ The admin applications area needs:
 - internal notes;
 - spam/reject action;
 - create vacancy from `vacancy_submission`;
+- publish vacancy, supplier or partner from a reviewed application when the payload is complete and consent is recorded;
 - forward response to employer for `vacancy_response`;
 - private file access for authorized admins only;
 - table rows that do not expose full personal data.

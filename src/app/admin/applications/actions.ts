@@ -5,6 +5,11 @@ import { revalidatePath } from 'next/cache';
 import { ApplicationStatus, ApplicationType, BusinessAccountStatus, UserRole, UserStatus } from '@prisma/client';
 import { z } from 'zod';
 import {
+  getPartnerPublicationFieldsFromApplication,
+  getSupplierPublicationFieldsFromApplication,
+  getVacancyPublicationFieldsFromApplication
+} from '@/lib/admin/application-publication';
+import {
   canUpdateApplicationBusinessNotes,
   getApplicationStatusUpdate
 } from '@/lib/admin/application-transitions';
@@ -23,7 +28,9 @@ import {
   getBusinessAccessInviteExpiresAt,
   getBusinessAccessPreviewCookieOptions,
   hashBusinessAccessInviteToken,
-  parseBusinessAccessRequestPayload
+  isBusinessAccessInvitePreparationStatusAllowed,
+  parseBusinessAccessRequestPayload,
+  shouldInvalidateBusinessAccessInvitesOnStatusChange
 } from '@/lib/auth/business-access';
 import { hashPassword } from '@/lib/auth/password';
 import {
@@ -66,6 +73,11 @@ const vacancyDraftFormSchema = z.object({
   applicationId: z.string().trim().min(1)
 });
 
+const publicationFormSchema = z.object({
+  applicationId: z.string().trim().min(1),
+  target: z.enum(['vacancy', 'supplier', 'partner'])
+});
+
 const BUSINESS_ACCESS_ADMIN_REQUIRED_ERROR = 'business access requires admin';
 
 const prepareBusinessAccessFormSchema = z.object({
@@ -97,13 +109,30 @@ export async function updateApplicationStatus(formData: FormData) {
       }
     });
 
-    await prisma.application.update({
-      where: { id: parsed.applicationId },
-      data: getApplicationStatusUpdate({
-        application,
-        nextStatus: parsed.status,
-        userId: user.id
-      })
+    await prisma.$transaction(async (tx) => {
+      await tx.application.update({
+        where: { id: parsed.applicationId },
+        data: getApplicationStatusUpdate({
+          application,
+          nextStatus: parsed.status,
+          userId: user.id
+        })
+      });
+
+      if (
+        shouldInvalidateBusinessAccessInvitesOnStatusChange({
+          applicationType: application.type,
+          previousStatus: application.status,
+          nextStatus: parsed.status
+        })
+      ) {
+        await tx.businessAccessInvite.deleteMany({
+          where: {
+            applicationId: parsed.applicationId,
+            usedAt: null
+          }
+        });
+      }
     });
 
     revalidatePath(ADMIN_APPLICATIONS_PATH);
@@ -212,16 +241,33 @@ export async function updateApplicationProcessing(formData: FormData) {
       ? { businessNotes: parsed.businessNotes ?? null }
       : {};
 
-    await prisma.application.update({
-      where: { id: parsed.applicationId },
-      data: {
-        ...getApplicationStatusUpdate({
-          application,
-          nextStatus: parsed.status,
-          userId: user.id
-        }),
-        ...businessNotesUpdate,
-        internalNotes: parsed.internalNotes ?? null
+    await prisma.$transaction(async (tx) => {
+      await tx.application.update({
+        where: { id: parsed.applicationId },
+        data: {
+          ...getApplicationStatusUpdate({
+            application,
+            nextStatus: parsed.status,
+            userId: user.id
+          }),
+          ...businessNotesUpdate,
+          internalNotes: parsed.internalNotes ?? null
+        }
+      });
+
+      if (
+        shouldInvalidateBusinessAccessInvitesOnStatusChange({
+          applicationType: application.type,
+          previousStatus: application.status,
+          nextStatus: parsed.status
+        })
+      ) {
+        await tx.businessAccessInvite.deleteMany({
+          where: {
+            applicationId: parsed.applicationId,
+            usedAt: null
+          }
+        });
       }
     });
 
@@ -316,6 +362,197 @@ export async function createVacancyDraftFromApplication(formData: FormData) {
   redirectWithAdminActionResult(redirectTo, result);
 }
 
+export async function publishContentFromApplication(formData: FormData) {
+  const fallbackPath = applicationDetailPath(getString(formData, 'applicationId'));
+  const redirectTo = safeAdminRedirectPath(formData, fallbackPath);
+  let result: { type: 'success' | 'error'; message: string };
+
+  try {
+    const user = await requireAdminSectionAccess('applications');
+    const parsed = publicationFormSchema.parse({
+      applicationId: getString(formData, 'applicationId'),
+      target: getString(formData, 'target')
+    });
+    const now = new Date();
+
+    const publication = await prisma.$transaction(async (tx) => {
+      const application = await tx.application.findUniqueOrThrow({
+        where: { id: parsed.applicationId },
+        select: {
+          type: true,
+          status: true,
+          vacancyId: true,
+          supplierId: true,
+          partnerId: true,
+          cityId: true,
+          message: true,
+          name: true,
+          email: true,
+          phone: true,
+          telegram: true,
+          consentAcceptedAt: true,
+          payload: true,
+          internalNotes: true
+        }
+      });
+
+      if (parsed.target === 'vacancy') {
+        const fields = getVacancyPublicationFieldsFromApplication(application);
+        const slug = slugify(`${fields.position}-${fields.companyName}`);
+
+        if (!slug) {
+          throw new Error('vacancy publication requires slug');
+        }
+
+        const vacancy = await persistWithUniqueSlugRetry({
+          baseSlug: slug,
+          exists: async (candidate) =>
+            Boolean(
+              await tx.vacancy.findFirst({
+                where: { slug: candidate },
+                select: { id: true }
+              })
+            ),
+          persist: (uniqueSlug) =>
+            tx.vacancy.create({
+              data: {
+                ...fields,
+                slug: uniqueSlug,
+                publishedAt: now,
+                archivedAt: null,
+                createdById: user.id,
+                updatedById: user.id
+              },
+              select: { id: true, title: true, slug: true }
+            })
+        });
+
+        await tx.application.update({
+          where: { id: parsed.applicationId },
+          data: {
+            vacancyId: vacancy.id,
+            status: ApplicationStatus.APPROVED,
+            internalNotes: appendApplicationInternalNote(
+              application.internalNotes,
+              `Опубликована вакансия: ${vacancy.title} (${vacancy.slug}).`
+            )
+          }
+        });
+
+        return { target: parsed.target, title: vacancy.title };
+      }
+
+      if (parsed.target === 'supplier') {
+        const fields = getSupplierPublicationFieldsFromApplication(application);
+        const slug = slugify(fields.title);
+
+        if (!slug) {
+          throw new Error('supplier publication requires slug');
+        }
+
+        const supplier = await persistWithUniqueSlugRetry({
+          baseSlug: slug,
+          exists: async (candidate) =>
+            Boolean(
+              await tx.supplier.findFirst({
+                where: { slug: candidate },
+                select: { id: true }
+              })
+            ),
+          persist: (uniqueSlug) =>
+            tx.supplier.create({
+              data: {
+                ...fields,
+                slug: uniqueSlug,
+                publishedAt: now,
+                archivedAt: null,
+                createdById: user.id,
+                updatedById: user.id
+              },
+              select: { id: true, title: true, slug: true }
+            })
+        });
+
+        await tx.application.update({
+          where: { id: parsed.applicationId },
+          data: {
+            supplierId: supplier.id,
+            status: ApplicationStatus.APPROVED,
+            internalNotes: appendApplicationInternalNote(
+              application.internalNotes,
+              `Опубликован поставщик: ${supplier.title} (${supplier.slug}).`
+            )
+          }
+        });
+
+        return { target: parsed.target, title: supplier.title };
+      }
+
+      const fields = getPartnerPublicationFieldsFromApplication(application);
+      const slug = slugify(fields.title);
+
+      if (!slug) {
+        throw new Error('partner publication requires slug');
+      }
+
+      const partner = await persistWithUniqueSlugRetry({
+        baseSlug: slug,
+        exists: async (candidate) =>
+          Boolean(
+            await tx.partner.findFirst({
+              where: { slug: candidate },
+              select: { id: true }
+            })
+          ),
+        persist: (uniqueSlug) =>
+          tx.partner.create({
+            data: {
+              ...fields,
+              slug: uniqueSlug,
+              publishedAt: now,
+              archivedAt: null,
+              createdById: user.id,
+              updatedById: user.id
+            },
+            select: { id: true, title: true, slug: true }
+          })
+      });
+
+      await tx.application.update({
+        where: { id: parsed.applicationId },
+        data: {
+          partnerId: partner.id,
+          status: ApplicationStatus.APPROVED,
+          internalNotes: appendApplicationInternalNote(
+            application.internalNotes,
+            `Опубликован партнёр: ${partner.title} (${partner.slug}).`
+          )
+        }
+      });
+
+      return { target: parsed.target, title: partner.title };
+    });
+
+    revalidatePath(ADMIN_APPLICATIONS_PATH);
+    revalidatePath(applicationDetailPath(parsed.applicationId));
+    revalidatePath(`/admin/${publication.target === 'vacancy' ? 'vacancies' : `${publication.target}s`}`);
+    revalidatePath(publication.target === 'vacancy' ? '/vacancies' : `/${publication.target}s`);
+    revalidatePath('/');
+
+    const message =
+      publication.target === 'vacancy'
+        ? `Вакансия опубликована: ${publication.title}.`
+        : publication.target === 'supplier'
+          ? `Поставщик опубликован: ${publication.title}.`
+          : `Партнёр опубликован: ${publication.title}.`;
+    result = { type: 'success', message };
+  } catch (error) {
+    result = { type: 'error', message: formatApplicationActionError(error) };
+  }
+
+  redirectWithAdminActionResult(redirectTo, result);
+}
+
 export async function prepareBusinessAccessAction(formData: FormData) {
   const fallbackPath = applicationDetailPath(getString(formData, 'applicationId'));
   const redirectTo = safeAdminRedirectPath(formData, fallbackPath);
@@ -376,6 +613,10 @@ export async function prepareBusinessAccessAction(formData: FormData) {
         throw new Error('business access request is invalid');
       }
 
+      if (!isBusinessAccessInvitePreparationStatusAllowed(application.status)) {
+        throw new Error('business access request is not eligible for activation');
+      }
+
       if (!application.email) {
         throw new Error('business access email is missing');
       }
@@ -416,6 +657,10 @@ export async function prepareBusinessAccessAction(formData: FormData) {
         existingUser?.businessAccount?.status === BusinessAccountStatus.BLOCKED
       ) {
         throw new Error('business access is blocked');
+      }
+
+      if (existingUser?.businessAccount?.status === BusinessAccountStatus.ARCHIVED) {
+        throw new Error('business access is archived');
       }
 
       const user =

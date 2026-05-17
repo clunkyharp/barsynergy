@@ -298,7 +298,8 @@ export async function deleteCourseDraft(formData: FormData) {
 
       const deletion = await tx.course.deleteMany({
         where: {
-          id: parsed.courseId
+          id: parsed.courseId,
+          status: ContentStatus.DRAFT
         }
       });
 

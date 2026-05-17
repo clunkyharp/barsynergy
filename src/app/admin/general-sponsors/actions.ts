@@ -388,7 +388,8 @@ export async function deleteGeneralSponsorDraft(formData: FormData) {
 
       const deletion = await tx.generalSponsor.deleteMany({
         where: {
-          id: parsed.sponsorId
+          id: parsed.sponsorId,
+          status: ContentStatus.DRAFT
         }
       });
 

@@ -304,7 +304,8 @@ export async function deleteVacancyDraft(formData: FormData) {
 
       const deletion = await tx.vacancy.deleteMany({
         where: {
-          id: parsed.vacancyId
+          id: parsed.vacancyId,
+          status: ContentStatus.DRAFT
         }
       });
 

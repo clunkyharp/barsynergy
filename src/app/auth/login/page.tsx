@@ -2,6 +2,7 @@ import Image from 'next/image';
 import { ArrowLeft, Headphones, Lock } from 'lucide-react';
 import { loginAction } from '@/app/auth/actions';
 import { FeatureCard } from '@/components/public/public-card-patterns';
+import { AppLink } from '@/components/ui/app-link';
 import { Button } from '@/components/ui/button';
 import { InlineAlert } from '@/components/ui/inline-alert';
 import { FormField } from '@/components/ui/form-field';
@@ -60,18 +61,18 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   return (
     <div className="container max-w-[1220px] py-10 md:py-14 xl:py-20">
       <header className="mb-8 flex flex-wrap items-center gap-x-4 gap-y-3 md:mb-10">
-        <a className="inline-flex shrink-0 w-fit focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]" href="/">
+        <AppLink className="inline-flex shrink-0 w-fit focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]" href="/">
           <Image alt="BARSYNERGY" className="theme-logo-light h-auto w-[220px] md:w-[250px]" height={70} priority src="/brand/barsynergy-lockup.svg" width={360} />
           <Image alt="BARSYNERGY" className="theme-logo-dark h-auto w-[220px] md:w-[250px]" height={70} priority src="/brand/barsynergy-lockup-light.svg" width={360} />
-        </a>
+        </AppLink>
         <span aria-hidden="true" className="hidden h-9 w-px bg-[var(--line)] sm:block" />
-        <a
+        <AppLink
           className="inline-flex min-h-11 items-center gap-2 rounded-[var(--radius-md)] px-3 text-sm font-semibold leading-5 text-[var(--muted)] transition-colors hover:bg-[var(--surface-wash)] hover:text-[var(--accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
           href="/"
         >
           <ArrowLeft aria-hidden size={15} strokeWidth={1.8} />
           Вернуться на сайт
-        </a>
+        </AppLink>
       </header>
       <div className="grid gap-8 xl:grid-cols-[minmax(0,0.82fr)_minmax(380px,0.72fr)] xl:items-center">
         <aside className="min-w-0">

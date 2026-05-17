@@ -240,6 +240,26 @@ export function formatApplicationActionError(error: unknown) {
         message: 'Черновик вакансии можно создать только из заявки на размещение вакансии с полными данными и согласием.'
       },
       {
+        matches: (candidate) => hasErrorMessage(candidate, 'publication already exists'),
+        message: 'Публичная запись уже связана с этой заявкой.'
+      },
+      {
+        matches: (candidate) => hasErrorMessage(candidate, 'publication requires review status'),
+        message: 'Опубликовать можно только новую, проверяемую, согласованную или одобренную заявку.'
+      },
+      {
+        matches: (candidate) => hasErrorMessage(candidate, 'publication requires consent'),
+        message: 'Для публикации нужна заявка с зафиксированным согласием.'
+      },
+      {
+        matches: (candidate) => hasErrorMessage(candidate, 'publication requires'),
+        message: 'Для публикации не хватает данных в заявке.'
+      },
+      {
+        matches: (candidate) => hasErrorMessage(candidate, 'External URL must use http or https'),
+        message: 'В заявке указан некорректный сайт. Исправьте адрес перед публикацией.'
+      },
+      {
         matches: (candidate) => hasErrorMessage(candidate, 'business access request is invalid'),
         message: 'Ссылка доступа доступна только для заявок на бизнес-подключение.'
       },
@@ -258,6 +278,10 @@ export function formatApplicationActionError(error: unknown) {
       {
         matches: (candidate) => hasErrorMessage(candidate, 'business access is blocked'),
         message: 'Для этого доступа установлен блок. Снимите блокировку перед новой активацией.'
+      },
+      {
+        matches: (candidate) => hasErrorMessage(candidate, 'business access is archived'),
+        message: 'Связанный бизнес-доступ в архиве. Проверьте заявку вручную перед новой активацией.'
       }
     ],
     fallbackMessage: 'Не удалось сохранить заявку. Проверьте данные и повторите попытку.'

@@ -17,6 +17,7 @@ import {
   type MouseEvent as ReactMouseEvent
 } from 'react';
 import { createPortal } from 'react-dom';
+import { AppLink } from '@/components/ui/app-link';
 import { getOverlayPosition } from '@/lib/ui/overlay-position';
 import { cn } from '@/lib/utils';
 
@@ -257,8 +258,12 @@ export function AdminActionMenuContent({ className, children, style, ...props }:
 const actionMenuItemClassName =
   'flex min-h-9 w-full items-center rounded-[var(--radius-sm)] px-3 text-left text-sm font-semibold text-[var(--text)] transition hover:bg-[var(--admin-action-bg-hover)] hover:text-[var(--admin-action-text-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] disabled:pointer-events-none disabled:opacity-50';
 
-export function AdminActionMenuLink({ className, ...props }: AnchorHTMLAttributes<HTMLAnchorElement>) {
-  return <a className={cn(actionMenuItemClassName, className)} role="menuitem" {...props} />;
+type AdminActionMenuLinkProps = AnchorHTMLAttributes<HTMLAnchorElement> & {
+  href: string;
+};
+
+export function AdminActionMenuLink({ className, ...props }: AdminActionMenuLinkProps) {
+  return <AppLink className={cn(actionMenuItemClassName, className)} role="menuitem" {...props} />;
 }
 
 type AdminActionMenuButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {

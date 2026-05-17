@@ -1,3 +1,4 @@
+import { AppLink } from '@/components/ui/app-link';
 import { displayFont } from '@/lib/fonts';
 
 export default function NotFound() {
@@ -12,18 +13,18 @@ export default function NotFound() {
           Проверьте адрес или перейдите в один из основных разделов сайта.
         </p>
         <div className="mt-8 flex flex-wrap gap-4">
-          <a
+          <AppLink
             className="inline-flex min-h-12 items-center justify-center border border-[var(--graphite)] bg-[var(--graphite)] px-5 text-sm font-semibold uppercase tracking-[0.06em] text-white transition hover:bg-black"
             href="/"
           >
             На главную
-          </a>
-          <a
+          </AppLink>
+          <AppLink
             className="inline-flex min-h-12 items-center justify-center border border-black/25 px-5 text-sm font-semibold uppercase tracking-[0.06em] transition hover:border-[var(--accent)] hover:text-[var(--accent)]"
             href="/contacts"
           >
             Контакты
-          </a>
+          </AppLink>
         </div>
       </section>
     </main>

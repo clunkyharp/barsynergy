@@ -589,6 +589,8 @@ export function HomepageClient({ data }: HomepageClientProps) {
 
       {data.socialBlocks.length > 0 ? <CommunityChannelRows channels={data.socialBlocks} /> : null}
 
+      <BusinessDigitalSolutionsSection />
+
       {data.ctaBlock ? (
         <section className="background-zone background-zone-cta border-b border-[var(--line)] py-10 md:py-14" id="home-about">
           <div className="home-about-panel container rounded-[var(--radius-xl)] border border-[var(--editorial-dark-border)] bg-[var(--editorial-dark-surface)] p-6 shadow-[0_24px_72px_rgba(0,0,0,0.22)] md:grid md:grid-cols-[minmax(0,1fr)_minmax(15rem,0.36fr)] md:items-center md:gap-7 md:p-8">

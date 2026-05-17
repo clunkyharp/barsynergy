@@ -2,6 +2,11 @@ import { z } from 'zod';
 import { prisma } from '@/lib/db/prisma';
 import { getEnv } from '@/lib/validation/env';
 import { createSessionToken, getSessionCookieOptions, hashSessionToken } from '@/lib/auth/session';
+export {
+  isBusinessAccessInviteActivationEligible,
+  isBusinessAccessInvitePreparationStatusAllowed,
+  shouldInvalidateBusinessAccessInvitesOnStatusChange
+} from '@/lib/auth/business-access-lifecycle';
 
 export const BUSINESS_ACCESS_PREVIEW_COOKIE_NAME = 'barsynergy_business_access_preview';
 export const BUSINESS_ACCESS_ACTIVATION_COOKIE_NAME = 'barsynergy_business_access_activation';

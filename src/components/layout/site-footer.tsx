@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
+import { AppLink } from '@/components/ui/app-link';
 
 export function SiteFooter() {
   const pathname = usePathname();
@@ -20,10 +21,10 @@ export function SiteFooter() {
       <section className="border-t border-[var(--line)] bg-[var(--footer-bg)] py-9 text-[var(--text)]">
         <div className="container grid gap-8 md:grid-cols-[1fr_auto_auto_auto]">
           <div>
-            <a className="inline-flex w-fit items-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]" href="/">
+            <AppLink className="inline-flex w-fit items-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]" href="/">
               <Image alt="BARSYNERGY" className="theme-logo-light h-auto w-[168px]" height={54} src="/brand/barsynergy-lockup.svg" width={252} />
               <Image alt="BARSYNERGY" className="theme-logo-dark h-auto w-[168px]" height={54} src="/brand/barsynergy-lockup-light.svg" width={252} />
-            </a>
+            </AppLink>
             <p className="mt-4 max-w-md text-sm leading-7 text-[var(--muted)]">
               Обучение, события, материалы и полезные контакты для барной индустрии СКФО.
             </p>
@@ -31,54 +32,54 @@ export function SiteFooter() {
           </div>
           <nav className="grid gap-0.5 text-sm leading-6 text-[var(--muted)] md:justify-items-start">
             <p className="mb-2 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--text)]">Платформа</p>
-            <a className={footerLinkClassName} href={aboutHref}>
+            <AppLink className={footerLinkClassName} href={aboutHref}>
               О нас
-            </a>
-            <a className={footerLinkClassName} href="/education">
+            </AppLink>
+            <AppLink className={footerLinkClassName} href="/education">
               Образование
-            </a>
-            <a className={footerLinkClassName} href="/events">
+            </AppLink>
+            <AppLink className={footerLinkClassName} href="/events">
               События
-            </a>
-            <a className={footerLinkClassName} href="/vacancies">
+            </AppLink>
+            <AppLink className={footerLinkClassName} href="/vacancies">
               Вакансии
-            </a>
-            <a className={footerLinkClassName} href="/business">
+            </AppLink>
+            <AppLink className={footerLinkClassName} href="/business">
               Для бизнеса
-            </a>
-            <a className={footerLinkClassName} href="/consulting">
+            </AppLink>
+            <AppLink className={footerLinkClassName} href="/consulting">
               Консалтинг
-            </a>
+            </AppLink>
           </nav>
           <nav className="grid gap-0.5 text-sm leading-6 text-[var(--muted)] md:justify-items-start">
             <p className="mb-2 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--text)]">Сообщество</p>
-            <a className={footerLinkClassName} href="/partners">
+            <AppLink className={footerLinkClassName} href="/partners">
               Для партнёров
-            </a>
-            <a className={footerLinkClassName} href="/suppliers">
+            </AppLink>
+            <AppLink className={footerLinkClassName} href="/suppliers">
               Поставщики
-            </a>
-            <a className={footerLinkClassName} href="/general-sponsors">
+            </AppLink>
+            <AppLink className={footerLinkClassName} href="/general-sponsors">
               Спонсорство
-            </a>
-            <a className={footerLinkClassName} href="/contacts">
+            </AppLink>
+            <AppLink className={footerLinkClassName} href="/contacts">
               Контакты
-            </a>
+            </AppLink>
           </nav>
           <nav className="grid gap-0.5 text-sm leading-6 text-[var(--muted)] md:justify-items-start">
             <p className="mb-2 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--text)]">Документы</p>
-            <a className={footerLinkClassName} href="/legal/privacy">
+            <AppLink className={footerLinkClassName} href="/legal/privacy">
               Политика конфиденциальности
-            </a>
-            <a className={footerLinkClassName} href="/legal/personal-data-consent">
+            </AppLink>
+            <AppLink className={footerLinkClassName} href="/legal/personal-data-consent">
               Согласие на обработку ПДн
-            </a>
-            <a className={footerLinkClassName} href="/legal/terms">
+            </AppLink>
+            <AppLink className={footerLinkClassName} href="/legal/terms">
               Условия использования
-            </a>
-            <a className={footerLinkClassName} href="/legal/cookies">
+            </AppLink>
+            <AppLink className={footerLinkClassName} href="/legal/cookies">
               Куки и аналитика
-            </a>
+            </AppLink>
           </nav>
         </div>
       </section>

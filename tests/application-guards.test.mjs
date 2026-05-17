@@ -10,6 +10,12 @@ const {
 const { appendApplicationInternalNote, getVacancyDraftFieldsFromApplication } = await import(
   '../src/lib/admin/vacancy-application-drafts.ts'
 );
+const {
+  getPartnerPublicationFieldsFromApplication,
+  getSupplierPublicationFieldsFromApplication,
+  getVacancyPublicationFieldsFromApplication,
+  isApplicationPublicationStatusAllowed
+} = await import('../src/lib/admin/application-publication.ts');
 const { arePublicApplicationFormsEnabled } = await import('../src/lib/applications/public-forms.ts');
 const { getApplicationThrottleKeyHash, getClientIpFromHeaders, hasHoneypotValue } = await import(
   '../src/lib/applications/submission-guard-utils.ts'
@@ -259,5 +265,139 @@ test('vacancy submission applications can produce safe vacancy draft fields', ()
         payload: {}
       }),
     /vacancy draft requires vacancy submission application/
+  );
+});
+
+test('supplier and partner applications can produce published content fields', () => {
+  const consentAcceptedAt = new Date('2026-05-17T10:00:00.000Z');
+  const supplier = getSupplierPublicationFieldsFromApplication({
+    type: ApplicationType.SUPPLIER_SUBMISSION,
+    status: ApplicationStatus.APPROVED,
+    vacancyId: null,
+    supplierId: null,
+    partnerId: null,
+    cityId: 'city-1',
+    message: 'Поставляем оборудование, расходники и сервис для заведений.',
+    name: 'Supplier Contact',
+    email: 'supplier@example.test',
+    phone: '+79990000000',
+    telegram: '@supplier',
+    consentAcceptedAt,
+    payload: {
+      companyName: 'Test Supplier',
+      websiteUrl: 'https://supplier.example.test',
+      serviceArea: 'Оборудование и расходники'
+    }
+  });
+
+  assert.equal(supplier.status, 'PUBLISHED');
+  assert.equal(supplier.title, 'Test Supplier');
+  assert.equal(supplier.companyName, 'Test Supplier');
+  assert.equal(supplier.cityId, 'city-1');
+  assert.equal(supplier.websiteUrl, 'https://supplier.example.test/');
+  assert.equal(supplier.contactLabel, null);
+  assert.equal(supplier.isVerified, false);
+
+  const partner = getPartnerPublicationFieldsFromApplication({
+    type: ApplicationType.PARTNER_APPLICATION,
+    status: ApplicationStatus.IN_REVIEW,
+    vacancyId: null,
+    supplierId: null,
+    partnerId: null,
+    cityId: null,
+    message: 'Готовы поддержать отраслевые события и образовательные программы.',
+    name: 'Partner Contact',
+    email: 'partner@example.test',
+    phone: null,
+    telegram: null,
+    consentAcceptedAt,
+    payload: {
+      companyName: 'Test Partner',
+      partnerType: 'Бренд',
+      websiteUrl: 'https://partner.example.test'
+    }
+  });
+
+  assert.equal(partner.status, 'PUBLISHED');
+  assert.equal(partner.title, 'Test Partner');
+  assert.equal(partner.companyName, 'Test Partner');
+  assert.equal(partner.websiteUrl, 'https://partner.example.test/');
+  assert.equal(partner.partnerType, 'Бренд');
+  assert.equal(partner.isFeatured, false);
+});
+
+test('application publication requires submitted review status, consent and no linked record', () => {
+  assert.equal(isApplicationPublicationStatusAllowed(ApplicationStatus.NEW), true);
+  assert.equal(isApplicationPublicationStatusAllowed(ApplicationStatus.APPROVED), true);
+  assert.equal(isApplicationPublicationStatusAllowed(ApplicationStatus.DRAFT), false);
+  assert.equal(isApplicationPublicationStatusAllowed(ApplicationStatus.REJECTED), false);
+
+  assert.throws(
+    () =>
+      getSupplierPublicationFieldsFromApplication({
+        type: ApplicationType.SUPPLIER_SUBMISSION,
+        status: ApplicationStatus.DRAFT,
+        vacancyId: null,
+        supplierId: null,
+        partnerId: null,
+        cityId: null,
+        message: 'Поставляем оборудование для заведений.',
+        name: null,
+        email: null,
+        phone: null,
+        telegram: null,
+        consentAcceptedAt: new Date('2026-05-17T10:00:00.000Z'),
+        payload: {
+          companyName: 'Draft Supplier',
+          serviceArea: 'Оборудование'
+        }
+      }),
+    /application publication requires review status/
+  );
+
+  assert.throws(
+    () =>
+      getPartnerPublicationFieldsFromApplication({
+        type: ApplicationType.PARTNER_APPLICATION,
+        status: ApplicationStatus.APPROVED,
+        vacancyId: null,
+        supplierId: null,
+        partnerId: 'partner-1',
+        cityId: null,
+        message: 'Партнёрская заявка.',
+        name: null,
+        email: null,
+        phone: null,
+        telegram: null,
+        consentAcceptedAt: new Date('2026-05-17T10:00:00.000Z'),
+        payload: {
+          companyName: 'Existing Partner',
+          partnerType: 'Бренд'
+        }
+      }),
+    /partner publication already exists for application/
+  );
+
+  assert.equal(
+    getVacancyPublicationFieldsFromApplication({
+      type: ApplicationType.VACANCY_SUBMISSION,
+      status: ApplicationStatus.CONTACTED,
+      vacancyId: null,
+      supplierId: null,
+      partnerId: null,
+      cityId: 'city-1',
+      message: 'Full vacancy description for publication.',
+      name: 'Employer Contact',
+      email: 'hr@example.test',
+      phone: null,
+      telegram: null,
+      consentAcceptedAt: new Date('2026-05-17T10:00:00.000Z'),
+      payload: {
+        companyName: 'Test Bar',
+        position: 'Бариста',
+        shortDescription: 'Short public vacancy summary.'
+      }
+    }).status,
+    'PUBLISHED'
   );
 });

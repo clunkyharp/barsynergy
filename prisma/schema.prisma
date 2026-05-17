@@ -455,6 +455,7 @@ model Supplier {
   category   Category?     @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   createdBy  User?         @relation("SupplierCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
   updatedBy  User?         @relation("SupplierUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
+  applications Application[]
 
   @@index([status, publishedAt])
   @@index([cityId, status])
@@ -489,6 +490,7 @@ model Partner {
   category   Category?     @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   createdBy  User?         @relation("PartnerCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
   updatedBy  User?         @relation("PartnerUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
+  applications Application[]
 
   @@index([status, publishedAt])
   @@index([categoryId, status])
@@ -659,6 +661,8 @@ model Application {
   cityId            String?
   vacancyId         String?
   businessAccountId String?
+  supplierId        String?
+  partnerId         String?
   resumeFileId      String?
   payload           Json?
   consentAcceptedAt DateTime?
@@ -676,6 +680,8 @@ model Application {
   city            City?            @relation(fields: [cityId], references: [id], onDelete: SetNull)
   vacancy         Vacancy?         @relation(fields: [vacancyId], references: [id], onDelete: SetNull)
   businessAccount BusinessAccount? @relation(fields: [businessAccountId], references: [id], onDelete: SetNull)
+  supplier        Supplier?        @relation(fields: [supplierId], references: [id], onDelete: SetNull)
+  partner         Partner?         @relation(fields: [partnerId], references: [id], onDelete: SetNull)
   resumeFile      UploadedFile?    @relation("ApplicationResumeFile", fields: [resumeFileId], references: [id], onDelete: SetNull)
   forwardedBy     User?            @relation("ApplicationForwardedBy", fields: [forwardedById], references: [id], onDelete: SetNull)
   businessAccessInvites BusinessAccessInvite[]
@@ -685,6 +691,8 @@ model Application {
   @@index([cityId, status])
   @@index([vacancyId, status])
   @@index([businessAccountId, status])
+  @@index([supplierId, status])
+  @@index([partnerId, status])
   @@index([email])
   @@index([phone])
   @@index([createdAt])
