@@ -13,13 +13,14 @@ import {
   AdminActionMenuTrigger,
   AdminRowActions
 } from '@/components/ui/admin-table';
+import { ConfirmSubmitButton } from '@/components/ui/confirm-submit-button';
 import { Input } from '@/components/ui/input';
 import { InlineAlert } from '@/components/ui/inline-alert';
 import { FieldHint, FieldLabel, FormField } from '@/components/ui/form-field';
 import { SearchInput } from '@/components/ui/search-input';
 import { Select } from '@/components/ui/select';
 import type { AdminContentSearchParams } from '@/lib/admin/content-utils';
-import { contentStatusLabels, firstParam } from '@/lib/admin/content-utils';
+import { PUBLICATION_STATUS_HINT, contentStatusLabels, firstParam } from '@/lib/admin/content-utils';
 import { cn } from '@/lib/utils';
 
 type AdminActionAlertProps = {
@@ -74,6 +75,15 @@ type AdminContentRowActionsProps = {
   currentPath: string;
   deleteAction: (formData: FormData) => Promise<void>;
   editHref: string;
+  idName: string;
+  idValue: string;
+  publicHref?: string;
+  status: ContentStatus;
+  updateStatusAction: (formData: FormData) => Promise<void>;
+};
+
+type AdminContentVisibilityPanelProps = {
+  currentPath: string;
   idName: string;
   idValue: string;
   publicHref?: string;
@@ -282,6 +292,109 @@ export function AdminListFilters({ basePath, params, filters = [], searchPlaceho
   );
 }
 
+function AdminContentStatusForm({
+  children,
+  className,
+  currentPath,
+  idName,
+  idValue,
+  status,
+  updateStatusAction
+}: {
+  children: ReactNode;
+  className?: string;
+  currentPath: string;
+  idName: string;
+  idValue: string;
+  status: ContentStatus;
+  updateStatusAction: (formData: FormData) => Promise<void>;
+}) {
+  return (
+    <form action={updateStatusAction} className={className}>
+      <HiddenRedirect value={currentPath} />
+      <input name={idName} type="hidden" value={idValue} />
+      <input name="status" type="hidden" value={status} />
+      {children}
+    </form>
+  );
+}
+
+export function AdminContentVisibilityPanel({
+  currentPath,
+  idName,
+  idValue,
+  publicHref,
+  status,
+  updateStatusAction
+}: AdminContentVisibilityPanelProps) {
+  const isPublished = status === ContentStatus.PUBLISHED;
+  const isArchived = status === ContentStatus.ARCHIVED;
+
+  return (
+    <section className="rounded-[var(--radius-md)] border border-[var(--line)] border-l-[3px] border-l-[var(--admin-structure-accent)] bg-[var(--surface)] p-4">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <div>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--admin-label)]">Видимость на сайте</p>
+          <p className="mt-1 text-sm leading-6 text-[var(--muted)]">{PUBLICATION_STATUS_HINT}</p>
+        </div>
+        <AdminActionRow className="justify-start lg:justify-end">
+          {publicHref && isPublished ? (
+            <Button href={publicHref} size="sm" target="_blank" rel="noreferrer" variant="secondary">
+              Публичная страница
+            </Button>
+          ) : null}
+          {isPublished ? (
+            <AdminContentStatusForm
+              currentPath={currentPath}
+              idName={idName}
+              idValue={idValue}
+              status={ContentStatus.ARCHIVED}
+              updateStatusAction={updateStatusAction}
+            >
+              <ConfirmSubmitButton
+                className="min-h-9 px-3 py-1.5 text-xs"
+                confirmActionLabel="Снять с сайта"
+                confirmText="Запись останется в админке и пропадёт с публичной страницы."
+                confirmTitle="Снять запись с сайта?"
+                size="sm"
+                type="submit"
+                variant="secondary"
+              >
+                Снять с сайта
+              </ConfirmSubmitButton>
+            </AdminContentStatusForm>
+          ) : (
+            <AdminContentStatusForm
+              currentPath={currentPath}
+              idName={idName}
+              idValue={idValue}
+              status={ContentStatus.PUBLISHED}
+              updateStatusAction={updateStatusAction}
+            >
+              <Button className="min-h-9 px-3 py-1.5 text-xs" size="sm" type="submit">
+                Опубликовать
+              </Button>
+            </AdminContentStatusForm>
+          )}
+          {isArchived ? (
+            <AdminContentStatusForm
+              currentPath={currentPath}
+              idName={idName}
+              idValue={idValue}
+              status={ContentStatus.DRAFT}
+              updateStatusAction={updateStatusAction}
+            >
+              <Button className="min-h-9 px-3 py-1.5 text-xs" size="sm" type="submit" variant="ghost">
+                Вернуть в черновик
+              </Button>
+            </AdminContentStatusForm>
+          ) : null}
+        </AdminActionRow>
+      </div>
+    </section>
+  );
+}
+
 export function AdminContentRowActions({
   currentPath,
   deleteAction,
@@ -294,12 +407,44 @@ export function AdminContentRowActions({
 }: AdminContentRowActionsProps) {
   const isPublished = status === ContentStatus.PUBLISHED;
   const isArchived = status === ContentStatus.ARCHIVED;
-  const canPublish = status === ContentStatus.DRAFT || status === ContentStatus.REVIEW;
-  const canArchive = !isArchived;
-  const canDelete = !isPublished;
+  const canPublish = !isPublished;
+  const canArchive = !isArchived && !isPublished;
+  const canDelete = status === ContentStatus.DRAFT;
 
   return (
     <AdminRowActions>
+      {canPublish ? (
+        <AdminContentStatusForm
+          currentPath={currentPath}
+          idName={idName}
+          idValue={idValue}
+          status={ContentStatus.PUBLISHED}
+          updateStatusAction={updateStatusAction}
+        >
+          <Button className="min-h-9 px-3 py-1.5 text-xs" type="submit">
+            Опубликовать
+          </Button>
+        </AdminContentStatusForm>
+      ) : (
+        <AdminContentStatusForm
+          currentPath={currentPath}
+          idName={idName}
+          idValue={idValue}
+          status={ContentStatus.ARCHIVED}
+          updateStatusAction={updateStatusAction}
+        >
+          <ConfirmSubmitButton
+            className="min-h-9 px-3 py-1.5 text-xs"
+            confirmActionLabel="Снять с сайта"
+            confirmText="Запись останется в админке и пропадёт с публичной страницы."
+            confirmTitle="Снять запись с сайта?"
+            type="submit"
+            variant="secondary"
+          >
+            Снять с сайта
+          </ConfirmSubmitButton>
+        </AdminContentStatusForm>
+      )}
       <Button className="min-h-9 px-3 py-1.5 text-xs" href={editHref} variant="secondary">
         Изменить
       </Button>
@@ -317,14 +462,6 @@ export function AdminContentRowActions({
               <input name={idName} type="hidden" value={idValue} />
               <input name="status" type="hidden" value={ContentStatus.DRAFT} />
               <AdminActionMenuButton>Восстановить</AdminActionMenuButton>
-            </form>
-          ) : null}
-          {canPublish ? (
-            <form action={updateStatusAction}>
-              <HiddenRedirect value={currentPath} />
-              <input name={idName} type="hidden" value={idValue} />
-              <input name="status" type="hidden" value={ContentStatus.PUBLISHED} />
-              <AdminActionMenuButton>Опубликовать</AdminActionMenuButton>
             </form>
           ) : null}
           {canArchive ? (

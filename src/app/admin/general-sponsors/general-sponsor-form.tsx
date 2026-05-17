@@ -7,7 +7,7 @@ import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { contentStatusLabels } from '@/lib/admin/content-utils';
+import { PUBLICATION_STATUS_HINT, contentStatusLabels } from '@/lib/admin/content-utils';
 
 type GeneralSponsorFormCity = {
   id: string;
@@ -65,13 +65,6 @@ export function GeneralSponsorForm({ action, cities, redirectTo, submitLabel, sp
             { label: 'Город', value: cityName },
             { label: 'Подборка', value: sponsor.isFeatured ? 'Приоритетный показ' : 'Обычный показ' }
           ]}
-          actions={
-            sponsor.status === ContentStatus.PUBLISHED ? (
-              <Button href="/general-sponsors" size="sm" variant="secondary">
-                Публичная страница
-              </Button>
-            ) : null
-          }
         />
       ) : null}
 
@@ -83,7 +76,7 @@ export function GeneralSponsorForm({ action, cities, redirectTo, submitLabel, sp
           <FormField htmlFor="sponsor-slug" label="Адрес страницы">
             <Input id="sponsor-slug" name="slug" maxLength={180} defaultValue={sponsor?.slug ?? ''} placeholder="Если пусто, будет создан из названия" />
           </FormField>
-          <FormField htmlFor="sponsor-status" label="Статус">
+          <FormField htmlFor="sponsor-status" label="Статус" hint={PUBLICATION_STATUS_HINT}>
             <Select id="sponsor-status" name="status" defaultValue={sponsor?.status ?? ContentStatus.DRAFT}>
               {Object.values(ContentStatus).map((status) => (
                 <option key={status} value={status}>

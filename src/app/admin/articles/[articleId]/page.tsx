@@ -1,15 +1,15 @@
 import { notFound } from 'next/navigation';
 import { CategoryType, ContentStatus } from '@prisma/client';
-import { deleteArticleDraft, updateArticle } from '@/app/admin/articles/actions';
+import { deleteArticleDraft, updateArticle, updateArticleStatus } from '@/app/admin/articles/actions';
 import { AdminCmsActions, AdminCmsAdvancedSection, AdminCmsForm, AdminCmsGrid, AdminCmsSection, AdminCmsSummary } from '@/components/admin/admin-cms-form';
-import { AdminActionAlert, CoverImageField, HiddenRedirect } from '@/components/admin/content-admin-controls';
+import { AdminActionAlert, AdminContentVisibilityPanel, CoverImageField, HiddenRedirect } from '@/components/admin/content-admin-controls';
 import { Button } from '@/components/ui/button';
 import { CheckboxField } from '@/components/ui/checkbox-field';
 import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { contentStatusLabels, type AdminContentSearchParams } from '@/lib/admin/content-utils';
+import { PUBLICATION_STATUS_HINT, contentStatusLabels, type AdminContentSearchParams } from '@/lib/admin/content-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
 import { prisma } from '@/lib/db/prisma';
 
@@ -73,23 +73,25 @@ export default async function AdminArticleDetailPage({ params, searchParams }: A
 
       <AdminActionAlert params={query} />
 
+      <AdminContentVisibilityPanel
+        currentPath={currentPath}
+        idName="articleId"
+        idValue={article.id}
+        publicHref={`/articles/${article.slug}`}
+        status={article.status}
+        updateStatusAction={updateArticleStatus}
+      />
+
       <AdminCmsForm action={updateArticle}>
           <HiddenRedirect value={currentPath} />
           <input name="articleId" type="hidden" value={article.id} />
           <AdminCmsSummary
             items={[
               { label: 'Статус', value: contentStatusLabels[article.status] },
-              { label: 'Адрес', value: `/${article.slug}` },
-              { label: 'Автор', value: article.authorName ?? 'Не указан' },
-              { label: 'Теги', value: article.tags.length }
-            ]}
-            actions={
-              article.status === ContentStatus.PUBLISHED ? (
-                <Button href={`/articles/${article.slug}`} size="sm" variant="secondary">
-                  Открыть страницу
-                </Button>
-              ) : null
-            }
+            { label: 'Адрес', value: `/${article.slug}` },
+            { label: 'Автор', value: article.authorName ?? 'Не указан' },
+            { label: 'Теги', value: article.tags.length }
+          ]}
           />
           <AdminCmsSection title="Публикация" description="Название и адрес материала.">
             <AdminCmsGrid>
@@ -160,7 +162,7 @@ export default async function AdminArticleDetailPage({ params, searchParams }: A
 
           <AdminCmsSection title="Статус и настройки" description="Публикационный статус и теги материала.">
             <AdminCmsGrid>
-          <FormField htmlFor="article-status" label="Статус">
+          <FormField htmlFor="article-status" label="Статус" hint={PUBLICATION_STATUS_HINT}>
             <Select id="article-status" name="status" defaultValue={article.status}>
               {Object.values(ContentStatus).map((status) => (
                 <option key={status} value={status}>
@@ -217,7 +219,7 @@ export default async function AdminArticleDetailPage({ params, searchParams }: A
           </AdminCmsActions>
       </AdminCmsForm>
 
-      {article.status !== ContentStatus.PUBLISHED ? (
+      {article.status === ContentStatus.DRAFT ? (
         <form action={deleteArticleDraft}>
           <input name="articleId" type="hidden" value={article.id} />
           <Button type="submit" variant="ghost">

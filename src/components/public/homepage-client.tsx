@@ -536,8 +536,6 @@ export function HomepageClient({ data }: HomepageClientProps) {
         </div>
       </section>
 
-      <BusinessDigitalSolutionsSection />
-
       <section className="background-zone background-zone-beige scroll-mt-28 border-b border-[var(--line)] py-8 md:py-14" id="home-current">
         <div className="container">
           <div className="mb-7 flex flex-wrap items-end justify-between gap-4">

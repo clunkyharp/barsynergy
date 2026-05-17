@@ -1,14 +1,14 @@
 import { notFound } from 'next/navigation';
 import { CategoryType, ContentStatus } from '@prisma/client';
-import { updateSupplier } from '@/app/admin/suppliers/actions';
+import { updateSupplier, updateSupplierStatus } from '@/app/admin/suppliers/actions';
 import { AdminCmsActions, AdminCmsForm, AdminCmsGrid, AdminCmsSection, AdminCmsSummary } from '@/components/admin/admin-cms-form';
-import { CoverImageField, HiddenRedirect } from '@/components/admin/content-admin-controls';
+import { AdminContentVisibilityPanel, CoverImageField, HiddenRedirect } from '@/components/admin/content-admin-controls';
 import { Button } from '@/components/ui/button';
 import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { contentStatusLabels } from '@/lib/admin/content-utils';
+import { PUBLICATION_STATUS_HINT, contentStatusLabels } from '@/lib/admin/content-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
 import { prisma } from '@/lib/db/prisma';
 
@@ -45,6 +45,7 @@ export default async function AdminSupplierEditPage({ params }: AdminSupplierEdi
     notFound();
   }
   const cityName = cities.find((city) => city.id === supplier.cityId)?.name ?? 'Город не указан';
+  const currentPath = `${ADMIN_SUPPLIERS_PATH}/${supplier.id}`;
 
   return (
     <div className="space-y-8">
@@ -58,6 +59,15 @@ export default async function AdminSupplierEditPage({ params }: AdminSupplierEdi
         </Button>
       </header>
 
+      <AdminContentVisibilityPanel
+        currentPath={currentPath}
+        idName="supplierId"
+        idValue={supplier.id}
+        publicHref={`/suppliers/${supplier.slug}`}
+        status={supplier.status}
+        updateStatusAction={updateSupplierStatus}
+      />
+
       <AdminCmsForm action={updateSupplier}>
         <HiddenRedirect value={ADMIN_SUPPLIERS_PATH} />
         <input name="supplierId" type="hidden" value={supplier.id} />
@@ -68,13 +78,6 @@ export default async function AdminSupplierEditPage({ params }: AdminSupplierEdi
             { label: 'Город', value: cityName },
             { label: 'Проверка', value: supplier.isVerified ? 'Проверен' : 'Не проверен' }
           ]}
-          actions={
-            supplier.status === ContentStatus.PUBLISHED ? (
-              <Button href={`/suppliers/${supplier.slug}`} size="sm" variant="secondary">
-                Публичная страница
-              </Button>
-            ) : null
-          }
         />
 
         <AdminCmsSection title="Публикация" description="Заголовок, адрес страницы, категория и статус поставщика.">
@@ -95,7 +98,7 @@ export default async function AdminSupplierEditPage({ params }: AdminSupplierEdi
                 ))}
               </Select>
             </FormField>
-            <FormField htmlFor="supplier-status" label="Статус">
+            <FormField htmlFor="supplier-status" label="Статус" hint={PUBLICATION_STATUS_HINT}>
               <Select id="supplier-status" name="status" defaultValue={supplier.status}>
                 {Object.values(ContentStatus).map((status) => (
                   <option key={status} value={status}>

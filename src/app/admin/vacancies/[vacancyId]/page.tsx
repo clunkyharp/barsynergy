@@ -1,8 +1,8 @@
 import { notFound } from 'next/navigation';
 import { CategoryType, ContentStatus } from '@prisma/client';
-import { updateVacancy } from '@/app/admin/vacancies/actions';
+import { updateVacancy, updateVacancyStatus } from '@/app/admin/vacancies/actions';
 import { AdminCmsActions, AdminCmsForm, AdminCmsGrid, AdminCmsSection, AdminCmsSummary } from '@/components/admin/admin-cms-form';
-import { CoverImageField, HiddenRedirect } from '@/components/admin/content-admin-controls';
+import { AdminContentVisibilityPanel, CoverImageField, HiddenRedirect } from '@/components/admin/content-admin-controls';
 import { Button } from '@/components/ui/button';
 import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
@@ -11,6 +11,7 @@ import { Textarea } from '@/components/ui/textarea';
 import {
   contentStatusLabels,
   getAdminOptionLabel,
+  PUBLICATION_STATUS_HINT,
   vacancyEmploymentTypeOptions,
   vacancyExperienceOptions,
   withCurrentValueOption
@@ -55,6 +56,7 @@ export default async function AdminVacancyEditPage({ params }: AdminVacancyEditP
     notFound();
   }
   const cityName = cities.find((city) => city.id === vacancy.cityId)?.name ?? 'Город не указан';
+  const currentPath = `${ADMIN_VACANCIES_PATH}/${vacancy.id}`;
 
   return (
     <div className="space-y-8">
@@ -68,6 +70,15 @@ export default async function AdminVacancyEditPage({ params }: AdminVacancyEditP
         </Button>
       </header>
 
+      <AdminContentVisibilityPanel
+        currentPath={currentPath}
+        idName="vacancyId"
+        idValue={vacancy.id}
+        publicHref={`/vacancies/${vacancy.slug}`}
+        status={vacancy.status}
+        updateStatusAction={updateVacancyStatus}
+      />
+
       <AdminCmsForm action={updateVacancy}>
         <HiddenRedirect value={ADMIN_VACANCIES_PATH} />
         <input type="hidden" name="vacancyId" value={vacancy.id} />
@@ -80,16 +91,9 @@ export default async function AdminVacancyEditPage({ params }: AdminVacancyEditP
             { label: 'Отклики', value: vacancy._count.applications }
           ]}
           actions={
-            <>
-              {vacancy.status === ContentStatus.PUBLISHED ? (
-                <Button href={`/vacancies/${vacancy.slug}`} size="sm" variant="secondary">
-                  Публичная страница
-                </Button>
-              ) : null}
-              <Button href="/admin/applications?type=VACANCY_RESPONSE" size="sm" variant="secondary">
-                Открыть отклики
-              </Button>
-            </>
+            <Button href="/admin/applications?type=VACANCY_RESPONSE" size="sm" variant="secondary">
+              Открыть отклики
+            </Button>
           }
         />
 
@@ -101,7 +105,7 @@ export default async function AdminVacancyEditPage({ params }: AdminVacancyEditP
             <FormField htmlFor="vacancy-slug" label="Адрес страницы">
               <Input id="vacancy-slug" name="slug" maxLength={180} defaultValue={vacancy.slug} />
             </FormField>
-            <FormField htmlFor="vacancy-status" label="Статус">
+            <FormField htmlFor="vacancy-status" label="Статус" hint={PUBLICATION_STATUS_HINT}>
               <Select id="vacancy-status" name="status" defaultValue={vacancy.status}>
                 {Object.values(ContentStatus).map((status) => (
                   <option key={status} value={status}>

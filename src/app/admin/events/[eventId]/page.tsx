@@ -1,8 +1,8 @@
 import { notFound } from 'next/navigation';
 import { CategoryType, ContentStatus } from '@prisma/client';
-import { updateEvent } from '@/app/admin/events/actions';
+import { updateEvent, updateEventStatus } from '@/app/admin/events/actions';
 import { AdminCmsActions, AdminCmsForm, AdminCmsGrid, AdminCmsSection, AdminCmsSummary } from '@/components/admin/admin-cms-form';
-import { CoverImageField, HiddenRedirect } from '@/components/admin/content-admin-controls';
+import { AdminContentVisibilityPanel, CoverImageField, HiddenRedirect } from '@/components/admin/content-admin-controls';
 import { Button } from '@/components/ui/button';
 import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
@@ -13,6 +13,7 @@ import {
   eventFormatOptions,
   eventRegistrationModeOptions,
   getAdminOptionLabel,
+  PUBLICATION_STATUS_HINT,
   withCurrentValueOption
 } from '@/lib/admin/content-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
@@ -64,6 +65,7 @@ export default async function AdminEventEditPage({ params }: AdminEventEditPageP
     notFound();
   }
   const cityName = cities.find((city) => city.id === event.cityId)?.name ?? 'Город не указан';
+  const currentPath = `${ADMIN_EVENTS_PATH}/${event.id}`;
 
   return (
     <div className="space-y-8">
@@ -77,6 +79,15 @@ export default async function AdminEventEditPage({ params }: AdminEventEditPageP
         </Button>
       </header>
 
+      <AdminContentVisibilityPanel
+        currentPath={currentPath}
+        idName="eventId"
+        idValue={event.id}
+        publicHref={`/events/${event.slug}`}
+        status={event.status}
+        updateStatusAction={updateEventStatus}
+      />
+
       <AdminCmsForm action={updateEvent}>
           <HiddenRedirect value={ADMIN_EVENTS_PATH} />
           <input name="eventId" type="hidden" value={event.id} />
@@ -87,13 +98,6 @@ export default async function AdminEventEditPage({ params }: AdminEventEditPageP
               { label: 'Город', value: cityName },
               { label: 'Формат', value: getAdminOptionLabel(eventFormatOptions, event.format) }
             ]}
-            actions={
-              event.status === ContentStatus.PUBLISHED ? (
-                <Button href={`/events/${event.slug}`} size="sm" variant="secondary">
-                  Публичная страница
-                </Button>
-              ) : null
-            }
           />
           
           <AdminCmsSection title="Публикация" description="Название, адрес, категория и статус события.">
@@ -114,7 +118,7 @@ export default async function AdminEventEditPage({ params }: AdminEventEditPageP
                   ))}
                 </Select>
               </FormField>
-              <FormField htmlFor="event-status" label="Статус">
+              <FormField htmlFor="event-status" label="Статус" hint={PUBLICATION_STATUS_HINT}>
                 <Select id="event-status" name="status" defaultValue={event.status}>
                   {Object.values(ContentStatus).map((status) => (
                     <option key={status} value={status}>

@@ -7,7 +7,7 @@ import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { contentStatusLabels, vacancyEmploymentTypeOptions, vacancyExperienceOptions } from '@/lib/admin/content-utils';
+import { PUBLICATION_STATUS_HINT, contentStatusLabels, vacancyEmploymentTypeOptions, vacancyExperienceOptions } from '@/lib/admin/content-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
 import { prisma } from '@/lib/db/prisma';
 import { vacancyPositionValues } from '@/lib/vacancies/positions';
@@ -55,7 +55,7 @@ export default async function AdminVacanciesCreatePage() {
             <FormField htmlFor="vacancy-slug" label="Адрес страницы">
               <Input id="vacancy-slug" name="slug" maxLength={180} placeholder="Если пусто, будет создан из заголовка" />
             </FormField>
-            <FormField htmlFor="vacancy-status" label="Статус">
+            <FormField htmlFor="vacancy-status" label="Статус" hint={PUBLICATION_STATUS_HINT}>
               <Select id="vacancy-status" name="status" defaultValue={ContentStatus.DRAFT}>
                 {Object.values(ContentStatus).map((status) => (
                   <option key={status} value={status}>

@@ -26,7 +26,13 @@ import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { Textarea } from '@/components/ui/textarea';
-import { contentStatusBadgeVariants, contentStatusLabels, firstParam, type AdminContentSearchParams } from '@/lib/admin/content-utils';
+import {
+  PUBLICATION_STATUS_HINT,
+  contentStatusBadgeVariants,
+  contentStatusLabels,
+  firstParam,
+  type AdminContentSearchParams
+} from '@/lib/admin/content-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
 import { prisma } from '@/lib/db/prisma';
 
@@ -417,7 +423,7 @@ function HeroFields({ hero, uid }: { hero?: HeroValues; uid: string }) {
   return (
     <>
       <AdminCmsGrid columns="three">
-        <FormField label="Статус" htmlFor={`hero-status-${uid}`}>
+        <FormField label="Статус" htmlFor={`hero-status-${uid}`} hint={PUBLICATION_STATUS_HINT}>
           <StatusSelect id={`hero-status-${uid}`} defaultValue={hero?.status} />
         </FormField>
         <FormField label="Надзаголовок" htmlFor={`hero-eyebrow-${uid}`}>
@@ -442,7 +448,7 @@ function AudienceFields({ card, uid }: { card?: AudienceValues; uid: string }) {
   return (
     <>
       <AdminCmsGrid columns="three">
-        <FormField label="Статус" htmlFor={`audience-status-${uid}`}>
+        <FormField label="Статус" htmlFor={`audience-status-${uid}`} hint={PUBLICATION_STATUS_HINT}>
           <StatusSelect id={`audience-status-${uid}`} defaultValue={card?.status} />
         </FormField>
         <FormField label="Заголовок" htmlFor={`audience-title-${uid}`}>
@@ -478,7 +484,7 @@ function SocialFields({ social, uid }: { social?: SocialValues; uid: string }) {
   return (
     <>
       <AdminCmsGrid columns="three">
-        <FormField label="Статус" htmlFor={`social-status-${uid}`}>
+        <FormField label="Статус" htmlFor={`social-status-${uid}`} hint={PUBLICATION_STATUS_HINT}>
           <StatusSelect id={`social-status-${uid}`} defaultValue={social?.status} />
         </FormField>
         <FormField label="Площадка" htmlFor={`social-name-${uid}`}>
@@ -519,7 +525,7 @@ function CtaFields({ cta, uid }: { cta?: CtaValues; uid: string }) {
   return (
     <>
       <AdminCmsGrid columns="three">
-        <FormField label="Статус" htmlFor={`cta-status-${uid}`}>
+        <FormField label="Статус" htmlFor={`cta-status-${uid}`} hint={PUBLICATION_STATUS_HINT}>
           <StatusSelect id={`cta-status-${uid}`} defaultValue={cta?.status} />
         </FormField>
         <FormField label="Подпись" htmlFor={`cta-helperText-${uid}`}>
@@ -555,7 +561,7 @@ function CalculatorFields({ teaser, uid }: { teaser?: CalculatorValues; uid: str
   return (
     <>
       <AdminCmsGrid columns="three">
-        <FormField label="Статус" htmlFor={`calculator-status-${uid}`}>
+        <FormField label="Статус" htmlFor={`calculator-status-${uid}`} hint={PUBLICATION_STATUS_HINT}>
           <StatusSelect id={`calculator-status-${uid}`} defaultValue={teaser?.status} />
         </FormField>
         <FormField label="Надзаголовок" htmlFor={`calculator-eyebrow-${uid}`}>
@@ -757,7 +763,7 @@ export default async function AdminHomepagePage({ searchParams }: AdminHomepageP
               <input name="cardId" type="hidden" value={card.id} />
               <AudienceFields card={card} uid={card.id} />
               <SubmitRow record={card}>
-                {card.status !== ContentStatus.PUBLISHED ? <DeleteButton action={deleteHomepageAudienceCard} id={card.id} /> : null}
+                {card.status === ContentStatus.DRAFT ? <DeleteButton action={deleteHomepageAudienceCard} id={card.id} /> : null}
               </SubmitRow>
             </AdminCmsInlineEditRecord>
           ))}
@@ -867,7 +873,7 @@ export default async function AdminHomepagePage({ searchParams }: AdminHomepageP
               <input name="socialId" type="hidden" value={social.id} />
               <SocialFields social={social} uid={social.id} />
               <SubmitRow record={social}>
-                {social.status !== ContentStatus.PUBLISHED ? <DeleteButton action={deleteHomepageSocialBlock} id={social.id} /> : null}
+                {social.status === ContentStatus.DRAFT ? <DeleteButton action={deleteHomepageSocialBlock} id={social.id} /> : null}
               </SubmitRow>
             </AdminCmsInlineEditRecord>
           ))}

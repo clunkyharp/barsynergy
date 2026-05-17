@@ -140,8 +140,8 @@ async function assertCanDeleteHomepageRecord<T extends { status: ContentStatus }
     throw new Error('draft is invalid');
   }
 
-  if (record.status === ContentStatus.PUBLISHED) {
-    throw new Error('published content cannot be deleted');
+  if (record.status !== ContentStatus.DRAFT) {
+    throw new Error('draft is invalid');
   }
 }
 

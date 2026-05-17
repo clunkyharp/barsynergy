@@ -34,6 +34,8 @@ export const contentStatusLabels: Record<ContentStatus, string> = {
   [ContentStatus.ARCHIVED]: 'Архив'
 };
 
+export const PUBLICATION_STATUS_HINT = 'Опубликовано видно на сайте. Черновик, на проверке и архив скрыты.';
+
 export const contentStatusBadgeVariants: Record<ContentStatus, 'neutral' | 'success' | 'warning' | 'danger' | 'pending'> = {
   [ContentStatus.DRAFT]: 'neutral',
   [ContentStatus.REVIEW]: 'pending',
@@ -301,6 +303,10 @@ export function formatAdminActionError(error: unknown) {
       {
         matches: (candidate) => hasErrorMessage(candidate, 'draft is invalid'),
         message: 'Черновик не найден или уже недоступен для удаления.'
+      },
+      {
+        matches: (candidate) => hasErrorMessage(candidate, 'record is invalid'),
+        message: 'Удалять можно только черновики. Чтобы убрать запись с сайта, переведите её в архив.'
       },
       {
         matches: (candidate) => hasErrorMessage(candidate, 'slug is required'),

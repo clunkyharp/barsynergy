@@ -8,7 +8,7 @@ import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { contentStatusLabels } from '@/lib/admin/content-utils';
+import { PUBLICATION_STATUS_HINT, contentStatusLabels } from '@/lib/admin/content-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
 import { prisma } from '@/lib/db/prisma';
 
@@ -61,7 +61,7 @@ export default async function AdminArticlesCreatePage() {
               <FormField htmlFor="slug" label="Адрес страницы">
                 <Input id="slug" name="slug" maxLength={180} placeholder="Если пусто, будет создан из заголовка" />
               </FormField>
-              <FormField htmlFor="status" label="Статус">
+              <FormField htmlFor="status" label="Статус" hint={PUBLICATION_STATUS_HINT}>
                 <Select id="status" name="status" defaultValue={ContentStatus.DRAFT}>
                   {Object.values(ContentStatus).map((status) => (
                     <option key={status} value={status}>

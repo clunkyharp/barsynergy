@@ -1,5 +1,6 @@
 import { ApplicationStatus, ApplicationType, type Prisma } from '@prisma/client';
-import { AdminFilterBar, AdminPagination } from '@/components/admin/content-admin-controls';
+import { publishContentFromApplication } from '@/app/admin/applications/actions';
+import { AdminFilterBar, AdminPagination, HiddenRedirect } from '@/components/admin/content-admin-controls';
 import { AdminPageIntro } from '@/components/admin/admin-page-intro';
 import { Button } from '@/components/ui/button';
 import {
@@ -64,6 +65,8 @@ const activeQuickFilterStyle = {
   color: 'var(--admin-filter-active-text)'
 };
 
+type ApplicationPublicationTarget = 'partner' | 'supplier' | 'vacancy';
+
 type AdminApplicationsPageProps = {
   searchParams?: Promise<AdminContentSearchParams>;
 };
@@ -114,6 +117,33 @@ function applicationActionLabel(application: {
   }
 
   return 'Контроль не требуется';
+}
+
+function applicationPublicationTarget(application: {
+  consentAcceptedAt: Date | null;
+  partner: { title: string; slug: string } | null;
+  status: ApplicationStatus;
+  supplier: { title: string; slug: string } | null;
+  type: ApplicationType;
+  vacancy: { title: string; slug: string } | null;
+}): ApplicationPublicationTarget | null {
+  if (application.status !== ApplicationStatus.APPROVED || !application.consentAcceptedAt) {
+    return null;
+  }
+
+  if (application.type === ApplicationType.VACANCY_SUBMISSION && !application.vacancy) {
+    return 'vacancy';
+  }
+
+  if (application.type === ApplicationType.SUPPLIER_SUBMISSION && !application.supplier) {
+    return 'supplier';
+  }
+
+  if (application.type === ApplicationType.PARTNER_APPLICATION && !application.partner) {
+    return 'partner';
+  }
+
+  return null;
 }
 
 function getPayloadText(payload: Prisma.JsonValue | null, keys: string[]) {
@@ -205,6 +235,25 @@ export default async function AdminApplicationsPage({ searchParams }: AdminAppli
   ]);
   const totalPages = getAdminTotalPages(total);
   const hasActiveFilters = Boolean(search || selectedType || selectedStatus);
+  const currentParams = new URLSearchParams();
+
+  if (search) {
+    currentParams.set('search', search);
+  }
+
+  if (selectedType) {
+    currentParams.set('type', selectedType);
+  }
+
+  if (selectedStatus) {
+    currentParams.set('status', selectedStatus);
+  }
+
+  if (page > 1) {
+    currentParams.set('page', String(page));
+  }
+
+  const currentPath = `${ADMIN_APPLICATIONS_PATH}${currentParams.toString() ? `?${currentParams.toString()}` : ''}`;
 
   return (
     <div className="space-y-8">
@@ -309,6 +358,7 @@ export default async function AdminApplicationsPage({ searchParams }: AdminAppli
                 {applications.map((application) => {
                   const actionLabel = applicationActionLabel(application);
                   const identity = applicationPersonOrCompany(application);
+                  const publicationTarget = applicationPublicationTarget(application);
 
                   return (
                     <DataTableRow key={application.id}>
@@ -365,9 +415,21 @@ export default async function AdminApplicationsPage({ searchParams }: AdminAppli
                         </DataTableClamp>
                       </DataTableCell>
                       <DataTableActionsCell>
-                        <Button className="min-h-9 px-3 py-1.5 text-xs" href={`/admin/applications/${application.id}`} variant="secondary">
-                          Открыть
-                        </Button>
+                        <DataTableActionRow className="justify-end">
+                          {publicationTarget ? (
+                            <form action={publishContentFromApplication}>
+                              <HiddenRedirect value={currentPath} />
+                              <input name="applicationId" type="hidden" value={application.id} />
+                              <input name="target" type="hidden" value={publicationTarget} />
+                              <Button className="min-h-9 px-3 py-1.5 text-xs" type="submit">
+                                Опубликовать
+                              </Button>
+                            </form>
+                          ) : null}
+                          <Button className="min-h-9 px-3 py-1.5 text-xs" href={`/admin/applications/${application.id}`} variant="secondary">
+                            Открыть
+                          </Button>
+                        </DataTableActionRow>
                       </DataTableActionsCell>
                     </DataTableRow>
                   );

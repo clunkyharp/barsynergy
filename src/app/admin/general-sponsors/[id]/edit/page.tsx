@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
-import { updateGeneralSponsor } from '@/app/admin/general-sponsors/actions';
+import { updateGeneralSponsor, updateGeneralSponsorStatus } from '@/app/admin/general-sponsors/actions';
 import { GeneralSponsorForm } from '@/app/admin/general-sponsors/general-sponsor-form';
-import { AdminActionAlert } from '@/components/admin/content-admin-controls';
+import { AdminActionAlert, AdminContentVisibilityPanel } from '@/components/admin/content-admin-controls';
 import { Button } from '@/components/ui/button';
 import type { AdminContentSearchParams } from '@/lib/admin/content-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
@@ -54,6 +54,15 @@ export default async function AdminGeneralSponsorEditPage({ params, searchParams
       </header>
 
       <AdminActionAlert params={query} />
+
+      <AdminContentVisibilityPanel
+        currentPath={currentPath}
+        idName="sponsorId"
+        idValue={sponsor.id}
+        publicHref="/general-sponsors"
+        status={sponsor.status}
+        updateStatusAction={updateGeneralSponsorStatus}
+      />
 
       <GeneralSponsorForm
         action={updateGeneralSponsor}

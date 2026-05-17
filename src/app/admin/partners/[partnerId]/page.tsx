@@ -1,18 +1,26 @@
 import { notFound } from 'next/navigation';
 import { CategoryType, ContentStatus } from '@prisma/client';
-import { updatePartner } from '@/app/admin/partners/actions';
+import { updatePartner, updatePartnerStatus } from '@/app/admin/partners/actions';
 import { AdminCmsActions, AdminCmsForm, AdminCmsGrid, AdminCmsSection, AdminCmsSummary } from '@/components/admin/admin-cms-form';
-import { CoverImageField } from '@/components/admin/content-admin-controls';
+import { AdminContentVisibilityPanel, CoverImageField } from '@/components/admin/content-admin-controls';
 import { Button } from '@/components/ui/button';
 import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { contentStatusLabels, getAdminOptionLabel, partnerTypeOptions, withCurrentValueOption } from '@/lib/admin/content-utils';
+import {
+  PUBLICATION_STATUS_HINT,
+  contentStatusLabels,
+  getAdminOptionLabel,
+  partnerTypeOptions,
+  withCurrentValueOption
+} from '@/lib/admin/content-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
 import { prisma } from '@/lib/db/prisma';
 
 export const dynamic = 'force-dynamic';
+
+const ADMIN_PARTNERS_PATH = '/admin/partners';
 
 type AdminEditPartnerPageProps = {
   params: Promise<{ partnerId: string }>;
@@ -37,6 +45,7 @@ export default async function AdminEditPartnerPage({ params }: AdminEditPartnerP
   if (!partner) {
     notFound();
   }
+  const currentPath = `${ADMIN_PARTNERS_PATH}/${partner.id}`;
 
   return (
     <div className="space-y-8">
@@ -44,6 +53,15 @@ export default async function AdminEditPartnerPage({ params }: AdminEditPartnerP
         <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Админка / Партнёры / Редактирование</p>
         <h1 className="mt-2 text-3xl font-semibold">{partner.title}</h1>
       </header>
+
+      <AdminContentVisibilityPanel
+        currentPath={currentPath}
+        idName="partnerId"
+        idValue={partner.id}
+        publicHref={`/partners/${partner.slug}`}
+        status={partner.status}
+        updateStatusAction={updatePartnerStatus}
+      />
 
       <AdminCmsForm action={updatePartner}>
         <input name="partnerId" type="hidden" value={partner.id} />
@@ -54,13 +72,6 @@ export default async function AdminEditPartnerPage({ params }: AdminEditPartnerP
             { label: 'Тип', value: getAdminOptionLabel(partnerTypeOptions, partner.partnerType) },
             { label: 'Подборка', value: partner.isFeatured ? 'Показывать' : 'Не показывать' }
           ]}
-          actions={
-            partner.status === ContentStatus.PUBLISHED ? (
-              <Button href={`/partners/${partner.slug}`} size="sm" variant="secondary">
-                Публичная страница
-              </Button>
-            ) : null
-          }
         />
 
         <AdminCmsSection title="Публикация" description="Заголовок, адрес страницы и публикационный статус партнёра.">
@@ -71,7 +82,7 @@ export default async function AdminEditPartnerPage({ params }: AdminEditPartnerP
             <FormField htmlFor="partner-slug" label="Адрес страницы">
               <Input id="partner-slug" name="slug" maxLength={180} defaultValue={partner.slug} />
             </FormField>
-            <FormField htmlFor="partner-status" label="Статус">
+            <FormField htmlFor="partner-status" label="Статус" hint={PUBLICATION_STATUS_HINT}>
               <Select id="partner-status" name="status" defaultValue={partner.status}>
                 {Object.values(ContentStatus).map((status) => (
                   <option key={status} value={status}>
@@ -143,7 +154,7 @@ export default async function AdminEditPartnerPage({ params }: AdminEditPartnerP
         </AdminCmsSection>
 
         <AdminCmsActions>
-          <Button type="button" variant="secondary" href="/admin/partners">
+          <Button type="button" variant="secondary" href={ADMIN_PARTNERS_PATH}>
             Отмена
           </Button>
           <Button type="submit">Сохранить изменения</Button>

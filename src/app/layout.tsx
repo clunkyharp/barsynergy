@@ -41,6 +41,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
       <body className={bodyFont.className}>
         <script
           nonce={nonce}
+          suppressHydrationWarning
           dangerouslySetInnerHTML={{
             __html: `
               try {

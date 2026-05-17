@@ -1,18 +1,27 @@
 import { notFound } from 'next/navigation';
 import { CategoryType, ContentStatus } from '@prisma/client';
-import { updateCourse } from '@/app/admin/courses/actions';
+import { updateCourse, updateCourseStatus } from '@/app/admin/courses/actions';
 import { AdminCmsActions, AdminCmsForm, AdminCmsGrid, AdminCmsSection, AdminCmsSummary } from '@/components/admin/admin-cms-form';
-import { CoverImageField } from '@/components/admin/content-admin-controls';
+import { AdminContentVisibilityPanel, CoverImageField } from '@/components/admin/content-admin-controls';
 import { Button } from '@/components/ui/button';
 import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { contentStatusLabels, courseFormatOptions, courseLevelOptions, getAdminOptionLabel, withCurrentValueOption } from '@/lib/admin/content-utils';
+import {
+  PUBLICATION_STATUS_HINT,
+  contentStatusLabels,
+  courseFormatOptions,
+  courseLevelOptions,
+  getAdminOptionLabel,
+  withCurrentValueOption
+} from '@/lib/admin/content-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
 import { prisma } from '@/lib/db/prisma';
 
 export const dynamic = 'force-dynamic';
+
+const ADMIN_COURSES_PATH = '/admin/courses';
 
 type AdminEditCoursePageProps = {
   params: Promise<{ courseId: string }>;
@@ -43,6 +52,7 @@ export default async function AdminEditCoursePage({ params }: AdminEditCoursePag
     notFound();
   }
   const cityName = cities.find((city) => city.id === course.cityId)?.name ?? 'Город не указан';
+  const currentPath = `${ADMIN_COURSES_PATH}/${course.id}`;
 
   return (
     <div className="space-y-8">
@@ -50,6 +60,15 @@ export default async function AdminEditCoursePage({ params }: AdminEditCoursePag
         <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Админка / Курсы / Редактирование</p>
         <h1 className="mt-2 text-3xl font-semibold">{course.title}</h1>
       </header>
+
+      <AdminContentVisibilityPanel
+        currentPath={currentPath}
+        idName="courseId"
+        idValue={course.id}
+        publicHref={`/education/${course.slug}`}
+        status={course.status}
+        updateStatusAction={updateCourseStatus}
+      />
 
       <AdminCmsForm action={updateCourse}>
         <input name="courseId" type="hidden" value={course.id} />
@@ -60,13 +79,6 @@ export default async function AdminEditCoursePage({ params }: AdminEditCoursePag
             { label: 'Уровень', value: getAdminOptionLabel(courseLevelOptions, course.level) },
             { label: 'Город', value: cityName }
           ]}
-          actions={
-            course.status === ContentStatus.PUBLISHED ? (
-              <Button href={`/education/${course.slug}`} size="sm" variant="secondary">
-                Публичная страница
-              </Button>
-            ) : null
-          }
         />
 
         <AdminCmsSection title="Публикация" description="Название, адрес страницы и публикационный статус курса.">
@@ -77,7 +89,7 @@ export default async function AdminEditCoursePage({ params }: AdminEditCoursePag
             <FormField htmlFor="course-slug" label="Адрес страницы">
               <Input id="course-slug" name="slug" maxLength={180} defaultValue={course.slug} />
             </FormField>
-            <FormField htmlFor="course-status" label="Статус">
+            <FormField htmlFor="course-status" label="Статус" hint={PUBLICATION_STATUS_HINT}>
               <Select id="course-status" name="status" defaultValue={course.status}>
                 {Object.values(ContentStatus).map((status) => (
                   <option key={status} value={status}>
@@ -161,7 +173,7 @@ export default async function AdminEditCoursePage({ params }: AdminEditCoursePag
         </AdminCmsSection>
 
         <AdminCmsActions>
-            <Button type="button" variant="secondary" href="/admin/courses">
+            <Button type="button" variant="secondary" href={ADMIN_COURSES_PATH}>
               Отмена
             </Button>
             <Button type="submit">Сохранить изменения</Button>

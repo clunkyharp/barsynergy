@@ -7,7 +7,7 @@ import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { contentStatusLabels, courseFormatOptions, courseLevelOptions } from '@/lib/admin/content-utils';
+import { PUBLICATION_STATUS_HINT, contentStatusLabels, courseFormatOptions, courseLevelOptions } from '@/lib/admin/content-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
 import { prisma } from '@/lib/db/prisma';
 
@@ -45,7 +45,7 @@ export default async function AdminCreateCoursePage() {
             <FormField htmlFor="course-slug" label="Адрес страницы">
               <Input id="course-slug" name="slug" maxLength={180} placeholder="Если пусто, будет создан из названия" />
             </FormField>
-            <FormField htmlFor="course-status" label="Статус">
+            <FormField htmlFor="course-status" label="Статус" hint={PUBLICATION_STATUS_HINT}>
               <Select id="course-status" name="status" defaultValue={ContentStatus.DRAFT}>
                 {Object.values(ContentStatus).map((status) => (
                   <option key={status} value={status}>
