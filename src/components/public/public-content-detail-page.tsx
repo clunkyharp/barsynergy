@@ -213,16 +213,13 @@ export function PublicContentDetailPage({
               <ArrowLeft size={16} />
               {backLabel}
             </InlineLink>
-            <p className="hidden text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--muted)] md:block">
-              {eyebrow} / {copy.contextLabel}
-            </p>
           </div>
 
           <Panel className="mt-6 overflow-hidden border-[var(--border-default)] bg-[var(--surface)] p-0" padding="none">
             <div className="grid gap-0 lg:grid-cols-[minmax(0,1.45fr)_minmax(16rem,0.55fr)] lg:items-stretch">
               <div className="grid min-w-0 content-center px-5 py-8 sm:px-7 md:px-8 md:py-10 xl:px-9">
                 <div className="flex flex-wrap gap-2">
-                  <MetaChip variant="selected">{eyebrow}</MetaChip>
+                  <MetaChip variant="default">{eyebrow}</MetaChip>
                   {heroMeta.slice(0, 5).map((entry, index) => (
                     <MetaChip key={`${entry}-${index}`} variant="default">
                       {entry}

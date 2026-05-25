@@ -100,6 +100,7 @@ export default async function SuppliersPage({ searchParams }: SuppliersPageProps
             />
           }
           listLabel="Поставщики"
+          rowActionLabel="Смотреть профиль"
           rowVariant="directory"
           sectionId="suppliers-list"
           title="Каталог"

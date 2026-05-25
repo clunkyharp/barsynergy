@@ -1,7 +1,9 @@
 import type { Metadata } from 'next';
+import { ArrowUpRight } from 'lucide-react';
 import { EditorialPublicPage } from '@/components/public/editorial-public-page';
 import { FeatureCard, RoleTaskCard } from '@/components/public/public-card-patterns';
 import { PublicBodyText, PublicDisplayTitle, PublicEyebrow } from '@/components/public/public-primitives';
+import { Button } from '@/components/ui/button';
 import { businessSolutionTypeOptions } from '@/lib/applications/b2b-request-options';
 
 export const metadata: Metadata = {
@@ -56,7 +58,7 @@ export default function BusinessPage() {
         <div className="container">
           <div className="mb-6 max-w-3xl">
             <PublicEyebrow>Решения</PublicEyebrow>
-            <PublicDisplayTitle className="mt-4 max-w-4xl">Что можно собрать</PublicDisplayTitle>
+            <PublicDisplayTitle className="mt-4 max-w-4xl">Услуги, которые мы предоставляем</PublicDisplayTitle>
             <PublicBodyText className="mt-5 max-w-2xl" size="md">
               Начинаем с одной понятной задачи. Сложные интеграции, оплаты и личные кабинеты лучше выносить во второй этап.
             </PublicBodyText>
@@ -64,7 +66,6 @@ export default function BusinessPage() {
           <div className="border-t border-[var(--line)]">
             {businessSolutionTypeOptions.map((option) => (
               <FeatureCard
-                action={{ href: getBusinessContactHref(option.label), label: option.actionLabel }}
                 description={option.description}
                 eyebrow="Сервис"
                 key={option.value}
@@ -73,14 +74,23 @@ export default function BusinessPage() {
               />
             ))}
           </div>
+          <Button className="mt-6 min-h-12 rounded-[var(--radius-md)] px-6 tracking-normal" href={getBusinessContactHref('Бизнес-решение')}>
+            Оставить заявку
+            <ArrowUpRight size={18} />
+          </Button>
         </div>
       </section>
 
       <section className="background-zone background-zone-beige editorial-grid border-b border-[var(--line)] py-10 md:py-14">
-        <div className="container grid gap-8 xl:grid-cols-[minmax(16rem,0.58fr)_minmax(0,1.42fr)]">
+        <div className="container grid gap-8 xl:grid-cols-[minmax(32rem,0.72fr)_minmax(0,1.28fr)]">
           <div className="xl:sticky xl:top-24 xl:self-start">
             <PublicEyebrow>Процесс</PublicEyebrow>
-            <PublicDisplayTitle className="mt-4 max-w-[13ch]">Как начинается работа</PublicDisplayTitle>
+            <PublicDisplayTitle
+              className="mt-4 max-w-[12ch] !text-[clamp(2.9rem,3.7vw,4rem)]"
+              style={{ hyphens: 'none', overflowWrap: 'normal', wordBreak: 'normal' }}
+            >
+              Как начинается работа
+            </PublicDisplayTitle>
             <PublicBodyText className="mt-5 max-w-md" size="md">
               Не нужно готовить ТЗ. Достаточно описать процесс, который сейчас отнимает время.
             </PublicBodyText>

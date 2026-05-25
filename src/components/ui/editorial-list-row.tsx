@@ -115,6 +115,14 @@ export function EditorialListRow({
           {subtitle ? <p className="mt-2 text-sm leading-6 text-[var(--muted)]">{subtitle}</p> : null}
           <div className="mt-3 hidden max-w-2xl text-sm leading-7 text-[var(--muted)] sm:block">{description}</div>
           {meta ? <div className="mt-4">{meta}</div> : null}
+          {href ? (
+            <div className="mt-5 flex justify-start md:justify-end">
+              <span className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--accent)]">
+                {actionLabel}
+                <ArrowUpRight className="transition-transform duration-[var(--motion-duration-base)] ease-[var(--motion-ease-move)] group-hover:translate-x-1 motion-reduce:transition-none" size={16} />
+              </span>
+            </div>
+          ) : null}
         </div>
       </div>
     </>
