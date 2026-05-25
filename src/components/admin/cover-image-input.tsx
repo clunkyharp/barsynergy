@@ -36,6 +36,7 @@ export function CoverImageInput({ id, name = 'coverImage' }: CoverImageInputProp
       ) : null}
       <FileUpload
         accept="image/jpeg,image/png,image/webp,image/avif"
+        error={error ?? undefined}
         id={id}
         meta={fileName}
         name={name}
@@ -81,10 +82,12 @@ export function CoverImageInput({ id, name = 'coverImage' }: CoverImageInputProp
             return file ? URL.createObjectURL(file) : null;
           });
         }}
+        privacy="public"
+        privacyLabel="Файл станет публичным только после сохранения записи и публикации материала."
+        success={previewUrl ? 'Предпросмотр готов. Сохраните форму, чтобы применить файл.' : undefined}
         title="Выбрать изображение"
         description="JPEG, PNG, WebP или AVIF. После выбора появится предпросмотр."
       />
-      {error ? <p className="field-error">{error}</p> : null}
     </div>
   );
 }

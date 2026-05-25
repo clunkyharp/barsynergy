@@ -112,7 +112,7 @@ export default async function AdminCoursesPage({ searchParams }: AdminCoursesPag
               <AdminTableBody>
                 {courses.map((course) => (
                   <AdminTableRow key={course.id}>
-                    <AdminTableCell className="max-w-[320px]">
+                    <AdminTableCell className="max-w-[320px]" label="Курс">
                       <AdminTableClamp className="font-semibold">{course.title}</AdminTableClamp>
                       <div className="mt-1 truncate text-xs text-[var(--muted)]">/{course.slug}</div>
                       <div className="mt-1 text-xs text-[var(--muted)]">{course.category?.name ?? 'Без категории'}</div>
@@ -120,7 +120,7 @@ export default async function AdminCoursesPage({ searchParams }: AdminCoursesPag
                         <div className="mt-1 text-xs text-[var(--muted)]">Обложка: {course.coverImage.originalName}</div>
                       ) : null}
                     </AdminTableCell>
-                    <AdminTableCell className="text-[var(--muted)]">
+                    <AdminTableCell className="text-[var(--muted)]" label="Параметры">
                       <div>{getAdminOptionLabel(courseFormatOptions, course.format, 'Формат не указан')}</div>
                       {course.durationLabel ? <div className="mt-1 text-xs">{course.durationLabel}</div> : null}
                       {course.level ? (
@@ -128,11 +128,11 @@ export default async function AdminCoursesPage({ searchParams }: AdminCoursesPag
                       ) : null}
                       {course.priceLabel ? <div className="mt-1 text-xs">{course.priceLabel}</div> : null}
                     </AdminTableCell>
-                    <AdminTableCell className="text-[var(--muted)]">{course.city?.name ?? '-'}</AdminTableCell>
-                    <AdminTableCell>
+                    <AdminTableCell className="text-[var(--muted)]" label="Город">{course.city?.name ?? '-'}</AdminTableCell>
+                    <AdminTableCell label="Статус">
                       <StatusBadge variant={contentStatusBadgeVariants[course.status]}>{contentStatusLabels[course.status]}</StatusBadge>
                     </AdminTableCell>
-                    <AdminTableCell className="text-[var(--muted)]">
+                    <AdminTableCell className="text-[var(--muted)]" label="Обновлено">
                       <div>{dateFormatter.format(course.updatedAt)}</div>
                       {course.updatedBy?.email ? <div className="mt-1 text-xs">{course.updatedBy.email}</div> : null}
                     </AdminTableCell>

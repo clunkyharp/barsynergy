@@ -72,11 +72,13 @@ Keep changes minimal. Preserve existing architecture, naming, routing, styling, 
 
 - Main development branch: `dev`.
 - Stable production branch: `prod`.
+- VPS deploy branch: `prod`, kept as the clean site branch.
 - Use `feature/*` only for large coherent features.
 - Use `fix/*` only for critical production fixes.
 - Small tasks can be done directly on `dev`.
 - Do not combine commit/checkpoint work with further implementation in the same batch. First classify the dirty tree and create the checkpoint, then open a separate implementation batch if more work is needed.
 - Do not push, deploy, merge to `prod`, delete broadly, or run destructive commands without explicit owner approval.
+- Do not merge local agent memory, generated QA/browser artifacts, scratch output, local-only access notes, real env files, backups, uploads, private keys, tokens or passwords into `prod`.
 - Always run `git status --short --branch` before file-changing work.
 - Do not revert unrelated user changes.
 - If the worktree is dirty, identify whether changes are related before editing.
@@ -112,7 +114,7 @@ Validation:
 ```bash
 npm run lint
 npm run typecheck
-npx prisma validate
+./node_modules/.bin/prisma validate
 ```
 
 `npm run build` is mandatory only before creating a commit. For ordinary implementation checks, run it only when the task explicitly needs production-build, deploy or standalone-runtime validation.
@@ -131,9 +133,11 @@ When both build and typecheck are required, run them sequentially. Next.js type 
 
 - Required local variables are documented in `.env.example`.
 - Required production variables are documented in `.env.production.example` and `docs/env.md`.
+- Local production server access notes belong in gitignored `ssh.md`; keep only safe connection/runtime notes there and never store passwords, private keys, tokens, env values or database URLs.
 - Local PostgreSQL is exposed on `localhost:55432`.
 - Local uploads use `STORAGE_DRIVER=local` and `LOCAL_UPLOAD_DIR=./uploads`.
 - Production must use `STORAGE_DRIVER=s3`.
+- The only documented production local-storage exception is an owner-approved single-server fallback with `STORAGE_DRIVER=local` and `ALLOW_LOCAL_STORAGE_IN_PRODUCTION=true`.
 - Production `DATABASE_URL` in Docker Compose must use host `postgres`, not `localhost`.
 - Do not commit real `.env` files, secrets, tokens, passwords, private keys, production configs, database dumps, uploads, or user data.
 - Treat auth, live deploys, production data, migrations, object storage, and environment changes as readiness-first work. Stop and report missing access or missing success criteria before acting.

@@ -1,10 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useId, useRef, useState, type RefObject } from 'react';
 import { createPortal } from 'react-dom';
-import { ArrowUpRight } from 'lucide-react';
-import { ThemeToggle } from '@/components/layout/theme-toggle';
+import { usePathname } from 'next/navigation';
 import { AppLink } from '@/components/ui/app-link';
+import { focusFirstElement, trapFocusInContainer } from '@/components/ui/focus-trap';
 import { displayFont } from '@/lib/fonts';
 import { cn } from '@/lib/utils';
 
@@ -17,17 +17,49 @@ type MobileSiteMenuProps = {
   onOpenChange: (nextState: boolean) => void;
 };
 
-const MENU_TOGGLE_SIZE_CLASS = 'h-[54px] w-[54px]';
-const MENU_TOGGLE_ICON_SIZE_CLASS = 'h-[24px] w-[24px]';
-const MOBILE_MENU_CONTENT_TOP_CLASS = 'pt-[110px] sm:pt-[114px]';
-const MENU_TOGGLE_LINE_LENGTH = 18;
-const MENU_TOGGLE_LINE_THICKNESS = 2;
-const MENU_TOGGLE_ICON_OFFSET = 5;
+const MENU_TOGGLE_SIZE_CLASS = 'h-11 w-11';
+const MENU_TOGGLE_ICON_SIZE_CLASS = 'h-[18px] w-[18px]';
+const MOBILE_MENU_CONTENT_TOP_CLASS = 'pt-[84px] sm:pt-[88px]';
+const MENU_TOGGLE_LINE_LENGTH = 14;
+const MENU_TOGGLE_LINE_THICKNESS = 1.5;
+const MENU_TOGGLE_ICON_OFFSET = 4;
+
+const primaryNavOrder = ['/events', '/education', '/vacancies', '/suppliers', '/articles'];
+const businessNavOrder = ['/business', '/partners', '/general-sponsors', '/consulting'];
+const teamNavOrder = ['/about', '/contacts', '/auth/login'];
+
+function getMobileNavItems(navItems: MobileSiteMenuProps['navItems'], hrefs: string[]) {
+  return hrefs
+    .map((href) => navItems.find((item) => item.href === href))
+    .filter((item): item is MobileSiteMenuProps['navItems'][number] => Boolean(item));
+}
+
+function isActiveMobileItem(pathname: string | null, href: string) {
+  if (!pathname) {
+    return false;
+  }
+
+  const [pathOnly] = href.split('?');
+
+  if (pathOnly === '/auth/login') {
+    return pathname.startsWith('/auth');
+  }
+
+  return pathname === pathOnly || pathname.startsWith(`${pathOnly}/`);
+}
 
 export function MobileSiteMenu({ isOpen, navItems, onOpenChange }: MobileSiteMenuProps) {
+  const pathname = usePathname();
   const [isRendered, setIsRendered] = useState(false);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const previousFocusRef = useRef<HTMLElement | null>(null);
+  const triggerRef = useRef<HTMLButtonElement | null>(null);
+  const dialogTitleId = useId();
   const overlayId = 'mobile-menu';
   const portalTarget = typeof document !== 'undefined' ? document.querySelector('.site-shell') ?? document.body : null;
+  const primaryNavItems = getMobileNavItems(navItems, primaryNavOrder);
+  const businessNavItems = getMobileNavItems(navItems, businessNavOrder);
+  const teamNavItems = getMobileNavItems(navItems, teamNavOrder);
 
   useEffect(() => {
     if (isOpen) {
@@ -41,7 +73,7 @@ export function MobileSiteMenu({ isOpen, navItems, onOpenChange }: MobileSiteMen
 
     const timeoutId = window.setTimeout(() => {
       setIsRendered(false);
-    }, 240);
+    }, 280);
 
     return () => {
       window.clearTimeout(timeoutId);
@@ -68,20 +100,40 @@ export function MobileSiteMenu({ isOpen, navItems, onOpenChange }: MobileSiteMen
     }
 
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        onOpenChange(false);
+      if (!isOpen) {
+        return;
       }
+
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        onOpenChange(false);
+        return;
+      }
+
+      trapFocusInContainer(event, dialogRef.current);
     };
 
-    window.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('keydown', handleKeyDown);
 
     return () => {
       rootStyle.overflow = previousRootOverflow;
       bodyStyle.overflow = previousBodyOverflow;
       bodyStyle.paddingRight = previousPaddingRight;
-      window.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [isRendered, onOpenChange]);
+  }, [isOpen, isRendered, onOpenChange]);
+
+  useEffect(() => {
+    if (!isOpen) {
+      previousFocusRef.current?.focus();
+      previousFocusRef.current = null;
+      return;
+    }
+
+    window.setTimeout(() => {
+      focusFirstElement(dialogRef.current);
+    }, 0);
+  }, [isOpen]);
 
   useEffect(() => {
     const mediaQuery = window.matchMedia('(min-width: 1280px)');
@@ -109,7 +161,18 @@ export function MobileSiteMenu({ isOpen, navItems, onOpenChange }: MobileSiteMen
 
   return (
     <>
-      <MenuToggle isOpen={isOpen} onClick={() => onOpenChange(!isOpen)} overlayId={overlayId} />
+      <MenuToggle
+        isOpen={isOpen}
+        onClick={() => {
+          if (!isOpen) {
+            previousFocusRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : triggerRef.current;
+          }
+
+          onOpenChange(!isOpen);
+        }}
+        overlayId={overlayId}
+        triggerRef={triggerRef}
+      />
 
       {isRendered && portalTarget
         ? createPortal(
@@ -118,48 +181,38 @@ export function MobileSiteMenu({ isOpen, navItems, onOpenChange }: MobileSiteMen
               id={overlayId}
               style={{ background: 'var(--mobile-menu-bg)' }}
               className={cn(
-                'mobile-menu-overlay fixed inset-0 z-[45] overflow-y-auto overscroll-contain text-[var(--text)] transition-opacity duration-[240ms] ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none xl:hidden',
+                'mobile-menu-overlay fixed inset-0 z-[45] overflow-y-auto overscroll-contain text-[var(--text)] transition-opacity duration-[var(--motion-duration-panel)] ease-[var(--motion-ease-standard)] motion-reduce:transition-none xl:hidden',
                 isOpen ? 'opacity-100' : 'pointer-events-none opacity-0'
               )}
             >
               <div aria-hidden="true" className="absolute inset-0 bg-[url('/images/grain.svg')] opacity-[0.22]" />
               <div
                 aria-modal="true"
+                aria-labelledby={dialogTitleId}
                 role="dialog"
                 className={cn(
-                  'container relative min-h-[100dvh] px-0 pb-8 transition-[opacity,transform] duration-[240ms] ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none',
+                  'container relative min-h-[100dvh] px-0 pb-8 transition-[opacity,transform] duration-[var(--motion-duration-panel)] ease-[var(--motion-ease-move)] motion-reduce:transition-none',
                   MOBILE_MENU_CONTENT_TOP_CLASS,
                   isOpen ? 'translate-y-0 opacity-100' : 'translate-y-2 opacity-0'
                 )}
+                ref={dialogRef}
+                tabIndex={-1}
               >
+                <h2 className="sr-only" id={dialogTitleId}>
+                  Мобильная навигация
+                </h2>
                 <nav aria-label="Мобильная навигация" className="grid content-start gap-4 sm:gap-5">
-                  <ThemeToggle className="w-fit" />
-                  <div className="grid gap-2 border-t border-[var(--line)] pt-2">
-                    {navItems.map((item) => (
-                      <AppLink
-                        className="group/link grid min-h-20 grid-cols-[minmax(0,1fr)_auto] items-center gap-5 rounded-[var(--radius-lg)] border border-transparent px-4 py-3 text-[var(--text)] transition-[background-color,border-color,color] duration-[240ms] ease-[cubic-bezier(0.22,1,0.36,1)] hover:border-[var(--line)] hover:bg-[var(--surface-wash)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] motion-reduce:transition-none sm:min-h-[88px] sm:px-5"
-                        href={item.href}
-                        key={item.href}
-                        onClick={() => onOpenChange(false)}
-                      >
-                        <span className={cn(displayFont.className, 'display-tight text-[34px] leading-none text-balance sm:text-[46px]')}>
-                          {item.label}
-                        </span>
-                        <ArrowUpRight
-                          className="text-[var(--accent)] transition duration-[240ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover/link:-translate-y-1 group-hover/link:translate-x-1 motion-reduce:transition-none"
-                          size={24}
-                        />
-                      </AppLink>
-                    ))}
-                  </div>
-                  <AppLink
-                    className="mt-4 inline-flex min-h-14 w-fit items-center gap-3 rounded-[var(--radius-md)] border border-[var(--accent)] px-6 text-sm font-semibold text-[var(--accent)] transition-[background-color,color,border-color] duration-[240ms] ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-[var(--accent)] hover:text-[var(--accent-contrast)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] motion-reduce:transition-none"
-                    href="/contacts"
-                    onClick={() => onOpenChange(false)}
-                  >
-                    Написать команде
-                    <ArrowUpRight size={18} />
-                  </AppLink>
+                  <MobileMenuGroup label="Разделы" items={primaryNavItems} onNavigate={() => onOpenChange(false)} pathname={pathname} />
+                  {businessNavItems.length > 0 ? (
+                    <MobileMenuGroup
+                      label="Для бизнеса"
+                      items={businessNavItems}
+                      onNavigate={() => onOpenChange(false)}
+                      pathname={pathname}
+                      withDivider
+                    />
+                  ) : null}
+                  <MobileMenuGroup label="Команда" items={teamNavItems} onNavigate={() => onOpenChange(false)} pathname={pathname} withDivider />
                 </nav>
               </div>
             </div>,
@@ -170,14 +223,61 @@ export function MobileSiteMenu({ isOpen, navItems, onOpenChange }: MobileSiteMen
   );
 }
 
+function MobileMenuGroup({
+  items,
+  label,
+  onNavigate,
+  pathname,
+  withDivider = false
+}: {
+  items: MobileSiteMenuProps['navItems'];
+  label: string;
+  onNavigate: () => void;
+  pathname: string | null;
+  withDivider?: boolean;
+}) {
+  if (items.length === 0) {
+    return null;
+  }
+
+  return (
+    <div className={cn('grid gap-1.5', withDivider && 'border-t border-[var(--line)] pt-4')}>
+      <p className="text-[9px] font-bold uppercase tracking-[0.08em] text-[var(--accent)]">{label}</p>
+      <div className="grid gap-1">
+        {items.map((item) => {
+          const isActive = isActiveMobileItem(pathname, item.href);
+
+          return (
+            <AppLink
+              aria-current={isActive ? 'page' : undefined}
+              className={cn(
+                displayFont.className,
+                'display-tight block min-h-11 w-fit rounded-[var(--radius-sm)] py-1 pr-2 text-[18px] font-bold leading-[1.12] text-[var(--text)] transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] hover:text-[var(--accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] motion-reduce:transition-none sm:text-[19px]',
+                isActive && 'border-l-2 border-[var(--accent)] pl-3 text-[var(--accent)]'
+              )}
+              href={item.href}
+              key={item.href}
+              onClick={onNavigate}
+            >
+              {item.label}
+            </AppLink>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 function MenuToggle({
   isOpen,
   onClick,
-  overlayId
+  overlayId,
+  triggerRef
 }: {
   isOpen: boolean;
   onClick: () => void;
   overlayId: string;
+  triggerRef: RefObject<HTMLButtonElement | null>;
 }) {
   return (
     <button
@@ -185,10 +285,11 @@ function MenuToggle({
       aria-expanded={isOpen}
       aria-label={isOpen ? 'Закрыть меню' : 'Открыть меню'}
       className={cn(
-        'group inline-flex shrink-0 items-center justify-center rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--surface-elevated)] text-[var(--text)] shadow-[0_12px_24px_rgba(20,20,18,0.08)] backdrop-blur-[12px] transition-[background-color,border-color,box-shadow,color] duration-[240ms] ease-[cubic-bezier(0.22,1,0.36,1)] hover:border-[var(--accent)]/30 hover:bg-[var(--surface)] hover:shadow-[0_16px_28px_rgba(20,20,18,0.1)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] motion-reduce:transition-none xl:hidden',
+        'group inline-flex shrink-0 items-center justify-center rounded-[var(--radius-sm)] border border-[var(--border-default)] bg-[var(--surface-elevated)] text-[var(--text)] shadow-[var(--shadow-card)] backdrop-blur-[12px] transition-[background-color,border-color,color] duration-[var(--motion-duration-base)] ease-[var(--motion-ease-standard)] hover:border-[var(--accent)]/30 hover:bg-[var(--surface)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] motion-reduce:transition-none xl:hidden',
         MENU_TOGGLE_SIZE_CLASS
       )}
       onClick={onClick}
+      ref={triggerRef}
       type="button"
     >
       <span className="grid h-full w-full place-items-center">
@@ -200,7 +301,7 @@ function MenuToggle({
 
 function MenuToggleIcon({ isOpen }: { isOpen: boolean }) {
   const lineBaseClass =
-    'absolute left-1/2 top-1/2 block rounded-full bg-current transition-[transform,opacity] duration-[260ms] ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none';
+    'absolute left-1/2 top-1/2 block rounded-full bg-current transition-[transform,opacity] duration-[var(--motion-duration-panel)] ease-[var(--motion-ease-move)] motion-reduce:transition-none';
 
   return (
     <span aria-hidden="true" className={cn('relative block', MENU_TOGGLE_ICON_SIZE_CLASS)}>

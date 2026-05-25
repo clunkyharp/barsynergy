@@ -25,15 +25,15 @@ export function BusinessSolutionForm({ enabled, result, utm, cities, defaults = 
       title="Описать рабочую задачу"
       description="Подходит для сайта заведения, Telegram-бота, внутренней формы, уведомлений или простой панели."
       disclosureAliases={['applications']}
-      disclosureDescription="Укажите проект, город, контакт и тип решения. Команда уточнит детали после заявки."
+      disclosureDescription="Укажите проект, город, контакт и тип решения. После заявки уточним детали."
       disclosureFocusSelector="#businessProjectName"
       disclosureId="business-request"
-      disclosureOpenLabel="Открыть заявку"
+      disclosureOpenLabel="Оставить заявку"
       disclosureTitle="Заявка на бизнес-решение"
       enabled={enabled}
       result={result}
     >
-      <form action={submitBusinessSolutionRequest} className="editorial-form-shell">
+      <form action={submitBusinessSolutionRequest} className="editorial-form-shell public-form-shell">
         <HiddenUtmFields utm={utm} />
         <HoneypotField id="business-solution-website" />
         <div className="relative grid lg:grid-cols-[0.42fr_0.58fr]">
@@ -43,7 +43,7 @@ export function BusinessSolutionForm({ enabled, result, utm, cities, defaults = 
               Цифровой инструмент под конкретный процесс
             </PublicDisplayTitle>
             <PublicBodyText className="mt-4 max-w-md" tone="inverse">
-              В заявке достаточно описать задачу и текущий способ работы. Тарифы и оплату в этой форме не собираем.
+              Опишите задачу и как всё работает сейчас. Тарифы и оплату в этой форме не собираем.
             </PublicBodyText>
 
             <div className="mt-6 flex flex-wrap gap-2">
@@ -59,11 +59,11 @@ export function BusinessSolutionForm({ enabled, result, utm, cities, defaults = 
               <ul className="mt-4 space-y-3 text-sm leading-6 text-white/74">
                 <li className="flex gap-3">
                   <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--accent)]" />
-                  <span>Какой процесс нужно упростить: заявки, вакансии, уведомления, сайт или внутренний список.</span>
+                  <span>Что нужно упростить: заявки, вакансии, уведомления, сайт или внутренний список.</span>
                 </li>
                 <li className="flex gap-3">
                   <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--accent)]" />
-                  <span>Кто будет пользоваться решением: гости, кандидаты, администратор, команда смены.</span>
+                  <span>Кто будет пользоваться: гости, кандидаты, администратор или команда смены.</span>
                 </li>
                 <li className="flex gap-3">
                   <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--accent)]" />
@@ -123,7 +123,7 @@ export function BusinessSolutionForm({ enabled, result, utm, cities, defaults = 
                 </Select>
               </FormField>
               <div className="md:col-span-2">
-                <FormField htmlFor="businessComment" hint="Опишите задачу, текущий процесс и что должно измениться после запуска." label="Комментарий">
+                <FormField htmlFor="businessComment" hint="Опишите задачу, текущий процесс и что должно измениться после запуска." label="Что нужно сделать">
                   <Textarea
                     className="min-h-40"
                     defaultValue={defaults.comment}
@@ -141,7 +141,7 @@ export function BusinessSolutionForm({ enabled, result, utm, cities, defaults = 
                   <InlineLink href="/legal/personal-data-consent">согласие на обработку персональных данных</InlineLink> для этой заявки.
                 </ConsentField>
               </div>
-              <PublicFormShellFooter className="md:col-span-2" note="После отправки команда свяжется по указанному способу связи.">
+              <PublicFormShellFooter className="md:col-span-2" note="После отправки свяжемся по указанному способу связи.">
                 <SubmitButton>Отправить заявку</SubmitButton>
               </PublicFormShellFooter>
             </div>

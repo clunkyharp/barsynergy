@@ -52,7 +52,7 @@ export function EducationApplicationForms({ enabled, result, utm, cities, defaul
     {
       href: '/education?formType=course&courseTitle=%D0%9F%D1%80%D0%B5%D0%B4%D0%BB%D0%BE%D0%B6%D0%B8%D1%82%D1%8C%20%D1%82%D0%B5%D0%BC%D1%83#education-request',
       label: 'Предложить тему',
-      description: 'Если хотите отправить тему занятия или разбора.'
+      description: 'Если хотите предложить занятие или разбор.'
     }
   ];
 
@@ -60,14 +60,14 @@ export function EducationApplicationForms({ enabled, result, utm, cities, defaul
     <PublicApplicationSection
       eyebrow="Образование / Заявки"
       title="Заявки на обучение"
-      description="Можно записаться на программу, запросить обучение для команды или заказать сертификат."
+      description="Запишитесь на программу, запросите обучение для команды или закажите сертификат."
       disclosureAliases={['applications']}
       disclosureClosedContent={
         <div>
           <div className="max-w-3xl">
             <h3 className="text-lg font-semibold leading-7 text-[var(--text)]">Выберите тип заявки</h3>
             <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
-              Выберите, что нужно отправить: программу, обучение команды, сертификат или тему занятия.
+              Выберите, что нужно: программа, обучение команды, сертификат или новая тема.
             </p>
           </div>
           <div className="mt-5 grid gap-3 md:grid-cols-2">
@@ -104,7 +104,7 @@ export function EducationApplicationForms({ enabled, result, utm, cities, defaul
     >
       <div className="grid grid-flow-dense gap-6 lg:grid-cols-2">
         {showCourseForm ? (
-          <form action={submitCourseApplication} className="editorial-form-shell h-full">
+          <form action={submitCourseApplication} className="editorial-form-shell public-form-shell h-full">
             <HiddenUtmFields utm={utm} />
             <HoneypotField id="course-application-website" />
             <PublicFormShellHeader
@@ -151,7 +151,7 @@ export function EducationApplicationForms({ enabled, result, utm, cities, defaul
         ) : null}
 
         {showCorporateTrainingForm ? (
-          <form action={submitCorporateTrainingApplication} className="editorial-form-shell h-full">
+          <form action={submitCorporateTrainingApplication} className="editorial-form-shell public-form-shell h-full">
             <HiddenUtmFields utm={utm} />
             <HoneypotField id="corporate-training-website" />
             <PublicFormShellHeader
@@ -209,7 +209,7 @@ export function EducationApplicationForms({ enabled, result, utm, cities, defaul
         ) : null}
 
         {showCertificateOrderForm ? (
-          <form action={submitCertificateOrderApplication} className="editorial-form-shell h-full lg:col-span-2">
+          <form action={submitCertificateOrderApplication} className="editorial-form-shell public-form-shell h-full lg:col-span-2">
             <HiddenUtmFields utm={utm} />
             <HoneypotField id="certificate-order-website" />
             <PublicFormShellHeader

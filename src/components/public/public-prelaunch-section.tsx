@@ -1,6 +1,6 @@
 import { ArrowUpRight } from 'lucide-react';
-import { FeatureCard } from '@/components/public/public-card-patterns';
 import { PublicBodyText, PublicDisplayTitle, PublicEyebrow } from '@/components/public/public-primitives';
+import { AppLink } from '@/components/ui/app-link';
 import { Button } from '@/components/ui/button';
 import { MetaChip } from '@/components/ui/meta-chip';
 
@@ -73,18 +73,39 @@ export function PublicPrelaunchSection({
           </div>
         </div>
 
-        <div className="divide-y divide-[var(--line)] border-y border-[var(--line)] md:grid md:grid-cols-2 md:gap-4 md:divide-y-0 md:border-y-0 lg:grid-cols-3">
-          {cards.map((card, index) => (
-            <FeatureCard
-              action={card.action}
-              className="border-0 bg-transparent py-4 hover:bg-transparent md:min-h-[22rem] md:border md:bg-[var(--surface-wash)] md:hover:bg-[var(--surface-wash-strong)]"
-              code={String(index + 1).padStart(2, '0')}
-              description={card.description}
-              details={card.details}
-              footer={card.hint}
+        <div className="divide-y divide-[var(--line)] border-y border-[var(--line)]">
+          {cards.map((card) => (
+            <article
+              className="grid gap-3 py-4 md:grid-cols-[minmax(10rem,0.38fr)_minmax(0,1fr)_auto] md:items-start md:gap-5 md:px-3 md:py-5"
               key={card.title}
-              title={card.title}
-            />
+            >
+              <div className="min-w-0">
+                <h3 className="text-lg font-semibold leading-7 text-[var(--text)]">{card.title}</h3>
+                {card.hint ? <p className="mt-1 text-[12px] font-semibold uppercase tracking-[0.12em] text-[var(--accent)]">{card.hint}</p> : null}
+              </div>
+              <div className="min-w-0">
+                <p className="text-sm leading-6 text-[var(--muted)]">{card.description}</p>
+                {card.details && card.details.length > 0 ? (
+                  <dl className="mt-3 grid gap-2 sm:grid-cols-2">
+                    {card.details.map((detail) => (
+                      <div className="rounded-[var(--radius-sm)] bg-[var(--surface-wash)] px-3 py-2" key={`${detail.label}-${detail.value}`}>
+                        <dt className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--muted)]">{detail.label}</dt>
+                        <dd className="mt-1 text-sm leading-5 text-[var(--text)]">{detail.value}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                ) : null}
+              </div>
+              {card.action ? (
+                <AppLink
+                  className="inline-flex min-h-11 w-fit items-center gap-2 rounded-[var(--radius-sm)] text-sm font-semibold text-[var(--accent)] transition-colors hover:text-[var(--accent-strong)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] md:justify-self-end"
+                  href={card.action.href}
+                >
+                  {card.action.label}
+                  <ArrowUpRight size={16} />
+                </AppLink>
+              ) : null}
+            </article>
           ))}
         </div>
       </div>

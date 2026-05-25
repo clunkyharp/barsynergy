@@ -6,7 +6,7 @@ export async function requireAdminSectionAccess(section: AdminSection) {
   const user = await getCurrentUser();
 
   if (!user) {
-    redirect('/auth/login');
+    redirect('/admin/login');
   }
 
   if (!canAccessAdminSection(user.role, section)) {

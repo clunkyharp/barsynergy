@@ -239,6 +239,14 @@ function titleInitials(title: string) {
     .join('');
 }
 
+function directoryFallbackKind(item: PublishedContentItem) {
+  if (item.kind === 'partner') {
+    return 'Партнёр';
+  }
+
+  return 'Поставщик';
+}
+
 function buildListMedia(item: PublishedContentItem, rowVariant: 'default' | 'opportunity' | 'directory') {
   if (rowVariant === 'opportunity') {
     return (
@@ -254,11 +262,20 @@ function buildListMedia(item: PublishedContentItem, rowVariant: 'default' | 'opp
 
   if (rowVariant === 'directory') {
     return (
-      <div className="grid h-14 min-h-14 w-14 place-items-center overflow-hidden rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--surface-wash)] px-2 text-center text-sm font-semibold uppercase tracking-[0.08em] text-[var(--text)] md:h-auto md:min-h-28 md:w-full md:px-4 md:text-lg">
+      <div
+        aria-label={item.imageUrl ? undefined : `${directoryFallbackKind(item)} без логотипа`}
+        className="grid h-14 min-h-14 w-14 place-items-center overflow-hidden rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--surface-wash)] text-center font-semibold text-[var(--text)] md:h-16 md:min-h-16 md:w-16"
+      >
         {item.imageUrl ? (
-          <span aria-hidden="true" className="h-full min-h-14 w-full bg-contain bg-center bg-no-repeat md:min-h-28" style={{ backgroundImage: `url("${item.imageUrl}")` }} />
+          <span aria-hidden="true" className="h-full min-h-14 w-full bg-contain bg-center bg-no-repeat md:min-h-16" style={{ backgroundImage: `url("${item.imageUrl}")` }} />
         ) : (
-          <span>{titleInitials(item.subtitle ?? item.title)}</span>
+          <span
+            aria-hidden="true"
+            className="grid size-10 place-items-center rounded-[var(--radius-sm)] bg-[var(--accent-soft)] text-sm font-semibold uppercase tracking-[0.06em] text-[var(--accent)] md:size-11 md:text-base"
+            data-logo-fallback={item.kind ?? 'directory'}
+          >
+            {titleInitials(item.subtitle ?? item.title) || '—'}
+          </span>
         )}
       </div>
     );
@@ -268,7 +285,7 @@ function buildListMedia(item: PublishedContentItem, rowVariant: 'default' | 'opp
     return (
       <div
         aria-hidden="true"
-        className="aspect-[4/3] overflow-hidden rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-cover bg-center transition-transform duration-700 ease-out group-hover:scale-[1.02]"
+        className="aspect-[4/3] overflow-hidden rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-cover bg-center transition-transform duration-[var(--motion-duration-media)] ease-[var(--motion-ease-move)] group-hover:scale-[1.02] motion-reduce:transition-none"
         style={{ backgroundImage: `url("${item.imageUrl}")` }}
       />
     );
@@ -293,7 +310,7 @@ export function PublishedContentSection({
   listAction,
   sortLabel,
   rowVariant = 'default',
-  rowActionLabel = 'Открыть запись'
+  rowActionLabel = 'Подробнее'
 }: PublishedContentSectionProps) {
   const visibleItems = content.items.filter((item) => !excludedItemIds.includes(item.id));
   const resolvedEmptyActions = emptyActions ?? (emptyAction ? [emptyAction] : []);
@@ -303,22 +320,40 @@ export function PublishedContentSection({
     ? 'Сбросьте фильтры или измените запрос. Так можно вернуться к полному списку.'
     : emptyDescription;
   const emptyStateActions = buildEmptyActions(basePath, hasActiveFilters, resolvedEmptyActions);
+  const listToolbar = (
+    <div className="public-catalog-toolbar flex flex-wrap items-center justify-between gap-3">
+      <div className="flex flex-wrap items-center gap-2.5">
+        <MetaChip className="border-[var(--border-default)] bg-[var(--accent-soft)] text-[var(--accent)]" variant="filter">
+          {countLabel}: {content.total}
+        </MetaChip>
+        <MetaChip className="border-[var(--border-default)] bg-transparent text-[var(--muted)]" variant="filter">
+          {listLabel}
+        </MetaChip>
+        {sortLabel ? (
+          <MetaChip className="border-[var(--border-default)] bg-transparent text-[var(--muted)]" variant="filter">
+            {sortLabel}
+          </MetaChip>
+        ) : null}
+      </div>
+      {listAction ? (
+        <Button className="gap-2 px-0 text-sm tracking-normal" href={listAction.href} size="sm" variant={listAction.variant ?? 'link'}>
+          {listAction.label}
+          <ArrowUpRight size={14} />
+        </Button>
+      ) : null}
+    </div>
+  );
 
   return (
-    <section className="background-zone background-zone-ivory editorial-grid border-b border-[var(--line)] py-8 md:py-14" id={sectionId}>
-      <div className="container grid gap-6 md:gap-8 xl:grid-cols-[minmax(16rem,0.58fr)_minmax(0,1.42fr)] xl:gap-10">
-        <div className="xl:sticky xl:top-24 xl:self-start">
-          <PublicDisplayTitle className="max-w-sm">{title}</PublicDisplayTitle>
-          <div className="mt-5 flex flex-wrap gap-2">
-            <MetaChip className="border-[var(--border-default)] bg-[var(--surface-wash)] text-[var(--text)]" variant="filter">
-              {countLabel}: {content.total}
-            </MetaChip>
-          </div>
+    <section className="public-catalog-section background-zone background-zone-ivory editorial-grid border-b border-[var(--line)] py-8 md:py-14" id={sectionId}>
+      <div className="container grid gap-6 md:gap-8 xl:grid-cols-[minmax(16rem,0.48fr)_minmax(0,1.52fr)] xl:gap-8">
+        <aside className="public-catalog-sidebar min-w-0 xl:sticky xl:top-24 xl:self-start">
+          <PublicDisplayTitle className="public-catalog-title max-w-sm">{title}</PublicDisplayTitle>
           {filters ? <div className="mt-5">{filters}</div> : null}
-        </div>
+        </aside>
 
         {content.items.length === 0 ? (
-          <Panel className="space-y-4 border-[var(--border-default)] bg-[var(--surface-wash)]" padding="lg">
+          <Panel className="public-missing-state space-y-4 border-[var(--border-default)] bg-[var(--surface-wash)]" padding="lg">
             <div>
               <PublicEyebrow tone="muted">{listLabel}</PublicEyebrow>
               <h3 className="mt-3 text-2xl font-semibold leading-8">{noResultsTitle}</h3>
@@ -340,29 +375,17 @@ export function PublishedContentSection({
             ) : null}
           </Panel>
         ) : visibleItems.length === 0 ? (
-          <Panel className="space-y-4 border-[var(--border-default)] bg-[var(--surface-wash)]" padding="lg">
+          <Panel className="public-missing-state public-missing-state-secondary space-y-4 border-[var(--border-default)] bg-[var(--surface-wash)]" padding="lg">
             <h3 className="text-xl font-semibold leading-7">Других записей пока нет</h3>
             <PublicBodyText className="max-w-2xl">
               Главная рекомендация уже показана выше. Когда появятся новые записи с такими фильтрами, они будут здесь.
             </PublicBodyText>
           </Panel>
         ) : (
-          <div>
-            <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-              <div className="flex flex-wrap items-center gap-2.5">
-                <PublicEyebrow tone="muted">{listLabel}</PublicEyebrow>
-                <span className="text-sm font-medium text-[var(--muted)]">{content.total} в списке</span>
-                {sortLabel ? <span className="text-sm text-[var(--muted)]">{sortLabel}</span> : null}
-              </div>
-              {listAction ? (
-                <Button className="gap-2 px-0 text-sm tracking-normal" href={listAction.href} size="sm" variant={listAction.variant ?? 'ghost'}>
-                  {listAction.label}
-                  <ArrowUpRight size={14} />
-                </Button>
-              ) : null}
-            </div>
+          <Panel className="public-catalog-list-panel min-w-0 overflow-hidden border-[var(--border-default)] bg-[var(--surface-card)]" padding="none">
+            {listToolbar}
 
-            <div className="divide-y divide-[var(--line)] border-y border-[var(--line)] md:flex md:flex-col md:gap-4 md:divide-y-0 md:border-y-0">
+            <div className="public-catalog-list-rows divide-y divide-[var(--line)] border-y border-[var(--line)] md:flex md:flex-col md:gap-4 md:divide-y-0 md:border-y-0">
               {visibleItems.map((item) => (
                 <EditorialListRow
                   actionLabel={rowActionLabel}
@@ -381,7 +404,7 @@ export function PublishedContentSection({
               ))}
             </div>
 
-            <div className="mt-4 flex flex-wrap items-center justify-between gap-3 pt-3">
+            <div className="public-catalog-pagination flex flex-wrap items-center justify-between gap-3">
               <MetaChip className="border-[var(--border-default)] bg-transparent text-[var(--muted)]" variant="default">
                 Страница {content.page} из {content.totalPages}
               </MetaChip>
@@ -396,7 +419,7 @@ export function PublishedContentSection({
                 </div>
               ) : null}
             </div>
-          </div>
+          </Panel>
         )}
       </div>
     </section>

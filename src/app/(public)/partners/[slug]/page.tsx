@@ -51,6 +51,7 @@ export default async function PartnerDetailPage({ params }: PartnerDetailPagePro
             ? { href: partner.externalUrl, label: partner.externalUrlLabel, external: true }
             : { href: '/partners', label: 'Вернуться в раздел' }
         }
+        sections={partner.sections}
         summary={partner.summary}
         title={partner.title}
       />

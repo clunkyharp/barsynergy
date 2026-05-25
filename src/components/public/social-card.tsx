@@ -30,7 +30,7 @@ export type SocialLinkCardProps = {
 };
 
 export function SocialLinkCard({
-  actionLabel = 'Открыть канал',
+  actionLabel = 'Перейти в канал',
   className,
   description,
   helperText,
@@ -47,7 +47,7 @@ export function SocialLinkCard({
   return (
     <a
       className={cn(
-        'group relative flex h-full min-h-[13.5rem] flex-col overflow-hidden rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--surface-wash)] p-4 transition duration-200 hover:border-[color-mix(in_srgb,var(--platform-accent)_34%,var(--border-default))] hover:bg-[var(--surface-wash-strong)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--field-focus-ring)] md:p-5',
+        'group relative flex h-full min-h-[13.5rem] flex-col overflow-hidden rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--surface-wash)] p-4 transition-[background-color,border-color,color,box-shadow] duration-[var(--motion-duration-base)] ease-[var(--motion-ease-standard)] hover:border-[color-mix(in_srgb,var(--platform-accent)_34%,var(--border-default))] hover:bg-[var(--surface-wash-strong)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--field-focus-ring)] motion-reduce:transition-none md:p-5',
         className
       )}
       href={href}

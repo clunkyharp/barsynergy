@@ -5,24 +5,24 @@ export type StatusBadgeVariant = 'success' | 'warning' | 'danger' | 'neutral' | 
 
 const variants: Record<StatusBadgeVariant, { chip: string; dot: string }> = {
   success: {
-    chip: 'border-[var(--success-border)] bg-[var(--success-bg)] text-[var(--success-text)]',
-    dot: 'bg-[var(--success-text)]'
+    chip: 'border-[#b6dcc8] bg-[#e5f4ea] text-[#1e7a4d]',
+    dot: 'bg-[#1e7a4d]'
   },
   warning: {
-    chip: 'border-[var(--warning-border)] bg-[var(--warning-bg)] text-[var(--warning-text)]',
-    dot: 'bg-[var(--warning-text)]'
+    chip: 'border-[#e2c780] bg-[#fff1d6] text-[#a15c07]',
+    dot: 'bg-[#a15c07]'
   },
   danger: {
     chip: 'border-[var(--danger-border)] bg-[var(--danger-bg)] text-[var(--danger-text)]',
     dot: 'bg-[var(--danger-text)]'
   },
   neutral: {
-    chip: 'border-[var(--border-default)] bg-[color-mix(in_oklab,var(--surface),var(--surface-muted)_65%)] text-[var(--muted)]',
-    dot: 'bg-[var(--muted)]'
+    chip: 'border-[#ded2c2] bg-[#fbf8f1] text-[#171513]',
+    dot: 'bg-[#8a8178]'
   },
   pending: {
-    chip: 'border-[var(--border-default)] bg-[var(--pending-bg)] text-[var(--text)]',
-    dot: 'bg-[var(--accent)]'
+    chip: 'border-[#bfd4ea] bg-[#e5f0fa] text-[#1d5d8c]',
+    dot: 'bg-[#1d5d8c]'
   }
 };
 
@@ -37,10 +37,11 @@ export function AdminStatusChip({ children, className, variant = 'neutral', show
   return (
     <span
       className={cn(
-        'inline-flex items-center gap-1.5 rounded-[var(--radius-sm)] border px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.08em]',
+        'inline-flex min-h-8 items-center gap-1.5 rounded-[var(--radius-pill)] border px-2.5 py-1.5 text-[11px] font-semibold leading-[14px] tracking-[0]',
         styles.chip,
         className
       )}
+      data-component="admin-status-badge"
       {...props}
     >
       {showDot ? <span aria-hidden="true" className={cn('h-1.5 w-1.5 rounded-full', styles.dot)} /> : null}

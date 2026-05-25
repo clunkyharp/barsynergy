@@ -1,4 +1,5 @@
 import type { HTMLAttributes } from 'react';
+import { AppLink } from '@/components/ui/app-link';
 import { displayFont } from '@/lib/fonts';
 import { cn } from '@/lib/utils';
 
@@ -6,6 +7,47 @@ type PublicEyebrowTone = 'accent' | 'muted' | 'inverse';
 type PublicDisplayTitleSize = 'hero' | 'section' | 'card' | 'legal';
 type PublicBodyTone = 'default' | 'muted' | 'inverse';
 type PublicBodySize = 'sm' | 'md';
+
+type PublicBreadcrumbItem = {
+  href?: string;
+  label: string;
+};
+
+export function PublicBreadcrumbs({
+  className,
+  items,
+  current
+}: {
+  className?: string;
+  items?: PublicBreadcrumbItem[];
+  current: string;
+}) {
+  const resolvedItems = items ?? [{ href: '/', label: 'Главная' }];
+
+  return (
+    <nav aria-label="Хлебные крошки" className={cn('text-sm leading-6 text-[var(--muted)]', className)}>
+      <ol className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
+        {resolvedItems.map((item, index) => (
+          <li className="inline-flex min-w-0 items-center gap-2" key={`${item.label}-${item.href ?? index}`}>
+            {item.href ? (
+              <AppLink className="muted-link truncate" href={item.href}>
+                {item.label}
+              </AppLink>
+            ) : (
+              <span className="truncate">{item.label}</span>
+            )}
+            <span aria-hidden="true" className="text-[var(--muted)]">
+              ›
+            </span>
+          </li>
+        ))}
+        <li aria-current="page" className="min-w-0 truncate">
+          {current}
+        </li>
+      </ol>
+    </nav>
+  );
+}
 
 export function PublicEyebrow({
   className,

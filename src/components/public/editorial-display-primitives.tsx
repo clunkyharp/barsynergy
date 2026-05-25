@@ -34,7 +34,6 @@ export type RouteIndexPanelItem = {
 };
 
 export type EditorialReadingQueueItem = {
-  index: ReactNode;
   rubric: ReactNode;
   title: ReactNode;
   description: ReactNode;
@@ -92,7 +91,7 @@ function InlineAction({ action, className }: { action: EditorialAction; classNam
     <AppLink
       aria-label={action.ariaLabel}
       className={cn(
-        'inline-flex min-h-10 w-fit items-center gap-2 rounded-[var(--radius-sm)] text-sm font-semibold text-[var(--accent)] transition hover:text-[var(--accent-strong)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)]',
+        'inline-flex min-h-10 w-fit items-center gap-2 rounded-[var(--radius-sm)] text-sm font-semibold text-[var(--accent)] transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] hover:text-[var(--accent-strong)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)] motion-reduce:transition-none',
         'min-h-11 lg:min-h-10',
         className
       )}
@@ -160,12 +159,11 @@ function PrimitiveShell({ eyebrow, title, description, className, children, ...p
 
 function FactList({ items, compact = false }: { items: LabeledValue[]; compact?: boolean }) {
   return (
-    <dl className={cn('grid rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--surface-wash)] px-3 py-1', compact ? 'text-sm' : '')}>
+    <dl className={cn('grid gap-2', compact ? 'text-sm' : '')}>
       {items.map((item, index) => (
         <div
           className={cn(
-            'py-2.5',
-            index > 0 && 'border-t border-[var(--line)]',
+            'rounded-[var(--radius-sm)] border border-[var(--border-subtle)] bg-[var(--surface-card-muted)] px-3 py-2.5',
             compact ? 'sm:grid sm:grid-cols-[7.5rem_minmax(0,1fr)] sm:gap-3' : ''
           )}
           key={index}
@@ -186,7 +184,6 @@ function StructuredCard({
   className,
   description,
   footer,
-  index,
   mark,
   status,
   title
@@ -196,7 +193,6 @@ function StructuredCard({
   className?: string;
   description?: ReactNode;
   footer?: ReactNode;
-  index?: ReactNode;
   mark: ReactNode;
   status?: ReactNode;
   title: ReactNode;
@@ -204,14 +200,12 @@ function StructuredCard({
   return (
     <article
       className={cn(
-        'flex h-full flex-col rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[color-mix(in_oklab,var(--surface),white_18%)] p-4 shadow-[0_12px_34px_rgba(20,20,18,0.028)] transition-colors md:p-5',
-        'hover:border-[var(--accent)]/24 hover:bg-[color-mix(in_oklab,var(--surface),white_23%)]',
+        'public-card-shell flex h-full flex-col p-4 md:p-5',
         className
       )}
     >
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="flex min-w-0 flex-wrap items-center gap-2">
-          {index ? <CompactMark>{index}</CompactMark> : null}
           <MetaText>{mark}</MetaText>
         </div>
         {status ? <StatusPill accent>{status}</StatusPill> : null}
@@ -223,7 +217,7 @@ function StructuredCard({
       {children ? <div className="mt-5 md:min-h-[10.5rem]">{children}</div> : null}
       {footer ? <div className="mt-6 border-t border-[var(--line)] pt-5">{footer}</div> : null}
       {action ? (
-        <div className="mt-6 border-t border-[var(--line)] pt-5">
+        <div className="mt-auto pt-5">
           <InlineAction action={action} />
         </div>
       ) : null}
@@ -238,7 +232,7 @@ export function RouteIndexPanel({ items, className, ...props }: PrimitiveShellPr
         {items.map((item, index) => (
           <AppLink
             aria-label={item.ariaLabel}
-            className="group grid gap-4 py-4 transition hover:bg-[var(--surface-wash)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] focus-visible:ring-inset md:grid-cols-[4.5rem_minmax(0,1fr)_minmax(9rem,0.28fr)] md:px-3"
+            className="group grid gap-4 py-4 transition-colors duration-[var(--motion-duration-base)] ease-[var(--motion-ease-standard)] hover:bg-[var(--surface-wash)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] focus-visible:ring-inset motion-reduce:transition-none md:grid-cols-[4.5rem_minmax(0,1fr)_minmax(9rem,0.28fr)] md:px-3"
             href={item.href}
             key={index}
           >
@@ -261,8 +255,8 @@ export function RouteIndexPanel({ items, className, ...props }: PrimitiveShellPr
               {item.status ? <StatusPill accent>{item.status}</StatusPill> : null}
               {item.count ? <StatusPill>{item.count}</StatusPill> : null}
               <span className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--accent)]">
-                {item.actionLabel ?? 'Открыть раздел'}
-                <ArrowUpRight className="transition group-hover:translate-x-1" size={16} strokeWidth={1.8} />
+                {item.actionLabel ?? 'Перейти в раздел'}
+                <ArrowUpRight className="transition-transform duration-[var(--motion-duration-base)] ease-[var(--motion-ease-move)] group-hover:translate-x-1 motion-reduce:transition-none" size={16} strokeWidth={1.8} />
               </span>
             </div>
           </AppLink>
@@ -285,7 +279,6 @@ export function EditorialReadingQueue({
             <StructuredCard
               action={item.action}
               description={item.description}
-              index={item.index}
               mark={item.rubric}
               status={item.status ?? item.type}
               title={item.title}
@@ -315,22 +308,21 @@ export function ProgramFormatMatrix({
       <div className="grid items-stretch gap-4 md:grid-cols-2 xl:grid-cols-3">
         {items.map((item, index) => (
           <article
-            className="flex h-full min-h-[24rem] flex-col rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[color-mix(in_oklab,var(--surface),white_18%)] p-4 shadow-[0_12px_34px_rgba(20,20,18,0.028)] transition-colors hover:border-[var(--accent)]/24 hover:bg-[color-mix(in_oklab,var(--surface),white_23%)] md:p-5"
+            className={cn(
+              'public-card-shell flex h-full min-h-0 flex-col p-4 md:p-5'
+            )}
             key={index}
           >
             <div className="flex flex-wrap items-start justify-between gap-3">
-              <div className="flex min-w-0 flex-wrap items-center gap-2">
-                <CompactMark>{String(index + 1).padStart(2, '0')}</CompactMark>
-                <MetaText>Формат</MetaText>
-              </div>
+              <MetaText>Формат</MetaText>
             </div>
-            <div className="mt-4 md:min-h-[5rem]">
+            <div className="mt-4">
               <h3 className={`${displayFont.className} text-[1.55rem] font-semibold leading-none text-[var(--text)] md:text-[1.8rem]`}>
                 {item.format}
               </h3>
             </div>
-            <p className="mt-3 text-sm leading-6 text-[var(--muted)] md:min-h-[5.25rem]">{item.includes}</p>
-            <div className="mt-4 md:min-h-[8.75rem]">
+            <p className="mt-3 text-sm leading-6 text-[var(--muted)]">{item.includes}</p>
+            <div className="mt-4">
               <FactList
                 compact
                 items={[
@@ -339,8 +331,7 @@ export function ProgramFormatMatrix({
                 ]}
               />
             </div>
-            <div className="mt-auto flex flex-wrap items-center justify-between gap-3 border-t border-[var(--line)] pt-3">
-              <StatusPill accent>{item.status}</StatusPill>
+            <div className="mt-auto flex flex-wrap items-center justify-end gap-3 pt-3">
               <InlineAction action={item.action} />
             </div>
           </article>
@@ -360,14 +351,11 @@ export function PartnerFormatTable({
       <div className="grid items-stretch gap-4 lg:grid-cols-2">
         {items.map((item, index) => (
           <article
-            className="flex h-full min-h-0 flex-col rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[color-mix(in_oklab,var(--surface),white_18%)] p-4 shadow-[0_12px_34px_rgba(20,20,18,0.028)] transition-colors hover:border-[var(--accent)]/28 hover:bg-[color-mix(in_oklab,var(--surface),white_23%)] md:p-5"
+            className="public-card-shell flex h-full min-h-0 flex-col p-4 md:p-5"
             key={index}
           >
             <div className="flex flex-wrap items-start justify-between gap-3">
-              <div className="flex min-w-0 flex-wrap items-center gap-2">
-                <CompactMark>{String(index + 1).padStart(2, '0')}</CompactMark>
-                <MetaText>Партнёрский формат</MetaText>
-              </div>
+              <MetaText>Партнёрский формат</MetaText>
               <StatusPill accent>Выбор</StatusPill>
             </div>
             <h3 className={`${displayFont.className} mt-5 text-[1.75rem] font-semibold leading-none text-[var(--text)] md:text-[2.2rem]`}>
@@ -384,7 +372,7 @@ export function PartnerFormatTable({
               />
             </div>
             {item.action ? (
-              <div className="mt-6 border-t border-[var(--line)] pt-5">
+              <div className="mt-auto pt-5">
                 <InlineAction action={item.action} />
               </div>
             ) : null}
@@ -406,7 +394,6 @@ export function SponsorBenefitSheet({
         {items.map((item, index) => (
           <StructuredCard
             description={item.detail}
-            index={String(index + 1).padStart(2, '0')}
             key={index}
             mark="Польза"
             title={item.area}
@@ -435,7 +422,7 @@ export function SponsorPackageComparison({
         {items.map((item, index) => (
           <StructuredCard
             action={item.action}
-            className={item.recommended ? 'border-[var(--accent)]/35 bg-[linear-gradient(180deg,var(--accent-soft),color-mix(in_oklab,var(--surface),white_18%)_42%)]' : undefined}
+            className={item.recommended ? 'border-[var(--card-border-hover)] bg-[var(--surface-card-hover)]' : undefined}
             footer={
               item.priceStatus ? (
                 <div className="flex flex-wrap items-center gap-2">
@@ -445,7 +432,6 @@ export function SponsorPackageComparison({
                 </div>
               ) : undefined
             }
-            index={String(index + 1).padStart(2, '0')}
             key={index}
             mark="Пакет"
             status={item.recommended ? 'Основной' : undefined}
@@ -472,9 +458,8 @@ export function ProcessStepsInline({ steps, className, ...props }: PrimitiveShel
     <PrimitiveShell className={className} {...props}>
       <ol className="divide-y divide-[var(--line)] border-y border-[var(--line)] lg:grid lg:grid-cols-[repeat(auto-fit,minmax(9rem,1fr))] lg:divide-x lg:divide-y-0">
         {steps.map((step, index) => (
-          <li className="grid grid-cols-[3rem_minmax(0,1fr)] gap-3 py-3.5 lg:block lg:px-4 lg:py-5" key={index}>
-            <CompactMark>{String(index + 1).padStart(2, '0')}</CompactMark>
-            <div className="min-w-0 lg:mt-5">
+          <li className="py-3.5 lg:px-4 lg:py-5" key={index}>
+            <div className="min-w-0">
               <h3 className={`${displayFont.className} text-[1.55rem] font-semibold leading-none text-[var(--text)]`}>{step.title}</h3>
               {step.description ? <p className="mt-2 text-sm leading-6 text-[var(--muted)] lg:mt-3">{step.description}</p> : null}
             </div>

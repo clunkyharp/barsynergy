@@ -34,6 +34,18 @@ async function upsertCategory({ name, slug, type, sortOrder }) {
   });
 }
 
+async function upsertTag({ name, slug, type, sortOrder }) {
+  return prisma.tag.upsert({
+    where: { slug_type: { slug, type } },
+    update: { name, sortOrder, isActive: true },
+    create: { name, slug, type, sortOrder, isActive: true }
+  });
+}
+
+function articleTagLinks(tags) {
+  return tags.map((tag) => ({ tagId: tag.id }));
+}
+
 async function main() {
   const { demoBusinessPassword } = getDemoSeedConfig();
   const passwordHash = await bcrypt.hash(demoBusinessPassword, 10);
@@ -137,6 +149,240 @@ async function main() {
         telegram: '@linea_service',
         websiteUrl: 'https://linea-service.example',
         description: 'Оснащение и сервисное сопровождение кофейных и барных проектов.'
+      }
+    })
+  ]);
+
+  const [menuArticleCategory, teamArticleCategory, supplierArticleCategory, eventArticleCategory, regionArticleCategory] = await Promise.all([
+    upsertCategory({ name: 'Меню', slug: 'menu', type: CategoryType.ARTICLE, sortOrder: 1 }),
+    upsertCategory({ name: 'Команда', slug: 'team', type: CategoryType.ARTICLE, sortOrder: 2 }),
+    upsertCategory({ name: 'Поставщики', slug: 'suppliers', type: CategoryType.ARTICLE, sortOrder: 3 }),
+    upsertCategory({ name: 'События', slug: 'events', type: CategoryType.ARTICLE, sortOrder: 4 }),
+    upsertCategory({ name: 'Индустрия региона', slug: 'regional-industry', type: CategoryType.ARTICLE, sortOrder: 5 })
+  ]);
+
+  const [calculatorTag, hiringTag, supplierTag, eventTag, regionTag] = await Promise.all([
+    upsertTag({ name: 'Калькулятор', slug: 'calculator', type: CategoryType.ARTICLE, sortOrder: 1 }),
+    upsertTag({ name: 'Найм', slug: 'hiring', type: CategoryType.ARTICLE, sortOrder: 2 }),
+    upsertTag({ name: 'Поставщики', slug: 'supplier-list', type: CategoryType.ARTICLE, sortOrder: 3 }),
+    upsertTag({ name: 'Гостевая смена', slug: 'guest-shift', type: CategoryType.ARTICLE, sortOrder: 4 }),
+    upsertTag({ name: 'СКФО', slug: 'skfo', type: CategoryType.ARTICLE, sortOrder: 5 })
+  ]);
+
+  const starterArticles = await Promise.all([
+    prisma.article.upsert({
+      where: { slug: 'how-to-calculate-drink-cost' },
+      update: {
+        title: 'Как считать себестоимость напитка',
+        summary: 'Короткий порядок расчёта: цена упаковки, расход на порцию, итоговая себестоимость и рабочая цена продажи.',
+        body: [
+          'Начните с одной позиции меню. Запишите все ингредиенты, которые входят в порцию: кофе, молоко, сироп, украшение, лёд или расходники, если они заметно влияют на итог.',
+          'Для каждого ингредиента укажите цену упаковки и её размер. Затем внесите расход на одну порцию. Важно сравнивать одинаковые единицы: граммы с граммами, миллилитры с миллилитрами.',
+          'Себестоимость строки считается так: цена упаковки делится на размер упаковки и умножается на расход в рецепте. Итог по напитку — сумма всех строк.',
+          'После этого задайте целевую долю себестоимости. Для быстрой проверки можно начать с 30%, а затем сравнить цену с рынком, подачей и ожиданиями гостей.'
+        ].join('\n\n'),
+        status: ContentStatus.PUBLISHED,
+        publishedAt: daysAgo(1),
+        archivedAt: null,
+        categoryId: menuArticleCategory.id,
+        cityId: makhachkala.id,
+        authorName: 'Редакция BARSYNERGY',
+        sourceLabel: 'Тестовый материал',
+        readingTimeMinutes: 3,
+        sortOrder: 1,
+        tags: { deleteMany: {}, create: articleTagLinks([calculatorTag]) }
+      },
+      create: {
+        slug: 'how-to-calculate-drink-cost',
+        title: 'Как считать себестоимость напитка',
+        summary: 'Короткий порядок расчёта: цена упаковки, расход на порцию, итоговая себестоимость и рабочая цена продажи.',
+        body: [
+          'Начните с одной позиции меню. Запишите все ингредиенты, которые входят в порцию: кофе, молоко, сироп, украшение, лёд или расходники, если они заметно влияют на итог.',
+          'Для каждого ингредиента укажите цену упаковки и её размер. Затем внесите расход на одну порцию. Важно сравнивать одинаковые единицы: граммы с граммами, миллилитры с миллилитрами.',
+          'Себестоимость строки считается так: цена упаковки делится на размер упаковки и умножается на расход в рецепте. Итог по напитку — сумма всех строк.',
+          'После этого задайте целевую долю себестоимости. Для быстрой проверки можно начать с 30%, а затем сравнить цену с рынком, подачей и ожиданиями гостей.'
+        ].join('\n\n'),
+        status: ContentStatus.PUBLISHED,
+        publishedAt: daysAgo(1),
+        categoryId: menuArticleCategory.id,
+        cityId: makhachkala.id,
+        authorName: 'Редакция BARSYNERGY',
+        sourceLabel: 'Тестовый материал',
+        readingTimeMinutes: 3,
+        sortOrder: 1,
+        tags: { create: articleTagLinks([calculatorTag]) }
+      }
+    }),
+    prisma.article.upsert({
+      where: { slug: 'what-to-include-in-vacancy' },
+      update: {
+        title: 'Что указать в вакансии',
+        summary: 'Проверьте роль, график, оплату, требования и контакт до публикации вакансии.',
+        body: [
+          'Хорошая вакансия начинается с понятной роли. Напишите, кого ищете: бариста, бармена, менеджера смены, управляющего или стажёра.',
+          'Дальше укажите график, город, район, формат занятости и оплату. Если сумма зависит от смен, процентов или собеседования, лучше написать это прямо.',
+          'Отдельно перечислите задачи: работа с гостем, касса, настройка напитков, инвентаризация, обучение смены или запуск меню. Так кандидат быстрее поймёт, подходит ли ему позиция.',
+          'В конце добавьте контакт и короткий порядок отклика: куда писать, что прислать и когда ждать ответа.'
+        ].join('\n\n'),
+        status: ContentStatus.PUBLISHED,
+        publishedAt: daysAgo(2),
+        archivedAt: null,
+        categoryId: teamArticleCategory.id,
+        cityId: makhachkala.id,
+        authorName: 'Редакция BARSYNERGY',
+        sourceLabel: 'Тестовый материал',
+        readingTimeMinutes: 3,
+        sortOrder: 2,
+        tags: { deleteMany: {}, create: articleTagLinks([hiringTag]) }
+      },
+      create: {
+        slug: 'what-to-include-in-vacancy',
+        title: 'Что указать в вакансии',
+        summary: 'Проверьте роль, график, оплату, требования и контакт до публикации вакансии.',
+        body: [
+          'Хорошая вакансия начинается с понятной роли. Напишите, кого ищете: бариста, бармена, менеджера смены, управляющего или стажёра.',
+          'Дальше укажите график, город, район, формат занятости и оплату. Если сумма зависит от смен, процентов или собеседования, лучше написать это прямо.',
+          'Отдельно перечислите задачи: работа с гостем, касса, настройка напитков, инвентаризация, обучение смены или запуск меню. Так кандидат быстрее поймёт, подходит ли ему позиция.',
+          'В конце добавьте контакт и короткий порядок отклика: куда писать, что прислать и когда ждать ответа.'
+        ].join('\n\n'),
+        status: ContentStatus.PUBLISHED,
+        publishedAt: daysAgo(2),
+        categoryId: teamArticleCategory.id,
+        cityId: makhachkala.id,
+        authorName: 'Редакция BARSYNERGY',
+        sourceLabel: 'Тестовый материал',
+        readingTimeMinutes: 3,
+        sortOrder: 2,
+        tags: { create: articleTagLinks([hiringTag]) }
+      }
+    }),
+    prisma.article.upsert({
+      where: { slug: 'how-to-choose-supplier' },
+      update: {
+        title: 'Как выбрать поставщика',
+        summary: 'Соберите список рабочих контактов и сравните категорию, географию, условия и стабильность поставки.',
+        body: [
+          'Сначала определите, что именно нужно заведению: кофе, молоко, сиропы, оборудование, стекло, расходники или сервисное обслуживание.',
+          'Проверьте географию работы. Поставщик может быть удобным по ассортименту, но неудобным по срокам доставки, минимальному заказу или маршруту.',
+          'Сравните условия: цена, отсрочка, частота поставок, наличие документов, возможность срочной дозакупки и контакт ответственного менеджера.',
+          'Для первой закупки лучше зафиксировать короткий тест: одна категория, понятный объём и дата обратной связи от команды.'
+        ].join('\n\n'),
+        status: ContentStatus.PUBLISHED,
+        publishedAt: daysAgo(3),
+        archivedAt: null,
+        categoryId: supplierArticleCategory.id,
+        cityId: makhachkala.id,
+        authorName: 'Редакция BARSYNERGY',
+        sourceLabel: 'Тестовый материал',
+        readingTimeMinutes: 3,
+        sortOrder: 3,
+        tags: { deleteMany: {}, create: articleTagLinks([supplierTag]) }
+      },
+      create: {
+        slug: 'how-to-choose-supplier',
+        title: 'Как выбрать поставщика',
+        summary: 'Соберите список рабочих контактов и сравните категорию, географию, условия и стабильность поставки.',
+        body: [
+          'Сначала определите, что именно нужно заведению: кофе, молоко, сиропы, оборудование, стекло, расходники или сервисное обслуживание.',
+          'Проверьте географию работы. Поставщик может быть удобным по ассортименту, но неудобным по срокам доставки, минимальному заказу или маршруту.',
+          'Сравните условия: цена, отсрочка, частота поставок, наличие документов, возможность срочной дозакупки и контакт ответственного менеджера.',
+          'Для первой закупки лучше зафиксировать короткий тест: одна категория, понятный объём и дата обратной связи от команды.'
+        ].join('\n\n'),
+        status: ContentStatus.PUBLISHED,
+        publishedAt: daysAgo(3),
+        categoryId: supplierArticleCategory.id,
+        cityId: makhachkala.id,
+        authorName: 'Редакция BARSYNERGY',
+        sourceLabel: 'Тестовый материал',
+        readingTimeMinutes: 3,
+        sortOrder: 3,
+        tags: { create: articleTagLinks([supplierTag]) }
+      }
+    }),
+    prisma.article.upsert({
+      where: { slug: 'how-to-prepare-guest-shift' },
+      update: {
+        title: 'Как подготовить гостевую смену',
+        summary: 'Короткий план для команды, которая хочет провести встречу, совместный бар или партнёрский формат.',
+        body: [
+          'Гостевая смена начинается с понятной цели: представить бар, познакомить команды, показать продукт или собрать аудиторию вокруг темы.',
+          'Опишите площадку, дату, примерное время, роли участников и формат меню. Если нужен партнёр, заранее укажите, какая помощь требуется.',
+          'Подготовьте анонс: тема, кто участвует, почему гостю стоит прийти и как попасть на событие. Не перегружайте текст внутренними деталями.',
+          'После события соберите короткий итог: сколько гостей пришло, какие позиции работали лучше, какие контакты появились и что можно повторить.'
+        ].join('\n\n'),
+        status: ContentStatus.PUBLISHED,
+        publishedAt: daysAgo(4),
+        archivedAt: null,
+        categoryId: eventArticleCategory.id,
+        cityId: makhachkala.id,
+        authorName: 'Редакция BARSYNERGY',
+        sourceLabel: 'Тестовый материал',
+        readingTimeMinutes: 4,
+        sortOrder: 4,
+        tags: { deleteMany: {}, create: articleTagLinks([eventTag]) }
+      },
+      create: {
+        slug: 'how-to-prepare-guest-shift',
+        title: 'Как подготовить гостевую смену',
+        summary: 'Короткий план для команды, которая хочет провести встречу, совместный бар или партнёрский формат.',
+        body: [
+          'Гостевая смена начинается с понятной цели: представить бар, познакомить команды, показать продукт или собрать аудиторию вокруг темы.',
+          'Опишите площадку, дату, примерное время, роли участников и формат меню. Если нужен партнёр, заранее укажите, какая помощь требуется.',
+          'Подготовьте анонс: тема, кто участвует, почему гостю стоит прийти и как попасть на событие. Не перегружайте текст внутренними деталями.',
+          'После события соберите короткий итог: сколько гостей пришло, какие позиции работали лучше, какие контакты появились и что можно повторить.'
+        ].join('\n\n'),
+        status: ContentStatus.PUBLISHED,
+        publishedAt: daysAgo(4),
+        categoryId: eventArticleCategory.id,
+        cityId: makhachkala.id,
+        authorName: 'Редакция BARSYNERGY',
+        sourceLabel: 'Тестовый материал',
+        readingTimeMinutes: 4,
+        sortOrder: 4,
+        tags: { create: articleTagLinks([eventTag]) }
+      }
+    }),
+    prisma.article.upsert({
+      where: { slug: 'skfo-bar-industry-map' },
+      update: {
+        title: 'Карта барной индустрии СКФО',
+        summary: 'Короткий обзор того, какие участники рынка чаще всего нужны специалистам, заведениям и партнёрам.',
+        body: [
+          'Региональная карта индустрии помогает быстро понять, кто рядом: заведения, школы, поставщики, бренды, площадки для событий и специалисты.',
+          'Для специалиста такая карта отвечает на вопрос, где учиться, куда откликаться и какие события стоит отслеживать.',
+          'Для заведения она помогает собрать контакты поставщиков, экспертов, кандидатов и партнёров для запуска новых форматов.',
+          'Для бренда или сервиса карта показывает, с кем можно обсудить событие, материал, обучение или пилотный проект.'
+        ].join('\n\n'),
+        status: ContentStatus.PUBLISHED,
+        publishedAt: daysAgo(5),
+        archivedAt: null,
+        categoryId: regionArticleCategory.id,
+        cityId: makhachkala.id,
+        authorName: 'Редакция BARSYNERGY',
+        sourceLabel: 'Тестовый материал',
+        readingTimeMinutes: 3,
+        sortOrder: 5,
+        tags: { deleteMany: {}, create: articleTagLinks([regionTag]) }
+      },
+      create: {
+        slug: 'skfo-bar-industry-map',
+        title: 'Карта барной индустрии СКФО',
+        summary: 'Короткий обзор того, какие участники рынка чаще всего нужны специалистам, заведениям и партнёрам.',
+        body: [
+          'Региональная карта индустрии помогает быстро понять, кто рядом: заведения, школы, поставщики, бренды, площадки для событий и специалисты.',
+          'Для специалиста такая карта отвечает на вопрос, где учиться, куда откликаться и какие события стоит отслеживать.',
+          'Для заведения она помогает собрать контакты поставщиков, экспертов, кандидатов и партнёров для запуска новых форматов.',
+          'Для бренда или сервиса карта показывает, с кем можно обсудить событие, материал, обучение или пилотный проект.'
+        ].join('\n\n'),
+        status: ContentStatus.PUBLISHED,
+        publishedAt: daysAgo(5),
+        categoryId: regionArticleCategory.id,
+        cityId: makhachkala.id,
+        authorName: 'Редакция BARSYNERGY',
+        sourceLabel: 'Тестовый материал',
+        readingTimeMinutes: 3,
+        sortOrder: 5,
+        tags: { create: articleTagLinks([regionTag]) }
       }
     })
   ]);
@@ -631,6 +877,7 @@ async function main() {
   console.log(`Cities: ${makhachkala.name}, ${kaspiysk.name}, ${derbent.name}`);
   console.log(`Vacancies: ${vacancyOne.title}, ${vacancyTwo.title}, ${vacancyThree.title}, ${vacancyFour.title}`);
   console.log(`Suppliers: ${supplierOne.companyName}, ${supplierTwo.companyName}, ${supplierThree.companyName}, ${supplierFour.companyName}`);
+  console.log(`Published test articles: ${starterArticles.map((article) => article.slug).join(', ')}`);
   console.log(`Draft content: ${articleOne.slug}, ${articleTwo.slug}, ${eventOne.slug}, ${eventTwo.slug}`);
 }
 

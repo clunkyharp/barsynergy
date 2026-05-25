@@ -180,7 +180,7 @@ export default async function AdminVacanciesPage({ searchParams }: AdminVacancie
               <AdminTableBody>
                 {vacancies.map((vacancy) => (
                   <AdminTableRow key={vacancy.id}>
-                    <AdminTableCell className="max-w-[320px]">
+                    <AdminTableCell className="max-w-[320px]" label="Вакансия">
                       <AdminTableClamp className="font-semibold">{vacancy.title}</AdminTableClamp>
                       <div className="mt-1 truncate text-xs text-[var(--muted)]">/{vacancy.slug}</div>
                       <div className="mt-1 text-xs text-[var(--muted)]">{vacancy.category?.name ?? 'Без категории'}</div>
@@ -188,16 +188,16 @@ export default async function AdminVacanciesPage({ searchParams }: AdminVacancie
                         <div className="mt-1 text-xs text-[var(--muted)]">Обложка: {vacancy.coverImage.originalName}</div>
                       ) : null}
                     </AdminTableCell>
-                    <AdminTableCell className="text-[var(--muted)]">
+                    <AdminTableCell className="text-[var(--muted)]" label="Компания">
                       <div>{vacancy.companyName}</div>
                       <div className="mt-1 text-xs">{vacancy.position}</div>
                       {vacancy.salaryLabel ? <div className="mt-1 text-xs">{vacancy.salaryLabel}</div> : null}
                     </AdminTableCell>
-                    <AdminTableCell className="text-[var(--muted)]">{vacancy.city?.name ?? '-'}</AdminTableCell>
-                    <AdminTableCell>
+                    <AdminTableCell className="text-[var(--muted)]" label="Город">{vacancy.city?.name ?? '-'}</AdminTableCell>
+                    <AdminTableCell label="Статус">
                       <StatusBadge variant={contentStatusBadgeVariants[vacancy.status]}>{contentStatusLabels[vacancy.status]}</StatusBadge>
                     </AdminTableCell>
-                    <AdminTableCell className="text-[var(--muted)]">
+                    <AdminTableCell className="text-[var(--muted)]" label="Обновлено">
                       <div>{dateFormatter.format(vacancy.updatedAt)}</div>
                       {vacancy.updatedBy?.email ? <div className="mt-1 text-xs">{vacancy.updatedBy.email}</div> : null}
                     </AdminTableCell>

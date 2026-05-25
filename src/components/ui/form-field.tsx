@@ -8,6 +8,7 @@ type FormFieldProps = {
   error?: string;
   hint?: string;
   className?: string;
+  labelClassName?: string;
   children: ReactNode;
   required?: boolean;
   success?: string;
@@ -48,7 +49,7 @@ export function FieldError({ children, className, id }: { children: ReactNode; c
   );
 }
 
-export function FormField({ label, htmlFor, error, hint, className, children, required, success }: FormFieldProps) {
+export function FormField({ label, htmlFor, error, hint, className, labelClassName, children, required, success }: FormFieldProps) {
   const errorId = `${htmlFor}-error`;
   const hintId = `${htmlFor}-hint`;
   const successId = `${htmlFor}-success`;
@@ -73,7 +74,7 @@ export function FormField({ label, htmlFor, error, hint, className, children, re
 
   return (
     <div className={cn('form-field', className)} data-state={error ? 'error' : success ? 'success' : undefined}>
-      <FieldLabel htmlFor={htmlFor} required={isRequired}>{label}</FieldLabel>
+      <FieldLabel className={labelClassName} htmlFor={htmlFor} required={isRequired}>{label}</FieldLabel>
       {field}
       {hint ? <FieldHint id={hintId}>{hint}</FieldHint> : null}
       {success ? <p className="field-success" id={successId}>{success}</p> : null}

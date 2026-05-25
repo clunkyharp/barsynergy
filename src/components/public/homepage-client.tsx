@@ -1,22 +1,27 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
+import { useState } from 'react';
 import {
   ArrowUpRight,
   BookOpen,
   BriefcaseBusiness,
-  CalendarDays,
+  ChevronDown,
+  ChevronUp,
+  Handshake,
   PackageCheck,
+  Search,
+  School,
+  Store,
   type LucideIcon
 } from 'lucide-react';
 import { GeneralSponsorCard } from './general-sponsor-card';
 import { ToolTeaser } from './platform-ui';
-import { RoleTaskCard } from './public-card-patterns';
 import { SocialLinkCard } from './social-card';
 import { Button } from '@/components/ui/button';
-import { MetaChip } from '@/components/ui/meta-chip';
 import { accentFont, displayFont } from '@/lib/fonts';
-import type { HomepageAudienceCardBlock, HomepageData, HomepageLiveCard, HomepageSocialBlock } from '@/lib/public/home';
+import type { HomepageData, HomepageLiveCard, HomepageSocialBlock } from '@/lib/public/home';
 
 type HomepageClientProps = {
   data: HomepageData;
@@ -24,14 +29,6 @@ type HomepageClientProps = {
 
 function compactMeta(card: HomepageLiveCard) {
   return card.meta.filter(Boolean).slice(0, 2).join(' / ');
-}
-
-function formatHeroEyebrow(value: string) {
-  return value
-    .split(',')
-    .map((item) => item.trim())
-    .filter(Boolean)
-    .join(' • ');
 }
 
 function InlineIcon({ icon: Icon }: { icon: LucideIcon }) {
@@ -42,151 +39,155 @@ function InlineIcon({ icon: Icon }: { icon: LucideIcon }) {
   );
 }
 
-function pluralizeCount(value: number, forms: [string, string, string]) {
-  const absolute = Math.abs(value);
-  const mod10 = absolute % 10;
-  const mod100 = absolute % 100;
-  const form = mod10 === 1 && mod100 !== 11 ? forms[0] : mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14) ? forms[1] : forms[2];
+const roleRouterCards = [
+  {
+    title: 'Я специалист',
+    description: 'Найдите обучение, события, вакансии и материалы.',
+    href: '/education',
+    icon: School
+  },
+  {
+    title: 'Я представляю заведение',
+    description: 'Подберите поставщиков, вакансии, консультацию или цифровой инструмент.',
+    href: '/business',
+    icon: Store
+  },
+  {
+    title: 'Я поставщик',
+    description: 'Добавьте компанию в каталог и получайте заявки от заведений.',
+    href: '/suppliers',
+    icon: PackageCheck
+  },
+  {
+    title: 'Я бренд / партнёр',
+    description: 'Обсудите спонсорство, событие, материал или спецпроект.',
+    href: '/partners',
+    icon: Handshake
+  }
+] as const;
 
-  return `${value} ${form}`;
-}
+const heroQuickLinks = [
+  { label: 'Обучение', href: '/education' },
+  { label: 'События', href: '/events' },
+  { label: 'Вакансии', href: '/vacancies' },
+  { label: 'Поставщики', href: '/suppliers' },
+  { label: 'Партнёры', href: '/partners' }
+] as const;
 
-function countOrStatus(value: number, forms: [string, string, string], fallback: string) {
-  return value > 0 ? pluralizeCount(value, forms) : fallback;
-}
-
-function getRouteGroups(data: HomepageData) {
-  return [
-    {
-      group: 'Учиться и читать',
-      entries: [
-        {
-          code: 'Учёба',
-          label: 'Обучение',
-          title: 'Курсы и программы',
-          useCase: 'Подобрать занятие для себя или команды.',
-          href: '/education',
-          status: countOrStatus(data.stats.courses, ['программа', 'программы', 'программ'], 'заявки открыты'),
-          actionLabel: 'Выбрать формат'
-        },
-        {
-          code: 'Тексты',
-          label: 'Материалы',
-          title: 'Статьи и разборы',
-          useCase: 'Найти рабочие тексты по сервису, команде и меню.',
-          href: '/articles',
-          status: countOrStatus(data.stats.articles, ['материал', 'материала', 'материалов'], 'раздел открыт'),
-          actionLabel: 'Читать'
-        },
-        {
-          code: 'Расчёт',
-          label: 'Инструмент',
-          title: 'Калькулятор себестоимости',
-          useCase: 'Быстро проверить стоимость напитка или заготовки.',
-          href: '/tools/cost-calculator',
-          status: 'доступен',
-          actionLabel: 'Открыть калькулятор'
-        }
-      ]
-    },
-    {
-      group: 'Работа и поставки',
-      entries: [
-        {
-          code: 'Афиша',
-          label: 'Афиша',
-          title: 'События индустрии',
-          useCase: 'Посмотреть встречи, дегустации и гостевые смены.',
-          href: '/events',
-          status: countOrStatus(data.stats.events, ['событие', 'события', 'событий'], 'афиша открыта'),
-          actionLabel: 'Смотреть афишу'
-        },
-        {
-          code: 'Работа',
-          label: 'Работа',
-          title: 'Вакансии',
-          useCase: 'Откликнуться на роль или отправить вакансию компании.',
-          href: '/vacancies',
-          status: countOrStatus(data.stats.vacancies, ['вакансия', 'вакансии', 'вакансий'], 'можно подать заявку'),
-          actionLabel: 'Смотреть вакансии'
-        },
-        {
-          code: 'Поставки',
-          label: 'Каталог',
-          title: 'Поставщики',
-          useCase: 'Найти компании, сервисы и контакты для закупок.',
-          href: '/suppliers',
-          status: countOrStatus(data.stats.suppliers, ['поставщик', 'поставщика', 'поставщиков'], 'каталог открыт'),
-          actionLabel: 'Открыть каталог'
-        }
-      ]
-    },
-    {
-      group: 'Партнёрство',
-      entries: [
-        {
-          code: 'Партнёры',
-          label: 'Проекты',
-          title: 'Партнёры',
-          useCase: 'Предложить совместный проект, площадку или бренд.',
-          href: '/partners',
-          status: countOrStatus(data.stats.partners, ['партнёр', 'партнёра', 'партнёров'], 'заявки открыты'),
-          actionLabel: 'Обсудить формат'
-        },
-        {
-          code: 'Спонсоры',
-          label: 'Спонсорство',
-          title: 'Генеральные спонсоры',
-          useCase: 'Посмотреть профиль спонсора и форматы участия.',
-          href: '/general-sponsors',
-          status: data.generalSponsors.length > 0 ? pluralizeCount(data.generalSponsors.length, ['профиль', 'профиля', 'профилей']) : 'профиль готовится',
-          actionLabel: 'Смотреть пакеты'
-        }
-      ]
-    }
-  ];
-}
-
-function RouteIndexPanel({ data }: { data: HomepageData }) {
+function HomeHeroRouter() {
   return (
-    <section className="background-zone background-zone-ivory scroll-mt-28 border-b border-[var(--line)] py-10 md:py-14" id="home-actions">
-      <div className="container">
-        <div className="border-y border-[var(--line)] py-6 md:py-8">
-          <div className="max-w-3xl">
-            <div>
-              <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--accent)]">Разделы сайта</p>
-              <h2 className={`${displayFont.className} mt-3 text-[2.1rem] font-semibold leading-[1.04] text-[var(--text)] md:text-[2.8rem]`}>
-                Куда перейти
-              </h2>
-            </div>
-          </div>
-
-          <div className="mt-7 grid gap-8">
-            {getRouteGroups(data).map((group) => (
-              <section className="min-w-0" key={group.group}>
-                <div className="flex items-center gap-4">
-                  <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--muted)]">{group.group}</p>
-                  <span className="h-px flex-1 bg-[var(--line)]" />
-                </div>
-                <div className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-                  {group.entries.map((entry) => (
-                    <RoleTaskCard
-                      action={{ href: entry.href, label: entry.actionLabel }}
-                      code={entry.code}
-                      density="compact"
-                      description={entry.useCase}
-                      eyebrow={entry.label}
-                      key={entry.code}
-                      meta={entry.status}
-                      metaLabel="Статус"
-                      title={entry.title}
-                    />
-                  ))}
-                </div>
-              </section>
+    <section
+      aria-labelledby="home-hero-title"
+      className="relative isolate flex min-h-[680px] items-center overflow-hidden border-b border-[var(--line)] bg-[#15110e] text-[#fffdf9] md:min-h-[720px] lg:min-h-[760px]"
+    >
+      <div className="absolute inset-0 z-0">
+        <Image
+          alt="Кофейный бар с эспрессо-машиной и полками"
+          className="object-cover object-[center_52%] saturate-[0.94] contrast-[1.02]"
+          fill
+          priority
+          sizes="100vw"
+          src="/images/home/hero-coffee-counter-haberdoedas.jpg"
+        />
+      </div>
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 z-[1]"
+        style={{
+          background:
+            'linear-gradient(90deg, rgba(18,14,12,0.98), rgba(18,14,12,0.83) 43%, rgba(18,14,12,0.32) 74%, rgba(18,14,12,0.14)), linear-gradient(0deg, rgba(18,14,12,0.68), rgba(18,14,12,0.08) 54%), radial-gradient(circle at 18% 34%, rgba(157,9,14,0.18), transparent 24rem)'
+        }}
+      />
+      <div className="container relative z-[2] py-16 md:py-24">
+        <div className="max-w-[58rem]">
+          <p className={`${accentFont.className} text-[11px] font-semibold uppercase tracking-[0.18em] text-[#f2b0a8]`}>
+            BARSYNERGY / Барная индустрия СКФО
+          </p>
+          <h1 className={`${displayFont.className} mt-4 max-w-[55rem] text-[clamp(2.8rem,5vw,4.8rem)] font-semibold leading-[1.04] text-balance text-[#fffdf9] max-[640px]:max-w-[15ch] max-[640px]:text-[clamp(2.25rem,9.6vw,2.55rem)]`} id="home-hero-title">
+            Платформа, которая объединяет людей индустрии кофе и бара
+          </h1>
+          <p className="mt-5 max-w-2xl text-[15px] leading-7 text-[rgba(255,253,249,0.78)] md:text-base">
+            Обучение, события, вакансии, поставщики, расчёты и партнёрские заявки для баров, кофеен, команд и брендов региона.
+          </p>
+          <form
+            action="/articles"
+            aria-label="Поиск по материалам BARSYNERGY"
+            className="home-hero-search mt-8 grid min-h-16 w-full max-w-[43rem] grid-cols-[2.75rem_minmax(0,1fr)_auto] items-center border-b border-[rgba(255,253,249,0.46)] text-[rgba(255,253,249,0.9)] max-[640px]:grid-cols-[2.35rem_minmax(0,1fr)] max-[640px]:gap-y-3 max-[640px]:pb-4"
+            method="get"
+            role="search"
+          >
+            <Search aria-hidden="true" size={24} strokeWidth={1.8} />
+            <input
+              aria-label="Поиск по материалам"
+              className="home-hero-search-input min-w-0 bg-transparent text-[clamp(1.05rem,2vw,1.45rem)] leading-[1.4] text-[rgba(255,253,249,0.92)] outline-none placeholder:text-[rgba(255,253,249,0.56)]"
+              name="q"
+              placeholder="Поиск по платформе"
+              type="search"
+            />
+            <button
+              className="min-h-11 rounded-[var(--radius-md)] border border-[var(--accent-burgundy)] bg-[var(--accent-burgundy)] px-4 text-sm font-bold text-[var(--accent-burgundy-contrast)] transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] hover:border-[var(--accent-burgundy-strong)] hover:bg-[var(--accent-burgundy-strong)] focus-visible:border-[var(--accent-burgundy-strong)] focus-visible:bg-[var(--accent-burgundy-strong)] motion-reduce:transition-none max-[640px]:col-span-2 max-[640px]:w-full"
+              type="submit"
+            >
+              Искать
+            </button>
+          </form>
+          <nav aria-label="Быстрые направления" className="mt-5 flex flex-wrap gap-2.5">
+            {heroQuickLinks.map((link) => (
+              <Link
+                className="inline-flex min-h-10 items-center rounded-[var(--radius-pill)] border border-[rgba(255,253,249,0.3)] px-3 py-1.5 text-[13px] font-bold text-[rgba(255,253,249,0.8)] transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] hover:border-[rgba(255,253,249,0.68)] hover:bg-[rgba(255,253,249,0.08)] hover:text-[#fffdf9] focus-visible:border-[rgba(255,253,249,0.68)] focus-visible:bg-[rgba(255,253,249,0.08)] focus-visible:text-[#fffdf9] motion-reduce:transition-none"
+                href={link.href}
+                key={link.href}
+              >
+                {link.label}
+              </Link>
             ))}
-          </div>
+          </nav>
         </div>
+      </div>
+    </section>
+  );
+}
+
+function HomeRoleRouter() {
+  return (
+    <section className="background-zone background-zone-ivory scroll-mt-28 border-b border-[var(--line)] py-8 md:py-12" id="home-role-router">
+      <div className="container">
+        <div className="mb-6">
+          <p className={`${accentFont.className} text-[11px] uppercase tracking-[0.18em] text-[var(--accent)]`}>Разделы</p>
+          <h2 className={`${displayFont.className} mt-2 text-[2.3rem] font-semibold leading-none text-[var(--text)] md:text-[3.1rem]`}>
+            Выберите свое направление
+          </h2>
+        </div>
+        <ul className="home-role-list border-t border-[var(--line)]">
+          {roleRouterCards.map((card) => {
+            const Icon = card.icon;
+
+            return (
+              <li className="min-w-0" key={card.title}>
+                <Link
+                  aria-label={`Перейти в раздел: ${card.title}`}
+                  className="home-role-row group grid gap-3 border-b border-[var(--line)] py-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] md:grid-cols-[minmax(0,0.58fr)_minmax(0,1fr)_auto] md:items-center md:gap-5"
+                  href={card.href}
+                >
+                  <span className="flex min-w-0 items-center gap-3">
+                    <span className="home-role-row-icon" aria-hidden="true">
+                      <Icon size={18} strokeWidth={1.8} />
+                    </span>
+                    <h3 className={`${displayFont.className} text-[1.45rem] font-semibold leading-[1.05] text-[var(--text)] md:text-[1.8rem]`}>
+                      {card.title}
+                    </h3>
+                  </span>
+                  <span className="text-sm leading-6 text-[var(--muted)]">{card.description}</span>
+                  <span className="flex items-center gap-3 md:justify-end">
+                    <span className="home-role-card-nav" aria-hidden="true">
+                      <ArrowUpRight size={15} strokeWidth={1.8} />
+                    </span>
+                  </span>
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
       </div>
     </section>
   );
@@ -195,23 +196,41 @@ function RouteIndexPanel({ data }: { data: HomepageData }) {
 const businessDigitalServices = [
   {
     label: 'Сайты и лендинги',
-    pain: 'Нужно быстро показать событие, набор, партнёрский проект или новое меню без долгой разработки.',
-    result: 'Страница с понятной структурой, формой заявки, аналитикой и базовой SEO-подготовкой.'
+    pain: 'Нужно быстро показать событие, набор, партнёрский проект или новое меню.',
+    result: 'Страница с понятной структурой, формой заявки, аналитикой и базовой SEO-настройкой.'
   },
   {
     label: 'Telegram-боты',
-    pain: 'Заявки, записи, напоминания и первичные ответы собираются вручную в личных чатах.',
-    result: 'Бот принимает обращения, задаёт нужные вопросы и передаёт данные команде в рабочем формате.'
+    pain: 'Заявки, записи и напоминания сейчас собираются вручную в личных чатах.',
+    result: 'Бот задаёт нужные вопросы и передаёт ответы команде.'
   },
   {
     label: 'Mini Apps',
-    pain: 'Гостю, участнику или партнёру нужен короткий сценарий внутри Telegram без отдельной регистрации.',
-    result: 'Мини-приложение для записи, каталога, анкеты, личного статуса или простой программы события.'
+    pain: 'Гостю, участнику или партнёру нужен короткий путь внутри Telegram без отдельной регистрации.',
+    result: 'Мини-приложение для записи, каталога, анкеты или программы события.'
   },
   {
     label: 'Автоматизация процессов',
-    pain: 'Команда тратит время на повторяющиеся проверки, таблицы, пересылки и ручные статусы.',
-    result: 'Связка форм, уведомлений, таблиц, CRM или внутренних панелей без лишнего ручного контроля.'
+    pain: 'Команда тратит время на проверки, таблицы, пересылки и ручные статусы.',
+    result: 'Формы, уведомления, таблицы или внутренняя панель в одном рабочем сценарии.'
+  }
+] as const;
+
+const businessDigitalProcessSteps = [
+  {
+    value: '1',
+    title: 'Задача',
+    description: 'Фиксируем сценарий: заявка, запись, каталог, партнёрская страница или внутренняя форма.'
+  },
+  {
+    value: '2',
+    title: 'Сборка',
+    description: 'Собираем рабочий экран, вопросы, уведомления и точки передачи заявки команде.'
+  },
+  {
+    value: '3',
+    title: 'Запуск',
+    description: 'Передаём ссылку, проверяем путь пользователя и оставляем понятный процесс обработки.'
   }
 ] as const;
 
@@ -219,41 +238,42 @@ function BusinessDigitalSolutionsSection() {
   return (
     <section className="background-zone background-zone-ivory scroll-mt-28 border-b border-[var(--line)] py-10 md:py-14" id="home-digital-solutions">
       <div className="container">
-        <div className="grid gap-8 lg:grid-cols-[minmax(0,0.88fr)_minmax(0,1.12fr)] lg:items-start">
-          <div className="max-w-3xl">
+        <div className="grid gap-8 lg:grid-cols-[minmax(0,0.88fr)_minmax(0,1.12fr)] lg:items-stretch">
+          <div className="home-digital-intro flex min-w-0 flex-col">
             <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--accent)]">Цифровые решения</p>
             <h2 className={`${displayFont.className} mt-3 text-[2.1rem] font-semibold leading-[1.04] text-[var(--text)] md:text-[2.85rem]`}>
               Сайты, боты и автоматизация для барных проектов
             </h2>
             <p className="mt-4 text-sm leading-7 text-[var(--muted)] md:text-[15px]">
-              Помогаем барам, школам, поставщикам и партнёрам быстро собрать рабочий цифровой сценарий: от страницы мероприятия до Telegram-бота или внутренней заявки.
+              Соберём страницу, Telegram-бот, Mini App или внутреннюю форму под задачу бара, школы, поставщика или партнёра.
             </p>
-            <div className="mt-6 flex flex-wrap gap-2">
-              {['сайт', 'бот', 'Mini App', 'процесс'].map((item) => (
-                <MetaChip className="bg-[var(--surface-wash)] text-[var(--text)]" key={item} variant="filter">
-                  {item}
-                </MetaChip>
-              ))}
-            </div>
             <Button className="mt-7 w-full max-w-[17rem] rounded-[var(--radius-md)]" href="/contacts?topic=other#contact-form">
-              Обсудить задачу
+              Оставить заявку
               <ArrowUpRight size={16} />
             </Button>
+            <div className="home-digital-process mt-9 border-t border-[var(--line)] pt-5 lg:mt-10 lg:pt-6">
+              <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--muted)]">От задачи к запуску</p>
+              <ol className="mt-4 grid gap-3">
+                {businessDigitalProcessSteps.map((step) => (
+                  <li className="home-digital-process-step grid grid-cols-[2.4rem_minmax(0,1fr)] gap-3" key={step.value}>
+                    <span className="home-digital-process-index">{step.value}</span>
+                    <span>
+                      <span className="block text-sm font-semibold leading-5 text-[var(--text)]">{step.title}</span>
+                      <span className="mt-1 block text-sm leading-6 text-[var(--muted)]">{step.description}</span>
+                    </span>
+                  </li>
+                ))}
+              </ol>
+            </div>
           </div>
 
           <div className="grid gap-3 sm:grid-cols-2">
-            {businessDigitalServices.map((service, index) => (
+            {businessDigitalServices.map((service) => (
               <article
-                className="flex min-h-[16rem] flex-col rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[color-mix(in_oklab,var(--surface),white_18%)] p-4 shadow-[0_12px_34px_rgba(20,20,18,0.028)] md:p-5"
+                className="public-card-shell flex min-h-[16rem] flex-col p-4 md:p-5"
                 key={service.label}
               >
-                <div className="flex items-start justify-between gap-3">
-                  <span className="inline-flex min-h-7 items-center rounded-[var(--radius-sm)] border border-[var(--border-default)] bg-[var(--surface-wash)] px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--muted)]">
-                    Услуга
-                  </span>
-                  <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--accent)]">D{String(index + 1).padStart(2, '0')}</span>
-                </div>
-                <h3 className={`${displayFont.className} mt-4 text-[1.55rem] font-semibold leading-[1.04] text-[var(--text)]`}>
+                <h3 className={`${displayFont.className} text-[1.55rem] font-semibold leading-[1.04] text-[var(--text)]`}>
                   {service.label}
                 </h3>
                 <dl className="mt-4 grid gap-3 border-t border-[var(--line)] pt-4">
@@ -269,119 +289,6 @@ function BusinessDigitalSolutionsSection() {
               </article>
             ))}
           </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-const audienceActionFallbacks = [
-  {
-    actionLabel: 'Выбрать формат',
-    description: 'Курсы, события, материалы и вакансии по региону.',
-    href: '/education',
-    id: 'homepage-audience-specialists',
-    proof: 'обучение, афиша, вакансии',
-    title: 'Для специалиста'
-  },
-  {
-    actionLabel: 'Открыть вакансии',
-    description: 'Разместить вакансию, найти поставщика или собрать обучение для команды.',
-    href: '/vacancies',
-    id: 'homepage-audience-venues',
-    proof: 'найм, закупки, команда',
-    title: 'Для заведения'
-  },
-  {
-    actionLabel: 'Смотреть форматы',
-    description: 'Попасть в каталог, обсудить событие или партнёрский формат.',
-    href: '/partners',
-    id: 'homepage-audience-brands',
-    proof: 'каталог, партнёрство, спонсорство',
-    title: 'Для бренда или поставщика'
-  }
-] satisfies HomepageAudienceCardBlock[];
-
-const audienceQuickLinks = {
-  specialist: [
-    { href: '/education', label: 'Обучение' },
-    { href: '/events', label: 'Афиша' },
-    { href: '/vacancies', label: 'Вакансии' }
-  ],
-  venue: [
-    { href: '/vacancies#submit-vacancy', label: 'Вакансия' },
-    { href: '/suppliers', label: 'Поставщики' },
-    { href: '/education?formType=corporate#education-request', label: 'Команда' }
-  ],
-  brand: [
-    { href: '/partners', label: 'Партнёрство' },
-    { href: '/suppliers', label: 'Каталог' },
-    { href: '/general-sponsors', label: 'Спонсорство' }
-  ]
-} as const;
-
-const audienceRoleConfigs = [
-  {
-    fallback: audienceActionFallbacks[0] as HomepageAudienceCardBlock,
-    quickLinks: audienceQuickLinks.specialist,
-    actionLabel: 'Выбрать формат',
-    roleLabel: 'Специалист',
-    roleTitle: 'Найти обучение, события и работу'
-  },
-  {
-    fallback: audienceActionFallbacks[1] as HomepageAudienceCardBlock,
-    quickLinks: audienceQuickLinks.venue,
-    actionLabel: 'Открыть вакансии',
-    roleLabel: 'Заведение',
-    roleTitle: 'Закрыть задачу заведения'
-  },
-  {
-    fallback: audienceActionFallbacks[2] as HomepageAudienceCardBlock,
-    quickLinks: audienceQuickLinks.brand,
-    actionLabel: 'Выбрать формат',
-    roleLabel: 'Бренд / поставщик',
-    roleTitle: 'Выбрать партнёрский формат'
-  }
-] as const;
-
-function audienceCardsForDisplay(cards: HomepageAudienceCardBlock[]) {
-  return audienceRoleConfigs.map((config, index) => ({
-    card: cards[index] ?? config.fallback,
-    config
-  }));
-}
-
-function AudienceActionCards({ cards }: { cards: HomepageAudienceCardBlock[] }) {
-  const displayCards = audienceCardsForDisplay(cards);
-
-  return (
-    <section className="background-zone background-zone-gray scroll-mt-28 border-b border-[var(--line)] py-10 md:py-14" id="home-next-actions">
-      <div className="container">
-        <div className="mb-7 max-w-3xl">
-          <div>
-            <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--text)]">Роли и задачи</p>
-            <h2 className={`${displayFont.className} mt-3 text-[2.1rem] font-semibold leading-[1.04] text-[var(--text)] md:text-[2.75rem]`}>
-              Что нужно сделать
-            </h2>
-          </div>
-        </div>
-
-        <div className="grid items-stretch gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {displayCards.map(({ card, config }, index) => {
-            return (
-              <RoleTaskCard
-                action={{ href: card.href, label: config.actionLabel }}
-                code={`A${String(index + 1).padStart(2, '0')}`}
-                description={card.description}
-                eyebrow={config.roleLabel}
-                key={card.id}
-                meta={card.proof ?? 'заявка, раздел и контакт с командой'}
-                metaLabel="Подходит для"
-                quickLinks={config.quickLinks}
-                title={config.roleTitle}
-              />
-            );
-          })}
         </div>
       </div>
     </section>
@@ -405,37 +312,37 @@ const channelDetailsByVariant: Record<HomepageSocialBlock['variant'], { platform
 
 function CommunityChannelRows({ channels }: { channels: HomepageSocialBlock[] }) {
   return (
-    <section className="background-zone background-zone-social scroll-mt-28 border-b border-[var(--line)] py-10 md:py-14" id="home-community">
-      <div className="container">
-        <div className="max-w-3xl">
-          <p className={`${accentFont.className} text-sm uppercase tracking-[0.24em] text-[var(--accent)]`}>Сообщество</p>
-          <h2 className={`${displayFont.className} display-tight mt-5 max-w-5xl text-[38px] md:text-[58px] xl:text-[70px]`}>
+    <div className="home-community-panel scroll-mt-28 border-t border-[var(--line)] pt-6 md:pt-7" id="home-community">
+      <div>
+        <div className="max-w-2xl">
+          <p className={`${accentFont.className} text-xs uppercase tracking-[0.2em] text-[var(--accent)]`}>Сообщество</p>
+          <h3 className={`${displayFont.className} mt-3 text-[2rem] font-semibold leading-[1.02] text-[var(--editorial-dark-text)] md:text-[2.8rem]`}>
             Каналы BARSYNERGY
-          </h2>
-        </div>
-
-        <div className="mx-auto mt-8 grid max-w-4xl items-stretch gap-3 md:grid-cols-3">
-          {channels.map((channel) => {
-            const details = channelDetailsByVariant[channel.variant];
-
-            return (
-              <SocialLinkCard
-                actionLabel={channel.actionLabel}
-                description={channel.description}
-                helperText={channel.helperText}
-                href={channel.href}
-                key={channel.id}
-                logoSrc={channel.logoPath}
-                serviceName={details.platformLabel}
-                title={channel.title}
-                typeLabel={details.typeLabel}
-                variant={channel.variant}
-              />
-            );
-          })}
+          </h3>
         </div>
       </div>
-    </section>
+
+      <div className="mt-6 grid items-stretch gap-3 md:grid-cols-3">
+        {channels.map((channel) => {
+          const details = channelDetailsByVariant[channel.variant];
+
+          return (
+            <SocialLinkCard
+              actionLabel={channel.actionLabel}
+              description={channel.description}
+              helperText={channel.helperText}
+              href={channel.href}
+              key={channel.id}
+              logoSrc={channel.logoPath}
+              serviceName={details.platformLabel}
+              title={channel.title}
+              typeLabel={details.typeLabel}
+              variant={channel.variant}
+            />
+          );
+        })}
+      </div>
+    </div>
   );
 }
 
@@ -444,7 +351,7 @@ function NowCard({
   card,
   href,
   actionLabel,
-  fallbackMeta = 'Открыть раздел',
+  fallbackMeta = 'Раздел платформы',
   icon
 }: {
   label: string;
@@ -456,7 +363,7 @@ function NowCard({
 }) {
   return (
     <Link
-      className="group grid grid-cols-[2.75rem_minmax(0,1fr)] gap-x-3 border-b border-[var(--line)] py-3 transition hover:border-[var(--accent)]/34 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] sm:flex sm:h-full sm:min-h-[13rem] sm:flex-col sm:rounded-[var(--radius-lg)] sm:border sm:border-[var(--border-default)] sm:bg-[var(--surface-wash)] sm:p-4 sm:hover:bg-[var(--surface-wash-strong)]"
+      className="group grid grid-cols-[2.75rem_minmax(0,1fr)] gap-x-3 border-b border-[var(--line)] py-3 transition-[background-color,border-color,color,box-shadow] duration-[var(--motion-duration-base)] ease-[var(--motion-ease-standard)] hover:border-[var(--accent)]/34 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] motion-reduce:transition-none sm:flex sm:h-full sm:min-h-[11.5rem] sm:flex-col sm:rounded-[var(--radius-lg)] sm:border sm:border-[var(--card-border)] sm:bg-[var(--surface-card)] sm:p-4 sm:shadow-[var(--shadow-card)] sm:hover:border-[var(--card-border-hover)] sm:hover:bg-[var(--surface-card-hover)]"
       href={card?.href ?? href}
     >
       <span className="row-span-4 sm:flex sm:items-start sm:justify-between sm:gap-3">
@@ -476,65 +383,173 @@ function NowCard({
   );
 }
 
+function normalizedMetaKey(value: string) {
+  return value.trim().toLowerCase();
+}
+
+function getVisibleFeaturedMeta(card: HomepageLiveCard) {
+  const hiddenMeta = new Set(['Открытый доступ', card.eyebrow].map(normalizedMetaKey));
+  const seenMeta = new Set<string>();
+
+  return card.meta
+    .map((entry) => entry.trim())
+    .filter((entry) => {
+      if (!entry) {
+        return false;
+      }
+
+      const key = normalizedMetaKey(entry);
+
+      if (hiddenMeta.has(key) || seenMeta.has(key)) {
+        return false;
+      }
+
+      seenMeta.add(key);
+      return true;
+    })
+    .slice(0, 3);
+}
+
 function FeaturedNowCard({ card }: { card: HomepageLiveCard }) {
+  const visibleMeta = getVisibleFeaturedMeta(card);
+
   return (
     <Link
-      className="group grid overflow-hidden rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[color-mix(in_oklab,var(--surface),white_20%)] shadow-[0_18px_54px_rgba(20,20,18,0.045)] transition hover:border-[var(--accent)]/30 hover:bg-[color-mix(in_oklab,var(--surface),white_26%)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] md:rounded-[var(--radius-xl)] lg:min-h-[260px] lg:grid-cols-[minmax(0,0.78fr)_minmax(0,1fr)]"
+      className="public-card-shell featured-now-card group grid overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] md:rounded-[var(--radius-xl)] lg:grid-cols-[minmax(0,0.78fr)_minmax(0,1fr)] xl:self-start"
       href={card.href}
     >
       <span
         aria-hidden="true"
-        className="min-h-[118px] bg-[linear-gradient(135deg,rgba(153,44,38,0.13),rgba(20,20,18,0.08))] bg-cover bg-center grayscale-[0.08] transition-transform duration-700 group-hover:scale-[1.02] sm:min-h-[150px] lg:min-h-full"
+        className="featured-now-media min-h-[118px] bg-[linear-gradient(135deg,rgba(153,44,38,0.13),rgba(20,20,18,0.08))] bg-cover bg-center grayscale-[0.08] transition-transform duration-[var(--motion-duration-media)] ease-[var(--motion-ease-move)] group-hover:scale-[1.02] motion-reduce:transition-none sm:min-h-[150px] lg:min-h-full"
         style={card.imageUrl ? { backgroundImage: `url("${card.imageUrl}")` } : undefined}
       />
-      <span className="flex min-w-0 flex-col justify-between p-4 md:p-6">
+      <span className="featured-now-content flex min-w-0 flex-col p-4 md:p-6">
         <span>
-          <span className="flex flex-wrap gap-2">
-            <span className="inline-flex w-fit rounded-[var(--radius-sm)] border border-[var(--accent)]/22 bg-[var(--accent-soft)] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--accent)]">
+          <span className="featured-now-meta-row flex flex-wrap gap-2">
+            <span className="public-card-label w-fit">
               {card.eyebrow}
             </span>
-            {card.meta.slice(0, 3).map((entry) => (
+            {visibleMeta.map((entry) => (
               <span
-                className="inline-flex w-fit rounded-[var(--radius-sm)] border border-[var(--border-default)] bg-[var(--surface-wash)] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--muted)]"
+                className="public-card-meta w-fit text-[var(--muted)]"
                 key={entry}
               >
                 {entry}
               </span>
             ))}
           </span>
-          <span className={`${displayFont.className} mt-3 block text-[1.8rem] font-semibold leading-none text-[var(--text)] md:mt-4 md:text-[2.45rem]`}>
+          <span className={`${displayFont.className} featured-now-title mt-3 block text-[1.8rem] font-semibold leading-none text-[var(--text)] md:mt-4 md:text-[2.45rem]`}>
             {card.title}
           </span>
-          <span className="mt-3 block max-h-[4.5rem] max-w-2xl overflow-hidden text-sm leading-6 text-[var(--muted)] md:mt-4 md:max-h-[5.2rem] md:leading-7 md:text-[15px]">{card.summary}</span>
+          <span className="featured-now-summary mt-3 block max-h-[4.5rem] max-w-2xl overflow-hidden text-sm leading-6 text-[var(--muted)] md:mt-4 md:max-h-[5.2rem] md:leading-7 md:text-[15px]">{card.summary}</span>
         </span>
-        <span className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-[var(--accent)] md:mt-5">
-          {card.actionLabel}
-          <ArrowUpRight className="transition-transform group-hover:translate-x-1" size={16} />
+        <span className="featured-now-footer mt-5 flex flex-wrap items-center gap-3 border-t border-[var(--line)] pt-4 md:mt-6">
+          <span className="featured-now-action inline-flex items-center gap-2 text-sm font-semibold text-[var(--accent)]">
+            {card.actionLabel}
+            <ArrowUpRight className="transition-transform duration-[var(--motion-duration-base)] ease-[var(--motion-ease-move)] group-hover:translate-x-1 motion-reduce:transition-none" size={16} />
+          </span>
         </span>
       </span>
     </Link>
   );
 }
 
+const homepageFaqItems = [
+  {
+    question: 'Что уже можно сделать на платформе?',
+    answer: 'Можно читать материалы, смотреть образовательные форматы, проверять вакансии, находить поставщиков и оставлять заявки на партнёрские задачи.'
+  },
+  {
+    question: 'Кому подходит BARSYNERGY?',
+    answer: 'Платформа рассчитана на барменов, управляющих, владельцев заведений, поставщиков, бренды и специалистов, которые работают с HoReCa в СКФО.'
+  },
+  {
+    question: 'Можно ли предложить своё событие или материал?',
+    answer: 'Да. Через раздел контактов можно отправить идею события, партнёрского проекта, обучающего формата или публикации.'
+  },
+  {
+    question: 'Есть ли инструменты для бизнеса?',
+    answer: 'Да. На главной уже есть калькулятор себестоимости, а для заведений доступны заявки по цифровым решениям, вакансиям, поставщикам и консалтингу.'
+  },
+  {
+    question: 'Как связаться с командой?',
+    answer: 'Откройте форму в контактах и выберите тему обращения. Так заявка сразу попадёт в правильный рабочий сценарий.'
+  }
+] as const;
+
+function HomeCtaFaqSection() {
+  const [activeIndex, setActiveIndex] = useState<number | null>(0);
+
+  const toggleFaq = (index: number) => {
+    setActiveIndex((currentIndex) => (currentIndex === index ? null : index));
+  };
+
+  return (
+    <section
+      className="background-zone background-zone-ivory border-b border-[var(--line)] py-16 text-[var(--text)] max-[900px]:py-[60px]"
+      id="home-platform-help"
+    >
+      <div className="mx-auto w-full max-w-[1100px] px-5">
+        <div className="grid grid-cols-[1.6fr_1fr] items-stretch gap-[30px] max-[900px]:grid-cols-1 max-[900px]:gap-[60px]">
+          <div
+            className="bars-home-gradient flex flex-col items-center justify-center rounded-[var(--radius-xl)] border border-[var(--editorial-dark-border)] px-10 py-20 text-center text-[var(--editorial-dark-text)] max-[640px]:px-6 max-[640px]:py-14"
+            style={{ boxShadow: 'var(--shadow-panel)' }}
+          >
+            <h2
+              className={`${displayFont.className} mb-[15px] text-[3.35rem] font-semibold leading-[1.04] max-[640px]:text-[2.45rem]`}
+            >
+              Напишите команде
+              <br />
+              BARSYNERGY
+            </h2>
+            <p className="mb-[30px] max-w-[34rem] text-[0.95rem] font-medium leading-7 text-[var(--editorial-dark-muted)]">
+              Ответим на вопрос, примем идею события или поможем выбрать нужный раздел.
+            </p>
+          </div>
+
+          <div className="home-help-faq-list flex flex-col gap-3">
+            {homepageFaqItems.map((item, index) => {
+              const isActive = activeIndex === index;
+
+              return (
+                <button
+                  aria-expanded={isActive}
+                  aria-controls={`home-faq-answer-${index}`}
+                  className="home-help-faq-item cursor-pointer rounded-[var(--radius-md)] border bg-[var(--surface-card)] px-5 py-[18px] text-left transition-[background-color,border-color,box-shadow,color] duration-[var(--motion-duration-base)] ease-[var(--motion-ease-standard)] hover:border-[var(--card-border-hover)] hover:bg-[var(--surface-card-hover)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] motion-reduce:transition-none"
+                  data-active={isActive ? 'true' : 'false'}
+                  key={item.question}
+                  onClick={() => toggleFaq(index)}
+                  style={{
+                    borderColor: isActive ? 'var(--card-border-hover)' : 'var(--card-border)',
+                    boxShadow: isActive ? 'var(--shadow-card)' : 'none'
+                  }}
+                  type="button"
+                >
+                  <span className="flex items-center justify-between gap-4 text-[0.9rem] font-semibold text-[var(--text)]">
+                    <span>{item.question}</span>
+                    {isActive ? <ChevronUp aria-hidden="true" size={20} /> : <ChevronDown aria-hidden="true" size={20} />}
+                  </span>
+                  {isActive ? (
+                    <span className="home-help-faq-answer mt-3 block text-[0.9rem] leading-[1.6] text-[var(--muted)]" id={`home-faq-answer-${index}`}>
+                      {item.answer}
+                    </span>
+                  ) : null}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export function HomepageClient({ data }: HomepageClientProps) {
   return (
     <div className="overflow-x-hidden">
-      <section className="background-zone background-zone-hero border-b border-[var(--line)] py-8 md:py-12">
-        <div className="container">
-          <div className="min-w-0">
-            <p className={`${accentFont.className} text-[11px] font-bold uppercase tracking-[0.22em] text-[var(--accent)]`}>
-              {formatHeroEyebrow(data.hero.eyebrow)}
-            </p>
-            <h1 className={`${displayFont.className} mt-6 max-w-5xl text-[clamp(3.1rem,6.6vw,6.7rem)] font-semibold leading-[1.08] text-[var(--text)]`}>
-              {data.hero.title}
-            </h1>
-            <div className="mt-7 max-w-4xl border-y border-[var(--line)] py-5">
-              <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--accent)]">Что такое BARSYNERGY</p>
-              <p className="mt-3 text-base leading-8 text-[var(--text)] md:text-lg">{data.hero.description}</p>
-            </div>
-          </div>
-        </div>
-      </section>
+      <HomeHeroRouter />
+
+      <HomeRoleRouter />
 
       <section className="background-zone background-zone-beige scroll-mt-28 border-b border-[var(--line)] py-8 md:py-14" id="home-current">
         <div className="container">
@@ -544,30 +559,23 @@ export function HomepageClient({ data }: HomepageClientProps) {
                 Актуальное
               </h2>
             </div>
-            <Button className="px-0 text-sm tracking-normal" href="/articles" variant="ghost">
+            <Button className="px-0 text-sm tracking-normal" href="/articles" variant="link">
               Все материалы
               <ArrowUpRight size={16} />
             </Button>
           </div>
-          <div className="grid gap-4 xl:grid-cols-[minmax(0,1.08fr)_minmax(20rem,0.62fr)]">
+          <div className="home-current-layout grid gap-4">
             <FeaturedNowCard card={data.article} />
-            <div className="border-y border-[var(--line)] sm:border-y-0 xl:[&>a]:h-full">
-              <NowCard actionLabel="Открыть событие" card={data.event} href="/events" icon={CalendarDays} label="Событие" />
-            </div>
-            <div className="border-y border-[var(--line)] sm:grid sm:grid-cols-2 sm:gap-3 sm:border-y-0 xl:col-span-2 xl:grid-cols-3">
-              <NowCard actionLabel="Откликнуться" card={data.vacancy} href="/vacancies" icon={BriefcaseBusiness} label="Вакансия" />
-              <NowCard actionLabel="Читать" card={data.secondaryArticle} fallbackMeta="Другие материалы" href="/articles" icon={BookOpen} label="Материал" />
-              <NowCard actionLabel="Открыть каталог" card={data.supplier} href="/suppliers" icon={PackageCheck} label="Поставщик" />
+            <div className="home-current-support-grid border-y border-[var(--line)] sm:grid sm:grid-cols-2 sm:gap-3 sm:border-y-0 xl:grid-cols-3">
+              <NowCard actionLabel="Откликнуться" card={data.vacancy} href="/vacancies" icon={BriefcaseBusiness} label="Вакансии" />
+              <NowCard actionLabel="Читать" card={data.secondaryArticle} fallbackMeta="Другие материалы" href="/articles" icon={BookOpen} label="Материалы" />
+              <NowCard actionLabel="Перейти в каталог" card={data.supplier} href="/suppliers" icon={PackageCheck} label="Поставщики" />
             </div>
           </div>
         </div>
       </section>
 
-      <RouteIndexPanel data={data} />
-
       {data.calculatorTeaser ? <ToolTeaser teaser={data.calculatorTeaser} /> : null}
-
-      <AudienceActionCards cards={data.audienceCards} />
 
       {data.generalSponsors.length > 0 ? (
         <section className="background-zone background-zone-sponsor border-b border-[var(--line)] py-10 md:py-14">
@@ -577,17 +585,17 @@ export function HomepageClient({ data }: HomepageClientProps) {
               <span className="h-px flex-1 bg-[var(--line)]" />
             </div>
             <div className="grid gap-5">
-              {data.generalSponsors.map((sponsor) => (
-                <GeneralSponsorCard key={sponsor.id} sponsor={sponsor} />
+              {data.generalSponsors.map((sponsor, index) => (
+                <GeneralSponsorCard key={sponsor.id} priority={index === 0} sponsor={sponsor} variant="home" />
               ))}
             </div>
           </div>
         </section>
       ) : null}
 
-      {data.socialBlocks.length > 0 ? <CommunityChannelRows channels={data.socialBlocks} /> : null}
-
       <BusinessDigitalSolutionsSection />
+
+      <HomeCtaFaqSection />
 
       {data.ctaBlock ? (
         <section className="background-zone background-zone-cta border-b border-[var(--line)] py-10 md:py-14" id="home-about">
@@ -622,6 +630,11 @@ export function HomepageClient({ data }: HomepageClientProps) {
                 </Link>
               ) : null}
             </div>
+            {data.socialBlocks.length > 0 ? (
+              <div className="md:col-span-2">
+                <CommunityChannelRows channels={data.socialBlocks} />
+              </div>
+            ) : null}
           </div>
         </section>
       ) : null}

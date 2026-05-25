@@ -17,6 +17,8 @@ const contactTopicAliases: Record<string, string> = {
   'partnership-format': 'partnership',
   sponsorship: 'sponsorship',
   'sponsorship-presentation': 'sponsorship',
+  consulting: 'consulting',
+  'consulting-request': 'consulting',
   supplier: 'supplier',
   event: 'event',
   'article-topic': 'article-topic',
@@ -62,33 +64,11 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
         eyebrow="Контакты"
         title="Связь с командой"
         description="Пишите по обучению, событиям, партнёрствам, вакансиям и поставщикам."
-        summary="Выберите тему обращения. Так команда быстрее поймёт, кто должен ответить и какие детали нужны."
+        summary="Выберите тему обращения. Так мы быстрее поймём, кто должен ответить и какие детали нужны."
+        density="task"
         summaryHeading="Каналы связи"
-        metrics={[
-          { value: 'Почта', label: 'основной канал связи' },
-          { value: 'Форма', label: 'для рабочих запросов' },
-          { value: 'Ответ', label: 'по теме обращения' }
-        ]}
-        rows={[
-          {
-            label: 'Запрос',
-            title: 'Образование и события',
-            description: 'Участие, проведение занятий, мастер-классы и корпоративные программы.'
-          },
-          {
-            label: 'Запрос',
-            title: 'Партнёрства и размещение',
-            description: 'Запросы от брендов, школ, заведений, поставщиков и работодателей.'
-          },
-          {
-            label: 'Документы',
-            title: 'Условия и данные',
-            description: 'Если запрос связан с регистрацией или персональными данными, ссылки на документы собраны здесь.'
-          }
-        ]}
-        rowsHeading="Что можно отправить"
-        primaryLink={{ label: 'Открыть форму', href: '#contact-form' }}
-        secondaryLink={{ label: 'Политика ПДн', href: '/legal/privacy' }}
+        metrics={[]}
+        rows={[]}
       />
       <ContactApplicationForm
         defaultTopic={defaultTopic}

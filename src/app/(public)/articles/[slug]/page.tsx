@@ -30,6 +30,7 @@ export default async function ArticleDetailPage({ params }: ArticleDetailPagePro
         meta={article.meta}
         primaryLink={{ href: '/articles', label: 'Смотреть все материалы' }}
         secondaryLink={{ href: '/about', label: 'О проекте' }}
+        sections={article.sections}
         summary={article.summary}
         title={article.title}
       />

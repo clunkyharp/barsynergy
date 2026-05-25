@@ -1,4 +1,5 @@
 import { PublicBodyText, PublicDisplayTitle, PublicEyebrow } from '@/components/public/public-primitives';
+import { PublicFormValidation } from '@/components/public/public-form-validation';
 import { RequestDisclosure } from '@/components/public/request-disclosure';
 import { Button } from '@/components/ui/button';
 import { EditorialShell } from '@/components/ui/editorial-shell';
@@ -26,9 +27,11 @@ type PublicApplicationSectionProps = {
   };
   disclosureAliases?: string[];
   disclosureClosedContent?: React.ReactNode;
+  disclosureClosedPanelClassName?: string;
   disclosureDefaultOpen?: boolean;
   disclosureDescription?: string;
   disclosureFocusSelector?: string;
+  disclosureHeadingLevel?: 'h2' | 'h3';
   disclosureId?: string;
   disclosureOpenLabel?: string;
   disclosureShowDefaultTrigger?: boolean;
@@ -79,12 +82,12 @@ export function ContactChannelFieldset({
   const hintId = `${emailId}-contact-channel-hint`;
 
   return (
-    <fieldset aria-describedby={hintId} aria-required="true" className={cn('form-choice-group grid gap-4 md:grid-cols-3', className)}>
-      <legend className="field-label px-1">
+    <fieldset aria-describedby={hintId} className={cn('contact-channel-fieldset grid gap-4 md:grid-cols-3', className)}>
+      <legend className="field-label">
         Способ связи <span aria-hidden="true" className="text-[var(--accent)]">*</span>
       </legend>
       <p className="field-hint md:col-span-3" id={hintId}>
-        Обязательное поле: укажите email, телефон или Telegram.
+        Укажите email, телефон или Telegram.
       </p>
       <FormField htmlFor={emailId} label="Email">
         <Input autoComplete="email" id={emailId} name="email" spellCheck={false} type="email" maxLength={180} />
@@ -99,23 +102,45 @@ export function ContactChannelFieldset({
   );
 }
 
+export function PublicSubmissionFeedback({
+  className,
+  result,
+  title
+}: {
+  className?: string;
+  result: PublicApplicationResult;
+  title?: string;
+}) {
+  const feedbackTitle = title ?? (result.type === 'error' ? 'Не удалось отправить' : 'Заявка отправлена');
+
+  return (
+    <InlineAlert className={cn('public-submission-feedback', className)} tone={result.type === 'error' ? 'error' : 'success'}>
+      <strong className="public-submission-feedback-title">{feedbackTitle}</strong>
+      <span className="public-submission-feedback-body">{result.message}</span>
+    </InlineAlert>
+  );
+}
+
 export function PublicFormShellHeader({
   eyebrow,
   title,
   description,
+  headingLevel = 'h3',
   tone = 'light'
 }: {
   eyebrow: string;
   title: string;
   description: string;
+  headingLevel?: 'h2' | 'h3';
   tone?: 'light' | 'dark';
 }) {
   const isDark = tone === 'dark';
+  const Heading = headingLevel;
 
   return (
     <div
         className={cn(
-          'relative border-b px-5 py-5 md:px-6 md:py-6',
+          'public-form-shell-header relative border-b px-5 py-5 md:px-6 md:py-6',
           isDark
             ? 'border-white/10 bg-[var(--graphite)] text-white'
             : 'border-[var(--divider-product)] bg-[var(--surface-wash)]'
@@ -128,12 +153,9 @@ export function PublicFormShellHeader({
           isDark ? 'bg-white/18' : 'bg-[var(--surface-wash-strong)]'
         )}
       />
+      <PublicFormValidation />
       <PublicEyebrow tone={isDark ? 'inverse' : 'accent'}>{eyebrow}</PublicEyebrow>
-      <PublicDisplayTitle
-        as="h3"
-        className={cn('mt-3', isDark ? 'text-white' : 'text-[var(--text)]')}
-        size="card"
-      >
+      <PublicDisplayTitle as={Heading} className={cn('mt-3', isDark ? 'text-white' : 'text-[var(--text)]')} size="card">
         {title}
       </PublicDisplayTitle>
       <PublicBodyText className="mt-3 max-w-xl" tone={isDark ? 'inverse' : 'muted'}>
@@ -155,7 +177,7 @@ export function PublicFormShellFooter({
   return (
     <div
       className={cn(
-        'mt-6 flex flex-col gap-3 border-t border-[var(--line)] pt-5 sm:flex-row sm:items-center sm:justify-between',
+        'public-form-shell-footer mt-6 flex flex-col gap-3 border-t border-[var(--line)] pt-5 sm:flex-row sm:items-center sm:justify-between',
         className
       )}
     >
@@ -176,9 +198,11 @@ export function PublicApplicationSection({
   disabledLink,
   disclosureAliases,
   disclosureClosedContent,
+  disclosureClosedPanelClassName,
   disclosureDefaultOpen,
   disclosureDescription,
   disclosureFocusSelector,
+  disclosureHeadingLevel,
   disclosureId,
   disclosureOpenLabel,
   disclosureShowDefaultTrigger,
@@ -189,10 +213,12 @@ export function PublicApplicationSection({
   const content = disclosureId ? (
     <RequestDisclosure
       aliases={disclosureAliases}
+      closedPanelClassName={disclosureClosedPanelClassName}
       closedContent={disclosureClosedContent}
       defaultOpen={Boolean(disclosureDefaultOpen || result)}
       description={disclosureDescription}
       focusSelector={disclosureFocusSelector}
+      headingLevel={disclosureHeadingLevel}
       id={disclosureId}
       openLabel={disclosureOpenLabel}
       showDefaultTrigger={disclosureShowDefaultTrigger}
@@ -218,18 +244,14 @@ export function PublicApplicationSection({
               {title}
             </PublicDisplayTitle>
             <PublicBodyText className="mt-3 max-w-2xl">{description}</PublicBodyText>
-            {result ? (
-              <InlineAlert className="mt-5" tone={result.type === 'error' ? 'error' : 'success'}>
-                {result.message}
-              </InlineAlert>
-            ) : null}
+            {result ? <PublicSubmissionFeedback className="mt-5" result={result} /> : null}
           </div>
 
           {!enabled ? (
             <EditorialShell className="p-5 md:p-6">
               <h3 className="text-lg font-semibold leading-7">Формы сейчас закрыты</h3>
               <p className="mt-3 text-sm leading-7 text-[var(--muted)]">
-                {disabledDescription ?? `Публичные формы временно закрыты. Напишите нам на ${PUBLIC_CONTACT_EMAIL}.`}
+                {disabledDescription ?? `Формы временно закрыты. Напишите нам на ${PUBLIC_CONTACT_EMAIL}.`}
               </p>
               <Button className="mt-6 rounded-[var(--radius-md)] sm:self-start" href={disabledLink?.href ?? PUBLIC_CONTACT_MAILTO} size="lg" variant="secondary">
                 {disabledLink?.label ?? 'Написать на почту'}
@@ -242,24 +264,20 @@ export function PublicApplicationSection({
   }
 
   return (
-    <section className="relative overflow-visible border-b border-[var(--line)] bg-[var(--surface)] py-14 md:py-18" id={sectionId}>
+    <section className="relative overflow-visible border-b border-[var(--line)] bg-[var(--surface)] py-8 md:py-10" id={sectionId}>
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_24%,var(--accent-soft),transparent_18%),radial-gradient(circle_at_72%_82%,rgba(20,20,18,0.05),transparent_22%)]"
       />
-      <div className="container relative grid gap-6 xl:grid-cols-[0.64fr_1.36fr] xl:items-start">
+      <div className="container relative grid gap-5 xl:grid-cols-[minmax(15rem,0.48fr)_minmax(0,1.52fr)] xl:items-start">
         <div className="xl:self-start">
-          <EditorialShell className="p-6 md:p-8">
+          <EditorialShell className="p-5 md:p-6">
             <PublicEyebrow>{eyebrow}</PublicEyebrow>
-            <PublicDisplayTitle className="mt-4 max-w-4xl !text-[clamp(2rem,3vw,3.25rem)] [overflow-wrap:normal] [word-break:normal]">
+            <PublicDisplayTitle className="mt-3 max-w-4xl !text-[clamp(1.85rem,2.5vw,2.65rem)] [overflow-wrap:normal] [word-break:normal]">
               {title}
             </PublicDisplayTitle>
-            <PublicBodyText className="mt-5 max-w-md">{description}</PublicBodyText>
-            {result ? (
-              <InlineAlert className="mt-8" tone={result.type === 'error' ? 'error' : 'success'}>
-                {result.message}
-              </InlineAlert>
-            ) : null}
+            <PublicBodyText className="mt-3 max-w-md text-sm leading-6">{description}</PublicBodyText>
+            {result ? <PublicSubmissionFeedback className="mt-5" result={result} /> : null}
           </EditorialShell>
         </div>
 
@@ -267,7 +285,7 @@ export function PublicApplicationSection({
           <EditorialShell className="p-5 md:p-6">
             <h3 className="text-lg font-semibold leading-7">Формы сейчас закрыты</h3>
             <p className="mt-3 text-sm leading-7 text-[var(--muted)]">
-              {disabledDescription ?? `Публичные формы временно закрыты. Напишите нам на ${PUBLIC_CONTACT_EMAIL}.`}
+              {disabledDescription ?? `Формы временно закрыты. Напишите нам на ${PUBLIC_CONTACT_EMAIL}.`}
             </p>
             <Button className="mt-6 rounded-[var(--radius-md)] sm:self-start" href={disabledLink?.href ?? PUBLIC_CONTACT_MAILTO} size="lg" variant="secondary">
               {disabledLink?.label ?? 'Написать на почту'}

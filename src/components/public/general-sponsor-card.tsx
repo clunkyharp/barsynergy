@@ -11,13 +11,18 @@ import type { GeneralSponsor, GeneralSponsorLinkKind } from '@/lib/public/genera
 type GeneralSponsorCardProps = {
   priority?: boolean;
   sponsor: GeneralSponsor;
+  variant?: 'full' | 'home';
 };
+
+function sponsorVisualState(status: string) {
+  return /архив|заверш|неактив|inactive|archived/i.test(status) ? 'archived' : 'active';
+}
 
 function SponsorPhoneCard({ contact }: { contact: GeneralSponsor['contacts'][number] }) {
   return (
     <a
       aria-label={`Позвонить: ${contact.name}, ${contact.phone}`}
-      className="group grid min-h-[5.5rem] grid-cols-[auto_minmax(0,1fr)] gap-3 rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--surface-wash)] p-3 transition hover:border-[var(--accent)]/32 hover:bg-[var(--surface-wash-strong)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:items-center sm:p-4"
+      className="sponsor-phone-card group grid min-h-[5.5rem] grid-cols-[auto_minmax(0,1fr)] gap-3 rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--surface-wash)] p-3 transition-[background-color,border-color,color,box-shadow] duration-[var(--motion-duration-base)] ease-[var(--motion-ease-standard)] hover:border-[var(--accent)]/32 hover:bg-[var(--surface-wash-strong)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] motion-reduce:transition-none sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:items-center sm:p-4"
       href={contact.href}
     >
       <span className="grid size-10 shrink-0 place-items-center rounded-[var(--radius-sm)] border border-[var(--accent)]/24 bg-[var(--accent-soft)] text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--accent)]">
@@ -27,7 +32,7 @@ function SponsorPhoneCard({ contact }: { contact: GeneralSponsor['contacts'][num
         <span className="block text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">Телефон</span>
         <span className="mt-1 block text-sm font-semibold leading-5 text-[var(--text)]">{contact.name}</span>
         <span
-          className="mt-1 block whitespace-nowrap text-sm leading-5 text-[var(--text)] sm:text-[0.9375rem] md:text-base"
+          className="mt-1 block break-words text-sm leading-5 text-[var(--text)] sm:text-[0.9375rem] md:text-base"
           data-sponsor-phone-number
         >
           {contact.phone}
@@ -35,7 +40,7 @@ function SponsorPhoneCard({ contact }: { contact: GeneralSponsor['contacts'][num
       </span>
       <span className="col-span-2 inline-flex w-fit items-center gap-2 whitespace-nowrap text-sm font-semibold text-[var(--accent)] sm:col-span-1 sm:justify-self-end">
         Позвонить
-        <ArrowUpRight className="transition-transform group-hover:translate-x-1" size={16} strokeWidth={1.8} />
+        <ArrowUpRight className="transition-transform duration-[var(--motion-duration-base)] ease-[var(--motion-ease-move)] group-hover:translate-x-1 motion-reduce:transition-none" size={16} strokeWidth={1.8} />
       </span>
     </a>
   );
@@ -57,22 +62,22 @@ const linkMeta: Record<
   },
   instagram: {
     accent: '#c14f7a',
-    actionLabel: 'Открыть Instagram',
+    actionLabel: 'Перейти в Instagram',
     iconSrc: '/images/social/instagram-logo.png'
   },
   telegram: {
     accent: '#2a86d9',
-    actionLabel: 'Открыть Telegram',
+    actionLabel: 'Написать в Telegram',
     icon: Send
   },
   website: {
     accent: '#5f4a3d',
-    actionLabel: 'Открыть сайт',
+    actionLabel: 'Перейти на сайт',
     icon: Globe2
   },
   whatsapp: {
     accent: '#238c46',
-    actionLabel: 'Открыть WhatsApp',
+    actionLabel: 'Написать в WhatsApp',
     iconSrc: '/images/social/whatsapp-logo.png'
   }
 };
@@ -106,7 +111,7 @@ function SponsorContactLink({ link }: { link: GeneralSponsor['links'][number] })
   return (
     <a
       aria-label={meta.actionLabel}
-      className="group flex min-h-[5.5rem] items-center justify-between gap-6 rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--surface-wash)] px-3 py-3 transition duration-200 hover:border-[color-mix(in_srgb,var(--sponsor-channel-accent)_34%,var(--border-default))] hover:bg-[var(--surface-wash-strong)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] sm:px-4 sm:py-4"
+      className="sponsor-contact-link group flex min-h-[5.5rem] min-w-0 items-center justify-between gap-3 rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--surface-wash)] px-3 py-3 transition-[background-color,border-color,color,box-shadow] duration-[var(--motion-duration-base)] ease-[var(--motion-ease-standard)] hover:border-[color-mix(in_srgb,var(--sponsor-channel-accent)_34%,var(--border-default))] hover:bg-[var(--surface-wash-strong)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] motion-reduce:transition-none sm:px-4 sm:py-4"
       data-sponsor-channel-card={link.kind}
       href={link.href}
       rel={link.href.startsWith('http') ? 'noreferrer' : undefined}
@@ -115,44 +120,111 @@ function SponsorContactLink({ link }: { link: GeneralSponsor['links'][number] })
     >
       <SponsorChannelIcon icon={meta.icon} iconSrc={meta.iconSrc} label={link.label} />
       <span
-        className="inline-flex shrink-0 items-center gap-2 whitespace-nowrap text-[13px] font-semibold text-[var(--sponsor-channel-accent)] sm:text-sm"
+        className="inline-flex min-w-0 shrink items-center justify-end gap-2 text-right text-[13px] font-semibold leading-5 text-[var(--sponsor-channel-accent)] sm:text-sm"
         data-sponsor-channel-cta
       >
         {meta.actionLabel}
-        <ArrowUpRight className="transition-transform group-hover:translate-x-1" size={16} strokeWidth={1.8} />
+        <ArrowUpRight className="transition-transform duration-[var(--motion-duration-base)] ease-[var(--motion-ease-move)] group-hover:translate-x-1 motion-reduce:transition-none" size={16} strokeWidth={1.8} />
       </span>
     </a>
   );
 }
 
-export function GeneralSponsorCard({ priority = false, sponsor }: GeneralSponsorCardProps) {
+function SponsorLogoMark({ priority = false, sponsor }: GeneralSponsorCardProps) {
+  if (sponsor.logoSrc) {
+    return (
+      <Image
+        alt={sponsor.logoAlt}
+        className="general-sponsor-logo-image h-auto w-full max-w-[240px] object-contain md:max-w-[340px]"
+        height={1252}
+        priority={priority}
+        sizes="(min-width: 1024px) 24rem, 82vw"
+        src={sponsor.logoSrc}
+        width={1252}
+      />
+    );
+  }
+
+  return (
+    <div
+      className="general-sponsor-logo-fallback grid min-h-32 w-full place-items-center rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--surface-wash)] px-4 py-6 text-center"
+      data-logo-fallback="sponsor"
+    >
+      <span className="grid gap-2">
+        <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">Генеральный спонсор</span>
+        <span className="text-base font-semibold leading-6 text-[var(--text)] md:text-lg">Без логотипа</span>
+        <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--accent)]">{sponsor.status}</span>
+      </span>
+    </div>
+  );
+}
+
+export function GeneralSponsorCard({ priority = false, sponsor, variant = 'full' }: GeneralSponsorCardProps) {
   const venueItems = sponsor.venueValue.length > 0 ? sponsor.venueValue : [sponsor.shortDescription];
+  const sponsorChips = Array.from(new Set([sponsor.name, ...sponsor.brands, ...sponsor.supplyGroups].filter(Boolean))).slice(0, 5);
+  const visualState = sponsorVisualState(sponsor.status);
+
+  if (variant === 'home') {
+    return (
+      <Panel className="home-sponsor-card general-sponsor-card" data-sponsor-state={visualState} data-sponsor-variant="home" padding="none">
+        <div className="home-sponsor-card-grid">
+          <div className="home-sponsor-media-box">
+            <SponsorLogoMark priority={priority} sponsor={sponsor} />
+          </div>
+
+          <div className="home-sponsor-content">
+            <div className="flex flex-wrap gap-2">
+              <span className="home-sponsor-badge">{sponsor.status}</span>
+            </div>
+            <h3 className={`${displayFont.className} home-sponsor-title`}>{sponsor.name}</h3>
+            <p className="home-sponsor-description">{sponsor.description}</p>
+
+            <ul className="home-sponsor-benefits">
+              {venueItems.slice(0, 3).map((item) => (
+                <li key={item}>
+                  <span aria-hidden="true" />
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+
+            {sponsorChips.length > 0 ? (
+              <div className="home-sponsor-chips">
+                {sponsorChips.map((item) => (
+                  <span key={item}>{item}</span>
+                ))}
+              </div>
+            ) : null}
+
+            <div className="home-sponsor-actions">
+              <Button className="home-sponsor-primary-action" href="/general-sponsors" size="sm">
+                Подробнее о спонсоре
+                <ArrowUpRight size={16} strokeWidth={1.8} />
+              </Button>
+              <Button className="home-sponsor-secondary-action" href="/contacts?topic=sponsorship#contact-form" size="sm" variant="secondary">
+                Связаться
+                <ArrowUpRight size={16} strokeWidth={1.8} />
+              </Button>
+            </div>
+          </div>
+        </div>
+      </Panel>
+    );
+  }
 
   return (
     <Panel
       className="general-sponsor-card overflow-hidden border-[var(--border-default)] bg-[var(--surface-elevated)] shadow-[var(--shadow-panel)]"
+      data-sponsor-state={visualState}
+      data-sponsor-variant="full"
       padding="none"
     >
-      <div className="grid gap-0 lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)]">
-        <div className="flex flex-col justify-between gap-5 border-b border-[var(--line)] p-4 md:gap-8 md:p-8 lg:border-b-0 lg:border-r">
+      <div className="general-sponsor-layout grid gap-0 lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)]">
+        <div className="general-sponsor-media-column flex flex-col justify-between gap-5 border-b border-[var(--line)] p-4 md:gap-8 md:p-8 lg:border-b-0 lg:border-r">
           <div>
             <PublicEyebrow>Генеральный спонсор</PublicEyebrow>
             <div className="general-sponsor-logo-panel mt-4 md:mt-7">
-              {sponsor.logoSrc ? (
-                <Image
-                  alt={sponsor.logoAlt}
-                  className="general-sponsor-logo-image h-auto w-full max-w-[240px] object-contain md:max-w-[340px]"
-                  height={1252}
-                  priority={priority}
-                  sizes="(min-width: 1024px) 24rem, 82vw"
-                  src={sponsor.logoSrc}
-                  width={1252}
-                />
-              ) : (
-                <div className="grid min-h-32 place-items-center text-3xl font-semibold uppercase tracking-[0.08em] text-[var(--text)]">
-                  {sponsor.name.slice(0, 2)}
-                </div>
-              )}
+              <SponsorLogoMark priority={priority} sponsor={sponsor} />
               {sponsor.brandLogos.length > 0 ? (
                 <div className="mt-4 grid gap-3 border-t border-[var(--line)] pt-4 md:mt-5 md:pt-5">
                   {sponsor.brandLogos.map((logo) => (
@@ -173,19 +245,19 @@ export function GeneralSponsorCard({ priority = false, sponsor }: GeneralSponsor
 
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">{sponsor.status}</p>
-            <p className={`${displayFont.className} mt-3 max-w-lg text-[1.55rem] font-semibold leading-[1.05] text-[var(--text)] md:mt-4 md:text-[2.55rem]`}>
+            <p className={`${displayFont.className} general-sponsor-short-description mt-3 max-w-lg text-[1.55rem] font-semibold leading-[1.05] text-[var(--text)] md:mt-4 md:text-[2.55rem]`}>
               {sponsor.shortDescription}
             </p>
           </div>
         </div>
 
-        <div className="p-4 md:p-8">
+        <div className="general-sponsor-content-column min-w-0 p-4 md:p-8">
           <PublicEyebrow tone="muted">{sponsor.title}</PublicEyebrow>
 
-          <h3 className={`${displayFont.className} mt-4 text-[2rem] font-semibold leading-none text-[var(--text)] md:mt-5 md:text-[3.7rem]`}>
+          <h3 className={`${displayFont.className} general-sponsor-name mt-4 text-[2rem] font-semibold leading-none text-[var(--text)] md:mt-5 md:text-[3.7rem]`}>
             {sponsor.name}
           </h3>
-          <PublicBodyText className="mt-3 max-h-[5.25rem] max-w-3xl overflow-hidden md:mt-5 md:max-h-none" size="md">
+          <PublicBodyText className="general-sponsor-description-text mt-3 max-w-3xl md:mt-5" size="md">
             {sponsor.description}
           </PublicBodyText>
 
@@ -206,7 +278,7 @@ export function GeneralSponsorCard({ priority = false, sponsor }: GeneralSponsor
               <div className="mt-4 flex flex-wrap gap-2">
                 {[...sponsor.supplyGroups, ...sponsor.brands].slice(0, 10).map((item, index) => (
                   <span
-                    className="rounded-[var(--radius-sm)] border border-[var(--border-default)] bg-transparent px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.1em] text-[var(--text)]"
+                    className="general-sponsor-chip rounded-[var(--radius-sm)] border border-[var(--border-default)] bg-transparent px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.1em] text-[var(--text)]"
                     key={`${item}-${index}`}
                   >
                     {item}

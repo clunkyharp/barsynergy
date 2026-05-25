@@ -148,7 +148,7 @@ S3 deletion must use the persisted `bucket + fileKey` pair when a bucket is know
 
 Production must use `STORAGE_DRIVER=s3`.
 
-If production starts with `STORAGE_DRIVER=local`, the app must fail at startup with a clear error.
+If production starts with `STORAGE_DRIVER=local`, the app must fail at startup with a clear error unless the owner explicitly approves the single-server fallback and sets `ALLOW_LOCAL_STORAGE_IN_PRODUCTION=true`.
 
 ## MVP Public Sections
 
@@ -407,6 +407,8 @@ Branches:
 - `dev` is the main development branch;
 - `feature/*` only for large coherent features;
 - `fix/*` only for critical production fixes.
+
+`prod` is the VPS deploy branch and must stay clean: only application code, required migrations/scripts/runtime config examples, deployment files and minimal operator documentation should reach it. Local agent memory, generated QA/browser artifacts, scratch output, ignored access notes, real env files, backups, uploads, private keys, tokens and passwords must stay out of git.
 
 Flow:
 

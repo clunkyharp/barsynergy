@@ -10,14 +10,16 @@ type CardAction = {
 };
 
 type RoleTaskCardProps = {
-  action: CardAction;
+  action?: CardAction;
   className?: string;
   code?: ReactNode;
   density?: 'compact' | 'standard';
   description: ReactNode;
-  eyebrow: ReactNode;
+  eyebrow?: ReactNode;
   meta?: ReactNode;
   metaLabel?: ReactNode;
+  presentation?: 'card' | 'row';
+  priority?: boolean;
   quickLinks?: readonly CardAction[];
   title: ReactNode;
 };
@@ -35,19 +37,16 @@ type FeatureCardProps = {
   details?: FeatureCardDetail[];
   eyebrow?: ReactNode;
   footer?: ReactNode;
+  presentation?: 'card' | 'row';
   title: ReactNode;
 };
 
 function CardLabel({ children }: { children: ReactNode }) {
-  return (
-    <span className="inline-flex min-h-7 items-center rounded-[var(--radius-sm)] border border-[var(--border-default)] bg-[var(--surface-wash)] px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--muted)]">
-      {children}
-    </span>
-  );
+  return <span className="public-card-label">{children}</span>;
 }
 
 function CardCode({ children }: { children: ReactNode }) {
-  return <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--accent)]">{children}</span>;
+  return <span className="public-card-code">{children}</span>;
 }
 
 export function RoleTaskCard({
@@ -59,47 +58,118 @@ export function RoleTaskCard({
   eyebrow,
   meta,
   metaLabel,
+  presentation = 'card',
+  priority = false,
   quickLinks,
   title
 }: RoleTaskCardProps) {
+  const hasHeaderMeta = Boolean(eyebrow || code || meta);
+
+  if (presentation === 'row') {
+    return (
+      <article
+        className={cn(
+          'group grid gap-3 border-b border-[var(--line)] py-4 md:grid-cols-[minmax(0,0.72fr)_minmax(0,1.1fr)_auto] md:items-center md:gap-5',
+          className
+        )}
+        data-priority={priority || undefined}
+      >
+        <div className="min-w-0">
+          {hasHeaderMeta ? (
+            <div className="flex flex-wrap items-center gap-2">
+              {eyebrow ? <CardLabel>{eyebrow}</CardLabel> : null}
+              {code ? <CardCode>{code}</CardCode> : null}
+              {meta ? (
+                <span className="public-card-meta">
+                  {metaLabel ? <span className="sr-only">{metaLabel}: </span> : null}
+                  {meta}
+                </span>
+              ) : null}
+            </div>
+          ) : null}
+          <h3
+            className={cn(
+              `${displayFont.className} text-[1.45rem] font-semibold leading-[1.08] text-[var(--text)] md:text-[1.75rem]`,
+              hasHeaderMeta && 'mt-3'
+            )}
+          >
+            {title}
+          </h3>
+        </div>
+
+        <div className="min-w-0">
+          <p className="text-sm leading-6 text-[var(--muted)]">{description}</p>
+          {quickLinks?.length ? (
+            <div className="mt-3 flex flex-wrap gap-2">
+              {quickLinks.map((link) => (
+                <Link
+                  className="public-card-meta group/link min-h-10 gap-2 transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] hover:border-[var(--card-border-hover)] hover:text-[var(--accent)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--field-focus-ring)] motion-reduce:transition-none"
+                  href={link.href}
+                  key={link.href}
+                >
+                  <span>{link.label}</span>
+                  <ArrowUpRight className="shrink-0" size={13} strokeWidth={1.8} />
+                </Link>
+              ))}
+            </div>
+          ) : null}
+        </div>
+
+        {action ? (
+          <Link
+            className="public-card-action min-h-11 w-fit focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--field-focus-ring)] md:justify-self-end"
+            href={action.href}
+          >
+            {action.label}
+            <ArrowUpRight size={16} strokeWidth={1.8} />
+          </Link>
+        ) : null}
+      </article>
+    );
+  }
+
   return (
     <article
       className={cn(
-        'group flex h-full min-h-0 flex-col rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[color-mix(in_oklab,var(--surface),white_18%)] p-4 shadow-[0_12px_34px_rgba(20,20,18,0.028)] transition-colors hover:border-[var(--accent)]/32 hover:bg-[color-mix(in_oklab,var(--surface),white_24%)] focus-within:border-[var(--accent)]/32 md:p-5',
-        density === 'compact' ? 'sm:min-h-[15rem]' : 'md:min-h-[24rem]',
+        'public-card-shell group flex h-full min-h-0 flex-col p-4 md:p-5',
+        density === 'compact' ? 'sm:min-h-[12rem]' : 'md:min-h-[13rem]',
         className
       )}
+      data-priority={priority || undefined}
     >
-      <div className="flex items-start justify-between gap-3">
-        <CardLabel>{eyebrow}</CardLabel>
-        {code ? <CardCode>{code}</CardCode> : null}
-      </div>
+      {hasHeaderMeta ? (
+        <div className="flex items-start justify-between gap-3">
+          {eyebrow ? <CardLabel>{eyebrow}</CardLabel> : null}
+          {code ? <CardCode>{code}</CardCode> : null}
+        </div>
+      ) : null}
       <h3
         className={cn(
-          `${displayFont.className} mt-5 text-[1.65rem] font-semibold leading-[1.03] text-[var(--text)] group-hover:text-[var(--accent)] md:text-[2rem]`,
-          density === 'compact' ? 'sm:min-h-[4.2rem]' : 'md:min-h-[4.8rem]'
+          `${displayFont.className} text-[1.45rem] font-semibold leading-[1.08] text-[var(--text)] md:text-[1.65rem]`,
+          hasHeaderMeta && 'mt-4',
+          density === 'compact' ? 'sm:min-h-[3.4rem]' : 'md:min-h-[3.5rem]'
         )}
       >
         {title}
       </h3>
 
       <div className="flex flex-1 flex-col">
-        <p className={cn('text-sm leading-6 text-[var(--muted)]', density === 'compact' ? 'sm:min-h-[3.7rem]' : 'md:min-h-[4.6rem]')}>
+        <p className={cn('text-sm leading-6 text-[var(--muted)]', density === 'compact' ? 'sm:min-h-[3rem]' : 'md:min-h-[3.2rem]')}>
           {description}
         </p>
 
         {quickLinks?.length ? (
-          <div className={cn('mt-5', density === 'compact' ? 'sm:min-h-[7.4rem]' : 'md:min-h-[8.7rem]')}>
-            <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--muted)]">Быстрые переходы</p>
-            <div className="mt-2 grid gap-2">
+          <div className="mt-4">
+            <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--muted)]">Быстрые переходы</p>
+            <div className="mt-2 flex flex-wrap gap-2">
               {quickLinks.map((link) => (
                 <Link
-                  className="group/link flex min-h-10 items-center justify-between gap-3 rounded-[var(--radius-sm)] border border-[var(--border-default)] bg-[var(--surface-wash)] px-3 py-2 text-sm font-semibold leading-5 text-[var(--text)] transition hover:border-[var(--accent)]/32 hover:text-[var(--accent)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--field-focus-ring)]"
+                  className="public-card-meta group/link min-h-8 gap-2 transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] hover:border-[var(--card-border-hover)] hover:text-[var(--accent)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--field-focus-ring)] motion-reduce:transition-none"
                   href={link.href}
                   key={link.href}
                 >
-                  <span className="truncate">{link.label}</span>
-                  <ArrowUpRight className="shrink-0 transition-transform group-hover/link:translate-x-0.5" size={14} strokeWidth={1.8} />
+                  <span>{link.label}</span>
+                  <ArrowUpRight className="shrink-0" size={13} strokeWidth={1.8} />
                 </Link>
               ))}
             </div>
@@ -107,11 +177,11 @@ export function RoleTaskCard({
         ) : null}
 
         {meta ? (
-          <div className={cn('mt-5', density === 'compact' ? 'sm:min-h-[3.3rem]' : 'md:min-h-[3.8rem]')}>
-            {metaLabel ? <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--muted)]">{metaLabel}</p> : null}
+          <div className="mt-4">
+            {metaLabel ? <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--muted)]">{metaLabel}</p> : null}
             <p
               className={cn(
-                'mt-1 inline-flex w-fit rounded-[var(--radius-sm)] border border-[var(--border-default)] bg-[var(--surface-wash)] px-2.5 py-1 text-xs font-semibold leading-5 text-[var(--text)]',
+                'public-card-meta mt-1 w-fit',
                 !metaLabel && 'mt-0'
               )}
             >
@@ -121,22 +191,72 @@ export function RoleTaskCard({
         ) : null}
       </div>
 
-      <Link
-        className="mt-6 flex min-h-11 items-center justify-between gap-3 border-t border-[var(--line)] pt-4 text-sm font-semibold text-[var(--accent)] transition hover:text-[var(--accent-strong)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--field-focus-ring)]"
-        href={action.href}
-      >
-        {action.label}
-        <ArrowUpRight className="transition-transform group-hover:translate-x-1" size={16} strokeWidth={1.8} />
-      </Link>
+      {action ? (
+        <Link
+          className="public-card-action mt-5 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--field-focus-ring)]"
+          href={action.href}
+        >
+          {action.label}
+          <ArrowUpRight size={16} strokeWidth={1.8} />
+        </Link>
+      ) : null}
     </article>
   );
 }
 
-export function FeatureCard({ action, className, code, description, details, eyebrow, footer, title }: FeatureCardProps) {
+export function FeatureCard({ action, className, code, description, details, eyebrow, footer, presentation = 'card', title }: FeatureCardProps) {
+  if (presentation === 'row') {
+    return (
+      <article
+        className={cn(
+          'grid gap-3 border-b border-[var(--line)] py-4 md:grid-cols-[minmax(0,0.72fr)_minmax(0,1.1fr)_auto] md:items-center md:gap-5',
+          className
+        )}
+      >
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-center gap-2">
+            {eyebrow ? <CardLabel>{eyebrow}</CardLabel> : null}
+            {code ? <CardCode>{code}</CardCode> : null}
+          </div>
+          <h3 className={`${displayFont.className} mt-3 text-[1.45rem] font-semibold leading-[1.08] text-[var(--text)] md:text-[1.75rem]`}>
+            {title}
+          </h3>
+        </div>
+
+        <div className="min-w-0">
+          <p className="text-sm leading-6 text-[var(--muted)]">{description}</p>
+          {details?.length ? (
+            <dl className="mt-3 grid gap-2">
+              {details.map((detail, index) => (
+                <div className="grid grid-cols-[5rem_minmax(0,1fr)] gap-3 rounded-[var(--radius-sm)] border border-[var(--border-subtle)] bg-[var(--surface-card-muted)] px-3 py-2.5" key={index}>
+                  <dt className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">{detail.label}</dt>
+                  <dd className="text-sm leading-6 text-[var(--text)]">{detail.value}</dd>
+                </div>
+              ))}
+            </dl>
+          ) : null}
+        </div>
+
+        <div className="flex flex-wrap items-center gap-3 md:justify-self-end">
+          {footer ? <div className="text-sm font-semibold leading-6 text-[var(--accent)]">{footer}</div> : null}
+          {action ? (
+            <Link
+              className="inline-flex min-h-11 items-center gap-2 rounded-[var(--radius-sm)] text-sm font-semibold text-[var(--accent)] transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] hover:text-[var(--accent-strong)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--field-focus-ring)] motion-reduce:transition-none"
+              href={action.href}
+            >
+              {action.label}
+              <ArrowUpRight size={16} strokeWidth={1.8} />
+            </Link>
+          ) : null}
+        </div>
+      </article>
+    );
+  }
+
   return (
     <article
       className={cn(
-        'flex h-full min-h-0 flex-col rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--surface-wash)] p-4 transition-colors hover:border-[var(--accent)]/24 hover:bg-[var(--surface-wash-strong)] md:p-5',
+        'public-card-shell flex h-full min-h-0 flex-col p-4 md:p-5',
         className
       )}
     >
@@ -150,9 +270,9 @@ export function FeatureCard({ action, className, code, description, details, eye
       <p className="mt-3 text-sm leading-6 text-[var(--muted)] md:min-h-[4.5rem]">{description}</p>
 
       {details?.length ? (
-        <dl className="mt-4 grid gap-2 border-t border-[var(--line)] pt-4 md:min-h-[8.8rem]">
+        <dl className="mt-4 grid gap-2 md:min-h-[8.8rem]">
           {details.map((detail, index) => (
-            <div className="grid grid-cols-[5rem_minmax(0,1fr)] gap-3" key={index}>
+            <div className="grid grid-cols-[5rem_minmax(0,1fr)] gap-3 rounded-[var(--radius-sm)] border border-[var(--border-subtle)] bg-[var(--surface-card-muted)] px-3 py-2.5" key={index}>
               <dt className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">{detail.label}</dt>
               <dd className="text-sm leading-6 text-[var(--text)]">{detail.value}</dd>
             </div>
@@ -161,11 +281,11 @@ export function FeatureCard({ action, className, code, description, details, eye
       ) : null}
 
       {(footer || action) ? (
-        <div className="mt-auto flex flex-wrap items-center justify-between gap-3 border-t border-[var(--line)] pt-3 md:pt-4">
+        <div className="mt-auto flex flex-wrap items-center justify-between gap-3 pt-3 md:pt-4">
           {footer ? <div className="text-sm font-semibold leading-6 text-[var(--accent)]">{footer}</div> : null}
           {action ? (
             <Link
-              className="inline-flex min-h-10 items-center gap-2 rounded-[var(--radius-sm)] text-sm font-semibold text-[var(--accent)] transition hover:text-[var(--accent-strong)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--field-focus-ring)]"
+              className="inline-flex min-h-10 items-center gap-2 rounded-[var(--radius-sm)] text-sm font-semibold text-[var(--accent)] transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] hover:text-[var(--accent-strong)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--field-focus-ring)] motion-reduce:transition-none"
               href={action.href}
             >
               {action.label}

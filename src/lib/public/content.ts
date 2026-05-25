@@ -272,7 +272,8 @@ export async function getPublishedEvents(params: PublicContentSearchParams = {})
   const page = getPage(params);
   const pageSize = getPageSize(params);
   const q = optionalParam(params, 'q');
-  const period = optionalParam(params, 'period');
+  const periodParam = optionalParam(params, 'period');
+  const period = periodParam === 'all' ? undefined : periodParam;
   const where: Prisma.EventWhereInput = {
     status: ContentStatus.PUBLISHED,
     ...textSearch(q),
@@ -518,8 +519,9 @@ export async function getPublishedSuppliers(params: PublicContentSearchParams = 
         supplier.city?.name ? { label: 'Город', value: supplier.city.name } : undefined,
         supplier.serviceArea ? { label: 'География', value: supplier.serviceArea } : undefined,
         { label: 'Условия', value: 'по запросу' },
+        { label: 'Связь', value: supplier.contactLabel ?? 'через BARSYNERGY' },
         { label: 'Продукты / услуги', value: compactLabel(supplier.summary) },
-        supplier.isVerified ? { value: 'Проверен BARSYNERGY', tone: 'accent' } : { value: 'Контакт для уточнения' }
+        supplier.isVerified ? undefined : { value: 'Контакт для уточнения' }
       ].filter(Boolean) as PublishedContentMetaGroup[],
       statusLabel: supplier.isVerified ? 'Проверен' : 'Контакт для уточнения',
       updatedLabel: formatUpdatedLabel(supplier.publishedAt ?? supplier.createdAt),
@@ -578,6 +580,8 @@ export async function getPublishedPartners(params: PublicContentSearchParams = {
         partner.partnerType ? { label: 'Формат', value: getAdminOptionLabel(partnerTypeOptions, partner.partnerType) } : undefined,
         partner.isFeatured ? { value: 'В подборке', tone: 'accent' } : undefined
       ].filter(Boolean) as PublishedContentMetaGroup[],
+      statusLabel: partner.isFeatured ? 'В подборке' : 'Партнёр',
+      updatedLabel: formatUpdatedLabel(partner.publishedAt ?? partner.createdAt),
       imageUrl: publicImageUrl(partner.coverImage)
     }))
   });

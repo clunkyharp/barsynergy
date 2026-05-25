@@ -164,7 +164,7 @@ export default async function AdminEventsPage({ searchParams }: AdminEventsPageP
               <AdminTableBody>
                 {events.map((event) => (
                   <AdminTableRow key={event.id}>
-                    <AdminTableCell className="max-w-[320px]">
+                    <AdminTableCell className="max-w-[320px]" label="Событие">
                       <AdminTableClamp className="font-semibold">{event.title}</AdminTableClamp>
                       <div className="mt-1 truncate text-xs text-[var(--muted)]">/{event.slug}</div>
                       <div className="mt-1 text-xs text-[var(--muted)]">{event.category?.name ?? 'Без категории'}</div>
@@ -172,15 +172,15 @@ export default async function AdminEventsPage({ searchParams }: AdminEventsPageP
                         <div className="mt-1 text-xs text-[var(--muted)]">Обложка: {event.coverImage.originalName}</div>
                       ) : null}
                     </AdminTableCell>
-                    <AdminTableCell className="text-[var(--muted)]">
+                    <AdminTableCell className="text-[var(--muted)]" label="Дата">
                       <div>{dateFormatter.format(event.startsAt)}</div>
                       {event.endsAt ? <div className="mt-1 text-xs">до {dateFormatter.format(event.endsAt)}</div> : null}
                     </AdminTableCell>
-                    <AdminTableCell className="text-[var(--muted)]">{event.city?.name ?? '-'}</AdminTableCell>
-                    <AdminTableCell>
+                    <AdminTableCell className="text-[var(--muted)]" label="Город">{event.city?.name ?? '-'}</AdminTableCell>
+                    <AdminTableCell label="Статус">
                       <StatusBadge variant={contentStatusBadgeVariants[event.status]}>{contentStatusLabels[event.status]}</StatusBadge>
                     </AdminTableCell>
-                    <AdminTableCell className="text-[var(--muted)]">
+                    <AdminTableCell className="text-[var(--muted)]" label="Обновлено">
                       <div>{dateFormatter.format(event.updatedAt)}</div>
                       {event.updatedBy?.email ? <div className="mt-1 text-xs">{event.updatedBy.email}</div> : null}
                     </AdminTableCell>

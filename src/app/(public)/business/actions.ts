@@ -54,7 +54,7 @@ export async function submitBusinessSolutionRequest(formData: FormData) {
     assertPublicApplicationFormsEnabled();
 
     if (hasHoneypotValue(getString(formData, 'website'))) {
-      result = { type: 'success', message: 'Заявку получили. Если понадобится уточнение, команда свяжется с вами.' };
+      result = { type: 'success', message: 'Заявку получили. Если понадобится уточнение, мы свяжемся с вами.' };
       redirectWithBusinessResult(result);
     }
 
@@ -100,7 +100,7 @@ export async function submitBusinessSolutionRequest(formData: FormData) {
       }
     });
 
-    result = { type: 'success', message: 'Заявку получили. Если понадобится уточнение, команда свяжется с вами.' };
+    result = { type: 'success', message: 'Заявку получили. Если понадобится уточнение, мы свяжемся с вами.' };
   } catch (error) {
     result = { type: 'error', message: resolvePublicApplicationActionError('public:business-solution', error) };
   }

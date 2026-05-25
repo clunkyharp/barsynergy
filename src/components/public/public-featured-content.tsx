@@ -25,7 +25,7 @@ export function PublicFeaturedContent({
   eyebrow,
   title,
   description,
-  actionLabel = 'Открыть запись'
+  actionLabel = 'Подробнее'
 }: PublicFeaturedContentProps) {
   if (!item) {
     return null;

@@ -21,6 +21,7 @@ The central agent must:
 - run verification;
 - run a dedicated `QA` review pass after every large code batch or cross-module remediation before treating the result as stable;
 - keep documentation and the Obsidian Kanban board synchronized with every meaningful project change;
+- keep production-bound git work clean: `prod` is the VPS deploy branch, and local memory, QA/browser artifacts, scratch output, local access notes, real env files and secrets must not be merged into it;
 - report risks and validation gaps clearly;
 - prevent scope creep and repeated polishing.
 
@@ -94,7 +95,7 @@ Do not use subagents for tiny edits where delegation adds overhead.
 
 Do not assign the same file ownership to multiple agents at the same time.
 
-For deep audits, use the dedicated workflow in `docs/audit-workflow.md`. Each audit type must be a separate bounded pass with its own `gpt-5.3-codex` subagent when subagent execution is available.
+For deep audits, use the dedicated workflow in `docs/audit-workflow.md`. Each audit type must be a separate bounded pass; use a dedicated subagent only when the current agent policy, tooling and owner request allow it.
 
 ## Subagent Task Contract
 

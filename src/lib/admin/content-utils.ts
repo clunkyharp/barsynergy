@@ -38,9 +38,9 @@ export const PUBLICATION_STATUS_HINT = 'Опубликовано видно на
 
 export const contentStatusBadgeVariants: Record<ContentStatus, 'neutral' | 'success' | 'warning' | 'danger' | 'pending'> = {
   [ContentStatus.DRAFT]: 'neutral',
-  [ContentStatus.REVIEW]: 'pending',
+  [ContentStatus.REVIEW]: 'warning',
   [ContentStatus.PUBLISHED]: 'success',
-  [ContentStatus.ARCHIVED]: 'danger'
+  [ContentStatus.ARCHIVED]: 'neutral'
 };
 
 export function firstParam(value: string | string[] | undefined) {

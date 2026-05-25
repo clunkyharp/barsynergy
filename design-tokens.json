@@ -66,9 +66,9 @@
       "darkBurgundyHover": { "value": "#be746f", "type": "color" }
     },
     "font": {
-      "body": { "value": "Manrope", "type": "fontFamily" },
-      "display": { "value": "Playfair Display", "type": "fontFamily" },
-      "accent": { "value": "Manrope", "type": "fontFamily" }
+      "body": { "value": "Noto Sans", "type": "fontFamily" },
+      "display": { "value": "Noto Serif Display", "type": "fontFamily" },
+      "accent": { "value": "Noto Sans", "type": "fontFamily" }
     },
     "size": {
       "0": { "value": "0", "type": "dimension" },

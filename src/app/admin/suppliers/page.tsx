@@ -189,7 +189,7 @@ export default async function AdminSuppliersPage({ searchParams }: AdminSupplier
               <AdminTableBody>
                 {suppliers.map((supplier) => (
                   <AdminTableRow key={supplier.id}>
-                    <AdminTableCell className="max-w-[320px]">
+                    <AdminTableCell className="max-w-[320px]" label="Поставщик">
                       <AdminTableClamp className="font-semibold">{supplier.title}</AdminTableClamp>
                       <div className="mt-1 truncate text-xs text-[var(--muted)]">/{supplier.slug}</div>
                       <div className="mt-1 text-xs text-[var(--muted)]">{supplier.category?.name ?? 'Без категории'}</div>
@@ -197,7 +197,7 @@ export default async function AdminSuppliersPage({ searchParams }: AdminSupplier
                         <div className="mt-1 text-xs text-[var(--muted)]">Обложка: {supplier.coverImage.originalName}</div>
                       ) : null}
                     </AdminTableCell>
-                    <AdminTableCell className="text-[var(--muted)]">
+                    <AdminTableCell className="text-[var(--muted)]" label="Компания">
                       <div>{supplier.companyName}</div>
                       <div className="mt-1">
                         <StatusBadge variant={supplier.isVerified ? 'success' : 'warning'}>
@@ -206,11 +206,11 @@ export default async function AdminSuppliersPage({ searchParams }: AdminSupplier
                       </div>
                       {supplier.serviceArea ? <div className="mt-1 text-xs">{supplier.serviceArea}</div> : null}
                     </AdminTableCell>
-                    <AdminTableCell className="text-[var(--muted)]">{supplier.city?.name ?? '-'}</AdminTableCell>
-                    <AdminTableCell>
+                    <AdminTableCell className="text-[var(--muted)]" label="Город">{supplier.city?.name ?? '-'}</AdminTableCell>
+                    <AdminTableCell label="Статус">
                       <StatusBadge variant={contentStatusBadgeVariants[supplier.status]}>{contentStatusLabels[supplier.status]}</StatusBadge>
                     </AdminTableCell>
-                    <AdminTableCell className="text-[var(--muted)]">
+                    <AdminTableCell className="text-[var(--muted)]" label="Обновлено">
                       <div>{dateFormatter.format(supplier.updatedAt)}</div>
                       {supplier.updatedBy?.email ? <div className="mt-1 text-xs">{supplier.updatedBy.email}</div> : null}
                     </AdminTableCell>

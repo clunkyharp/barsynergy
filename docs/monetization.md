@@ -26,6 +26,6 @@ The first private cabinet is planned for businesses only. General user profiles 
 4. Partner packages.
 5. Online payments after legal and accounting review.
 6. Premium/subscription after regular audience appears.
-7. Business cabinet after the application flow is stable.
+7. Business cabinet expansion after the current Phase 4 business-cabinet MVP proves useful.
 
 Do not create payment tables before the payment phase.

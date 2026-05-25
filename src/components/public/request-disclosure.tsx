@@ -23,10 +23,12 @@ type RequestDisclosureProps = {
   aliases?: string[];
   children: ReactNode;
   className?: string;
+  closedPanelClassName?: string;
   closedContent?: ReactNode;
   defaultOpen?: boolean;
   description?: string;
   focusSelector?: string;
+  headingLevel?: 'h2' | 'h3';
   openLabel?: string;
   showDefaultTrigger?: boolean;
   title?: string;
@@ -80,10 +82,12 @@ export function RequestDisclosure({
   aliases = [],
   children,
   className,
+  closedPanelClassName,
   closedContent,
   defaultOpen = false,
-  description = 'Откройте форму, заполните данные и отправьте заявку.',
+  description = 'Откройте форму, заполните поля и отправьте заявку.',
   focusSelector = defaultFocusSelector,
+  headingLevel = 'h3',
   id,
   openLabel = 'Заполнить форму',
   showDefaultTrigger = true,
@@ -92,6 +96,7 @@ export function RequestDisclosure({
   const sectionRef = useRef<HTMLDivElement>(null);
   const panelId = `${id}-panel`;
   const [open, setOpen] = useState(defaultOpen);
+  const Heading = headingLevel;
 
   useEffect(() => {
     if (defaultOpen) {
@@ -154,12 +159,15 @@ export function RequestDisclosure({
         <div id={panelId}>{children}</div>
       ) : (
         <div
-          className="rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--surface-wash)] p-5 shadow-[var(--shadow-card)] md:p-6"
+          className={cn(
+            'grid gap-4 rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--surface-wash)] p-5 shadow-[var(--shadow-card)] md:grid-cols-[minmax(0,1fr)_auto] md:items-center',
+            closedPanelClassName
+          )}
           id={panelId}
         >
           {closedContent ?? (
             <div className="max-w-2xl">
-              <h3 className="text-lg font-semibold leading-7 text-[var(--text)]">{title}</h3>
+              <Heading className="text-lg font-semibold leading-7 text-[var(--text)]">{title}</Heading>
               <p className="mt-2 text-sm leading-6 text-[var(--muted)]">{description}</p>
             </div>
           )}
@@ -167,8 +175,9 @@ export function RequestDisclosure({
             <Button
               aria-controls={panelId}
               aria-expanded={open}
-              className="mt-5 rounded-[var(--radius-md)] px-5"
+              className="rounded-[var(--radius-md)] px-5 md:justify-self-end"
               onClick={handleOpenClick}
+              size="sm"
               type="button"
             >
               {openLabel}

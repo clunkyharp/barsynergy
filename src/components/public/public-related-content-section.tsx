@@ -23,26 +23,26 @@ function relatedActionLabel(basePath: string) {
   }
 
   if (basePath === '/events') {
-    return 'Открыть событие';
+    return 'Подробнее о событии';
   }
 
   if (basePath === '/vacancies') {
-    return 'Открыть вакансию';
+    return 'Смотреть вакансию';
   }
 
   if (basePath === '/suppliers') {
-    return 'Открыть профиль';
+    return 'Смотреть профиль';
   }
 
   if (basePath === '/education') {
-    return 'Открыть программу';
+    return 'Смотреть программу';
   }
 
   if (basePath === '/partners') {
-    return 'Открыть партнёра';
+    return 'Смотреть партнёра';
   }
 
-  return 'Открыть запись';
+  return 'Подробнее';
 }
 
 export function PublicRelatedContentSection({
@@ -69,7 +69,7 @@ export function PublicRelatedContentSection({
           {items.map((item, index) => (
             <article className="grid gap-4 border-b border-[var(--line)] py-5 last:border-b-0 md:grid-cols-[auto_minmax(0,1fr)_auto] md:items-start md:gap-6" key={item.id}>
               <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">
-                {String(index + 1).padStart(2, '0')}
+                {index + 1}
               </p>
 
               <div className="min-w-0">

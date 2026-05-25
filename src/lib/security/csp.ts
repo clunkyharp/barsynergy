@@ -61,6 +61,10 @@ export function buildContentSecurityPolicy({
 }
 
 export function isProtectedAppPath(pathname: string) {
+  if (pathname === '/admin/login') {
+    return false;
+  }
+
   return (
     pathname === '/admin' ||
     pathname.startsWith('/admin/') ||

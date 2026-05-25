@@ -1,94 +1,54 @@
 import type { Metadata } from 'next';
-import { ArrowUpRight } from 'lucide-react';
-import { BusinessSolutionForm } from '@/components/public/business-solution-form';
 import { EditorialPublicPage } from '@/components/public/editorial-public-page';
 import { FeatureCard, RoleTaskCard } from '@/components/public/public-card-patterns';
 import { PublicBodyText, PublicDisplayTitle, PublicEyebrow } from '@/components/public/public-primitives';
-import { RequestDisclosureTrigger } from '@/components/public/request-disclosure';
-import { getApplicationCityOptions } from '@/lib/applications/form-options';
-import { arePublicApplicationFormsEnabled } from '@/lib/applications/public-forms';
-import {
-  firstParam,
-  getPublicApplicationResult,
-  getPublicApplicationUtm
-} from '@/lib/applications/public-form-helpers';
 import { businessSolutionTypeOptions } from '@/lib/applications/b2b-request-options';
-import type { PublicContentSearchParams } from '@/lib/public/content';
-import { getEnv } from '@/lib/validation/env';
-
-type BusinessPageProps = {
-  searchParams?: Promise<PublicContentSearchParams>;
-};
 
 export const metadata: Metadata = {
   title: 'Для бизнеса',
   description: 'Цифровые решения BARSYNERGY для заведений: сайт, Telegram-бот, вакансии, внутренние формы и уведомления.'
 };
 
-const businessProblems = [
-  {
-    label: 'Сайт',
-    title: 'Гости не видят меню, события и контакты в одном месте',
-    description: 'Подходит заведению, которому нужна понятная страница с меню, событиями, адресом и заявками.'
-  },
-  {
-    label: 'Заявки',
-    title: 'Запросы приходят в разные чаты и теряются',
-    description: 'Telegram-бот собирает заявки по одинаковому сценарию и передаёт их ответственному человеку.'
-  },
-  {
-    label: 'Команда',
-    title: 'Вакансии и отклики трудно разбирать вручную',
-    description: 'Бот задаёт первичные вопросы кандидату и помогает быстрее отделить релевантные отклики.'
+function getBusinessContactHref(topicTitle?: string) {
+  const params = new URLSearchParams({ topic: 'other' });
+
+  if (topicTitle) {
+    params.set('topicTitle', topicTitle);
   }
-];
+
+  return `/contacts?${params.toString()}#contact-form`;
+}
 
 const processSteps = [
   {
     label: 'Шаг 1',
     title: 'Разобрать задачу',
-    description: 'Фиксируем процесс, пользователей, обязательные поля и кто получает результат.',
-    action: 'Оставить заявку',
-    href: '#business-request'
+    description: 'Записываем процесс, пользователей, обязательные поля и получателя заявки.'
   },
   {
     label: 'Шаг 2',
     title: 'Собрать короткий сценарий',
-    description: 'Определяем экраны, статусы, уведомления и минимальный набор данных без лишних функций.',
-    action: 'Описать процесс',
-    href: '#business-request'
+    description: 'Выбираем экраны, статусы, уведомления и данные, без которых запуск не получится.'
   },
   {
     label: 'Шаг 3',
     title: 'Запустить первую версию',
-    description: 'Готовим рабочую версию, проверяем форму или бот на реальных заявках и уточняем следующий шаг.',
-    action: 'Начать первый запуск',
-    href: '#business-request'
+    description: 'Запускаем рабочую версию, проверяем её на заявках и решаем, что добавить дальше.'
   }
 ] as const;
 
-export default async function BusinessPage({ searchParams }: BusinessPageProps) {
-  const params = (await searchParams) ?? {};
-  const [cities] = await Promise.all([getApplicationCityOptions()]);
-  const applicationFormsEnabled = arePublicApplicationFormsEnabled(getEnv());
-  const solutionType = firstParam(params.solutionType);
-
+export default function BusinessPage() {
   return (
     <>
       <EditorialPublicPage
         eyebrow="Для бизнеса"
         title="Цифровые решения для заведений и команд"
-        description="BARSYNERGY помогает собрать сайт, Telegram-бот или простую внутреннюю систему под конкретный рабочий процесс."
-        summary="Начните с задачи: заявки, вакансии, уведомления, внутренняя форма или сайт. После заявки команда уточнит сценарий и объём первого запуска."
+        description="Соберём сайт, Telegram-бот или простую внутреннюю систему под ваш рабочий процесс."
+        summary="Напишите, что нужно запустить: заявки, вакансии, уведомления, внутреннюю форму или сайт. После заявки уточним сценарий и объём первого запуска."
         summaryHeading="B2B"
-        metrics={[
-          { value: '5', label: 'типов решений' },
-          { value: 'Старт', label: 'первый запуск' },
-          { value: 'Заявка', label: 'старт работы' }
-        ]}
-        rows={businessProblems}
-        rowsHeading="Рабочие проблемы"
-        primaryLink={{ label: 'Оставить заявку', href: '#business-request' }}
+        metrics={[]}
+        rows={[]}
+        primaryLink={{ label: 'Оставить заявку', href: getBusinessContactHref('Бизнес-решение') }}
         secondaryLink={{ label: 'Войти в кабинет', href: '/business/cabinet' }}
       />
 
@@ -98,17 +58,17 @@ export default async function BusinessPage({ searchParams }: BusinessPageProps) 
             <PublicEyebrow>Решения</PublicEyebrow>
             <PublicDisplayTitle className="mt-4 max-w-4xl">Что можно собрать</PublicDisplayTitle>
             <PublicBodyText className="mt-5 max-w-2xl" size="md">
-              Каждая заявка привязана к одной практической задаче. Сложные интеграции, оплаты и личные кабинеты не входят в первый запуск.
+              Начинаем с одной понятной задачи. Сложные интеграции, оплаты и личные кабинеты лучше выносить во второй этап.
             </PublicBodyText>
           </div>
-          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
-            {businessSolutionTypeOptions.map((option, index) => (
+          <div className="border-t border-[var(--line)]">
+            {businessSolutionTypeOptions.map((option) => (
               <FeatureCard
-                action={{ href: `/business?solutionType=${encodeURIComponent(option.value)}#business-request`, label: 'Выбрать' }}
-                code={String(index + 1).padStart(2, '0')}
+                action={{ href: getBusinessContactHref(option.label), label: option.actionLabel }}
                 description={option.description}
                 eyebrow="Сервис"
                 key={option.value}
+                presentation="row"
                 title={option.label}
               />
             ))}
@@ -122,41 +82,24 @@ export default async function BusinessPage({ searchParams }: BusinessPageProps) 
             <PublicEyebrow>Процесс</PublicEyebrow>
             <PublicDisplayTitle className="mt-4 max-w-[13ch]">Как начинается работа</PublicDisplayTitle>
             <PublicBodyText className="mt-5 max-w-md" size="md">
-              Первый шаг не требует ТЗ. Достаточно описать, какой процесс нужно сделать понятнее и быстрее.
+              Не нужно готовить ТЗ. Достаточно описать процесс, который сейчас отнимает время.
             </PublicBodyText>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <RequestDisclosureTrigger className="min-h-12 rounded-[var(--radius-md)] px-5 tracking-normal" targetId="business-request">
-                Оставить заявку
-                <ArrowUpRight size={16} />
-              </RequestDisclosureTrigger>
-            </div>
           </div>
 
-          <div className="grid gap-3 md:grid-cols-3">
-            {processSteps.map((step, index) => (
+          <div className="border-t border-[var(--line)]">
+            {processSteps.map((step) => (
               <RoleTaskCard
-                action={{ href: step.href, label: step.action }}
-                code={String(index + 1).padStart(2, '0')}
                 density="compact"
                 description={step.description}
                 eyebrow={step.label}
                 key={step.title}
-                meta={index === 0 ? 'Старт' : index === 1 ? 'Сценарий' : 'Первый запуск'}
-                metaLabel="Этап"
+                presentation="row"
                 title={step.title}
               />
             ))}
           </div>
         </div>
       </section>
-
-      <BusinessSolutionForm
-        cities={cities}
-        defaults={{ solutionType }}
-        enabled={applicationFormsEnabled}
-        result={getPublicApplicationResult(params)}
-        utm={getPublicApplicationUtm(params)}
-      />
     </>
   );
 }

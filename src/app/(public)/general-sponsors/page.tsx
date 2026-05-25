@@ -1,9 +1,8 @@
 import type { Metadata } from 'next';
 import { SponsorBenefitSheet, SponsorPackageComparison } from '@/components/public/editorial-display-primitives';
 import { GeneralSponsorCard } from '@/components/public/general-sponsor-card';
-import { PublicBodyText, PublicDisplayTitle, PublicEyebrow } from '@/components/public/public-primitives';
+import { PublicBodyText, PublicBreadcrumbs, PublicDisplayTitle, PublicEyebrow } from '@/components/public/public-primitives';
 import { SectionCtaPanel } from '@/components/public/public-ui-adaptation';
-import { AppLink } from '@/components/ui/app-link';
 import { Button } from '@/components/ui/button';
 import { Panel } from '@/components/ui/panel';
 import { displayFont } from '@/lib/fonts';
@@ -19,26 +18,26 @@ export const dynamic = 'force-dynamic';
 const sponsorBenefits = [
   {
     area: 'Аудитория',
-    summary: 'Бармены, владельцы, менеджеры и поставщики СКФО видят бренд в контексте событий, обучения и материалов.',
+    summary: 'Бармены, владельцы, менеджеры и поставщики СКФО видят бренд рядом с событиями, обучением и материалами.',
     detail: 'Сначала фиксируются места размещения: сайт, события, материалы и контакты.',
     touchpoint: 'События, материалы сайта и прямые переходы к контакту.'
   },
   {
     area: 'Размещения',
-    summary: 'Упоминания распределяются между страницами событий, материалами сайта, рассылками и социальными анонсами.',
+    summary: 'Упоминания появляются на страницах событий, в материалах сайта, рассылках и анонсах.',
     detail: 'Пакет можно собрать под отдельную встречу, сезонную серию или генеральную позицию на период.',
     touchpoint: 'Страница события, анонсы, соцсети, рассылка.'
   },
   {
     area: 'Материалы и события',
-    summary: 'Бренд можно связать с темой: продуктом, экспертом, кейсом, обучением или встречей.',
+    summary: 'Бренд можно связать с продуктом, экспертом, кейсом, обучением или встречей.',
     detail: 'Карточка или материал показывает, чем бренд полезен специалистам, заведениям и партнёрам.',
     touchpoint: 'Интервью, приветственное слово, материал или совместная тема.'
   },
   {
     area: 'Следующий шаг',
-    summary: 'После размещения можно выбрать следующий материал, событие или контакт.',
-    detail: 'Подходит брендам, которым нужен не разовый логотип, а план размещения на выбранный период.',
+    summary: 'После размещения можно выбрать следующий материал, событие или контакт с аудиторией.',
+    detail: 'Подходит брендам, которым нужен план на период, а не разовый логотип.',
     touchpoint: 'Итоговый разбор, следующий формат, контакт с командой.'
   }
 ] as const;
@@ -78,25 +77,23 @@ export default async function GeneralSponsorsPage() {
 
   return (
     <>
-      <section className="background-zone background-zone-hero border-b border-[var(--line)] py-10 md:py-14">
+      <section className="background-zone background-zone-hero border-b border-[var(--line)] py-7 md:py-10">
         <div className="container grid gap-8 lg:grid-cols-[minmax(0,0.95fr)_minmax(20rem,0.72fr)] lg:items-center">
           <div className="min-w-0">
-            <p className="text-sm leading-6 text-[var(--muted)]">
-              <AppLink className="muted-link" href="/">Главная</AppLink> <span aria-hidden="true">›</span> Спонсорство
-            </p>
-            <PublicEyebrow className="mt-8">Спонсорство</PublicEyebrow>
-            <PublicDisplayTitle as="h1" className="mt-5" size="hero">
+            <PublicBreadcrumbs current="Спонсорство" />
+            <PublicEyebrow className="mt-6">Спонсорство</PublicEyebrow>
+            <PublicDisplayTitle as="h1" className="mt-4 max-w-5xl text-[32px] sm:text-[42px] md:text-[50px] xl:text-[56px]" size="section">
               Спонсорство BARSYNERGY
             </PublicDisplayTitle>
-            <PublicBodyText className="mt-6 max-w-2xl" size="md">
-              Бренд может поддержать события, обучение и материалы для барной индустрии СКФО. Формат, период, места размещения и материалы согласуются отдельно.
+            <PublicBodyText className="mt-4 max-w-2xl" size="md">
+              Бренд может поддержать события, обучение и материалы для барной индустрии СКФО. Формат, период и места размещения обсуждаем отдельно.
             </PublicBodyText>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
               <Button className="rounded-[var(--radius-md)] px-7" href="/contacts?topic=sponsorship#contact-form" size="lg">
-                Запросить условия
+                Запросить условия сотрудничества
               </Button>
               <Button className="rounded-[var(--radius-md)] px-7" href="/contacts?topic=sponsorship-presentation#contact-form" size="lg" variant="secondary">
-                Запросить презентацию
+                Получить презентацию
               </Button>
             </div>
           </div>
@@ -135,7 +132,7 @@ export default async function GeneralSponsorsPage() {
               priceStatus: 'по запросу',
               action: {
                 href: `/contacts?topic=sponsorship&partnerType=${encodeURIComponent(level.packageName)}#contact-form`,
-                label: 'Запросить условия'
+                label: 'Запросить условия сотрудничества'
               }
             }))}
             title="Пакеты спонсорства"
@@ -155,7 +152,7 @@ export default async function GeneralSponsorsPage() {
                   Опубликованного генерального спонсора пока нет
                 </h2>
                 <p className="mt-4 max-w-2xl text-sm leading-7 text-[var(--muted)]">
-                  Когда появится опубликованный спонсор, карточка будет здесь и на главной странице.
+                  Когда спонсор будет опубликован, карточка появится здесь и на главной странице.
                 </p>
                 <div className="mt-6">
                   <Button className="rounded-[var(--radius-md)] px-7" href="/contacts?topic=sponsorship#contact-form">
@@ -173,10 +170,9 @@ export default async function GeneralSponsorsPage() {
           <SectionCtaPanel
             brandGlyph="partnership-route"
             brandIconVariant="dark"
-            description="Расскажите, какую задачу нужно решить, какой период интересен и какие материалы уже готовы."
+            description="Расскажите, какая задача стоит перед брендом, на какой период планируете размещение и какие материалы уже готовы."
             primary={{ href: '/contacts?topic=sponsorship#contact-form', label: 'Оставить заявку' }}
-            secondary={{ href: '/contacts?topic=sponsorship-presentation#contact-form', label: 'Запросить презентацию' }}
-            title="Запросить условия"
+            title="Стать спонсором"
           />
         </div>
       </section>

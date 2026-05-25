@@ -4,6 +4,14 @@
 
 Production target is a Russian VPS/cloud, with Timeweb Cloud VPS as the primary option.
 
+## Access Note
+
+The local source of truth for server access is the repo-root `ssh.md` file.
+That file is gitignored on purpose and may contain the safe SSH command and runtime notes.
+It must not contain passwords, private keys, tokens, env values or database URLs.
+
+If `ssh.md` is missing or outdated, ask the owner for the current server access details before any deploy or production check. Do not reconstruct access from shell history, neighboring projects or old chat notes.
+
 ## Architecture
 
 - Ubuntu Server
@@ -166,9 +174,10 @@ systemctl is-active --quiet barsynergy.service
 Post-deploy smoke:
 
 ```bash
-curl -I https://barsynergy.ru/
-curl -I https://barsynergy.ru/auth/login
-curl -I https://barsynergy.ru/admin
+curl -I https://<production-host>/
+curl -I https://<production-host>/auth/login
+curl -I https://<production-host>/admin/login
+curl -I https://<production-host>/admin
 journalctl -u barsynergy.service --since '10 minutes ago' --no-pager -p err..alert
 ```
 
@@ -176,7 +185,8 @@ Expected smoke behavior:
 
 - `/` returns `200`;
 - `/auth/login` returns `200`;
-- `/admin` redirects unauthenticated users to `/auth/login`;
+- `/admin/login` returns `200`;
+- `/admin` redirects unauthenticated users to `/admin/login`;
 - service logs have no fresh `err..alert` entries.
 
 Host-checkout nuances:
@@ -186,6 +196,16 @@ Host-checkout nuances:
 - if `next.config.ts` or another tracked file is dirty on the server, inspect and save a patch before `git restore` or `git pull`;
 - do not edit `.env.production` during deploy unless the owner explicitly approved the env change;
 - stop the deploy before restart if `npm ci`, `npm run build`, Prisma validation or migrations fail.
+
+### Clean Production Branch Rule
+
+The VPS must deploy from `prod` only. Treat `prod` as the clean site branch:
+
+- include application source, Prisma schema/migrations, required scripts, runtime config examples, Docker/Nginx files and the minimum operator docs needed to deploy the site;
+- do not include local agent memory, generated QA screenshots, scratch output, browser artifacts, `.lazyweb/`, `.codex/`, `.agents/`, `.mempalace/`, `test-results/`, `.playwright-cli/`, `output/` or local-only secret notes;
+- keep `ssh.md`, `.env*` with real values, database dumps, backups, uploads, private keys and tokens out of git;
+- merge or cherry-pick into `prod` only after validation and owner confirmation;
+- on the VPS, confirm `git branch --show-current` returns `prod` before pulling and restarting.
 
 Rollback plan for this mode:
 
@@ -228,6 +248,8 @@ Unsupported production mode for the current repo without a separate ingress revi
 - trusting `CF-Connecting-IP` or another provider-specific header without locking traffic to that provider.
 
 Status note, 2026-05-05: this single-node Nginx/TLS contract is the current launch-readiness target. Older notes about a trusted external edge are historical unless the owner explicitly reopens that architecture.
+
+The tracked `.env.production.example` and `docker/nginx/nginx.conf` currently contain `72.56.1.69.sslip.io`. Treat that value as an example or current temporary host name, not as the canonical public domain. For a real release, align `APP_URL`, Nginx `server_name`, certificate paths and smoke-check URLs to the owner-approved production host.
 
 ## Single-Node Fallback Contract
 

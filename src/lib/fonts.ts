@@ -1,18 +1,18 @@
-import { Manrope, Playfair_Display } from 'next/font/google';
+import { Noto_Sans, Noto_Serif_Display } from 'next/font/google';
 
-export const bodyFont = Manrope({
+export const bodyFont = Noto_Sans({
   subsets: ['latin', 'cyrillic'],
   weight: ['400', '500', '600', '700'],
   display: 'swap'
 });
 
-export const displayFont = Playfair_Display({
+export const displayFont = Noto_Serif_Display({
   subsets: ['latin', 'cyrillic'],
-  weight: ['600', '700', '800'],
+  weight: ['500', '600', '700', '800'],
   display: 'swap'
 });
 
-export const accentFont = Manrope({
+export const accentFont = Noto_Sans({
   subsets: ['latin', 'cyrillic'],
   weight: ['500', '600', '700'],
   display: 'swap'

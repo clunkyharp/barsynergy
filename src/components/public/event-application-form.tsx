@@ -23,17 +23,17 @@ export function EventApplicationForm({ enabled, result, utm, cities, defaults = 
     <PublicApplicationSection
       eyebrow="События / Заявка"
       title={hasEventContext ? 'Заявка на выбранное событие' : 'Записаться или предложить событие'}
-      description={hasEventContext ? 'Название события уже подставлено в форму.' : 'Можно записаться или предложить новую встречу.'}
+      description={hasEventContext ? 'Название события уже подставлено в форму.' : 'Можно записаться или предложить встречу.'}
       disclosureAliases={['applications']}
       disclosureFocusSelector={hasEventContext ? '#eventName' : '#eventTitle'}
       disclosureId="event-request"
       disclosureOpenLabel={hasEventContext ? 'Записаться' : 'Предложить событие'}
       disclosureTitle={hasEventContext ? 'Запись на событие' : 'Заявка на событие'}
-      disclosureDescription="Оставьте контакт для участия или добавьте событие в афишу."
+      disclosureDescription="Оставьте контакт для участия или предложите событие в афишу."
       enabled={enabled}
       result={result}
     >
-      <form action={submitEventApplication} className="editorial-form-shell">
+      <form action={submitEventApplication} className="editorial-form-shell public-form-shell">
         <HiddenUtmFields utm={utm} />
         <HoneypotField id="event-application-website" />
         <PublicFormShellHeader

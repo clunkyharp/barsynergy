@@ -27,8 +27,13 @@ import { getEnv } from '@/lib/validation/env';
 
 const loginSchema = z.object({
   email: z.string().trim().email().max(255),
-  password: z.string().min(1).max(200)
+  password: z.string().min(1).max(200),
+  role: z.enum(['participant', 'business']).optional(),
+  surface: z.enum(['public', 'admin']).optional()
 });
+
+type LoginRoleIntent = z.infer<typeof loginSchema>['role'];
+type LoginSurface = z.infer<typeof loginSchema>['surface'];
 
 const businessRequestSchema = z.object({
   companyName: z.string().trim().min(2).max(160),
@@ -61,6 +66,20 @@ function authResultPath(path: string, result: { type: 'success' | 'error'; code:
 
 function redirectWithAuthResult(path: string, result: { type: 'success' | 'error'; code: string }): never {
   redirect(authResultPath(path, result));
+}
+
+function getLoginPath(surface: LoginSurface, role: LoginRoleIntent) {
+  if (surface === 'admin') {
+    return '/admin/login';
+  }
+
+  if (!role) {
+    return '/auth/login';
+  }
+
+  const url = new URL('/auth/login', 'http://localhost');
+  url.searchParams.set('role', role);
+  return `${url.pathname}${url.search}`;
 }
 
 function activationResultPath(result: { type: 'error'; code: string }) {
@@ -105,6 +124,22 @@ function getPostLoginPath(role: UserRole) {
   }
 
   return '/';
+}
+
+function canUseSelectedLoginRole(selectedRole: LoginRoleIntent, userRole: UserRole) {
+  if (!selectedRole) {
+    return true;
+  }
+
+  if (selectedRole === 'participant') {
+    return userRole === UserRole.USER;
+  }
+
+  if (selectedRole === 'business') {
+    return userRole === UserRole.BUSINESS;
+  }
+
+  return false;
 }
 
 function resolveAuthLoginErrorCode(error: unknown) {
@@ -154,14 +189,19 @@ function resolveBusinessAccessActivationErrorCode(error: unknown) {
 }
 
 export async function loginAction(formData: FormData) {
+  const rawSurface: LoginSurface = getString(formData, 'surface') === 'admin' ? 'admin' : 'public';
   const parsed = loginSchema.safeParse({
     email: getString(formData, 'email').toLowerCase(),
-    password: getString(formData, 'password')
+    password: getString(formData, 'password'),
+    role: optionalString(getString(formData, 'role')),
+    surface: rawSurface
   });
 
   if (!parsed.success) {
-    redirectWithAuthResult('/auth/login', { type: 'error', code: 'invalid' });
+    redirectWithAuthResult(getLoginPath(rawSurface, undefined), { type: 'error', code: 'invalid' });
   }
+
+  const loginPath = getLoginPath(parsed.data.surface, parsed.data.role);
 
   try {
     await assertAuthAttemptAllowed({ action: 'login', email: parsed.data.email });
@@ -173,19 +213,23 @@ export async function loginAction(formData: FormData) {
 
     if (!user) {
       await verifyPasswordAgainstDummyHash(parsed.data.password);
-      redirectWithAuthResult('/auth/login', { type: 'error', code: 'invalid' });
+      redirectWithAuthResult(loginPath, { type: 'error', code: 'invalid' });
     }
 
     if (!(await verifyPassword(parsed.data.password, user.passwordHash))) {
-      redirectWithAuthResult('/auth/login', { type: 'error', code: 'invalid' });
+      redirectWithAuthResult(loginPath, { type: 'error', code: 'invalid' });
     }
 
     if (user.status === UserStatus.PENDING) {
-      redirectWithAuthResult('/auth/login', { type: 'error', code: 'pending' });
+      redirectWithAuthResult(loginPath, { type: 'error', code: 'pending' });
     }
 
     if (user.status === UserStatus.BLOCKED) {
-      redirectWithAuthResult('/auth/login', { type: 'error', code: 'blocked' });
+      redirectWithAuthResult(loginPath, { type: 'error', code: 'blocked' });
+    }
+
+    if (!canUseSelectedLoginRole(parsed.data.role, user.role)) {
+      redirectWithAuthResult(loginPath, { type: 'error', code: 'role-mismatch' });
     }
 
     const token = createSessionToken();
@@ -203,10 +247,10 @@ export async function loginAction(formData: FormData) {
     redirect(getPostLoginPath(user.role));
   } catch (error) {
     if (error instanceof AuthRateLimitError) {
-      redirectWithAuthResult('/auth/login', { type: 'error', code: 'rate-limited' });
+      redirectWithAuthResult(loginPath, { type: 'error', code: 'rate-limited' });
     }
 
-    redirectWithAuthResult('/auth/login', {
+    redirectWithAuthResult(loginPath, {
       type: 'error',
       code: resolveAuthLoginErrorCode(error)
     });

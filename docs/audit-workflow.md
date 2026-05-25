@@ -28,7 +28,7 @@ Recommended order:
 
 After any large code batch, broad remediation pass, or cross-module backend/auth/data-flow change, run at least the Code Review audit pass before calling the slice stable.
 
-Each audit pass must use its own bounded subagent on `gpt-5.3-codex` when subagent execution is available. The central agent remains responsible for scope, verification, integration, final prioritization and closeout.
+Each audit pass should use its own bounded subagent when the current agent policy, tooling and owner request allow it. The central agent remains responsible for scope, verification, integration, final prioritization and closeout.
 
 ## Universal Audit Header
 
@@ -350,7 +350,7 @@ Convert the results into one working artifact:
 Respect priorities and dependencies.
 Avoid duplicated findings.
 Make the result actionable for implementation.
-Use a separate gpt-5.3-codex subagent for each audit task.
+Use a separate audit subagent for each audit task when the current agent policy, tooling and owner request allow it.
 ```
 
 ## Quality Rules

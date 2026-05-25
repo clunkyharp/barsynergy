@@ -19,13 +19,15 @@ export default async function EventDetailPage({ params, searchParams }: EventDet
   const query = (await searchParams) ?? {};
   const [event, related, cities] = await Promise.all([
     getPublishedEventDetail(slug),
-    getPublishedEvents({ pageSize: '4' }),
+    getPublishedEvents({ pageSize: '4', period: 'upcoming' }),
     getApplicationCityOptions()
   ]);
 
   if (!event) {
     notFound();
   }
+  const eventStart = event.startsAtIso ? new Date(event.startsAtIso) : undefined;
+  const isPastEvent = eventStart ? Number.isFinite(eventStart.getTime()) && eventStart.getTime() < Date.now() : false;
   const relatedItems = related.items.filter((item) => item.slug !== slug).slice(0, 3);
   const applicationFormsEnabled = arePublicApplicationFormsEnabled(getEnv());
 
@@ -39,19 +41,21 @@ export default async function EventDetailPage({ params, searchParams }: EventDet
         imageUrl={event.imageUrl}
         label={event.label}
         meta={event.meta}
-        primaryLink={{ href: '#event-request', label: 'Записаться' }}
+        primaryLink={isPastEvent ? { href: '/events', label: 'Смотреть другие события' } : { href: '#event-request', label: 'Записаться' }}
         secondaryLink={{ href: '/events', label: 'Вернуться в афишу' }}
         sections={event.sections}
         summary={event.summary}
         title={event.title}
       />
-      <EventApplicationForm
-        cities={cities}
-        defaults={{ eventTitle: event.title }}
-        enabled={applicationFormsEnabled}
-        result={getPublicApplicationResult(query)}
-        utm={getPublicApplicationUtm(query)}
-      />
+      {isPastEvent ? null : (
+        <EventApplicationForm
+          cities={cities}
+          defaults={{ eventTitle: event.title }}
+          enabled={applicationFormsEnabled}
+          result={getPublicApplicationResult(query)}
+          utm={getPublicApplicationUtm(query)}
+        />
+      )}
       <PublicRelatedContentSection
         basePath="/events"
         items={relatedItems}

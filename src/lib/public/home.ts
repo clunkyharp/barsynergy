@@ -123,7 +123,7 @@ const fallbackCards: Record<HomepageCardKind, Omit<HomepageLiveCard, 'kind'>> = 
     summary: 'Интенсивы, командные программы и материалы для задач сервиса, меню и смены.',
     meta: ['Очные и онлайн-занятия', 'СКФО'],
     href: '/education',
-    actionLabel: 'Выбрать формат',
+    actionLabel: 'Выбрать программу',
     isFallback: true
   },
   event: {
@@ -132,7 +132,7 @@ const fallbackCards: Record<HomepageCardKind, Omit<HomepageLiveCard, 'kind'>> = 
     summary: 'В разделе есть лекции, гостевые смены, дегустации и встречи по городам региона.',
     meta: ['Афиша обновляется', 'СКФО'],
     href: '/events',
-    actionLabel: 'Смотреть афишу',
+    actionLabel: 'Выбрать событие',
     isFallback: true
   },
   article: {
@@ -151,7 +151,7 @@ const fallbackCards: Record<HomepageCardKind, Omit<HomepageLiveCard, 'kind'>> = 
     summary: 'Здесь можно откликнуться на открытую роль или отправить заявку на публикацию вакансии.',
     meta: ['Для кандидатов и компаний', 'СКФО'],
     href: '/vacancies',
-    actionLabel: 'Смотреть вакансии',
+    actionLabel: 'Найти вакансию',
     isFallback: true
   },
   supplier: {
@@ -160,7 +160,7 @@ const fallbackCards: Record<HomepageCardKind, Omit<HomepageLiveCard, 'kind'>> = 
     summary: 'Компании для закупок, расходников, оборудования и сервисных задач по региону.',
     meta: ['Закупки и сервис', 'Для заведений'],
     href: '/suppliers',
-    actionLabel: 'Открыть каталог',
+    actionLabel: 'Перейти в каталог',
     isFallback: true
   }
 };
@@ -194,6 +194,30 @@ function normalizeSocialVariant(value?: string | null): HomepageSocialBlock['var
   }
 
   return 'telegram';
+}
+
+function normalizePublicActionLabel(label: string) {
+  const trimmedLabel = label.trim();
+  const replacements: Record<string, string> = {
+    'Написать команде': 'Связаться с нами',
+    'Открыть обучение': 'Выбрать программу',
+    'Посмотреть обучение': 'Выбрать программу',
+    'Открыть каталог': 'Перейти в каталог',
+    'Смотреть каталог': 'Перейти в каталог',
+    'Открыть калькулятор': 'Рассчитать себестоимость',
+    'Перейти к расчёту': 'Рассчитать себестоимость',
+    'Открыть программу': 'Смотреть программу',
+    'Открыть профиль': 'Смотреть профиль',
+    'Открыть форму заявки': 'Оставить заявку',
+    'Открыть отклик': 'Откликнуться на вакансию',
+    'Открыть Telegram': 'Написать в Telegram',
+    'Открыть WhatsApp': 'Написать в WhatsApp',
+    'Открыть Instagram': 'Перейти в Instagram',
+    'Открыть сайт': 'Перейти на сайт',
+    'Открыть канал': 'Перейти в канал'
+  };
+
+  return replacements[trimmedLabel] ?? trimmedLabel;
 }
 
 function toHomepageCard(
@@ -293,13 +317,13 @@ export async function getHomepageData(): Promise<HomepageData> {
       title: card.title,
       description: card.description,
       href: card.href,
-      actionLabel: card.actionLabel,
+      actionLabel: normalizePublicActionLabel(card.actionLabel),
       proof: card.proof ?? undefined,
       imagePath: card.imagePath ?? undefined,
       iconKey: card.iconKey ?? undefined
     })),
-    course: toHomepageCard(courses.items[0], 'course', '/education', 'Выбрать формат', 'Образование'),
-    event: toHomepageCard(featuredEvent, 'event', '/events', 'Смотреть афишу', 'Ближайшее событие'),
+    course: toHomepageCard(courses.items[0], 'course', '/education', 'Выбрать программу', 'Образование'),
+    event: toHomepageCard(featuredEvent, 'event', '/events', 'Выбрать событие', 'Ближайшее событие'),
     article: toHomepageCard(
       articles.items[0],
       'article',
@@ -310,8 +334,8 @@ export async function getHomepageData(): Promise<HomepageData> {
     secondaryArticle: articles.items[1]
       ? toHomepageCard(articles.items[1], 'article', `/articles/${articles.items[1].slug}`, 'Читать материал', 'Материал')
       : undefined,
-    vacancy: toHomepageCard(vacancies.items[0], 'vacancy', '/vacancies', 'Смотреть вакансии', 'Открытая вакансия'),
-    supplier: toHomepageCard(featuredSupplier, 'supplier', '/suppliers', 'Открыть каталог', 'Поставщик'),
+    vacancy: toHomepageCard(vacancies.items[0], 'vacancy', '/vacancies', 'Найти вакансию', 'Открытая вакансия'),
+    supplier: toHomepageCard(featuredSupplier, 'supplier', '/suppliers', 'Перейти в каталог', 'Поставщик'),
     generalSponsors,
     socialBlocks: socialBlocks.map((block) => ({
       id: block.id,
@@ -319,7 +343,7 @@ export async function getHomepageData(): Promise<HomepageData> {
       title: block.title,
       description: block.description,
       helperText: block.helperText ?? block.name,
-      actionLabel: block.actionLabel,
+      actionLabel: normalizePublicActionLabel(block.actionLabel),
       href: block.href,
       logoPath: block.logoPath ?? '/icon.svg',
       variant: normalizeSocialVariant(block.variant)
@@ -329,9 +353,9 @@ export async function getHomepageData(): Promise<HomepageData> {
           title: ctaBlock.title,
           description: ctaBlock.description,
           helperText: ctaBlock.helperText ?? undefined,
-          primaryLabel: ctaBlock.primaryLabel,
+          primaryLabel: normalizePublicActionLabel(ctaBlock.primaryLabel),
           primaryHref: ctaBlock.primaryHref,
-          secondaryLabel: ctaBlock.secondaryLabel ?? undefined,
+          secondaryLabel: ctaBlock.secondaryLabel ? normalizePublicActionLabel(ctaBlock.secondaryLabel) : undefined,
           secondaryHref: ctaBlock.secondaryHref ?? undefined
         }
       : undefined,
@@ -343,7 +367,7 @@ export async function getHomepageData(): Promise<HomepageData> {
           cardTitle: calculatorTeaser.cardTitle,
           description: calculatorTeaser.description,
           steps: parseLines(calculatorTeaser.stepsText),
-          actionLabel: calculatorTeaser.actionLabel,
+          actionLabel: normalizePublicActionLabel(calculatorTeaser.actionLabel),
           actionHref: calculatorTeaser.actionHref
         }
       : undefined,

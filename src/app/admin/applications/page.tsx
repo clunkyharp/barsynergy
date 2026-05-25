@@ -362,15 +362,15 @@ export default async function AdminApplicationsPage({ searchParams }: AdminAppli
 
                   return (
                     <DataTableRow key={application.id}>
-                      <DataTableCell className="max-w-[240px]">
+                      <DataTableCell className="max-w-[240px]" label="Тип заявки">
                         <DataTableClamp className="font-semibold">{applicationTypeLabels[application.type]}</DataTableClamp>
                         {application.subject ? <DataTableClamp className="mt-1 text-xs text-[var(--muted)]">{application.subject}</DataTableClamp> : null}
                       </DataTableCell>
-                      <DataTableCell className="max-w-[300px]">
+                      <DataTableCell className="max-w-[300px]" label="Имя / компания">
                         <DataTableClamp className="font-semibold">{identity.primary}</DataTableClamp>
                         {identity.secondary ? <DataTableClamp className="mt-1 text-xs text-[var(--muted)]">{identity.secondary}</DataTableClamp> : null}
                       </DataTableCell>
-                      <DataTableCell className="text-[var(--muted)]">
+                      <DataTableCell className="text-[var(--muted)]" label="Город">
                         <div>{application.city?.name ?? 'Город не указан'}</div>
                         {application.vacancy ? (
                           <div className="mt-1 text-xs">
@@ -391,12 +391,12 @@ export default async function AdminApplicationsPage({ searchParams }: AdminAppli
                           </div>
                         ) : null}
                       </DataTableCell>
-                      <DataTableCell>
+                      <DataTableCell label="Статус">
                         <AdminStatusChip variant={applicationStatusBadgeVariants[application.status]}>
                           {applicationStatusLabels[application.status]}
                         </AdminStatusChip>
                       </DataTableCell>
-                      <DataTableCell>
+                      <DataTableCell label="Файлы / согласия">
                         <div className="flex flex-wrap gap-1.5">
                           {application.resumeFileId ? <AdminStatusChip variant="neutral">Резюме</AdminStatusChip> : null}
                           {application.consentAcceptedAt ? <AdminStatusChip variant="success">Согласие</AdminStatusChip> : null}
@@ -406,10 +406,10 @@ export default async function AdminApplicationsPage({ searchParams }: AdminAppli
                           ) : null}
                         </div>
                       </DataTableCell>
-                      <DataTableCell className="text-[var(--muted)]">
+                      <DataTableCell className="text-[var(--muted)]" label="Создана">
                         {dateTimeFormatter.format(application.createdAt)}
                       </DataTableCell>
-                      <DataTableCell className="max-w-[260px]">
+                      <DataTableCell className="max-w-[260px]" label="Следующий шаг">
                         <DataTableClamp className={actionLabel === 'Контроль не требуется' ? 'text-[var(--muted)]' : 'font-medium'}>
                           {actionLabel}
                         </DataTableClamp>

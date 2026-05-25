@@ -47,7 +47,7 @@ printf '%s\n' 'YourStrongPassword123!' | npm run admin:upsert:local -- --email a
 - `uploads/` is ignored by git.
 - New migration creation is a separate step during schema changes: `npm run prisma:migrate:dev -- --name <migration_name>`.
 - Production scheduler cleanup is documented in one place: [Scheduler runbook](scheduler-runbook.md).
-- Local manual cleanup commands stay available: `npm run session:cleanup:expired`, `npm run application:cleanup:throttles`, `npm run business-access:cleanup:invites`.
+- Local manual cleanup commands stay available: `npm run session:cleanup:expired`, `npm run auth:cleanup:throttles`, `npm run application:cleanup:throttles`, `npm run business-access:cleanup:invites`.
 - Real user data, dumps and secrets must not be committed.
 
 ## Related Docs

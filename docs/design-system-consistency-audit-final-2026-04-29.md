@@ -6,7 +6,7 @@
 
 Охват: mixed full audit
 
-Статус: исторический аудит. Текущий шрифтовой контракт после photo-reference redesign — `Playfair Display + Manrope`; если ниже встречается прежний контракт `Geist + Oswald + Outfit`, он описывает состояние на дату аудита и не является текущим source of truth.
+Статус: исторический аудит. Текущий шрифтовой контракт после owner-selected visual follow-up — `Noto Serif Display + Noto Sans`; если ниже встречается прежний контракт `Geist + Oswald + Outfit`, он описывает состояние на дату аудита и не является текущим source of truth.
 
 - Public и auth: runtime, screenshots, source review.
 - Admin, business, profile: source-level review и existing QA artifacts.
@@ -96,7 +96,7 @@
 
 Что работает:
 
-- На дату аудита был зафиксирован прежний font contract: `Geist` + `Oswald` + `Outfit`. Сейчас он superseded текущим `Playfair Display + Manrope`. `Evidence: source-level`
+- На дату аудита был зафиксирован прежний font contract: `Geist` + `Oswald` + `Outfit`. Сейчас он superseded текущим `Noto Serif Display + Noto Sans`. `Evidence: source-level`
 - Есть roles для public/product headings, body, caption, label, button. `Evidence: source-level`
 
 Что не работает:

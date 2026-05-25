@@ -165,7 +165,7 @@ export default async function AdminArticlesPage({ searchParams }: AdminArticlesP
               <AdminTableBody>
                 {articles.map((article) => (
                   <AdminTableRow key={article.id}>
-                    <AdminTableCell className="max-w-[320px]">
+                    <AdminTableCell className="max-w-[320px]" label="Материал">
                       <AdminTableClamp className="font-semibold">{article.title}</AdminTableClamp>
                       <div className="mt-1 truncate text-xs text-[var(--muted)]">/{article.slug}</div>
                       {article.tags.length > 0 ? (
@@ -181,12 +181,12 @@ export default async function AdminArticlesPage({ searchParams }: AdminArticlesP
                         <div className="mt-1 text-xs text-[var(--muted)]">Обложка: {article.coverImage.originalName}</div>
                       ) : null}
                     </AdminTableCell>
-                    <AdminTableCell className="text-[var(--muted)]">{article.category?.name ?? '-'}</AdminTableCell>
-                    <AdminTableCell className="text-[var(--muted)]">{article.city?.name ?? '-'}</AdminTableCell>
-                    <AdminTableCell>
+                    <AdminTableCell className="text-[var(--muted)]" label="Категория">{article.category?.name ?? '-'}</AdminTableCell>
+                    <AdminTableCell className="text-[var(--muted)]" label="Город">{article.city?.name ?? '-'}</AdminTableCell>
+                    <AdminTableCell label="Статус">
                       <StatusBadge variant={contentStatusBadgeVariants[article.status]}>{contentStatusLabels[article.status]}</StatusBadge>
                     </AdminTableCell>
-                    <AdminTableCell className="text-[var(--muted)]">
+                    <AdminTableCell className="text-[var(--muted)]" label="Обновлено">
                       <div>{dateFormatter.format(article.updatedAt)}</div>
                       {article.updatedBy?.email ? <div className="mt-1 text-xs">{article.updatedBy.email}</div> : null}
                     </AdminTableCell>

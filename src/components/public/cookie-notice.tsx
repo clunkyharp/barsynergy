@@ -1,68 +1,83 @@
 'use client';
 
-import { X } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { InlineLink } from '@/components/ui/inline-link';
 import { cn } from '@/lib/utils';
 
-const cookieNoticeStorageKey = 'barsynergy_cookie_notice_accepted';
+export const COOKIE_NOTICE_STORAGE_KEY = 'barsynergy_cookie_notice_accepted';
+const cookieSettingsPanelId = 'cookie-settings-panel';
 
 export function CookieNotice() {
   const pathname = usePathname();
   const [isVisible, setIsVisible] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const isCostCalculatorPage = pathname === '/tools/cost-calculator';
 
   useEffect(() => {
-    setIsVisible(window.localStorage.getItem(cookieNoticeStorageKey) !== 'true');
+    setIsVisible(window.localStorage.getItem(COOKIE_NOTICE_STORAGE_KEY) !== 'true');
   }, []);
 
   if (!isVisible || pathname?.startsWith('/admin') || pathname?.startsWith('/business/cabinet') || pathname?.startsWith('/auth')) {
     return null;
   }
 
+  function saveCookieChoice() {
+    window.localStorage.setItem(COOKIE_NOTICE_STORAGE_KEY, 'true');
+    setIsVisible(false);
+  }
+
   return (
     <div
+      aria-label="Настройки файлов cookie"
       className={cn(
         isCostCalculatorPage
           ? 'relative z-10 mx-auto my-4 w-[calc(100%-1.5rem)] max-w-[420px]'
-          : 'fixed inset-x-3 bottom-[calc(0.75rem+env(safe-area-inset-bottom))] z-40 md:inset-x-auto md:bottom-5 md:right-5 md:w-[420px]'
+          : 'fixed inset-x-3 bottom-[calc(0.75rem+env(safe-area-inset-bottom))] z-40 md:inset-x-auto md:left-1/2 md:right-auto md:w-[min(680px,calc(100%-2rem))] md:-translate-x-1/2'
       )}
+      role="region"
     >
-      <div className="rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--paper)] p-3 shadow-[var(--shadow-overlay)] md:p-4">
-        <div className={cn('grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3 md:gap-4', isCostCalculatorPage && 'gap-3')}>
-          <p className="min-w-0 text-[13px] leading-5 text-[var(--muted)] md:text-sm md:leading-6">
-            Сайт использует технические cookies для входа, защиты форм и стабильной работы. Документы: <InlineLink href="/legal/cookies">куки</InlineLink> и{' '}
-            <InlineLink href="/legal/privacy">политика данных</InlineLink>.
-          </p>
-          <button
-            aria-label="Закрыть уведомление о cookies"
-            className="inline-flex min-h-10 shrink-0 items-center justify-center rounded-[var(--radius-md)] border border-[var(--border-default)] px-3 text-sm font-semibold text-[var(--text)] transition hover:bg-[var(--accent)] hover:text-[var(--accent-contrast)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] md:size-11 md:px-0"
-            onClick={() => {
-              window.localStorage.setItem(cookieNoticeStorageKey, 'true');
-              setIsVisible(false);
-            }}
-            type="button"
-          >
-            <span className="md:hidden">Понятно</span>
-            <span aria-hidden="true" className="hidden md:inline-flex">
-              <X size={16} />
-            </span>
-          </button>
+      <div className="rounded-[12px] border border-[var(--border-subtle)] bg-[color-mix(in_oklab,var(--paper)_94%,transparent)] p-2 shadow-none md:p-3">
+        <div className={cn('grid gap-2 md:grid-cols-[minmax(0,1fr)_auto] md:items-center md:gap-4', isCostCalculatorPage && 'gap-3')}>
+          <div className="min-w-0">
+            <p className="text-sm font-semibold leading-5 text-[var(--text)]">Файлы куки</p>
+            <p className="text-[12px] leading-5 text-[var(--muted)] md:text-[13px]">
+              Нужны для работы сайта. Дополнительные куки не включены.
+            </p>
+          </div>
+          <div className="grid grid-cols-2 gap-2 md:w-[260px]">
+            <Button className="min-h-11 w-full rounded-[var(--radius-md)] text-sm" onClick={saveCookieChoice} type="button">
+              Принять
+            </Button>
+            <Button
+              aria-controls={cookieSettingsPanelId}
+              aria-expanded={settingsOpen}
+              className="min-h-11 w-full rounded-[var(--radius-md)] text-sm"
+              onClick={() => setSettingsOpen((current) => !current)}
+              type="button"
+              variant="secondary"
+            >
+              Настроить
+            </Button>
+          </div>
         </div>
-        {isCostCalculatorPage ? null : (
-          <Button
-            className="mt-3 hidden min-h-10 w-full rounded-[var(--radius-md)] md:flex md:mt-4 md:min-h-11"
-            onClick={() => {
-              window.localStorage.setItem(cookieNoticeStorageKey, 'true');
-              setIsVisible(false);
-            }}
-            type="button"
+        {settingsOpen ? (
+          <div
+            className="mt-2 border-t border-[var(--line)] pt-2 text-sm leading-6 text-[var(--muted)]"
+            id={cookieSettingsPanelId}
           >
-            Понятно
-          </Button>
-        )}
+            <p className="font-semibold text-[var(--text)]">Настройки куки</p>
+            <label className="mt-2 flex items-start gap-2">
+              <input checked className="mt-1 accent-[var(--accent)]" disabled type="checkbox" />
+              <span>
+                Технические куки обязательны для входа, защиты форм и сохранения сессии. Дополнительные куки на сайте не включены.
+              </span>
+            </label>
+            <Button className="mt-3 min-h-11 w-full rounded-[var(--radius-md)]" onClick={saveCookieChoice} type="button">
+              Сохранить
+            </Button>
+          </div>
+        ) : null}
       </div>
     </div>
   );

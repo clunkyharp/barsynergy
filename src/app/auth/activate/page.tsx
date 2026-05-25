@@ -61,7 +61,7 @@ export default async function ActivateBusinessAccessPage({ searchParams }: Activ
       <div className="grid gap-6 lg:grid-cols-[0.42fr_0.58fr] lg:items-start">
         <section className="editorial-form-shell p-6 md:p-8">
           <div className="mb-8 flex justify-end">
-            <Button className="rounded-[var(--radius-md)] px-4" href="/" size="sm" variant="ghost">
+            <Button className="px-4" href="/" size="sm" variant="link">
               <ArrowLeft aria-hidden size={15} strokeWidth={1.8} />
               Вернуться на сайт
             </Button>
@@ -69,7 +69,7 @@ export default async function ActivateBusinessAccessPage({ searchParams }: Activ
           <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Бизнес-аккаунт</p>
           <h1 className={`${displayFont.className} display-tight mt-4 text-[40px] md:text-[54px]`}>Завершить подключение</h1>
           <p className="mt-4 max-w-md text-base leading-7 text-[var(--muted)]">
-            Установите пароль для первого входа в кабинет компании. Ссылка действует ограниченное время и используется один раз.
+            Установите пароль для первого входа в кабинет компании. Ссылка действует недолго и открывается один раз.
           </p>
           {companyName ? (
             <Panel className="mt-8" padding="sm">
@@ -87,7 +87,7 @@ export default async function ActivateBusinessAccessPage({ searchParams }: Activ
             <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Активация</p>
             <h2 className={`${displayFont.className} mt-3 text-[2rem] font-semibold leading-none`}>Создайте пароль</h2>
             <p className="mt-3 max-w-xl text-sm leading-7 text-[var(--muted)]">
-              После активации вы сразу попадёте в кабинет и сможете продолжить работу с заявками компании.
+              После активации вы попадёте в кабинет и сможете работать с заявками компании.
             </p>
           </div>
           <div className="p-5 md:p-6">
@@ -102,7 +102,7 @@ export default async function ActivateBusinessAccessPage({ searchParams }: Activ
             ) : (
               <form action={activateBusinessAccessAction} className="grid gap-4">
                 <input name="token" type="hidden" value={token} />
-                <FormField htmlFor="password" label="Пароль" hint="Минимум 8 символов. Лучше использовать уникальный пароль для кабинета.">
+                <FormField htmlFor="password" label="Пароль" hint="Минимум 8 символов. Лучше взять отдельный пароль для кабинета.">
                   <Input id="password" name="password" type="password" minLength={8} autoComplete="new-password" required />
                 </FormField>
                 <FormField htmlFor="confirmPassword" label="Повторите пароль">

@@ -18,7 +18,7 @@ export function MetaChip({ className, variant = 'default', ...props }: MetaChipP
   return (
     <span
       className={cn(
-        'inline-flex items-center rounded-[var(--radius-sm)] border px-3 py-1 text-xs font-semibold uppercase tracking-[0.08em]',
+        'inline-flex min-h-[2.125rem] items-center rounded-[var(--radius-pill)] border px-3.5 py-1.5 text-[13px] font-medium leading-[18px] tracking-normal',
         variants[variant],
         className
       )}

@@ -12,7 +12,7 @@ Important production values:
 
 ```txt
 NODE_ENV=production
-APP_URL=https://barsynergy.ru
+APP_URL=https://<production-host>
 DATABASE_URL=postgresql://barsynergy:<password>@postgres:5432/barsynergy
 SESSION_SECRET=<long-random-secret>
 NEXT_SERVER_ACTIONS_ENCRYPTION_KEY=<base64-aes-key>
@@ -31,6 +31,8 @@ POSTGRES_PASSWORD=<password>
 ```
 
 `DATABASE_URL` for production compose must use `postgres` host from Docker network, not `localhost`.
+
+`APP_URL` must match the real production host used for the release. The tracked `.env.production.example` and `docker/nginx/nginx.conf` currently use `72.56.1.69.sslip.io` as a temporary/example host; replace it with the owner-approved production host before public launch.
 
 `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` must stay stable across production builds and app instances. Use a base64-encoded AES key with 16, 24 or 32 bytes.
 

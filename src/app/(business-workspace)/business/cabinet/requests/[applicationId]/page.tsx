@@ -175,7 +175,7 @@ export default async function BusinessRequestDetailPage({ params, searchParams }
               <input name="applicationId" type="hidden" value={application.id} />
               <input name="type" type="hidden" value={application.type} />
               <div className="grid gap-5 md:grid-cols-2">
-                <div className="rounded-[var(--radius-md)] border border-black/10 bg-[rgba(255,252,248,0.72)] px-4 py-3">
+                <div className="rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--surface-wash)] px-4 py-3">
                   <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Тип заявки</p>
                   <p className="mt-1 text-sm font-semibold text-[var(--text)]">{applicationTypeLabels[application.type]}</p>
                   <p className="mt-1 text-xs leading-5 text-[var(--muted)]">Тип фиксируется для черновика, чтобы показывать только нужные поля.</p>

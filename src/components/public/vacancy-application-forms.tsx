@@ -62,14 +62,14 @@ function VacancyResponseForm({
       <EditorialShell className="p-5 md:p-6">
         <h3 className="text-xl font-semibold uppercase leading-7">Пока нет открытых вакансий</h3>
         <p className="mt-3 max-w-2xl text-sm leading-7 text-[var(--muted)]">
-          Сейчас открытых вакансий нет. Как только они появятся, отклик станет доступен на странице конкретной вакансии.
+          Открытых вакансий сейчас нет. Когда появятся новые роли, отклик будет на странице вакансии.
         </p>
         <div className="mt-5 flex flex-col gap-3 sm:flex-row">
           <Button className="rounded-[var(--radius-md)]" href="#vacancy-list" size="lg" variant="secondary">
             К вакансиям
           </Button>
           <Button className="rounded-[var(--radius-md)]" href="/contacts" size="lg">
-            Написать команде
+            Связаться с нами
           </Button>
         </div>
       </EditorialShell>
@@ -77,7 +77,7 @@ function VacancyResponseForm({
   }
 
   return (
-    <form action={submitVacancyResponseApplication} className="editorial-form-shell" id="vacancy-response-form">
+    <form action={submitVacancyResponseApplication} className="editorial-form-shell public-form-shell" id="vacancy-response-form">
       <HiddenUtmFields utm={utm} />
       <HoneypotField id="vacancy-response-website" />
       {selectedVacancy ? <input name="vacancyId" type="hidden" value={selectedVacancy.id} /> : null}
@@ -116,7 +116,7 @@ function VacancyResponseForm({
         <div className="mt-5 grid gap-6">
           <FormSection
             title="Контакт"
-            description="Укажите имя и любой удобный канал связи. Email, телефон и Telegram можно заполнить не все сразу."
+            description="Укажите имя и любой удобный канал связи. Достаточно email, телефона или Telegram."
           >
             <div className="grid gap-4 md:grid-cols-2">
               <FormField htmlFor="candidateName" label="Имя">
@@ -136,7 +136,7 @@ function VacancyResponseForm({
             <ContactChannelFieldset emailId="responseEmail" phoneId="responsePhone" telegramId="responseTelegram" />
           </FormSection>
 
-          <FormSection title="Опыт" description="Коротко опишите текущую роль и то, что важно передать работодателю.">
+          <FormSection title="Опыт" description="Коротко опишите текущую роль и что важно сказать работодателю.">
             <FormField htmlFor="roleSummary" label="Опыт и текущая роль">
               <Textarea id="roleSummary" name="roleSummary" required maxLength={500} minLength={4} />
             </FormField>
@@ -160,6 +160,9 @@ function VacancyResponseForm({
                 title="Приложить резюме"
                 description="Выберите документ с резюме или оставьте поле пустым."
                 meta="PDF, DOC, DOCX, RTF, ODT / до 8 МБ"
+                privacy="private"
+                privacyLabel="Резюме не публикуется на сайте и доступно команде только для проверки отклика."
+                success="Резюме выбрано. Оно будет отправлено вместе с откликом."
                 accept=".pdf,.doc,.docx,.rtf,.odt,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/rtf,text/rtf,application/vnd.oasis.opendocument.text"
               />
             </FormField>
@@ -188,7 +191,7 @@ function VacancySubmissionForm({
   utm: VacancyApplicationFormsProps['utm'];
 }) {
   return (
-    <form action={submitVacancyPlacementApplication} className="editorial-form-shell" id="vacancy-submission-form">
+    <form action={submitVacancyPlacementApplication} className="editorial-form-shell public-form-shell" id="vacancy-submission-form">
       <HiddenUtmFields utm={utm} />
       <HoneypotField id="vacancy-submission-website" />
       <PublicFormShellHeader
@@ -276,7 +279,7 @@ export function VacancyApplicationForms({
         disclosureAliases={['applications']}
         disclosureFocusSelector="#candidateName"
         disclosureId="vacancy-response"
-        disclosureOpenLabel="Открыть отклик"
+        disclosureOpenLabel="Откликнуться на вакансию"
         disclosureTitle="Отклик на вакансию"
         disclosureDescription="Оставьте контакт, опыт, сообщение работодателю и ссылку или файл резюме."
         enabled={enabled}
@@ -293,13 +296,15 @@ export function VacancyApplicationForms({
     <PublicApplicationSection
       eyebrow="Вакансии / Заявки"
       title="Разместить вакансию"
-      description="Заполните роль, условия и контакты компании. После проверки команда подготовит вакансию к публикации."
+      description="Заполните роль, условия и контакты компании. После проверки подготовим вакансию к публикации."
       disclosureAliases={['applications', 'vacancy-submission', 'vacancy-forms']}
+      disclosureClosedPanelClassName="max-w-2xl"
       disclosureFocusSelector="#companyName"
       disclosureId="submit-vacancy"
       disclosureOpenLabel="Заполнить вакансию"
       disclosureTitle="Заявка на публикацию"
       disclosureDescription="Укажите роль, город, график, условия, требования и контакт для отклика."
+      introVariant="compact"
       enabled={enabled}
       result={result}
     >

@@ -51,6 +51,7 @@ export default async function SupplierDetailPage({ params }: SupplierDetailPageP
             ? { href: supplier.externalUrl, label: supplier.externalUrlLabel, external: true }
             : { href: '/suppliers', label: 'Вернуться в каталог' }
         }
+        sections={supplier.sections}
         summary={supplier.summary}
         title={supplier.title}
       />

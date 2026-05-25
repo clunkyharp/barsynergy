@@ -160,7 +160,7 @@ export default async function AdminGeneralSponsorsPage({ searchParams }: AdminGe
               <AdminTableBody>
                 {sponsors.map((sponsor) => (
                   <AdminTableRow key={sponsor.id}>
-                    <AdminTableCell className="max-w-[320px]">
+                    <AdminTableCell className="max-w-[320px]" label="Спонсор">
                       <AdminTableClamp className="font-semibold">{sponsor.name}</AdminTableClamp>
                       <div className="mt-1 truncate text-xs text-[var(--muted)]">/{sponsor.slug}</div>
                       {sponsor.logoImage?.originalName ? (
@@ -172,15 +172,15 @@ export default async function AdminGeneralSponsorsPage({ searchParams }: AdminGe
                         <div className="mt-1 text-xs text-[var(--muted)]">Обложка: {sponsor.coverImage.originalName}</div>
                       ) : null}
                     </AdminTableCell>
-                    <AdminTableCell className="text-[var(--muted)]">
+                    <AdminTableCell className="text-[var(--muted)]" label="Город и приоритет">
                       <div>{sponsor.city?.name ?? 'Без города'}</div>
                       {sponsor.seasonLabel ? <div className="mt-1 text-xs">{sponsor.seasonLabel}</div> : null}
                       {sponsor.isFeatured ? <div className="mt-1 text-xs">Приоритетный</div> : null}
                     </AdminTableCell>
-                    <AdminTableCell>
+                    <AdminTableCell label="Статус">
                       <StatusBadge variant={contentStatusBadgeVariants[sponsor.status]}>{contentStatusLabels[sponsor.status]}</StatusBadge>
                     </AdminTableCell>
-                    <AdminTableCell className="text-[var(--muted)]">
+                    <AdminTableCell className="text-[var(--muted)]" label="Обновлено">
                       <div>{dateFormatter.format(sponsor.updatedAt)}</div>
                       {sponsor.updatedBy?.email ? <div className="mt-1 text-xs">{sponsor.updatedBy.email}</div> : null}
                     </AdminTableCell>

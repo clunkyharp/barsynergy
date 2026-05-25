@@ -43,7 +43,11 @@ export function proxy(request: NextRequest) {
       return withSecurityHeaders(NextResponse.json({ error: 'Unauthorized.' }, { status: 401 }));
     }
 
-    return withSecurityHeaders(NextResponse.redirect(new URL('/auth/login', request.url)));
+    const loginPath = request.nextUrl.pathname === '/admin' || request.nextUrl.pathname.startsWith('/admin/')
+      ? '/admin/login'
+      : '/auth/login';
+
+    return withSecurityHeaders(NextResponse.redirect(new URL(loginPath, request.url)));
   }
 
   return withSecurityHeaders(

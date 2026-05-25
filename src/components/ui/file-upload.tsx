@@ -1,13 +1,19 @@
 'use client';
 
-import { forwardRef, useState, type ChangeEvent, type InputHTMLAttributes } from 'react';
-import { Upload } from 'lucide-react';
+import { forwardRef, useId, useState, type ChangeEvent, type InputHTMLAttributes } from 'react';
+import { useFormStatus } from 'react-dom';
+import { CheckCircle2, FileLock2, Loader2, TriangleAlert, Upload } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 type FileUploadProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'type'> & {
   description?: string;
+  error?: string;
   meta?: string;
+  privacy?: 'private' | 'public';
+  privacyLabel?: string;
+  success?: string;
   title?: string;
+  uploadPendingText?: string;
 };
 
 export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(function FileUpload(
@@ -16,17 +22,42 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(function
     className,
     description = 'Перетащите файл сюда или выберите его на устройстве.',
     disabled,
+    error,
     id,
     meta,
     name,
     onChange,
+    privacy,
+    privacyLabel,
     required,
+    success,
     title = 'Загрузить файл',
+    uploadPendingText = 'Файл загружается. Дождитесь завершения отправки.',
+    'aria-describedby': ariaDescribedBy,
+    'aria-invalid': ariaInvalid,
     ...props
   },
   ref
 ) {
   const [fileName, setFileName] = useState('');
+  const { pending } = useFormStatus();
+  const generatedId = useId();
+  const fieldId = id ?? generatedId;
+  const errorId = `${fieldId}-error`;
+  const successId = `${fieldId}-success`;
+  const privacyId = `${fieldId}-privacy`;
+  const isUploading = pending && Boolean(fileName);
+  const effectiveSuccess = fileName ? success : undefined;
+  const state = error ? 'error' : isUploading ? 'uploading' : effectiveSuccess || fileName ? 'success' : undefined;
+  const describedBy =
+    [
+      ariaDescribedBy,
+      privacy ? privacyId : undefined,
+      error ? errorId : undefined,
+      !error && effectiveSuccess ? successId : undefined
+    ]
+      .filter(Boolean)
+      .join(' ') || undefined;
 
   function handleChange(event: ChangeEvent<HTMLInputElement>) {
     onChange?.(event);
@@ -35,12 +66,27 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(function
   }
 
   return (
-    <div className={cn('file-upload', disabled && 'is-disabled', fileName && 'is-filled', className)}>
+    <div
+      className={cn(
+        'file-upload',
+        disabled && 'is-disabled',
+        fileName && 'is-filled',
+        isUploading && 'is-uploading',
+        error && 'is-invalid',
+        effectiveSuccess && !error && 'is-success',
+        privacy === 'private' && 'is-private',
+        className
+      )}
+      data-state={state}
+      data-privacy={privacy}
+    >
       <input
         accept={accept}
+        aria-describedby={describedBy}
+        aria-invalid={error ? true : ariaInvalid}
         className="sr-only"
         disabled={disabled}
-        id={id}
+        id={fieldId}
         name={name}
         onChange={handleChange}
         ref={ref}
@@ -48,16 +94,43 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(function
         type="file"
         {...props}
       />
-      <label className="file-upload-panel" htmlFor={id}>
+      <label className="file-upload-panel" htmlFor={fieldId}>
         <span className="file-upload-icon" aria-hidden>
-          <Upload size={20} strokeWidth={1.8} />
+          {error ? (
+            <TriangleAlert size={20} strokeWidth={1.8} />
+          ) : isUploading ? (
+            <Loader2 className="file-upload-spinner" size={20} strokeWidth={1.8} />
+          ) : effectiveSuccess || fileName ? (
+            <CheckCircle2 size={20} strokeWidth={1.8} />
+          ) : privacy === 'private' ? (
+            <FileLock2 size={20} strokeWidth={1.8} />
+          ) : (
+            <Upload size={20} strokeWidth={1.8} />
+          )}
         </span>
         <span className="min-w-0">
           <span className="file-upload-title">{fileName || title}</span>
-          <span className="file-upload-description">{fileName ? 'Файл выбран. Его можно заменить перед отправкой.' : description}</span>
+          <span className="file-upload-description">
+            {error ? error : isUploading ? uploadPendingText : fileName ? effectiveSuccess ?? 'Файл выбран. Его можно заменить перед отправкой.' : description}
+          </span>
           {meta ? <span className="file-upload-meta">{meta}</span> : null}
+          {privacy ? (
+            <span className="file-upload-privacy" id={privacyId}>
+              {privacyLabel ?? (privacy === 'private' ? 'Файл будет доступен только команде после проверки заявки.' : 'Файл будет использоваться как публичный материал после публикации.')}
+            </span>
+          ) : null}
         </span>
       </label>
+      {error ? (
+        <p className="file-upload-error" id={errorId}>
+          {error}
+        </p>
+      ) : null}
+      {!error && effectiveSuccess ? (
+        <p className="file-upload-success" id={successId}>
+          {effectiveSuccess}
+        </p>
+      ) : null}
     </div>
   );
 });

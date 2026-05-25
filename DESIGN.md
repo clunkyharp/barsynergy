@@ -67,16 +67,16 @@ Avoid:
 
 Runtime fonts:
 
-- body: `Manrope`
-- display: `Playfair Display`
-- accent: `Manrope`
+- body: `Noto Sans`
+- display: `Noto Serif Display`
+- accent: `Noto Sans`
 
 Rules:
 
-- `Playfair Display` is for public, auth and selected workspace headings.
-- `Manrope` is the default body, control and product/workspace font.
+- `Noto Serif Display` is for public, auth and selected workspace headings.
+- `Noto Sans` is the default body, control and product/workspace font.
 - The accent role is limited to short labels and brand-adjacent text; it should not replace body copy.
-- Russian helper labels and long Russian copy must stay on `Manrope`, not on the display font.
+- Russian helper labels and long Russian copy must stay on `Noto Sans`, not on the display font.
 - Long Russian text stays in body typography.
 - Do not use display sizing for dense product workflows.
 

@@ -14,7 +14,7 @@ export function Card({ className, interactive = false, selected = false, loading
       aria-busy={loading || undefined}
       aria-selected={selected || undefined}
       className={cn(
-        'rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--surface)] shadow-[var(--shadow-card)] transition',
+        'rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--surface)] shadow-none transition-[background-color,border-color,box-shadow] duration-[var(--motion-duration-base)] ease-[var(--motion-ease-standard)] motion-reduce:transition-none',
         interactive && 'hover:border-[var(--accent)] focus-within:border-[var(--accent)] focus-within:ring-2 focus-within:ring-[var(--accent)]/20',
         selected && 'border-[var(--accent)] ring-2 ring-[var(--accent)]/20',
         loading && 'animate-pulse',

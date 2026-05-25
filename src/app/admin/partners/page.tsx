@@ -163,7 +163,7 @@ export default async function AdminPartnersPage({ searchParams }: AdminPartnersP
               <AdminTableBody>
                 {partners.map((partner) => (
                   <AdminTableRow key={partner.id}>
-                    <AdminTableCell className="max-w-[320px]">
+                    <AdminTableCell className="max-w-[320px]" label="Партнёр">
                       <AdminTableClamp className="font-semibold">{partner.title}</AdminTableClamp>
                       <div className="mt-1 truncate text-xs text-[var(--muted)]">/{partner.slug}</div>
                       <div className="mt-1 text-xs text-[var(--muted)]">{partner.category?.name ?? 'Без категории'}</div>
@@ -171,17 +171,17 @@ export default async function AdminPartnersPage({ searchParams }: AdminPartnersP
                         <div className="mt-1 text-xs text-[var(--muted)]">Обложка: {partner.coverImage.originalName}</div>
                       ) : null}
                     </AdminTableCell>
-                    <AdminTableCell className="text-[var(--muted)]">
+                    <AdminTableCell className="text-[var(--muted)]" label="Компания и тип">
                       <div>{partner.companyName}</div>
                       {partner.partnerType ? (
                         <div className="mt-1 text-xs">{getAdminOptionLabel(partnerTypeOptions, partner.partnerType)}</div>
                       ) : null}
                       {partner.isFeatured ? <div className="mt-1 text-xs">В подборке</div> : null}
                     </AdminTableCell>
-                    <AdminTableCell>
+                    <AdminTableCell label="Статус">
                       <StatusBadge variant={contentStatusBadgeVariants[partner.status]}>{contentStatusLabels[partner.status]}</StatusBadge>
                     </AdminTableCell>
-                    <AdminTableCell className="text-[var(--muted)]">
+                    <AdminTableCell className="text-[var(--muted)]" label="Обновлено">
                       <div>{dateFormatter.format(partner.updatedAt)}</div>
                       {partner.updatedBy?.email ? <div className="mt-1 text-xs">{partner.updatedBy.email}</div> : null}
                     </AdminTableCell>

@@ -5,6 +5,7 @@ import { SiteFooter } from '@/components/layout/site-footer';
 import { SiteHeader } from '@/components/layout/site-header';
 import { CookieNotice } from '@/components/public/cookie-notice';
 import { ScrollToTopButton } from '@/components/layout/scroll-to-top-button';
+import { ToastProvider } from '@/components/ui/toast';
 import { bodyFont } from '@/lib/fonts';
 import { getEnv } from '@/lib/validation/env';
 
@@ -55,13 +56,15 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
             `
           }}
         />
-        <div className="site-shell overflow-x-clip">
-          <SiteHeader />
-          <main className="site-main overflow-x-hidden w-full max-w-full">{children}</main>
-          <SiteFooter />
-          <ScrollToTopButton />
-          <CookieNotice />
-        </div>
+        <ToastProvider>
+          <div className="site-shell overflow-x-clip">
+            <SiteHeader />
+            <main className="site-main overflow-x-hidden w-full max-w-full">{children}</main>
+            <SiteFooter />
+            <ScrollToTopButton />
+            <CookieNotice />
+          </div>
+        </ToastProvider>
       </body>
     </html>
   );

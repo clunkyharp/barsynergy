@@ -29,6 +29,7 @@ const contactTopicValues = [
   'supplier',
   'partnership',
   'sponsorship',
+  'consulting',
   'article-topic',
   'other'
 ] as const;
@@ -40,6 +41,7 @@ const contactTopicLabels: Record<(typeof contactTopicValues)[number], string> = 
   supplier: 'Поставщик',
   partnership: 'Партнёрство',
   sponsorship: 'Спонсорство',
+  consulting: 'Консалтинг',
   'article-topic': 'Материал или интервью',
   other: 'Другое'
 };
@@ -111,7 +113,7 @@ export async function submitContactMessage(formData: FormData) {
     assertPublicApplicationFormsEnabled();
 
     if (hasHoneypotValue(getString(formData, 'website'))) {
-      result = { type: 'success', message: 'Сообщение отправлено. Если понадобится, мы свяжемся с вами.' };
+      result = { type: 'success', message: 'Сообщение получено. Мы свяжемся с вами после проверки обращения.' };
       redirectWithContactsResult(result);
     }
 
@@ -184,7 +186,7 @@ export async function submitContactMessage(formData: FormData) {
       }
     });
 
-    result = { type: 'success', message: 'Сообщение отправлено. Если понадобится, мы свяжемся с вами.' };
+    result = { type: 'success', message: 'Сообщение получено. Мы свяжемся с вами после проверки обращения.' };
   } catch (error) {
     result = { type: 'error', message: resolvePublicApplicationActionError('public:contact-message', error) };
   }

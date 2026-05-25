@@ -63,7 +63,7 @@ printf '%s\n' 'YourStrongPassword123!' | npm run admin:upsert:local -- --email a
 npm run lint
 npm test
 npm run typecheck
-npx prisma validate
+./node_modules/.bin/prisma validate
 ```
 
 `npm run build` is mandatory before creating a commit. During ordinary local checks, run it only for production-build, deployment or standalone-runtime changes.
@@ -100,6 +100,7 @@ Current production server uses the host-checkout path instead of the Compose app
 - database: host PostgreSQL service.
 
 Use [Deploy](docs/deploy.md) for the full production runbook, including `.env.production` handling for Prisma, database backup, service restart, smoke checks and rollback.
+Local server access details live in gitignored `ssh.md`. Keep only safe connection/runtime notes there; do not store passwords, private keys, tokens, env values or database URLs.
 
 Production must use:
 
@@ -127,6 +128,7 @@ Current schema includes the Phase 4 business-account MVP and the public B2B requ
 - `feature/*`: only for large coherent features.
 
 Production releases go `dev -> validation -> prod` only after owner confirmation.
+The VPS deploys from `prod`; keep that branch clean from agent memory, generated QA artifacts, local access notes, real env files and other files that are not required to build, run or operate the site.
 
 ## Documentation
 

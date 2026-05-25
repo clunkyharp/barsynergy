@@ -89,7 +89,7 @@ export function BusinessRequestForm({ cities, defaultCityId }: BusinessRequestFo
           value={selectedType}
         />
 
-        <div className="rounded-[var(--radius-md)] border border-black/10 bg-[rgba(255,252,248,0.72)] p-4">
+        <div className="rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--surface-wash)] p-4">
           <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Что подготовить</p>
           <h3 className="mt-2 text-base font-semibold leading-7 text-[var(--text)]">{selectedRequest.title}</h3>
           <ul className="mt-3 grid gap-2 text-sm leading-6 text-[var(--muted)] md:grid-cols-3">

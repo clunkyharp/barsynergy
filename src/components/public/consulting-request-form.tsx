@@ -28,17 +28,17 @@ export function ConsultingRequestForm({ enabled, result, utm, cities, defaults =
     <PublicApplicationSection
       eyebrow="Консалтинг / Заявка"
       title="Описать задачу для эксперта"
-      description="Для запуска, барной карты, обучения команды, экономики, закупок и операционной проверки."
+      description="Для запуска, барной карты, обучения команды, экономики, закупок и проверки процессов."
       disclosureAliases={['applications']}
       disclosureDescription="Укажите формат бизнеса, стадию проекта, направление и задачу."
       disclosureFocusSelector="#consultingContactName"
       disclosureId="consulting-request"
-      disclosureOpenLabel="Открыть заявку"
+      disclosureOpenLabel="Оставить заявку"
       disclosureTitle="Заявка на консультацию"
       enabled={enabled}
       result={result}
     >
-      <form action={submitConsultingRequest} className="editorial-form-shell">
+      <form action={submitConsultingRequest} className="editorial-form-shell public-form-shell">
         <HiddenUtmFields utm={utm} />
         <HoneypotField id="consulting-request-website" />
         <div className="relative grid lg:grid-cols-[0.42fr_0.58fr]">
@@ -48,7 +48,7 @@ export function ConsultingRequestForm({ enabled, result, utm, cities, defaults =
               Разбор задачи без календаря и оплаты на сайте
             </PublicDisplayTitle>
             <PublicBodyText className="mt-4 max-w-md" tone="inverse">
-              Опишите, что нужно разобрать. Команда уточнит формат консультации и подходящего специалиста после заявки.
+              Опишите, что нужно разобрать. После заявки уточним формат консультации и специалиста.
             </PublicBodyText>
 
             <div className="mt-6 flex flex-wrap gap-2">
@@ -68,7 +68,7 @@ export function ConsultingRequestForm({ enabled, result, utm, cities, defaults =
                 </li>
                 <li className="flex gap-3">
                   <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--accent)]" />
-                  <span>Что нужно улучшить: меню, команда, себестоимость, закупки или операционный порядок.</span>
+                  <span>Что нужно улучшить: меню, команду, себестоимость, закупки или порядок работы.</span>
                 </li>
                 <li className="flex gap-3">
                   <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--accent)]" />
@@ -151,7 +151,7 @@ export function ConsultingRequestForm({ enabled, result, utm, cities, defaults =
                 </Select>
               </FormField>
               <div className="md:col-span-2">
-                <FormField htmlFor="consultingTaskDescription" hint="Опишите, что нужно решить и какой результат нужен после консультации." label="Описание задачи">
+                <FormField htmlFor="consultingTaskDescription" hint="Опишите задачу и что должно стать понятнее после консультации." label="Описание задачи">
                   <Textarea
                     className="min-h-40"
                     defaultValue={defaults.taskDescription}
@@ -169,7 +169,7 @@ export function ConsultingRequestForm({ enabled, result, utm, cities, defaults =
                   <InlineLink href="/legal/personal-data-consent">согласие на обработку персональных данных</InlineLink> для этой заявки.
                 </ConsentField>
               </div>
-              <PublicFormShellFooter className="md:col-span-2" note="После отправки команда уточнит задачу и подходящий формат консультации.">
+              <PublicFormShellFooter className="md:col-span-2" note="После отправки уточним задачу и формат консультации.">
                 <SubmitButton>Отправить заявку</SubmitButton>
               </PublicFormShellFooter>
             </div>

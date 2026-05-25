@@ -58,7 +58,7 @@ export default async function RegisterPage({ searchParams }: RegisterPageProps) 
               <Image alt="BARSYNERGY" className="theme-logo-light h-auto w-[220px]" height={70} priority src="/brand/barsynergy-lockup.svg" width={360} />
               <Image alt="BARSYNERGY" className="theme-logo-dark h-auto w-[220px]" height={70} priority src="/brand/barsynergy-lockup-light.svg" width={360} />
             </AppLink>
-            <Button className="rounded-[var(--radius-md)] px-4" href="/" size="sm" variant="ghost">
+            <Button className="px-4" href="/" size="sm" variant="link">
               <ArrowLeft aria-hidden size={15} strokeWidth={1.8} />
               Вернуться на сайт
             </Button>
@@ -71,7 +71,7 @@ export default async function RegisterPage({ searchParams }: RegisterPageProps) 
             Для баров, брендов, поставщиков и специалистов, которым нужен рабочий контакт с BARSYNERGY.
           </p>
           <div className="mt-8 border-t border-black/10 pt-5">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Что важно</p>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Что указать</p>
             <ul className="mt-4 grid gap-3 text-sm leading-6 text-[var(--muted)]">
               <li className="grid grid-cols-[0.5rem_minmax(0,1fr)] gap-3">
                 <span className="mt-2 h-2 w-2 rounded-full bg-[var(--accent)]" />
@@ -79,7 +79,7 @@ export default async function RegisterPage({ searchParams }: RegisterPageProps) 
               </li>
               <li className="grid grid-cols-[0.5rem_minmax(0,1fr)] gap-3">
                 <span className="mt-2 h-2 w-2 rounded-full bg-[var(--accent)]" />
-                <span>Для чего нужен доступ: заявки, партнёрство, вакансии или публикации.</span>
+                <span>Зачем нужен доступ: заявки, партнёрство, вакансии или публикации.</span>
               </li>
             </ul>
           </div>
@@ -92,7 +92,7 @@ export default async function RegisterPage({ searchParams }: RegisterPageProps) 
                 <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--warning)]">Доступ временно закрыт</p>
                 <h2 className="mt-4 text-3xl font-semibold leading-tight md:text-4xl">Форма заявок сейчас недоступна</h2>
                 <p className="mt-4 max-w-2xl text-sm leading-7 text-[var(--muted)]">
-                  Сейчас новые заявки через эту форму не принимаются. Если доступ нужен уже сейчас, напишите на {PUBLIC_CONTACT_EMAIL}.
+                  Новые заявки через эту форму сейчас не принимаются. Если доступ нужен уже сейчас, напишите на {PUBLIC_CONTACT_EMAIL}.
                 </p>
                 <div className="mt-6 grid gap-3 md:grid-cols-2">
                   <Panel className="bg-[var(--surface-wash)] text-sm leading-6 text-[var(--muted)]" padding="sm">
@@ -118,7 +118,7 @@ export default async function RegisterPage({ searchParams }: RegisterPageProps) 
                 <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Заявка на подключение</p>
                 <h2 className={`${displayFont.className} mt-3 text-[2rem] font-semibold leading-none`}>Данные для рассмотрения</h2>
                 <p className="mt-3 max-w-xl text-sm leading-7 text-[var(--muted)]">
-                  Напишите, кто вы и какой доступ нужен. Команда ответит по указанному контакту.
+                  Напишите, кто вы и какой доступ нужен. Мы ответим по указанному контакту.
                 </p>
               </div>
               <div className="p-5 md:p-6">

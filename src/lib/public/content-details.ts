@@ -33,6 +33,7 @@ export type PublicContentDetail = {
   title: string;
   slug: string;
   summary: string;
+  startsAtIso?: string;
   label?: string;
   meta: string[];
   body?: string;
@@ -162,7 +163,26 @@ export async function getPublishedArticleDetail(slug: string): Promise<PublicCon
         label,
         value: rest.join(': ')
       };
-    })
+    }),
+    sections: [
+      {
+        title: 'В материале',
+        items: compact([
+          article.category?.name ? `Тема: ${article.category.name}.` : undefined,
+          article.city?.name ? `Городской контекст: ${article.city.name}.` : undefined,
+          article.authorName ? `Автор: ${article.authorName}.` : undefined,
+          article.readingTimeMinutes ? `Время чтения: ${article.readingTimeMinutes} мин.` : undefined
+        ])
+      },
+      {
+        title: 'Как использовать',
+        items: compact([
+          'Сохраните материал как ориентир по теме.',
+          article.tags.length > 0 ? `Связанные метки: ${article.tags.map((entry) => entry.tag.name).join(', ')}.` : undefined,
+          'Переходите к похожим материалам ниже, если нужен следующий контекст.'
+        ])
+      }
+    ].filter((section) => section.items.length > 0)
   };
 }
 
@@ -185,6 +205,7 @@ export async function getPublishedEventDetail(slug: string): Promise<PublicConte
     title: event.title,
     slug: event.slug,
     summary: cleanPublicDetailText(event.summary),
+    startsAtIso: event.startsAt.toISOString(),
     label: event.category?.name,
     meta: compact([event.city?.name, getAdminOptionLabel(eventFormatOptions, event.format, ''), formatDate(event.startsAt)]),
     imageUrl: publicImage(event.coverImage, event.coverImageAlt, event.title),
@@ -271,7 +292,26 @@ export async function getPublishedCourseDetail(slug: string): Promise<PublicCont
         label,
         value: rest.join(': ')
       };
-    })
+    }),
+    sections: [
+      {
+        title: 'Параметры программы',
+        items: compact([
+          course.format ? `Формат: ${getAdminOptionLabel(courseFormatOptions, course.format)}.` : undefined,
+          course.level ? `Уровень: ${getAdminOptionLabel(courseLevelOptions, course.level)}.` : undefined,
+          course.durationLabel ? `Длительность: ${course.durationLabel}.` : undefined,
+          course.instructorName ? `Преподаватель: ${course.instructorName}.` : undefined,
+          course.priceLabel ? `Стоимость: ${course.priceLabel}.` : undefined
+        ])
+      },
+      {
+        title: 'Следующий шаг',
+        items: [
+          'Оставьте заявку, если хотите уточнить расписание, формат или состав группы.',
+          'В заявке можно указать город, уровень подготовки и удобный контакт.'
+        ]
+      }
+    ].filter((section) => section.items.length > 0)
   };
 }
 
@@ -319,7 +359,27 @@ export async function getPublishedVacancyDetail(slug: string): Promise<PublicCon
         label,
         value: rest.join(': ')
       };
-    })
+    }),
+    sections: [
+      {
+        title: 'Условия роли',
+        items: compact([
+          `Компания: ${vacancy.companyName}.`,
+          vacancy.city?.name ? `Город: ${vacancy.city.name}.` : undefined,
+          vacancy.salaryLabel ? `Зарплата: ${vacancy.salaryLabel}.` : undefined,
+          vacancy.employmentType ? `График: ${getAdminOptionLabel(vacancyEmploymentTypeOptions, vacancy.employmentType)}.` : undefined,
+          vacancy.experienceLabel ? `Опыт: ${getAdminOptionLabel(vacancyExperienceOptions, vacancy.experienceLabel)}.` : undefined
+        ])
+      },
+      {
+        title: 'Как откликнуться',
+        items: compact([
+          'Нажмите «Откликнуться» и заполните форму на этой странице.',
+          'Можно приложить резюме или оставить ссылку на профиль.',
+          vacancy.contactMode ? `Контакт после проверки: ${vacancy.contactMode}.` : undefined
+        ])
+      }
+    ].filter((section) => section.items.length > 0)
   };
 }
 
@@ -353,8 +413,8 @@ export async function getPublishedSupplierDetail(slug: string): Promise<PublicCo
       `Компания: ${supplier.companyName}`,
       supplier.category?.name ? `Категория: ${supplier.category.name}` : undefined,
       supplier.city?.name ? `Город: ${supplier.city.name}` : undefined,
-      supplier.serviceArea ? `Поставка: ${supplier.serviceArea}` : undefined,
-      supplier.contactLabel ? `Контакт: ${supplier.contactLabel}` : undefined,
+      supplier.serviceArea ? `География: ${supplier.serviceArea}` : undefined,
+      supplier.contactLabel ? `Контакты: ${supplier.contactLabel}` : undefined,
       supplier.isVerified ? 'Статус: проверен BARSYNERGY' : 'Статус: контакт для уточнения',
       'Условия: уточняйте у компании'
     ]).map((entry) => {
@@ -365,7 +425,26 @@ export async function getPublishedSupplierDetail(slug: string): Promise<PublicCo
       };
     }),
     externalUrl,
-    externalUrlLabel: externalUrl ? 'Сайт компании' : undefined
+    externalUrlLabel: externalUrl ? 'Сайт компании' : undefined,
+    sections: [
+      {
+        title: 'Профиль поставщика',
+        items: compact([
+          supplier.category?.name ? `Категория: ${supplier.category.name}.` : undefined,
+          supplier.city?.name ? `Базовый город: ${supplier.city.name}.` : undefined,
+          supplier.serviceArea ? `Зона поставки: ${supplier.serviceArea}.` : undefined,
+          supplier.isVerified ? 'Поставщик отмечен как проверенный в BARSYNERGY.' : 'Условия и актуальность контакта нужно уточнить у компании.'
+        ])
+      },
+      {
+        title: 'Контакт',
+        items: compact([
+          'Используйте кнопку связи, чтобы передать запрос с выбранным поставщиком.',
+          supplier.contactLabel ? `Контактный ориентир: ${supplier.contactLabel}.` : undefined,
+          externalUrl ? 'Сайт компании доступен отдельной ссылкой.' : undefined
+        ])
+      }
+    ].filter((section) => section.items.length > 0)
   };
 }
 
@@ -410,6 +489,24 @@ export async function getPublishedPartnerDetail(slug: string): Promise<PublicCon
       };
     }),
     externalUrl,
-    externalUrlLabel: externalUrl ? 'Сайт партнёра' : undefined
+    externalUrlLabel: externalUrl ? 'Сайт партнёра' : undefined,
+    sections: [
+      {
+        title: 'Формат партнёрства',
+        items: compact([
+          partner.partnerType ? `Тип: ${getAdminOptionLabel(partnerTypeOptions, partner.partnerType)}.` : undefined,
+          partner.category?.name ? `Направление: ${partner.category.name}.` : undefined,
+          partner.isFeatured ? 'Партнёр отмечен в подборке BARSYNERGY.' : undefined
+        ])
+      },
+      {
+        title: 'Следующий шаг',
+        items: compact([
+          'Используйте кнопку связи, чтобы обсудить формат сотрудничества.',
+          externalUrl ? 'Сайт партнёра доступен отдельной ссылкой.' : undefined,
+          'В обращении сохранится выбранная компания и направление.'
+        ])
+      }
+    ].filter((section) => section.items.length > 0)
   };
 }

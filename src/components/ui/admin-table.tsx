@@ -10,13 +10,18 @@ export {
 
 type AdminTableProps = TableHTMLAttributes<HTMLTableElement> & {
   minWidth?: number | string;
+  mobileLayout?: 'cards' | 'scroll';
+};
+
+type AdminTableCellProps = TdHTMLAttributes<HTMLTableCellElement> & {
+  label?: string;
 };
 
 export function AdminTableFrame({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
   return (
     <div
       className={cn(
-        'overflow-x-auto rounded-[var(--radius-md)] border border-[var(--line)] border-l-2 border-l-[var(--admin-structure-accent)] bg-[var(--surface)] shadow-none',
+        'admin-surface-shell admin-data-table-frame overflow-x-auto',
         className
       )}
       {...props}
@@ -24,10 +29,11 @@ export function AdminTableFrame({ className, ...props }: HTMLAttributes<HTMLDivE
   );
 }
 
-export function AdminDataTable({ className, minWidth = '1040px', style, ...props }: AdminTableProps) {
+export function AdminDataTable({ className, minWidth = '1040px', mobileLayout = 'cards', style, ...props }: AdminTableProps) {
   return (
     <table
-      className={cn('admin-data-table w-full border-collapse text-left text-[13px]', className)}
+      className={cn('admin-data-table w-full border-collapse text-left text-[13px] leading-[18px]', className)}
+      data-mobile-layout={mobileLayout}
       style={
         {
           '--admin-table-min-width': typeof minWidth === 'number' ? `${minWidth}px` : minWidth,
@@ -47,7 +53,7 @@ export function AdminTableHead({ className, ...props }: HTMLAttributes<HTMLTable
   return (
     <thead
       className={cn(
-        'border-b border-[var(--line)] bg-[color-mix(in_oklab,var(--surface-muted),var(--surface)_34%)] text-[11px] uppercase tracking-[0.1em] text-[var(--muted)]',
+        'admin-data-table-head border-b border-[var(--line)] bg-[var(--admin-table-header)] text-[11px] text-[var(--muted)]',
         className
       )}
       {...props}
@@ -63,7 +69,7 @@ export function AdminTableRow({ className, ...props }: HTMLAttributes<HTMLTableR
   return (
     <tr
       className={cn(
-        'border-b border-[var(--line)] transition-colors last:border-0 hover:bg-[color-mix(in_oklab,var(--surface-muted),var(--surface)_62%)]',
+        'admin-data-table-row border-b border-[var(--line)] transition-colors last:border-0 hover:bg-[var(--admin-table-row-hover)]',
         className
       )}
       {...props}
@@ -72,18 +78,18 @@ export function AdminTableRow({ className, ...props }: HTMLAttributes<HTMLTableR
 }
 
 export function AdminTableHeaderCell({ className, ...props }: ThHTMLAttributes<HTMLTableCellElement>) {
-  return <th className={cn('min-w-[7rem] whitespace-nowrap px-4 py-3 font-semibold', className)} {...props} />;
+  return <th className={cn('admin-data-table-header-cell min-w-[7rem] whitespace-nowrap px-4 py-3 font-semibold', className)} {...props} />;
 }
 
-export function AdminTableCell({ className, ...props }: TdHTMLAttributes<HTMLTableCellElement>) {
-  return <td className={cn('px-4 py-3.5 align-top', className)} {...props} />;
+export function AdminTableCell({ className, label, ...props }: AdminTableCellProps) {
+  return <td className={cn('admin-data-table-cell px-4 py-3.5 align-top', className)} data-label={label} {...props} />;
 }
 
 export function AdminTableActionsHeaderCell({ className, ...props }: ThHTMLAttributes<HTMLTableCellElement>) {
   return (
     <AdminTableHeaderCell
       className={cn(
-        'sticky right-0 z-20 min-w-[112px] border-l border-[var(--line)] bg-[color-mix(in_oklab,var(--surface-muted),var(--surface)_34%)] text-right sm:min-w-[148px] lg:min-w-[168px]',
+        'sticky right-0 z-20 min-w-[112px] border-l border-[var(--line)] bg-[var(--admin-table-header)] text-right sm:min-w-[148px] lg:min-w-[168px]',
         'admin-table-actions-header',
         className
       )}
@@ -96,10 +102,11 @@ export function AdminTableActionsCell({ className, ...props }: TdHTMLAttributes<
   return (
     <AdminTableCell
       className={cn(
-        'sticky right-0 z-10 min-w-[112px] border-l border-[var(--line)] bg-[var(--surface)] text-right sm:min-w-[148px] lg:min-w-[168px]',
+        'sticky right-0 z-10 min-w-[112px] border-l border-[var(--line)] bg-[var(--admin-surface)] text-right sm:min-w-[148px] lg:min-w-[168px]',
         'admin-table-actions-cell',
         className
       )}
+      label="Действия"
       {...props}
     />
   );
@@ -110,7 +117,7 @@ export function AdminTableClamp({ className, ...props }: HTMLAttributes<HTMLDivE
 }
 
 export function AdminActionRow({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn('flex flex-wrap items-center justify-end gap-2', className)} {...props} />;
+  return <div className={cn('admin-action-row flex flex-wrap items-center justify-end gap-2', className)} {...props} />;
 }
 
 export function AdminRowActions({ className, ...props }: HTMLAttributes<HTMLDivElement>) {

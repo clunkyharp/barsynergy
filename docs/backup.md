@@ -9,11 +9,14 @@ Minimum MVP policy:
 - store backups outside the running database volume;
 - document restore steps before public launch.
 
-Example command:
+Compose-managed production example:
 
 ```bash
-docker compose -f docker-compose.production.yml exec postgres pg_dump -U "$POSTGRES_USER" "$POSTGRES_DB" > backups/barsynergy-$(date +%F).sql
+mkdir -p backups
+docker compose --env-file .env.production -f docker-compose.production.yml exec -T postgres sh -lc 'pg_dump -U "$POSTGRES_USER" "$POSTGRES_DB"' > "backups/barsynergy-$(date +%F).sql"
 ```
+
+Host-checkout production mode must use the safe production env-loading backup pattern from [Deploy](deploy.md). Do not paste `DATABASE_URL` into shell history and do not rely on host shell variables that only exist inside the Compose container.
 
 ## Files
 

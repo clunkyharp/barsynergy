@@ -46,6 +46,7 @@ export default async function VacancyDetailPage({ params, searchParams }: Vacanc
         meta={vacancy.meta}
         primaryLink={{ href: '#vacancy-response', label: 'Откликнуться' }}
         secondaryLink={{ href: '/vacancies', label: 'Вернуться к списку' }}
+        sections={vacancy.sections}
         summary={vacancy.summary}
         title={vacancy.title}
       />

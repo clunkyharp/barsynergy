@@ -11,6 +11,7 @@ Use one controlled scheduler only. Do not split these cleanup commands across mu
 This runbook covers:
 
 - expired session cleanup;
+- stale auth attempt throttle cleanup;
 - stale public application throttle cleanup;
 - stale business-access invite cleanup.
 
@@ -19,7 +20,6 @@ Out of scope:
 - deploy flow;
 - database backups;
 - Prisma migrations;
-- auth throttle cleanup scheduling.
 
 ## Commands
 
@@ -27,6 +27,7 @@ Application-level commands:
 
 ```bash
 npm run session:cleanup:expired
+npm run auth:cleanup:throttles
 npm run application:cleanup:throttles
 npm run business-access:cleanup:invites
 ```
@@ -51,6 +52,7 @@ Host-checkout command pattern for this mode:
 ```bash
 cd /opt/barsynergy
 npm run session:cleanup:expired
+npm run auth:cleanup:throttles
 npm run application:cleanup:throttles
 npm run business-access:cleanup:invites
 ```
@@ -64,7 +66,7 @@ Recommended production shape:
 - one scheduler entry;
 - one host;
 - app container already running;
-- all three cleanup commands executed sequentially.
+- all four cleanup commands executed sequentially.
 
 Example host-side shell block for a Compose-managed host:
 
@@ -74,6 +76,7 @@ set -euo pipefail
 cd /opt/barsynergy
 
 docker compose --env-file .env.production -f docker-compose.production.yml exec -T app npm run session:cleanup:expired
+docker compose --env-file .env.production -f docker-compose.production.yml exec -T app npm run auth:cleanup:throttles
 docker compose --env-file .env.production -f docker-compose.production.yml exec -T app npm run application:cleanup:throttles
 docker compose --env-file .env.production -f docker-compose.production.yml exec -T app npm run business-access:cleanup:invites
 ```
@@ -86,6 +89,7 @@ set -euo pipefail
 cd /opt/barsynergy
 
 npm run session:cleanup:expired
+npm run auth:cleanup:throttles
 npm run application:cleanup:throttles
 
 if node -e "const p=require('./package.json'); process.exit(p.scripts && p.scripts['business-access:cleanup:invites'] ? 0 : 1)"; then
@@ -122,7 +126,7 @@ Description=BARSYNERGY scheduled cleanup
 [Service]
 Type=oneshot
 WorkingDirectory=/opt/barsynergy
-ExecStart=/bin/bash -lc 'set -euo pipefail; docker compose --env-file .env.production -f docker-compose.production.yml exec -T app npm run session:cleanup:expired && docker compose --env-file .env.production -f docker-compose.production.yml exec -T app npm run application:cleanup:throttles && docker compose --env-file .env.production -f docker-compose.production.yml exec -T app npm run business-access:cleanup:invites'
+ExecStart=/bin/bash -lc 'set -euo pipefail; docker compose --env-file .env.production -f docker-compose.production.yml exec -T app npm run session:cleanup:expired && docker compose --env-file .env.production -f docker-compose.production.yml exec -T app npm run auth:cleanup:throttles && docker compose --env-file .env.production -f docker-compose.production.yml exec -T app npm run application:cleanup:throttles && docker compose --env-file .env.production -f docker-compose.production.yml exec -T app npm run business-access:cleanup:invites'
 ```
 
 Timer unit example:
@@ -162,7 +166,7 @@ ExecStart=/usr/local/bin/barsynergy-cleanup.sh
 Fallback if systemd timers are not available:
 
 ```cron
-0 * * * * cd /opt/barsynergy && docker compose --env-file .env.production -f docker-compose.production.yml exec -T app npm run session:cleanup:expired && docker compose --env-file .env.production -f docker-compose.production.yml exec -T app npm run application:cleanup:throttles && docker compose --env-file .env.production -f docker-compose.production.yml exec -T app npm run business-access:cleanup:invites >> /var/log/barsynergy-cleanup.log 2>&1
+0 * * * * cd /opt/barsynergy && docker compose --env-file .env.production -f docker-compose.production.yml exec -T app npm run session:cleanup:expired && docker compose --env-file .env.production -f docker-compose.production.yml exec -T app npm run auth:cleanup:throttles && docker compose --env-file .env.production -f docker-compose.production.yml exec -T app npm run application:cleanup:throttles && docker compose --env-file .env.production -f docker-compose.production.yml exec -T app npm run business-access:cleanup:invites >> /var/log/barsynergy-cleanup.log 2>&1
 ```
 
 ## Preconditions

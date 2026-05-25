@@ -136,15 +136,19 @@ export function ContactActionRow({
             isCard ? 'col-span-2 mt-3 self-end' : 'col-start-2 sm:col-start-auto sm:justify-self-end sm:text-sm'
           )}
         >
-          {actionLabel ?? 'Открыть контакт'}
-          <ArrowUpRight className="transition-transform group-hover:translate-x-1" size={16} strokeWidth={1.8} />
+          {actionLabel ?? 'Связаться'}
+          <ArrowUpRight
+            className="transition-transform duration-[var(--motion-duration-base)] ease-[var(--motion-ease-move)] group-hover:translate-x-1 motion-reduce:transition-none"
+            size={16}
+            strokeWidth={1.8}
+          />
         </span>
       ) : null}
     </>
   );
 
   const rowClassName = cn(
-    'group relative overflow-hidden rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--surface-wash)] transition duration-200',
+    'group relative overflow-hidden rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--surface-wash)] transition-[background-color,border-color,color,box-shadow] duration-[var(--motion-duration-base)] ease-[var(--motion-ease-standard)] motion-reduce:transition-none',
     isCard
       ? 'grid min-h-[9.5rem] grid-cols-[auto_minmax(0,1fr)] content-start items-start gap-3 px-4 py-4'
       : 'grid min-h-0 grid-cols-[auto_minmax(0,1fr)] items-center gap-3 px-3 py-2.5 sm:min-h-14 sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:py-3',

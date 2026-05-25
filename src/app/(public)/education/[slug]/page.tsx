@@ -30,6 +30,7 @@ export default async function CourseDetailPage({ params }: CourseDetailPageProps
         meta={course.meta}
         primaryLink={{ href: `/contacts?topic=education-program&topicTitle=${encodeURIComponent(course.title)}#contact-form`, label: 'Оставить заявку' }}
         secondaryLink={{ href: '/education', label: 'Вернуться в каталог' }}
+        sections={course.sections}
         summary={course.summary}
         title={course.title}
       />

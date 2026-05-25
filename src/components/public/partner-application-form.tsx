@@ -22,31 +22,31 @@ export function PartnerApplicationForm({ enabled, result, utm, cities, defaults 
     'Образовательные проекты',
     'События для заведений',
     'Партнёрские материалы',
-    'Поддержка событий'
+    'Спонсорство событий'
   ];
 
   const preparationNotes = [
     'Кто вы и что хотите сделать вместе с BARSYNERGY.',
     'Какая задача: обучение, событие, запуск, размещение или контакт с заведениями.',
-    'Ссылку на сайт, Telegram или материалы, если их уже можно посмотреть.'
+    'Ссылка на сайт, Telegram или материалы, если их уже можно посмотреть.'
   ];
 
   return (
     <PublicApplicationSection
       eyebrow="Партнёрство / Заявка"
       title="Обсудить партнёрство"
-      description="Для брендов, школ, заведений и сервисных команд: совместный проект, событие, размещение или программа."
+      description="Для брендов, школ, заведений и сервисных команд: совместный проект, событие, размещение или обучение."
       disclosureAliases={['applications']}
       disclosureFocusSelector="#partnerCompanyName"
       disclosureId="partner-request"
-      disclosureOpenLabel="Открыть заявку"
+      disclosureOpenLabel="Оставить заявку"
       disclosureTitle="Обсудить партнёрство"
       disclosureDescription="Укажите компанию, формат, город, ссылку и короткое описание задачи."
       disclosureDefaultOpen={Boolean(defaults.partnerType)}
       enabled={enabled}
       result={result}
     >
-      <form action={submitPartnerApplication} className="editorial-form-shell">
+      <form action={submitPartnerApplication} className="editorial-form-shell public-form-shell">
         <HiddenUtmFields utm={utm} />
         <HoneypotField id="partner-application-website" />
         <div className="relative grid lg:grid-cols-[0.42fr_0.58fr]">
@@ -56,7 +56,7 @@ export function PartnerApplicationForm({ enabled, result, utm, cities, defaults 
               Заявка для брендов, школ и заведений
             </PublicDisplayTitle>
             <PublicBodyText className="mt-4 max-w-md" tone="inverse">
-              Коротко опишите задачу и идею. Этого достаточно, чтобы начать разговор по делу.
+              Коротко опишите задачу и идею. Этого достаточно, чтобы начать разговор.
             </PublicBodyText>
 
             <div className="mt-6 flex flex-wrap gap-2">

@@ -166,7 +166,7 @@ export function AdminCmsInlineEditRecord({
     <details
       name={groupName}
       className={cn(
-        'group/admin-inline overflow-hidden rounded-[var(--radius-md)] border border-[var(--line)] bg-[var(--surface)] transition hover:border-[var(--border-strong)]',
+        'group/admin-inline admin-inline-edit-record overflow-hidden rounded-[12px] border border-[var(--line)] bg-[var(--surface)] transition hover:border-[var(--border-strong)]',
         className
       )}
     >
@@ -179,7 +179,7 @@ export function AdminCmsInlineEditRecord({
           Свернуть
         </span>
       </summary>
-      <form action={action} className={cn('grid gap-4 border-t border-[var(--line)] p-4', formClassName)}>
+      <form action={action} className={cn('admin-inline-edit-form grid gap-4 border-t border-[var(--line)] p-4', formClassName)}>
         {children}
       </form>
     </details>
@@ -190,7 +190,7 @@ export function AdminCmsActions({ className, ...props }: AdminCmsActionsProps) {
   return (
     <FormActions
       className={cn(
-        'sticky bottom-3 z-30 rounded-[var(--radius-md)] border border-[var(--line)] bg-[color-mix(in_oklab,var(--surface),transparent_4%)] p-3 shadow-[0_16px_36px_rgba(48,40,35,0.12)] backdrop-blur sm:bottom-4 sm:[&>*:last-child]:ml-auto',
+        'admin-sticky-form-actions sticky bottom-3 z-30 rounded-[14px] border border-[var(--line)] bg-[color-mix(in_oklab,var(--surface),transparent_4%)] p-4 shadow-[0_16px_36px_rgba(48,40,35,0.12)] backdrop-blur sm:bottom-4 sm:[&>*:last-child]:ml-auto',
         className
       )}
       {...props}
