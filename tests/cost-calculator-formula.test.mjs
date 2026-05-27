@@ -16,6 +16,18 @@ function round(value) {
   return Math.round(value * 100) / 100;
 }
 
+async function readCalculatorComponentSources() {
+  const files = [
+    '../src/components/public/cost-calculator-client.tsx',
+    '../src/components/public/cost-calculator/ingredient-editor.tsx',
+    '../src/components/public/cost-calculator/result-rail.tsx',
+    '../src/components/public/cost-calculator/use-cost-calculator-state.ts',
+    '../src/components/public/cost-calculator/format.ts'
+  ];
+
+  return Promise.all(files.map((file) => readFile(new URL(file, import.meta.url), 'utf8'))).then((sources) => sources.join('\n'));
+}
+
 test('calculator formula returns expected recommended price for the demo recipe', () => {
   const summary = calculateCostSummary({
     foodCostPercent: '30',
@@ -103,7 +115,7 @@ test('calculator rejects invalid percent and never exposes Infinity', () => {
 });
 
 test('calculator pricing mode control uses explicit separated options', async () => {
-  const componentSource = await readFile(new URL('../src/components/public/cost-calculator-client.tsx', import.meta.url), 'utf8');
+  const componentSource = await readCalculatorComponentSources();
   const stylesSource = readGlobalStyles();
 
   assert.match(componentSource, /eyebrow: 'Автоматически'/);
@@ -119,7 +131,7 @@ test('calculator pricing mode control uses explicit separated options', async ()
 });
 
 test('calculator ingredient actions keep breathing room inside the table', async () => {
-  const componentSource = await readFile(new URL('../src/components/public/cost-calculator-client.tsx', import.meta.url), 'utf8');
+  const componentSource = await readCalculatorComponentSources();
 
   assert.match(componentSource, /grid-cols-\[minmax\(130px,1fr\)_72px_minmax\(132px,0\.85fr\)_minmax\(132px,0\.85fr\)_88px_96px\]/);
   assert.doesNotMatch(componentSource, /minmax\(145px,1\.05fr\)_minmax\(80px,0\.5fr\)_minmax\(150px,0\.8fr\)_minmax\(150px,0\.8fr\)_minmax\(94px,0\.58fr\)_104px/);
@@ -135,7 +147,7 @@ test('calculator field cards keep input text away from card edges', async () => 
 });
 
 test('calculator does not render the redundant row subtotal strip', async () => {
-  const componentSource = await readFile(new URL('../src/components/public/cost-calculator-client.tsx', import.meta.url), 'utf8');
+  const componentSource = await readCalculatorComponentSources();
 
   assert.doesNotMatch(componentSource, /function CalculatorSubtotalStrip/);
   assert.doesNotMatch(componentSource, /<CalculatorSubtotalStrip/);
