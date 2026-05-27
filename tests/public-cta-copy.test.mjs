@@ -291,10 +291,7 @@ test('supplier list header does not repeat the add company action', () => {
 });
 
 test('supplier list cards do not duplicate verified status as an extra badge', () => {
-  const source = readProjectFile('src/lib/public/content.ts');
-  const supplierStart = source.indexOf('export async function getPublishedSuppliers');
-  const supplierEnd = source.indexOf('export async function getPublishedPartners');
-  const supplierSource = source.slice(supplierStart, supplierEnd);
+  const supplierSource = readProjectFile('src/lib/public/content/suppliers.ts');
 
   assert.match(supplierSource, /statusLabel: supplier\.isVerified \? 'Проверен' : 'Контакт для уточнения'/);
   assert.doesNotMatch(supplierSource, /value: 'Проверен BARSYNERGY'/);
