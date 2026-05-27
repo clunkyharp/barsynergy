@@ -14,6 +14,7 @@ This runbook covers:
 - stale auth attempt throttle cleanup;
 - stale public application throttle cleanup;
 - stale business-access invite cleanup.
+- failed public application notification retry.
 
 Out of scope:
 
@@ -30,6 +31,7 @@ npm run session:cleanup:expired
 npm run auth:cleanup:throttles
 npm run application:cleanup:throttles
 npm run business-access:cleanup:invites
+npm run notifications:retry
 ```
 
 Production host command pattern for a Compose-managed app container:
@@ -55,6 +57,7 @@ npm run session:cleanup:expired
 npm run auth:cleanup:throttles
 npm run application:cleanup:throttles
 npm run business-access:cleanup:invites
+npm run notifications:retry
 ```
 
 If the deployed revision does not yet contain one of these scripts, the scheduler must log that fact explicitly instead of pretending the full batch ran.
@@ -66,7 +69,7 @@ Recommended production shape:
 - one scheduler entry;
 - one host;
 - app container already running;
-- all four cleanup commands executed sequentially.
+- all cleanup and notification retry commands executed sequentially.
 
 Example host-side shell block for a Compose-managed host:
 
@@ -79,6 +82,7 @@ docker compose --env-file .env.production -f docker-compose.production.yml exec 
 docker compose --env-file .env.production -f docker-compose.production.yml exec -T app npm run auth:cleanup:throttles
 docker compose --env-file .env.production -f docker-compose.production.yml exec -T app npm run application:cleanup:throttles
 docker compose --env-file .env.production -f docker-compose.production.yml exec -T app npm run business-access:cleanup:invites
+docker compose --env-file .env.production -f docker-compose.production.yml exec -T app npm run notifications:retry
 ```
 
 Example host-side shell block for the current verified `systemd` checkout mode:
@@ -97,6 +101,12 @@ if node -e "const p=require('./package.json'); process.exit(p.scripts && p.scrip
 else
   echo "Skipping business-access:cleanup:invites: script is not present in the deployed revision"
 fi
+
+if node -e "const p=require('./package.json'); process.exit(p.scripts && p.scripts['notifications:retry'] ? 0 : 1)"; then
+  npm run notifications:retry
+else
+  echo "Skipping notifications:retry: script is not present in the deployed revision"
+fi
 ```
 
 ## Recommended Frequency
@@ -109,7 +119,8 @@ Reasoning:
 
 - expired sessions are harmless after expiry but should not accumulate for long;
 - throttle cleanup has a long retention window, but is cheap to run together with session cleanup;
-- business-access invite cleanup should remove expired or long-used tokens without relying on manual maintenance.
+- business-access invite cleanup should remove expired or long-used tokens without relying on manual maintenance;
+- notification retry should resend failed application notifications without relying on manual admin checks.
 
 If the first production host has very limited resources, every 6 hours is an acceptable fallback. Do not go lower than daily only after explicit owner approval.
 
@@ -126,7 +137,7 @@ Description=BARSYNERGY scheduled cleanup
 [Service]
 Type=oneshot
 WorkingDirectory=/opt/barsynergy
-ExecStart=/bin/bash -lc 'set -euo pipefail; docker compose --env-file .env.production -f docker-compose.production.yml exec -T app npm run session:cleanup:expired && docker compose --env-file .env.production -f docker-compose.production.yml exec -T app npm run auth:cleanup:throttles && docker compose --env-file .env.production -f docker-compose.production.yml exec -T app npm run application:cleanup:throttles && docker compose --env-file .env.production -f docker-compose.production.yml exec -T app npm run business-access:cleanup:invites'
+ExecStart=/bin/bash -lc 'set -euo pipefail; docker compose --env-file .env.production -f docker-compose.production.yml exec -T app npm run session:cleanup:expired && docker compose --env-file .env.production -f docker-compose.production.yml exec -T app npm run auth:cleanup:throttles && docker compose --env-file .env.production -f docker-compose.production.yml exec -T app npm run application:cleanup:throttles && docker compose --env-file .env.production -f docker-compose.production.yml exec -T app npm run business-access:cleanup:invites && docker compose --env-file .env.production -f docker-compose.production.yml exec -T app npm run notifications:retry'
 ```
 
 Timer unit example:
@@ -166,7 +177,7 @@ ExecStart=/usr/local/bin/barsynergy-cleanup.sh
 Fallback if systemd timers are not available:
 
 ```cron
-0 * * * * cd /opt/barsynergy && docker compose --env-file .env.production -f docker-compose.production.yml exec -T app npm run session:cleanup:expired && docker compose --env-file .env.production -f docker-compose.production.yml exec -T app npm run auth:cleanup:throttles && docker compose --env-file .env.production -f docker-compose.production.yml exec -T app npm run application:cleanup:throttles && docker compose --env-file .env.production -f docker-compose.production.yml exec -T app npm run business-access:cleanup:invites >> /var/log/barsynergy-cleanup.log 2>&1
+0 * * * * cd /opt/barsynergy && docker compose --env-file .env.production -f docker-compose.production.yml exec -T app npm run session:cleanup:expired && docker compose --env-file .env.production -f docker-compose.production.yml exec -T app npm run auth:cleanup:throttles && docker compose --env-file .env.production -f docker-compose.production.yml exec -T app npm run application:cleanup:throttles && docker compose --env-file .env.production -f docker-compose.production.yml exec -T app npm run business-access:cleanup:invites && docker compose --env-file .env.production -f docker-compose.production.yml exec -T app npm run notifications:retry >> /var/log/barsynergy-cleanup.log 2>&1
 ```
 
 ## Preconditions

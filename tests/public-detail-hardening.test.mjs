@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import process from 'node:process';
 import test from 'node:test';
+import { readGlobalStyles } from './helpers/global-styles.mjs';
 
 const repoRoot = process.cwd();
 
@@ -12,7 +13,7 @@ function readProjectFile(path) {
 
 test('shared public detail page exposes type-specific labels and stable runtime hooks', () => {
   const componentSource = readProjectFile('src/components/public/public-content-detail-page.tsx');
-  const cssSource = readProjectFile('src/app/globals.css');
+  const cssSource = readGlobalStyles();
 
   assert.match(componentSource, /type DetailKind = 'article' \| 'event' \| 'course' \| 'vacancy' \| 'supplier' \| 'partner'/);
   assert.match(componentSource, /data-detail-kind=\{detailKind\}/);

@@ -38,6 +38,7 @@ import {
   type AdminContentSearchParams
 } from '@/lib/admin/content-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
+import { getApplicationPayloadText } from '@/lib/applications/application-payloads';
 import { prisma } from '@/lib/db/prisma';
 
 export const dynamic = 'force-dynamic';
@@ -146,22 +147,6 @@ function applicationPublicationTarget(application: {
   return null;
 }
 
-function getPayloadText(payload: Prisma.JsonValue | null, keys: string[]) {
-  if (!payload || Array.isArray(payload) || typeof payload !== 'object') {
-    return null;
-  }
-
-  for (const key of keys) {
-    const value = (payload as Record<string, Prisma.JsonValue>)[key];
-
-    if (typeof value === 'string' && value.trim()) {
-      return value.trim();
-    }
-  }
-
-  return null;
-}
-
 function applicationPersonOrCompany(application: {
   businessAccount: { companyName: string } | null;
   email: string | null;
@@ -170,8 +155,11 @@ function applicationPersonOrCompany(application: {
   phone: string | null;
   subject: string | null;
   telegram: string | null;
+  type: ApplicationType;
 }) {
-  const companyName = application.businessAccount?.companyName ?? getPayloadText(application.payload, ['projectName', 'companyName', 'employerCompanyName']);
+  const companyName =
+    application.businessAccount?.companyName ??
+    getApplicationPayloadText(application.type, application.payload, ['projectName', 'companyName', 'employerCompanyName']);
   const primary = companyName ?? application.name?.trim() ?? application.subject?.trim() ?? application.email ?? 'Не указано';
   const secondary = [application.name && companyName ? application.name : null, application.email, application.phone, application.telegram]
     .filter(Boolean)

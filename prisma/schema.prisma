@@ -84,6 +84,18 @@ enum ApplicationStatus {
   ARCHIVED              @map("archived")
 }
 
+enum ApplicationNotificationChannel {
+  ADMIN_EMAIL    @map("admin_email")
+  ADMIN_TELEGRAM @map("admin_telegram")
+  USER_EMAIL     @map("user_email")
+}
+
+enum ApplicationNotificationStatus {
+  PENDING @map("pending")
+  SENT    @map("sent")
+  FAILED  @map("failed")
+}
+
 model User {
   id           String     @id @default(cuid())
   email        String     @unique
@@ -685,6 +697,7 @@ model Application {
   resumeFile      UploadedFile?    @relation("ApplicationResumeFile", fields: [resumeFileId], references: [id], onDelete: SetNull)
   forwardedBy     User?            @relation("ApplicationForwardedBy", fields: [forwardedById], references: [id], onDelete: SetNull)
   businessAccessInvites BusinessAccessInvite[]
+  notifications   ApplicationNotification[]
 
   @@index([type, status])
   @@index([status, createdAt])
@@ -696,6 +709,25 @@ model Application {
   @@index([email])
   @@index([phone])
   @@index([createdAt])
+}
+
+model ApplicationNotification {
+  id            String                        @id @default(cuid())
+  applicationId String
+  channel       ApplicationNotificationChannel
+  status        ApplicationNotificationStatus @default(PENDING)
+  attempts      Int                           @default(0)
+  nextAttemptAt DateTime                      @default(now())
+  sentAt        DateTime?
+  lastError     String?
+  payload       Json
+  createdAt     DateTime                      @default(now())
+  updatedAt     DateTime                      @updatedAt
+
+  application Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@index([status, nextAttemptAt])
+  @@index([applicationId, channel])
 }
 
 model BusinessAccessInvite {

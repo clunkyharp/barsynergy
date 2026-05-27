@@ -1,12 +1,12 @@
 # BARSYNERGY Project Status
 
-Last updated: 2026-05-26
+Last updated: 2026-05-27
 
 ## Current Branch
 
-- Active branch: `dev`
+- Active branch: `feature/stabilization-remediation`
 - Production branch: `prod`
-- Current work mode: `QA + IMPLEMENTATION`
+- Current work mode: `IMPLEMENTATION`
 
 ## Current Phase
 
@@ -17,11 +17,49 @@ Phase 1-4 MVP foundation is implemented at source level:
 - Phase 3 unified `Application` flows and public form handling are implemented;
 - Phase 4 auth and first business account cabinet are implemented;
 - public `/business` and `/consulting` request pages are implemented;
-- Phase 5 service-specialist catalog, filters/search/directory-quality work remains planned and should not start until the current local docs/status cleanup is checkpointed.
+- Phase 5 service-specialist catalog, filters/search/directory-quality work remains planned and should not start until the stabilization queue in `docs/remediation-plan.md` is closed or explicitly deferred by the owner.
 
 Public personal-data forms remain disabled by default in production until `APPLICATION_FORMS_ENABLED=true` is explicitly approved after legal/operator readiness checks.
 
-## Current Local Batch
+## Current Stabilization Batch
+
+The current branch is a pre-Phase-5 stabilization branch. The previous dirty `dev` tree was checkpointed before this work as `5f42e91 Checkpoint UI QA remediation`.
+
+Implemented in this branch so far:
+
+- typed `Application.payload` contract with Zod parse/build helpers and migrated public/admin/business readers and writers;
+- same-origin protection helper for server actions, applied to high-risk public, auth, admin and business mutations with a source test;
+- notification outbox schema, migration, processor, immediate post-commit dispatch and `npm run notifications:retry`;
+- admin application notification attempt status on the application detail page;
+- split admin application server actions into status, notes, publication and business-access files while keeping `src/app/admin/applications/actions.ts` as the facade;
+- common public application submission helper, migrated for suppliers, partners, events, education, business, consulting, contacts and vacancy placement; vacancy response stays specialized because it owns private resume upload cleanup;
+- mechanical CSS split into `src/app/styles/*` with `src/app/globals.css` kept as the import facade;
+- direct dependencies pinned to exact currently resolved versions;
+- CSP `frame-ancestors` changed to `'none'`;
+- scheduler runbook updated with notification retry.
+
+Validation so far:
+
+- `npm run lint` passed;
+- `npm test` passed with 119/119 tests;
+- `./node_modules/.bin/prisma validate` passed;
+- `git diff --check` passed;
+- direct `./node_modules/.bin/tsc --noEmit` passed after the application/action refactors;
+- `npm run typecheck` completed but still printed the local Next/SWC code-signature warning during `next typegen`;
+- `npm audit signatures` and `npm audit --omit=dev` passed;
+- full `npm audit --audit-level=low` reports one moderate dev-only `brace-expansion` advisory under `typescript-eslint`;
+- `npm run build` is blocked locally by the known Next/SWC darwin-arm64 code-signature Team ID mismatch after successful `prisma generate`.
+
+Still open in this stabilization queue:
+
+- cost calculator component split;
+- public content service split by domain;
+- Playwright/axe Select and Dropdown keyboard/form scenarios;
+- shared admin content lifecycle helper for status update and draft delete;
+- browser QA for this branch;
+- clean production build in an environment without the local SWC code-signature blocker before commit or merge.
+
+## Previous Local Batch (Historical)
 
 Code/browser QA remediation has been run locally on `dev` and is ready for the requested release checkpoint:
 

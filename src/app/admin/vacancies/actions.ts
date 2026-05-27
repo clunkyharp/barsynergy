@@ -21,6 +21,7 @@ import {
 } from '@/lib/admin/content-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
 import { prisma } from '@/lib/db/prisma';
+import { assertSameOriginServerAction } from '@/lib/security/server-action-origin';
 import { vacancyPositionValues } from '@/lib/vacancies/positions';
 
 const ADMIN_VACANCIES_PATH = '/admin/vacancies';
@@ -57,6 +58,7 @@ export async function createVacancy(formData: FormData) {
   let uploadedCoverImageId: string | null = null;
 
   try {
+    await assertSameOriginServerAction();
     const user = await requireAdminSectionAccess('vacancies');
     const parsed = vacancyFormSchema.parse({
       title: getString(formData, 'title'),
@@ -146,6 +148,7 @@ export async function updateVacancy(formData: FormData) {
   let previousCoverImageId: string | null = null;
 
   try {
+    await assertSameOriginServerAction();
     const user = await requireAdminSectionAccess('vacancies');
     const parsed = vacancyFormSchema
       .extend({
@@ -249,6 +252,7 @@ export async function updateVacancyStatus(formData: FormData) {
   let result: { type: 'success' | 'error'; message: string };
 
   try {
+    await assertSameOriginServerAction();
     const user = await requireAdminSectionAccess('vacancies');
     const parsed = statusFormSchema.parse({
       vacancyId: getString(formData, 'vacancyId'),
@@ -285,6 +289,7 @@ export async function deleteVacancyDraft(formData: FormData) {
   let result: { type: 'success' | 'error'; message: string };
 
   try {
+    await assertSameOriginServerAction();
     await requireAdminSectionAccess('vacancies');
     const parsed = deleteFormSchema.parse({
       vacancyId: getString(formData, 'vacancyId')

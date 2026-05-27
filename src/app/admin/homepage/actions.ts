@@ -16,6 +16,7 @@ import {
 } from '@/lib/admin/content-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
 import { prisma } from '@/lib/db/prisma';
+import { assertSameOriginServerAction } from '@/lib/security/server-action-origin';
 import { normalizeExternalUrlInput } from '@/lib/validation/external-url';
 
 const ADMIN_HOMEPAGE_PATH = '/admin/homepage';
@@ -150,6 +151,7 @@ export async function saveHomepageHero(formData: FormData) {
   let result: { type: 'success' | 'error'; message: string };
 
   try {
+    await assertSameOriginServerAction();
     const user = await requireAdminSectionAccess('homepage');
     const parsed = heroSchema.parse({
       heroId: optionalString(getString(formData, 'heroId')),
@@ -207,6 +209,7 @@ export async function saveHomepageAudienceCard(formData: FormData) {
   let result: { type: 'success' | 'error'; message: string };
 
   try {
+    await assertSameOriginServerAction();
     const user = await requireAdminSectionAccess('homepage');
     const parsed = audienceSchema.parse({
       cardId: optionalString(getString(formData, 'cardId')),
@@ -260,6 +263,7 @@ export async function saveHomepageSocialBlock(formData: FormData) {
   let result: { type: 'success' | 'error'; message: string };
 
   try {
+    await assertSameOriginServerAction();
     const user = await requireAdminSectionAccess('homepage');
     const parsed = socialSchema.parse({
       socialId: optionalString(getString(formData, 'socialId')),
@@ -315,6 +319,7 @@ export async function saveHomepageCtaBlock(formData: FormData) {
   let result: { type: 'success' | 'error'; message: string };
 
   try {
+    await assertSameOriginServerAction();
     const user = await requireAdminSectionAccess('homepage');
     const parsed = ctaSchema.parse({
       ctaId: optionalString(getString(formData, 'ctaId')),
@@ -368,6 +373,7 @@ export async function saveHomepageCalculatorTeaser(formData: FormData) {
   let result: { type: 'success' | 'error'; message: string };
 
   try {
+    await assertSameOriginServerAction();
     const user = await requireAdminSectionAccess('homepage');
     const parsed = calculatorSchema.parse({
       calculatorId: optionalString(getString(formData, 'calculatorId')),
@@ -423,6 +429,7 @@ export async function deleteHomepageAudienceCard(formData: FormData) {
   let result: { type: 'success' | 'error'; message: string };
 
   try {
+    await assertSameOriginServerAction();
     await requireAdminSectionAccess('homepage');
     const parsed = deleteSchema.parse({ id: getString(formData, 'id') });
     const current = await prisma.homepageAudienceCard.findUnique({ where: { id: parsed.id }, select: { status: true } });
@@ -442,6 +449,7 @@ export async function deleteHomepageSocialBlock(formData: FormData) {
   let result: { type: 'success' | 'error'; message: string };
 
   try {
+    await assertSameOriginServerAction();
     await requireAdminSectionAccess('homepage');
     const parsed = deleteSchema.parse({ id: getString(formData, 'id') });
     const current = await prisma.homepageSocialBlock.findUnique({ where: { id: parsed.id }, select: { status: true } });

@@ -10,6 +10,7 @@ import {
 } from '@/lib/admin/content-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
 import { prisma } from '@/lib/db/prisma';
+import { assertSameOriginServerAction } from '@/lib/security/server-action-origin';
 
 const ADMIN_USERS_PATH = '/admin/users';
 
@@ -23,6 +24,7 @@ export async function updateBusinessUserAccess(formData: FormData) {
   let result: { type: 'success' | 'error'; message: string };
 
   try {
+    await assertSameOriginServerAction();
     await requireAdminSectionAccess('users');
     const parsed = userStatusFormSchema.parse({
       userId: getString(formData, 'userId'),

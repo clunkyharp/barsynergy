@@ -13,6 +13,7 @@ import {
 import { PERSONAL_DATA_CONSENT_TEXT } from '@/lib/applications/public-form-helpers';
 import { requireBusinessAccountAccess } from '@/lib/auth/require-business-account';
 import { prisma } from '@/lib/db/prisma';
+import { assertSameOriginServerAction } from '@/lib/security/server-action-origin';
 
 const BUSINESS_PATH = '/business/cabinet';
 const BUSINESS_REQUESTS_PATH = '/business/cabinet/requests';
@@ -154,6 +155,7 @@ export async function updateBusinessProfile(formData: FormData) {
   let result: { type: 'success' | 'error'; message: string };
 
   try {
+    await assertSameOriginServerAction();
     const { businessAccount } = await requireBusinessAccountAccess();
     const parsed = businessProfileSchema.parse({
       companyName: getString(formData, 'companyName'),
@@ -200,6 +202,7 @@ export async function createBusinessApplication(formData: FormData) {
   let result: { type: 'success' | 'error'; message: string };
 
   try {
+    await assertSameOriginServerAction();
     const { user, businessAccount } = await requireBusinessAccountAccess();
     const parsed = parseBusinessApplicationInput(getBusinessApplicationFormData(formData));
     const city = await assertActiveCity(parsed.cityId);
@@ -254,6 +257,7 @@ export async function updateBusinessDraftApplication(formData: FormData) {
   let result: { type: 'success' | 'error'; message: string };
 
   try {
+    await assertSameOriginServerAction();
     const { user, businessAccount } = await requireBusinessAccountAccess();
     const parsed = parseBusinessApplicationInput(getBusinessApplicationFormData(formData));
     const city = await assertActiveCity(parsed.cityId);
@@ -320,6 +324,7 @@ export async function submitBusinessDraftApplication(formData: FormData) {
   let result: { type: 'success' | 'error'; message: string };
 
   try {
+    await assertSameOriginServerAction();
     if (!parsed.success) {
       throw new Error('application is invalid');
     }
@@ -362,6 +367,7 @@ export async function archiveBusinessDraftApplication(formData: FormData) {
   let result: { type: 'success' | 'error'; message: string };
 
   try {
+    await assertSameOriginServerAction();
     if (!parsed.success) {
       throw new Error('application is invalid');
     }

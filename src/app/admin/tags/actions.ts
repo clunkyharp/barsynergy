@@ -15,6 +15,7 @@ import {
 } from '@/lib/admin/content-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
 import { prisma } from '@/lib/db/prisma';
+import { assertSameOriginServerAction } from '@/lib/security/server-action-origin';
 
 const ADMIN_TAGS_PATH = '/admin/tags';
 
@@ -75,6 +76,7 @@ export async function createTag(formData: FormData) {
   let result: { type: 'success' | 'error'; message: string };
 
   try {
+    await assertSameOriginServerAction();
     await requireAdminSectionAccess('tags');
     const parsed = readTagForm(formData);
 
@@ -114,6 +116,7 @@ export async function updateTag(formData: FormData) {
   let result: { type: 'success' | 'error'; message: string };
 
   try {
+    await assertSameOriginServerAction();
     await requireAdminSectionAccess('tags');
     const base = readTagForm(formData);
     const parsed = tagUpdateSchema.parse({

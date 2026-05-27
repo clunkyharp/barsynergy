@@ -1,4 +1,5 @@
 import nodemailer from 'nodemailer';
+import { ApplicationNotificationChannel } from '@prisma/client';
 import {
   buildAdminApplicationEmailText,
   buildAdminApplicationTelegramMessage,
@@ -128,4 +129,23 @@ export async function notifyOnApplicationCreated(input: ApplicationNotificationI
       console.error('Application notification failed.', result.reason);
     }
   }
+}
+
+export async function sendApplicationNotification(
+  channel: ApplicationNotificationChannel,
+  input: ApplicationNotificationInput
+) {
+  const env = getEnv();
+
+  if (channel === ApplicationNotificationChannel.ADMIN_TELEGRAM) {
+    await sendAdminTelegramNotification(env, input);
+    return;
+  }
+
+  if (channel === ApplicationNotificationChannel.ADMIN_EMAIL) {
+    await sendAdminEmailNotification(env, input);
+    return;
+  }
+
+  await sendUserConfirmationEmail(env, input);
 }

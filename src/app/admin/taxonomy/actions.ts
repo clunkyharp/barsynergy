@@ -14,6 +14,7 @@ import {
 } from '@/lib/admin/content-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
 import { prisma } from '@/lib/db/prisma';
+import { assertSameOriginServerAction } from '@/lib/security/server-action-origin';
 
 const ADMIN_CATEGORIES_PATH = '/admin/categories';
 const ADMIN_CITIES_PATH = '/admin/cities';
@@ -83,6 +84,7 @@ export async function createCategory(formData: FormData) {
   let result: { type: 'success' | 'error'; message: string };
 
   try {
+    await assertSameOriginServerAction();
     await requireAdminSectionAccess('categories');
     const parsed = categorySchema.parse({
       name: getString(formData, 'name'),
@@ -119,6 +121,7 @@ export async function updateCategory(formData: FormData) {
   let result: { type: 'success' | 'error'; message: string };
 
   try {
+    await assertSameOriginServerAction();
     await requireAdminSectionAccess('categories');
     const categoryId = getString(formData, 'categoryId');
     const parsed = categorySchema.parse({
@@ -165,6 +168,7 @@ export async function createCity(formData: FormData) {
   let result: { type: 'success' | 'error'; message: string };
 
   try {
+    await assertSameOriginServerAction();
     await requireAdminSectionAccess('cities');
     const parsed = citySchema.parse({
       name: getString(formData, 'name'),
@@ -199,6 +203,7 @@ export async function updateCity(formData: FormData) {
   let result: { type: 'success' | 'error'; message: string };
 
   try {
+    await assertSameOriginServerAction();
     await requireAdminSectionAccess('cities');
     const cityId = getString(formData, 'cityId');
     const parsed = citySchema.parse({

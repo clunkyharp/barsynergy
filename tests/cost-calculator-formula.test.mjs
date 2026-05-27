@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 import { URL } from 'node:url';
+import { readGlobalStyles } from './helpers/global-styles.mjs';
 
 const { calculateCostSummary, calculateIngredientCost } = await import('../src/lib/calculator/cost-calculator.ts');
 
@@ -103,7 +104,7 @@ test('calculator rejects invalid percent and never exposes Infinity', () => {
 
 test('calculator pricing mode control uses explicit separated options', async () => {
   const componentSource = await readFile(new URL('../src/components/public/cost-calculator-client.tsx', import.meta.url), 'utf8');
-  const stylesSource = await readFile(new URL('../src/app/globals.css', import.meta.url), 'utf8');
+  const stylesSource = readGlobalStyles();
 
   assert.match(componentSource, /eyebrow: 'Автоматически'/);
   assert.match(componentSource, /label: 'Рассчитать цену'/);
@@ -127,7 +128,7 @@ test('calculator ingredient actions keep breathing room inside the table', async
 });
 
 test('calculator field cards keep input text away from card edges', async () => {
-  const stylesSource = await readFile(new URL('../src/app/globals.css', import.meta.url), 'utf8');
+  const stylesSource = readGlobalStyles();
 
   assert.match(stylesSource, /\.calculator-field-card \.field-base \{\n\s+border-color: transparent;\n\s+padding-inline: 12px;\n\}/);
   assert.doesNotMatch(stylesSource, /\.calculator-field-card \.field-base \{\n\s+border-color: transparent;\n\s+padding-right: 0;\n\s+padding-left: 0;\n\}/);

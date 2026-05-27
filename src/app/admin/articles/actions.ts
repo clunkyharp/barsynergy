@@ -21,6 +21,7 @@ import {
 } from '@/lib/admin/content-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
 import { prisma } from '@/lib/db/prisma';
+import { assertSameOriginServerAction } from '@/lib/security/server-action-origin';
 
 const ADMIN_ARTICLES_PATH = '/admin/articles';
 const ARTICLE_BODY_MAX_LENGTH = 20_000;
@@ -85,6 +86,7 @@ export async function createArticle(formData: FormData) {
   let uploadedCoverImageId: string | null = null;
 
   try {
+    await assertSameOriginServerAction();
     const user = await requireAdminSectionAccess('articles');
     const parsed = articleFormSchema.parse({
       title: getString(formData, 'title'),
@@ -186,6 +188,7 @@ export async function updateArticle(formData: FormData) {
   let previousCoverImageId: string | null = null;
 
   try {
+    await assertSameOriginServerAction();
     const user = await requireAdminSectionAccess('articles');
     const parsed = articleFormSchema
       .extend({
@@ -302,6 +305,7 @@ export async function updateArticleStatus(formData: FormData) {
   let result: { type: 'success' | 'error'; message: string };
 
   try {
+    await assertSameOriginServerAction();
     const user = await requireAdminSectionAccess('articles');
     const parsed = statusFormSchema.parse({
       articleId: getString(formData, 'articleId'),
@@ -338,6 +342,7 @@ export async function deleteArticleDraft(formData: FormData) {
   let result: { type: 'success' | 'error'; message: string };
 
   try {
+    await assertSameOriginServerAction();
     await requireAdminSectionAccess('articles');
     const parsed = deleteFormSchema.parse({
       articleId: getString(formData, 'articleId')

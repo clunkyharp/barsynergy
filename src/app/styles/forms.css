@@ -1,0 +1,575 @@
+.editorial-form-shell {
+  position: relative;
+  overflow: visible;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-xl);
+  background:
+    linear-gradient(180deg, rgba(255, 253, 249, 0.82), rgba(255, 253, 249, 0.96)),
+    radial-gradient(circle at top right, rgba(157, 9, 14, 0.07), transparent 34%),
+    radial-gradient(circle at bottom left, rgba(178, 133, 82, 0.08), transparent 30%);
+  box-shadow: var(--shadow-panel), inset 0 1px 0 rgba(255, 255, 255, 0.74);
+}
+
+:root[data-theme="dark"] .editorial-form-shell {
+  background: var(--surface-elevated);
+  box-shadow: var(--shadow-panel), inset 0 1px 0 rgba(244, 234, 223, 0.035);
+}
+
+.editorial-form-shell::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background-image:
+    url("/images/grain.svg"),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.14), transparent 54%);
+  background-size: 180px 180px, auto;
+  opacity: 0.05;
+  mix-blend-mode: multiply;
+  pointer-events: none;
+}
+
+:root[data-theme="dark"] .editorial-form-shell::before {
+  opacity: 0.04;
+  mix-blend-mode: screen;
+}
+
+.form-field {
+  display: grid;
+  gap: 0.55rem;
+  min-width: 0;
+}
+
+.field-label {
+  display: block;
+  color: var(--field-label);
+  font-size: 0.72rem;
+  font-weight: 750;
+  letter-spacing: 0.13em;
+  line-height: 1.35;
+  text-transform: uppercase;
+}
+
+.field-hint,
+.field-error,
+.field-success {
+  max-width: 46rem;
+  font-size: 0.82rem;
+  line-height: 1.65;
+}
+
+.field-hint {
+  color: var(--field-hint);
+}
+
+.field-error {
+  color: var(--danger-text);
+}
+
+.field-success {
+  color: var(--success-text);
+}
+
+.field-base {
+  min-height: 3.25rem;
+  width: 100%;
+  cursor: text;
+  border: 1px solid var(--field-border);
+  border-radius: var(--radius-md);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.28), transparent 62%),
+    var(--field-surface);
+  color: var(--text);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.7),
+    inset 0 -1px 0 rgba(48, 40, 35, 0.05);
+  outline: none;
+  transition:
+    border-color var(--motion-duration-fast) var(--motion-ease-standard),
+    background var(--motion-duration-fast) var(--motion-ease-standard),
+    box-shadow var(--motion-duration-fast) var(--motion-ease-standard),
+    color var(--motion-duration-fast) var(--motion-ease-standard),
+    opacity var(--motion-duration-fast) var(--motion-ease-standard);
+}
+
+.field-base::placeholder {
+  color: var(--field-placeholder);
+}
+
+.field-base:hover {
+  border-color: var(--field-border-hover);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.34), transparent 62%),
+    var(--field-surface-hover);
+}
+
+.field-base[data-filled="true"],
+.field-base[data-filled="true"]:hover {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.28), transparent 62%),
+    var(--field-surface-filled);
+}
+
+.field-base:focus,
+.field-base:focus-visible,
+.field-base:active,
+.custom-select-trigger[aria-expanded="true"] {
+  border-color: var(--field-border-focus);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.38), transparent 62%),
+    var(--field-surface-hover);
+  box-shadow: none;
+}
+
+.field-base[aria-invalid="true"],
+.field-base[data-state="error"] {
+  border-color: var(--field-border-error);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.24), transparent 62%),
+    var(--field-surface-hover);
+  box-shadow: inset 0 -2px 0 var(--danger-text);
+}
+
+.field-base[data-state="success"] {
+  border-color: var(--field-border-success);
+  box-shadow: inset 0 -2px 0 var(--success-text);
+}
+
+.field-base[aria-busy="true"],
+.field-base[data-state="loading"] {
+  cursor: progress;
+  background:
+    linear-gradient(100deg, transparent 0%, rgba(255, 255, 255, 0.34) 45%, transparent 78%),
+    var(--field-surface-hover);
+  background-size: 220% 100%, auto;
+  box-shadow: inset 0 -2px 0 color-mix(in srgb, var(--accent) 55%, transparent);
+  animation: field-loading-sheen 1.35s ease-in-out infinite;
+}
+
+.field-base:disabled,
+.field-base[aria-disabled="true"] {
+  cursor: not-allowed;
+  border-color: var(--border-subtle);
+  background: var(--field-surface-disabled);
+  color: var(--muted);
+  box-shadow: none;
+  opacity: 0.72;
+}
+
+:root[data-theme="dark"] .field-base {
+  background: var(--field-surface);
+  box-shadow: none;
+}
+
+:root[data-theme="dark"] .field-base:hover {
+  background: var(--field-surface-hover);
+}
+
+:root[data-theme="dark"] .field-base[data-filled="true"],
+:root[data-theme="dark"] .field-base[data-filled="true"]:hover {
+  background: var(--field-surface-filled);
+}
+
+:root[data-theme="dark"] .field-base:focus,
+:root[data-theme="dark"] .field-base:focus-visible,
+:root[data-theme="dark"] .field-base:active,
+:root[data-theme="dark"] .custom-select-trigger[aria-expanded="true"] {
+  background: var(--field-surface-hover);
+  box-shadow: none;
+}
+
+:root[data-theme="dark"] .field-base[aria-invalid="true"],
+:root[data-theme="dark"] .field-base[data-state="error"] {
+  background: var(--field-surface-hover);
+  box-shadow: inset 0 -1px 0 var(--danger-text);
+}
+
+:root[data-theme="dark"] .field-base[data-state="success"] {
+  box-shadow: inset 0 -1px 0 var(--success-text);
+}
+
+:root[data-theme="dark"] .field-base[aria-busy="true"],
+:root[data-theme="dark"] .field-base[data-state="loading"] {
+  background: var(--field-surface-hover);
+  background-size: auto;
+  box-shadow: inset 0 -1px 0 color-mix(in srgb, var(--accent) 55%, transparent);
+  animation: none;
+}
+
+.editorial-form-shell.public-form-shell {
+  overflow: hidden;
+  border-color: color-mix(in oklab, var(--border-default) 72%, transparent);
+  border-radius: 16px;
+  background: color-mix(in oklab, var(--surface) 92%, transparent);
+  box-shadow: none;
+}
+
+.editorial-form-shell.public-form-shell::before {
+  opacity: 0;
+}
+
+.public-form-shell-header {
+  border-bottom-color: color-mix(in oklab, var(--line) 66%, transparent);
+  background: color-mix(in oklab, var(--surface-wash) 68%, transparent);
+}
+
+.public-form-shell .form-section {
+  border-top: 1px solid color-mix(in oklab, var(--line) 64%, transparent);
+  padding-top: 26px;
+}
+
+.public-form-shell .form-section:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.public-form-shell .form-section-header {
+  margin-bottom: 16px;
+}
+
+.public-form-shell .form-section-title {
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 750;
+  letter-spacing: 0.08em;
+}
+
+.public-form-shell .form-section-description {
+  margin-top: 6px;
+  max-width: 42rem;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.public-form-shell .form-section-body {
+  gap: 16px;
+}
+
+.public-form-shell .form-field {
+  gap: 8px;
+  min-width: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  padding: 0;
+}
+
+.public-form-shell .form-field:focus-within {
+  box-shadow: none;
+}
+
+.public-form-shell .form-field[data-state="error"] {
+  box-shadow: none;
+}
+
+.public-form-shell .field-label {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 14px;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.public-form-shell .field-hint,
+.public-form-shell .field-error,
+.public-form-shell .field-success {
+  font-size: 12px;
+  line-height: 17px;
+}
+
+.public-form-shell .field-base {
+  min-height: 44px;
+  border-color: var(--field-border);
+  border-radius: 10px;
+  background: color-mix(in oklab, var(--field-surface) 88%, transparent);
+  box-shadow: none;
+  padding: 10px 12px;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+}
+
+.public-form-shell textarea.field-base {
+  font-weight: 500;
+  line-height: 24px;
+}
+
+.public-form-shell .field-base:hover,
+.public-form-shell .field-base[data-filled="true"],
+.public-form-shell .field-base[data-filled="true"]:hover {
+  border-color: var(--field-border-hover);
+  background: var(--field-surface-hover);
+  box-shadow: none;
+}
+
+.public-form-shell .field-base:focus,
+.public-form-shell .field-base:focus-visible,
+.public-form-shell .field-base:active,
+.public-form-shell .custom-select-trigger[aria-expanded="true"] {
+  border-color: color-mix(in oklab, var(--accent) 68%, var(--field-border-focus));
+  background: var(--field-surface-hover);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 18%, transparent);
+}
+
+.public-form-shell .field-base[aria-invalid="true"],
+.public-form-shell .field-base[data-state="error"] {
+  border-color: var(--field-border-error);
+  background: var(--field-surface-hover);
+  box-shadow: none;
+}
+
+.public-form-shell .field-base[data-state="success"] {
+  border-color: var(--field-border-success);
+  background: var(--field-surface-hover);
+  box-shadow: none;
+}
+
+.public-form-shell .contact-channel-fieldset,
+.public-form-shell .form-choice-group {
+  gap: 12px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  padding: 0;
+}
+
+.public-form-shell .contact-channel-fieldset > .field-label {
+  grid-column: 1 / -1;
+}
+
+.public-form-shell .contact-channel-fieldset .field-hint,
+.public-form-shell .form-choice-group .field-hint {
+  max-width: 42rem;
+}
+
+.public-form-shell .contact-channel-fieldset .field-hint {
+  grid-column: 1 / -1;
+}
+
+.public-form-shell .consent-field {
+  border: 0;
+  border-top: 1px solid color-mix(in oklab, var(--line) 64%, transparent);
+  border-radius: 0;
+  background: transparent;
+  padding: 20px 0 0;
+}
+
+:root[data-theme="dark"] .public-form-shell .consent-field,
+:root[data-theme="dark"] .public-form-shell .contact-channel-fieldset,
+:root[data-theme="dark"] .public-form-shell .form-choice-group {
+  background: transparent;
+}
+
+.public-form-shell-footer {
+  border-top-color: color-mix(in oklab, var(--line) 64%, transparent);
+}
+
+.form-inline-note {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.public-submission-feedback.inline-alert {
+  display: grid;
+  min-height: 96px;
+  max-width: 340px;
+  align-content: start;
+  gap: 6px;
+  border-color: var(--border-default);
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+
+.public-submission-feedback-title {
+  display: block;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 22px;
+}
+
+.public-submission-feedback-body {
+  display: block;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 20px;
+}
+
+.public-submission-feedback.inline-alert[data-tone="success"] {
+  border-color: var(--border-default);
+  background: #ddf0e3;
+}
+
+.public-submission-feedback.inline-alert[data-tone="error"],
+.public-submission-feedback.inline-alert[data-tone="destructive"] {
+  border-color: var(--border-default);
+  background: #f8dad5;
+}
+
+.public-filter-panel.inset-panel,
+.public-filter-search-panel.inset-panel,
+.public-filter-toolbar-panel.inset-panel {
+  border-color: var(--border-default);
+  border-radius: 8px;
+  background: var(--surface);
+  box-shadow: none;
+}
+
+.public-filter-panel.inset-panel {
+  padding: 24px;
+}
+
+.public-filter-sidebar-panel.inset-panel {
+  padding: 18px;
+}
+
+.public-filter-search-panel.inset-panel,
+.public-filter-toolbar-panel.inset-panel {
+  padding: 18px;
+}
+
+.public-filter-title {
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 24px;
+  letter-spacing: 0;
+}
+
+.public-filter-field {
+  display: grid;
+  gap: 8px;
+}
+
+.public-filter-label {
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 14px;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.public-filter-control.field-base,
+.public-filter-control.custom-select-trigger {
+  min-height: 44px;
+  border-color: var(--border-default);
+  border-radius: 6px;
+  background: var(--surface);
+  box-shadow: none;
+  padding: 10px 12px;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 16px;
+}
+
+.public-filter-control.field-base:hover,
+.public-filter-control.field-base[data-filled="true"],
+.public-filter-control.field-base[data-filled="true"]:hover,
+.public-filter-control.field-base:focus,
+.public-filter-control.field-base:focus-visible,
+.public-filter-control.field-base:active,
+.public-filter-control.custom-select-trigger[aria-expanded="true"] {
+  border-color: var(--field-border-focus);
+  background: var(--surface);
+  box-shadow: none;
+}
+
+.search-input .public-filter-control.field-base {
+  padding-left: 40px;
+}
+
+.public-filter-chip {
+  border-radius: 6px;
+  letter-spacing: 0;
+  min-height: 44px;
+}
+
+.public-catalog-title {
+  font-size: clamp(2.35rem, 3.3vw, 3.25rem);
+  line-height: 0.96;
+  overflow-wrap: normal;
+  word-break: normal;
+}
+
+.render-deferred-section {
+  contain: layout style paint;
+}
+
+@supports (content-visibility: auto) {
+  .render-deferred-section {
+    content-visibility: auto;
+    contain-intrinsic-size: auto none auto 680px;
+  }
+}
+
+@media (pointer: coarse) {
+  .field-base,
+  .custom-select-trigger {
+    min-height: 48px !important;
+    font-size: 1rem !important;
+    line-height: 1.4 !important;
+  }
+
+  .public-filter-control.field-base,
+  .public-filter-control.custom-select-trigger {
+    min-height: 48px !important;
+    font-size: 1rem !important;
+    line-height: 1.35 !important;
+  }
+
+  .public-filter-chip {
+    min-height: 48px !important;
+  }
+}
+
+.public-catalog-sidebar {
+  align-self: start;
+}
+
+.public-catalog-list-panel.inset-panel {
+  border-radius: 8px;
+  box-shadow: none;
+}
+
+.public-catalog-toolbar {
+  border-bottom: 1px solid var(--line);
+  background: color-mix(in oklab, var(--surface-muted) 46%, var(--surface-card));
+  padding: 16px;
+}
+
+.public-catalog-list-rows {
+  padding: 16px;
+}
+
+.public-catalog-pagination {
+  border-top: 1px solid var(--line);
+  padding: 14px 16px 16px;
+}
+
+@media (max-width: 767px) {
+  .public-filter-sidebar-panel.inset-panel {
+    padding: 16px;
+  }
+
+  .public-catalog-list-rows {
+    padding: 12px;
+  }
+}
+
+.public-missing-state.inset-panel {
+  border-color: var(--border-default);
+  border-radius: 8px;
+  background: var(--surface);
+  box-shadow: none;
+}
+
+.public-missing-state h3 {
+  font-size: 20px;
+  line-height: 28px;
+}
+
+.public-missing-state-secondary.inset-panel {
+  background: color-mix(in oklab, var(--surface-muted) 58%, var(--surface));
+}

@@ -4,7 +4,9 @@ import { redirect } from 'next/navigation';
 import { ApplicationType, ContentStatus } from '@prisma/client';
 import { z } from 'zod';
 import { deleteUploadedFileIfUnused } from '@/lib/admin/content-utils';
+import { buildApplicationPayload } from '@/lib/applications/application-payloads';
 import { createPublicApplication } from '@/lib/applications/create-public-application';
+import { submitPublicApplicationAction } from '@/lib/applications/submit-public-application-action';
 import {
   assertActiveCity,
   baseContactSchema,
@@ -24,6 +26,7 @@ import {
   hasHoneypotValue
 } from '@/lib/applications/public-submission-guards';
 import { prisma } from '@/lib/db/prisma';
+import { assertSameOriginServerAction } from '@/lib/security/server-action-origin';
 import { vacancyPositionValues } from '@/lib/vacancies/positions';
 
 const VACANCIES_PATH = '/vacancies';
@@ -75,38 +78,36 @@ function redirectWithApplicationResult(
 }
 
 export async function submitVacancyPlacementApplication(formData: FormData) {
-  let result: { type: 'success' | 'error'; message: string };
+  await submitPublicApplicationAction({
+    actionName: 'public:vacancy-submission',
+    applicationType: ApplicationType.VACANCY_SUBMISSION,
+    formData,
+    successMessage: 'Заявку на размещение вакансии получили.',
+    redirectWithResult: redirectWithApplicationResult,
+    parse: async (data) => {
+      const parsed = vacancySubmissionSchema.parse({
+        companyName: getString(data, 'companyName'),
+        contactName: getString(data, 'contactName'),
+        email: optionalString(getString(data, 'email')),
+        phone: optionalString(getString(data, 'phone')),
+        telegram: optionalString(getString(data, 'telegram')),
+        cityId: optionalString(getString(data, 'cityId')),
+        position: getString(data, 'position'),
+        employmentType: optionalString(getString(data, 'employmentType')),
+        salaryLabel: optionalString(getString(data, 'salaryLabel')),
+        experienceLabel: optionalString(getString(data, 'experienceLabel')),
+        shortDescription: getString(data, 'shortDescription'),
+        details: getString(data, 'details'),
+        consent: getString(data, 'consent'),
+        utmSource: optionalString(getString(data, 'utmSource')),
+        utmMedium: optionalString(getString(data, 'utmMedium')),
+        utmCampaign: optionalString(getString(data, 'utmCampaign'))
+      });
+      const city = await assertActiveCity(parsed.cityId);
 
-  try {
-    assertPublicApplicationFormsEnabled();
-
-    if (hasHoneypotValue(getString(formData, 'website'))) {
-      result = { type: 'success', message: 'Заявку на размещение вакансии получили.' };
-      redirectWithApplicationResult(result);
-    }
-
-    const parsed = vacancySubmissionSchema.parse({
-      companyName: getString(formData, 'companyName'),
-      contactName: getString(formData, 'contactName'),
-      email: optionalString(getString(formData, 'email')),
-      phone: optionalString(getString(formData, 'phone')),
-      telegram: optionalString(getString(formData, 'telegram')),
-      cityId: optionalString(getString(formData, 'cityId')),
-      position: getString(formData, 'position'),
-      employmentType: optionalString(getString(formData, 'employmentType')),
-      salaryLabel: optionalString(getString(formData, 'salaryLabel')),
-      experienceLabel: optionalString(getString(formData, 'experienceLabel')),
-      shortDescription: getString(formData, 'shortDescription'),
-      details: getString(formData, 'details'),
-      consent: getString(formData, 'consent'),
-      utmSource: optionalString(getString(formData, 'utmSource')),
-      utmMedium: optionalString(getString(formData, 'utmMedium')),
-      utmCampaign: optionalString(getString(formData, 'utmCampaign'))
-    });
-
-    const city = await assertActiveCity(parsed.cityId);
-    await assertPublicApplicationSubmissionAllowed(ApplicationType.VACANCY_SUBMISSION);
-    await createPublicApplication({
+      return { parsed, city };
+    },
+    buildApplication: ({ parsed, city }) => ({
       type: ApplicationType.VACANCY_SUBMISSION,
       subject: `${parsed.companyName}: ${parsed.position}`,
       message: parsed.details,
@@ -122,22 +123,16 @@ export async function submitVacancyPlacementApplication(formData: FormData) {
         medium: nullableString(parsed.utmMedium),
         campaign: nullableString(parsed.utmCampaign)
       },
-      payload: {
+      payload: buildApplicationPayload(ApplicationType.VACANCY_SUBMISSION, {
         companyName: parsed.companyName,
         position: parsed.position,
         employmentType: parsed.employmentType ?? null,
         salaryLabel: parsed.salaryLabel ?? null,
         experienceLabel: parsed.experienceLabel ?? null,
         shortDescription: parsed.shortDescription
-      }
-    });
-
-    result = { type: 'success', message: 'Заявку на размещение вакансии получили.' };
-  } catch (error) {
-    result = { type: 'error', message: resolvePublicApplicationActionError('public:vacancy-submission', error) };
-  }
-
-  redirectWithApplicationResult(result);
+      })
+    })
+  });
 }
 
 export async function submitVacancyResponseApplication(formData: FormData) {
@@ -146,6 +141,7 @@ export async function submitVacancyResponseApplication(formData: FormData) {
   const returnPath = getVacancyReturnPath(formData);
 
   try {
+    await assertSameOriginServerAction();
     assertPublicApplicationFormsEnabled();
 
     if (hasHoneypotValue(getString(formData, 'website'))) {
@@ -203,11 +199,11 @@ export async function submitVacancyResponseApplication(formData: FormData) {
         medium: nullableString(parsed.utmMedium),
         campaign: nullableString(parsed.utmCampaign)
       },
-      payload: {
+      payload: buildApplicationPayload(ApplicationType.VACANCY_RESPONSE, {
         roleSummary: parsed.roleSummary,
         resumeUrl: parsed.resumeUrl ?? null,
         employerCompanyName: vacancy.companyName
-      }
+      })
     });
 
     result = { type: 'success', message: 'Отклик отправлен.' };

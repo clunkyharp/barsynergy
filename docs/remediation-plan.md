@@ -4,6 +4,54 @@
 
 This document turns the code, security, performance, UX/UI and documentation audits into one implementation plan.
 
+## Active Stabilization Queue - 2026-05-27
+
+This section is the active remediation queue before Phase 5. The historical 2026-04-26 remediation plan below is preserved for audit trail only.
+
+Mode: `IMPLEMENTATION` on `feature/stabilization-remediation`, after a separate checkpoint of the previous dirty `dev` tree.
+
+### Completed In Current Batch
+
+- Checkpointed the previous dirty `dev` batch before starting stabilization.
+- Added typed `Application.payload` Zod schemas and parse/build helpers in `src/lib/applications/application-payloads.ts`.
+- Replaced manual payload reads/writes in public form actions, admin publication/drafts, business access and cabinet/admin application views.
+- Added `assertSameOriginServerAction()` and applied it to public, auth, admin and business mutation actions.
+- Added a source test that tracks high-risk server action files and requires same-origin protection.
+- Added `ApplicationNotification` outbox schema, migration, queue processor and `npm run notifications:retry`.
+- Public application creation now stores the application and queued notification attempts in one transaction, then dispatches an immediate attempt after commit.
+- Admin application detail now shows notification attempts and status.
+- Split admin application actions into status, notes, publication and business-access action files, with `actions.ts` kept as the import facade.
+- Moved admin application transaction/business rules into `src/lib/admin/applications/*`.
+- Added `submitPublicApplicationAction()` and migrated supplier, partner, event, education, business, consulting, contact and vacancy-placement submissions to the common public-form flow. Vacancy response remains specialized because it owns private resume upload and cleanup.
+- Mechanically split `src/app/globals.css` into `src/app/styles/{tokens,base,forms,calculator,ui-primitives,public,admin}.css` and kept `globals.css` as the import facade.
+- Pinned direct dependencies in `package.json` and the lockfile root to the currently resolved exact versions without updating to latest.
+- Changed CSP `frame-ancestors` from `'self'` to `'none'`.
+- Updated the scheduler runbook with the notification retry job.
+
+### Still Open
+
+- Extract the cost calculator into hook, calculation utilities and smaller UI parts without changing formulas or visible values.
+- Split `src/lib/public/content.ts` by domain while preserving current exports.
+- Add browser/axe Playwright scenarios specifically for custom Select and Dropdown keyboard/form flows.
+- Add a shared admin content lifecycle helper for status update and draft delete across content entities.
+- Confirm production scheduler setup before launch; code-level session cleanup remains unchanged by design.
+- Decide separately whether a mobile admin read-only/actions layer is a product requirement.
+
+### Current Validation Status
+
+- `npm run lint`: passed.
+- `npm test`: passed, 119/119.
+- `./node_modules/.bin/prisma validate`: passed.
+- `git diff --check`: passed.
+- `npm run typecheck`: completed with the existing local Next/SWC code-signature warning during `next typegen`; direct `tsc --noEmit` passed earlier in this batch.
+- `npm audit signatures`: passed.
+- `npm audit --omit=dev`: passed.
+- `npm audit --audit-level=low`: reports one existing moderate dev-only `brace-expansion` advisory under `typescript-eslint`; no automatic fix was applied because this dependency batch only pins current lockfile versions.
+- `npm ls --depth=0`: completed; it still reports the pre-existing extraneous `@emnapi/runtime` in local `node_modules`.
+- `npm run build`: blocked by the local Next/SWC darwin-arm64 code-signature Team ID mismatch after successful `prisma generate`.
+- Browser QA is still pending for this stabilization branch.
+- Commit/merge still requires a clean build in an environment without the SWC code-signature blocker and fresh browser QA.
+
 ## Current Use
 
 This is a historical remediation plan from the 2026-04-26 audit cycle. Keep it for audit trail and context, but do not use the open/closed labels below as the current launch queue.

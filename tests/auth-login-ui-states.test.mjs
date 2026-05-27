@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import process from 'node:process';
 import test from 'node:test';
+import { readGlobalStyles } from './helpers/global-styles.mjs';
 
 const repoRoot = process.cwd();
 
@@ -24,7 +25,7 @@ test('public login keeps role intent visual states without exposing admin roles'
 
 test('public login has mobile, loading, error and request-sent state hooks', () => {
   const pageSource = readProjectFile('src/app/auth/login/page.tsx');
-  const cssSource = readProjectFile('src/app/globals.css');
+  const cssSource = readGlobalStyles();
 
   assert.match(pageSource, /auth-login-screen/);
   assert.match(pageSource, /w-\[176px\] md:w-\[198px\]/);

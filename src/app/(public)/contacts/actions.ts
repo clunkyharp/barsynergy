@@ -3,7 +3,7 @@
 import { redirect } from 'next/navigation';
 import { ApplicationType } from '@prisma/client';
 import { z } from 'zod';
-import { createPublicApplication } from '@/lib/applications/create-public-application';
+import { buildApplicationPayload } from '@/lib/applications/application-payloads';
 import {
   assertActiveCity,
   baseContactSchema,
@@ -12,14 +12,9 @@ import {
   nullableString,
   optionalString,
   PERSONAL_DATA_CONSENT_TEXT,
-  resolvePublicApplicationActionError,
   utmSchema
 } from '@/lib/applications/public-form-helpers';
-import {
-  assertPublicApplicationFormsEnabled,
-  assertPublicApplicationSubmissionAllowed,
-  hasHoneypotValue
-} from '@/lib/applications/public-submission-guards';
+import { submitPublicApplicationAction } from '@/lib/applications/submit-public-application-action';
 
 const CONTACTS_PATH = '/contacts';
 const contactTopicValues = [
@@ -107,49 +102,47 @@ function redirectWithContactsResult(result: { type: 'success' | 'error'; message
 }
 
 export async function submitContactMessage(formData: FormData) {
-  let result: { type: 'success' | 'error'; message: string };
+  await submitPublicApplicationAction({
+    actionName: 'public:contact-message',
+    applicationType: ApplicationType.CONTACT_MESSAGE,
+    formData,
+    successMessage: 'Сообщение получено. Мы свяжемся с вами после проверки обращения.',
+    redirectWithResult: redirectWithContactsResult,
+    parse: async (data) => {
+      const parsed = contactMessageSchema.parse({
+        name: getString(data, 'name'),
+        email: optionalString(getString(data, 'email')),
+        phone: optionalString(getString(data, 'phone')),
+        telegram: optionalString(getString(data, 'telegram')),
+        cityId: optionalString(getString(data, 'cityId')),
+        topic: getString(data, 'topic'),
+        message: getString(data, 'message'),
+        companyName: optionalString(getString(data, 'companyName')),
+        teamSize: optionalString(getString(data, 'teamSize')),
+        topicTitle: optionalString(getString(data, 'topicTitle')),
+        position: optionalString(getString(data, 'position')),
+        employmentType: optionalString(getString(data, 'employmentType')),
+        salaryLabel: optionalString(getString(data, 'salaryLabel')),
+        supplierCategory: optionalString(getString(data, 'supplierCategory')),
+        serviceArea: optionalString(getString(data, 'serviceArea')),
+        websiteUrl: optionalString(getString(data, 'websiteUrl')),
+        eventTitle: optionalString(getString(data, 'eventTitle')),
+        eventDate: optionalString(getString(data, 'eventDate')),
+        venueName: optionalString(getString(data, 'venueName')),
+        formatLabel: optionalString(getString(data, 'formatLabel')),
+        registrationUrl: optionalString(getString(data, 'registrationUrl')),
+        partnerType: optionalString(getString(data, 'partnerType')),
+        consent: getString(data, 'consent'),
+        utmSource: optionalString(getString(data, 'utmSource')),
+        utmMedium: optionalString(getString(data, 'utmMedium')),
+        utmCampaign: optionalString(getString(data, 'utmCampaign'))
+      });
+      const city = await assertActiveCity(parsed.cityId);
+      const topicLabel = contactTopicLabels[parsed.topic];
 
-  try {
-    assertPublicApplicationFormsEnabled();
-
-    if (hasHoneypotValue(getString(formData, 'website'))) {
-      result = { type: 'success', message: 'Сообщение получено. Мы свяжемся с вами после проверки обращения.' };
-      redirectWithContactsResult(result);
-    }
-
-    const parsed = contactMessageSchema.parse({
-      name: getString(formData, 'name'),
-      email: optionalString(getString(formData, 'email')),
-      phone: optionalString(getString(formData, 'phone')),
-      telegram: optionalString(getString(formData, 'telegram')),
-      cityId: optionalString(getString(formData, 'cityId')),
-      topic: getString(formData, 'topic'),
-      message: getString(formData, 'message'),
-      companyName: optionalString(getString(formData, 'companyName')),
-      teamSize: optionalString(getString(formData, 'teamSize')),
-      topicTitle: optionalString(getString(formData, 'topicTitle')),
-      position: optionalString(getString(formData, 'position')),
-      employmentType: optionalString(getString(formData, 'employmentType')),
-      salaryLabel: optionalString(getString(formData, 'salaryLabel')),
-      supplierCategory: optionalString(getString(formData, 'supplierCategory')),
-      serviceArea: optionalString(getString(formData, 'serviceArea')),
-      websiteUrl: optionalString(getString(formData, 'websiteUrl')),
-      eventTitle: optionalString(getString(formData, 'eventTitle')),
-      eventDate: optionalString(getString(formData, 'eventDate')),
-      venueName: optionalString(getString(formData, 'venueName')),
-      formatLabel: optionalString(getString(formData, 'formatLabel')),
-      registrationUrl: optionalString(getString(formData, 'registrationUrl')),
-      partnerType: optionalString(getString(formData, 'partnerType')),
-      consent: getString(formData, 'consent'),
-      utmSource: optionalString(getString(formData, 'utmSource')),
-      utmMedium: optionalString(getString(formData, 'utmMedium')),
-      utmCampaign: optionalString(getString(formData, 'utmCampaign'))
-    });
-    const topicLabel = contactTopicLabels[parsed.topic];
-
-    const city = await assertActiveCity(parsed.cityId);
-    await assertPublicApplicationSubmissionAllowed(ApplicationType.CONTACT_MESSAGE);
-    await createPublicApplication({
+      return { parsed, city, topicLabel };
+    },
+    buildApplication: ({ parsed, city, topicLabel }) => ({
       type: ApplicationType.CONTACT_MESSAGE,
       subject: `Контакт: ${topicLabel}`,
       message: parsed.message,
@@ -165,7 +158,7 @@ export async function submitContactMessage(formData: FormData) {
         medium: nullableString(parsed.utmMedium),
         campaign: nullableString(parsed.utmCampaign)
       },
-      payload: {
+      payload: buildApplicationPayload(ApplicationType.CONTACT_MESSAGE, {
         topic: parsed.topic,
         topicLabel,
         companyName: parsed.companyName ?? null,
@@ -183,13 +176,7 @@ export async function submitContactMessage(formData: FormData) {
         formatLabel: parsed.formatLabel ?? null,
         registrationUrl: parsed.registrationUrl ?? null,
         partnerType: parsed.partnerType ?? null
-      }
-    });
-
-    result = { type: 'success', message: 'Сообщение получено. Мы свяжемся с вами после проверки обращения.' };
-  } catch (error) {
-    result = { type: 'error', message: resolvePublicApplicationActionError('public:contact-message', error) };
-  }
-
-  redirectWithContactsResult(result);
+      })
+    })
+  });
 }

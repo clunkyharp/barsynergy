@@ -21,6 +21,7 @@ import {
 } from '@/lib/admin/content-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
 import { prisma } from '@/lib/db/prisma';
+import { assertSameOriginServerAction } from '@/lib/security/server-action-origin';
 import { normalizeExternalUrlInput } from '@/lib/validation/external-url';
 
 const ADMIN_PARTNERS_PATH = '/admin/partners';
@@ -54,6 +55,7 @@ export async function createPartner(formData: FormData) {
   let uploadedCoverImageId: string | null = null;
 
   try {
+    await assertSameOriginServerAction();
     const user = await requireAdminSectionAccess('partners');
     const parsed = partnerFormSchema.parse({
       title: getString(formData, 'title'),
@@ -137,6 +139,7 @@ export async function updatePartner(formData: FormData) {
   let previousCoverImageId: string | null = null;
 
   try {
+    await assertSameOriginServerAction();
     const user = await requireAdminSectionAccess('partners');
     const parsed = partnerFormSchema
       .extend({
@@ -234,6 +237,7 @@ export async function updatePartnerStatus(formData: FormData) {
   let result: { type: 'success' | 'error'; message: string };
 
   try {
+    await assertSameOriginServerAction();
     const user = await requireAdminSectionAccess('partners');
     const parsed = statusFormSchema.parse({
       partnerId: getString(formData, 'partnerId'),
@@ -270,6 +274,7 @@ export async function deletePartnerDraft(formData: FormData) {
   let result: { type: 'success' | 'error'; message: string };
 
   try {
+    await assertSameOriginServerAction();
     await requireAdminSectionAccess('partners');
     const parsed = deleteFormSchema.parse({
       partnerId: getString(formData, 'partnerId')

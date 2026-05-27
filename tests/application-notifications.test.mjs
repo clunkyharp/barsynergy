@@ -7,6 +7,7 @@ const {
   hasSmtpNotificationConfig,
   hasTelegramAdminNotificationConfig
 } = await import('../src/lib/notifications/application-notification-format.ts');
+const { buildApplicationNotificationJobs } = await import('../src/lib/notifications/application-notification-outbox.ts');
 
 test('notification config helpers detect configured transports', () => {
   assert.equal(
@@ -106,4 +107,39 @@ test('dispatchApplicationCreatedNotification does not block caller and logs unex
   assert.equal(loggedErrors.length, 1);
   assert.equal(loggedErrors[0][0], 'Application notification dispatch failed.');
   assert.match(String(loggedErrors[0][1]), /boom/);
+});
+
+test('application notification outbox creates only configured channel jobs', () => {
+  const input = {
+    applicationId: 'app-3',
+    applicationTypeLabel: 'Заявка',
+    subject: 'Новая заявка',
+    userEmail: 'user@example.test'
+  };
+
+  const jobs = buildApplicationNotificationJobs(input, {
+    SMTP_HOST: 'smtp.example.test',
+    SMTP_PORT: 587,
+    SMTP_FROM: 'hello@example.test',
+    ADMIN_NOTIFICATION_EMAIL: 'admin@example.test',
+    TELEGRAM_BOT_TOKEN: 'token',
+    TELEGRAM_ADMIN_CHAT_ID: 'chat'
+  });
+
+  assert.deepEqual(
+    jobs.map((job) => job.channel).sort(),
+    ['ADMIN_EMAIL', 'ADMIN_TELEGRAM', 'USER_EMAIL'].sort()
+  );
+
+  assert.deepEqual(
+    buildApplicationNotificationJobs({ ...input, userEmail: undefined }, {
+      SMTP_HOST: 'smtp.example.test',
+      SMTP_PORT: 587,
+      SMTP_FROM: 'hello@example.test',
+      ADMIN_NOTIFICATION_EMAIL: undefined,
+      TELEGRAM_BOT_TOKEN: undefined,
+      TELEGRAM_ADMIN_CHAT_ID: undefined
+    }),
+    []
+  );
 });

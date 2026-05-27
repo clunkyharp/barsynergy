@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import process from 'node:process';
 import test from 'node:test';
+import { readGlobalStyles } from './helpers/global-styles.mjs';
 
 const repoRoot = process.cwd();
 
@@ -30,7 +31,7 @@ test('homepage featured card keeps metadata only in the top badge row', () => {
 });
 
 test('homepage featured card CSS has scoped density and mobile wrapping rules', () => {
-  const css = readProjectFile('src/app/globals.css');
+  const css = readGlobalStyles();
 
   assert.match(css, /\.featured-now-card/);
   assert.match(css, /\.featured-now-content/);
@@ -66,12 +67,12 @@ test('homepage hero explains the product without top action buttons', () => {
   assert.doesNotMatch(heroSource, /Здесь можно найти/);
   assert.doesNotMatch(heroSource, /Специалисты записываются на программы и события/);
 
-  assert.doesNotMatch(readProjectFile('src/app/globals.css'), /\.home-hero-copy/);
+  assert.doesNotMatch(readGlobalStyles(), /\.home-hero-copy/);
 });
 
 test('homepage hero removes the side visual panel', () => {
   const source = readProjectFile('src/components/public/homepage-client.tsx');
-  const css = readProjectFile('src/app/globals.css');
+  const css = readGlobalStyles();
   const heroStart = source.indexOf('function HomeHeroRouter');
   const heroEnd = source.indexOf('function HomeRoleRouter');
   const heroSource = source.slice(heroStart, heroEnd);
@@ -91,7 +92,7 @@ test('homepage hero removes the side visual panel', () => {
 
 test('homepage role router uses editorial rows without card-grid tiles', () => {
   const source = readProjectFile('src/components/public/homepage-client.tsx');
-  const css = readProjectFile('src/app/globals.css');
+  const css = readGlobalStyles();
   const sectionStart = source.indexOf('function HomeRoleRouter');
   const sectionEnd = source.indexOf('const businessDigitalServices');
   const sectionSource = source.slice(sectionStart, sectionEnd);
@@ -149,7 +150,7 @@ test('homepage calculator teaser uses existing steps and a compact CTA rail', ()
 });
 
 test('homepage calculator teaser CSS keeps the utility block dense and responsive', () => {
-  const css = readProjectFile('src/app/globals.css');
+  const css = readGlobalStyles();
 
   assert.match(css, /\.home-tool-teaser/);
   assert.match(css, /\.home-tool-teaser-grid/);
@@ -184,7 +185,7 @@ test('homepage digital solutions fills the left column with a static process blo
 });
 
 test('homepage digital solutions CSS exposes scoped responsive process styling', () => {
-  const css = readProjectFile('src/app/globals.css');
+  const css = readGlobalStyles();
 
   assert.match(css, /\.home-digital-intro/);
   assert.match(css, /\.home-digital-process/);
@@ -209,7 +210,7 @@ test('homepage help CTA has a direct contact heading', () => {
 
 test('homepage help FAQ keeps accordion expansion inside a stable column', () => {
   const source = readProjectFile('src/components/public/homepage-client.tsx');
-  const css = readProjectFile('src/app/globals.css');
+  const css = readGlobalStyles();
   const sectionStart = source.indexOf('function HomeCtaFaqSection');
   const sectionEnd = source.indexOf('export function HomepageClient');
   const sectionSource = source.slice(sectionStart, sectionEnd);

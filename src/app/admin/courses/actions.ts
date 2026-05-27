@@ -21,6 +21,7 @@ import {
 } from '@/lib/admin/content-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
 import { prisma } from '@/lib/db/prisma';
+import { assertSameOriginServerAction } from '@/lib/security/server-action-origin';
 
 const ADMIN_COURSES_PATH = '/admin/courses';
 
@@ -55,6 +56,7 @@ export async function createCourse(formData: FormData) {
   let uploadedCoverImageId: string | null = null;
 
   try {
+    await assertSameOriginServerAction();
     const user = await requireAdminSectionAccess('courses');
     const parsed = courseFormSchema.parse({
       title: getString(formData, 'title'),
@@ -142,6 +144,7 @@ export async function updateCourse(formData: FormData) {
   let previousCoverImageId: string | null = null;
 
   try {
+    await assertSameOriginServerAction();
     const user = await requireAdminSectionAccess('courses');
     const parsed = courseFormSchema
       .extend({
@@ -243,6 +246,7 @@ export async function updateCourseStatus(formData: FormData) {
   let result: { type: 'success' | 'error'; message: string };
 
   try {
+    await assertSameOriginServerAction();
     const user = await requireAdminSectionAccess('courses');
     const parsed = statusFormSchema.parse({
       courseId: getString(formData, 'courseId'),
@@ -279,6 +283,7 @@ export async function deleteCourseDraft(formData: FormData) {
   let result: { type: 'success' | 'error'; message: string };
 
   try {
+    await assertSameOriginServerAction();
     await requireAdminSectionAccess('courses');
     const parsed = deleteFormSchema.parse({
       courseId: getString(formData, 'courseId')

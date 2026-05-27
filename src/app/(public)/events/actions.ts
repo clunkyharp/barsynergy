@@ -3,7 +3,7 @@
 import { redirect } from 'next/navigation';
 import { ApplicationType } from '@prisma/client';
 import { z } from 'zod';
-import { createPublicApplication } from '@/lib/applications/create-public-application';
+import { buildApplicationPayload } from '@/lib/applications/application-payloads';
 import {
   assertActiveCity,
   baseContactSchema,
@@ -12,14 +12,9 @@ import {
   nullableString,
   optionalString,
   PERSONAL_DATA_CONSENT_TEXT,
-  resolvePublicApplicationActionError,
   utmSchema
 } from '@/lib/applications/public-form-helpers';
-import {
-  assertPublicApplicationFormsEnabled,
-  assertPublicApplicationSubmissionAllowed,
-  hasHoneypotValue
-} from '@/lib/applications/public-submission-guards';
+import { submitPublicApplicationAction } from '@/lib/applications/submit-public-application-action';
 
 const EVENTS_PATH = '/events';
 
@@ -39,33 +34,31 @@ function redirectWithEventsResult(result: { type: 'success' | 'error'; message: 
 }
 
 export async function submitEventApplication(formData: FormData) {
-  let result: { type: 'success' | 'error'; message: string };
+  await submitPublicApplicationAction({
+    actionName: 'public:event-application',
+    applicationType: ApplicationType.EVENT_APPLICATION,
+    formData,
+    successMessage: 'Заявку на событие получили.',
+    redirectWithResult: redirectWithEventsResult,
+    parse: async (data) => {
+      const parsed = eventApplicationSchema.parse({
+        name: getString(data, 'name'),
+        email: optionalString(getString(data, 'email')),
+        phone: optionalString(getString(data, 'phone')),
+        telegram: optionalString(getString(data, 'telegram')),
+        cityId: optionalString(getString(data, 'cityId')),
+        eventTitle: getString(data, 'eventTitle'),
+        message: getString(data, 'message'),
+        consent: getString(data, 'consent'),
+        utmSource: optionalString(getString(data, 'utmSource')),
+        utmMedium: optionalString(getString(data, 'utmMedium')),
+        utmCampaign: optionalString(getString(data, 'utmCampaign'))
+      });
+      const city = await assertActiveCity(parsed.cityId);
 
-  try {
-    assertPublicApplicationFormsEnabled();
-
-    if (hasHoneypotValue(getString(formData, 'website'))) {
-      result = { type: 'success', message: 'Заявку на событие получили.' };
-      redirectWithEventsResult(result);
-    }
-
-    const parsed = eventApplicationSchema.parse({
-      name: getString(formData, 'name'),
-      email: optionalString(getString(formData, 'email')),
-      phone: optionalString(getString(formData, 'phone')),
-      telegram: optionalString(getString(formData, 'telegram')),
-      cityId: optionalString(getString(formData, 'cityId')),
-      eventTitle: getString(formData, 'eventTitle'),
-      message: getString(formData, 'message'),
-      consent: getString(formData, 'consent'),
-      utmSource: optionalString(getString(formData, 'utmSource')),
-      utmMedium: optionalString(getString(formData, 'utmMedium')),
-      utmCampaign: optionalString(getString(formData, 'utmCampaign'))
-    });
-
-    const city = await assertActiveCity(parsed.cityId);
-    await assertPublicApplicationSubmissionAllowed(ApplicationType.EVENT_APPLICATION);
-    await createPublicApplication({
+      return { parsed, city };
+    },
+    buildApplication: ({ parsed, city }) => ({
       type: ApplicationType.EVENT_APPLICATION,
       subject: `Событие: ${parsed.eventTitle}`,
       message: parsed.message,
@@ -81,15 +74,9 @@ export async function submitEventApplication(formData: FormData) {
         medium: nullableString(parsed.utmMedium),
         campaign: nullableString(parsed.utmCampaign)
       },
-      payload: {
+      payload: buildApplicationPayload(ApplicationType.EVENT_APPLICATION, {
         eventTitle: parsed.eventTitle
-      }
-    });
-
-    result = { type: 'success', message: 'Заявку на событие получили.' };
-  } catch (error) {
-    result = { type: 'error', message: resolvePublicApplicationActionError('public:event-application', error) };
-  }
-
-  redirectWithEventsResult(result);
+      })
+    })
+  });
 }

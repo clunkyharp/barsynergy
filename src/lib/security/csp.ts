@@ -44,7 +44,7 @@ export function buildContentSecurityPolicy({
     [`default-src`, `'self'`],
     [`base-uri`, `'self'`],
     [`form-action`, `'self'`],
-    [`frame-ancestors`, `'self'`],
+    [`frame-ancestors`, `'none'`],
     [`object-src`, `'none'`],
     [`script-src`, ...scriptSources],
     [`style-src`, `'self'`, `'unsafe-inline'`],

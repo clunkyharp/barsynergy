@@ -3,7 +3,7 @@
 import { redirect } from 'next/navigation';
 import { ApplicationType } from '@prisma/client';
 import { z } from 'zod';
-import { createPublicApplication } from '@/lib/applications/create-public-application';
+import { buildApplicationPayload } from '@/lib/applications/application-payloads';
 import {
   assertActiveCity,
   baseContactSchema,
@@ -12,14 +12,9 @@ import {
   nullableString,
   optionalString,
   PERSONAL_DATA_CONSENT_TEXT,
-  resolvePublicApplicationActionError,
   utmSchema
 } from '@/lib/applications/public-form-helpers';
-import {
-  assertPublicApplicationFormsEnabled,
-  assertPublicApplicationSubmissionAllowed,
-  hasHoneypotValue
-} from '@/lib/applications/public-submission-guards';
+import { submitPublicApplicationAction } from '@/lib/applications/submit-public-application-action';
 
 const EDUCATION_PATH = '/education';
 
@@ -63,33 +58,31 @@ const certificateOrderSchema = baseContactSchema
   .refine((data) => data.email || data.phone || data.telegram, { message: 'contact is required' });
 
 export async function submitCourseApplication(formData: FormData) {
-  let result: { type: 'success' | 'error'; message: string };
+  await submitPublicApplicationAction({
+    actionName: 'public:course-application',
+    applicationType: ApplicationType.COURSE_APPLICATION,
+    formData,
+    successMessage: 'Заявку на программу получили.',
+    redirectWithResult: redirectWithEducationResult,
+    parse: async (data) => {
+      const parsed = courseApplicationSchema.parse({
+        name: getString(data, 'name'),
+        email: optionalString(getString(data, 'email')),
+        phone: optionalString(getString(data, 'phone')),
+        telegram: optionalString(getString(data, 'telegram')),
+        cityId: optionalString(getString(data, 'cityId')),
+        courseTitle: getString(data, 'courseTitle'),
+        goals: getString(data, 'goals'),
+        consent: getString(data, 'consent'),
+        utmSource: optionalString(getString(data, 'utmSource')),
+        utmMedium: optionalString(getString(data, 'utmMedium')),
+        utmCampaign: optionalString(getString(data, 'utmCampaign'))
+      });
+      const city = await assertActiveCity(parsed.cityId);
 
-  try {
-    assertPublicApplicationFormsEnabled();
-
-    if (hasHoneypotValue(getString(formData, 'website'))) {
-      result = { type: 'success', message: 'Заявку на программу получили.' };
-      redirectWithEducationResult(result);
-    }
-
-    const parsed = courseApplicationSchema.parse({
-      name: getString(formData, 'name'),
-      email: optionalString(getString(formData, 'email')),
-      phone: optionalString(getString(formData, 'phone')),
-      telegram: optionalString(getString(formData, 'telegram')),
-      cityId: optionalString(getString(formData, 'cityId')),
-      courseTitle: getString(formData, 'courseTitle'),
-      goals: getString(formData, 'goals'),
-      consent: getString(formData, 'consent'),
-      utmSource: optionalString(getString(formData, 'utmSource')),
-      utmMedium: optionalString(getString(formData, 'utmMedium')),
-      utmCampaign: optionalString(getString(formData, 'utmCampaign'))
-    });
-
-    const city = await assertActiveCity(parsed.cityId);
-    await assertPublicApplicationSubmissionAllowed(ApplicationType.COURSE_APPLICATION);
-    await createPublicApplication({
+      return { parsed, city };
+    },
+    buildApplication: ({ parsed, city }) => ({
       type: ApplicationType.COURSE_APPLICATION,
       subject: `Обучение: ${parsed.courseTitle}`,
       message: parsed.goals,
@@ -105,48 +98,40 @@ export async function submitCourseApplication(formData: FormData) {
         medium: nullableString(parsed.utmMedium),
         campaign: nullableString(parsed.utmCampaign)
       },
-      payload: {
+      payload: buildApplicationPayload(ApplicationType.COURSE_APPLICATION, {
         courseTitle: parsed.courseTitle
-      }
-    });
-
-    result = { type: 'success', message: 'Заявку на программу получили.' };
-  } catch (error) {
-    result = { type: 'error', message: resolvePublicApplicationActionError('public:course-application', error) };
-  }
-
-  redirectWithEducationResult(result);
+      })
+    })
+  });
 }
 
 export async function submitCorporateTrainingApplication(formData: FormData) {
-  let result: { type: 'success' | 'error'; message: string };
+  await submitPublicApplicationAction({
+    actionName: 'public:corporate-training',
+    applicationType: ApplicationType.CORPORATE_TRAINING_APPLICATION,
+    formData,
+    successMessage: 'Запрос на корпоративное обучение получили.',
+    redirectWithResult: redirectWithEducationResult,
+    parse: async (data) => {
+      const parsed = corporateTrainingSchema.parse({
+        companyName: getString(data, 'companyName'),
+        contactName: getString(data, 'contactName'),
+        email: optionalString(getString(data, 'email')),
+        phone: optionalString(getString(data, 'phone')),
+        telegram: optionalString(getString(data, 'telegram')),
+        cityId: optionalString(getString(data, 'cityId')),
+        teamSize: getString(data, 'teamSize'),
+        requestDetails: getString(data, 'requestDetails'),
+        consent: getString(data, 'consent'),
+        utmSource: optionalString(getString(data, 'utmSource')),
+        utmMedium: optionalString(getString(data, 'utmMedium')),
+        utmCampaign: optionalString(getString(data, 'utmCampaign'))
+      });
+      const city = await assertActiveCity(parsed.cityId);
 
-  try {
-    assertPublicApplicationFormsEnabled();
-
-    if (hasHoneypotValue(getString(formData, 'website'))) {
-      result = { type: 'success', message: 'Запрос на корпоративное обучение получили.' };
-      redirectWithEducationResult(result);
-    }
-
-    const parsed = corporateTrainingSchema.parse({
-      companyName: getString(formData, 'companyName'),
-      contactName: getString(formData, 'contactName'),
-      email: optionalString(getString(formData, 'email')),
-      phone: optionalString(getString(formData, 'phone')),
-      telegram: optionalString(getString(formData, 'telegram')),
-      cityId: optionalString(getString(formData, 'cityId')),
-      teamSize: getString(formData, 'teamSize'),
-      requestDetails: getString(formData, 'requestDetails'),
-      consent: getString(formData, 'consent'),
-      utmSource: optionalString(getString(formData, 'utmSource')),
-      utmMedium: optionalString(getString(formData, 'utmMedium')),
-      utmCampaign: optionalString(getString(formData, 'utmCampaign'))
-    });
-
-    const city = await assertActiveCity(parsed.cityId);
-    await assertPublicApplicationSubmissionAllowed(ApplicationType.CORPORATE_TRAINING_APPLICATION);
-    await createPublicApplication({
+      return { parsed, city };
+    },
+    buildApplication: ({ parsed, city }) => ({
       type: ApplicationType.CORPORATE_TRAINING_APPLICATION,
       subject: `Корпоративное обучение: ${parsed.companyName}`,
       message: parsed.requestDetails,
@@ -162,49 +147,41 @@ export async function submitCorporateTrainingApplication(formData: FormData) {
         medium: nullableString(parsed.utmMedium),
         campaign: nullableString(parsed.utmCampaign)
       },
-      payload: {
+      payload: buildApplicationPayload(ApplicationType.CORPORATE_TRAINING_APPLICATION, {
         companyName: parsed.companyName,
         teamSize: parsed.teamSize
-      }
-    });
-
-    result = { type: 'success', message: 'Запрос на корпоративное обучение получили.' };
-  } catch (error) {
-    result = { type: 'error', message: resolvePublicApplicationActionError('public:corporate-training', error) };
-  }
-
-  redirectWithEducationResult(result);
+      })
+    })
+  });
 }
 
 export async function submitCertificateOrderApplication(formData: FormData) {
-  let result: { type: 'success' | 'error'; message: string };
+  await submitPublicApplicationAction({
+    actionName: 'public:certificate-order',
+    applicationType: ApplicationType.CERTIFICATE_ORDER,
+    formData,
+    successMessage: 'Заказ сертификата получили.',
+    redirectWithResult: redirectWithEducationResult,
+    parse: async (data) => {
+      const parsed = certificateOrderSchema.parse({
+        name: getString(data, 'name'),
+        email: optionalString(getString(data, 'email')),
+        phone: optionalString(getString(data, 'phone')),
+        telegram: optionalString(getString(data, 'telegram')),
+        cityId: optionalString(getString(data, 'cityId')),
+        recipientName: getString(data, 'recipientName'),
+        amountLabel: getString(data, 'amountLabel'),
+        message: getString(data, 'message'),
+        consent: getString(data, 'consent'),
+        utmSource: optionalString(getString(data, 'utmSource')),
+        utmMedium: optionalString(getString(data, 'utmMedium')),
+        utmCampaign: optionalString(getString(data, 'utmCampaign'))
+      });
+      const city = await assertActiveCity(parsed.cityId);
 
-  try {
-    assertPublicApplicationFormsEnabled();
-
-    if (hasHoneypotValue(getString(formData, 'website'))) {
-      result = { type: 'success', message: 'Заказ сертификата получили.' };
-      redirectWithEducationResult(result);
-    }
-
-    const parsed = certificateOrderSchema.parse({
-      name: getString(formData, 'name'),
-      email: optionalString(getString(formData, 'email')),
-      phone: optionalString(getString(formData, 'phone')),
-      telegram: optionalString(getString(formData, 'telegram')),
-      cityId: optionalString(getString(formData, 'cityId')),
-      recipientName: getString(formData, 'recipientName'),
-      amountLabel: getString(formData, 'amountLabel'),
-      message: getString(formData, 'message'),
-      consent: getString(formData, 'consent'),
-      utmSource: optionalString(getString(formData, 'utmSource')),
-      utmMedium: optionalString(getString(formData, 'utmMedium')),
-      utmCampaign: optionalString(getString(formData, 'utmCampaign'))
-    });
-
-    const city = await assertActiveCity(parsed.cityId);
-    await assertPublicApplicationSubmissionAllowed(ApplicationType.CERTIFICATE_ORDER);
-    await createPublicApplication({
+      return { parsed, city };
+    },
+    buildApplication: ({ parsed, city }) => ({
       type: ApplicationType.CERTIFICATE_ORDER,
       subject: 'Заказ сертификата',
       message: parsed.message,
@@ -220,16 +197,10 @@ export async function submitCertificateOrderApplication(formData: FormData) {
         medium: nullableString(parsed.utmMedium),
         campaign: nullableString(parsed.utmCampaign)
       },
-      payload: {
+      payload: buildApplicationPayload(ApplicationType.CERTIFICATE_ORDER, {
         recipientName: parsed.recipientName,
         amountLabel: parsed.amountLabel
-      }
-    });
-
-    result = { type: 'success', message: 'Заказ сертификата получили.' };
-  } catch (error) {
-    result = { type: 'error', message: resolvePublicApplicationActionError('public:certificate-order', error) };
-  }
-
-  redirectWithEducationResult(result);
+      })
+    })
+  });
 }

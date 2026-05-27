@@ -1,0 +1,313 @@
+@property --bars-cta-x1 {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 8%;
+}
+
+@property --bars-cta-y1 {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 12%;
+}
+
+@property --bars-cta-x2 {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 92%;
+}
+
+@property --bars-cta-y2 {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 18%;
+}
+
+@property --bars-cta-x3 {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 18%;
+}
+
+@property --bars-cta-y3 {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 88%;
+}
+
+@property --bars-cta-x4 {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 86%;
+}
+
+@property --bars-cta-y4 {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 86%;
+}
+
+@property --bars-cta-s1 {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 48%;
+}
+
+@property --bars-cta-s2 {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 42%;
+}
+
+@property --bars-cta-s3 {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 44%;
+}
+
+@property --bars-cta-s4 {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 40%;
+}
+
+:root {
+  --background: #fbf7f0;
+  --background-cream-strong: #fffdf8;
+  --background-band: #f3eadc;
+  --background-band-soft: #f7f1e8;
+  --background-band-gray: #eee9e1;
+  --background-graphite-band: #171311;
+  --background-burgundy-glow: rgba(157, 9, 14, 0.08);
+  --background-graphite-glow: rgba(23, 19, 17, 0.045);
+  --background-paper-grain-opacity: 0.026;
+  --surface: #fffdf9;
+  --surface-muted: #f2eadf;
+  --surface-elevated: rgba(255, 253, 249, 0.94);
+  --surface-inverse: #171311;
+  --surface-inverse-card: #211914;
+  --paper: var(--surface-elevated);
+  --text: #171513;
+  --muted: #6d6861;
+  --line: rgba(48, 40, 35, 0.16);
+  --border-subtle: rgba(48, 40, 35, 0.08);
+  --border-default: rgba(48, 40, 35, 0.14);
+  --border-strong: rgba(48, 40, 35, 0.28);
+  --border-inverse: rgba(255, 255, 255, 0.22);
+  --border-inverse-soft: rgba(255, 253, 249, 0.14);
+  --accent: #9d090e;
+  --accent-strong: #76060a;
+  --accent-contrast: #ffffff;
+  --accent-soft: #f4e7df;
+  --accent-burgundy: #9d090e;
+  --accent-burgundy-strong: #76060a;
+  --accent-burgundy-contrast: #ffffff;
+  --admin-nav-active-bg: color-mix(in oklab, var(--accent) 9%, var(--surface-muted));
+  --admin-nav-active-border: color-mix(in oklab, var(--accent) 24%, var(--border-default));
+  --admin-nav-active-text: color-mix(in oklab, var(--accent) 62%, var(--text));
+  --admin-nav-active-hover: color-mix(in oklab, var(--accent) 12%, var(--surface-muted));
+  --admin-label: color-mix(in oklab, var(--muted) 82%, var(--text));
+  --admin-structure-accent: color-mix(in oklab, var(--border-strong) 82%, var(--accent));
+  --admin-secondary-bg: rgba(255, 253, 249, 0.52);
+  --admin-secondary-bg-hover: color-mix(in oklab, var(--surface-muted) 76%, var(--surface));
+  --admin-secondary-border: var(--border-default);
+  --admin-secondary-border-hover: color-mix(in oklab, var(--border-strong) 82%, var(--accent));
+  --admin-secondary-text: var(--text);
+  --admin-secondary-text-hover: color-mix(in oklab, var(--accent) 50%, var(--text));
+  --admin-filter-active-bg: color-mix(in oklab, var(--accent) 10%, var(--surface-muted));
+  --admin-filter-active-border: color-mix(in oklab, var(--accent) 26%, var(--border-default));
+  --admin-filter-active-text: color-mix(in oklab, var(--accent) 58%, var(--text));
+  --admin-filter-active-hover: color-mix(in oklab, var(--accent) 13%, var(--surface-muted));
+  --admin-action-bg: color-mix(in oklab, var(--surface-muted) 82%, var(--surface));
+  --admin-action-bg-hover: color-mix(in oklab, var(--surface-muted) 72%, var(--accent) 5%);
+  --admin-action-border: var(--border-default);
+  --admin-action-border-hover: color-mix(in oklab, var(--border-strong) 88%, var(--accent));
+  --admin-action-text: var(--text);
+  --admin-action-text-hover: color-mix(in oklab, var(--accent) 46%, var(--text));
+  --admin-confirm-bg: color-mix(in oklab, var(--surface-inverse) 8%, var(--surface-muted));
+  --admin-confirm-border: color-mix(in oklab, var(--surface-inverse) 18%, var(--border-default));
+  --admin-confirm-text: var(--text);
+  --admin-confirm-bg-hover: color-mix(in oklab, var(--surface-inverse) 12%, var(--surface-muted));
+  --editorial-dark-surface: #171311;
+  --editorial-dark-surface-muted: #211c19;
+  --editorial-dark-text: #fffdf9;
+  --editorial-dark-muted: #c8b8a7;
+  --editorial-dark-border: rgba(255, 255, 255, 0.14);
+  --graphite: #171311;
+  --success: #2f684f;
+  --warning: #9a661a;
+  --danger: #9f2f2f;
+  --danger-action-bg: var(--danger);
+  --danger-action-bg-hover: color-mix(in oklab, var(--danger) 84%, #3a1414);
+  --danger-action-text: #ffffff;
+  --field-bg: rgba(255, 253, 249, 0.92);
+  --field-bg-hover: #ffffff;
+  --field-bg-disabled: var(--surface-muted);
+  --field-surface: rgba(255, 253, 249, 0.9);
+  --field-surface-hover: #fffdf9;
+  --field-surface-filled: rgba(255, 250, 244, 0.96);
+  --field-surface-disabled: rgba(242, 234, 223, 0.74);
+  --field-border: rgba(111, 96, 82, 0.24);
+  --field-border-hover: rgba(48, 40, 35, 0.26);
+  --field-border-focus: rgba(48, 40, 35, 0.42);
+  --field-border-error: rgba(159, 47, 47, 0.48);
+  --field-border-success: rgba(47, 104, 79, 0.44);
+  --field-label: #6d6861;
+  --field-hint: #746d65;
+  --field-placeholder: rgba(48, 40, 35, 0.82);
+  --field-focus-ring: rgba(48, 40, 35, 0.1);
+  --field-focus-line: rgba(48, 40, 35, 0.48);
+  --success-bg: rgba(47, 104, 79, 0.08);
+  --success-border: rgba(47, 104, 79, 0.32);
+  --success-text: #2f684f;
+  --warning-bg: rgba(154, 102, 26, 0.09);
+  --warning-border: rgba(154, 102, 26, 0.34);
+  --warning-text: #9a661a;
+  --danger-bg: rgba(159, 47, 47, 0.08);
+  --danger-border: rgba(159, 47, 47, 0.34);
+  --danger-text: #9f2f2f;
+  --focus-ring: rgba(157, 9, 14, 0.16);
+  --focus-ring-danger: rgba(159, 47, 47, 0.12);
+  --selected-bg: #9d090e;
+  --selected-border: #9d090e;
+  --pending-bg: rgba(95, 86, 75, 0.08);
+  --skeleton-fill: rgba(22, 19, 15, 0.08);
+  --radius-none: 0;
+  --radius-sm: 0.35rem;
+  --radius-md: 0.55rem;
+  --radius-lg: 0.8rem;
+  --radius-xl: 1rem;
+  --radius-pill: 999px;
+  --shadow-none: none;
+  --shadow-card: 0 10px 30px rgba(48, 40, 35, 0.035);
+  --shadow-panel: 0 24px 72px rgba(48, 40, 35, 0.07);
+  --shadow-overlay: 0 18px 42px rgba(48, 40, 35, 0.14);
+  --shadow-action: 0 12px 28px rgba(157, 9, 14, 0.16);
+  --shadow-focus: 0 0 0 3px rgba(157, 9, 14, 0.16);
+  --z-overlay: 80;
+  --divider-public: rgba(48, 40, 35, 0.14);
+  --divider-product: rgba(48, 40, 35, 0.12);
+  --header-bg: rgba(251, 247, 240, 0.9);
+  --footer-bg: rgba(255, 253, 249, 0.82);
+  --mobile-menu-bg: radial-gradient(circle at 76% 10%, rgba(157, 9, 14, 0.08), transparent 26rem), linear-gradient(145deg, #fffdf8 0%, #f8f0e7 58%, #fffaf3 100%);
+  --surface-wash: rgba(255, 253, 249, 0.76);
+  --surface-wash-strong: rgba(255, 253, 249, 0.9);
+  --surface-card: rgba(255, 253, 249, 0.94);
+  --surface-card-muted: rgba(255, 253, 249, 0.72);
+  --surface-card-hover: #fffdf9;
+  --card-border: var(--border-default);
+  --card-border-hover: color-mix(in oklab, var(--accent) 32%, var(--border-default));
+  --admin-surface: rgba(255, 253, 249, 0.94);
+  --admin-surface-muted: color-mix(in oklab, var(--surface-muted) 64%, var(--surface));
+  --admin-table-header: color-mix(in oklab, var(--surface-muted) 72%, var(--surface));
+  --admin-table-row-hover: color-mix(in oklab, var(--surface-muted) 48%, var(--surface));
+  --motion-ease-standard: cubic-bezier(0.22, 1, 0.36, 1);
+  --motion-ease-move: cubic-bezier(0.25, 1, 0.5, 1);
+  --motion-duration-fast: 180ms;
+  --motion-duration-base: 220ms;
+  --motion-duration-panel: 280ms;
+  --motion-duration-media: 820ms;
+}
+
+:root[data-theme="dark"] {
+  --background: #11100e;
+  --background-cream-strong: #13110f;
+  --background-band: #15130f;
+  --background-band-soft: #181510;
+  --background-band-gray: #1b1814;
+  --background-graphite-band: #0f0e0c;
+  --background-burgundy-glow: rgba(180, 105, 103, 0.035);
+  --background-graphite-glow: rgba(236, 220, 200, 0.012);
+  --background-paper-grain-opacity: 0.03;
+  --surface: #191612;
+  --surface-muted: #211c17;
+  --surface-elevated: rgba(34, 29, 24, 0.96);
+  --surface-inverse: #f8efe5;
+  --surface-inverse-card: #211914;
+  --paper: var(--surface-elevated);
+  --text: #f3ecdf;
+  --muted: #b3a795;
+  --line: rgba(229, 210, 188, 0.12);
+  --border-subtle: rgba(229, 210, 188, 0.07);
+  --border-default: rgba(229, 210, 188, 0.13);
+  --border-strong: rgba(229, 210, 188, 0.2);
+  --border-inverse: rgba(20, 18, 16, 0.22);
+  --border-inverse-soft: rgba(229, 210, 188, 0.14);
+  --accent: #b46967;
+  --accent-strong: #be746f;
+  --accent-contrast: #120f0d;
+  --accent-soft: rgba(180, 105, 103, 0.12);
+  --accent-burgundy: #b46967;
+  --accent-burgundy-strong: #be746f;
+  --accent-burgundy-contrast: #120f0d;
+  --admin-secondary-bg: rgba(33, 28, 23, 0.68);
+  --admin-secondary-bg-hover: color-mix(in oklab, var(--surface-muted) 82%, var(--accent) 4%);
+  --admin-confirm-bg: color-mix(in oklab, var(--surface-inverse) 8%, var(--surface-muted));
+  --admin-confirm-border: color-mix(in oklab, var(--surface-inverse) 18%, var(--border-default));
+  --admin-confirm-text: var(--text);
+  --admin-confirm-bg-hover: color-mix(in oklab, var(--surface-inverse) 12%, var(--surface-muted));
+  --editorial-dark-surface: #15130f;
+  --editorial-dark-surface-muted: #1d1915;
+  --editorial-dark-text: #f3ecdf;
+  --editorial-dark-muted: #b3a795;
+  --editorial-dark-border: rgba(229, 210, 188, 0.13);
+  --graphite: #f3ecdf;
+  --success: #77c49e;
+  --warning: #e3b05f;
+  --danger: #f28c8c;
+  --danger-action-bg: color-mix(in oklab, var(--danger) 72%, #3a1414);
+  --danger-action-bg-hover: color-mix(in oklab, var(--danger) 82%, #3a1414);
+  --danger-action-text: #ffffff;
+  --field-bg: #15130f;
+  --field-bg-hover: #1b1713;
+  --field-bg-disabled: #14110e;
+  --field-surface: #15130f;
+  --field-surface-hover: #1b1713;
+  --field-surface-filled: #1e1a15;
+  --field-surface-disabled: rgba(20, 17, 14, 0.78);
+  --field-border: rgba(229, 210, 188, 0.15);
+  --field-border-hover: rgba(229, 210, 188, 0.22);
+  --field-border-focus: rgba(229, 210, 188, 0.34);
+  --field-border-error: rgba(242, 140, 140, 0.5);
+  --field-border-success: rgba(119, 196, 158, 0.48);
+  --field-label: #b3a795;
+  --field-hint: rgba(179, 167, 149, 0.78);
+  --field-placeholder: rgba(179, 167, 149, 0.58);
+  --field-focus-ring: rgba(229, 210, 188, 0.1);
+  --field-focus-line: rgba(229, 210, 188, 0.42);
+  --success-bg: rgba(119, 196, 158, 0.1);
+  --success-border: rgba(119, 196, 158, 0.34);
+  --success-text: #a7dfc3;
+  --warning-bg: rgba(227, 176, 95, 0.12);
+  --warning-border: rgba(227, 176, 95, 0.38);
+  --warning-text: #f0c77d;
+  --danger-bg: rgba(242, 140, 140, 0.12);
+  --danger-border: rgba(242, 140, 140, 0.38);
+  --danger-text: #ffb0b0;
+  --focus-ring: rgba(180, 105, 103, 0.16);
+  --focus-ring-danger: rgba(242, 140, 140, 0.16);
+  --selected-bg: #b46967;
+  --selected-border: #b46967;
+  --pending-bg: rgba(229, 210, 188, 0.065);
+  --skeleton-fill: rgba(229, 210, 188, 0.08);
+  --shadow-card: 0 1px 0 rgba(229, 210, 188, 0.025);
+  --shadow-panel: 0 10px 28px rgba(0, 0, 0, 0.14);
+  --shadow-overlay: 0 16px 34px rgba(0, 0, 0, 0.22);
+  --shadow-action: 0 1px 0 rgba(229, 210, 188, 0.04);
+  --shadow-focus: 0 0 0 2px rgba(180, 105, 103, 0.16);
+  --divider-public: rgba(229, 210, 188, 0.115);
+  --divider-product: rgba(229, 210, 188, 0.1);
+  --header-bg: rgba(17, 16, 14, 0.92);
+  --footer-bg: rgba(17, 16, 14, 0.9);
+  --mobile-menu-bg: linear-gradient(145deg, #11100e 0%, #191511 62%, #14120f 100%);
+  --surface-wash: rgba(29, 25, 21, 0.72);
+  --surface-wash-strong: rgba(35, 30, 25, 0.9);
+  --surface-card: rgba(34, 29, 24, 0.9);
+  --surface-card-muted: rgba(229, 210, 188, 0.085);
+  --surface-card-hover: rgba(35, 30, 25, 0.94);
+  --card-border: var(--border-default);
+  --card-border-hover: color-mix(in oklab, var(--accent) 30%, var(--border-default));
+  --admin-surface: rgba(34, 29, 24, 0.92);
+  --admin-surface-muted: color-mix(in oklab, var(--surface-muted) 72%, var(--surface));
+  --admin-table-header: color-mix(in oklab, var(--surface-muted) 78%, var(--surface));
+  --admin-table-row-hover: color-mix(in oklab, var(--surface-muted) 56%, var(--surface));
+}

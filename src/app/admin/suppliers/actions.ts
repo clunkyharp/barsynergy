@@ -21,6 +21,7 @@ import {
 } from '@/lib/admin/content-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
 import { prisma } from '@/lib/db/prisma';
+import { assertSameOriginServerAction } from '@/lib/security/server-action-origin';
 import { normalizeExternalUrlInput } from '@/lib/validation/external-url';
 
 const ADMIN_SUPPLIERS_PATH = '/admin/suppliers';
@@ -56,6 +57,7 @@ export async function createSupplier(formData: FormData) {
   let uploadedCoverImageId: string | null = null;
 
   try {
+    await assertSameOriginServerAction();
     const user = await requireAdminSectionAccess('suppliers');
     const parsed = supplierFormSchema.parse({
       title: getString(formData, 'title'),
@@ -144,6 +146,7 @@ export async function updateSupplier(formData: FormData) {
   let previousCoverImageId: string | null = null;
 
   try {
+    await assertSameOriginServerAction();
     const user = await requireAdminSectionAccess('suppliers');
     const parsed = supplierFormSchema
       .extend({
@@ -246,6 +249,7 @@ export async function updateSupplierStatus(formData: FormData) {
   let result: { type: 'success' | 'error'; message: string };
 
   try {
+    await assertSameOriginServerAction();
     const user = await requireAdminSectionAccess('suppliers');
     const parsed = statusFormSchema.parse({
       supplierId: getString(formData, 'supplierId'),
@@ -282,6 +286,7 @@ export async function deleteSupplierDraft(formData: FormData) {
   let result: { type: 'success' | 'error'; message: string };
 
   try {
+    await assertSameOriginServerAction();
     await requireAdminSectionAccess('suppliers');
     const parsed = deleteFormSchema.parse({
       supplierId: getString(formData, 'supplierId')

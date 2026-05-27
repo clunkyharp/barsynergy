@@ -1,6 +1,13 @@
 import { cookies } from 'next/headers';
 import { notFound } from 'next/navigation';
-import { ApplicationStatus, ApplicationType, BusinessAccountStatus, UserStatus } from '@prisma/client';
+import {
+  ApplicationNotificationChannel,
+  ApplicationNotificationStatus,
+  ApplicationStatus,
+  ApplicationType,
+  BusinessAccountStatus,
+  UserStatus
+} from '@prisma/client';
 import {
   createVacancyDraftFromApplication,
   prepareBusinessAccessAction,
@@ -33,6 +40,7 @@ import {
   BUSINESS_ACCESS_PREVIEW_COOKIE_NAME,
   isBusinessAccessInvitePreparationStatusAllowed
 } from '@/lib/auth/business-access';
+import { getApplicationPayloadEntries } from '@/lib/applications/application-payloads';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
 import { prisma } from '@/lib/db/prisma';
 
@@ -61,18 +69,22 @@ const userStatusLabels: Record<UserStatus, string> = {
   [UserStatus.PENDING]: 'Ожидает'
 };
 
+const notificationChannelLabels: Record<ApplicationNotificationChannel, string> = {
+  [ApplicationNotificationChannel.ADMIN_EMAIL]: 'Email администратору',
+  [ApplicationNotificationChannel.ADMIN_TELEGRAM]: 'Telegram администратору',
+  [ApplicationNotificationChannel.USER_EMAIL]: 'Email пользователю'
+};
+
+const notificationStatusLabels: Record<ApplicationNotificationStatus, string> = {
+  [ApplicationNotificationStatus.PENDING]: 'Ожидает',
+  [ApplicationNotificationStatus.SENT]: 'Отправлено',
+  [ApplicationNotificationStatus.FAILED]: 'Ошибка'
+};
+
 type AdminApplicationDetailPageProps = {
   params: Promise<{ applicationId: string }>;
   searchParams?: Promise<AdminContentSearchParams>;
 };
-
-function payloadEntries(payload: unknown) {
-  if (!payload || Array.isArray(payload) || typeof payload !== 'object') {
-    return [];
-  }
-
-  return Object.entries(payload).filter(([, value]) => value !== null && value !== undefined && value !== '');
-}
 
 function formatFileSize(bytes: number) {
   if (bytes < 1024) {
@@ -135,6 +147,9 @@ export default async function AdminApplicationDetailPage({ params, searchParams 
             }
           }
         }
+      },
+      notifications: {
+        orderBy: { createdAt: 'asc' }
       }
     }
   });
@@ -143,7 +158,7 @@ export default async function AdminApplicationDetailPage({ params, searchParams 
     notFound();
   }
 
-  const entries = payloadEntries(application.payload);
+  const entries = getApplicationPayloadEntries(application.type, application.payload);
   const messageTitle =
     application.type === ApplicationType.BUSINESS_SOLUTION
       ? 'Комментарий'
@@ -309,6 +324,28 @@ export default async function AdminApplicationDetailPage({ params, searchParams 
               </div>
             ) : (
               <p className="mt-3 text-sm text-[var(--muted)]">Файл не приложен.</p>
+            )}
+          </Card>
+
+          <Card className="p-5">
+            <h2 className="text-lg font-semibold">Уведомления</h2>
+            {application.notifications.length > 0 ? (
+              <dl className="mt-4 grid gap-3 text-sm">
+                {application.notifications.map((notification) => (
+                  <div key={notification.id} className="rounded-[var(--radius-sm)] border border-[var(--border-default)] p-3">
+                    <dt className="font-semibold">{notificationChannelLabels[notification.channel]}</dt>
+                    <dd className="mt-1 text-[var(--muted)]">
+                      {notificationStatusLabels[notification.status]} / попыток: {notification.attempts}
+                      {notification.sentAt ? ` / ${dateTimeFormatter.format(notification.sentAt)}` : ''}
+                    </dd>
+                    {notification.lastError ? (
+                      <dd className="mt-1 text-xs text-[var(--danger-text)]">{notification.lastError}</dd>
+                    ) : null}
+                  </div>
+                ))}
+              </dl>
+            ) : (
+              <p className="mt-3 text-sm text-[var(--muted)]">Очередь уведомлений для этой заявки не создавалась.</p>
             )}
           </Card>
         </div>

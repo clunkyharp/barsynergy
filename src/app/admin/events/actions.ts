@@ -21,6 +21,7 @@ import {
 } from '@/lib/admin/content-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
 import { prisma } from '@/lib/db/prisma';
+import { assertSameOriginServerAction } from '@/lib/security/server-action-origin';
 
 const ADMIN_EVENTS_PATH = '/admin/events';
 
@@ -56,6 +57,7 @@ export async function createEvent(formData: FormData) {
   let uploadedCoverImageId: string | null = null;
 
   try {
+    await assertSameOriginServerAction();
     const user = await requireAdminSectionAccess('events');
     const parsed = eventFormSchema.parse({
       title: getString(formData, 'title'),
@@ -149,6 +151,7 @@ export async function updateEvent(formData: FormData) {
   let previousCoverImageId: string | null = null;
 
   try {
+    await assertSameOriginServerAction();
     const user = await requireAdminSectionAccess('events');
     const parsed = eventFormSchema
       .extend({
@@ -256,6 +259,7 @@ export async function updateEventStatus(formData: FormData) {
   let result: { type: 'success' | 'error'; message: string };
 
   try {
+    await assertSameOriginServerAction();
     const user = await requireAdminSectionAccess('events');
     const parsed = statusFormSchema.parse({
       eventId: getString(formData, 'eventId'),
@@ -292,6 +296,7 @@ export async function deleteEventDraft(formData: FormData) {
   let result: { type: 'success' | 'error'; message: string };
 
   try {
+    await assertSameOriginServerAction();
     await requireAdminSectionAccess('events');
     const parsed = deleteFormSchema.parse({
       eventId: getString(formData, 'eventId')

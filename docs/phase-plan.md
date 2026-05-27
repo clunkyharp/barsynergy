@@ -340,6 +340,7 @@ Current status:
 
 - service-specialist module is planned as a Phase 5 catalog expansion;
 - current schema has `CategoryType.SERVICE` as taxonomy preparation, but it does not yet have `ServiceSpecialist`, `ApplicationType.SERVICE_SPECIALIST_SUBMISSION`, `/services` or `/admin/services`;
+- Phase 5 remains gated by the active stabilization queue in `docs/remediation-plan.md`, especially payload contracts, same-origin protection and notification retry;
 - it must not interrupt Phase 4 auth and first business account work unless the owner explicitly records a roadmap reorder;
 - first version has no specialist personal cabinet and no direct public publishing.
 

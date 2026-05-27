@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation';
 import { ApplicationStatus, ApplicationType, BusinessAccountStatus, UserRole, UserStatus } from '@prisma/client';
 import { z } from 'zod';
 import { getString, nullableString, optionalString } from '@/lib/admin/content-utils';
+import { buildApplicationPayload } from '@/lib/applications/application-payloads';
 import {
   BUSINESS_ACCESS_ACTIVATION_COOKIE_NAME,
   findActiveBusinessAccessInvite,
@@ -23,6 +24,7 @@ import {
   hashSessionToken
 } from '@/lib/auth/session';
 import { prisma } from '@/lib/db/prisma';
+import { assertSameOriginServerAction } from '@/lib/security/server-action-origin';
 import { getEnv } from '@/lib/validation/env';
 
 const loginSchema = z.object({
@@ -189,6 +191,8 @@ function resolveBusinessAccessActivationErrorCode(error: unknown) {
 }
 
 export async function loginAction(formData: FormData) {
+  await assertSameOriginServerAction();
+
   const rawSurface: LoginSurface = getString(formData, 'surface') === 'admin' ? 'admin' : 'public';
   const parsed = loginSchema.safeParse({
     email: getString(formData, 'email').toLowerCase(),
@@ -258,6 +262,8 @@ export async function loginAction(formData: FormData) {
 }
 
 export async function logoutAction() {
+  await assertSameOriginServerAction();
+
   try {
     const cookieStore = await cookies();
     const token = cookieStore.get(SESSION_COOKIE_NAME)?.value;
@@ -281,6 +287,8 @@ export async function logoutAction() {
 }
 
 export async function createBusinessAccountRequestAction(formData: FormData) {
+  await assertSameOriginServerAction();
+
   const env = getEnv();
 
   if (!arePublicApplicationFormsEnabled(env)) {
@@ -349,12 +357,12 @@ export async function createBusinessAccountRequestAction(formData: FormData) {
           phone: nullableString(parsed.data.phone),
           telegram: nullableString(parsed.data.telegram),
           cityId: nullableString(parsed.data.cityId),
-          payload: {
+          payload: buildApplicationPayload(ApplicationType.BUSINESS_ACCOUNT_REQUEST, {
             companyName: parsed.data.companyName,
             contactPerson: parsed.data.contactPerson,
             websiteUrl: parsed.data.websiteUrl || null,
             description: parsed.data.description || null
-          },
+          }),
           consentAcceptedAt: new Date(),
           consentText:
             'Пользователь согласился с политикой обработки персональных данных и дал согласие на обработку персональных данных для рассмотрения заявки на бизнес-доступ.'
@@ -376,6 +384,8 @@ export async function createBusinessAccountRequestAction(formData: FormData) {
 }
 
 export async function activateBusinessAccessAction(formData: FormData) {
+  await assertSameOriginServerAction();
+
   const token = getString(formData, 'token');
   let parsed: z.infer<typeof businessAccessActivationSchema>;
 

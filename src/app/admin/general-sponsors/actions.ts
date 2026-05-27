@@ -21,6 +21,7 @@ import {
 } from '@/lib/admin/content-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
 import { prisma } from '@/lib/db/prisma';
+import { assertSameOriginServerAction } from '@/lib/security/server-action-origin';
 import { normalizeExternalUrlInput } from '@/lib/validation/external-url';
 
 const ADMIN_GENERAL_SPONSORS_PATH = '/admin/general-sponsors';
@@ -123,6 +124,7 @@ export async function createGeneralSponsor(formData: FormData) {
   let uploadedCoverImageId: string | null = null;
 
   try {
+    await assertSameOriginServerAction();
     const user = await requireAdminSectionAccess('generalSponsors');
     const parsed = readGeneralSponsorForm(formData);
     const slug = slugify(parsed.slug ?? parsed.name);
@@ -220,6 +222,7 @@ export async function updateGeneralSponsor(formData: FormData) {
   let previousCoverImageId: string | null = null;
 
   try {
+    await assertSameOriginServerAction();
     const user = await requireAdminSectionAccess('generalSponsors');
     const parsed = generalSponsorFormSchema
       .extend({
@@ -333,6 +336,7 @@ export async function updateGeneralSponsorStatus(formData: FormData) {
   let result: { type: 'success' | 'error'; message: string };
 
   try {
+    await assertSameOriginServerAction();
     const user = await requireAdminSectionAccess('generalSponsors');
     const parsed = statusFormSchema.parse({
       sponsorId: getString(formData, 'sponsorId'),
@@ -369,6 +373,7 @@ export async function deleteGeneralSponsorDraft(formData: FormData) {
   let result: { type: 'success' | 'error'; message: string };
 
   try {
+    await assertSameOriginServerAction();
     await requireAdminSectionAccess('generalSponsors');
     const parsed = deleteFormSchema.parse({
       sponsorId: getString(formData, 'sponsorId')

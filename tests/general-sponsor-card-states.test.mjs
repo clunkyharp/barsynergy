@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import process from 'node:process';
 import test from 'node:test';
+import { readGlobalStyles } from './helpers/global-styles.mjs';
 
 const repoRoot = process.cwd();
 
@@ -22,7 +23,7 @@ test('general sponsor card exposes variant and lifecycle state hooks', () => {
 });
 
 test('general sponsor card CSS covers hover, focus, archived and compact mobile states', () => {
-  const css = readProjectFile('src/app/globals.css');
+  const css = readGlobalStyles();
 
   assert.match(css, /\.general-sponsor-card:hover/);
   assert.match(css, /\.general-sponsor-card:focus-within/);

@@ -1,7 +1,8 @@
-import { z } from 'zod';
+import { ApplicationType } from '@prisma/client';
 import { prisma } from '@/lib/db/prisma';
 import { getEnv } from '@/lib/validation/env';
 import { createSessionToken, getSessionCookieOptions, hashSessionToken } from '@/lib/auth/session';
+import { parseApplicationPayload } from '@/lib/applications/application-payloads';
 export {
   isBusinessAccessInviteActivationEligible,
   isBusinessAccessInvitePreparationStatusAllowed,
@@ -11,13 +12,6 @@ export {
 export const BUSINESS_ACCESS_PREVIEW_COOKIE_NAME = 'barsynergy_business_access_preview';
 export const BUSINESS_ACCESS_ACTIVATION_COOKIE_NAME = 'barsynergy_business_access_activation';
 const BUSINESS_ACCESS_INVITE_TTL_HOURS = 72;
-
-const businessAccessRequestPayloadSchema = z.object({
-  companyName: z.string().trim().min(2).max(160),
-  contactPerson: z.string().trim().min(2).max(120).optional().nullable(),
-  websiteUrl: z.string().trim().max(240).optional().nullable(),
-  description: z.string().trim().max(1000).optional().nullable()
-});
 
 export function createBusinessAccessInviteToken() {
   return createSessionToken();
@@ -52,7 +46,7 @@ export function getBusinessAccessActivationCookieOptions() {
 }
 
 export function parseBusinessAccessRequestPayload(payload: unknown, fallbackContactPerson?: string | null) {
-  const parsed = businessAccessRequestPayloadSchema.parse(payload);
+  const parsed = parseApplicationPayload(ApplicationType.BUSINESS_ACCOUNT_REQUEST, payload);
 
   return {
     companyName: parsed.companyName,

@@ -3,7 +3,7 @@
 import { redirect } from 'next/navigation';
 import { ApplicationType } from '@prisma/client';
 import { z } from 'zod';
-import { createPublicApplication } from '@/lib/applications/create-public-application';
+import { buildApplicationPayload } from '@/lib/applications/application-payloads';
 import {
   assertActiveCity,
   baseContactSchema,
@@ -12,14 +12,9 @@ import {
   nullableString,
   optionalString,
   PERSONAL_DATA_CONSENT_TEXT,
-  resolvePublicApplicationActionError,
   utmSchema
 } from '@/lib/applications/public-form-helpers';
-import {
-  assertPublicApplicationFormsEnabled,
-  assertPublicApplicationSubmissionAllowed,
-  hasHoneypotValue
-} from '@/lib/applications/public-submission-guards';
+import { submitPublicApplicationAction } from '@/lib/applications/submit-public-application-action';
 
 const PARTNERS_PATH = '/partners';
 
@@ -41,35 +36,33 @@ function redirectWithPartnersResult(result: { type: 'success' | 'error'; message
 }
 
 export async function submitPartnerApplication(formData: FormData) {
-  let result: { type: 'success' | 'error'; message: string };
+  await submitPublicApplicationAction({
+    actionName: 'public:partner-application',
+    applicationType: ApplicationType.PARTNER_APPLICATION,
+    formData,
+    successMessage: 'Заявку на партнёрство получили.',
+    redirectWithResult: redirectWithPartnersResult,
+    parse: async (data) => {
+      const parsed = partnerApplicationSchema.parse({
+        companyName: getString(data, 'companyName'),
+        contactName: getString(data, 'contactName'),
+        email: optionalString(getString(data, 'email')),
+        phone: optionalString(getString(data, 'phone')),
+        telegram: optionalString(getString(data, 'telegram')),
+        cityId: optionalString(getString(data, 'cityId')),
+        partnerType: getString(data, 'partnerType'),
+        websiteUrl: optionalString(getString(data, 'websiteUrl')),
+        proposal: getString(data, 'proposal'),
+        consent: getString(data, 'consent'),
+        utmSource: optionalString(getString(data, 'utmSource')),
+        utmMedium: optionalString(getString(data, 'utmMedium')),
+        utmCampaign: optionalString(getString(data, 'utmCampaign'))
+      });
+      const city = await assertActiveCity(parsed.cityId);
 
-  try {
-    assertPublicApplicationFormsEnabled();
-
-    if (hasHoneypotValue(getString(formData, 'website'))) {
-      result = { type: 'success', message: 'Заявку на партнёрство получили.' };
-      redirectWithPartnersResult(result);
-    }
-
-    const parsed = partnerApplicationSchema.parse({
-      companyName: getString(formData, 'companyName'),
-      contactName: getString(formData, 'contactName'),
-      email: optionalString(getString(formData, 'email')),
-      phone: optionalString(getString(formData, 'phone')),
-      telegram: optionalString(getString(formData, 'telegram')),
-      cityId: optionalString(getString(formData, 'cityId')),
-      partnerType: getString(formData, 'partnerType'),
-      websiteUrl: optionalString(getString(formData, 'websiteUrl')),
-      proposal: getString(formData, 'proposal'),
-      consent: getString(formData, 'consent'),
-      utmSource: optionalString(getString(formData, 'utmSource')),
-      utmMedium: optionalString(getString(formData, 'utmMedium')),
-      utmCampaign: optionalString(getString(formData, 'utmCampaign'))
-    });
-
-    const city = await assertActiveCity(parsed.cityId);
-    await assertPublicApplicationSubmissionAllowed(ApplicationType.PARTNER_APPLICATION);
-    await createPublicApplication({
+      return { parsed, city };
+    },
+    buildApplication: ({ parsed, city }) => ({
       type: ApplicationType.PARTNER_APPLICATION,
       subject: `Партнёрство: ${parsed.companyName}`,
       message: parsed.proposal,
@@ -85,17 +78,11 @@ export async function submitPartnerApplication(formData: FormData) {
         medium: nullableString(parsed.utmMedium),
         campaign: nullableString(parsed.utmCampaign)
       },
-      payload: {
+      payload: buildApplicationPayload(ApplicationType.PARTNER_APPLICATION, {
         companyName: parsed.companyName,
         partnerType: parsed.partnerType,
         websiteUrl: parsed.websiteUrl ?? null
-      }
-    });
-
-    result = { type: 'success', message: 'Заявку на партнёрство получили.' };
-  } catch (error) {
-    result = { type: 'error', message: resolvePublicApplicationActionError('public:partner-application', error) };
-  }
-
-  redirectWithPartnersResult(result);
+      })
+    })
+  });
 }
