@@ -19,6 +19,7 @@ import {
   slugify,
   statusTransitionDates
 } from '@/lib/admin/content-utils';
+import { deleteContentDraft, updateContentStatus } from '@/lib/admin/content-lifecycle';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
 import { prisma } from '@/lib/db/prisma';
 import { assertSameOriginServerAction } from '@/lib/security/server-action-origin';
@@ -312,20 +313,19 @@ export async function updateArticleStatus(formData: FormData) {
       status: getString(formData, 'status')
     });
 
-    await prisma.$transaction(async (tx) => {
-      const article = await tx.article.findUniqueOrThrow({
-        where: { id: parsed.articleId },
-        select: { publishedAt: true }
-      });
-
-      await tx.article.update({
-        where: { id: parsed.articleId },
-        data: {
-          status: parsed.status,
-          updatedById: user.id,
-          ...statusTransitionDates(parsed.status, article.publishedAt)
-        }
-      });
+    await updateContentStatus({
+      status: parsed.status,
+      userId: user.id,
+      findCurrent: (tx) =>
+        tx.article.findUniqueOrThrow({
+          where: { id: parsed.articleId },
+          select: { publishedAt: true }
+        }),
+      update: (tx, data) =>
+        tx.article.update({
+          where: { id: parsed.articleId },
+          data
+        })
     });
 
     revalidatePath(ADMIN_ARTICLES_PATH);
@@ -348,30 +348,21 @@ export async function deleteArticleDraft(formData: FormData) {
       articleId: getString(formData, 'articleId')
     });
 
-    const deletedArticle = await prisma.$transaction(async (tx) => {
-      const article = await tx.article.findUnique({
-        where: {
-          id: parsed.articleId
-        },
-        select: { coverImageId: true }
-      });
-
-      if (!article) {
-        throw new Error('record is invalid');
-      }
-
-      const deletion = await tx.article.deleteMany({
-        where: {
-          id: parsed.articleId,
-          status: ContentStatus.DRAFT
-        }
-      });
-
-      if (deletion.count !== 1) {
-        throw new Error('record is invalid');
-      }
-
-      return article;
+    const deletedArticle = await deleteContentDraft({
+      findRecord: (tx) =>
+        tx.article.findUnique({
+          where: {
+            id: parsed.articleId
+          },
+          select: { coverImageId: true }
+        }),
+      deleteDraft: (tx) =>
+        tx.article.deleteMany({
+          where: {
+            id: parsed.articleId,
+            status: ContentStatus.DRAFT
+          }
+        })
     });
 
     await deleteUploadedFileIfUnused(deletedArticle.coverImageId);

@@ -19,6 +19,7 @@ import {
   slugify,
   statusTransitionDates
 } from '@/lib/admin/content-utils';
+import { deleteContentDraft, updateContentStatus } from '@/lib/admin/content-lifecycle';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
 import { prisma } from '@/lib/db/prisma';
 import { assertSameOriginServerAction } from '@/lib/security/server-action-origin';
@@ -256,20 +257,19 @@ export async function updateSupplierStatus(formData: FormData) {
       status: getString(formData, 'status')
     });
 
-    await prisma.$transaction(async (tx) => {
-      const supplier = await tx.supplier.findUniqueOrThrow({
-        where: { id: parsed.supplierId },
-        select: { publishedAt: true }
-      });
-
-      await tx.supplier.update({
-        where: { id: parsed.supplierId },
-        data: {
-          status: parsed.status,
-          updatedById: user.id,
-          ...statusTransitionDates(parsed.status, supplier.publishedAt)
-        }
-      });
+    await updateContentStatus({
+      status: parsed.status,
+      userId: user.id,
+      findCurrent: (tx) =>
+        tx.supplier.findUniqueOrThrow({
+          where: { id: parsed.supplierId },
+          select: { publishedAt: true }
+        }),
+      update: (tx, data) =>
+        tx.supplier.update({
+          where: { id: parsed.supplierId },
+          data
+        })
     });
 
     revalidatePath(ADMIN_SUPPLIERS_PATH);
@@ -292,30 +292,21 @@ export async function deleteSupplierDraft(formData: FormData) {
       supplierId: getString(formData, 'supplierId')
     });
 
-    const deletedSupplier = await prisma.$transaction(async (tx) => {
-      const supplier = await tx.supplier.findUnique({
-        where: {
-          id: parsed.supplierId
-        },
-        select: { coverImageId: true }
-      });
-
-      if (!supplier) {
-        throw new Error('record is invalid');
-      }
-
-      const deletion = await tx.supplier.deleteMany({
-        where: {
-          id: parsed.supplierId,
-          status: ContentStatus.DRAFT
-        }
-      });
-
-      if (deletion.count !== 1) {
-        throw new Error('record is invalid');
-      }
-
-      return supplier;
+    const deletedSupplier = await deleteContentDraft({
+      findRecord: (tx) =>
+        tx.supplier.findUnique({
+          where: {
+            id: parsed.supplierId
+          },
+          select: { coverImageId: true }
+        }),
+      deleteDraft: (tx) =>
+        tx.supplier.deleteMany({
+          where: {
+            id: parsed.supplierId,
+            status: ContentStatus.DRAFT
+          }
+        })
     });
 
     await deleteUploadedFileIfUnused(deletedSupplier.coverImageId);

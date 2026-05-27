@@ -19,6 +19,7 @@ import {
   slugify,
   statusTransitionDates
 } from '@/lib/admin/content-utils';
+import { deleteContentDraft, updateContentStatus } from '@/lib/admin/content-lifecycle';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
 import { prisma } from '@/lib/db/prisma';
 import { assertSameOriginServerAction } from '@/lib/security/server-action-origin';
@@ -244,20 +245,19 @@ export async function updatePartnerStatus(formData: FormData) {
       status: getString(formData, 'status')
     });
 
-    await prisma.$transaction(async (tx) => {
-      const partner = await tx.partner.findUniqueOrThrow({
-        where: { id: parsed.partnerId },
-        select: { publishedAt: true }
-      });
-
-      await tx.partner.update({
-        where: { id: parsed.partnerId },
-        data: {
-          status: parsed.status,
-          updatedById: user.id,
-          ...statusTransitionDates(parsed.status, partner.publishedAt)
-        }
-      });
+    await updateContentStatus({
+      status: parsed.status,
+      userId: user.id,
+      findCurrent: (tx) =>
+        tx.partner.findUniqueOrThrow({
+          where: { id: parsed.partnerId },
+          select: { publishedAt: true }
+        }),
+      update: (tx, data) =>
+        tx.partner.update({
+          where: { id: parsed.partnerId },
+          data
+        })
     });
 
     revalidatePath(ADMIN_PARTNERS_PATH);
@@ -280,30 +280,21 @@ export async function deletePartnerDraft(formData: FormData) {
       partnerId: getString(formData, 'partnerId')
     });
 
-    const deletedPartner = await prisma.$transaction(async (tx) => {
-      const partner = await tx.partner.findUnique({
-        where: {
-          id: parsed.partnerId
-        },
-        select: { coverImageId: true }
-      });
-
-      if (!partner) {
-        throw new Error('record is invalid');
-      }
-
-      const deletion = await tx.partner.deleteMany({
-        where: {
-          id: parsed.partnerId,
-          status: ContentStatus.DRAFT
-        }
-      });
-
-      if (deletion.count !== 1) {
-        throw new Error('record is invalid');
-      }
-
-      return partner;
+    const deletedPartner = await deleteContentDraft({
+      findRecord: (tx) =>
+        tx.partner.findUnique({
+          where: {
+            id: parsed.partnerId
+          },
+          select: { coverImageId: true }
+        }),
+      deleteDraft: (tx) =>
+        tx.partner.deleteMany({
+          where: {
+            id: parsed.partnerId,
+            status: ContentStatus.DRAFT
+          }
+        })
     });
 
     await deleteUploadedFileIfUnused(deletedPartner.coverImageId);

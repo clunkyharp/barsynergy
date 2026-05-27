@@ -19,6 +19,7 @@ import {
   slugify,
   statusTransitionDates
 } from '@/lib/admin/content-utils';
+import { deleteContentDraft, updateContentStatus } from '@/lib/admin/content-lifecycle';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
 import { prisma } from '@/lib/db/prisma';
 import { assertSameOriginServerAction } from '@/lib/security/server-action-origin';
@@ -343,20 +344,19 @@ export async function updateGeneralSponsorStatus(formData: FormData) {
       status: getString(formData, 'status')
     });
 
-    await prisma.$transaction(async (tx) => {
-      const sponsor = await tx.generalSponsor.findUniqueOrThrow({
-        where: { id: parsed.sponsorId },
-        select: { publishedAt: true }
-      });
-
-      await tx.generalSponsor.update({
-        where: { id: parsed.sponsorId },
-        data: {
-          status: parsed.status,
-          updatedById: user.id,
-          ...statusTransitionDates(parsed.status, sponsor.publishedAt)
-        }
-      });
+    await updateContentStatus({
+      status: parsed.status,
+      userId: user.id,
+      findCurrent: (tx) =>
+        tx.generalSponsor.findUniqueOrThrow({
+          where: { id: parsed.sponsorId },
+          select: { publishedAt: true }
+        }),
+      update: (tx, data) =>
+        tx.generalSponsor.update({
+          where: { id: parsed.sponsorId },
+          data
+        })
     });
 
     revalidateGeneralSponsorPaths();
@@ -379,30 +379,21 @@ export async function deleteGeneralSponsorDraft(formData: FormData) {
       sponsorId: getString(formData, 'sponsorId')
     });
 
-    const deletedSponsor = await prisma.$transaction(async (tx) => {
-      const sponsor = await tx.generalSponsor.findUnique({
-        where: {
-          id: parsed.sponsorId
-        },
-        select: { logoImageId: true, coverImageId: true }
-      });
-
-      if (!sponsor) {
-        throw new Error('record is invalid');
-      }
-
-      const deletion = await tx.generalSponsor.deleteMany({
-        where: {
-          id: parsed.sponsorId,
-          status: ContentStatus.DRAFT
-        }
-      });
-
-      if (deletion.count !== 1) {
-        throw new Error('record is invalid');
-      }
-
-      return sponsor;
+    const deletedSponsor = await deleteContentDraft({
+      findRecord: (tx) =>
+        tx.generalSponsor.findUnique({
+          where: {
+            id: parsed.sponsorId
+          },
+          select: { logoImageId: true, coverImageId: true }
+        }),
+      deleteDraft: (tx) =>
+        tx.generalSponsor.deleteMany({
+          where: {
+            id: parsed.sponsorId,
+            status: ContentStatus.DRAFT
+          }
+        })
     });
 
     await Promise.all([
