@@ -31,11 +31,11 @@ type ToastContextValue = {
 
 const ToastContext = createContext<ToastContextValue | null>(null);
 
-const toastToneClassNames: Record<ToastTone, string> = {
-  error: 'border-[var(--danger)] bg-[var(--danger-bg)] text-[var(--danger-text)]',
-  info: 'border-[var(--line)] bg-[var(--surface)] text-[var(--text)]',
-  success: 'border-[var(--success)] bg-[var(--success-bg)] text-[var(--success-text)]',
-  warning: 'border-[var(--warning)] bg-[var(--warning-bg)] text-[var(--warning-text)]'
+const toastToneMarkerClassNames: Record<ToastTone, string> = {
+  error: 'bg-[var(--danger)]',
+  info: 'bg-[var(--accent)]',
+  success: 'bg-[var(--success)]',
+  warning: 'bg-[var(--warning)]'
 };
 
 function createToastId() {
@@ -114,13 +114,15 @@ function ToastItem({ dismissToast, toast }: { dismissToast: (id: string) => void
 
   return (
     <div
-      className={cn('min-h-[78px] rounded-[12px] border p-4 shadow-[var(--shadow-overlay)]', toastToneClassNames[toast.tone])}
+      className="min-h-[78px] rounded-[12px] border border-[#d8c7b8] bg-[#fffcf8] p-4 text-[#1e1a16] shadow-none"
+      data-tone={toast.tone}
       role={assertive ? 'alert' : 'status'}
     >
       <div className="flex items-start gap-3">
+        <span aria-hidden="true" className={cn('mt-1 h-2.5 w-2.5 shrink-0 rounded-full', toastToneMarkerClassNames[toast.tone])} />
         <div className="min-w-0 flex-1">
           <p className="text-base font-semibold leading-[22px]">{toast.title}</p>
-          {toast.description ? <div className="mt-1 text-[13px] leading-[18px] opacity-85">{toast.description}</div> : null}
+          {toast.description ? <div className="mt-1 text-[13px] leading-[18px] text-[#6b625a]">{toast.description}</div> : null}
         </div>
         <button
           aria-label="Закрыть уведомление"

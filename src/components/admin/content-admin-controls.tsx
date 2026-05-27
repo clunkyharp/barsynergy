@@ -214,7 +214,7 @@ export function AdminFilterBar({
   ...props
 }: AdminFilterBarProps) {
   const classNames = cn(
-    'rounded-[var(--radius-md)] border border-[var(--line)] border-l-[3px] border-l-[var(--admin-structure-accent)] bg-[var(--surface)] p-4 shadow-none',
+    'admin-filter-panel admin-surface-shell rounded-[var(--radius-md)] border border-[var(--line)] border-l-[3px] border-l-[var(--admin-structure-accent)] bg-[var(--surface)] p-4 shadow-none',
     className
   );
   const content = (
@@ -331,7 +331,7 @@ export function AdminContentVisibilityPanel({
   const isArchived = status === ContentStatus.ARCHIVED;
 
   return (
-    <section className="rounded-[var(--radius-md)] border border-[var(--line)] border-l-[3px] border-l-[var(--admin-structure-accent)] bg-[var(--surface)] p-4">
+    <section className="admin-visibility-panel admin-surface-shell rounded-[var(--radius-md)] border border-[var(--line)] border-l-[3px] border-l-[var(--admin-structure-accent)] bg-[var(--surface)] p-4">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--admin-label)]">Видимость на сайте</p>

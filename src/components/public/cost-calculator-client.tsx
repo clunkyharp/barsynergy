@@ -56,10 +56,6 @@ function decimal(value: number) {
   return value.toLocaleString('ru-RU', { maximumFractionDigits: 2, minimumFractionDigits: 0 });
 }
 
-function formulaMoney(value: number) {
-  return money(value).replace(/\s?₽$/, ' ₽');
-}
-
 function DivisionSign() {
   return (
     <span className="mx-1 inline-flex h-[1em] w-[0.72em] translate-y-[0.12em] items-center justify-center">
@@ -300,46 +296,6 @@ function PricingModeFields({
           />
         </FormField>
       </div>
-      <CalculatorFoodCostSlider
-        disabled={isManualMode}
-        error={foodCostError}
-        onChange={onFoodCostChange}
-        value={foodCostPercent}
-      />
-    </div>
-  );
-}
-
-function CalculatorFoodCostSlider({
-  disabled,
-  error,
-  onChange,
-  value
-}: {
-  disabled: boolean;
-  error: string | null;
-  onChange: (value: string) => void;
-  value: string;
-}) {
-  const numericValue = Number(value.replace(',', '.'));
-  const safeValue = Number.isFinite(numericValue) && numericValue > 0 ? Math.min(60, Math.max(5, numericValue)) : 30;
-
-  return (
-    <div className="calculator-slider" data-disabled={disabled || undefined} data-state={error ? 'error' : undefined}>
-      <div className="flex items-center justify-between gap-4">
-        <span>Целевая доля</span>
-        <span className="tabular-nums">{percent(safeValue)}</span>
-      </div>
-      <input
-        aria-label="Целевая доля себестоимости"
-        disabled={disabled}
-        max={60}
-        min={5}
-        onChange={(event) => onChange(event.target.value)}
-        step={1}
-        type="range"
-        value={safeValue}
-      />
     </div>
   );
 }
@@ -412,7 +368,7 @@ function IngredientTable({
 
       {!hasAnyInput ? <EmptyRecipeNotice /> : null}
 
-      <div className="mx-4 overflow-hidden rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--surface)] md:mx-6">
+      <div className="mx-4 overflow-hidden rounded-[var(--radius-lg)] border border-transparent bg-transparent md:mx-6 md:border-[var(--border-default)] md:bg-[var(--surface)]">
         <div className="hidden grid-cols-[minmax(130px,1fr)_72px_minmax(132px,0.85fr)_minmax(132px,0.85fr)_88px_96px] gap-2 bg-[var(--surface-muted)]/55 px-4 py-3 text-[10px] font-semibold uppercase tracking-[0.11em] text-[var(--muted)] md:px-5 lg:grid">
           <span>Ингредиент</span>
           <span>Цена, ₽</span>
@@ -500,12 +456,12 @@ function MobileIngredientCard({
   rowCount: number;
 }) {
   return (
-    <div className="grid grid-cols-2 gap-3 rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--surface)] p-3 lg:hidden">
+    <div className="grid grid-cols-2 gap-3 rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-transparent p-3 lg:hidden">
       <div className="col-span-2 flex items-start justify-between gap-3">
-        <span className="inline-flex h-7 min-w-7 items-center justify-center rounded-[var(--radius-sm)] border border-[var(--border-default)] px-2 text-[11px] font-semibold text-[var(--muted)]">
-          {index + 1}
+        <span className="text-[13px] font-bold uppercase tracking-[0.12em] text-[var(--accent)]">
+          № {index + 1}
         </span>
-        <span className="text-sm font-semibold tabular-nums text-[var(--text)]">
+        <span className="text-[17px] font-bold leading-none tabular-nums text-[var(--text)]">
           {ingredient.error ? '—' : ingredient.cost === null ? 'Пока нет' : money(ingredient.cost)}
         </span>
       </div>
@@ -734,19 +690,8 @@ function CalculatorResultRail({
           ) : null}
         </dl>
 
-        {canShowSalePrice ? (
-          <div className="mt-4 rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--surface-wash)] px-4 py-3 text-sm leading-6 text-[var(--muted)]">
-            <span className="font-semibold text-[var(--text)]">{isManualMode ? 'Источник цены' : 'Формула'}:</span>{' '}
-            {isManualMode ? 'ручной режим' : (
-              <>
-                {formulaMoney(totalCost)} <DivisionSign /> {decimal(foodCost)}
-              </>
-            )}
-          </div>
-        ) : null}
-
         <div className="mt-4 grid gap-2">
-          <Button className="min-h-12 w-full rounded-[var(--radius-md)]" disabled={!canShowSalePrice} onClick={onCopyResult} type="button">
+          <Button className="calculator-copy-button min-h-12 w-full rounded-[var(--radius-md)]" disabled={!canShowSalePrice} onClick={onCopyResult} type="button">
             {copyState === 'copied' ? <Check size={17} strokeWidth={1.8} /> : <Copy size={17} strokeWidth={1.8} />}
             {copyState === 'copied' ? 'Результат скопирован' : 'Скопировать результат'}
           </Button>

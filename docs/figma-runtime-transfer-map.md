@@ -37,12 +37,12 @@
 | `55:1042` | Component / Home / General Sponsor Card | Home sponsor feature card: dark 12px shell, 430px desktop media/logo box, 28px sponsor badges, 30px chips, 46px CTA, no full phone/social contact blocks on home | Применено к home-only `GeneralSponsorCard variant="home"` в седьмом срезе; hover/focus/long content/archived/mobile compact hardening applied в двенадцатом срезе |
 | `55:780` | Component / Home / Sponsor Logo Box | Sponsor logo safe area and media constraints for home sponsor card | Применено к home sponsor media/logo box в седьмом срезе |
 | `55:788` | Component / Home / Sponsor Benefit List | Compact benefit list with three short bullets for home sponsor card | Применено к home sponsor benefits в седьмом срезе |
-| `22:11416` | Component / Admin Data Table / documented states | Dense admin table states and mobile-friendly row fallback labels | Применено к shared `AdminTable`/`DataTable` и core admin list pages в восьмом срезе |
-| `22:11442` | Component / Admin Form Field / documented states | Admin field label/control/error density, no glow error state | Применено к `.admin-shell` form states в восьмом срезе |
-| `22:11451` | Component / Admin Sticky Form Actions | 76px sticky action bar, 14px radius, compact action spacing | Применено к `AdminCmsActions` в восьмом срезе |
-| `22:11460` | Component / Admin Confirm Dialog | 235x200 confirm dialog, 18px radius, 24px padding, 18px title, 14px body, 38px action buttons | Применено: `Dialog size="confirm"` используется в `AdminActionMenuButton`; overlay marker сохраняет совместимость с dropdown ownership |
-| `22:11483` | Component / Admin Inline Edit Row | Compact inline edit row with grouped fields and stable open state | Применено к `AdminCmsInlineEditRecord` в восьмом срезе |
-| `39:13203` | Component / Admin Toast / variants | 360x78 toast variants: success/error/warning/info, 12px radius, 16px padding, 16px title and 13px body | Применено: `ToastProvider`/`useToast` существует и установлен в root layout; конкретные toast callers подключать только по отдельным behavior-задачам |
+| `22:11416` | Component / Admin Data Table / documented states | Dense admin table states and mobile-friendly row fallback labels | Применено к shared `AdminTable`/`DataTable`, `AdminTableStateRow` и core admin list pages |
+| `22:11442` | Component / Admin Form Field / documented states | Admin field label/control/error density, no glow error state | Применено к `.admin-shell` field-card states без влияния на public forms |
+| `22:11451` | Component / Admin Sticky Form Actions | 76px sticky action bar, 14px radius, compact action spacing | Применено к `AdminCmsActions`, включая default state text |
+| `22:11460` | Component / Admin Confirm Dialog | 235x200 confirm dialog, 18px radius, 24px padding, 18px title, 14px body, 38px action buttons | Применено: `Dialog size="confirm"` используется в `AdminActionMenuButton` и `ConfirmSubmitButton` |
+| `22:11483` | Component / Admin Inline Edit Row | Compact inline edit row with grouped fields and stable open state | Применено к `AdminCmsInlineEditRecord` |
+| `39:13203` | Component / Admin Toast / variants | 360x78 toast variants: success/error/warning/info, 12px radius, 16px padding, 16px title and 13px body | Применено к shared `ToastProvider`/`useToast`; tone меняет marker/role, не фон карточки |
 | `25:6708` / `25:6769` | File upload pattern and upload failed state | Upload metadata/privacy row and adjacent upload-failed state near the component/list context | Применено ко shared `FileUpload`: private/public notice, selected-file success, adjacent error, submit-pending upload state; live storage/API upload QA remains a separate authenticated scenario |
 | `25:5692` | Public detail templates | Article/Event/Course/Vacancy/Supplier/Partner split hero, fact rail, body column, action rail and type-specific sections | Shared detail shell was already applied; type-specific body labels, section blocks and 320px hardening applied в одиннадцатом срезе |
 
@@ -64,7 +64,7 @@
 - `src/components/public/cost-calculator-client.tsx`: `/tools/cost-calculator` выровнен по live Figma калькуляторным компонентам без изменения формул и данных: panel, mode control, calculator field cards, target-share slider и result card.
 - `src/app/globals.css`: добавлены scoped-стили `.calculator-panel`, `.calculator-field-card`, `.calculator-slider`, `.calculator-result-card` и `.calculator-metric-card` по live Figma размерам: 18px panel/result radius, 24px padding, 44px controls, 10px metric/input radius.
 - Решение по CTA, 2026-05-24: runtime не поддерживает сохранение/export расчёта, поэтому основной result action остаётся `Скопировать результат`; `Сохранить расчёт` нельзя использовать в макете или интерфейсе без отдельной save/export реализации.
-- Визуальный QA с Playwright сохранён в `qa/figma-calculator-transfer-2026-05-23/`: desktop `1366`, mobile `390`, narrow `320`, все с `overflowX = 0`.
+- Визуальный QA с Playwright проверял desktop `1366`, mobile `390`, narrow `320`, все с `overflowX = 0`.
 
 ## Изменения четвёртого среза
 
@@ -78,20 +78,20 @@
 - `src/components/public/application-form-section.tsx`: добавлен общий `PublicSubmissionFeedback` для публичных success/error состояний без изменения result data contract.
 - `src/components/public/contact-application-form.tsx`: контактная страница использует общий public feedback card вместо свободного inline alert.
 - `src/app/globals.css`: public form shell выровнен с live Figma contact state shell: 14px outer radius, no shadow, 10px field cards, graphite focus state. Public feedback cards получили 12px radius, 14/16px padding, 96px min-height, 340px desktop target width и Figma success/error backgrounds.
-- Visual QA сохранён в `qa/figma-contact-feedback-transfer-2026-05-23/final/`: `/contacts` success/error and `/education` empty filters на desktop/mobile, `overflowX = 0`, browser console/page errors clean.
+- Visual QA проверял `/contacts` success/error and `/education` empty filters на desktop/mobile, `overflowX = 0`, browser console/page errors clean.
 
 ## Изменения шестого среза
 
 - `src/app/(public)/education/page.tsx`: форматная матрица `/education` заменена на visual course/service card grid по live Figma `Component / Card`, сохраняя текущие `educationFormats`, routes and contact-form links. Внешний референс `https://baristaschool.ru/` использован только как UX-ориентир для образовательного блока “курсы и услуги”; тексты, бренд, данные и изображения референса не переносились.
 - `src/app/globals.css`: добавлены scoped-стили `.education-format-*`: 14px card radius, 192px media area, 23px pill labels/status, 20px title, 13px body, accent link action. Фото взяты из существующих локальных `public/images/**`.
-- Visual QA сохранён в `qa/figma-education-card-transfer-2026-05-23/final/`: `/education#education-formats` на desktop/mobile, 7 cards/media/images/actions, `overflowX = 0`, browser console/page errors clean.
+- Visual QA проверял `/education#education-formats` на desktop/mobile, 7 cards/media/images/actions, `overflowX = 0`, browser console/page errors clean.
 
 ## Изменения седьмого среза
 
 - `src/components/public/general-sponsor-card.tsx`: добавлен `variant="home"` для главной страницы. Home sponsor card теперь не выводит полные phone/WhatsApp/Instagram contact blocks, но сохраняет текущие sponsor data, logoSrc из базы, benefit text, chips и CTA на существующие маршруты.
 - `src/components/public/homepage-client.tsx`: главная использует `GeneralSponsorCard variant="home"` и выставляет `priority` для первого sponsor logo image.
 - `src/app/globals.css`: добавлены scoped-стили `.home-sponsor-*` по live Figma размерам: 12px dark shell, 430px desktop media box, 336px safe area, 28px badges, 30-32px chips, 46px CTAs. Full sponsor page card styles and contacts were kept.
-- Visual QA сохранён в `qa/figma-home-sponsor-card-transfer-2026-05-23/final/`: `/` desktop/mobile and `/general-sponsors` desktop, `overflowX = 0`, browser console/page errors clean. Verified home card has `0` full phone/channel blocks, while `/general-sponsors` keeps full contact cards.
+- Visual QA проверял `/` desktop/mobile and `/general-sponsors` desktop, `overflowX = 0`, browser console/page errors clean. Verified home card has `0` full phone/channel blocks, while `/general-sponsors` keeps full contact cards.
 
 ## Изменения восьмого среза
 
@@ -137,8 +137,47 @@
 - `tests/general-sponsor-card-states.test.mjs`: static regression covers variant/state hooks, removed description clipping, hover/focus, archived and compact mobile CSS.
 - Validation: `git diff --check`, targeted ESLint, targeted general sponsor test, `npm run lint`, `npm run typecheck`, `npm test` passed. Playwright/Chromium fallback verified `/` home card and `/general-sponsors` full card on desktop, 390px and 320px with `overflowX = 0`, active state, variant hooks, visible focus, long description not clipped and no full contact cards in the home variant. Archived state is source/static verified because public runtime only queries `PUBLISHED` sponsors.
 
+## Изменения тринадцатого среза
+
+- `src/app/admin/layout.tsx`: admin workspace grid was tightened to the recorded admin component density, with a narrower sidebar column and smaller top/bottom shell rhythm.
+- `src/components/layout/admin-sidebar.tsx`, `src/components/layout/admin-header.tsx`, `src/components/admin/admin-page-intro.tsx`: admin shell panels now opt into `admin-surface-shell`, so sidebar, header and list-page intros share the same Figma admin border, radius and no-shadow surface contract.
+- `src/components/admin/content-admin-controls.tsx`: list filters and visibility panels now use the same admin surface class as the rest of the workspace layer.
+- `src/components/admin/admin-cms-form.tsx`: CMS forms, panels, record forms, inline edit rows and sticky form actions now expose admin-specific surface hooks while preserving form action props, field names, values and submit behavior.
+- `src/app/globals.css`: added scoped admin shell CSS for hairline borders, 14px card radius, no decorative editorial form gradients in admin forms, stable sidebar scrolling, dense nav links, form section rhythm and sticky action surface styling.
+- Validation: `git diff --check`, ESLint, `next typegen`, `tsc --noEmit`, and targeted Playwright authenticated admin DOM check for `/admin/articles` passed. Playwright `test-results` artifacts were removed after the run.
+
+## Изменения четырнадцатого среза
+
+- `src/app/admin/layout.tsx`, `src/components/layout/admin-sidebar.tsx`, `src/components/layout/admin-header.tsx`: admin shell moved to the recorded Figma structure: 272px dark sidebar, 56px flat utility topbar, `#f7f2ea` content background and desktop content padding.
+- `src/components/admin/admin-page-intro.tsx`: page intro is now a compact Manrope-style content header instead of a large serif panel.
+- `src/components/ui/form-field.tsx` and `src/app/globals.css`: admin form fields are scoped under `.admin-shell` as one white field-card with label and transparent control inside; public forms keep their existing shell.
+- `src/components/admin/admin-cms-form.tsx`: `AdminCmsActions` now accepts `stateText?: ReactNode`, renders `Есть несохранённые изменения` by default, and uses the recorded 76px/no-shadow sticky action shell.
+- `src/components/ui/admin-table.tsx`, `src/components/ui/data-table.tsx` and core admin list pages: `AdminTableStateRow`/`DataTableStateRow` render empty/no-results rows inside the table frame instead of standalone empty cards.
+- `src/components/ui/dialog.tsx`, `src/components/ui/confirm-submit-button.tsx`, `src/components/ui/admin-action-menu.tsx`: confirm flows use shared `Dialog size="confirm"` with 235px panel and 38px actions; local confirm portal code was removed from `ConfirmSubmitButton`.
+- `src/components/ui/toast.tsx`: toast card shell follows the recorded neutral 360x78 visual; `tone` is preserved for semantic role and marker only.
+- Validation: `npm run lint`, `npm test` and direct `tsc --noEmit` passed. Fresh browser sign-off for this slice was blocked by the local Next/SWC code-signature issue at the time; no QA screenshots were saved.
+
+## Изменения пятнадцатого среза
+
+- `src/components/layout/admin-shell-frame.tsx`: admin shell grid state moved into a client wrapper so the sidebar can switch between expanded and collapsed desktop states without changing admin data, routes, auth, permissions or server actions.
+- `src/components/layout/admin-sidebar.tsx`: sidebar navigation now uses icon+label rows, a collapsed icon-only state with accessible labels/tooltips, and an edge-mounted circular toggle matching the provided reference behavior.
+- `src/app/globals.css`: admin sidebar CSS now defines the 272px expanded column, 84px collapsed column, dark sidebar body, edge toggle, visible focus states, nav truncation guards and scroll containment without saving QA artifacts in the repo.
+- `tests/admin-mobile-fallback.test.mjs`: static shell test now follows the new client wrapper while preserving the existing unsupported mobile state below `md`.
+- Validation: `npm run lint`, direct `tsc --noEmit`, `npm test` and authenticated Playwright DOM QA against `127.0.0.1:3001` passed. Browser QA checked `/admin` and `/admin/articles` at `1280x900` and `768x900`: expanded width `272px`, collapsed width `84px`, edge toggle crossing the sidebar border, hidden collapsed labels and no horizontal overflow. No QA screenshots were saved.
+
+## Изменения шестнадцатого среза
+
+- `src/components/layout/admin-sidebar.tsx`: sidebar navigation is now grouped by the recorded Figma structure (`Работа`, `Контент`, `Заявки`, `Бизнес`, `Справочники`), the dashboard item is labelled `Рабочая очередь`, and the header includes the admin role badge. Demo count badges from Figma were intentionally not moved because the current runtime has no data-backed sidebar counters.
+- `src/app/globals.css`: sidebar colors now use existing runtime tokens and semantic admin aliases instead of raw Figma colors; grouped nav rows, role badge, active state and edge toggle keep the expanded/collapsed shell behavior.
+- Validation: targeted ESLint for `src/components/layout/admin-sidebar.tsx`, direct `tsc --noEmit`, and `git diff --check -- src/components/layout/admin-sidebar.tsx src/app/globals.css` passed. Runtime CSS fixture in Playwright used the already running `127.0.0.1:3001` app without saving screenshots: expanded width `272px`, collapsed width `84px`, collapsed labels `1px`, horizontal overflow `0`, contrast ratios `15.31:1` for nav text, `9.07:1` for group headings, `5.86:1` for the role badge and `6.84:1` for the toggle.
+
 ## Зафиксированные расхождения
 
+- Четырнадцатый срез used the already recorded Figma inventory for page `13 — Admin Screens`, node `22:10907` and components `22:11416`, `22:11442`, `22:11451`, `22:11460`, `22:11483`, `39:13203`; data, queries, roles, auth, routes, actions, Prisma and seed stayed out of scope.
+- Fresh Figma connector context for sidebar node `24:1875` is still blocked locally: the Figma app connector returned `This app connection requires reauthentication before other actions on this app can succeed.` The fifteenth slice used the current repo contract, recorded admin shell decisions and the provided sidebar-toggle reference image; exact node-level Figma parity still needs reauthentication.
+- Fresh authenticated sidebar QA for the sixteenth slice is blocked inside Codex Node by the Prisma native engine code-signature Team ID mismatch. The app server on `127.0.0.1:3001` is still reachable, so the latest sidebar check used the loaded runtime CSS plus a non-auth fixture instead of creating a temporary DB session.
+- Fresh `next dev` on a new port can still be blocked locally while loading `@next/swc-darwin-arm64` because of a code-signature Team ID mismatch. The existing `127.0.0.1:3001` runtime was used for the authenticated sidebar QA.
+- Тринадцатый срез не смог получить свежий Figma app connector context: tool calls for `22:11416`, `22:11442` and `22:11451` returned `This app connection requires reauthentication before other actions on this app can succeed.` Implementation used the already recorded live Figma inventory for the admin components listed in this file; data, queries, roles, auth, routes, actions, Prisma and seed stayed out of scope.
 - Figma screenshot tool через app connector требует повторную авторизацию; визуальная реализация сверялась по live Desktop Bridge tree и runtime browser screenshots.
 - Live Figma inventory on 2026-05-24 used Figma Console Desktop Bridge because the app connector still required reauthentication and REST/file-data calls hit `429 Rate limit exceeded`.
 - Search found no local Figma components named `tabs`, `toggle`, `switch` or `upload`; upload exists as a documented pattern/state, not a source component set.

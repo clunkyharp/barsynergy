@@ -166,10 +166,10 @@ function HomeRoleRouter() {
               <li className="min-w-0" key={card.title}>
                 <Link
                   aria-label={`Перейти в раздел: ${card.title}`}
-                  className="home-role-row group grid gap-3 border-b border-[var(--line)] py-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] md:grid-cols-[minmax(0,0.58fr)_minmax(0,1fr)_auto] md:items-center md:gap-5"
+                  className="home-role-row group grid grid-cols-[minmax(0,1fr)_2.75rem] items-center gap-x-3 gap-y-2 border-b border-[var(--line)] py-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] md:grid-cols-[minmax(0,0.58fr)_minmax(0,1fr)_auto] md:gap-5"
                   href={card.href}
                 >
-                  <span className="flex min-w-0 items-center gap-3">
+                  <span className="flex min-w-0 items-center gap-3 max-md:col-start-1 max-md:row-start-1">
                     <span className="home-role-row-icon" aria-hidden="true">
                       <Icon size={18} strokeWidth={1.8} />
                     </span>
@@ -177,8 +177,8 @@ function HomeRoleRouter() {
                       {card.title}
                     </h3>
                   </span>
-                  <span className="text-sm leading-6 text-[var(--muted)]">{card.description}</span>
-                  <span className="flex items-center gap-3 md:justify-end">
+                  <span className="min-w-0 text-sm leading-6 text-[var(--muted)] max-md:col-start-1 max-md:row-start-2">{card.description}</span>
+                  <span className="flex items-center justify-end gap-3 max-md:col-start-2 max-md:row-span-2 max-md:row-start-1 max-md:self-center md:justify-end">
                     <span className="home-role-card-nav" aria-hidden="true">
                       <ArrowUpRight size={15} strokeWidth={1.8} />
                     </span>
@@ -236,13 +236,13 @@ const businessDigitalProcessSteps = [
 
 function BusinessDigitalSolutionsSection() {
   return (
-    <section className="background-zone background-zone-ivory scroll-mt-28 border-b border-[var(--line)] py-10 md:py-14" id="home-digital-solutions">
+    <section className="background-zone background-zone-ivory render-deferred-section scroll-mt-28 border-b border-[var(--line)] py-10 md:py-14" id="home-digital-solutions">
       <div className="container">
         <div className="grid gap-8 lg:grid-cols-[minmax(0,0.88fr)_minmax(0,1.12fr)] lg:items-stretch">
           <div className="home-digital-intro flex min-w-0 flex-col">
             <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--accent)]">Цифровые решения</p>
             <h2 className={`${displayFont.className} mt-3 text-[2.1rem] font-semibold leading-[1.04] text-[var(--text)] md:text-[2.85rem]`}>
-              Сайты, боты и автоматизация для барных проектов
+              Сайты, боты и автоматизация для бизнеса
             </h2>
             <p className="mt-4 text-sm leading-7 text-[var(--muted)] md:text-[15px]">
               Соберём страницу, Telegram-бот, Mini App или внутреннюю форму под задачу бара, школы, поставщика или партнёра.
@@ -371,7 +371,7 @@ function NowCard({
         <span className="hidden text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--accent)] sm:inline">{label}</span>
       </span>
       <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--accent)] sm:hidden">{label}</span>
-      <h3 className={`${displayFont.className} mt-1 text-[1.22rem] font-semibold leading-none text-[var(--text)] group-hover:text-[var(--accent)] sm:mt-5 sm:text-2xl`}>
+      <h3 className={`${displayFont.className} home-current-support-title mt-1 text-[1.22rem] font-semibold leading-[1.42] text-[var(--text)] group-hover:text-[var(--accent)] sm:mt-5 sm:text-2xl sm:leading-[1.2]`}>
         {card?.title ?? label}
       </h3>
       <p className="mt-1 text-sm leading-5 text-[var(--muted)] sm:mt-3 sm:min-h-10 sm:leading-6">{card ? compactMeta(card) : fallbackMeta}</p>
@@ -486,7 +486,7 @@ function HomeCtaFaqSection() {
 
   return (
     <section
-      className="background-zone background-zone-ivory border-b border-[var(--line)] py-16 text-[var(--text)] max-[900px]:py-[60px]"
+      className="background-zone background-zone-ivory render-deferred-section border-b border-[var(--line)] py-16 text-[var(--text)] max-[900px]:py-[60px]"
       id="home-platform-help"
     >
       <div className="mx-auto w-full max-w-[1100px] px-5">
@@ -578,7 +578,7 @@ export function HomepageClient({ data }: HomepageClientProps) {
       {data.calculatorTeaser ? <ToolTeaser teaser={data.calculatorTeaser} /> : null}
 
       {data.generalSponsors.length > 0 ? (
-        <section className="background-zone background-zone-sponsor border-b border-[var(--line)] py-10 md:py-14">
+        <section className="background-zone background-zone-sponsor render-deferred-section border-b border-[var(--line)] py-10 md:py-14">
           <div className="container">
             <div className="mb-7 flex items-center gap-5">
               <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--text)]">Генеральный спонсор</p>
@@ -598,7 +598,7 @@ export function HomepageClient({ data }: HomepageClientProps) {
       <HomeCtaFaqSection />
 
       {data.ctaBlock ? (
-        <section className="background-zone background-zone-cta border-b border-[var(--line)] py-10 md:py-14" id="home-about">
+        <section className="background-zone background-zone-cta render-deferred-section border-b border-[var(--line)] py-10 md:py-14" id="home-about">
           <div className="home-about-panel container rounded-[var(--radius-xl)] border border-[var(--editorial-dark-border)] bg-[var(--editorial-dark-surface)] p-6 shadow-[0_24px_72px_rgba(0,0,0,0.22)] md:grid md:grid-cols-[minmax(0,1fr)_minmax(15rem,0.36fr)] md:items-center md:gap-7 md:p-8">
             <div>
               <h2 className={`${displayFont.className} text-[2.1rem] font-semibold leading-[1.02] text-[var(--editorial-dark-text)] md:text-[3rem]`}>

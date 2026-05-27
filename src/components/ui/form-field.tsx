@@ -1,4 +1,4 @@
-import { cloneElement, isValidElement, type ReactElement, type ReactNode } from 'react';
+import { cloneElement, isValidElement, type ComponentPropsWithoutRef, type ReactElement, type ReactNode } from 'react';
 import { formActionsClassName, formSectionClassName } from '@/components/ui/field-styles';
 import { cn } from '@/lib/utils';
 
@@ -43,7 +43,15 @@ export function FieldHint({ children, className, id }: { children: ReactNode; cl
 
 export function FieldError({ children, className, id }: { children: ReactNode; className?: string; id?: string }) {
   return (
-    <p className={cn('field-error', className)} id={id}>
+    <p aria-live="polite" className={cn('field-error', className)} id={id} role="alert">
+      {children}
+    </p>
+  );
+}
+
+export function FieldSuccess({ children, className, id }: { children: ReactNode; className?: string; id?: string }) {
+  return (
+    <p aria-live="polite" className={cn('field-success', className)} id={id} role="status">
       {children}
     </p>
   );
@@ -77,7 +85,7 @@ export function FormField({ label, htmlFor, error, hint, className, labelClassNa
       <FieldLabel className={labelClassName} htmlFor={htmlFor} required={isRequired}>{label}</FieldLabel>
       {field}
       {hint ? <FieldHint id={hintId}>{hint}</FieldHint> : null}
-      {success ? <p className="field-success" id={successId}>{success}</p> : null}
+      {success ? <FieldSuccess id={successId}>{success}</FieldSuccess> : null}
       {error ? <FieldError id={errorId}>{error}</FieldError> : null}
     </div>
   );
@@ -105,6 +113,10 @@ export function FormSection({
   );
 }
 
-export function FormActions({ children, className }: { children: ReactNode; className?: string }) {
-  return <div className={cn(formActionsClassName, className)}>{children}</div>;
+type FormActionsProps = ComponentPropsWithoutRef<'div'> & {
+  children: ReactNode;
+};
+
+export function FormActions({ children, className, ...props }: FormActionsProps) {
+  return <div className={cn(formActionsClassName, className)} {...props}>{children}</div>;
 }

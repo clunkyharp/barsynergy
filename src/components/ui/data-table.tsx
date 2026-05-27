@@ -15,5 +15,6 @@ export {
   AdminTableFrame as DataTableFrame,
   AdminTableHead as DataTableHead,
   AdminTableHeaderCell as DataTableHeaderCell,
-  AdminTableRow as DataTableRow
+  AdminTableRow as DataTableRow,
+  AdminTableStateRow as DataTableStateRow
 } from '@/components/ui/admin-table';

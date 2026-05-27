@@ -18,9 +18,9 @@ import {
   AdminTableFrame,
   AdminTableHead,
   AdminTableHeaderCell,
-  AdminTableRow
+  AdminTableRow,
+  AdminTableStateRow
 } from '@/components/ui/admin-table';
-import { EmptyState } from '@/components/ui/empty-state';
 import { StatusBadge } from '@/components/ui/status-badge';
 import {
   ADMIN_CONTENT_PAGE_SIZE,
@@ -141,27 +141,27 @@ export default async function AdminPartnersPage({ searchParams }: AdminPartnersP
           <p className="text-sm text-[var(--muted)]">Всего записей: {total}.</p>
         </div>
 
-        {partners.length === 0 ? (
-          <EmptyState
-            actionHref={hasActiveFilters ? ADMIN_PARTNERS_PATH : `${ADMIN_PARTNERS_PATH}/create`}
-            actionLabel={hasActiveFilters ? 'Сбросить фильтры' : 'Создать партнёра'}
-            description={hasActiveFilters ? 'По текущим фильтрам партнёров нет.' : 'Добавьте партнёра, тип сотрудничества и статус публикации.'}
-            title={hasActiveFilters ? 'Партнёры не найдены' : 'Партнёров пока нет'}
-          />
-        ) : (
-          <AdminTableFrame>
-            <AdminTable minWidth={980}>
-              <AdminTableHead>
-                <AdminTableRow>
-                  <AdminTableHeaderCell>Партнёр</AdminTableHeaderCell>
-                  <AdminTableHeaderCell>Компания и тип</AdminTableHeaderCell>
-                  <AdminTableHeaderCell>Статус</AdminTableHeaderCell>
-                  <AdminTableHeaderCell>Обновлено</AdminTableHeaderCell>
-                  <AdminTableActionsHeaderCell>Действия</AdminTableActionsHeaderCell>
-                </AdminTableRow>
-              </AdminTableHead>
-              <AdminTableBody>
-                {partners.map((partner) => (
+        <AdminTableFrame>
+          <AdminTable minWidth={980}>
+            <AdminTableHead>
+              <AdminTableRow>
+                <AdminTableHeaderCell>Партнёр</AdminTableHeaderCell>
+                <AdminTableHeaderCell>Компания и тип</AdminTableHeaderCell>
+                <AdminTableHeaderCell>Статус</AdminTableHeaderCell>
+                <AdminTableHeaderCell>Обновлено</AdminTableHeaderCell>
+                <AdminTableActionsHeaderCell>Действия</AdminTableActionsHeaderCell>
+              </AdminTableRow>
+            </AdminTableHead>
+            <AdminTableBody>
+              {partners.length === 0 ? (
+                <AdminTableStateRow
+                  colSpan={5}
+                  description={hasActiveFilters ? 'По текущим фильтрам партнёров нет.' : 'Добавьте партнёра, тип сотрудничества и статус публикации.'}
+                  state={hasActiveFilters ? 'no-results' : 'empty'}
+                  title={hasActiveFilters ? 'Партнёры не найдены' : 'Партнёров пока нет'}
+                />
+              ) : (
+                partners.map((partner) => (
                   <AdminTableRow key={partner.id}>
                     <AdminTableCell className="max-w-[320px]" label="Партнёр">
                       <AdminTableClamp className="font-semibold">{partner.title}</AdminTableClamp>
@@ -198,11 +198,11 @@ export default async function AdminPartnersPage({ searchParams }: AdminPartnersP
                       />
                     </AdminTableActionsCell>
                   </AdminTableRow>
-                ))}
-              </AdminTableBody>
-            </AdminTable>
-          </AdminTableFrame>
-        )}
+                ))
+              )}
+            </AdminTableBody>
+          </AdminTable>
+        </AdminTableFrame>
 
         <AdminPagination
           basePath={ADMIN_PARTNERS_PATH}

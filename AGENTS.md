@@ -151,6 +151,7 @@ When both build and typecheck are required, run them sequentially. Next.js type 
 - When editing or rewriting connected Russian user-facing prose, apply the `humanizer-ru` cleanup principle by default. Do not apply it to code, logs, commands, schemas or exact quotations.
 - For small visible UI fixes, prefer concrete browser diff evidence, screenshot notes, page URL, and target element over a generic `поправь дизайн` prompt.
 - For visual QA, state which tool actually verified the screen: built-in browser, Playwright screenshot, HTML/source smoke, or an explicit unverified visual gap.
+- After visual QA, delete generated screenshots, browser dumps, JSON result files and other temporary QA artifacts from the project before closeout unless the owner explicitly asks to preserve them. Keep only concise validation notes in status/docs.
 - Use Prisma migrations for schema changes. Do not edit generated Prisma client files.
 - Keep validation close to boundaries using existing Zod/env patterns.
 - Do not introduce new libraries unless they are necessary and consistent with the stack.

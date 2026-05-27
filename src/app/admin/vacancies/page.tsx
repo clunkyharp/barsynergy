@@ -17,10 +17,10 @@ import {
   AdminTableFrame,
   AdminTableHead,
   AdminTableHeaderCell,
-  AdminTableRow
+  AdminTableRow,
+  AdminTableStateRow
 } from '@/components/ui/admin-table';
 import { Button } from '@/components/ui/button';
-import { EmptyState } from '@/components/ui/empty-state';
 import { StatCard } from '@/components/ui/stat-card';
 import { StatusBadge } from '@/components/ui/status-badge';
 import {
@@ -157,28 +157,28 @@ export default async function AdminVacanciesPage({ searchParams }: AdminVacancie
           </p>
         </div>
 
-        {vacancies.length === 0 ? (
-          <EmptyState
-            actionHref={hasActiveFilters ? ADMIN_VACANCIES_PATH : `${ADMIN_VACANCIES_PATH}/create`}
-            actionLabel={hasActiveFilters ? 'Сбросить фильтры' : 'Создать вакансию'}
-            description={hasActiveFilters ? 'По текущим фильтрам вакансий нет.' : 'Добавьте первую вакансию и настройте её публикацию.'}
-            title={hasActiveFilters ? 'Вакансии не найдены' : 'Вакансий пока нет'}
-          />
-        ) : (
-          <AdminTableFrame>
-            <AdminTable>
-              <AdminTableHead>
-                <tr>
-                  <AdminTableHeaderCell>Вакансия</AdminTableHeaderCell>
-                  <AdminTableHeaderCell>Компания</AdminTableHeaderCell>
-                  <AdminTableHeaderCell>Город</AdminTableHeaderCell>
-                  <AdminTableHeaderCell>Статус</AdminTableHeaderCell>
-                  <AdminTableHeaderCell>Обновлено</AdminTableHeaderCell>
-                  <AdminTableActionsHeaderCell>Действия</AdminTableActionsHeaderCell>
-                </tr>
-              </AdminTableHead>
-              <AdminTableBody>
-                {vacancies.map((vacancy) => (
+        <AdminTableFrame>
+          <AdminTable>
+            <AdminTableHead>
+              <tr>
+                <AdminTableHeaderCell>Вакансия</AdminTableHeaderCell>
+                <AdminTableHeaderCell>Компания</AdminTableHeaderCell>
+                <AdminTableHeaderCell>Город</AdminTableHeaderCell>
+                <AdminTableHeaderCell>Статус</AdminTableHeaderCell>
+                <AdminTableHeaderCell>Обновлено</AdminTableHeaderCell>
+                <AdminTableActionsHeaderCell>Действия</AdminTableActionsHeaderCell>
+              </tr>
+            </AdminTableHead>
+            <AdminTableBody>
+              {vacancies.length === 0 ? (
+                <AdminTableStateRow
+                  colSpan={6}
+                  description={hasActiveFilters ? 'По текущим фильтрам вакансий нет.' : 'Добавьте первую вакансию и настройте её публикацию.'}
+                  state={hasActiveFilters ? 'no-results' : 'empty'}
+                  title={hasActiveFilters ? 'Вакансии не найдены' : 'Вакансий пока нет'}
+                />
+              ) : (
+                vacancies.map((vacancy) => (
                   <AdminTableRow key={vacancy.id}>
                     <AdminTableCell className="max-w-[320px]" label="Вакансия">
                       <AdminTableClamp className="font-semibold">{vacancy.title}</AdminTableClamp>
@@ -214,11 +214,11 @@ export default async function AdminVacanciesPage({ searchParams }: AdminVacancie
                       />
                     </AdminTableActionsCell>
                   </AdminTableRow>
-                ))}
-              </AdminTableBody>
-            </AdminTable>
-          </AdminTableFrame>
-        )}
+                ))
+              )}
+            </AdminTableBody>
+          </AdminTable>
+        </AdminTableFrame>
 
         <AdminPagination
           basePath={ADMIN_VACANCIES_PATH}

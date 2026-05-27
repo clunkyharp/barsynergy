@@ -188,7 +188,10 @@ export function SiteHeader() {
               <span>Войти</span>
             </AppLink>
           </div>
-          <MobileSiteMenu isOpen={isMobileMenuOpen} navItems={navItems} onOpenChange={setIsMobileMenuOpen} />
+          <div className="flex shrink-0 items-center gap-2 xl:hidden">
+            <ThemeToggle compact />
+            <MobileSiteMenu isOpen={isMobileMenuOpen} navItems={navItems} onOpenChange={setIsMobileMenuOpen} />
+          </div>
         </div>
       </div>
     </header>

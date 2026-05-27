@@ -1,75 +1,133 @@
 'use client';
 
-import { usePathname } from 'next/navigation';
 import type { UserRole } from '@prisma/client';
+import {
+  BadgePercent,
+  BriefcaseBusiness,
+  CalendarDays,
+  Files,
+  GraduationCap,
+  Handshake,
+  Hash,
+  Home,
+  Inbox,
+  LayoutDashboard,
+  MapPin,
+  Package,
+  PanelLeftClose,
+  PanelLeftOpen,
+  Tags,
+  Users
+} from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
+import { usePathname } from 'next/navigation';
 import { AppLink } from '@/components/ui/app-link';
 import { NavLink } from '@/components/ui/nav-link';
-import { Panel } from '@/components/ui/panel';
 import { type AdminSection, canAccessAdminSection } from '@/lib/auth/permissions';
 
-const adminLinks: { label: string; href: string; section: AdminSection; available?: boolean }[] = [
-  { label: 'Главная', href: '/admin', section: 'dashboard', available: true },
-  { label: 'Статьи', href: '/admin/articles', section: 'articles', available: true },
-  { label: 'События', href: '/admin/events', section: 'events', available: true },
-  { label: 'Курсы', href: '/admin/courses', section: 'courses', available: true },
-  { label: 'Вакансии', href: '/admin/vacancies', section: 'vacancies', available: true },
-  { label: 'Поставщики', href: '/admin/suppliers', section: 'suppliers', available: true },
-  { label: 'Партнёры', href: '/admin/partners', section: 'partners', available: true },
-  { label: 'Генспонсоры', href: '/admin/general-sponsors', section: 'generalSponsors', available: true },
-  { label: 'Главная сайта', href: '/admin/homepage', section: 'homepage', available: true },
-  { label: 'Заявки', href: '/admin/applications', section: 'applications', available: true },
-  { label: 'Бизнес-доступы', href: '/admin/users', section: 'users', available: true },
-  { label: 'Категории', href: '/admin/categories', section: 'categories', available: true },
-  { label: 'Города', href: '/admin/cities', section: 'cities', available: true },
-  { label: 'Теги', href: '/admin/tags', section: 'tags', available: true }
+const adminLinks: { icon: LucideIcon; label: string; href: string; section: AdminSection; available?: boolean }[] = [
+  { icon: LayoutDashboard, label: 'Рабочая очередь', href: '/admin', section: 'dashboard', available: true },
+  { icon: Files, label: 'Статьи', href: '/admin/articles', section: 'articles', available: true },
+  { icon: CalendarDays, label: 'События', href: '/admin/events', section: 'events', available: true },
+  { icon: GraduationCap, label: 'Курсы', href: '/admin/courses', section: 'courses', available: true },
+  { icon: BriefcaseBusiness, label: 'Вакансии', href: '/admin/vacancies', section: 'vacancies', available: true },
+  { icon: Package, label: 'Поставщики', href: '/admin/suppliers', section: 'suppliers', available: true },
+  { icon: Handshake, label: 'Партнёры', href: '/admin/partners', section: 'partners', available: true },
+  { icon: BadgePercent, label: 'Генспонсоры', href: '/admin/general-sponsors', section: 'generalSponsors', available: true },
+  { icon: Home, label: 'Главная сайта', href: '/admin/homepage', section: 'homepage', available: true },
+  { icon: Inbox, label: 'Заявки', href: '/admin/applications', section: 'applications', available: true },
+  { icon: Users, label: 'Бизнес-доступы', href: '/admin/users', section: 'users', available: true },
+  { icon: Tags, label: 'Категории', href: '/admin/categories', section: 'categories', available: true },
+  { icon: MapPin, label: 'Города', href: '/admin/cities', section: 'cities', available: true },
+  { icon: Hash, label: 'Теги', href: '/admin/tags', section: 'tags', available: true }
+];
+
+const adminSidebarGroups: { title: string; sections: AdminSection[] }[] = [
+  { title: 'Работа', sections: ['dashboard'] },
+  {
+    title: 'Контент',
+    sections: ['articles', 'events', 'courses', 'vacancies', 'suppliers', 'partners', 'generalSponsors', 'homepage']
+  },
+  { title: 'Заявки', sections: ['applications'] },
+  { title: 'Бизнес', sections: ['users'] },
+  { title: 'Справочники', sections: ['categories', 'cities', 'tags'] }
 ];
 
 type AdminSidebarProps = {
+  collapsed: boolean;
+  onCollapsedChange: (nextValue: boolean) => void;
   role: UserRole;
 };
 
-export function AdminSidebar({ role }: AdminSidebarProps) {
+export function AdminSidebar({ collapsed, onCollapsedChange, role }: AdminSidebarProps) {
   const pathname = usePathname();
   const visibleLinks = adminLinks.filter((item) => item.available && canAccessAdminSection(role, item.section));
-  const upcomingLinks = adminLinks.filter((item) => !item.available && canAccessAdminSection(role, item.section));
+  const visibleGroups = adminSidebarGroups
+    .map((group) => ({
+      ...group,
+      links: group.sections
+        .map((section) => visibleLinks.find((item) => item.section === section))
+        .filter((item): item is (typeof visibleLinks)[number] => Boolean(item))
+    }))
+    .filter((group) => group.links.length > 0);
+  const roleLabel = role === 'ADMIN' ? 'Админ' : 'Модератор';
+  const toggleLabel = collapsed ? 'Развернуть боковую навигацию' : 'Свернуть боковую навигацию';
 
   return (
-    <Panel className="backdrop-blur" padding="md" tone="elevated">
-      <AppLink className="block text-lg font-bold tracking-normal" href="/admin">
-        Админка BARSYNERGY
-      </AppLink>
-      <nav className="mt-5 grid gap-1.5 text-sm">
-        {visibleLinks.map((item) => {
-          const isActive = item.href === '/admin' ? pathname === item.href : pathname === item.href || pathname?.startsWith(`${item.href}/`);
+    <aside aria-label="Навигация админки" className="admin-sidebar-shell" data-sidebar-state={collapsed ? 'collapsed' : 'expanded'}>
+      <button
+        aria-controls="admin-sidebar-nav"
+        aria-expanded={!collapsed}
+        aria-label={toggleLabel}
+        className="admin-sidebar-toggle"
+        onClick={() => onCollapsedChange(!collapsed)}
+        type="button"
+      >
+        {collapsed ? <PanelLeftOpen aria-hidden="true" size={17} strokeWidth={2.4} /> : <PanelLeftClose aria-hidden="true" size={17} strokeWidth={2.4} />}
+      </button>
+      <div className="admin-sidebar-body">
+        <div className="admin-sidebar-header">
+          <AppLink aria-label="Админка BARSYNERGY" className="admin-sidebar-brand" href="/admin">
+            <span aria-hidden="true" className="admin-sidebar-brand-mark">
+              B
+            </span>
+            <span className="admin-sidebar-brand-wordmark">BARSYNERGY</span>
+            <span className="admin-sidebar-role-badge">
+              <span className="admin-sidebar-role-badge-dot" aria-hidden="true" />
+              {roleLabel}
+            </span>
+          </AppLink>
+        </div>
+        <nav className="admin-sidebar-nav" id="admin-sidebar-nav">
+          <div className="admin-sidebar-groups">
+            {visibleGroups.map((group) => (
+              <section aria-label={group.title} className="admin-sidebar-group" key={group.title}>
+                <p className="admin-sidebar-group-title">{group.title}</p>
+                <div className="admin-sidebar-group-links">
+                  {group.links.map((item) => {
+                    const isActive = item.href === '/admin' ? pathname === item.href : pathname === item.href || pathname?.startsWith(`${item.href}/`);
+                    const Icon = item.icon;
 
-          return (
-            <NavLink
-              active={isActive}
-              className={
-                isActive
-                  ? 'border border-[var(--admin-nav-active-border)] bg-[var(--admin-nav-active-bg)] text-[var(--admin-nav-active-text)] hover:bg-[var(--admin-nav-active-hover)] hover:text-[var(--admin-nav-active-text)]'
-                  : 'text-[var(--muted)]'
-              }
-              href={item.href}
-              key={item.href}
-            >
-              {item.label}
-            </NavLink>
-          );
-        })}
-      </nav>
-      {upcomingLinks.length > 0 ? (
-        <div className="mt-5 border-t border-[var(--line)] pt-4">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Скоро</p>
-          <div className="mt-3 grid gap-1.5 text-sm text-[var(--muted)]">
-            {upcomingLinks.map((item) => (
-              <span className="rounded-[var(--radius-md)] px-3 py-2.5" key={item.href}>
-                {item.label}
-              </span>
+                    return (
+                      <NavLink
+                        active={isActive}
+                        aria-label={item.label}
+                        className="admin-nav-link"
+                        href={item.href}
+                        key={item.href}
+                        title={collapsed ? item.label : undefined}
+                      >
+                        <Icon aria-hidden="true" className="admin-sidebar-link-icon" size={18} strokeWidth={2.1} />
+                        <span className="admin-sidebar-link-label">{item.label}</span>
+                      </NavLink>
+                    );
+                  })}
+                </div>
+              </section>
             ))}
           </div>
-        </div>
-      ) : null}
-    </Panel>
+        </nav>
+      </div>
+    </aside>
   );
 }

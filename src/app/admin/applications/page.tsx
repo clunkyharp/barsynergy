@@ -14,9 +14,9 @@ import {
   DataTableFrame,
   DataTableHead,
   DataTableHeaderCell,
-  DataTableRow
+  DataTableRow,
+  DataTableStateRow
 } from '@/components/ui/data-table';
-import { EmptyState } from '@/components/ui/empty-state';
 import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
@@ -332,30 +332,30 @@ export default async function AdminApplicationsPage({ searchParams }: AdminAppli
           </div>
         </div>
 
-        {applications.length === 0 ? (
-          <EmptyState
-            actionHref={hasActiveFilters ? ADMIN_APPLICATIONS_PATH : undefined}
-            actionLabel={hasActiveFilters ? 'Сбросить фильтры' : undefined}
-            description={hasActiveFilters ? 'По текущим фильтрам заявок нет.' : 'Когда пользователи отправят формы, заявки появятся в этой очереди.'}
-            title={hasActiveFilters ? 'Заявки не найдены' : 'Заявок пока нет'}
-          />
-        ) : (
-          <DataTableFrame>
-            <DataTable minWidth={1320}>
-              <DataTableHead>
-                <tr>
-                  <DataTableHeaderCell>Тип заявки</DataTableHeaderCell>
-                  <DataTableHeaderCell>Имя / компания</DataTableHeaderCell>
-                  <DataTableHeaderCell>Город</DataTableHeaderCell>
-                  <DataTableHeaderCell>Статус</DataTableHeaderCell>
-                  <DataTableHeaderCell>Файлы / согласия</DataTableHeaderCell>
-                  <DataTableHeaderCell>Создана</DataTableHeaderCell>
-                  <DataTableHeaderCell>Следующий шаг</DataTableHeaderCell>
-                  <DataTableActionsHeaderCell>Действия</DataTableActionsHeaderCell>
-                </tr>
-              </DataTableHead>
-              <DataTableBody>
-                {applications.map((application) => {
+        <DataTableFrame>
+          <DataTable minWidth={1320}>
+            <DataTableHead>
+              <tr>
+                <DataTableHeaderCell>Тип заявки</DataTableHeaderCell>
+                <DataTableHeaderCell>Имя / компания</DataTableHeaderCell>
+                <DataTableHeaderCell>Город</DataTableHeaderCell>
+                <DataTableHeaderCell>Статус</DataTableHeaderCell>
+                <DataTableHeaderCell>Файлы / согласия</DataTableHeaderCell>
+                <DataTableHeaderCell>Создана</DataTableHeaderCell>
+                <DataTableHeaderCell>Следующий шаг</DataTableHeaderCell>
+                <DataTableActionsHeaderCell>Действия</DataTableActionsHeaderCell>
+              </tr>
+            </DataTableHead>
+            <DataTableBody>
+              {applications.length === 0 ? (
+                <DataTableStateRow
+                  colSpan={8}
+                  description={hasActiveFilters ? 'По текущим фильтрам заявок нет.' : 'Когда пользователи отправят формы, заявки появятся в этой очереди.'}
+                  state={hasActiveFilters ? 'no-results' : 'empty'}
+                  title={hasActiveFilters ? 'Заявки не найдены' : 'Заявок пока нет'}
+                />
+              ) : (
+                applications.map((application) => {
                   const actionLabel = applicationActionLabel(application);
                   const identity = applicationPersonOrCompany(application);
                   const publicationTarget = applicationPublicationTarget(application);
@@ -433,11 +433,11 @@ export default async function AdminApplicationsPage({ searchParams }: AdminAppli
                       </DataTableActionsCell>
                     </DataTableRow>
                   );
-                })}
-              </DataTableBody>
-            </DataTable>
-          </DataTableFrame>
-        )}
+                })
+              )}
+            </DataTableBody>
+          </DataTable>
+        </DataTableFrame>
 
         <AdminPagination
           basePath={ADMIN_APPLICATIONS_PATH}

@@ -18,9 +18,9 @@ import {
   AdminTableFrame,
   AdminTableHead,
   AdminTableHeaderCell,
-  AdminTableRow
+  AdminTableRow,
+  AdminTableStateRow
 } from '@/components/ui/admin-table';
-import { EmptyState } from '@/components/ui/empty-state';
 import { StatusBadge } from '@/components/ui/status-badge';
 import {
   ADMIN_CONTENT_PAGE_SIZE,
@@ -142,28 +142,28 @@ export default async function AdminArticlesPage({ searchParams }: AdminArticlesP
           </div>
         </div>
 
-        {articles.length === 0 ? (
-          <EmptyState
-            actionHref={hasActiveFilters ? ADMIN_ARTICLES_PATH : `${ADMIN_ARTICLES_PATH}/create`}
-            actionLabel={hasActiveFilters ? 'Сбросить фильтры' : 'Создать статью'}
-            description={hasActiveFilters ? 'По текущим фильтрам записей нет.' : 'Добавьте первый редакционный материал и сохраните его как черновик или публикацию.'}
-            title={hasActiveFilters ? 'Статьи не найдены' : 'Статей пока нет'}
-          />
-        ) : (
-          <AdminTableFrame>
-            <AdminTable minWidth={980}>
-              <AdminTableHead>
-                <tr>
-                  <AdminTableHeaderCell>Материал</AdminTableHeaderCell>
-                  <AdminTableHeaderCell>Категория</AdminTableHeaderCell>
-                  <AdminTableHeaderCell>Город</AdminTableHeaderCell>
-                  <AdminTableHeaderCell>Статус</AdminTableHeaderCell>
-                  <AdminTableHeaderCell>Обновлено</AdminTableHeaderCell>
-                  <AdminTableActionsHeaderCell>Действия</AdminTableActionsHeaderCell>
-                </tr>
-              </AdminTableHead>
-              <AdminTableBody>
-                {articles.map((article) => (
+        <AdminTableFrame>
+          <AdminTable minWidth={980}>
+            <AdminTableHead>
+              <tr>
+                <AdminTableHeaderCell>Материал</AdminTableHeaderCell>
+                <AdminTableHeaderCell>Категория</AdminTableHeaderCell>
+                <AdminTableHeaderCell>Город</AdminTableHeaderCell>
+                <AdminTableHeaderCell>Статус</AdminTableHeaderCell>
+                <AdminTableHeaderCell>Обновлено</AdminTableHeaderCell>
+                <AdminTableActionsHeaderCell>Действия</AdminTableActionsHeaderCell>
+              </tr>
+            </AdminTableHead>
+            <AdminTableBody>
+              {articles.length === 0 ? (
+                <AdminTableStateRow
+                  colSpan={6}
+                  description={hasActiveFilters ? 'По текущим фильтрам записей нет.' : 'Добавьте первый редакционный материал и сохраните его как черновик или публикацию.'}
+                  state={hasActiveFilters ? 'no-results' : 'empty'}
+                  title={hasActiveFilters ? 'Статьи не найдены' : 'Статей пока нет'}
+                />
+              ) : (
+                articles.map((article) => (
                   <AdminTableRow key={article.id}>
                     <AdminTableCell className="max-w-[320px]" label="Материал">
                       <AdminTableClamp className="font-semibold">{article.title}</AdminTableClamp>
@@ -203,11 +203,11 @@ export default async function AdminArticlesPage({ searchParams }: AdminArticlesP
                       />
                     </AdminTableActionsCell>
                   </AdminTableRow>
-                ))}
-              </AdminTableBody>
-            </AdminTable>
-          </AdminTableFrame>
-        )}
+                ))
+              )}
+            </AdminTableBody>
+          </AdminTable>
+        </AdminTableFrame>
 
         <AdminPagination
           basePath={ADMIN_ARTICLES_PATH}

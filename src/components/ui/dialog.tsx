@@ -132,9 +132,11 @@ export function Dialog({
         aria-modal="true"
         className={cn(
           'dialog-panel w-full rounded-[18px] border border-[var(--line)] bg-[var(--surface)] p-6 text-left text-[var(--text)] shadow-[var(--shadow-overlay)] motion-reduce:transition-none',
+          size === 'confirm' && 'border-[#ded2c2] bg-white shadow-none',
           dialogSizes[size],
           className
         )}
+        data-size={size}
         ref={dialogRef}
         role="dialog"
         tabIndex={-1}

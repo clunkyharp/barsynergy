@@ -85,6 +85,7 @@ export function PublicFilters({
   const searchInputId = `${filterInstanceId}-search`;
   const filterPanelId = `${filterInstanceId}-fields`;
   const filterIdPrefix = `${filterInstanceId}-filter`;
+  const filterStatusId = `${filterInstanceId}-status`;
 
   const currentQ = searchParams?.get('q') ?? '';
   const currentCategory = searchParams?.get('category') ?? '';
@@ -219,9 +220,18 @@ export function PublicFilters({
   );
   const shouldShowSearchLabel = isDirectoryTone || resolvedVariant === 'sidebar';
   const shouldShowFilterIntro = !(isDirectoryTone && resolvedVariant === 'sidebar');
+  const liveStatusText = isPending
+    ? 'Обновляем список.'
+    : hasActiveFilters
+      ? `${activeSummaryLabel}: ${activeFilters.length}.`
+      : 'Фильтры не выбраны.';
 
-  function renderDirectoryFieldLabel(label: string) {
-    return <span className={fieldLabelClassName}>{label}</span>;
+  function renderDirectoryFieldLabel(label: string, htmlFor: string) {
+    return (
+      <label className={fieldLabelClassName} htmlFor={htmlFor}>
+        {label}
+      </label>
+    );
   }
 
   const searchField = (
@@ -232,6 +242,7 @@ export function PublicFilters({
       <SearchInput
         aria-label="Поиск по списку"
         autoComplete="off"
+        enterKeyHint="search"
         id={searchInputId}
         inputMode="search"
         name="q"
@@ -267,7 +278,7 @@ export function PublicFilters({
     <>
       {categories.length > 0 ? (
         <div className={fieldShellClassName}>
-          {renderDirectoryFieldLabel(categoryLabel)}
+          {renderDirectoryFieldLabel(categoryLabel, `${filterIdPrefix}-category`)}
           <Select
             aria-label={categoryLabel}
             className={controlClassName}
@@ -288,7 +299,7 @@ export function PublicFilters({
 
       {cities.length > 0 ? (
         <div className={fieldShellClassName}>
-          {renderDirectoryFieldLabel(cityLabel)}
+          {renderDirectoryFieldLabel(cityLabel, `${filterIdPrefix}-city`)}
           <Select
             aria-label={cityLabel}
             className={controlClassName}
@@ -312,7 +323,7 @@ export function PublicFilters({
 
         return (
           <div className={fieldShellClassName} key={filter.name}>
-            {renderDirectoryFieldLabel(filter.label)}
+            {renderDirectoryFieldLabel(filter.label, `${filterIdPrefix}-${filter.name}`)}
             <Select
               aria-label={filter.label}
               className={controlClassName}
@@ -336,7 +347,10 @@ export function PublicFilters({
 
   if (resolvedVariant === 'toolbar') {
     const toolbarContent = (
-      <div className={cn('grid', compact ? 'gap-2' : 'gap-3', embedded ? '' : 'container')}>
+      <search aria-label={title} className={cn('grid', compact ? 'gap-2' : 'gap-3', embedded ? '' : 'container')}>
+        <p aria-atomic="true" aria-live="polite" className="sr-only" id={filterStatusId}>
+          {liveStatusText}
+        </p>
         <Panel
           className={cn(
             'public-filter-toolbar-panel',
@@ -408,7 +422,7 @@ export function PublicFilters({
             </div>
           ) : null}
         </Panel>
-      </div>
+      </search>
     );
 
     if (embedded) {
@@ -424,7 +438,10 @@ export function PublicFilters({
 
   if (resolvedVariant === 'sidebar') {
     const sidebarContent = (
-      <div className={cn('grid gap-3', embedded ? '' : 'container')}>
+      <search aria-label={title} className={cn('grid gap-3', embedded ? '' : 'container')}>
+        <p aria-atomic="true" aria-live="polite" className="sr-only" id={filterStatusId}>
+          {liveStatusText}
+        </p>
         <Panel className={cn('public-filter-panel public-filter-sidebar-panel', panelSurfaceClass)} padding={panelPadding}>
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
@@ -507,7 +524,7 @@ export function PublicFilters({
             </div>
           ) : null}
         </Panel>
-      </div>
+      </search>
     );
 
     if (embedded) {
@@ -522,7 +539,10 @@ export function PublicFilters({
   }
 
   const content = (
-    <div className={cn('grid gap-3', embedded ? '' : 'container')}>
+    <search aria-label={title} className={cn('grid gap-3', embedded ? '' : 'container')}>
+      <p aria-atomic="true" aria-live="polite" className="sr-only" id={filterStatusId}>
+        {liveStatusText}
+      </p>
       <Panel className={cn('public-filter-search-panel', searchSurfaceClass)} padding={panelPadding}>
         {isDirectoryTone ? (
           <div className="mb-2 flex items-center justify-between gap-3">
@@ -617,7 +637,7 @@ export function PublicFilters({
           ) : null}
         </Panel>
       ) : null}
-    </div>
+    </search>
   );
 
   if (embedded) {

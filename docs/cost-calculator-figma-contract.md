@@ -11,10 +11,6 @@ BARSYNERGY
 file key: aKzJvpAdbGIdIhc7J3MQNv
 ```
 
-Current local screenshot evidence:
-
-- `artifacts/figma-review-screenshots-2026-05-22/23-components-contracts-23-public-calculator-component-contract--40-13849.png`
-
 Target nodes for the calculator transfer:
 
 | Role | Node |
@@ -30,7 +26,7 @@ Target nodes for the calculator transfer:
 | Desktop calculator section | `19:8851` |
 | Mobile calculated screen | `1:7051` |
 
-Figma app screenshot export currently needs re-authentication. Until that is fixed, runtime work uses the checked-in local export above plus the node list from the owner handoff.
+Figma app screenshot export currently needs re-authentication. Until that is fixed, runtime work uses the source node list from the owner handoff and fresh runtime verification.
 
 ## Token Mapping
 

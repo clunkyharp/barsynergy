@@ -1,4 +1,4 @@
-import type { CSSProperties, HTMLAttributes, TableHTMLAttributes, TdHTMLAttributes, ThHTMLAttributes } from 'react';
+import type { CSSProperties, HTMLAttributes, ReactNode, TableHTMLAttributes, TdHTMLAttributes, ThHTMLAttributes } from 'react';
 import { cn } from '@/lib/utils';
 export {
   AdminActionMenu,
@@ -15,6 +15,15 @@ type AdminTableProps = TableHTMLAttributes<HTMLTableElement> & {
 
 type AdminTableCellProps = TdHTMLAttributes<HTMLTableCellElement> & {
   label?: string;
+};
+
+type AdminTableState = 'loading' | 'empty' | 'no-results' | 'error';
+
+type AdminTableStateRowProps = HTMLAttributes<HTMLTableRowElement> & {
+  colSpan: number;
+  description?: ReactNode;
+  state: AdminTableState;
+  title: ReactNode;
 };
 
 export function AdminTableFrame({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
@@ -63,6 +72,24 @@ export function AdminTableHead({ className, ...props }: HTMLAttributes<HTMLTable
 
 export function AdminTableBody({ className, ...props }: HTMLAttributes<HTMLTableSectionElement>) {
   return <tbody className={className} {...props} />;
+}
+
+export function AdminTableStateRow({ className, colSpan, description, state, title, ...props }: AdminTableStateRowProps) {
+  return (
+    <tr
+      aria-busy={state === 'loading' || undefined}
+      className={cn('admin-data-table-state-row', className)}
+      data-state={state}
+      {...props}
+    >
+      <td className="admin-data-table-state-cell" colSpan={colSpan}>
+        <div className="admin-data-table-state-content">
+          <p className="admin-data-table-state-title">{title}</p>
+          {description ? <p className="admin-data-table-state-description">{description}</p> : null}
+        </div>
+      </td>
+    </tr>
+  );
 }
 
 export function AdminTableRow({ className, ...props }: HTMLAttributes<HTMLTableRowElement>) {

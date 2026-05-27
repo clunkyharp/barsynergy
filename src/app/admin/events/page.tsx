@@ -18,9 +18,9 @@ import {
   AdminTableFrame,
   AdminTableHead,
   AdminTableHeaderCell,
-  AdminTableRow
+  AdminTableRow,
+  AdminTableStateRow
 } from '@/components/ui/admin-table';
-import { EmptyState } from '@/components/ui/empty-state';
 import { StatusBadge } from '@/components/ui/status-badge';
 import {
   ADMIN_CONTENT_PAGE_SIZE,
@@ -141,28 +141,28 @@ export default async function AdminEventsPage({ searchParams }: AdminEventsPageP
           <p className="text-sm text-[var(--muted)]">Всего записей: {total}.</p>
         </div>
 
-        {events.length === 0 ? (
-          <EmptyState
-            actionHref={hasActiveFilters ? ADMIN_EVENTS_PATH : `${ADMIN_EVENTS_PATH}/create`}
-            actionLabel={hasActiveFilters ? 'Сбросить фильтры' : 'Создать событие'}
-            description={hasActiveFilters ? 'По текущим фильтрам записей нет.' : 'Добавьте событие с датой, городом и статусом публикации.'}
-            title={hasActiveFilters ? 'События не найдены' : 'Событий пока нет'}
-          />
-        ) : (
-          <AdminTableFrame>
-            <AdminTable minWidth={1040}>
-              <AdminTableHead>
-                <tr>
-                  <AdminTableHeaderCell>Событие</AdminTableHeaderCell>
-                  <AdminTableHeaderCell>Дата</AdminTableHeaderCell>
-                  <AdminTableHeaderCell>Город</AdminTableHeaderCell>
-                  <AdminTableHeaderCell>Статус</AdminTableHeaderCell>
-                  <AdminTableHeaderCell>Обновлено</AdminTableHeaderCell>
-                  <AdminTableActionsHeaderCell>Действия</AdminTableActionsHeaderCell>
-                </tr>
-              </AdminTableHead>
-              <AdminTableBody>
-                {events.map((event) => (
+        <AdminTableFrame>
+          <AdminTable minWidth={1040}>
+            <AdminTableHead>
+              <tr>
+                <AdminTableHeaderCell>Событие</AdminTableHeaderCell>
+                <AdminTableHeaderCell>Дата</AdminTableHeaderCell>
+                <AdminTableHeaderCell>Город</AdminTableHeaderCell>
+                <AdminTableHeaderCell>Статус</AdminTableHeaderCell>
+                <AdminTableHeaderCell>Обновлено</AdminTableHeaderCell>
+                <AdminTableActionsHeaderCell>Действия</AdminTableActionsHeaderCell>
+              </tr>
+            </AdminTableHead>
+            <AdminTableBody>
+              {events.length === 0 ? (
+                <AdminTableStateRow
+                  colSpan={6}
+                  description={hasActiveFilters ? 'По текущим фильтрам записей нет.' : 'Добавьте событие с датой, городом и статусом публикации.'}
+                  state={hasActiveFilters ? 'no-results' : 'empty'}
+                  title={hasActiveFilters ? 'События не найдены' : 'Событий пока нет'}
+                />
+              ) : (
+                events.map((event) => (
                   <AdminTableRow key={event.id}>
                     <AdminTableCell className="max-w-[320px]" label="Событие">
                       <AdminTableClamp className="font-semibold">{event.title}</AdminTableClamp>
@@ -197,11 +197,11 @@ export default async function AdminEventsPage({ searchParams }: AdminEventsPageP
                       />
                     </AdminTableActionsCell>
                   </AdminTableRow>
-                ))}
-              </AdminTableBody>
-            </AdminTable>
-          </AdminTableFrame>
-        )}
+                ))
+              )}
+            </AdminTableBody>
+          </AdminTable>
+        </AdminTableFrame>
 
         <AdminPagination
           basePath={ADMIN_EVENTS_PATH}

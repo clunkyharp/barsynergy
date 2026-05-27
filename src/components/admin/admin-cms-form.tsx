@@ -48,6 +48,7 @@ type AdminCmsPanelProps = {
 
 type AdminCmsActionsProps = Omit<ComponentPropsWithoutRef<'div'>, 'children'> & {
   children: ReactNode;
+  stateText?: ReactNode;
 };
 
 type AdminCmsInlineEditRecordProps = {
@@ -61,7 +62,7 @@ type AdminCmsInlineEditRecordProps = {
 };
 
 export function AdminCmsForm({ className, ...props }: AdminCmsFormProps) {
-  return <form className={cn('editorial-form-shell grid gap-6 p-5 sm:p-6', className)} {...props} />;
+  return <form className={cn('admin-cms-form editorial-form-shell grid gap-6 p-5 sm:p-6', className)} {...props} />;
 }
 
 export function AdminCmsSection({ bodyClassName, children, className, description, title }: AdminCmsSectionProps) {
@@ -166,7 +167,7 @@ export function AdminCmsInlineEditRecord({
     <details
       name={groupName}
       className={cn(
-        'group/admin-inline admin-inline-edit-record overflow-hidden rounded-[12px] border border-[var(--line)] bg-[var(--surface)] transition hover:border-[var(--border-strong)]',
+        'group/admin-inline admin-inline-edit-record admin-surface-shell overflow-hidden rounded-[12px] border border-[var(--line)] bg-[var(--surface)] transition hover:border-[var(--border-strong)]',
         className
       )}
     >
@@ -186,21 +187,24 @@ export function AdminCmsInlineEditRecord({
   );
 }
 
-export function AdminCmsActions({ className, ...props }: AdminCmsActionsProps) {
+export function AdminCmsActions({ children, className, stateText = 'Есть несохранённые изменения', ...props }: AdminCmsActionsProps) {
   return (
     <FormActions
       className={cn(
-        'admin-sticky-form-actions sticky bottom-3 z-30 rounded-[14px] border border-[var(--line)] bg-[color-mix(in_oklab,var(--surface),transparent_4%)] p-4 shadow-[0_16px_36px_rgba(48,40,35,0.12)] backdrop-blur sm:bottom-4 sm:[&>*:last-child]:ml-auto',
+        'admin-sticky-form-actions admin-surface-shell sticky bottom-3 z-30 rounded-[14px] border border-[var(--line)] bg-[var(--admin-surface)] p-4 sm:bottom-4',
         className
       )}
       {...props}
-    />
+    >
+      {stateText ? <p className="admin-sticky-form-actions-state">{stateText}</p> : null}
+      <div className="admin-sticky-form-actions-controls">{children}</div>
+    </FormActions>
   );
 }
 
 export function AdminCmsPanel({ children, className, description, title }: AdminCmsPanelProps) {
   return (
-    <section className={cn('editorial-form-shell p-5 sm:p-6', className)}>
+    <section className={cn('admin-cms-panel editorial-form-shell p-5 sm:p-6', className)}>
       {title ? (
         <div className="mb-5 border-b border-[var(--line)] pb-4">
           <h2 className="text-lg font-semibold">{title}</h2>
@@ -216,7 +220,7 @@ export function AdminCmsRecordForm({ className, ...props }: AdminCmsFormProps) {
   return (
     <form
       className={cn(
-        'grid gap-4 rounded-[var(--radius-md)] border border-[var(--line)] border-l-[3px] border-l-[var(--accent)] bg-[var(--surface)] p-4 shadow-none',
+        'admin-record-form admin-surface-shell grid gap-4 rounded-[var(--radius-md)] border border-[var(--line)] border-l-[3px] border-l-[var(--accent)] bg-[var(--surface)] p-4 shadow-none',
         className
       )}
       {...props}

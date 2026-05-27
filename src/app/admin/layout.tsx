@@ -1,7 +1,6 @@
 import type { ReactNode } from 'react';
 import { redirect } from 'next/navigation';
-import { AdminHeader } from '@/components/layout/admin-header';
-import { AdminSidebar } from '@/components/layout/admin-sidebar';
+import { AdminShellFrame } from '@/components/layout/admin-shell-frame';
 import { AppLink } from '@/components/ui/app-link';
 import { Panel } from '@/components/ui/panel';
 import { getCurrentUser } from '@/lib/auth/current-user';
@@ -43,15 +42,9 @@ export default async function AdminLayout({ children }: { children: ReactNode })
   }
 
   return (
-    <div className="admin-shell min-h-screen border-t border-[var(--line)] bg-[var(--surface)]">
+    <div className="admin-shell min-h-screen">
       <AdminMobileUnsupportedState />
-      <div className="container hidden gap-6 py-8 md:grid lg:grid-cols-[300px_1fr]">
-        <AdminSidebar role={user.role} />
-        <div className="min-w-0">
-          <AdminHeader />
-          <div className="mt-6">{children}</div>
-        </div>
-      </div>
+      <AdminShellFrame role={user.role}>{children}</AdminShellFrame>
     </div>
   );
 }

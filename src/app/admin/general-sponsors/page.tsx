@@ -20,10 +20,10 @@ import {
   AdminTableFrame,
   AdminTableHead,
   AdminTableHeaderCell,
-  AdminTableRow
+  AdminTableRow,
+  AdminTableStateRow
 } from '@/components/ui/admin-table';
 import { Button } from '@/components/ui/button';
-import { EmptyState } from '@/components/ui/empty-state';
 import { StatusBadge } from '@/components/ui/status-badge';
 import {
   ADMIN_CONTENT_PAGE_SIZE,
@@ -138,27 +138,27 @@ export default async function AdminGeneralSponsorsPage({ searchParams }: AdminGe
           <p className="text-sm text-[var(--muted)]">Найдено записей: {total}.</p>
         </div>
 
-        {sponsors.length === 0 ? (
-          <EmptyState
-            actionHref={hasActiveFilters ? ADMIN_GENERAL_SPONSORS_PATH : `${ADMIN_GENERAL_SPONSORS_PATH}/new`}
-            actionLabel={hasActiveFilters ? 'Сбросить фильтры' : 'Создать спонсора'}
-            description={hasActiveFilters ? 'По текущим фильтрам спонсоров нет.' : 'Добавьте генерального спонсора, город и параметры показа.'}
-            title={hasActiveFilters ? 'Генеральные спонсоры не найдены' : 'Генеральных спонсоров пока нет'}
-          />
-        ) : (
-          <AdminTableFrame>
-            <AdminTable minWidth={1040}>
-              <AdminTableHead>
-                <AdminTableRow>
-                  <AdminTableHeaderCell>Спонсор</AdminTableHeaderCell>
-                  <AdminTableHeaderCell>Город и приоритет</AdminTableHeaderCell>
-                  <AdminTableHeaderCell>Статус</AdminTableHeaderCell>
-                  <AdminTableHeaderCell>Обновлено</AdminTableHeaderCell>
-                  <AdminTableActionsHeaderCell>Действия</AdminTableActionsHeaderCell>
-                </AdminTableRow>
-              </AdminTableHead>
-              <AdminTableBody>
-                {sponsors.map((sponsor) => (
+        <AdminTableFrame>
+          <AdminTable minWidth={1040}>
+            <AdminTableHead>
+              <AdminTableRow>
+                <AdminTableHeaderCell>Спонсор</AdminTableHeaderCell>
+                <AdminTableHeaderCell>Город и приоритет</AdminTableHeaderCell>
+                <AdminTableHeaderCell>Статус</AdminTableHeaderCell>
+                <AdminTableHeaderCell>Обновлено</AdminTableHeaderCell>
+                <AdminTableActionsHeaderCell>Действия</AdminTableActionsHeaderCell>
+              </AdminTableRow>
+            </AdminTableHead>
+            <AdminTableBody>
+              {sponsors.length === 0 ? (
+                <AdminTableStateRow
+                  colSpan={5}
+                  description={hasActiveFilters ? 'По текущим фильтрам спонсоров нет.' : 'Добавьте генерального спонсора, город и параметры показа.'}
+                  state={hasActiveFilters ? 'no-results' : 'empty'}
+                  title={hasActiveFilters ? 'Генеральные спонсоры не найдены' : 'Генеральных спонсоров пока нет'}
+                />
+              ) : (
+                sponsors.map((sponsor) => (
                   <AdminTableRow key={sponsor.id}>
                     <AdminTableCell className="max-w-[320px]" label="Спонсор">
                       <AdminTableClamp className="font-semibold">{sponsor.name}</AdminTableClamp>
@@ -197,11 +197,11 @@ export default async function AdminGeneralSponsorsPage({ searchParams }: AdminGe
                       />
                     </AdminTableActionsCell>
                   </AdminTableRow>
-                ))}
-              </AdminTableBody>
-            </AdminTable>
-          </AdminTableFrame>
-        )}
+                ))
+              )}
+            </AdminTableBody>
+          </AdminTable>
+        </AdminTableFrame>
 
         <AdminPagination
           basePath={ADMIN_GENERAL_SPONSORS_PATH}

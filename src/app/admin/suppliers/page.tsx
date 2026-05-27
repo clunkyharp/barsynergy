@@ -18,9 +18,9 @@ import {
   AdminTableFrame,
   AdminTableHead,
   AdminTableHeaderCell,
-  AdminTableRow
+  AdminTableRow,
+  AdminTableStateRow
 } from '@/components/ui/admin-table';
-import { EmptyState } from '@/components/ui/empty-state';
 import { StatCard } from '@/components/ui/stat-card';
 import { StatusBadge } from '@/components/ui/status-badge';
 import {
@@ -166,28 +166,28 @@ export default async function AdminSuppliersPage({ searchParams }: AdminSupplier
           </p>
         </div>
 
-        {suppliers.length === 0 ? (
-          <EmptyState
-            actionHref={hasActiveFilters ? ADMIN_SUPPLIERS_PATH : `${ADMIN_SUPPLIERS_PATH}/create`}
-            actionLabel={hasActiveFilters ? 'Сбросить фильтры' : 'Создать поставщика'}
-            description={hasActiveFilters ? 'По текущим фильтрам поставщиков нет.' : 'Добавьте компанию, географию работы и статус проверки.'}
-            title={hasActiveFilters ? 'Поставщики не найдены' : 'Поставщиков пока нет'}
-          />
-        ) : (
-          <AdminTableFrame>
-            <AdminTable minWidth={1040}>
-              <AdminTableHead>
-                <tr>
-                  <AdminTableHeaderCell>Поставщик</AdminTableHeaderCell>
-                  <AdminTableHeaderCell>Компания</AdminTableHeaderCell>
-                  <AdminTableHeaderCell>Город</AdminTableHeaderCell>
-                  <AdminTableHeaderCell>Статус</AdminTableHeaderCell>
-                  <AdminTableHeaderCell>Обновлено</AdminTableHeaderCell>
-                  <AdminTableActionsHeaderCell>Действия</AdminTableActionsHeaderCell>
-                </tr>
-              </AdminTableHead>
-              <AdminTableBody>
-                {suppliers.map((supplier) => (
+        <AdminTableFrame>
+          <AdminTable minWidth={1040}>
+            <AdminTableHead>
+              <tr>
+                <AdminTableHeaderCell>Поставщик</AdminTableHeaderCell>
+                <AdminTableHeaderCell>Компания</AdminTableHeaderCell>
+                <AdminTableHeaderCell>Город</AdminTableHeaderCell>
+                <AdminTableHeaderCell>Статус</AdminTableHeaderCell>
+                <AdminTableHeaderCell>Обновлено</AdminTableHeaderCell>
+                <AdminTableActionsHeaderCell>Действия</AdminTableActionsHeaderCell>
+              </tr>
+            </AdminTableHead>
+            <AdminTableBody>
+              {suppliers.length === 0 ? (
+                <AdminTableStateRow
+                  colSpan={6}
+                  description={hasActiveFilters ? 'По текущим фильтрам поставщиков нет.' : 'Добавьте компанию, географию работы и статус проверки.'}
+                  state={hasActiveFilters ? 'no-results' : 'empty'}
+                  title={hasActiveFilters ? 'Поставщики не найдены' : 'Поставщиков пока нет'}
+                />
+              ) : (
+                suppliers.map((supplier) => (
                   <AdminTableRow key={supplier.id}>
                     <AdminTableCell className="max-w-[320px]" label="Поставщик">
                       <AdminTableClamp className="font-semibold">{supplier.title}</AdminTableClamp>
@@ -227,11 +227,11 @@ export default async function AdminSuppliersPage({ searchParams }: AdminSupplier
                       />
                     </AdminTableActionsCell>
                   </AdminTableRow>
-                ))}
-              </AdminTableBody>
-            </AdminTable>
-          </AdminTableFrame>
-        )}
+                ))
+              )}
+            </AdminTableBody>
+          </AdminTable>
+        </AdminTableFrame>
 
         <AdminPagination
           basePath={ADMIN_SUPPLIERS_PATH}

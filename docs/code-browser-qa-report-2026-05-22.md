@@ -2,7 +2,7 @@
 
 Mode: Browser QA + Code QA + targeted fixes.
 
-Artifact: QA report, browser evidence, screenshots and targeted code fixes.
+Artifact: QA report and targeted code fixes.
 
 ## Summary
 
@@ -41,8 +41,6 @@ Result:
 Tool used:
 
 - Google Chrome headless through Chrome DevTools Protocol against `npm run dev`.
-- Evidence directory: `qa/browser-evidence/2026-05-22/`.
-- Consolidated evidence: `qa/browser-evidence/2026-05-22/browser-qa-summary.json`.
 
 Routes checked:
 
@@ -68,19 +66,11 @@ Verified by browser evidence:
 
 Local admin access was created through the project-supported `npm run admin:upsert:local` workflow. The password is not recorded in this report.
 
-Screenshots:
+Historical checks covered:
 
-- `qa/browser-evidence/2026-05-22/admin-dashboard.png`
-- `qa/browser-evidence/2026-05-22/admin-articles-list.png`
-- `qa/browser-evidence/2026-05-22/admin-articles-action-menu.png`
-- `qa/browser-evidence/2026-05-22/admin-applications-list.png`
-- `qa/browser-evidence/2026-05-22/admin-business-access.png`
-- `qa/browser-evidence/2026-05-22/admin-homepage-cms.png`
-- `qa/browser-evidence/2026-05-22/admin-dictionaries.png`
-- `qa/browser-evidence/2026-05-22/admin-cities.png`
-- `qa/browser-evidence/2026-05-22/admin-tags.png`
-- `qa/browser-evidence/2026-05-22/admin-content-form-default.png`
-- `qa/browser-evidence/2026-05-22/admin-content-form-error.png`
+- Admin dashboard, articles, applications, business access, homepage CMS, dictionaries, cities, tags and article create form.
+- Admin action menu open/focus/Escape behavior.
+- Article create form invalid-submit error state.
 
 Not proven:
 
@@ -96,13 +86,6 @@ Scenarios verified in browser:
 - Save: click `Сохранить настройки`, `localStorage["barsynergy_cookie_notice_accepted"] === "true"`.
 - Revisit: reload `/`, banner does not reappear.
 - Mobile: 390px viewport, banner and settings panel are visible and usable.
-
-Screenshots:
-
-- `qa/browser-evidence/2026-05-22/cookie-banner-desktop.png`
-- `qa/browser-evidence/2026-05-22/cookie-settings.png`
-- `qa/browser-evidence/2026-05-22/cookie-banner-mobile.png`
-- `qa/browser-evidence/2026-05-22/cookie-settings-mobile.png`
 
 ## CSS/Token Parity
 
@@ -146,12 +129,7 @@ Covered cases:
 - Zero recipe amount.
 - No `NaN`/`Infinity`.
 
-Browser evidence:
-
-- `qa/browser-evidence/2026-05-22/calculator-desktop.png`
-- `qa/browser-evidence/2026-05-22/calculator-mobile.png`
-- `qa/browser-evidence/2026-05-22/calculator-invalid-error.png`
-- `qa/browser-evidence/2026-05-22/calculator-targeted-results.json`
+Historical checks covered desktop/mobile calculator render, invalid error state and targeted calculator result assertions.
 
 ## Validation
 
