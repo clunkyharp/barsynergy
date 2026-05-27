@@ -23,7 +23,7 @@ Public personal-data forms remain disabled by default in production until `APPLI
 
 ## Current Stabilization Batch
 
-The current branch is a pre-Phase-5 stabilization branch. The previous dirty `dev` tree was checkpointed before this work as `5f42e91 Checkpoint UI QA remediation`.
+The current branch is a pre-Phase-5 stabilization branch. The previous dirty `dev` tree was checkpointed before this work as `5f42e91 Checkpoint UI QA remediation`; the already-open stabilization dirty state was separately checkpointed as `e134fd3 chore: checkpoint stabilization remediation` before the remaining remediation tasks started.
 
 Implemented in this branch so far:
 
@@ -36,28 +36,36 @@ Implemented in this branch so far:
 - mechanical CSS split into `src/app/styles/*` with `src/app/globals.css` kept as the import facade;
 - direct dependencies pinned to exact currently resolved versions;
 - CSP `frame-ancestors` changed to `'none'`;
-- scheduler runbook updated with notification retry.
+- scheduler runbook updated with notification retry;
+- cost calculator split into a thin client shell plus state hook, formatting helpers, ingredient editor and result rail modules without changing formulas or visible values;
+- public content service split into domain query modules behind the existing `src/lib/public/content.ts` facade;
+- shared admin content lifecycle helper added for repeated status update and draft delete logic across content entities;
+- Playwright/axe keyboard/form coverage added for the custom Select and admin Dropdown primitives;
+- focused browser QA completed for public smoke, public accessibility sweep, authenticated admin routes, UI primitives and a screenshot sweep of the key public/admin surfaces.
 
 Validation so far:
 
 - `npm run lint` passed;
-- `npm test` passed with 119/119 tests;
+- CSS parse for `src/app/**/*.css` passed with 8 files;
+- `npm test` passed with 122/122 tests;
 - `./node_modules/.bin/prisma validate` passed;
 - `git diff --check` passed;
 - direct `./node_modules/.bin/tsc --noEmit` passed after the application/action refactors;
 - `npm run typecheck` completed but still printed the local Next/SWC code-signature warning during `next typegen`;
 - `npm audit signatures` and `npm audit --omit=dev` passed;
 - full `npm audit --audit-level=low` reports one moderate dev-only `brace-expansion` advisory under `typescript-eslint`;
+- Playwright public smoke passed 1/1;
+- Playwright public accessibility sweep passed 28/28;
+- Playwright authenticated admin QA passed 23/23;
+- Playwright UI primitives passed 2/2;
+- focused Playwright screenshot sweep passed for home, suppliers, contacts form, calculator desktop/mobile, admin applications desktop and admin mobile fallback, and temporary screenshots/reports were removed;
 - `npm run build` is blocked locally by the known Next/SWC darwin-arm64 code-signature Team ID mismatch after successful `prisma generate`.
 
 Still open in this stabilization queue:
 
-- cost calculator component split;
-- public content service split by domain;
-- Playwright/axe Select and Dropdown keyboard/form scenarios;
-- shared admin content lifecycle helper for status update and draft delete;
-- browser QA for this branch;
-- clean production build in an environment without the local SWC code-signature blocker before commit or merge.
+- confirmation that the production scheduler is configured for session cleanup and notification retry before launch;
+- owner decision on whether mobile admin read-only/actions is required as a separate product task;
+- clean production build in an environment without the local SWC code-signature blocker before merge.
 
 ## Previous Local Batch (Historical)
 

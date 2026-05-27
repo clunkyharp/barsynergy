@@ -27,30 +27,37 @@ Mode: `IMPLEMENTATION` on `feature/stabilization-remediation`, after a separate 
 - Pinned direct dependencies in `package.json` and the lockfile root to the currently resolved exact versions without updating to latest.
 - Changed CSP `frame-ancestors` from `'self'` to `'none'`.
 - Updated the scheduler runbook with the notification retry job.
+- Split the cost calculator into a thin composition shell plus `use-cost-calculator-state`, formatting helpers, ingredient editor and result rail modules without changing formulas, CSS classes or visible copy.
+- Split public content list queries into `src/lib/public/content/*` domain modules while preserving the public `src/lib/public/content.ts` exports.
+- Added `src/lib/admin/content-lifecycle.ts` for shared admin content status updates and draft deletes across articles, events, courses, vacancies, suppliers, partners and general sponsors.
+- Added Playwright/axe coverage for custom Select and Dropdown keyboard/form flows in `tests/e2e/ui-primitives.spec.ts`.
+- Completed browser QA for public smoke, public accessibility sweep, authenticated admin QA, UI primitives and a focused screenshot sweep of home, suppliers, contacts form, calculator desktop/mobile, admin applications desktop and admin mobile fallback.
 
 ### Still Open
 
-- Extract the cost calculator into hook, calculation utilities and smaller UI parts without changing formulas or visible values.
-- Split `src/lib/public/content.ts` by domain while preserving current exports.
-- Add browser/axe Playwright scenarios specifically for custom Select and Dropdown keyboard/form flows.
-- Add a shared admin content lifecycle helper for status update and draft delete across content entities.
 - Confirm production scheduler setup before launch; code-level session cleanup remains unchanged by design.
 - Decide separately whether a mobile admin read-only/actions layer is a product requirement.
+- Confirm a clean production build in an environment without the local Next/SWC code-signature blocker.
 
 ### Current Validation Status
 
 - `npm run lint`: passed.
-- `npm test`: passed, 119/119.
+- CSS parse for `src/app/**/*.css`: passed, 8 files.
+- `npm test`: passed, 122/122.
 - `./node_modules/.bin/prisma validate`: passed.
 - `git diff --check`: passed.
-- `npm run typecheck`: completed with the existing local Next/SWC code-signature warning during `next typegen`; direct `tsc --noEmit` passed earlier in this batch.
+- `npm run typecheck`: completed with the existing local Next/SWC code-signature warning during `next typegen`; direct `./node_modules/.bin/tsc --noEmit` passed.
 - `npm audit signatures`: passed.
 - `npm audit --omit=dev`: passed.
 - `npm audit --audit-level=low`: reports one existing moderate dev-only `brace-expansion` advisory under `typescript-eslint`; no automatic fix was applied because this dependency batch only pins current lockfile versions.
 - `npm ls --depth=0`: completed; it still reports the pre-existing extraneous `@emnapi/runtime` in local `node_modules`.
 - `npm run build`: blocked by the local Next/SWC darwin-arm64 code-signature Team ID mismatch after successful `prisma generate`.
-- Browser QA is still pending for this stabilization branch.
-- Commit/merge still requires a clean build in an environment without the SWC code-signature blocker and fresh browser QA.
+- Playwright public smoke: passed, 1/1.
+- Playwright public accessibility sweep: passed, 28/28.
+- Playwright authenticated admin QA: passed, 23/23.
+- Playwright UI primitives: passed, 2/2.
+- Focused Playwright screenshot sweep: passed for home, suppliers, contacts form, calculator desktop/mobile, admin applications desktop and admin mobile fallback; temporary screenshots were removed after validation.
+- Commit/merge still requires a clean build in an environment without the SWC code-signature blocker; browser QA is current for this branch as of 2026-05-27.
 
 ## Current Use
 

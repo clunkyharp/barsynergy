@@ -231,13 +231,15 @@ Current status:
 - public `/education`, `/events`, `/suppliers`, `/partners`, `/business`, `/consulting` and `/contacts` now write the remaining MVP request types into `Application`;
 - `ApplicationType.BUSINESS_SOLUTION` and `ApplicationType.CONSULTING_REQUEST` are backed by migration `20260515120000_business_consulting_application_types`;
 - production public forms are disabled by default through `APPLICATION_FORMS_ENABLED`;
-- public forms include a honeypot and per-client rate limit;
+- public forms share the common public application submission helper and include form availability checks, same-origin protection, honeypot validation and per-client rate limiting;
+- `Application.payload` now has typed Zod parse/build helpers while the Prisma `Json?` field remains unchanged;
 - admin `/admin/applications` supports queue-style list/detail review, readable payload labels, private resume download, related-record cards, unified status/business-note/internal-note processing and manual `forwarded_to_employer` metadata;
+- admin application server actions are split by workflow area behind the existing facade, with transaction/business rules in `src/lib/admin/applications/*`;
 - employer-forwarding status is guarded so only consented vacancy responses can be marked as forwarded;
 - admins can create a draft `Vacancy` from a `vacancy_submission` application and keep publication manual;
 - admins can explicitly publish a vacancy, supplier or partner from an approved/reviewed application; the created public record is linked back to `Application.vacancyId`, `Application.supplierId` or `Application.partnerId`;
 - admin-only private resume download is available at `/admin/applications/[applicationId]/resume`;
-- user confirmation emails are sent when `SMTP_*` is configured, and short Telegram admin notifications are sent when Telegram env config is present;
+- user confirmation emails and short Telegram admin notifications are queued through `ApplicationNotification`; immediate dispatch runs after commit and failed attempts can be retried with `npm run notifications:retry`;
 - Phase 3 is complete at source level for the current MVP applications contract;
 - legal text and operator/Roskomnadzor readiness still need owner/legal review before personal-data forms are enabled in production.
 
@@ -340,7 +342,7 @@ Current status:
 
 - service-specialist module is planned as a Phase 5 catalog expansion;
 - current schema has `CategoryType.SERVICE` as taxonomy preparation, but it does not yet have `ServiceSpecialist`, `ApplicationType.SERVICE_SPECIALIST_SUBMISSION`, `/services` or `/admin/services`;
-- Phase 5 remains gated by the active stabilization queue in `docs/remediation-plan.md`, especially payload contracts, same-origin protection and notification retry;
+- Phase 5 remains gated by final stabilization sign-off in `docs/remediation-plan.md`, especially production scheduler confirmation and a clean production build in an environment without the local Next/SWC code-signature blocker;
 - it must not interrupt Phase 4 auth and first business account work unless the owner explicitly records a roadmap reorder;
 - first version has no specialist personal cabinet and no direct public publishing.
 
