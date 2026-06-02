@@ -18,7 +18,7 @@ const variants: Record<ButtonVariant, string> = {
 };
 
 const sizes: Record<ButtonSize, string> = {
-  sm: 'h-11 px-[18px] py-[11px] text-[15px] leading-5 tracking-normal',
+  sm: 'h-9 px-3.5 py-[7px] text-[13px] leading-5 tracking-normal',
   md: 'h-11 px-[18px] py-[11px] text-[15px] leading-5 tracking-normal',
   lg: 'h-12 px-6 py-3 text-[15px] leading-5 tracking-normal'
 };
@@ -51,7 +51,7 @@ function LoadingMark() {
 export function Button(props: ButtonProps | ButtonLinkProps) {
   const { children, variant = 'primary', size = 'md', className, loading = false, loadingText, ...rest } = props;
   const classes = cn(
-    'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-[10px] border text-center font-semibold transition-[background-color,border-color,color,box-shadow] duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)] motion-reduce:transition-none disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-[var(--surface-muted)] disabled:text-[var(--muted)] disabled:opacity-60 aria-disabled:pointer-events-none aria-disabled:cursor-not-allowed aria-disabled:bg-[var(--surface-muted)] aria-disabled:text-[var(--muted)] aria-disabled:opacity-60 aria-busy:cursor-wait',
+    'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-[var(--radius-md)] border text-center font-semibold transition-[background-color,border-color,color,box-shadow,filter,transform] duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)] motion-reduce:transition-none motion-reduce:active:scale-100 disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-[var(--surface-muted)] disabled:text-[var(--muted)] disabled:opacity-60 aria-disabled:pointer-events-none aria-disabled:cursor-not-allowed aria-disabled:bg-[var(--surface-muted)] aria-disabled:text-[var(--muted)] aria-disabled:opacity-60 aria-busy:cursor-wait',
     variants[variant],
     sizes[size],
     className

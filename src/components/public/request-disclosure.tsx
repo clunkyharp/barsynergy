@@ -154,7 +154,7 @@ export function RequestDisclosure({
   }
 
   return (
-    <div className={cn('scroll-mt-28', className)} id={id} ref={sectionRef}>
+    <div className={cn('scroll-mt-36 md:scroll-mt-44', className)} id={id} ref={sectionRef}>
       {open ? (
         <div id={panelId}>{children}</div>
       ) : (

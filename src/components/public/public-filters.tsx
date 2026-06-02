@@ -1,12 +1,11 @@
 'use client';
 
-import { useEffect, useId, useMemo, useState, useTransition } from 'react';
+import { Suspense, type ReactNode, useEffect, useId, useMemo, useState, useTransition } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { ChevronDown, RotateCcw, SlidersHorizontal, X } from 'lucide-react';
 import { Panel } from '@/components/ui/panel';
 import { SearchInput } from '@/components/ui/search-input';
 import { Select } from '@/components/ui/select';
-import { displayFont } from '@/lib/fonts';
 import { cn } from '@/lib/utils';
 
 type CategoryOption = {
@@ -42,7 +41,10 @@ type PublicFiltersProps = {
   cities?: CategoryOption[];
   compact?: boolean;
   contextItems?: FilterContextItem[];
+  collapseLabel?: string;
+  defaultCollapsed?: boolean;
   embedded?: boolean;
+  expandLabel?: string;
   extraFilters?: ExtraFilter[];
   placeholder?: string;
   description?: string;
@@ -57,7 +59,123 @@ type ActiveFilter = {
   value: string;
 };
 
-export function PublicFilters({
+function resolveFilterVariant(input: Pick<PublicFiltersProps, 'embedded' | 'variant'>) {
+  return input.variant ?? (input.embedded ? 'sidebar' : 'stacked');
+}
+
+function PublicFiltersSkeletonBlock({ className }: { className?: string }) {
+  return (
+    <div
+      aria-hidden="true"
+      className={cn('animate-pulse rounded-[var(--radius-sm)] bg-[var(--skeleton-fill)]', className)}
+    />
+  );
+}
+
+function wrapPublicFiltersFallback(content: ReactNode, embedded: boolean) {
+  if (embedded) {
+    return content;
+  }
+
+  return (
+    <section className="border-b border-[var(--line)] bg-[var(--surface-muted)] py-6">
+      {content}
+    </section>
+  );
+}
+
+function PublicFiltersFallback({
+  compact = false,
+  embedded = false,
+  title = 'Фильтры',
+  tone = 'default',
+  variant
+}: PublicFiltersProps) {
+  const resolvedVariant = resolveFilterVariant({ embedded, variant });
+  const isDirectoryTone = tone === 'directory';
+  const panelPadding = isDirectoryTone || compact ? 'sm' : 'md';
+  const panelSurfaceClass = isDirectoryTone
+    ? 'relative overflow-visible border-[var(--card-border-hover)] bg-[var(--surface-card)] shadow-none'
+    : 'border-[var(--border-default)] bg-[var(--surface-wash)]';
+  const searchSurfaceClass = isDirectoryTone
+    ? 'relative overflow-hidden border-[var(--card-border-hover)] bg-[var(--surface-card)] shadow-none'
+    : 'border-[var(--border-default)] bg-[var(--surface-wash)]';
+
+  if (resolvedVariant === 'toolbar') {
+    const toolbarContent = (
+      <search aria-label={title} className={cn('grid', compact ? 'gap-2' : 'gap-3', embedded ? '' : 'container')}>
+        <Panel
+          className={cn(
+            'public-filter-toolbar-panel',
+            'border-[var(--border-default)] bg-[var(--surface-wash)]',
+            compact ? 'shadow-none' : 'shadow-[var(--shadow-card)]'
+          )}
+          padding={compact ? 'sm' : 'md'}
+        >
+          <div
+            className={cn(
+              'grid max-md:pb-[calc(24px+env(safe-area-inset-bottom))] md:grid-cols-2',
+              compact
+                ? 'gap-2 xl:grid-cols-[minmax(14rem,1fr)_repeat(4,minmax(7.8rem,0.64fr))]'
+                : 'gap-3 xl:grid-cols-[minmax(16rem,1.15fr)_repeat(4,minmax(8.75rem,0.75fr))]'
+            )}
+          >
+            <PublicFiltersSkeletonBlock className={compact ? 'h-10' : 'h-12'} />
+            <PublicFiltersSkeletonBlock className={compact ? 'h-10' : 'h-12'} />
+            <PublicFiltersSkeletonBlock className={compact ? 'h-10' : 'h-12'} />
+          </div>
+        </Panel>
+      </search>
+    );
+
+    return wrapPublicFiltersFallback(toolbarContent, embedded);
+  }
+
+  if (resolvedVariant === 'sidebar') {
+    const sidebarContent = (
+      <search aria-label={title} className={cn('grid gap-3', embedded ? '' : 'container')}>
+        <Panel className={cn('public-filter-panel public-filter-sidebar-panel', panelSurfaceClass)} padding={panelPadding}>
+          <div className="grid gap-3">
+            <PublicFiltersSkeletonBlock className="h-5 max-w-32" />
+            <PublicFiltersSkeletonBlock className={compact ? 'h-10' : 'h-12'} />
+            <div className="grid gap-2.5 border-t border-[var(--line)] pt-4">
+              <PublicFiltersSkeletonBlock className={compact ? 'h-10' : 'h-12'} />
+              <PublicFiltersSkeletonBlock className={compact ? 'h-10' : 'h-12'} />
+            </div>
+          </div>
+        </Panel>
+      </search>
+    );
+
+    return wrapPublicFiltersFallback(sidebarContent, embedded);
+  }
+
+  const content = (
+    <search aria-label={title} className={cn('grid gap-3', embedded ? '' : 'container')}>
+      <Panel className={cn('public-filter-search-panel', searchSurfaceClass)} padding={panelPadding}>
+        <PublicFiltersSkeletonBlock className={compact ? 'h-10' : 'h-12'} />
+      </Panel>
+      <Panel className={cn('public-filter-panel', panelSurfaceClass)} padding={panelPadding}>
+        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+          <PublicFiltersSkeletonBlock className={compact ? 'h-10' : 'h-12'} />
+          <PublicFiltersSkeletonBlock className={compact ? 'h-10' : 'h-12'} />
+        </div>
+      </Panel>
+    </search>
+  );
+
+  return wrapPublicFiltersFallback(content, embedded);
+}
+
+export function PublicFilters(props: PublicFiltersProps) {
+  return (
+    <Suspense fallback={<PublicFiltersFallback {...props} />}>
+      <PublicFiltersContent {...props} />
+    </Suspense>
+  );
+}
+
+function PublicFiltersContent({
   activeSummaryLabel = 'Сейчас выбрано',
   categoryAllLabel = 'Все категории',
   categoryLabel = 'Категория',
@@ -65,9 +183,12 @@ export function PublicFilters({
   cityAllLabel = 'Все города',
   cityLabel = 'Город',
   cities = [],
+  collapseLabel = 'Свернуть параметры',
   compact = false,
   contextItems = [],
+  defaultCollapsed: defaultCollapsedProp,
   embedded = false,
+  expandLabel = 'Показать параметры',
   extraFilters = [],
   placeholder = 'Поиск по названию или теме…',
   description = 'Город, категория и формат.',
@@ -80,7 +201,11 @@ export function PublicFilters({
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
   const [draftQuery, setDraftQuery] = useState('');
+  const resolvedVariant = resolveFilterVariant({ embedded, variant });
+  // defaultCollapsed = resolvedVariant === 'sidebar' unless a caller overrides it.
+  const defaultCollapsed = defaultCollapsedProp ?? (resolvedVariant === 'sidebar');
   const [showFilters, setShowFilters] = useState(false);
+  const [areSidebarFieldsCollapsed, setAreSidebarFieldsCollapsed] = useState(defaultCollapsed);
   const filterInstanceId = useId();
   const searchInputId = `${filterInstanceId}-search`;
   const filterPanelId = `${filterInstanceId}-fields`;
@@ -196,7 +321,13 @@ export function PublicFilters({
   }, [categories, categoryLabel, cities, cityLabel, currentCategory, currentCity, currentQ, extraFilters, searchParams]);
 
   const hasActiveFilters = activeFilters.length > 0;
-  const resolvedVariant = variant ?? (embedded ? 'sidebar' : 'stacked');
+
+  useEffect(() => {
+    if (hasActiveFilters) {
+      setAreSidebarFieldsCollapsed(false);
+    }
+  }, [hasActiveFilters]);
+
   const isDirectoryTone = tone === 'directory';
   const showToolbarStatus = hasActiveFilters || isPending;
   const panelSurfaceClass = isDirectoryTone
@@ -205,7 +336,7 @@ export function PublicFilters({
   const searchSurfaceClass = isDirectoryTone
     ? 'relative overflow-hidden border-[var(--card-border-hover)] bg-[var(--surface-card)] shadow-none'
     : 'border-[var(--border-default)] bg-[var(--surface-wash)]';
-  const filterTitleClassName = cn(displayFont.className, 'public-filter-title text-[var(--text)]');
+  const filterTitleClassName = cn('public-filter-title text-[var(--text)]');
   const fieldShellClassName = cn('public-filter-field w-full', isDirectoryTone && 'space-y-1.5');
   const fieldLabelClassName = 'public-filter-label text-[var(--muted)]';
   const controlClassName = cn(
@@ -231,6 +362,24 @@ export function PublicFilters({
       <label className={fieldLabelClassName} htmlFor={htmlFor}>
         {label}
       </label>
+    );
+  }
+
+  function renderClearButton(name: string, label: string, activeValue: string) {
+    if (!activeValue) {
+      return null;
+    }
+
+    return (
+      <button
+        aria-label={`Сбросить фильтр: ${label}`}
+        className="inline-flex min-h-9 items-center gap-1.5 justify-self-start rounded-[var(--radius-sm)] border border-[var(--border-default)] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--muted)] transition-colors hover:border-[var(--accent)]/35 hover:text-[var(--text)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] motion-reduce:transition-none"
+        onClick={() => clearSingleFilter(name)}
+        type="button"
+      >
+        <X aria-hidden="true" size={12} />
+        Сбросить
+      </button>
     );
   }
 
@@ -294,6 +443,7 @@ export function PublicFilters({
               </option>
             ))}
           </Select>
+          {renderClearButton('category', categoryLabel, currentCategory)}
         </div>
       ) : null}
 
@@ -315,6 +465,7 @@ export function PublicFilters({
               </option>
             ))}
           </Select>
+          {renderClearButton('city', cityLabel, currentCity)}
         </div>
       ) : null}
 
@@ -339,6 +490,7 @@ export function PublicFilters({
                 </option>
               ))}
             </Select>
+            {renderClearButton(filter.name, filter.label, currentValue)}
           </div>
         );
       })}
@@ -361,14 +513,43 @@ export function PublicFilters({
         >
           <div
             className={cn(
-              'grid max-md:pb-[calc(24px+env(safe-area-inset-bottom))] md:grid-cols-2',
+              'grid',
               compact
-                ? 'gap-2 xl:grid-cols-[minmax(14rem,1fr)_repeat(4,minmax(7.8rem,0.64fr))]'
-                : 'gap-3 xl:grid-cols-[minmax(16rem,1.15fr)_repeat(4,minmax(8.75rem,0.75fr))]'
+                ? 'gap-2 xl:grid-cols-[minmax(16rem,1fr)_max-content]'
+                : 'gap-3 xl:grid-cols-[minmax(20rem,1fr)_max-content]'
             )}
           >
-            {searchField}
-            {filterFields}
+            <div className="toolbar-search-row min-w-0">
+              {searchField}
+            </div>
+            {hasFilters ? (
+              <button
+                aria-controls={filterPanelId}
+                aria-expanded={showFilters}
+                className={cn(
+                  'inline-flex min-h-11 items-center justify-center gap-2 whitespace-nowrap rounded-[var(--radius-sm)] border border-[var(--border-default)] px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--text)] transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] hover:border-[var(--accent)]/35 motion-reduce:transition-none',
+                  isDirectoryTone && 'border-[var(--accent)]/22 bg-[var(--surface-wash)]'
+                )}
+                onClick={() => setShowFilters((value) => !value)}
+                type="button"
+              >
+                <SlidersHorizontal size={14} />
+                {showFilters ? collapseLabel : expandLabel}
+                <ChevronDown
+                  className={cn('transition-transform duration-[var(--motion-duration-base)] ease-[var(--motion-ease-standard)] motion-reduce:transition-none', showFilters && 'rotate-180')}
+                  size={14}
+                />
+              </button>
+            ) : null}
+            <div
+              className={cn(
+                'col-span-full gap-2 max-md:pb-[calc(24px+env(safe-area-inset-bottom))] xl:grid-cols-4',
+                showFilters || hasActiveFilters ? 'grid md:grid' : 'hidden'
+              )}
+              id={filterPanelId}
+            >
+              {filterFields}
+            </div>
           </div>
 
           {showToolbarStatus ? (
@@ -443,36 +624,32 @@ export function PublicFilters({
           {liveStatusText}
         </p>
         <Panel className={cn('public-filter-panel public-filter-sidebar-panel', panelSurfaceClass)} padding={panelPadding}>
-          <div className="flex items-start justify-between gap-3">
-            <div className="min-w-0">
-              <p className={filterTitleClassName}>{title}</p>
-              {shouldShowFilterIntro ? <p className="mt-2 text-sm leading-6 text-[var(--muted)]">{description}</p> : null}
-            </div>
+          <p className={filterTitleClassName}>{title}</p>
+          {shouldShowFilterIntro ? <p className="mt-1.5 text-sm leading-6 text-[var(--muted)]">{description}</p> : null}
 
-            {hasFilters ? (
-              <button
-                aria-controls={filterPanelId}
-                aria-expanded={showFilters}
-                className={cn(
-                  'inline-flex min-h-10 shrink-0 items-center gap-2 rounded-[var(--radius-sm)] border border-[var(--border-default)] px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--text)] transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] hover:border-[var(--accent)]/35 motion-reduce:transition-none md:hidden',
-                  isDirectoryTone && 'border-[var(--accent)]/22 bg-[var(--surface-wash)]'
-                )}
-                onClick={() => setShowFilters((value) => !value)}
-                type="button"
-              >
-                <SlidersHorizontal size={14} />
-                {isDirectoryTone ? 'Параметры' : 'Фильтры'}
-                <ChevronDown
-                  className={cn('transition-transform duration-[var(--motion-duration-base)] ease-[var(--motion-ease-standard)] motion-reduce:transition-none', showFilters && 'rotate-180')}
-                  size={14}
-                />
-              </button>
-            ) : null}
-          </div>
+          <div className="mt-3">{searchField}</div>
 
-          <div className="mt-4">{searchField}</div>
+          {hasFilters ? (
+            <button
+              aria-controls={filterPanelId}
+              aria-expanded={!areSidebarFieldsCollapsed}
+              className={cn(
+                'mt-3 inline-flex min-h-9 w-full items-center justify-center gap-1.5 whitespace-nowrap rounded-[var(--radius-sm)] border border-[var(--border-default)] px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)] transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] hover:border-[var(--accent)]/35 hover:text-[var(--text)] motion-reduce:transition-none',
+                isDirectoryTone && 'border-[var(--accent)]/22 bg-[var(--surface-wash)]'
+              )}
+              onClick={() => setAreSidebarFieldsCollapsed((value) => !value)}
+              type="button"
+            >
+              <SlidersHorizontal size={13} />
+              {areSidebarFieldsCollapsed ? expandLabel : collapseLabel}
+              <ChevronDown
+                className={cn('transition-transform duration-[var(--motion-duration-base)] ease-[var(--motion-ease-standard)] motion-reduce:transition-none', !areSidebarFieldsCollapsed && 'rotate-180')}
+                size={12}
+              />
+            </button>
+          ) : null}
 
-          {contextSummary ? <div className="mt-4">{contextSummary}</div> : null}
+          {contextSummary && !areSidebarFieldsCollapsed ? <div className="mt-3">{contextSummary}</div> : null}
 
           {hasActiveFilters ? (
             <div className="mt-4 flex flex-wrap gap-2">
@@ -492,14 +669,12 @@ export function PublicFilters({
             </div>
           ) : null}
 
-          {hasFilters ? (
+          {hasFilters && !areSidebarFieldsCollapsed ? (
             <div
               id={filterPanelId}
               className={cn(
-                'mt-4 gap-2.5 border-t border-[var(--line)] pt-4 max-md:pb-[calc(20px+env(safe-area-inset-bottom))]',
-                embedded ? 'hidden md:grid' : 'grid md:grid-cols-2 xl:grid-cols-4',
-                embedded && showFilters && 'grid',
-                embedded && !showFilters && 'md:grid'
+                'mt-4 grid gap-2.5 border-t border-[var(--line)] pt-4',
+                embedded && 'pb-1'
               )}
             >
               {filterFields}
@@ -548,7 +723,7 @@ export function PublicFilters({
           <div className="mb-2 flex items-center justify-between gap-3">
             <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Поиск в каталоге</span>
             <span className="hidden text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)] sm:inline">
-              BARSYNERGY / поставщики
+              Каталог поставщиков
             </span>
           </div>
         ) : null}
@@ -558,7 +733,7 @@ export function PublicFilters({
       {hasFilters ? (
         <Panel className={cn('public-filter-panel', panelSurfaceClass)} padding={panelPadding}>
           <div className="flex items-start justify-between gap-3">
-            <div>
+            <div className="min-w-0">
               <p className={filterTitleClassName}>{title}</p>
               {shouldShowFilterIntro ? <p className="mt-2 text-sm leading-6 text-[var(--muted)]">{description}</p> : null}
               {shouldShowFilterIntro && contextSummary ? <div className="mt-3">{contextSummary}</div> : null}
@@ -568,7 +743,7 @@ export function PublicFilters({
                 </p>
               ) : null}
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex shrink-0 items-center gap-2">
               {hasActiveFilters ? (
                 <button
                   className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--accent)] transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] hover:text-[var(--accent-strong)] motion-reduce:transition-none"

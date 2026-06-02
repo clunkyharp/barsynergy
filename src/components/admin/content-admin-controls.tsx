@@ -53,6 +53,7 @@ type CoverImageFieldProps = {
 
 type AdminListFiltersProps = {
   basePath: string;
+  includeStatus?: boolean;
   params: AdminContentSearchParams;
   filters?: {
     name: string;
@@ -67,8 +68,18 @@ type AdminFilterBarProps = Omit<FormHTMLAttributes<HTMLFormElement>, 'action' | 
   action: string;
   children: ReactNode;
   method?: 'get' | 'post';
-  summary?: string;
-  title?: string;
+};
+
+type AdminStatusTabItem = {
+  count?: number;
+  current?: boolean;
+  href: string;
+  label: string;
+};
+
+type AdminStatusTabsProps = {
+  items: AdminStatusTabItem[];
+  label?: string;
 };
 
 type AdminContentRowActionsProps = {
@@ -91,7 +102,10 @@ type AdminContentVisibilityPanelProps = {
   updateStatusAction: (formData: FormData) => Promise<void>;
 };
 
-function adminPageHref(basePath: string, params: AdminContentSearchParams, page: number) {
+type QueryPatchValue = string | string[] | null | undefined;
+type QueryPatch = Record<string, QueryPatchValue>;
+
+function adminQueryHref(basePath: string, params: AdminContentSearchParams, patch: QueryPatch = {}) {
   const query = new URLSearchParams();
 
   Object.entries(params).forEach(([key, value]) => {
@@ -113,14 +127,29 @@ function adminPageHref(basePath: string, params: AdminContentSearchParams, page:
     }
   });
 
-  if (page > 1) {
-    query.set('page', String(page));
-  } else {
-    query.delete('page');
-  }
+  Object.entries(patch).forEach(([key, value]) => {
+    query.delete(key);
+
+    if (Array.isArray(value)) {
+      value.forEach((item) => {
+        if (item) {
+          query.append(key, item);
+        }
+      });
+      return;
+    }
+
+    if (value) {
+      query.set(key, value);
+    }
+  });
 
   const queryString = query.toString();
   return queryString ? `${basePath}?${queryString}` : basePath;
+}
+
+function adminPageHref(basePath: string, params: AdminContentSearchParams, page: number) {
+  return adminQueryHref(basePath, params, { page: page > 1 ? String(page) : null });
 }
 
 export function AdminActionAlert({ params }: AdminActionAlertProps) {
@@ -209,25 +238,13 @@ export function AdminFilterBar({
   children,
   className,
   method = 'get',
-  summary = 'Поиск и отбор записей без изменения данных.',
-  title = 'Фильтр списка',
   ...props
 }: AdminFilterBarProps) {
   const classNames = cn(
-    'admin-filter-panel admin-surface-shell rounded-[var(--radius-md)] border border-[var(--line)] border-l-[3px] border-l-[var(--admin-structure-accent)] bg-[var(--surface)] p-4 shadow-none',
+    'admin-filter-panel admin-surface-shell rounded-[var(--radius-md)] border border-[var(--line)] bg-[var(--surface)] p-4 shadow-none',
     className
   );
-  const content = (
-    <>
-      <div className="grid gap-1 border-b border-[var(--line)] pb-3">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--admin-label)]">{title}</p>
-        <p className="text-xs leading-5 text-[var(--muted)]">{summary}</p>
-      </div>
-      <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-[minmax(220px,1fr)_repeat(4,minmax(150px,220px))] xl:items-end">
-        {children}
-      </div>
-    </>
-  );
+  const content = <div className="admin-filter-toolbar">{children}</div>;
 
   if (method === 'get') {
     return (
@@ -249,7 +266,45 @@ export function AdminFilterBar({
   );
 }
 
-export function AdminListFilters({ basePath, params, filters = [], searchPlaceholder = 'Поиск по названию' }: AdminListFiltersProps) {
+export function AdminStatusTabs({ items, label = 'Быстрые фильтры' }: AdminStatusTabsProps) {
+  return (
+    <nav aria-label={label} className="admin-status-tabs">
+      {items.map((item) => (
+        <Button
+          aria-current={item.current ? 'page' : undefined}
+          className={cn('admin-status-tab', item.current && 'admin-filter-active')}
+          href={item.href}
+          key={`${item.label}-${item.href}`}
+          size="sm"
+          variant={item.current ? 'secondary' : 'ghost'}
+        >
+          <span>{item.label}</span>
+          {typeof item.count === 'number' ? <span className="admin-status-tab-count">{item.count}</span> : null}
+        </Button>
+      ))}
+    </nav>
+  );
+}
+
+export function AdminContentStatusTabs({ basePath, params }: Pick<AdminListFiltersProps, 'basePath' | 'params'>) {
+  const selectedStatus = firstParam(params.status) ?? '';
+
+  return (
+    <AdminStatusTabs
+      items={[
+        { current: selectedStatus === '', href: adminQueryHref(basePath, params, { page: null, status: null }), label: 'Все' },
+        ...Object.values(ContentStatus).map((status) => ({
+          current: selectedStatus === status,
+          href: adminQueryHref(basePath, params, { page: null, status }),
+          label: contentStatusLabels[status]
+        }))
+      ]}
+      label="Статусы публикации"
+    />
+  );
+}
+
+export function AdminListFilters({ basePath, includeStatus = true, params, filters = [], searchPlaceholder = 'Поиск по названию' }: AdminListFiltersProps) {
   const q = firstParam(params.q) ?? '';
   const status = firstParam(params.status) ?? '';
 
@@ -258,16 +313,18 @@ export function AdminListFilters({ basePath, params, filters = [], searchPlaceho
       <FormField htmlFor="admin-filter-q" label="Поиск">
         <SearchInput id="admin-filter-q" name="q" placeholder={searchPlaceholder} defaultValue={q} />
       </FormField>
-      <FormField htmlFor="admin-filter-status" label="Статус">
-        <Select id="admin-filter-status" name="status" defaultValue={status}>
-          <option value="">Все статусы</option>
-          {Object.values(ContentStatus).map((item) => (
-            <option key={item} value={item}>
-              {contentStatusLabels[item]}
-            </option>
-          ))}
-        </Select>
-      </FormField>
+      {includeStatus ? (
+        <FormField htmlFor="admin-filter-status" label="Статус">
+          <Select id="admin-filter-status" name="status" defaultValue={status}>
+            <option value="">Все статусы</option>
+            {Object.values(ContentStatus).map((item) => (
+              <option key={item} value={item}>
+                {contentStatusLabels[item]}
+              </option>
+            ))}
+          </Select>
+        </FormField>
+      ) : null}
       {filters.map((filter) => (
         <FormField htmlFor={`admin-filter-${filter.name}`} label={filter.label} key={filter.name}>
           <Select id={`admin-filter-${filter.name}`} name={filter.name} defaultValue={firstParam(params[filter.name]) ?? ''}>
@@ -280,7 +337,7 @@ export function AdminListFilters({ basePath, params, filters = [], searchPlaceho
           </Select>
         </FormField>
       ))}
-      <AdminActionRow className="justify-start xl:col-span-full">
+      <AdminActionRow className="justify-start">
         <Button type="submit" variant="secondary">
           Применить
         </Button>

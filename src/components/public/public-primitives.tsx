@@ -112,7 +112,7 @@ export function PublicBodyText({
         size === 'md' ? 'text-base leading-7' : 'text-sm leading-7',
         tone === 'default' && 'text-[var(--text)]',
         tone === 'muted' && 'text-[var(--muted)]',
-        tone === 'inverse' && 'text-white/72',
+        tone === 'inverse' && 'text-white/85',
         className
       )}
       {...props}

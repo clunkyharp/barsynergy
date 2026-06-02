@@ -1,6 +1,6 @@
 # Cost Calculator Figma Contract
 
-Status: implementation checkpoint, 2026-05-22.
+Status: implementation checkpoint, updated 2026-05-28.
 
 ## Source Nodes
 
@@ -60,7 +60,7 @@ Current internal component targets:
 - `IngredientRow`
 - `MobileIngredientCard`
 - `CalculatorFormulaHelp`
-- `CalculatorSubtotalStrip`
+- `CalculatorMobileResultStrip`
 - `CalculatorResultRail`
 - `CalculatorResultMessage`
 - `CalculatorActions`
@@ -75,13 +75,15 @@ Product decision, 2026-05-24: the calculator does not save or export calculation
 - Success label: `Результат скопирован`.
 - Empty/error behavior: the copy action stays disabled when the result cannot be calculated.
 - Do not use `Сохранить расчёт` in runtime or handoff docs unless a real save/export flow is added.
+- The right result rail stays focused on the main price, себестоимость and маржа. Доля себестоимости, наценка, валовая прибыль, manual recommendation and explanatory text live in `Подробности`.
+- Mobile shows a compact sticky result strip directly after the calculation parameters so the user does not need to scroll past all ingredient rows to see the current outcome.
 
 ## State Matrix
 
 | State | Required behavior |
 | --- | --- |
 | Empty recipe | Empty notice is visible; result rail shows no price; copy action is disabled. |
-| Demo filled | Demo rows calculate without row errors; result rail shows себестоимость, sale price, margin and markup. |
+| Demo filled | Demo rows calculate without row errors; result rail shows себестоимость, sale price and margin; markup stays in `Подробности`. |
 | Partial row | Row is excluded from total; status says a row is incomplete; no formula change. |
 | Invalid number | Field keeps value; row/result message uses danger tokens; no `NaN` or `Infinity`. |
 | Incompatible units | Row shows unit compatibility error; total price is blocked. |
@@ -98,6 +100,9 @@ Product decision, 2026-05-24: the calculator does not save or export calculation
 
 - Desktop structure matches the worksheet/result-rail model from Figma.
 - Mobile is not a compressed desktop table; ingredient rows are card-like rows with 44px+ controls.
+- Mobile keeps a compact sticky result strip after parameters and before ingredients.
+- Desktop ingredient rows keep a table rhythm: wider ingredient column, right-aligned numbers and a separate narrow action column.
+- Formula help stays available as a collapsed `Формула расчёта` disclosure on mobile, tablet and desktop.
 - Light and dark themes use the same semantic roles.
 - Long item and ingredient names do not push controls outside the viewport.
 - Error, partial, manual and calculated states are visible in runtime.

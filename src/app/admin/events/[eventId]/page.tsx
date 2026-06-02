@@ -171,6 +171,9 @@ export default async function AdminEventEditPage({ params }: AdminEventEditPageP
                   ))}
                 </Select>
               </FormField>
+              <FormField htmlFor="event-registrationUrl" label="Ссылка для записи или регистрации" hint="Будет использована в кнопке «Записаться» на странице события. Если поле пустое, кнопка ведёт на контакты.">
+                <Input id="event-registrationUrl" name="registrationUrl" maxLength={500} placeholder="https://..." type="url" defaultValue={event.registrationUrl ?? ''} />
+              </FormField>
             </AdminCmsGrid>
           </AdminCmsSection>
 

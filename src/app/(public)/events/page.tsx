@@ -1,21 +1,23 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import { CategoryType } from '@prisma/client';
+import { EditorialPublicPage } from '@/components/public/editorial-public-page';
 import { EventAgendaSection } from '@/components/public/platform-ui';
-import { PublicBodyText, PublicBreadcrumbs, PublicDisplayTitle } from '@/components/public/public-primitives';
 import { PublicFilters } from '@/components/public/public-filters';
 import { stripPublicApplicationResultParams } from '@/lib/applications/public-form-helpers';
 import { getPublishedEvents, type PublicContentSearchParams } from '@/lib/public/content';
 import { getEventFilterOptions, getPublicCategoryOptions, getPublicCityFilterOptions } from '@/lib/public/filter-options';
+import { buildPublicPageMetadata } from '@/lib/public/metadata';
 
 type EventsPageProps = {
   searchParams?: Promise<PublicContentSearchParams>;
 };
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildPublicPageMetadata({
   title: 'События',
-  description: 'Рабочая афиша встреч, лекций и событий для барной индустрии СКФО.'
-};
+  description: 'Рабочая афиша встреч, лекций и событий для барной индустрии СКФО.',
+  path: '/events'
+});
 
 function firstParam(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] : value;
@@ -37,19 +39,17 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
 
   return (
     <>
-      <section className="background-zone background-zone-hero border-b border-[var(--line)] py-7 md:py-10">
-        <div className="container">
-          <div className="min-w-0">
-            <PublicBreadcrumbs current="События" />
-            <PublicDisplayTitle as="h1" className="mt-5 max-w-5xl text-[32px] sm:text-[42px] md:text-[50px] xl:text-[56px]" size="section">
-              События
-            </PublicDisplayTitle>
-            <PublicBodyText className="mt-4 max-w-3xl" size="md">
-              Афиша встреч, лекций, дегустаций и гостевых смен для специалистов и команд.
-            </PublicBodyText>
-          </div>
-        </div>
-      </section>
+      <EditorialPublicPage
+        eyebrow="События"
+        path="/events"
+        title="Афиша"
+        description="Встречи, лекции, каппинги, дегустации и гостевые смены для специалистов и команд."
+        summary="Предстоящие события показываем сразу. Фильтры можно раскрыть по кнопке."
+        density="compact"
+        metrics={[]}
+        rows={[]}
+        primaryLink={{ label: 'Предложить событие', href: '/contacts?topic=event#contact-form' }}
+      />
       <Suspense
         fallback={
           <section className="background-zone background-zone-ivory editorial-grid border-b border-[var(--line)] py-10 md:py-14">
@@ -70,10 +70,10 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
               cities={filterCities}
               cityAllLabel="Все города"
               cityLabel="Город"
-              contextItems={[{ label: 'Аудитория', value: 'специалисты и команды' }]}
               description="Фильтр по городу, дате и формату события."
               embedded
               compact
+              contextItems={selectedPeriod ? [] : [{ label: 'Дата', value: 'Предстоящие' }]}
               extraFilters={[
                 { name: 'format', label: 'Формат', allLabel: 'Все форматы', options: filterOptions.formats },
                 {

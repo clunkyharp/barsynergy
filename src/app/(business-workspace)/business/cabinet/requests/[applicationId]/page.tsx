@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { ApplicationStatus, ApplicationType } from '@prisma/client';
 import {
@@ -24,16 +25,22 @@ import {
   applicationStatusLabels,
   applicationTypeLabels
 } from '@/lib/admin/application-utils';
-import type { AdminContentSearchParams } from '@/lib/admin/content-utils';
+import { vacancyEmploymentTypeOptions, withCurrentValueOption, type AdminContentSearchParams } from '@/lib/admin/content-utils';
 import { getApplicationPayloadText } from '@/lib/applications/application-payloads';
 import { requireBusinessAccountAccess } from '@/lib/auth/require-business-account';
 import { prisma } from '@/lib/db/prisma';
+import { buildPrivatePageMetadata } from '@/lib/public/metadata';
 import { isVacancyPosition, vacancyPositionValues } from '@/lib/vacancies/positions';
 
 type BusinessRequestDetailPageProps = {
   params: Promise<{ applicationId: string }>;
   searchParams?: Promise<AdminContentSearchParams>;
 };
+
+export const metadata: Metadata = buildPrivatePageMetadata({
+  title: 'Заявка компании',
+  description: 'Закрытая страница BARSYNERGY для просмотра и редактирования заявки компании.'
+});
 
 function payloadValue(type: ApplicationType, payload: unknown, key: string) {
   return getApplicationPayloadText(type, payload, [key]) ?? '';
@@ -60,7 +67,14 @@ function renderDraftTypeFields(type: ApplicationType, payload: unknown) {
             </Select>
           </FormField>
           <FormField htmlFor="employmentType" label="Тип занятости">
-            <Input id="employmentType" name="employmentType" maxLength={100} defaultValue={payloadValue(type, payload, 'employmentType')} />
+            <Select id="employmentType" name="employmentType" defaultValue={payloadValue(type, payload, 'employmentType')}>
+              <option value="">— Выбрать —</option>
+              {withCurrentValueOption([...vacancyEmploymentTypeOptions], payloadValue(type, payload, 'employmentType')).map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </Select>
           </FormField>
           <FormField htmlFor="salaryLabel" label="Зарплата">
             <Input id="salaryLabel" name="salaryLabel" maxLength={120} defaultValue={payloadValue(type, payload, 'salaryLabel')} />

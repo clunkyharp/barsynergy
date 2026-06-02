@@ -1,6 +1,6 @@
 import { ApplicationStatus, ApplicationType, type Prisma } from '@prisma/client';
 import { publishContentFromApplication } from '@/app/admin/applications/actions';
-import { AdminFilterBar, AdminPagination, HiddenRedirect } from '@/components/admin/content-admin-controls';
+import { AdminFilterBar, AdminPagination, AdminStatusTabs, HiddenRedirect } from '@/components/admin/content-admin-controls';
 import { AdminPageIntro } from '@/components/admin/admin-page-intro';
 import { Button } from '@/components/ui/button';
 import {
@@ -24,7 +24,6 @@ import { AdminStatusChip } from '@/components/ui/status-badge';
 import {
   applicationStatusBadgeVariants,
   applicationStatusLabels,
-  applicationStatusValues,
   applicationTypeLabels,
   applicationTypeValues,
   parseApplicationStatus,
@@ -59,12 +58,6 @@ const quickStatusFilters = [
   { label: 'Одобрены', status: ApplicationStatus.APPROVED },
   { label: 'Завершены', status: ApplicationStatus.COMPLETED }
 ] as const;
-
-const activeQuickFilterStyle = {
-  background: 'var(--admin-filter-active-bg)',
-  borderColor: 'var(--admin-filter-active-border)',
-  color: 'var(--admin-filter-active-text)'
-};
 
 type ApplicationPublicationTarget = 'partner' | 'supplier' | 'vacancy';
 
@@ -251,10 +244,19 @@ export default async function AdminApplicationsPage({ searchParams }: AdminAppli
         title="Заявки"
       />
 
-      <AdminFilterBar
-        action={ADMIN_APPLICATIONS_PATH}
-        summary="Поиск по входящим заявкам, типам и рабочим статусам."
-      >
+      <AdminStatusTabs
+        items={[
+          { current: !selectedStatus, href: ADMIN_APPLICATIONS_PATH, label: 'Все' },
+          ...quickStatusFilters.map((item) => ({
+            current: selectedStatus === item.status,
+            href: `${ADMIN_APPLICATIONS_PATH}?status=${encodeURIComponent(item.status)}`,
+            label: item.label
+          }))
+        ]}
+        label="Статусы заявок"
+      />
+
+      <AdminFilterBar action={ADMIN_APPLICATIONS_PATH}>
         <FormField htmlFor="search" label="Поиск">
           <Input id="search" name="search" defaultValue={search} placeholder="Поиск по заявке" />
         </FormField>
@@ -268,16 +270,6 @@ export default async function AdminApplicationsPage({ searchParams }: AdminAppli
             ))}
           </Select>
         </FormField>
-        <FormField htmlFor="status" label="Статус">
-          <Select id="status" name="status" defaultValue={selectedStatus ?? ''}>
-            <option value="">Все статусы</option>
-            {applicationStatusValues.map((status) => (
-              <option key={status} value={status}>
-                {applicationStatusLabels[status]}
-              </option>
-            ))}
-          </Select>
-        </FormField>
         <DataTableActionRow className="justify-start xl:col-span-full">
           <Button type="submit" variant="secondary">
             Применить
@@ -287,30 +279,6 @@ export default async function AdminApplicationsPage({ searchParams }: AdminAppli
           </Button>
         </DataTableActionRow>
       </AdminFilterBar>
-
-      <DataTableActionRow className="justify-start">
-        <Button
-          className={!selectedStatus ? 'admin-filter-active' : undefined}
-          href={ADMIN_APPLICATIONS_PATH}
-          size="sm"
-          style={!selectedStatus ? activeQuickFilterStyle : undefined}
-          variant="secondary"
-        >
-          Все
-        </Button>
-        {quickStatusFilters.map((item) => (
-          <Button
-            href={`${ADMIN_APPLICATIONS_PATH}?status=${encodeURIComponent(item.status)}`}
-            key={item.status}
-            size="sm"
-            className={selectedStatus === item.status ? 'admin-filter-active' : undefined}
-            style={selectedStatus === item.status ? activeQuickFilterStyle : undefined}
-            variant="secondary"
-          >
-            {item.label}
-          </Button>
-        ))}
-      </DataTableActionRow>
 
       <section className="space-y-4">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">

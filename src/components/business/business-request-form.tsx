@@ -13,7 +13,7 @@ import { SegmentedControl } from '@/components/ui/segmented-control';
 import { SubmitButton } from '@/components/ui/submit-button';
 import { Textarea } from '@/components/ui/textarea';
 import { applicationTypeLabels } from '@/lib/admin/application-utils';
-import { displayFont } from '@/lib/fonts';
+import { vacancyEmploymentTypeOptions } from '@/lib/admin/content-utils';
 import { vacancyPositionValues } from '@/lib/vacancies/positions';
 
 type CityOption = {
@@ -72,7 +72,7 @@ export function BusinessRequestForm({ cities, defaultCityId }: BusinessRequestFo
     <section className="overflow-hidden rounded-[var(--radius-lg)] border border-[var(--line)] bg-[var(--surface-elevated)] shadow-[var(--shadow-panel)]">
       <div className="border-b border-[var(--line)] px-5 py-5 md:px-6">
         <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Новая заявка</p>
-        <h2 className={`${displayFont.className} mt-3 text-[2rem] font-semibold leading-none tracking-normal`}>Выберите тип заявки</h2>
+        <h2 className="mt-3 text-[1.65rem] font-semibold leading-tight tracking-normal">Выберите тип заявки</h2>
       </div>
       <form action={createBusinessApplication} className="grid gap-6 p-5 md:p-6">
         <input name="type" type="hidden" value={selectedType} />
@@ -130,7 +130,14 @@ export function BusinessRequestForm({ cities, defaultCityId }: BusinessRequestFo
                 </Select>
               </FormField>
               <FormField htmlFor="employmentType" label="Тип занятости">
-                <Input id="employmentType" name="employmentType" maxLength={100} />
+                <Select id="employmentType" name="employmentType" defaultValue="">
+                  <option value="">— Выбрать —</option>
+                  {vacancyEmploymentTypeOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </Select>
               </FormField>
               <FormField htmlFor="salaryLabel" label="Зарплата">
                 <Input id="salaryLabel" name="salaryLabel" maxLength={120} />

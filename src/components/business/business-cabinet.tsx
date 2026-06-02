@@ -12,7 +12,6 @@ import {
   applicationStatusLabels,
   applicationTypeLabels
 } from '@/lib/admin/application-utils';
-import { displayFont } from '@/lib/fonts';
 import { cn } from '@/lib/utils';
 
 type BusinessFormAction = (formData: FormData) => void | Promise<void>;
@@ -114,7 +113,7 @@ export function BusinessProfileSheet({ account, action, cities }: BusinessProfil
       <div className="grid gap-4 border-b border-[var(--line)] px-5 py-5 md:px-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Профильный лист</p>
-          <h2 className={`${displayFont.className} mt-3 text-[2rem] font-semibold leading-none tracking-normal`}>
+          <h2 className="mt-3 text-[1.65rem] font-semibold leading-tight tracking-normal">
             Данные компании
           </h2>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--muted)]">

@@ -138,43 +138,50 @@ function detailCopy(kind: DetailKind) {
       contextLabel: string;
       fallbackBody: string;
       factsFallback: string;
+      metaLabel: string;
     }
   > = {
     article: {
       bodyLabel: 'Текст материала',
       contextLabel: 'Материал',
       fallbackBody: 'Основная информация собрана в кратком описании и метках материала.',
-      factsFallback: 'Источник, автор и дата указаны в описании материала.'
+      factsFallback: 'Источник, автор и дата указаны в описании материала.',
+      metaLabel: 'Темы материала'
     },
     event: {
       bodyLabel: 'О событии',
       contextLabel: 'Событие',
       fallbackBody: 'Основная информация собрана в описании, фактах и форме записи.',
-      factsFallback: 'Дата, место и формат указаны в описании события.'
+      factsFallback: 'Дата, место и формат указаны в описании события.',
+      metaLabel: 'Параметры события'
     },
     course: {
       bodyLabel: 'Программа обучения',
       contextLabel: 'Программа',
       fallbackBody: 'Программа и условия собраны в фактах и блоках ниже.',
-      factsFallback: 'Формат, уровень и условия указаны в описании программы.'
+      factsFallback: 'Формат, уровень и условия указаны в описании программы.',
+      metaLabel: 'Параметры программы'
     },
     vacancy: {
       bodyLabel: 'О роли',
       contextLabel: 'Вакансия',
       fallbackBody: 'Условия роли собраны в фактах и блоке отклика.',
-      factsFallback: 'Компания, позиция и условия указаны в описании вакансии.'
+      factsFallback: 'Компания, позиция и условия указаны в описании вакансии.',
+      metaLabel: 'Параметры вакансии'
     },
     supplier: {
       bodyLabel: 'Профиль компании',
       contextLabel: 'Поставщик',
       fallbackBody: 'Профиль поставщика собран в фактах и контактном действии.',
-      factsFallback: 'Категория, город и условия контакта указаны в профиле.'
+      factsFallback: 'Категория, город и условия контакта указаны в профиле.',
+      metaLabel: 'Кратко о поставщике'
     },
     partner: {
       bodyLabel: 'Формат партнёрства',
       contextLabel: 'Партнёр',
       fallbackBody: 'Формат партнёрства собран в описании и контактном действии.',
-      factsFallback: 'Компания и тип партнёрства указаны в профиле.'
+      factsFallback: 'Компания и тип партнёрства указаны в профиле.',
+      metaLabel: 'Кратко о партнёре'
     }
   };
 
@@ -208,14 +215,14 @@ export function PublicContentDetailPage({
     <div className="public-detail-page" data-detail-kind={detailKind}>
       <section className="background-zone background-zone-graphite relative overflow-hidden border-b border-[var(--line)] py-7 md:py-9">
         <div className="container relative">
-          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--line)] pb-5">
+          <div className="flex flex-wrap items-center justify-between gap-3">
             <InlineLink className="inline-flex items-center gap-2 text-sm text-[var(--muted)] hover:text-[var(--text)]" href={backHref}>
               <ArrowLeft size={16} />
               {backLabel}
             </InlineLink>
           </div>
 
-          <Panel className="mt-6 overflow-hidden border-[var(--border-default)] bg-[var(--surface)] p-0" padding="none">
+          <Panel className="mt-5 overflow-hidden border-[var(--border-default)] bg-[var(--surface)] p-0 md:mt-6" padding="none">
             <div className="grid gap-0 lg:grid-cols-[minmax(0,1.45fr)_minmax(16rem,0.55fr)] lg:items-stretch">
               <div className="grid min-w-0 content-center px-5 py-8 sm:px-7 md:px-8 md:py-10 xl:px-9">
                 <div className="flex flex-wrap gap-2">
@@ -284,8 +291,8 @@ export function PublicContentDetailPage({
 
       <section className="background-zone background-zone-beige border-b border-[var(--line)] py-9 md:py-12">
         <div className="container grid gap-7 xl:grid-cols-[minmax(14rem,0.36fr)_minmax(0,1fr)_minmax(14rem,0.38fr)]">
-          <aside className="order-2 xl:order-1">
-            <div className="space-y-4 xl:sticky xl:top-28">
+          <aside className="order-2 xl:order-1 xl:self-start">
+            <div className="space-y-4">
               <Panel className="bg-[var(--surface-wash-strong)]" padding="lg">
                 <PublicEyebrow tone="muted">{copy.contextLabel}</PublicEyebrow>
                 {facts.length > 0 ? (
@@ -365,8 +372,8 @@ export function PublicContentDetailPage({
             </div>
           </div>
 
-          <aside className="order-3">
-            <div className="space-y-4 xl:sticky xl:top-28">
+          <aside className="order-3 xl:self-start">
+            <div className="space-y-4">
               <Panel className="bg-[var(--surface-wash)]" padding="lg">
                 <PublicEyebrow tone="muted">Действия</PublicEyebrow>
                 <div className="mt-4 grid gap-3">
@@ -393,7 +400,7 @@ export function PublicContentDetailPage({
 
               {heroMeta.length > 0 ? (
                 <Panel padding="lg">
-                  <PublicEyebrow tone="muted">Метки</PublicEyebrow>
+                  <PublicEyebrow tone="muted">{copy.metaLabel}</PublicEyebrow>
                   <div className="mt-4 flex flex-wrap gap-2">
                     {heroMeta.slice(0, 6).map((entry, index) => (
                       <MetaChip key={`${entry}-${index}`} variant="filter">

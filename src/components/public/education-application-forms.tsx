@@ -58,7 +58,7 @@ export function EducationApplicationForms({ enabled, result, utm, cities, defaul
 
   return (
     <PublicApplicationSection
-      eyebrow="Образование / Заявки"
+      eyebrow="Обучение / Заявки"
       title="Заявки на обучение"
       description="Запишитесь на программу, запросите обучение для команды или закажите сертификат."
       disclosureAliases={['applications']}

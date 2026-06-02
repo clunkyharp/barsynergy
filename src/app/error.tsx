@@ -25,7 +25,7 @@ export default function Error({ reset }: ErrorProps) {
             onClick={reset}
             type="button"
           >
-            Повторить
+            Попробовать снова
           </button>
           <AppLink
             className="inline-flex min-h-12 items-center justify-center border border-black/25 px-5 text-sm font-semibold uppercase tracking-[0.06em] transition hover:border-[var(--accent)] hover:text-[var(--accent)]"

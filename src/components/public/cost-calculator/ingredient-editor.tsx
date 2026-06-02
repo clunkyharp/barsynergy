@@ -14,6 +14,9 @@ import { cn } from '@/lib/utils';
 import { money } from './format';
 import type { IngredientUpdate } from './use-cost-calculator-state';
 
+const ingredientDesktopGridClassName =
+  'lg:grid-cols-[minmax(178px,1.35fr)_78px_minmax(132px,0.86fr)_minmax(132px,0.86fr)_104px_88px]';
+
 function UnitField({
   className,
   error,
@@ -46,11 +49,11 @@ function UnitField({
       <label className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-[var(--muted)]" htmlFor={id}>
         {label}
       </label>
-      <div className="grid grid-cols-[minmax(0,1fr)_84px] gap-2">
+      <div className="grid grid-cols-[minmax(0,1fr)_84px] gap-2 lg:grid-cols-[minmax(60px,1fr)_64px]">
         <Input
           aria-describedby={describedBy}
           aria-invalid={error ? true : undefined}
-          className="h-11 text-sm tabular-nums lg:h-10"
+          className="h-11 text-right text-sm tabular-nums lg:h-10"
           id={id}
           inputMode="decimal"
           onChange={(event) => onAmountChange(event.target.value)}
@@ -59,7 +62,7 @@ function UnitField({
         />
         <Select
           aria-label={`${label}: единица`}
-          className="h-11 px-3 pr-5 text-sm lg:h-10"
+          className="h-11 px-3 pr-5 text-right text-sm tabular-nums lg:h-10 lg:px-2 lg:pr-5"
           onChange={(event) => onUnitChange(event.target.value as Unit)}
           value={unit}
         >
@@ -107,24 +110,29 @@ export function IngredientEditor({
 }) {
   return (
     <>
-      <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-4 md:px-6">
+      <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-4 md:px-5">
         <div className="min-w-0">
-          <h3 className="text-xl font-bold leading-tight text-[var(--text)]">Ингредиенты</h3>
-          <p className="mt-1 text-sm leading-6 text-[var(--muted)]">{rowStatusText}</p>
+          <h3 className="text-base font-bold leading-tight text-[var(--text)]">Ингредиенты</h3>
+          <p className="mt-0.5 text-xs leading-5 text-[var(--muted)]">{rowStatusText}</p>
         </div>
         <CalculatorActions hasAnyInput={hasAnyInput} onClear={onClear} onFillDemo={onFillDemo} />
       </div>
 
       {!hasAnyInput ? <EmptyRecipeNotice /> : null}
 
-      <div className="mx-4 overflow-hidden rounded-[var(--radius-lg)] border border-transparent bg-transparent md:mx-6 md:border-[var(--border-default)] md:bg-[var(--surface)]">
-        <div className="hidden grid-cols-[minmax(130px,1fr)_72px_minmax(132px,0.85fr)_minmax(132px,0.85fr)_88px_96px] gap-2 bg-[var(--surface-muted)]/55 px-4 py-3 text-[10px] font-semibold uppercase tracking-[0.11em] text-[var(--muted)] md:px-5 lg:grid">
-          <span>Ингредиент</span>
-          <span>Цена, ₽</span>
-          <span>Упаковка</span>
-          <span>В рецепте</span>
-          <span>Себестоимость</span>
-          <span className="text-center">Действия</span>
+      <div className="mx-4 overflow-hidden rounded-[var(--radius-md)] border border-transparent bg-transparent md:mx-5 md:border-[var(--line)] md:bg-transparent">
+        <div
+          className={cn(
+            'hidden gap-2 border-b border-[var(--line)] px-4 py-2.5 text-[10px] font-semibold uppercase tracking-[0.11em] text-[var(--muted)] md:px-5 lg:grid',
+            ingredientDesktopGridClassName
+          )}
+        >
+          <span className="truncate">Ингредиент</span>
+          <span className="truncate">Цена, ₽</span>
+          <span className="truncate">Упаковка</span>
+          <span className="truncate">В рецепте</span>
+          <span className="truncate">Себестоимость</span>
+          <span className="truncate text-center">Действия</span>
         </div>
 
         <div className="grid gap-3 p-3 lg:block lg:divide-y lg:divide-[var(--line)] lg:p-0">
@@ -151,13 +159,13 @@ export function IngredientEditor({
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center justify-between gap-3 p-4 md:p-6">
-        <Button className="min-h-12 rounded-[var(--radius-md)] px-5" onClick={onAddIngredient} type="button" variant="secondary">
-          <Plus size={17} strokeWidth={1.8} />
+      <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 md:px-5">
+        <Button className="min-h-10 rounded-[var(--radius-sm)] px-4 text-sm" onClick={onAddIngredient} type="button" variant="secondary">
+          <Plus size={16} strokeWidth={1.8} />
           Добавить ингредиент
         </Button>
-        <p className="max-w-xl text-sm leading-6 text-[var(--muted)]">
-          Пример строки: <span className="font-semibold text-[var(--text)]">Зерно · 1450 ₽ · 1 кг · 18 г · 26,10 ₽</span>
+        <p className="max-w-xl text-xs leading-5 text-[var(--muted)]">
+          Пример: <span className="font-semibold text-[var(--text)]">Зерно · 2400 ₽ · 1 кг · 18 г → 43,20 ₽</span>
         </p>
       </div>
     </>
@@ -205,7 +213,7 @@ function MobileIngredientCard({
   rowCount: number;
 }) {
   return (
-    <div className="grid grid-cols-2 gap-3 rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-transparent p-3 lg:hidden">
+    <div className="calculator-mobile-ingredient-card grid grid-cols-2 gap-3 rounded-[var(--radius-md)] border border-[var(--border-default)] bg-transparent p-3 lg:hidden">
       <div className="col-span-2 flex items-start justify-between gap-3">
         <span className="text-[13px] font-bold uppercase tracking-[0.12em] text-[var(--accent)]">
           № {index + 1}
@@ -215,7 +223,7 @@ function MobileIngredientCard({
         </span>
       </div>
       <IngredientFields ingredient={ingredient} index={index} onUpdate={onUpdate} scope="mobile" />
-      <IngredientActionButtons ingredientId={ingredient.id} onDuplicate={onDuplicate} onRemove={onRemove} rowCount={rowCount} />
+      <IngredientActionButtons ingredient={ingredient} index={index} onDuplicate={onDuplicate} onRemove={onRemove} rowCount={rowCount} />
       <IngredientRowMessage ingredient={ingredient} className="col-span-2" />
     </div>
   );
@@ -237,12 +245,12 @@ function IngredientRow({
   rowCount: number;
 }) {
   return (
-    <div className="hidden gap-2 px-4 py-3 md:px-5 md:py-4 lg:grid lg:grid-cols-[minmax(130px,1fr)_72px_minmax(132px,0.85fr)_minmax(132px,0.85fr)_88px_96px] lg:items-start">
+    <div className={cn('hidden gap-2 px-4 py-3 md:px-5 md:py-4 lg:grid lg:items-start', ingredientDesktopGridClassName)}>
       <IngredientFields ingredient={ingredient} index={index} onUpdate={onUpdate} scope="desktop" />
-      <div className="hidden min-h-10 items-center text-sm font-semibold tabular-nums text-[var(--text)] lg:flex">
+      <div className="hidden min-h-10 items-center justify-start truncate text-left text-sm font-semibold tabular-nums text-[var(--text)] lg:flex">
         {ingredient.error ? '—' : ingredient.cost === null ? 'Пока нет' : money(ingredient.cost)}
       </div>
-      <IngredientActionButtons ingredientId={ingredient.id} onDuplicate={onDuplicate} onRemove={onRemove} rowCount={rowCount} />
+      <IngredientActionButtons ingredient={ingredient} index={index} onDuplicate={onDuplicate} onRemove={onRemove} rowCount={rowCount} />
       <IngredientRowMessage ingredient={ingredient} className="lg:col-span-6" />
     </div>
   );
@@ -266,21 +274,21 @@ function IngredientFields({
       <FormField className="col-span-2 lg:col-span-1 lg:[&>label]:sr-only" htmlFor={fieldId('name')} label="Ингредиент">
         <Input
           autoComplete="off"
-          className="h-11 text-sm lg:h-10"
+          className="calculator-ingredient-name-input h-11 truncate text-sm lg:h-10"
           id={fieldId('name')}
           onChange={(event) => onUpdate(ingredient.id, 'name', event.target.value)}
-          placeholder={index === 0 ? 'Эспрессо, молоко, сироп...' : 'Ингредиент'}
+          placeholder={index === 0 ? 'Зерно Ethiopia Yirgacheffe' : 'Ингредиент'}
           value={ingredient.name}
         />
       </FormField>
 
       <FormField className="col-span-2 sm:col-span-1 lg:[&>label]:sr-only lg:[&>p]:sr-only" htmlFor={fieldId('packagePrice')} hint="В рублях" label="Цена упаковки, ₽">
         <Input
-          className="h-11 text-sm tabular-nums lg:h-10"
+          className="h-11 text-right text-sm tabular-nums lg:h-10"
           id={fieldId('packagePrice')}
           inputMode="decimal"
           onChange={(event) => onUpdate(ingredient.id, 'packagePrice', event.target.value)}
-          placeholder="1450"
+          placeholder="2400"
           value={ingredient.packagePrice}
         />
       </FormField>
@@ -313,35 +321,42 @@ function IngredientFields({
 }
 
 function IngredientActionButtons({
-  ingredientId,
+  ingredient,
+  index,
   onDuplicate,
   onRemove,
   rowCount
 }: {
-  ingredientId: string;
+  ingredient: CalculatorIngredientRow;
+  index: number;
   onDuplicate: (id: string) => void;
   onRemove: (id: string) => void;
   rowCount: number;
 }) {
+  const duplicateLabel = `Дублировать ингредиент: ${ingredient.name || `строка ${index + 1}`}`;
+  const removeLabel = `Удалить ингредиент: ${ingredient.name || `строка ${index + 1}`}`;
+
   return (
     <div className="col-span-2 grid grid-cols-2 gap-2 lg:col-span-1 lg:flex lg:justify-center">
       <button
-        aria-label="Дублировать ингредиент"
-        className="inline-flex h-11 min-w-11 items-center justify-center rounded-[var(--radius-sm)] border border-[var(--border-default)] px-3 text-[var(--muted)] transition hover:border-[var(--accent)]/35 hover:text-[var(--accent)]"
-        onClick={() => onDuplicate(ingredientId)}
+        aria-label={duplicateLabel}
+        className="inline-flex h-11 min-w-11 items-center justify-center rounded-[var(--radius-sm)] border border-[var(--border-default)] px-3 text-[var(--muted)] transition hover:border-[var(--accent)]/35 hover:text-[var(--accent)] lg:h-10 lg:min-w-10 lg:px-2"
+        onClick={() => onDuplicate(ingredient.id)}
+        title={duplicateLabel}
         type="button"
       >
         <CopyPlus size={16} strokeWidth={1.8} />
         <span className="ml-2 lg:sr-only">Дублировать</span>
       </button>
       <button
-        aria-label="Удалить ингредиент"
+        aria-label={removeLabel}
         className={cn(
-          'inline-flex h-11 min-w-11 items-center justify-center rounded-[var(--radius-sm)] border border-[var(--border-default)] px-3 text-[var(--muted)] transition hover:border-[var(--accent)]/35 hover:text-[var(--accent)]',
+          'inline-flex h-11 min-w-11 items-center justify-center rounded-[var(--radius-sm)] border border-[var(--border-default)] px-3 text-[var(--muted)] transition hover:border-[var(--accent)]/35 hover:text-[var(--accent)] lg:h-10 lg:min-w-10 lg:px-2',
           rowCount === 1 && 'pointer-events-none opacity-45'
         )}
         disabled={rowCount === 1}
-        onClick={() => onRemove(ingredientId)}
+        onClick={() => onRemove(ingredient.id)}
+        title={removeLabel}
         type="button"
       >
         <Trash2 size={16} strokeWidth={1.8} />

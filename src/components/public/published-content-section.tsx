@@ -28,6 +28,13 @@ type PublishedContentSectionProps = {
     label: string;
     variant?: ActionVariant;
   }>;
+  secondaryEmptyTitle?: string;
+  secondaryEmptyDescription?: string;
+  secondaryEmptyActions?: Array<{
+    href: string;
+    label: string;
+    variant?: ActionVariant;
+  }>;
   filters?: ReactNode;
   countLabel?: string;
   listLabel?: string;
@@ -39,6 +46,7 @@ type PublishedContentSectionProps = {
   sortLabel?: string;
   rowVariant?: 'default' | 'opportunity' | 'directory';
   rowActionLabel?: string;
+  showSidebarTitle?: boolean;
 };
 
 function pageHref(content: PublishedContentList, basePath: string, page: number) {
@@ -103,26 +111,12 @@ function metaGroupValue(item: PublishedContentItem, label: string) {
   return item.metaGroups?.find((entry) => entry.label === label)?.value;
 }
 
-function renderVacancyFacts(item: PublishedContentItem) {
-  const company = metaGroupValue(item, 'Компания') ?? item.subtitle;
-  const city = metaGroupValue(item, 'Город');
-  const facts = [
-    { label: 'Компания / город', value: [company, city].filter(Boolean).join(' / ') || 'уточняется' },
-    { label: 'График', value: metaGroupValue(item, 'График') ?? 'уточняется' },
-    { label: 'Опыт', value: metaGroupValue(item, 'Опыт') ?? 'уточняется' },
-    { label: 'Оплата', value: metaGroupValue(item, 'Оплата') ?? 'по договорённости' }
-  ];
+function renderCompactChips(entries: PublishedContentMetaGroup[]) {
+  if (entries.length === 0) {
+    return null;
+  }
 
-  return (
-    <dl className="grid divide-y divide-[var(--line)] border-y border-[var(--line)]">
-      {facts.map((fact) => (
-        <div className="grid gap-1 py-2.5 sm:grid-cols-[8rem_minmax(0,1fr)] sm:gap-3" key={fact.label}>
-          <dt className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--muted)]">{fact.label}</dt>
-          <dd className="text-sm leading-6 text-[var(--text)]">{fact.value}</dd>
-        </div>
-      ))}
-    </dl>
-  );
+  return <div className="flex flex-wrap gap-2.5">{entries.map((entry) => renderOpportunityChip(entry))}</div>;
 }
 
 function compactMetaEntries(metaGroups: PublishedContentMetaGroup[], rowVariant: 'default' | 'opportunity' | 'directory') {
@@ -137,24 +131,6 @@ function compactMetaEntries(metaGroups: PublishedContentMetaGroup[], rowVariant:
   }
 
   return metaGroups.slice(0, 3);
-}
-
-function renderCompactMetaLine(entries: PublishedContentMetaGroup[]) {
-  if (entries.length === 0) {
-    return null;
-  }
-
-  return (
-    <p className="line-clamp-2 text-[12px] font-medium leading-5 text-[var(--muted)] sm:hidden">
-      {entries.map((entry, index) => (
-        <span className={entry.tone === 'accent' ? 'font-semibold text-[var(--accent)]' : undefined} key={`${entry.label ?? 'meta'}-${entry.value}`}>
-          {index > 0 ? <span className="px-1.5 text-[var(--line-strong)]">/</span> : null}
-          {entry.label ? <span className="uppercase tracking-[0.1em]">{entry.label}: </span> : null}
-          {entry.value}
-        </span>
-      ))}
-    </p>
-  );
 }
 
 function buildLabel(item: PublishedContentItem, rowVariant: 'default' | 'opportunity' | 'directory') {
@@ -201,18 +177,19 @@ function buildLabelMeta(item: PublishedContentItem, rowVariant: 'default' | 'opp
 
 function buildMeta(item: PublishedContentItem, rowVariant: 'default' | 'opportunity' | 'directory') {
   if (rowVariant === 'opportunity') {
-    return renderVacancyFacts(item);
+    const compactEntries: PublishedContentMetaGroup[] = ['Опыт', 'Формат', 'График']
+      .map((label): PublishedContentMetaGroup | null => {
+        const value = metaGroupValue(item, label);
+        return value ? { label, value } : null;
+      })
+      .filter((entry): entry is PublishedContentMetaGroup => Boolean(entry));
+
+    return renderCompactChips(compactEntries);
   }
 
   if (rowVariant === 'directory' && item.metaGroups && item.metaGroups.length > 0) {
     const compactEntries = compactMetaEntries(item.metaGroups, rowVariant);
-
-    return (
-      <div>
-        {renderCompactMetaLine(compactEntries)}
-        <div className="hidden flex-wrap gap-2.5 sm:flex">{item.metaGroups.map((entry) => renderOpportunityChip(entry))}</div>
-      </div>
-    );
+    return renderCompactChips(compactEntries);
   }
 
   if (item.meta.length === 0) {
@@ -228,6 +205,87 @@ function buildMeta(item: PublishedContentItem, rowVariant: 'default' | 'opportun
       ))}
     </div>
   );
+}
+
+function buildVacancyLead(item: PublishedContentItem) {
+  const value = metaGroupValue(item, 'Оплата') ?? 'по договорённости';
+  return (
+    <span>
+      <span className="mr-2 text-[0.7em] font-semibold uppercase tracking-widest text-[var(--text-muted)]">Зарплата</span>
+      {value}
+    </span>
+  );
+}
+
+function buildSupplierLead(item: PublishedContentItem) {
+  return metaGroupValue(item, 'Продукты / услуги') ?? metaGroupValue(item, 'География') ?? item.label ?? 'Поставки для заведений';
+}
+
+function buildOpportunityLead(item: PublishedContentItem, rowVariant: 'default' | 'opportunity' | 'directory') {
+  if (rowVariant === 'opportunity') {
+    return buildVacancyLead(item);
+  }
+
+  if (rowVariant === 'directory') {
+    return buildSupplierLead(item);
+  }
+
+  return undefined;
+}
+
+function buildOpportunityDescription(item: PublishedContentItem, rowVariant: 'default' | 'opportunity' | 'directory') {
+  if (rowVariant === 'opportunity') {
+    const city = metaGroupValue(item, 'Город');
+    const summary = item.summary?.trim();
+
+    return [city, summary].filter(Boolean).join('. ');
+  }
+
+  if (rowVariant === 'directory') {
+    const geography = metaGroupValue(item, 'География') ?? metaGroupValue(item, 'Город');
+    const summary = item.summary?.trim();
+
+    return [geography, summary].filter(Boolean).join('. ');
+  }
+
+  return item.summary;
+}
+
+function encodedContactHref(topic: string, params: Record<string, string | undefined>) {
+  const searchParams = new URLSearchParams({ topic });
+
+  Object.entries(params).forEach(([key, value]) => {
+    if (value) {
+      searchParams.set(key, value);
+    }
+  });
+
+  return `/contacts?${searchParams.toString()}#contact-form`;
+}
+
+function buildOpportunityActions(item: PublishedContentItem, basePath: string, rowVariant: 'default' | 'opportunity' | 'directory') {
+  const profileHref = detailHref(basePath, item.slug);
+
+  if (rowVariant === 'opportunity') {
+    return [
+      { href: profileHref, label: 'Подробнее' }
+    ];
+  }
+
+  if (rowVariant === 'directory') {
+    return [
+      {
+        href: encodedContactHref('supplier-contact', {
+          companyName: item.title,
+          supplierCategory: item.label ?? undefined
+        }),
+        label: 'Связаться'
+      },
+      { href: profileHref, label: 'Профиль', variant: 'secondary' as const }
+    ];
+  }
+
+  return undefined;
 }
 
 function titleInitials(title: string) {
@@ -304,13 +362,17 @@ export function PublishedContentSection({
   excludedItemIds = [],
   emptyAction,
   emptyActions,
+  secondaryEmptyTitle = 'Других записей пока нет',
+  secondaryEmptyDescription = 'Главная рекомендация уже показана выше. Когда появятся новые записи с такими фильтрами, они будут здесь.',
+  secondaryEmptyActions = [],
   filters,
   countLabel = 'Найдено',
   listLabel = 'Список',
   listAction,
   sortLabel,
   rowVariant = 'default',
-  rowActionLabel = 'Подробнее'
+  rowActionLabel = 'Подробнее',
+  showSidebarTitle = true
 }: PublishedContentSectionProps) {
   const visibleItems = content.items.filter((item) => !excludedItemIds.includes(item.id));
   const resolvedEmptyActions = emptyActions ?? (emptyAction ? [emptyAction] : []);
@@ -336,7 +398,7 @@ export function PublishedContentSection({
         ) : null}
       </div>
       {listAction ? (
-        <Button className="gap-2 px-0 text-sm tracking-normal" href={listAction.href} size="sm" variant={listAction.variant ?? 'link'}>
+        <Button className="gap-2 px-4 text-sm tracking-normal" href={listAction.href} size="sm" variant={listAction.variant ?? 'link'}>
           {listAction.label}
           <ArrowUpRight size={14} />
         </Button>
@@ -345,11 +407,17 @@ export function PublishedContentSection({
   );
 
   return (
-    <section className="public-catalog-section background-zone background-zone-ivory editorial-grid border-b border-[var(--line)] py-8 md:py-14" id={sectionId}>
-      <div className="container grid gap-6 md:gap-8 xl:grid-cols-[minmax(16rem,0.48fr)_minmax(0,1.52fr)] xl:gap-8">
-        <aside className="public-catalog-sidebar min-w-0 xl:sticky xl:top-24 xl:self-start">
-          <PublicDisplayTitle className="public-catalog-title max-w-sm">{title}</PublicDisplayTitle>
-          {filters ? <div className="mt-5">{filters}</div> : null}
+    <section
+      aria-label={showSidebarTitle ? undefined : title}
+      className="public-catalog-section background-zone background-zone-ivory editorial-grid border-b border-[var(--line)] py-8 md:py-14"
+      id={sectionId}
+    >
+      <div className="container">
+        {showSidebarTitle ? <PublicDisplayTitle className="public-catalog-title max-w-sm">{title}</PublicDisplayTitle> : null}
+      </div>
+      <div className={cn('container grid gap-6 md:gap-8 xl:grid-cols-[minmax(16rem,0.48fr)_minmax(0,1.52fr)] xl:gap-8', showSidebarTitle && 'mt-5 md:mt-6')}>
+        <aside className="public-catalog-sidebar min-w-0 xl:self-start">
+          {filters}
         </aside>
 
         {content.items.length === 0 ? (
@@ -376,25 +444,46 @@ export function PublishedContentSection({
           </Panel>
         ) : visibleItems.length === 0 ? (
           <Panel className="public-missing-state public-missing-state-secondary space-y-4 border-[var(--border-default)] bg-[var(--surface-wash)]" padding="lg">
-            <h3 className="text-xl font-semibold leading-7">Других записей пока нет</h3>
-            <PublicBodyText className="max-w-2xl">
-              Главная рекомендация уже показана выше. Когда появятся новые записи с такими фильтрами, они будут здесь.
-            </PublicBodyText>
+            <h3 className="text-xl font-semibold leading-7">{secondaryEmptyTitle}</h3>
+            <PublicBodyText className="max-w-2xl">{secondaryEmptyDescription}</PublicBodyText>
+            {secondaryEmptyActions.length > 0 ? (
+              <div className="flex flex-wrap gap-3">
+                {secondaryEmptyActions.map((action) => (
+                  <Button
+                    className="min-h-12 rounded-[var(--radius-md)] px-6 tracking-normal"
+                    href={action.href}
+                    key={`${action.href}-${action.label}`}
+                    variant={action.variant ?? 'primary'}
+                  >
+                    {action.label}
+                  </Button>
+                ))}
+              </div>
+            ) : null}
           </Panel>
         ) : (
           <Panel className="public-catalog-list-panel min-w-0 overflow-hidden border-[var(--border-default)] bg-[var(--surface-card)]" padding="none">
             {listToolbar}
 
-            <div className="public-catalog-list-rows divide-y divide-[var(--line)] border-y border-[var(--line)] md:flex md:flex-col md:gap-4 md:divide-y-0 md:border-y-0">
+            <div
+              className={cn(
+                'public-catalog-list-rows',
+                rowVariant === 'directory' || rowVariant === 'opportunity'
+                  ? 'grid gap-3 md:flex md:flex-col md:gap-4'
+                  : 'divide-y divide-[var(--line)] border-y border-[var(--line)] md:flex md:flex-col md:gap-4 md:divide-y-0 md:border-y-0'
+              )}
+            >
               {visibleItems.map((item) => (
                 <EditorialListRow
                   actionLabel={rowActionLabel}
+                  actions={buildOpportunityActions(item, basePath, rowVariant)}
                   columns="content"
-                  description={item.summary}
+                  description={buildOpportunityDescription(item, rowVariant)}
                   href={detailHref(basePath, item.slug)}
                   key={item.id}
                   label={buildLabel(item, rowVariant)}
                   labelMeta={buildLabelMeta(item, rowVariant)}
+                  lead={buildOpportunityLead(item, rowVariant)}
                   media={buildListMedia(item, rowVariant)}
                   meta={buildMeta(item, rowVariant)}
                   subtitle={item.subtitle}

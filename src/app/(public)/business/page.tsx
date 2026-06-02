@@ -1,102 +1,114 @@
 import type { Metadata } from 'next';
-import { ArrowUpRight } from 'lucide-react';
+import { ArrowUpRight, BadgeCheck, MapPinned, SearchCheck, Store } from 'lucide-react';
+import { BusinessSolutionForm } from '@/components/public/business-solution-form';
 import { EditorialPublicPage } from '@/components/public/editorial-public-page';
-import { FeatureCard, RoleTaskCard } from '@/components/public/public-card-patterns';
+import { RoleTaskCard } from '@/components/public/public-card-patterns';
 import { PublicBodyText, PublicDisplayTitle, PublicEyebrow } from '@/components/public/public-primitives';
 import { Button } from '@/components/ui/button';
-import { businessSolutionTypeOptions } from '@/lib/applications/b2b-request-options';
+import { getApplicationCityOptions } from '@/lib/applications/form-options';
+import { firstParam, getPublicApplicationResult, getPublicApplicationUtm } from '@/lib/applications/public-form-helpers';
+import { arePublicApplicationFormsEnabled } from '@/lib/applications/public-forms';
+import { buildPublicPageMetadata } from '@/lib/public/metadata';
+import { getEnv } from '@/lib/validation/env';
 
-export const metadata: Metadata = {
-  title: 'Для бизнеса',
-  description: 'Цифровые решения BARSYNERGY для заведений: сайт, Telegram-бот, вакансии, внутренние формы и уведомления.'
+type BusinessPageProps = {
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
 };
 
-function getBusinessContactHref(topicTitle?: string) {
-  const params = new URLSearchParams({ topic: 'other' });
-
-  if (topicTitle) {
-    params.set('topicTitle', topicTitle);
-  }
-
-  return `/contacts?${params.toString()}#contact-form`;
-}
+export const metadata: Metadata = buildPublicPageMetadata({
+  title: 'Каталог заведений',
+  description: 'Добавление кофейных баров, кофеен, обжарочных и близких форматов в каталог BARSYNERGY по СКФО.',
+  path: '/business'
+});
 
 const processSteps = [
   {
     label: 'Шаг 1',
-    title: 'Разобрать задачу',
-    description: 'Записываем процесс, пользователей, обязательные поля и получателя заявки.'
+    title: 'Оставьте заявку',
+    description: 'Укажите название заведения, город, формат, контакт и ссылку на сайт или соцсети.'
   },
   {
     label: 'Шаг 2',
-    title: 'Собрать короткий сценарий',
-    description: 'Выбираем экраны, статусы, уведомления и данные, без которых запуск не получится.'
+    title: 'Уточним карточку',
+    description: 'Проверим данные, категорию, описание, фото и контактную информацию перед публикацией.'
   },
   {
     label: 'Шаг 3',
-    title: 'Запустить первую версию',
-    description: 'Запускаем рабочую версию, проверяем её на заявках и решаем, что добавить дальше.'
+    title: 'Разместим в каталоге',
+    description: 'После согласования заведению появится понятная карточка для гостей, партнёров и команды платформы.'
   }
 ] as const;
 
-export default function BusinessPage() {
+const benefits = [
+  {
+    label: 'Каталог',
+    title: 'Видимость в профильной среде',
+    description: 'Карточка помогает гостям, поставщикам, кандидатам и партнёрам быстрее найти ваше заведение.'
+  },
+  {
+    label: 'Контекст',
+    title: 'Фокус на СКФО',
+    description: 'Платформа собирает локальные бары, кофейни, поставщиков, события и образовательные форматы региона.'
+  },
+  {
+    label: 'Проверка',
+    title: 'Без случайных карточек',
+    description: 'Команда вручную сверяет базовые данные, чтобы каталог оставался аккуратным и полезным.'
+  },
+  {
+    label: 'Контакт',
+    title: 'Понятный первый контакт',
+    description: 'Гость, кандидат или партнёр быстро видит ссылку, город и формат заведения и понимает, куда писать дальше.'
+  }
+] as const;
+
+const heroMetrics = [
+  { label: 'Форматы', value: '4' },
+  { label: 'Регион', value: 'СКФО' },
+  { label: 'Проверка', value: 'ручная' }
+];
+
+const defaultParamKeys = ['projectName', 'contactName', 'cityId', 'solutionType', 'comment'] as const;
+
+export default async function BusinessPage({ searchParams }: BusinessPageProps) {
+  const params = (await searchParams) ?? {};
+  const applicationFormsEnabled = arePublicApplicationFormsEnabled(getEnv());
+  const cities = applicationFormsEnabled ? await getApplicationCityOptions() : [];
+  const defaults: Record<string, string | undefined> = Object.fromEntries(
+    defaultParamKeys.map((key) => [key, firstParam(params[key])]).filter(([, value]) => Boolean(value))
+  );
+
   return (
     <>
       <EditorialPublicPage
-        eyebrow="Для бизнеса"
-        title="Цифровые решения для заведений и команд"
-        description="Соберём сайт, Telegram-бот или простую внутреннюю систему под ваш рабочий процесс."
-        summary="Напишите, что нужно запустить: заявки, вакансии, уведомления, внутреннюю форму или сайт. После заявки уточним сценарий и объём первого запуска."
-        summaryHeading="B2B"
-        metrics={[]}
+        eyebrow="Каталог заведений"
+        path="/business"
+        title="Каталог заведений СКФО"
+        description="Добавляем кофейные бары, кофейни, обжарочные и близкие форматы в профильный каталог BARSYNERGY."
+        summary="Заполните карточку заведения — команда проверит данные и подготовит публикацию в каталоге BARSYNERGY."
+        summaryHeading="Каталог"
+        heroVariant="split"
+        metrics={heroMetrics}
         rows={[]}
-        primaryLink={{ label: 'Оставить заявку', href: getBusinessContactHref('Бизнес-решение') }}
-        secondaryLink={{ label: 'Войти в кабинет', href: '/business/cabinet' }}
+        primaryLink={{ label: 'Заполнить заявку', href: '#business-request' }}
+        secondaryLink={{ label: 'Посмотреть каталог', href: '/suppliers' }}
       />
 
-      <section className="background-zone background-zone-gray border-b border-[var(--line)] py-10 md:py-14">
-        <div className="container">
-          <div className="mb-6 max-w-3xl">
-            <PublicEyebrow>Решения</PublicEyebrow>
-            <PublicDisplayTitle className="mt-4 max-w-4xl">Услуги, которые мы предоставляем</PublicDisplayTitle>
-            <PublicBodyText className="mt-5 max-w-2xl" size="md">
-              Начинаем с одной понятной задачи. Сложные интеграции, оплаты и личные кабинеты лучше выносить во второй этап.
-            </PublicBodyText>
-          </div>
-          <div className="border-t border-[var(--line)]">
-            {businessSolutionTypeOptions.map((option) => (
-              <FeatureCard
-                description={option.description}
-                eyebrow="Сервис"
-                key={option.value}
-                presentation="row"
-                title={option.label}
-              />
-            ))}
-          </div>
-          <Button className="mt-6 min-h-12 rounded-[var(--radius-md)] px-6 tracking-normal" href={getBusinessContactHref('Бизнес-решение')}>
-            Оставить заявку
-            <ArrowUpRight size={18} />
-          </Button>
-        </div>
-      </section>
-
-      <section className="background-zone background-zone-beige editorial-grid border-b border-[var(--line)] py-10 md:py-14">
-        <div className="container grid gap-8 xl:grid-cols-[minmax(32rem,0.72fr)_minmax(0,1.28fr)]">
+      <section className="background-zone background-zone-beige border-b border-[var(--line)] py-10 md:py-14">
+        <div className="container grid gap-8 xl:grid-cols-[minmax(18rem,0.54fr)_minmax(0,1.46fr)]">
           <div className="xl:sticky xl:top-24 xl:self-start">
-            <PublicEyebrow>Процесс</PublicEyebrow>
-            <PublicDisplayTitle
-              className="mt-4 max-w-[12ch] !text-[clamp(2.9rem,3.7vw,4rem)]"
-              style={{ hyphens: 'none', overflowWrap: 'normal', wordBreak: 'normal' }}
-            >
-              Как начинается работа
-            </PublicDisplayTitle>
+            <PublicEyebrow>Как это работает</PublicEyebrow>
+            <PublicDisplayTitle className="mt-4 max-w-sm">Три шага до карточки</PublicDisplayTitle>
             <PublicBodyText className="mt-5 max-w-md" size="md">
-              Не нужно готовить ТЗ. Достаточно описать процесс, который сейчас отнимает время.
+              Нужна короткая заявка. Сложные анкеты, тарифы и оплату на этой странице не собираем.
             </PublicBodyText>
+            <Button className="mt-7 rounded-[var(--radius-md)]" href="#business-request" size="lg">
+              Перейти к форме
+              <ArrowUpRight size={16} />
+            </Button>
           </div>
 
-          <div className="border-t border-[var(--line)]">
+          <div className="[&>article:last-child]:border-b-0">
             {processSteps.map((step) => (
               <RoleTaskCard
                 density="compact"
@@ -110,6 +122,52 @@ export default function BusinessPage() {
           </div>
         </div>
       </section>
+
+      <section className="home-services-section background-zone background-zone-beige border-b border-[var(--line)] py-12 md:py-16">
+        <div className="container grid gap-8 xl:grid-cols-[minmax(18rem,0.54fr)_minmax(0,1.46fr)]">
+          <div className="min-w-0 xl:sticky xl:top-24 xl:self-start">
+            <div className="min-w-0">
+              <PublicEyebrow tone="muted">Польза</PublicEyebrow>
+              <PublicDisplayTitle className="mt-4 max-w-[13ch]">Что получает заведение</PublicDisplayTitle>
+              <PublicBodyText className="mt-5 max-w-md" size="md" tone="default">
+                Каталог нужен не для рекламы «обо всём», а для аккуратной отраслевой навигации по местам и командам региона.
+              </PublicBodyText>
+              <Button className="mt-7 rounded-[var(--radius-md)]" href="#business-request" size="lg">
+                Перейти к форме
+                <ArrowUpRight size={16} />
+              </Button>
+            </div>
+          </div>
+
+          <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:mt-0">
+            {benefits.map((benefit, index) => {
+              const Icon = [Store, MapPinned, SearchCheck, BadgeCheck][index] ?? BadgeCheck;
+
+              return (
+                <article className="public-card-shell p-5 md:p-6" key={benefit.title}>
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="public-meta-label">{benefit.label}</span>
+                    <span className="inline-flex h-10 w-10 items-center justify-center rounded-[var(--radius-sm)] bg-[var(--accent)] text-white">
+                      <Icon size={18} strokeWidth={1.8} />
+                    </span>
+                  </div>
+                  <h3 className="mt-5 text-xl font-semibold leading-7 text-[var(--text)]">{benefit.title}</h3>
+                  <p className="mt-3 text-sm leading-6 text-[var(--muted)]">{benefit.description}</p>
+                </article>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      <BusinessSolutionForm
+        direct
+        defaults={defaults}
+        enabled={applicationFormsEnabled}
+        result={getPublicApplicationResult(params)}
+        utm={getPublicApplicationUtm(params)}
+        cities={cities}
+      />
     </>
   );
 }

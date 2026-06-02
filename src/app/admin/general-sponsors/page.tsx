@@ -5,6 +5,7 @@ import {
 } from '@/app/admin/general-sponsors/actions';
 import {
   AdminActionAlert,
+  AdminContentStatusTabs,
   AdminContentRowActions,
   AdminListFilters,
   AdminPagination
@@ -114,8 +115,10 @@ export default async function AdminGeneralSponsorsPage({ searchParams }: AdminGe
       />
 
       <AdminActionAlert params={params} />
+      <AdminContentStatusTabs basePath={ADMIN_GENERAL_SPONSORS_PATH} params={params} />
       <AdminListFilters
         basePath={ADMIN_GENERAL_SPONSORS_PATH}
+        includeStatus={false}
         filters={[
           { name: 'cityId', label: 'Город', allLabel: 'Все города', options: cities.map((city) => ({ value: city.id, label: city.name })) },
           {

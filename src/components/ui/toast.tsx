@@ -114,7 +114,7 @@ function ToastItem({ dismissToast, toast }: { dismissToast: (id: string) => void
 
   return (
     <div
-      className="min-h-[78px] rounded-[12px] border border-[#d8c7b8] bg-[#fffcf8] p-4 text-[#1e1a16] shadow-none"
+      className="min-h-[78px] rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--surface)] p-4 text-[var(--text)] shadow-[var(--shadow-panel)]"
       data-tone={toast.tone}
       role={assertive ? 'alert' : 'status'}
     >
@@ -122,11 +122,11 @@ function ToastItem({ dismissToast, toast }: { dismissToast: (id: string) => void
         <span aria-hidden="true" className={cn('mt-1 h-2.5 w-2.5 shrink-0 rounded-full', toastToneMarkerClassNames[toast.tone])} />
         <div className="min-w-0 flex-1">
           <p className="text-base font-semibold leading-[22px]">{toast.title}</p>
-          {toast.description ? <div className="mt-1 text-[13px] leading-[18px] text-[#6b625a]">{toast.description}</div> : null}
+          {toast.description ? <div className="mt-1 text-[13px] leading-[18px] text-[var(--muted)]">{toast.description}</div> : null}
         </div>
         <button
           aria-label="Закрыть уведомление"
-          className="inline-flex min-h-8 min-w-8 shrink-0 items-center justify-center rounded-[var(--radius-sm)] text-lg leading-none opacity-70 transition-opacity duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] motion-reduce:transition-none"
+          className="inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-[var(--radius-sm)] text-lg leading-none opacity-70 transition-opacity duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] motion-reduce:transition-none"
           onClick={() => dismissToast(toast.id)}
           type="button"
         >

@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { ApplicationStatus } from '@prisma/client';
 import { updateBusinessProfile } from '@/lib/business/actions';
 import { AdminActionAlert } from '@/components/admin/content-admin-controls';
@@ -11,10 +12,16 @@ import { PageHeader } from '@/components/ui/page-header';
 import type { AdminContentSearchParams } from '@/lib/admin/content-utils';
 import { requireBusinessAccountAccess } from '@/lib/auth/require-business-account';
 import { prisma } from '@/lib/db/prisma';
+import { buildPrivatePageMetadata } from '@/lib/public/metadata';
 
 type BusinessDashboardPageProps = {
   searchParams?: Promise<AdminContentSearchParams>;
 };
+
+export const metadata: Metadata = buildPrivatePageMetadata({
+  title: 'Кабинет компании',
+  description: 'Закрытый кабинет компании BARSYNERGY для профиля, заявок и рабочих статусов.'
+});
 
 export default async function BusinessDashboardPage({ searchParams }: BusinessDashboardPageProps) {
   const { businessAccount } = await requireBusinessAccountAccess();

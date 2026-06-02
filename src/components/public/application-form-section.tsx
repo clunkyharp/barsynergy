@@ -8,10 +8,10 @@ import { InlineAlert } from '@/components/ui/inline-alert';
 import { Input } from '@/components/ui/input';
 import type { ApplicationCityOption } from '@/lib/applications/form-options';
 import type { PublicApplicationResult, PublicApplicationUtm } from '@/lib/applications/public-form-helpers';
+import { SUPPORT_EMAIL } from '@/lib/contact-info';
 import { cn } from '@/lib/utils';
 
-const PUBLIC_CONTACT_EMAIL = 'Rushgroupbar@gmail.com';
-const PUBLIC_CONTACT_MAILTO = `mailto:${PUBLIC_CONTACT_EMAIL}`;
+const PUBLIC_CONTACT_MAILTO = `mailto:${SUPPORT_EMAIL}`;
 
 type PublicApplicationSectionProps = {
   eyebrow: string;
@@ -251,7 +251,7 @@ export function PublicApplicationSection({
             <EditorialShell className="p-5 md:p-6">
               <h3 className="text-lg font-semibold leading-7">Формы сейчас закрыты</h3>
               <p className="mt-3 text-sm leading-7 text-[var(--muted)]">
-                {disabledDescription ?? `Формы временно закрыты. Напишите нам на ${PUBLIC_CONTACT_EMAIL}.`}
+                {disabledDescription ?? `Формы временно закрыты. Напишите нам на ${SUPPORT_EMAIL}.`}
               </p>
               <Button className="mt-6 rounded-[var(--radius-md)] sm:self-start" href={disabledLink?.href ?? PUBLIC_CONTACT_MAILTO} size="lg" variant="secondary">
                 {disabledLink?.label ?? 'Написать на почту'}
@@ -285,7 +285,7 @@ export function PublicApplicationSection({
           <EditorialShell className="p-5 md:p-6">
             <h3 className="text-lg font-semibold leading-7">Формы сейчас закрыты</h3>
             <p className="mt-3 text-sm leading-7 text-[var(--muted)]">
-              {disabledDescription ?? `Формы временно закрыты. Напишите нам на ${PUBLIC_CONTACT_EMAIL}.`}
+              {disabledDescription ?? `Формы временно закрыты. Напишите нам на ${SUPPORT_EMAIL}.`}
             </p>
             <Button className="mt-6 rounded-[var(--radius-md)] sm:self-start" href={disabledLink?.href ?? PUBLIC_CONTACT_MAILTO} size="lg" variant="secondary">
               {disabledLink?.label ?? 'Написать на почту'}

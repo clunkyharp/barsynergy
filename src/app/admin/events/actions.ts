@@ -40,7 +40,8 @@ const eventFormSchema = z.object({
   address: z.string().trim().max(240).optional(),
   format: z.string().trim().max(80).optional(),
   capacity: z.coerce.number().int().positive().max(100000).optional(),
-  registrationMode: z.string().trim().max(120).optional()
+  registrationMode: z.string().trim().max(120).optional(),
+  registrationUrl: z.string().trim().url().max(500).optional()
 });
 
 const statusFormSchema = z.object({
@@ -74,7 +75,8 @@ export async function createEvent(formData: FormData) {
       address: optionalString(getString(formData, 'address')),
       format: optionalString(getString(formData, 'format')),
       capacity: optionalString(getString(formData, 'capacity')),
-      registrationMode: optionalString(getString(formData, 'registrationMode'))
+      registrationMode: optionalString(getString(formData, 'registrationMode')),
+      registrationUrl: optionalString(getString(formData, 'registrationUrl'))
     });
     const slug = slugify(parsed.slug ?? parsed.title);
 
@@ -128,6 +130,7 @@ export async function createEvent(formData: FormData) {
             format: nullableString(parsed.format),
             capacity: parsed.capacity,
             registrationMode: nullableString(parsed.registrationMode),
+            registrationUrl: nullableString(parsed.registrationUrl),
             createdById: user.id,
             updatedById: user.id,
             ...initialPublicationDates(parsed.status)
@@ -173,7 +176,8 @@ export async function updateEvent(formData: FormData) {
         address: optionalString(getString(formData, 'address')),
         format: optionalString(getString(formData, 'format')),
         capacity: optionalString(getString(formData, 'capacity')),
-        registrationMode: optionalString(getString(formData, 'registrationMode'))
+        registrationMode: optionalString(getString(formData, 'registrationMode')),
+        registrationUrl: optionalString(getString(formData, 'registrationUrl'))
       });
     const slug = slugify(parsed.slug ?? parsed.title);
 
@@ -235,6 +239,7 @@ export async function updateEvent(formData: FormData) {
             format: nullableString(parsed.format),
             capacity: parsed.capacity,
             registrationMode: nullableString(parsed.registrationMode),
+            registrationUrl: nullableString(parsed.registrationUrl),
             updatedById: user.id,
             ...statusTransitionDates(parsed.status, existingEvent.publishedAt)
           }

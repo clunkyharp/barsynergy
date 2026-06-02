@@ -99,7 +99,7 @@ Current status:
 - personal-data launch checklist is documented in `docs/personal-data-launch-checklist.md`;
 - shared header, footer and public page templates are implemented;
 - `/general-sponsors` is implemented as a separate visible public screen with homepage and navigation entry points;
-- route-level loading, error and not-found states are implemented;
+- route-level error and not-found states are implemented; the root `loading.tsx` boundary is intentionally absent because it can turn missing dynamic detail pages into streamed soft-404 responses;
 - design-system foundation is documented in `DESIGN.md` and `design-tokens.json`;
 - lint, typecheck, build, Prisma validate, public route smoke and desktop/mobile homepage spot checks pass;
 - the homepage has been rebuilt as a live CMS-fed front page with a new public shell, GSAP-driven narrative sections, stronger B2B routing and renewed desktop/mobile screenshot checks;
@@ -121,6 +121,7 @@ Current status:
 - editorial background follow-up is applied locally: the public base background now uses warm ivory/deep graphite layers, subtle paper grain, no square grid layers and burgundy/graphite radial accents; homepage sections now have explicit hero, ivory, beige, warm gray, graphite tool, sponsor, social and CTA zones with Playwright fallback screenshots across mobile/tablet/desktop in light/dark and no horizontal overflow;
 - branded form system follow-up is applied locally: public, auth, business and admin field surfaces now share custom BARSYNERGY form primitives for input, textarea, select, checkbox, radio, upload, search, labels, hints, errors, sections and actions; the vacancy response form is the reference implementation, and existing form names/actions/validation remain unchanged;
 - dark graphite editorial theme polish is applied locally: dark mode now uses explicit graphite page/panel/elevated tokens, warm low-opacity borders, ivory and muted-clay text, calmer burgundy accents, reduced heavy shadows/glows and flat graphite form fields; Playwright fallback screenshots/checks cover the requested public/auth routes at desktop/mobile widths with no runtime errors or horizontal overflow;
+- 2026-06-01 Miro palette migration is applied at code/token level: yellow is now the single interactive accent across buttons, links, active nav and selected states; light/dark surfaces now use Miro-style white, gray and derived blue-gray neutrals; pastel support colors moved into decorative cards and ambient layers; admin surfaces inherit the shared accent contract, and field-focus styling stays neutral;
 - homepage browser-comment cleanup is applied locally: the hero text now uses `партнёрские предложения`, the first-screen audience action panel is removed, the featured knowledge card has a bitmap fallback image, and social cards no longer repeat platform names in uppercase labels plus titles; Playwright fallback checks cover `/` at `1175x813` and `822x813` with no horizontal overflow;
 - sponsor data is now shared between the homepage and `/general-sponsors`, so the separate sponsors page renders the same real entries and no longer keeps a separate test showcase list;
 - partner/sponsor follow-up is applied locally: `/partners` now leads with clearer plain-Russian copy, shows the current general sponsor directly on the page, the `Hustle Brew` block now reads as an editorial partner profile instead of a promo slab, social promo cards no longer let their oversized logos collide with the right-side divider treatment, and the public header no longer overflows or shifts its desktop nav/actions on medium desktop widths;
@@ -342,7 +343,7 @@ Current status:
 
 - service-specialist module is planned as a Phase 5 catalog expansion;
 - current schema has `CategoryType.SERVICE` as taxonomy preparation, but it does not yet have `ServiceSpecialist`, `ApplicationType.SERVICE_SPECIALIST_SUBMISSION`, `/services` or `/admin/services`;
-- Phase 5 remains gated by final stabilization sign-off in `docs/remediation-plan.md`, especially production scheduler confirmation and a clean production build in an environment without the local Next/SWC code-signature blocker;
+- Phase 5 remains gated by final stabilization sign-off in `docs/remediation-plan.md`, especially production scheduler confirmation; the mobile admin read-only/actions layer is a separate product decision;
 - it must not interrupt Phase 4 auth and first business account work unless the owner explicitly records a roadmap reorder;
 - first version has no specialist personal cabinet and no direct public publishing.
 

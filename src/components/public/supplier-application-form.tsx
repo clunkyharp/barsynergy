@@ -25,7 +25,7 @@ export function SupplierApplicationForm({ enabled, result, utm, cities }: Public
       disclosureAliases={['applications']}
       disclosureFocusSelector="#supplierCompanyName"
       disclosureId="supplier-request"
-      disclosureOpenLabel="Добавить компанию"
+      disclosureOpenLabel="Добавить свою компанию"
       disclosureTitle="Заявка поставщика"
       disclosureDescription="Укажите компанию, категорию, географию, продукты или услуги и контакт для заведений. Логотип или фото нужны перед публикацией профиля."
       enabled={enabled}

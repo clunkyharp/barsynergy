@@ -5,11 +5,13 @@ import { PartnerFormatTable } from '@/components/public/editorial-display-primit
 import { EditorialPublicPage } from '@/components/public/editorial-public-page';
 import { RoleTaskCard } from '@/components/public/public-card-patterns';
 import { PublicBodyText, PublicDisplayTitle, PublicEyebrow } from '@/components/public/public-primitives';
+import { buildPublicPageMetadata } from '@/lib/public/metadata';
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildPublicPageMetadata({
   title: 'Партнёры',
-  description: 'Партнёрские форматы BARSYNERGY для брендов, школ и заведений.'
-};
+  description: 'Партнёрские форматы BARSYNERGY для брендов, школ и заведений.',
+  path: '/partners'
+});
 
 const partnerFormats = [
   {
@@ -94,7 +96,7 @@ function PartnershipStartSequence() {
           </PublicBodyText>
           <div className="mt-8 flex flex-wrap gap-3">
             <Button className="min-h-12 rounded-[var(--radius-md)] px-5 tracking-normal" href={contactHref}>
-              Оставить заявку
+              Описать партнёрскую задачу
               <ArrowUpRight size={16} />
             </Button>
           </div>
@@ -121,13 +123,15 @@ export default function PartnersPage() {
   return (
     <>
       <EditorialPublicPage
-        eyebrow="Для партнёров"
+        eyebrow="Партнёры"
+        path="/partners"
         title="Партнёрство для брендов, школ и заведений"
-        description="Есть событие, обучение, запуск или совместный проект? Напишите команде BARSYNERGY."
-        summary="Опишите задачу: событие, обучение, материал, каталог или спецпроект. После заявки уточним детали."
+        description="Партнёры участвуют форматами, экспертами, продуктом и контентом. Спонсоры финансируют проект, а поставщики размещают рабочие контакты в каталоге."
+        summary="Опишите задачу: событие, обучение, материал, каталог или спецпроект. После обращения уточним детали."
+        heroVariant="split"
         metrics={[]}
         rows={[]}
-        primaryLink={{ label: 'Оставить заявку', href: getPartnerContactHref() }}
+        primaryLink={{ label: 'Описать партнёрскую задачу', href: getPartnerContactHref() }}
         secondaryLink={{ label: 'Смотреть спонсорство', href: '/general-sponsors' }}
       />
       <section className="background-zone background-zone-beige editorial-grid border-b border-[var(--line)] py-10 md:py-14">

@@ -1,13 +1,22 @@
 import type { HTMLAttributes, ReactNode } from 'react';
-import { ArrowUpRight } from 'lucide-react';
+import { ArrowUpRight, BadgeCheck } from 'lucide-react';
 import { AppLink } from '@/components/ui/app-link';
+import { Button, type ButtonVariant } from '@/components/ui/button';
 import { displayFont } from '@/lib/fonts';
 import { cn } from '@/lib/utils';
+
+type RowAction = {
+  href: string;
+  label: string;
+  variant?: ButtonVariant;
+};
 
 type EditorialListRowProps = HTMLAttributes<HTMLElement> & {
   label: ReactNode;
   title: ReactNode;
   description: ReactNode;
+  actions?: RowAction[];
+  lead?: ReactNode;
   media?: ReactNode;
   meta?: ReactNode;
   subtitle?: ReactNode;
@@ -21,11 +30,13 @@ type EditorialListRowProps = HTMLAttributes<HTMLElement> & {
 
 export function EditorialListRow({
   as = 'article',
+  actions,
   className,
   columns = 'default',
   description,
   label,
   labelMeta,
+  lead,
   media,
   meta,
   subtitle,
@@ -62,71 +73,78 @@ export function EditorialListRow({
     </>
   );
 
-  const opportunityContent = (
+  const compactCardContent = (
     <>
-      <div className="grid min-w-0 grid-cols-[4.25rem_minmax(0,1fr)] gap-3 sm:grid-cols-[4.5rem_minmax(0,1fr)] sm:gap-4">
-        {media ? <div className="sm:pt-1">{media}</div> : null}
+      <div className="min-w-0">
         <div className="min-w-0">
-          <div>{label}</div>
-          {labelMeta ? <div className="mt-2 md:mt-3">{labelMeta}</div> : null}
-          <div className="mt-3 md:mt-4">
-            <h3 className={`${displayFont.className} text-[1.35rem] font-semibold leading-none transition-colors duration-[var(--motion-duration-base)] ease-[var(--motion-ease-standard)] group-hover:text-[var(--accent)] motion-reduce:transition-none md:text-[1.95rem]`}>
-              {title}
-            </h3>
+          <div className="flex flex-wrap items-center gap-2.5">
+            <div>{label}</div>
+            {labelMeta ? <div>{labelMeta}</div> : null}
+          </div>
+          {href ? (
+            <AppLink className="group/title mt-3 block w-fit max-w-full rounded-[var(--radius-sm)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--accent)]" href={href}>
+              <h3 className="public-list-row-title text-balance text-[1.85rem] font-bold leading-[1.08] text-[var(--text)] transition-colors duration-[var(--motion-duration-base)] ease-[var(--motion-ease-standard)] group-hover/title:text-[var(--accent)] motion-reduce:transition-none md:text-[2.2rem]">
+                {title}
+              </h3>
+            </AppLink>
+          ) : (
+            <h3 className="public-list-row-title mt-3 text-balance text-[1.85rem] font-bold leading-[1.08] text-[var(--text)] md:text-[2.2rem]">{title}</h3>
+          )}
+          {lead ? <div className="public-list-row-lead mt-3 text-[1.25rem] font-semibold leading-8 text-[var(--text)] md:text-[1.45rem]">{lead}</div> : null}
+          {meta ? <div className="public-list-row-meta mt-4">{meta}</div> : null}
+        </div>
+      </div>
+      <div className="public-list-row-company min-w-0">
+        <div className="grid gap-3 sm:grid-cols-[4rem_minmax(0,1fr)] sm:items-start">
+          {media ? <div className="hidden sm:block">{media}</div> : null}
+          <div className="min-w-0">
             {subtitle ? (
-              <p className="mt-2 text-[12px] font-semibold uppercase tracking-[0.12em] text-[var(--muted)]">{subtitle}</p>
+              <div className="flex min-w-0 flex-wrap items-center gap-2 text-[1.05rem] font-semibold leading-7 text-[var(--text)]">
+                <span className="min-w-0 break-words">{subtitle}</span>
+                <BadgeCheck aria-label="Проверено" className="shrink-0 text-[var(--accent)]" size={18} strokeWidth={2.2} />
+              </div>
             ) : null}
-            {meta ? <div className="mt-4">{meta}</div> : null}
+            <div className={cn('text-[15px] leading-7 text-[var(--muted)]', subtitle ? 'mt-3' : '')}>{description}</div>
           </div>
         </div>
       </div>
-      <div className="col-span-2 flex min-w-0 flex-col justify-between gap-3 pt-2 sm:col-span-1 sm:pt-3 lg:pl-4 lg:pt-0">
-        <div className="hidden max-w-[34rem] text-sm leading-7 text-[var(--muted)] sm:block">{description}</div>
-        {href ? (
-          <div className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--accent)]">
-            <span>{actionLabel}</span>
-            <ArrowUpRight className="transition-transform duration-[var(--motion-duration-base)] ease-[var(--motion-ease-move)] group-hover:translate-x-1 motion-reduce:transition-none" size={16} />
-          </div>
-        ) : null}
-      </div>
+      {actions && actions.length > 0 ? (
+        <div className="public-list-row-actions flex flex-col gap-2.5 sm:flex-row sm:flex-wrap">
+          {actions.map((action, index) => (
+            <Button
+              className={cn(
+                'rounded-[var(--radius-md)] px-5 tracking-normal max-sm:w-full',
+                index === 0 ? 'public-list-row-primary-action' : 'public-list-row-secondary-action'
+              )}
+              href={action.href}
+              key={`${action.href}-${action.label}`}
+              size="lg"
+              variant={action.variant ?? (index === 0 ? 'primary' : 'secondary')}
+            >
+              {action.label}
+            </Button>
+          ))}
+        </div>
+      ) : null}
     </>
   );
 
-  const directoryContent = (
-    <>
-      <div className="grid min-w-0 grid-cols-[3.75rem_minmax(0,1fr)] gap-3 md:grid-cols-[4.5rem_minmax(0,1fr)] md:gap-4">
-        {media ? <div>{media}</div> : null}
-        <div className="min-w-0">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="flex min-w-0 flex-wrap items-center gap-3">
-              <div>{label}</div>
-              {labelMeta ? <div>{labelMeta}</div> : null}
-            </div>
-            {href && variant !== 'directory' ? (
-              <span className="inline-flex shrink-0 items-center gap-2 text-sm font-semibold text-[var(--accent)]">
-                {actionLabel}
-                <ArrowUpRight className="transition-transform duration-[var(--motion-duration-base)] ease-[var(--motion-ease-move)] group-hover:translate-x-1 motion-reduce:transition-none" size={16} />
-              </span>
-            ) : null}
-          </div>
-          <h3 className={`${displayFont.className} mt-2 text-[1.35rem] font-semibold leading-[1.05] transition-colors duration-[var(--motion-duration-base)] ease-[var(--motion-ease-standard)] group-hover:text-[var(--accent)] motion-reduce:transition-none md:mt-3 md:text-[1.9rem]`}>
-            {title}
-          </h3>
-          {subtitle ? <p className="mt-2 text-sm leading-6 text-[var(--muted)]">{subtitle}</p> : null}
-          <div className="mt-3 hidden max-w-2xl text-sm leading-7 text-[var(--muted)] sm:block">{description}</div>
-          {meta ? <div className="mt-4">{meta}</div> : null}
-          {href ? (
-            <div className="mt-5 flex justify-start md:justify-end">
-              <span className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--accent)]">
-                {actionLabel}
-                <ArrowUpRight className="transition-transform duration-[var(--motion-duration-base)] ease-[var(--motion-ease-move)] group-hover:translate-x-1 motion-reduce:transition-none" size={16} />
-              </span>
-            </div>
-          ) : null}
+  if (variant === 'opportunity' || variant === 'directory') {
+    return (
+      <article
+        className={cn(
+          'public-list-row-shell public-list-row-shell-hh',
+          variant === 'opportunity' ? 'public-list-row-shell-vacancy' : 'public-list-row-shell-supplier',
+          className
+        )}
+        {...props}
+      >
+        <div className="grid min-w-0 gap-6">
+          {compactCardContent}
         </div>
-      </div>
-    </>
-  );
+      </article>
+    );
+  }
 
   if (href) {
     return (
@@ -142,13 +160,11 @@ export function EditorialListRow({
             'group grid gap-3 rounded-[var(--radius-xl)] py-4 transition-colors duration-[var(--motion-duration-base)] ease-[var(--motion-ease-standard)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] focus-visible:ring-inset motion-reduce:transition-none md:gap-5 md:py-7',
             variant === 'default' && columns === 'default' && 'md:grid-cols-[0.24fr_0.5fr_0.7fr]',
             variant === 'default' && columns === 'content' && 'md:grid-cols-[0.26fr_0.52fr_0.72fr]',
-            variant === 'default' && 'px-0',
-            variant === 'opportunity' && 'px-4 lg:grid-cols-[minmax(0,1.08fr)_minmax(18rem,0.66fr)]',
-            variant === 'directory' && 'px-0'
+            'px-0'
           )}
           href={href}
         >
-          {variant === 'opportunity' ? opportunityContent : variant === 'directory' ? directoryContent : defaultContent}
+          {defaultContent}
         </AppLink>
       </article>
     );
@@ -160,13 +176,11 @@ export function EditorialListRow({
         'grid gap-5 border-b border-[var(--border-default)] py-6 md:py-7',
         variant === 'default' && columns === 'default' && 'md:grid-cols-[0.24fr_0.5fr_0.7fr]',
         variant === 'default' && columns === 'content' && 'md:grid-cols-[0.26fr_0.52fr_0.72fr]',
-        variant === 'opportunity' && 'lg:grid-cols-[minmax(0,1.08fr)_minmax(18rem,0.66fr)]',
-        variant === 'directory' && '',
         className
       )}
       {...props}
     >
-      {variant === 'opportunity' ? opportunityContent : variant === 'directory' ? directoryContent : defaultContent}
+      {defaultContent}
     </Component>
   );
 }

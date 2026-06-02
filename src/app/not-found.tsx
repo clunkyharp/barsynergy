@@ -1,5 +1,12 @@
 import { AppLink } from '@/components/ui/app-link';
+import { Button } from '@/components/ui/button';
 import { displayFont } from '@/lib/fonts';
+
+const quickLinks = [
+  { href: '/vacancies', label: 'Вакансии', description: 'Открытые роли и заявки от заведений.' },
+  { href: '/suppliers', label: 'Поставщики', description: 'Оборудование, зерно, продукты и сервисы.' },
+  { href: '/articles', label: 'Материалы', description: 'Разборы, инструкции и полезные тексты.' }
+];
 
 export default function NotFound() {
   return (
@@ -13,18 +20,25 @@ export default function NotFound() {
           Проверьте адрес или перейдите в один из основных разделов сайта.
         </p>
         <div className="mt-8 flex flex-wrap gap-4">
-          <AppLink
-            className="inline-flex min-h-12 items-center justify-center border border-[var(--graphite)] bg-[var(--graphite)] px-5 text-sm font-semibold uppercase tracking-[0.06em] text-white transition hover:bg-black"
-            href="/"
-          >
+          <Button className="rounded-[var(--radius-md)] px-6 uppercase tracking-[0.06em]" href="/">
             На главную
-          </AppLink>
-          <AppLink
-            className="inline-flex min-h-12 items-center justify-center border border-black/25 px-5 text-sm font-semibold uppercase tracking-[0.06em] transition hover:border-[var(--accent)] hover:text-[var(--accent)]"
-            href="/contacts"
-          >
+          </Button>
+          <Button className="rounded-[var(--radius-md)] border-[var(--accent)] px-6 uppercase tracking-[0.06em] text-[var(--accent)] hover:bg-[var(--accent-soft)]" href="/contacts" variant="secondary">
             Контакты
-          </AppLink>
+          </Button>
+        </div>
+        <div className="mt-10 grid gap-3 md:grid-cols-3">
+          {quickLinks.map((link) => (
+            <AppLink
+              className="group flex min-h-full cursor-pointer flex-col rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--surface-wash)] p-4 transition-colors hover:border-[var(--accent)] hover:bg-[var(--surface-wash-strong)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
+              href={link.href}
+              key={link.href}
+            >
+              <span className="text-sm font-semibold text-[var(--text)]">{link.label}</span>
+              <span className="mt-2 block text-sm leading-6 text-[var(--muted)]">{link.description}</span>
+              <span className="mt-auto pt-4 text-[13px] font-semibold text-[var(--accent)]">Перейти →</span>
+            </AppLink>
+          ))}
         </div>
       </section>
     </main>

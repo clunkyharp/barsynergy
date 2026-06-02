@@ -31,6 +31,13 @@ export const businessSolutionTypeOptions = [
   }
 ] as const;
 
+export const businessVenueTypeOptions = [
+  { value: 'coffee_bar', label: 'Кофейный бар' },
+  { value: 'specialty', label: 'Specialty' },
+  { value: 'roastery', label: 'Обжарочное' },
+  { value: 'other', label: 'Другое' }
+] as const;
+
 export const consultingDirectionOptions = [
   { value: 'venue_opening', label: 'Открытие заведения' },
   { value: 'bar_menu', label: 'Барная карта' },

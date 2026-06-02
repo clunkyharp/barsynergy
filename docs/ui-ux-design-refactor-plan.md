@@ -24,7 +24,7 @@
 Уже реализовано в коде в этом батче:
 
 - создан чекпоинт текущего dirty tree на `codex/barsynergy-ui-preview`, после чего работа продолжена в ветке `codex/photo-reference-ui-redesign`;
-- глобальный визуальный слой переведён ближе к фото-референсам: `Noto Serif Display` для крупных заголовков, `Noto Sans` для основного текста, тёплый off-white фон, бордовые action-цвета, тонкие разделители, меньшие радиусы и спокойные тени;
+- глобальный визуальный слой переведён ближе к фото-референсам: `Cormorant Garamond` для крупных публичных H1/H2, `Manrope` для основного текста и интерфейса, тёплый off-white фон, бордовые action-цвета, тонкие разделители, меньшие радиусы и спокойные тени;
 - обновлены shared primitives: header, mobile menu, footer, `Button`, `Panel`, `Card`, `MetaChip`, `PageHeader`, `StatCard`, public list rows, filters, sponsor card, auth shells, калькулятор, business/profile/admin shell;
 - главная `/` перестроена под структуру референса с реальными счётчиками, текущими CMS-данными, разделами платформы, аудиториями и DB-записями `GeneralSponsor` / Hustle Brew;
 - public-каталоги, формы, детальные страницы, auth, калькулятор, profile, business и admin-поверхности приведены к одной фото-reference системе без изменения маршрутов, Prisma schema, auth, application actions, storage, notifications или permissions;
@@ -159,7 +159,7 @@ Closeout 2026-05-24:
 
 Сделано в photo-reference batch:
 
-- `DESIGN.md`, `design-tokens.json`, `src/lib/fonts.ts` и `src/app/globals.css` синхронизированы с runtime-направлением `Noto Serif Display + Noto Sans`;
+- `DESIGN.md`, `design-tokens.json`, `src/lib/fonts.ts` и `src/app/globals.css` синхронизированы с runtime-направлением `Cormorant Garamond + Manrope`;
 - общие public/product primitives получили меньший radius scale, более тонкие border/shadow роли и бордовый action/focus слой;
 - отрицательный letter-spacing убран из пользовательских UI-поверхностей.
 - dark-mode token pass добавил отдельный `accent-contrast`, отдельные logo assets для light/dark, более спокойные hover-состояния header/nav, tokenized states для `Button`, `Select`, `Checkbox`, consent blocks, `MetaChip`, `PublicFilters`, sponsor cards и cookie notice.

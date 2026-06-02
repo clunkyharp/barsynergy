@@ -32,32 +32,51 @@ Mode: `IMPLEMENTATION` on `feature/stabilization-remediation`, after a separate 
 - Added `src/lib/admin/content-lifecycle.ts` for shared admin content status updates and draft deletes across articles, events, courses, vacancies, suppliers, partners and general sponsors.
 - Added Playwright/axe coverage for custom Select and Dropdown keyboard/form flows in `tests/e2e/ui-primitives.spec.ts`.
 - Completed browser QA for public smoke, public accessibility sweep, authenticated admin QA, UI primitives and a focused screenshot sweep of home, suppliers, contacts form, calculator desktop/mobile, admin applications desktop and admin mobile fallback.
+- Added local native-tool runners for `npm run build` and `npm run typecheck`; when launched from a bundled desktop-app Node on macOS, they re-exec through system/Homebrew Node so native Next/SWC and Prisma modules can load.
+- Added the 1024px admin fallback contract, widened the desktop calculator ingredient grid and added QA coverage that ignores hidden native custom-select elements while checking visible triggers.
+- Triaged and remediated the actionable React Doctor findings: `PublicFilters` now wraps its `useSearchParams()` implementation in an owned Suspense boundary, page metadata/detail metadata/noindex private metadata is present for the reported routes, custom admin/business guards and intentional public actions are recorded in `react-doctor.config.json`, and contacts topic labels no longer use a module-scoped object.
+- Applied the SEO remediation slice: route-specific public canonical metadata and OG URLs, noindex metadata for private/auth/admin entry pages, async sitemap with published detail URLs, rendered JSON-LD for site/breadcrumb/detail entities, hard 404 for missing public detail records, canonical `APP_URL=https://barsynergy.ru` examples/docs, and tracked Nginx redirects from `www`/temporary `sslip.io` hosts to the canonical domain.
+- Applied the 2026-05-27 UI remediation brief: simplified `/about`, profile states and public card systems, replaced repeated equal-height public tiles with comparison rows, removed hardcoded article starter placeholders, tightened mobile cookie/hash/form behavior, removed progressive `content-visibility` from deferred screenshot sections, and made admin application notification history optional when the local notification migration has not been applied.
+- Applied the public/auth visual stabilization slice: `/general-sponsors` benefit/package blocks use editorial rows instead of nested cards, sponsor contacts are compact links, `/business` and `/consulting` use service rows with type/result columns, contact/register forms are sectioned, and shared public card/label/form states use quieter neutral borders without hover-lift or glow.
+- Applied the coffee-bar redesign Batch 1 foundation slice: runtime/design tokens now use warm graphite plus amber, cookie notice is bottom-right with a six-month localStorage choice, homepage hero badges and the digital-services promo block are removed, homepage sponsors are a compact logo strip, and `/about` no longer renders the redundant next-links table.
+- Applied the 2026-05-30 fix-plan v2 remediation slice: public header white-logo/action spacing/mobile-menu theme fixes, global anchor scroll padding, article query/empty-state behavior, events and education empty-state cleanup, auth/profile/404/admin/business form polish, custom checkbox checked color, brand/action token documentation, and source audit for the reported floating `N`/issue badge.
 
 ### Still Open
 
 - Confirm production scheduler setup before launch; code-level session cleanup remains unchanged by design.
 - Decide separately whether a mobile admin read-only/actions layer is a product requirement.
-- Confirm a clean production build in an environment without the local Next/SWC code-signature blocker.
+- Re-run DB-backed public visual checks after local PostgreSQL is available at `localhost:55432` or another approved database connection is configured.
+- Apply/check the canonical-domain redirect rule in the real host Nginx runtime after deploy, then run live SEO smoke.
+- Search Console/Метрика indexing confirmation remains outside this batch.
 
 ### Current Validation Status
 
 - `npm run lint`: passed.
 - CSS parse for `src/app/**/*.css`: passed, 8 files.
-- `npm test`: passed, 122/122.
+- `npm test`: passed, 130/130.
 - `./node_modules/.bin/prisma validate`: passed.
 - `git diff --check`: passed.
-- `npm run typecheck`: completed with the existing local Next/SWC code-signature warning during `next typegen`; direct `./node_modules/.bin/tsc --noEmit` passed.
+- `npm run typecheck`: passed after the native-tool runner fix.
+- React Doctor full offline scan: passed the current remediation gate with 0 errors; targeted rules `nextjs-no-use-search-params-without-suspense`, `nextjs-missing-metadata`, `server-auth-actions` and `server-no-mutable-module-state` report 0 findings.
 - `npm audit signatures`: passed.
 - `npm audit --omit=dev`: passed.
 - `npm audit --audit-level=low`: reports one existing moderate dev-only `brace-expansion` advisory under `typescript-eslint`; no automatic fix was applied because this dependency batch only pins current lockfile versions.
 - `npm ls --depth=0`: completed; it still reports the pre-existing extraneous `@emnapi/runtime` in local `node_modules`.
-- `npm run build`: blocked by the local Next/SWC darwin-arm64 code-signature Team ID mismatch after successful `prisma generate`.
-- Playwright public smoke: passed, 1/1.
+- `npm run build`: passed after the SEO remediation slice; the latest rerun now compiles and typechecks, then blocks in the standalone runtime smoke because local PostgreSQL at `localhost:55432` is unavailable and Docker Desktop is not running.
+- Public/auth visual stabilization targeted tests: `node --test tests/public-cta-copy.test.mjs tests/general-sponsor-card-states.test.mjs` passed, 29/29.
+- Public/auth visual stabilization lint: `npm run lint` passed.
+- Direct `next build` with temporary local validation env overrides passed after the latest public/auth visual patch.
+- Playwright rendered SEO smoke against the standalone build: passed for 9 public index routes, 3 private/noindex routes, `/sitemap.xml`, `/suppliers/linea-service-equipment-demo`, `/articles/skfo-bar-industry-map` and a missing article 404.
+- Playwright public smoke: passed, 2/2, including calculator control geometry across 390, 1280, 1366 and 1440px.
 - Playwright public accessibility sweep: passed, 28/28.
-- Playwright authenticated admin QA: passed, 23/23.
+- Playwright authenticated admin QA: passed, 24/24, including admin fallback at 390, 768 and 1023px and desktop shell at 1024 and 1280px.
 - Playwright UI primitives: passed, 2/2.
-- Focused Playwright screenshot sweep: passed for home, suppliers, contacts form, calculator desktop/mobile, admin applications desktop and admin mobile fallback; temporary screenshots were removed after validation.
-- Commit/merge still requires a clean build in an environment without the SWC code-signature blocker; browser QA is current for this branch as of 2026-05-27.
+- Focused Playwright screenshot sweep: passed for home, about, articles, education, partners, contacts form, profile, business cabinet, business requests and admin application detail at `1280x900` and `390x844` where applicable; temporary screenshots were removed after validation.
+- Focused Playwright visual QA for the public/auth visual stabilization passed for `/tools/cost-calculator`, `/business` and `/consulting` at `390`, `768` and `1440` with zero horizontal overflow; `/contacts` and `/auth/register` passed in standalone with public forms disabled. `/general-sponsors` and enabled-form states are blocked until local PostgreSQL is available.
+- Coffee-bar redesign Batch 1 foundation passed `git diff --check`, targeted `node --test tests/cookie-notice.test.mjs tests/home-feature-card-density.test.mjs tests/public-cta-copy.test.mjs`, targeted ESLint, `npm run lint`, `npm run typecheck`, and Playwright DOM/console smoke for `/` and `/about` at desktop/mobile in light/dark mode with zero horizontal overflow.
+- Fix-plan v2 remediation passed `git diff --check`, targeted `node --test tests/site-header-navigation.test.mjs tests/home-feature-card-density.test.mjs tests/public-cta-copy.test.mjs tests/cost-calculator-formula.test.mjs`, full `npm test` with 141/141 tests, `npm run lint`, `npm run typecheck`, `./node_modules/.bin/prisma validate`, and Playwright DOM smoke on `http://127.0.0.1:3100` for header, mobile menu, auth error/role state, calculator copy error, 404 and legacy article query behavior.
+- Focused standalone runtime check: passed for admin application detail on the current build; notification-history fallback no longer logs the missing local notification table as a page failure.
+- Browser QA is current for this branch as of 2026-05-27.
 
 ## Current Use
 

@@ -2,6 +2,7 @@ import { CategoryType, type Prisma } from '@prisma/client';
 import { deletePartnerDraft, updatePartnerStatus } from '@/app/admin/partners/actions';
 import {
   AdminActionAlert,
+  AdminContentStatusTabs,
   AdminContentRowActions,
   AdminListFilters,
   AdminPagination
@@ -116,8 +117,10 @@ export default async function AdminPartnersPage({ searchParams }: AdminPartnersP
       />
 
       <AdminActionAlert params={params} />
+      <AdminContentStatusTabs basePath={ADMIN_PARTNERS_PATH} params={params} />
       <AdminListFilters
         basePath={ADMIN_PARTNERS_PATH}
+        includeStatus={false}
         filters={[
           { name: 'categoryId', label: 'Категория', allLabel: 'Все категории', options: categories.map((category) => ({ value: category.id, label: category.name })) },
           { name: 'partnerType', label: 'Тип партнёра', allLabel: 'Все типы', options: [...partnerTypeOptions] },

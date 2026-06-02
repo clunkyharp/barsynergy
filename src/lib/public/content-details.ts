@@ -34,6 +34,9 @@ export type PublicContentDetail = {
   slug: string;
   summary: string;
   startsAtIso?: string;
+  endsAtIso?: string;
+  publishedAtIso?: string;
+  updatedAtIso?: string;
   label?: string;
   meta: string[];
   body?: string;
@@ -43,6 +46,8 @@ export type PublicContentDetail = {
   externalUrlLabel?: string;
   companyName?: string;
   cityName?: string;
+  locationName?: string;
+  address?: string;
   sections?: PublicContentDetailSection[];
 };
 
@@ -145,6 +150,8 @@ export async function getPublishedArticleDetail(slug: string): Promise<PublicCon
     title: article.title,
     slug: article.slug,
     summary: cleanPublicDetailText(article.summary),
+    publishedAtIso: article.publishedAt?.toISOString(),
+    updatedAtIso: article.updatedAt.toISOString(),
     body: article.body ? cleanPublicDetailText(article.body) : article.body,
     label: article.category?.name,
     meta: compact([
@@ -199,6 +206,7 @@ export async function getPublishedEventDetail(slug: string): Promise<PublicConte
   if (!event) {
     return null;
   }
+  const registrationUrl = getRenderableExternalUrl(event.registrationUrl);
 
   return {
     id: event.id,
@@ -206,9 +214,17 @@ export async function getPublishedEventDetail(slug: string): Promise<PublicConte
     slug: event.slug,
     summary: cleanPublicDetailText(event.summary),
     startsAtIso: event.startsAt.toISOString(),
+    endsAtIso: event.endsAt?.toISOString(),
+    publishedAtIso: event.publishedAt?.toISOString(),
+    updatedAtIso: event.updatedAt.toISOString(),
     label: event.category?.name,
     meta: compact([event.city?.name, getAdminOptionLabel(eventFormatOptions, event.format, ''), formatDate(event.startsAt)]),
     imageUrl: publicImage(event.coverImage, event.coverImageAlt, event.title),
+    cityName: event.city?.name,
+    locationName: event.locationName ?? undefined,
+    address: event.address ?? undefined,
+    externalUrl: registrationUrl,
+    externalUrlLabel: registrationUrl ? 'Записаться' : undefined,
     facts: compact([
       event.city?.name ? `Город: ${event.city.name}` : undefined,
       formatDateTime(event.startsAt) ? `Дата и время: ${formatDateTime(event.startsAt)}` : undefined,
@@ -237,7 +253,9 @@ export async function getPublishedEventDetail(slug: string): Promise<PublicConte
           formatDateTime(event.startsAt) ? `Дата и время: ${formatDateTime(event.startsAt)}.` : undefined,
           event.locationName || event.city?.name ? `Место: ${eventPlaceLabel(event.locationName, event.city?.name)}.` : undefined,
           event.format ? `Формат: ${getAdminOptionLabel(eventFormatOptions, event.format)}.` : undefined,
-          event.registrationMode
+          registrationUrl
+            ? 'Запись: доступна по внешней ссылке.'
+            : event.registrationMode
             ? `Регистрация: ${getAdminOptionLabel(eventRegistrationModeOptions, event.registrationMode)}.`
             : 'Регистрация проходит через форму BARSYNERGY.'
         ])
@@ -273,6 +291,8 @@ export async function getPublishedCourseDetail(slug: string): Promise<PublicCont
     title: course.title,
     slug: course.slug,
     summary: cleanPublicDetailText(course.summary),
+    publishedAtIso: course.publishedAt?.toISOString(),
+    updatedAtIso: course.updatedAt.toISOString(),
     body: course.program ? cleanPublicDetailText(course.program) : course.program,
     label: course.category?.name,
     meta: compact([
@@ -282,6 +302,7 @@ export async function getPublishedCourseDetail(slug: string): Promise<PublicCont
       course.durationLabel
     ]),
     imageUrl: publicImage(course.coverImage, course.coverImageAlt, course.title),
+    cityName: course.city?.name,
     facts: compact([
       course.priceLabel ? `Стоимость: ${course.priceLabel}` : undefined,
       course.instructorName ? `Преподаватель: ${course.instructorName}` : undefined,
@@ -334,6 +355,8 @@ export async function getPublishedVacancyDetail(slug: string): Promise<PublicCon
     title: vacancy.title,
     slug: vacancy.slug,
     summary: cleanPublicDetailText(vacancy.summary),
+    publishedAtIso: vacancy.publishedAt?.toISOString() ?? vacancy.createdAt.toISOString(),
+    updatedAtIso: vacancy.updatedAt.toISOString(),
     body: vacancy.description ? cleanPublicDetailText(vacancy.description) : vacancy.description,
     label: vacancy.category?.name,
     meta: compact([
@@ -362,7 +385,7 @@ export async function getPublishedVacancyDetail(slug: string): Promise<PublicCon
     }),
     sections: [
       {
-        title: 'Условия роли',
+        title: 'Условия',
         items: compact([
           `Компания: ${vacancy.companyName}.`,
           vacancy.city?.name ? `Город: ${vacancy.city.name}.` : undefined,
@@ -372,11 +395,9 @@ export async function getPublishedVacancyDetail(slug: string): Promise<PublicCon
         ])
       },
       {
-        title: 'Как откликнуться',
+        title: 'Контакт для отклика',
         items: compact([
-          'Нажмите «Откликнуться» и заполните форму на этой странице.',
-          'Можно приложить резюме или оставить ссылку на профиль.',
-          vacancy.contactMode ? `Контакт после проверки: ${vacancy.contactMode}.` : undefined
+          vacancy.contactMode ? `Контакт для отклика: ${vacancy.contactMode}.` : undefined
         ])
       }
     ].filter((section) => section.items.length > 0)
@@ -404,11 +425,14 @@ export async function getPublishedSupplierDetail(slug: string): Promise<PublicCo
     title: supplier.title,
     slug: supplier.slug,
     summary: cleanPublicDetailText(supplier.summary),
+    publishedAtIso: supplier.publishedAt?.toISOString(),
+    updatedAtIso: supplier.updatedAt.toISOString(),
     body: cleanPublicDetailText(supplier.description),
     label: supplier.category?.name,
     meta: compact([supplier.city?.name, supplier.companyName, supplier.isVerified ? 'Проверенный поставщик' : undefined]),
     imageUrl: publicImage(supplier.coverImage, supplier.coverImageAlt, supplier.title),
     companyName: supplier.companyName,
+    cityName: supplier.city?.name,
     facts: compact([
       `Компания: ${supplier.companyName}`,
       supplier.category?.name ? `Категория: ${supplier.category.name}` : undefined,
@@ -468,6 +492,8 @@ export async function getPublishedPartnerDetail(slug: string): Promise<PublicCon
     title: partner.title,
     slug: partner.slug,
     summary: cleanPublicDetailText(partner.summary),
+    publishedAtIso: partner.publishedAt?.toISOString(),
+    updatedAtIso: partner.updatedAt.toISOString(),
     body: partner.description ? cleanPublicDetailText(partner.description) : partner.description,
     label: partner.category?.name,
     meta: compact([

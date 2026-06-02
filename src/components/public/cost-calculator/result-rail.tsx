@@ -38,16 +38,18 @@ export function CalculatorResultRail({
     isManualMode,
     markupPercent,
     recommendedPrice,
+    salePriceError,
     totalCost
   } = summary;
 
   const resultTitle = isManualMode ? 'Цена продажи' : 'Рекомендованная цена';
-  const resultState = rowErrors.length || foodCostError ? 'error' : canShowSalePrice ? 'calculated' : 'empty';
+  const resultState = rowErrors.length || foodCostError || salePriceError ? 'error' : canShowSalePrice ? 'calculated' : 'empty';
   const resultDescription = canShowSalePrice
     ? isManualMode
       ? `Расчёт от вашей цены продажи и себестоимости ${money(totalCost)}.`
       : `Расчёт: себестоимость ${money(totalCost)} и целевая доля ${percent(foodCost * 100)}.`
     : 'Добавьте ингредиенты и параметры. После этого появится себестоимость и цена в меню.';
+  const marginValue = canShowSalePrice ? percent(grossMargin) : '—';
 
   return (
     <aside className="order-last xl:order-none">
@@ -60,45 +62,44 @@ export function CalculatorResultRail({
           {resultState === 'error' ? 'Проверьте' : canShowSalePrice ? 'Итог' : 'Пока пусто'}
         </div>
 
-        <div className="mt-4">
-          <h2 className="text-xl font-bold leading-tight text-[var(--text)]">{resultTitle}</h2>
-          <p className="mt-2 text-[2.35rem] font-bold leading-none tabular-nums text-[var(--text)] md:text-[2.75rem]">
+        <div className="mt-3">
+          <h2 className="text-sm font-bold leading-tight text-[var(--muted)]">{resultTitle}</h2>
+          <p className="mt-1.5 text-[2rem] font-bold leading-none tabular-nums text-[var(--text)] md:text-[2.35rem]">
             {canShowSalePrice ? money(activeSalePrice) : '—'}
           </p>
-          <p className="mt-4 text-sm leading-6 text-[var(--muted)]">{resultDescription}</p>
           {canShowSalePrice ? (
-            <p className="mt-2 text-xs font-semibold uppercase tracking-[0.1em] text-[var(--muted)]">{salePriceTone}</p>
+            <p className="mt-1.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-[var(--muted)]">{salePriceTone}</p>
           ) : null}
         </div>
 
-        <CalculatorResultMessage foodCostError={foodCostError} resultMessage={resultMessage} rowErrors={rowErrors} />
+        <CalculatorResultMessage foodCostError={foodCostError} resultMessage={resultMessage} rowErrors={rowErrors} salePriceError={salePriceError} />
 
-        <dl className="mt-4 grid gap-2 sm:grid-cols-2 xl:grid-cols-1 2xl:grid-cols-2">
+        <dl className="mt-3 grid gap-2 sm:grid-cols-2 xl:grid-cols-1 2xl:grid-cols-2">
           <ResultMetricCard tone="accent" label="Себестоимость" value={rowErrors.length ? '—' : money(totalCost)} />
-          <ResultMetricCard label="Доля себестоимости" value={canShowSalePrice ? percent(actualFoodCostPercent) : percent(foodCost * 100)} />
-          {canShowSalePrice ? (
-            <>
-              <ResultMetricCard label="Маржа" value={percent(grossMargin)} />
-              <ResultMetricCard label="Наценка" value={percent(markupPercent)} />
-              <ResultMetricCard label="Валовая прибыль" value={money(grossProfit)} />
-              {isManualMode && canShowRecommendedPrice ? <ResultMetricCard label="Рекомендованная цена по цели" value={money(recommendedPrice)} /> : null}
-            </>
-          ) : null}
+          <ResultMetricCard label="Маржа" value={marginValue} />
         </dl>
 
-        <div className="mt-4 grid gap-2">
-          <Button className="calculator-copy-button min-h-12 w-full rounded-[var(--radius-md)]" disabled={!canShowSalePrice} onClick={onCopyResult} type="button">
-            {copyState === 'copied' ? <Check size={17} strokeWidth={1.8} /> : <Copy size={17} strokeWidth={1.8} />}
-            {copyState === 'copied' ? 'Результат скопирован' : 'Скопировать результат'}
+        <div className="mt-3 grid gap-2">
+          <Button className="calculator-copy-button min-h-10 w-full rounded-[var(--radius-sm)] text-sm" disabled={!canShowSalePrice} onClick={onCopyResult} type="button">
+            {copyState === 'copied' ? <Check size={15} strokeWidth={1.8} /> : <Copy size={15} strokeWidth={1.8} />}
+            {copyState === 'copied' ? 'Скопировано' : 'Скопировать'}
           </Button>
           {copyState === 'failed' ? (
             <p className="text-sm leading-6 text-[var(--danger)]">Не удалось скопировать автоматически. Выделите итог вручную.</p>
           ) : null}
         </div>
 
-        <p className="mt-4 text-xs leading-5 text-[var(--muted)]">
-          Расчёт ориентировочный. Перед запуском в меню проверьте формулу.
-        </p>
+        <details className="calculator-result-details mt-4">
+          <summary>Подробности</summary>
+          <dl className="calculator-result-detail-list">
+            <ResultDetailRow label="Доля себестоимости" value={canShowSalePrice ? percent(actualFoodCostPercent) : percent(foodCost * 100)} />
+            <ResultDetailRow label="Наценка" value={canShowSalePrice ? percent(markupPercent) : '—'} />
+            <ResultDetailRow label="Валовая прибыль" value={canShowSalePrice ? money(grossProfit) : '—'} />
+            {isManualMode && canShowRecommendedPrice ? <ResultDetailRow label="Рекомендованная цена по цели" value={money(recommendedPrice)} /> : null}
+          </dl>
+          <p>{resultDescription}</p>
+          <p>Расчёт ориентировочный. Перед запуском в меню проверьте формулу.</p>
+        </details>
       </div>
     </aside>
   );
@@ -118,21 +119,32 @@ function ResultMetricCard({ label, tone, value }: { label: string; tone?: 'accen
   );
 }
 
+function ResultDetailRow({ label, value }: { label: string; value: ReactNode }) {
+  return (
+    <div className="calculator-result-detail-row">
+      <dt>{label}</dt>
+      <dd>{value}</dd>
+    </div>
+  );
+}
+
 function CalculatorResultMessage({
   foodCostError,
   resultMessage,
-  rowErrors
+  rowErrors,
+  salePriceError
 }: {
   foodCostError: string | null;
   resultMessage: string | null;
   rowErrors: CalculatorIngredientRow[];
+  salePriceError: string | null;
 }) {
   if (!resultMessage) {
     return null;
   }
 
   return (
-    <div className={cn('mt-4 rounded-[12px] border px-4 py-3 text-sm leading-6', rowErrors.length || foodCostError ? 'border-[var(--danger-border)] bg-[var(--danger-bg)] text-[var(--danger-text)]' : 'border-[var(--border-default)] bg-[var(--surface-wash)] text-[var(--muted)]')}>
+    <div className={cn('mt-4 rounded-[12px] border px-4 py-3 text-sm leading-6', rowErrors.length || foodCostError || salePriceError ? 'border-[var(--danger-border)] bg-[var(--danger-bg)] text-[var(--danger-text)]' : 'border-[var(--border-default)] bg-[var(--surface-wash)] text-[var(--muted)]')}>
       {resultMessage}
     </div>
   );

@@ -16,38 +16,44 @@ import { MetaChip } from '@/components/ui/meta-chip';
 import { Select } from '@/components/ui/select';
 import { SubmitButton } from '@/components/ui/submit-button';
 import { Textarea } from '@/components/ui/textarea';
-import { businessSolutionTypeOptions } from '@/lib/applications/b2b-request-options';
+import { businessVenueTypeOptions } from '@/lib/applications/b2b-request-options';
 
-export function BusinessSolutionForm({ enabled, result, utm, cities, defaults = {} }: PublicApplicationFormProps) {
+type BusinessSolutionFormProps = PublicApplicationFormProps & {
+  direct?: boolean;
+};
+
+export function BusinessSolutionForm({ enabled, result, utm, cities, defaults = {}, direct = false }: BusinessSolutionFormProps) {
   return (
     <PublicApplicationSection
-      eyebrow="Для бизнеса / Заявка"
-      title="Описать рабочую задачу"
-      description="Подходит для сайта заведения, Telegram-бота, внутренней формы, уведомлений или простой панели."
+      eyebrow="Каталог / Заявка"
+      title="Разместить кофейный бар в каталоге"
+      description="Для кофеен, specialty-проектов, обжарочных и других точек, которые хотят попасть в каталог СКФО."
       disclosureAliases={['applications']}
-      disclosureDescription="Укажите проект, город, контакт и тип решения. После заявки уточним детали."
+      disclosureDescription="Укажите заведение, город, тип, контакт и короткий комментарий. После заявки уточним детали."
       disclosureFocusSelector="#businessProjectName"
-      disclosureId="business-request"
-      disclosureOpenLabel="Оставить заявку"
-      disclosureTitle="Заявка на бизнес-решение"
+      disclosureId={direct ? undefined : 'business-request'}
+      disclosureOpenLabel="Разместить заведение"
+      disclosureTitle="Заявка на размещение"
       enabled={enabled}
+      introVariant={direct ? 'compact' : undefined}
       result={result}
+      sectionId="business-request"
     >
       <form action={submitBusinessSolutionRequest} className="editorial-form-shell public-form-shell">
         <HiddenUtmFields utm={utm} />
         <HoneypotField id="business-solution-website" />
         <div className="relative grid lg:grid-cols-[0.42fr_0.58fr]">
-          <div className="relative border-b border-white/10 bg-[var(--graphite)] px-5 py-6 text-white md:px-6 md:py-7 lg:border-b-0 lg:border-r lg:border-white/10">
-            <PublicEyebrow tone="inverse">B2B-задача</PublicEyebrow>
+          <div className="relative border-b border-[var(--editorial-dark-border)] bg-[var(--editorial-dark-surface)] px-5 py-6 text-[var(--editorial-dark-text)] md:px-6 md:py-7 lg:border-b-0 lg:border-r lg:border-[var(--editorial-dark-border)]">
+            <PublicEyebrow tone="inverse">Каталог СКФО</PublicEyebrow>
             <PublicDisplayTitle as="h3" className="mt-3 text-white" size="card">
-              Цифровой инструмент под конкретный процесс
+              Проверим данные и подготовим карточку
             </PublicDisplayTitle>
             <PublicBodyText className="mt-4 max-w-md" tone="inverse">
-              Опишите задачу и как всё работает сейчас. Тарифы и оплату в этой форме не собираем.
+              В форме не собираем оплату. Нужны только данные, по которым команда сможет связаться и уточнить карточку.
             </PublicBodyText>
 
             <div className="mt-6 flex flex-wrap gap-2">
-              {businessSolutionTypeOptions.map((option) => (
+              {businessVenueTypeOptions.map((option) => (
                 <MetaChip className="px-3 py-2 text-white/80" key={option.value} variant="inverse">
                   {option.label}
                 </MetaChip>
@@ -56,18 +62,18 @@ export function BusinessSolutionForm({ enabled, result, utm, cities, defaults = 
 
             <div className="mt-8 border-t border-white/10 pt-5">
               <PublicEyebrow tone="inverse">Что написать</PublicEyebrow>
-              <ul className="mt-4 space-y-3 text-sm leading-6 text-white/74">
+              <ul className="mt-4 space-y-3 text-sm leading-6 text-white/85">
                 <li className="flex gap-3">
                   <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--accent)]" />
-                  <span>Что нужно упростить: заявки, вакансии, уведомления, сайт или внутренний список.</span>
+                  <span>Как называется заведение и в каком городе оно работает.</span>
                 </li>
                 <li className="flex gap-3">
                   <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--accent)]" />
-                  <span>Кто будет пользоваться: гости, кандидаты, администратор или команда смены.</span>
+                  <span>К какому формату его отнести: кофейный бар, specialty, обжарочное или другое.</span>
                 </li>
                 <li className="flex gap-3">
                   <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--accent)]" />
-                  <span>Что сейчас мешает: ручные сообщения, потеря заявок, лишние таблицы или долгие согласования.</span>
+                  <span>Что важно показать в карточке: кухня, кофе, бар, события, сайт или соцсети.</span>
                 </li>
               </ul>
             </div>
@@ -75,7 +81,7 @@ export function BusinessSolutionForm({ enabled, result, utm, cities, defaults = 
 
           <div className="relative p-5 md:p-6">
             <div className="grid gap-4 md:grid-cols-2">
-              <FormField htmlFor="businessProjectName" label="Проект или заведение">
+              <FormField htmlFor="businessProjectName" label="Название заведения">
                 <Input
                   autoComplete="organization"
                   defaultValue={defaults.projectName}
@@ -110,12 +116,12 @@ export function BusinessSolutionForm({ enabled, result, utm, cities, defaults = 
                   ))}
                 </Select>
               </FormField>
-              <FormField htmlFor="businessSolutionType" label="Тип решения">
+              <FormField htmlFor="businessSolutionType" label="Тип">
                 <Select id="businessSolutionType" name="solutionType" defaultValue={defaults.solutionType ?? ''} required>
                   <option value="" disabled>
                     Выберите тип
                   </option>
-                  {businessSolutionTypeOptions.map((option) => (
+                  {businessVenueTypeOptions.map((option) => (
                     <option key={option.value} value={option.value}>
                       {option.label}
                     </option>
@@ -123,7 +129,7 @@ export function BusinessSolutionForm({ enabled, result, utm, cities, defaults = 
                 </Select>
               </FormField>
               <div className="md:col-span-2">
-                <FormField htmlFor="businessComment" hint="Опишите задачу, текущий процесс и что должно измениться после запуска." label="Что нужно сделать">
+                <FormField htmlFor="businessComment" hint="Укажите сайт или соцсети, особенности заведения и что важно показать в каталоге." label="Комментарий">
                   <Textarea
                     className="min-h-40"
                     defaultValue={defaults.comment}

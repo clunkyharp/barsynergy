@@ -5,7 +5,7 @@ import { ApplicationType } from '@prisma/client';
 import { z } from 'zod';
 import { buildApplicationPayload } from '@/lib/applications/application-payloads';
 import {
-  businessSolutionTypeOptions,
+  businessVenueTypeOptions,
   getOptionLabel
 } from '@/lib/applications/b2b-request-options';
 import {
@@ -21,9 +21,9 @@ import {
 import { submitPublicApplicationAction } from '@/lib/applications/submit-public-application-action';
 
 const BUSINESS_PATH = '/business';
-const businessSolutionTypeValues = businessSolutionTypeOptions.map((option) => option.value) as [
-  (typeof businessSolutionTypeOptions)[number]['value'],
-  ...(typeof businessSolutionTypeOptions)[number]['value'][]
+const businessVenueTypeValues = businessVenueTypeOptions.map((option) => option.value) as [
+  (typeof businessVenueTypeOptions)[number]['value'],
+  ...(typeof businessVenueTypeOptions)[number]['value'][]
 ];
 
 const businessSolutionSchema = baseContactSchema
@@ -32,7 +32,7 @@ const businessSolutionSchema = baseContactSchema
     projectName: z.string().trim().min(2).max(180),
     contactName: z.string().trim().min(2).max(160),
     cityId: z.string().trim().min(1).max(120),
-    solutionType: z.enum(businessSolutionTypeValues),
+    solutionType: z.enum(businessVenueTypeValues),
     comment: z.string().trim().min(20).max(4000),
     consent: z.literal('accepted')
   })
@@ -47,7 +47,7 @@ export async function submitBusinessSolutionRequest(formData: FormData) {
     actionName: 'public:business-solution',
     applicationType: ApplicationType.BUSINESS_SOLUTION,
     formData,
-    successMessage: 'Заявку получили. Если понадобится уточнение, мы свяжемся с вами.',
+    successMessage: 'Заявку на размещение получили. Если понадобится уточнение, мы свяжемся с вами.',
     redirectWithResult: redirectWithBusinessResult,
     parse: async (data) => {
       const parsed = businessSolutionSchema.parse({
@@ -65,13 +65,13 @@ export async function submitBusinessSolutionRequest(formData: FormData) {
         utmCampaign: optionalString(getString(data, 'utmCampaign'))
       });
       const city = await assertActiveCity(parsed.cityId);
-      const solutionTypeLabel = getOptionLabel(businessSolutionTypeOptions, parsed.solutionType) ?? parsed.solutionType;
+      const solutionTypeLabel = getOptionLabel(businessVenueTypeOptions, parsed.solutionType) ?? parsed.solutionType;
 
       return { parsed, city, solutionTypeLabel };
     },
     buildApplication: ({ parsed, city, solutionTypeLabel }) => ({
       type: ApplicationType.BUSINESS_SOLUTION,
-      subject: `Бизнес-решение: ${parsed.projectName}`,
+      subject: `Размещение в каталоге: ${parsed.projectName}`,
       message: parsed.comment,
       name: parsed.contactName,
       email: nullableString(parsed.email),

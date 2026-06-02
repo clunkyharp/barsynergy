@@ -7,8 +7,7 @@ import { Panel } from '@/components/ui/panel';
 
 const links = [
   { href: '/profile', label: 'Обзор' },
-  { href: '/profile/responses', label: 'Мои отклики' },
-  { href: '/profile/settings', label: 'Настройки' }
+  { href: '/profile/responses', label: 'Мои отклики' }
 ];
 
 export function ProfileSidebar() {

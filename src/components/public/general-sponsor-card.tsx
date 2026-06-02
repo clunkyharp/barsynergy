@@ -1,6 +1,6 @@
 import Image from 'next/image';
-import type { CSSProperties } from 'react';
-import { ArrowUpRight, Globe2, Mail, Phone, Send } from 'lucide-react';
+import type { ReactNode } from 'react';
+import { ArrowUpRight, AtSign, Globe2, Mail, MessageCircle, Phone, Send } from 'lucide-react';
 import { PublicBodyText, PublicEyebrow } from '@/components/public/public-primitives';
 import { CardActionRow } from '@/components/public/public-ui-adaptation';
 import { Button } from '@/components/ui/button';
@@ -18,28 +18,53 @@ function sponsorVisualState(status: string) {
   return /архив|заверш|неактив|inactive|archived/i.test(status) ? 'archived' : 'active';
 }
 
-function SponsorPhoneCard({ contact }: { contact: GeneralSponsor['contacts'][number] }) {
+function sponsorAnchorId(name: string) {
+  if (name.toLowerCase().includes('hustle brew')) {
+    return 'hustle-brew';
+  }
+
+  if (name.toLowerCase().includes('gelabo')) {
+    return 'gelabo';
+  }
+
+  return undefined;
+}
+
+function SponsorContactCompactLink({
+  actionLabel,
+  children,
+  href,
+  icon: Icon,
+  kind,
+  label
+}: {
+  actionLabel: string;
+  children: ReactNode;
+  href: string;
+  icon: typeof Globe2;
+  kind: string;
+  label: string;
+}) {
+  const isExternal = href.startsWith('http');
+
   return (
     <a
-      aria-label={`Позвонить: ${contact.name}, ${contact.phone}`}
-      className="sponsor-phone-card group grid min-h-[5.5rem] grid-cols-[auto_minmax(0,1fr)] gap-3 rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--surface-wash)] p-3 transition-[background-color,border-color,color,box-shadow] duration-[var(--motion-duration-base)] ease-[var(--motion-ease-standard)] hover:border-[var(--accent)]/32 hover:bg-[var(--surface-wash-strong)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] motion-reduce:transition-none sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:items-center sm:p-4"
-      href={contact.href}
+      aria-label={`${actionLabel}: ${label}`}
+      className="sponsor-contact-compact-link group grid min-w-0 grid-cols-[2.25rem_minmax(0,1fr)] gap-3 border-b border-[var(--line)] py-3 transition-colors duration-[var(--motion-duration-base)] ease-[var(--motion-ease-standard)] last:border-b-0 hover:bg-[var(--surface-wash)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--field-focus-ring)] focus-visible:ring-inset motion-reduce:transition-none sm:grid-cols-[2.25rem_minmax(0,1fr)_auto] sm:items-center"
+      data-sponsor-contact-kind={kind}
+      href={href}
+      rel={isExternal ? 'noreferrer' : undefined}
+      target={isExternal ? '_blank' : undefined}
     >
-      <span className="grid size-10 shrink-0 place-items-center rounded-[var(--radius-sm)] border border-[var(--accent)]/24 bg-[var(--accent-soft)] text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--accent)]">
-        <Phone aria-hidden size={17} strokeWidth={1.8} />
+      <span className="sponsor-contact-compact-icon">
+        <Icon aria-hidden size={16} strokeWidth={1.8} />
       </span>
-      <span className="min-w-0">
-        <span className="block text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">Телефон</span>
-        <span className="mt-1 block text-sm font-semibold leading-5 text-[var(--text)]">{contact.name}</span>
-        <span
-          className="mt-1 block break-words text-sm leading-5 text-[var(--text)] sm:text-[0.9375rem] md:text-base"
-          data-sponsor-phone-number
-        >
-          {contact.phone}
-        </span>
+      <span className="sponsor-contact-compact-copy">
+        <span className="sponsor-contact-compact-label">{label}</span>
+        {children}
       </span>
-      <span className="col-span-2 inline-flex w-fit items-center gap-2 whitespace-nowrap text-sm font-semibold text-[var(--accent)] sm:col-span-1 sm:justify-self-end">
-        Позвонить
+      <span className="sponsor-contact-compact-action">
+        {actionLabel}
         <ArrowUpRight className="transition-transform duration-[var(--motion-duration-base)] ease-[var(--motion-ease-move)] group-hover:translate-x-1 motion-reduce:transition-none" size={16} strokeWidth={1.8} />
       </span>
     </a>
@@ -50,83 +75,74 @@ const linkMeta: Record<
   GeneralSponsorLinkKind,
   {
     actionLabel: string;
-    accent: string;
     icon?: typeof Globe2;
-    iconSrc?: string;
+    label: string;
+    valueLabel: string;
   }
 > = {
   email: {
-    accent: '#8f3d32',
     actionLabel: 'Написать',
-    icon: Mail
+    icon: Mail,
+    label: 'Email',
+    valueLabel: 'Почта команды бренда'
   },
   instagram: {
-    accent: '#c14f7a',
-    actionLabel: 'Перейти в Instagram',
-    iconSrc: '/images/social/instagram-logo.png'
+    actionLabel: 'Перейти',
+    icon: AtSign,
+    label: 'Instagram',
+    valueLabel: 'Профиль бренда'
   },
   telegram: {
-    accent: '#2a86d9',
-    actionLabel: 'Написать в Telegram',
-    icon: Send
+    actionLabel: 'Написать',
+    icon: Send,
+    label: 'Telegram',
+    valueLabel: 'Канал связи'
   },
   website: {
-    accent: '#5f4a3d',
-    actionLabel: 'Перейти на сайт',
-    icon: Globe2
+    actionLabel: 'Открыть',
+    icon: Globe2,
+    label: 'Сайт',
+    valueLabel: 'Официальная страница'
   },
   whatsapp: {
-    accent: '#238c46',
-    actionLabel: 'Написать в WhatsApp',
-    iconSrc: '/images/social/whatsapp-logo.png'
+    actionLabel: 'Написать',
+    icon: MessageCircle,
+    label: 'WhatsApp',
+    valueLabel: 'Сообщение в WhatsApp'
   }
 };
 
-function SponsorChannelIcon({
-  icon: Icon,
-  iconSrc,
-  label
-}: {
-  icon?: typeof Globe2;
-  iconSrc?: string;
-  label: string;
-}) {
+function SponsorContactLink({ link }: { link: GeneralSponsor['links'][number] }) {
+  const meta = linkMeta[link.kind];
+  const Icon = meta.icon ?? Globe2;
+
   return (
-    <span className="grid size-12 shrink-0 place-items-center rounded-[var(--radius-sm)] border border-[color-mix(in_srgb,var(--sponsor-channel-accent)_24%,var(--border-default))] bg-[color-mix(in_srgb,var(--sponsor-channel-accent)_9%,var(--surface-wash))] p-2 text-[10px] font-semibold uppercase tracking-[0.08em] text-[var(--sponsor-channel-accent)] sm:size-20 sm:p-5">
-      {iconSrc ? (
-        <Image alt="" aria-hidden className="h-full w-full object-contain opacity-95" height={64} src={iconSrc} width={64} />
-      ) : Icon ? (
-        <Icon aria-hidden="true" size={22} strokeWidth={1.8} />
-      ) : (
-        label.slice(0, 2).toLocaleUpperCase('ru')
-      )}
-    </span>
+    <SponsorContactCompactLink
+      actionLabel={meta.actionLabel}
+      href={link.href}
+      icon={Icon}
+      kind={link.kind}
+      label={meta.label}
+    >
+      <span className="sponsor-contact-compact-value">{meta.valueLabel}</span>
+    </SponsorContactCompactLink>
   );
 }
 
-function SponsorContactLink({ link }: { link: GeneralSponsor['links'][number] }) {
-  const meta = linkMeta[link.kind];
-  const style = { '--sponsor-channel-accent': meta.accent } as CSSProperties;
-
+function SponsorPhoneLink({ contact }: { contact: GeneralSponsor['contacts'][number] }) {
   return (
-    <a
-      aria-label={meta.actionLabel}
-      className="sponsor-contact-link group flex min-h-[5.5rem] min-w-0 items-center justify-between gap-3 rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--surface-wash)] px-3 py-3 transition-[background-color,border-color,color,box-shadow] duration-[var(--motion-duration-base)] ease-[var(--motion-ease-standard)] hover:border-[color-mix(in_srgb,var(--sponsor-channel-accent)_34%,var(--border-default))] hover:bg-[var(--surface-wash-strong)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] motion-reduce:transition-none sm:px-4 sm:py-4"
-      data-sponsor-channel-card={link.kind}
-      href={link.href}
-      rel={link.href.startsWith('http') ? 'noreferrer' : undefined}
-      style={style}
-      target={link.href.startsWith('http') ? '_blank' : undefined}
+    <SponsorContactCompactLink
+      actionLabel="Позвонить"
+      href={contact.href}
+      icon={Phone}
+      kind="phone"
+      label="Телефон"
     >
-      <SponsorChannelIcon icon={meta.icon} iconSrc={meta.iconSrc} label={link.label} />
-      <span
-        className="inline-flex min-w-0 shrink items-center justify-end gap-2 text-right text-[13px] font-semibold leading-5 text-[var(--sponsor-channel-accent)] sm:text-sm"
-        data-sponsor-channel-cta
-      >
-        {meta.actionLabel}
-        <ArrowUpRight className="transition-transform duration-[var(--motion-duration-base)] ease-[var(--motion-ease-move)] group-hover:translate-x-1 motion-reduce:transition-none" size={16} strokeWidth={1.8} />
+      <span className="sponsor-contact-compact-value">{contact.name}</span>
+      <span className="sponsor-contact-compact-value sponsor-contact-compact-phone" data-sponsor-phone-number>
+        {contact.phone}
       </span>
-    </a>
+    </SponsorContactCompactLink>
   );
 }
 
@@ -153,7 +169,7 @@ function SponsorLogoMark({ priority = false, sponsor }: GeneralSponsorCardProps)
       <span className="grid gap-2">
         <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">Генеральный спонсор</span>
         <span className="text-base font-semibold leading-6 text-[var(--text)] md:text-lg">Без логотипа</span>
-        <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--accent)]">{sponsor.status}</span>
+        <span className="general-sponsor-status-label text-[11px] font-semibold uppercase tracking-[0.12em]">{sponsor.status}</span>
       </span>
     </div>
   );
@@ -217,6 +233,7 @@ export function GeneralSponsorCard({ priority = false, sponsor, variant = 'full'
       className="general-sponsor-card overflow-hidden border-[var(--border-default)] bg-[var(--surface-elevated)] shadow-[var(--shadow-panel)]"
       data-sponsor-state={visualState}
       data-sponsor-variant="full"
+      id={sponsorAnchorId(sponsor.name)}
       padding="none"
     >
       <div className="general-sponsor-layout grid gap-0 lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)]">
@@ -244,7 +261,7 @@ export function GeneralSponsorCard({ priority = false, sponsor, variant = 'full'
           </div>
 
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">{sponsor.status}</p>
+            <p className="general-sponsor-status-label text-[11px] font-semibold uppercase tracking-[0.16em]">{sponsor.status}</p>
             <p className={`${displayFont.className} general-sponsor-short-description mt-3 max-w-lg text-[1.55rem] font-semibold leading-[1.05] text-[var(--text)] md:mt-4 md:text-[2.55rem]`}>
               {sponsor.shortDescription}
             </p>
@@ -290,27 +307,22 @@ export function GeneralSponsorCard({ priority = false, sponsor, variant = 'full'
 
           {sponsor.contacts.length > 0 || sponsor.links.length > 0 ? (
             <section className="mt-5 max-w-3xl">
-              <div className="rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--surface-wash)] p-4 md:p-5">
+              <div className="sponsor-contact-compact-list rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--surface-wash)] px-4 py-3 md:px-5">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">Контакты спонсора</p>
-                <div className="mt-4 grid gap-4">
+                <div className="mt-3 divide-y-0">
                   {sponsor.contacts.length > 0 ? (
-                    <div>
-                      <div className="grid gap-2 sm:grid-cols-2">
-                        {sponsor.contacts.map((contact) => (
-                          <SponsorPhoneCard contact={contact} key={contact.phone} />
-                        ))}
-                      </div>
+                    <div className="grid">
+                      {sponsor.contacts.map((contact) => (
+                        <SponsorPhoneLink contact={contact} key={contact.phone} />
+                      ))}
                     </div>
                   ) : null}
 
                   {sponsor.links.length > 0 ? (
-                    <div>
-                      <p className="text-sm font-semibold leading-5 text-[var(--text)]">Каналы связи</p>
-                      <div className="mt-2 grid gap-2 xl:grid-cols-2">
-                        {sponsor.links.map((link) => (
-                          <SponsorContactLink key={`${link.kind}-${link.href}`} link={link} />
-                        ))}
-                      </div>
+                    <div className="grid">
+                      {sponsor.links.map((link) => (
+                        <SponsorContactLink key={`${link.kind}-${link.href}`} link={link} />
+                      ))}
                     </div>
                   ) : null}
                 </div>

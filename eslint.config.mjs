@@ -12,7 +12,7 @@ export default tseslint.config(
       'references/**',
       'scripts/**/*.cjs',
       'test-results/**',
-      'output/playwright/**',
+      'output/**',
       '.playwright-cli/**'
     ]
   },

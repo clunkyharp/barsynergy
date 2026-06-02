@@ -149,7 +149,7 @@ export function PublicFormValidation() {
   const markerRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
-    const form = markerRef.current?.closest('form.public-form-shell');
+    const form = markerRef.current?.closest('form.public-form-shell, form[data-public-validation="true"]');
 
     if (!(form instanceof HTMLFormElement)) {
       return;

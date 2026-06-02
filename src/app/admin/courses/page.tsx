@@ -1,7 +1,9 @@
 import { deleteCourseDraft, updateCourseStatus } from '@/app/admin/courses/actions';
 import {
   AdminActionAlert,
+  AdminContentStatusTabs,
   AdminContentRowActions,
+  AdminListFilters,
   AdminPagination,
 } from '@/components/admin/content-admin-controls';
 import { AdminPageIntro } from '@/components/admin/admin-page-intro';
@@ -29,6 +31,9 @@ import {
   getAdminCurrentPath,
   getAdminOptionLabel,
   getAdminPage,
+  getAdminSearchQuery,
+  getAdminStatusFilter,
+  getAdminStringFilter,
   getAdminTotalPages,
   type AdminContentSearchParams
 } from '@/lib/admin/content-utils';
@@ -55,10 +60,31 @@ export default async function AdminCoursesPage({ searchParams }: AdminCoursesPag
   const params = (await searchParams) ?? {};
   const page = getAdminPage(params);
   const currentPath = getAdminCurrentPath(ADMIN_COURSES_PATH, params);
+  const q = getAdminSearchQuery(params);
+  const status = getAdminStatusFilter(params);
+  const cityId = getAdminStringFilter(params, 'cityId');
+  const format = getAdminStringFilter(params, 'format');
+  const level = getAdminStringFilter(params, 'level');
+  const where = {
+    status,
+    cityId,
+    format,
+    level,
+    ...(q
+      ? {
+          OR: [
+            { title: { contains: q, mode: 'insensitive' as const } },
+            { summary: { contains: q, mode: 'insensitive' as const } },
+            { slug: { contains: q, mode: 'insensitive' as const } }
+          ]
+        }
+      : {})
+  };
 
-  const [total, courses] = await Promise.all([
-    prisma.course.count(),
+  const [total, courses, cities] = await Promise.all([
+    prisma.course.count({ where }),
     prisma.course.findMany({
+      where,
       orderBy: [{ createdAt: 'desc' }],
       skip: (page - 1) * ADMIN_CONTENT_PAGE_SIZE,
       take: ADMIN_CONTENT_PAGE_SIZE,
@@ -68,9 +94,15 @@ export default async function AdminCoursesPage({ searchParams }: AdminCoursesPag
         coverImage: { select: { originalName: true } },
         updatedBy: { select: { email: true } }
       }
+    }),
+    prisma.city.findMany({
+      where: { isActive: true },
+      orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
+      select: { id: true, name: true }
     })
   ]);
   const totalPages = getAdminTotalPages(total);
+  const hasActiveFilters = Boolean(q || status || cityId || format || level);
 
   return (
     <div className="space-y-8">
@@ -82,6 +114,18 @@ export default async function AdminCoursesPage({ searchParams }: AdminCoursesPag
       />
 
       <AdminActionAlert params={params} />
+      <AdminContentStatusTabs basePath={ADMIN_COURSES_PATH} params={params} />
+      <AdminListFilters
+        basePath={ADMIN_COURSES_PATH}
+        includeStatus={false}
+        filters={[
+          { name: 'cityId', label: 'Город', allLabel: 'Все города', options: cities.map((city) => ({ value: city.id, label: city.name })) },
+          { name: 'format', label: 'Формат', allLabel: 'Все форматы', options: [...courseFormatOptions] },
+          { name: 'level', label: 'Уровень', allLabel: 'Все уровни', options: [...courseLevelOptions] }
+        ]}
+        params={params}
+        searchPlaceholder="Поиск по названию"
+      />
 
       <section className="space-y-4">
         <div>
@@ -105,9 +149,9 @@ export default async function AdminCoursesPage({ searchParams }: AdminCoursesPag
               {courses.length === 0 ? (
                 <AdminTableStateRow
                   colSpan={6}
-                  description="Добавьте программу, интенсив или другой учебный формат для публикации в разделе образования."
-                  state="empty"
-                  title="Курсов пока нет"
+                  description={hasActiveFilters ? 'По текущим фильтрам курсов нет.' : 'Добавьте программу, интенсив или другой учебный формат для публикации в разделе образования.'}
+                  state={hasActiveFilters ? 'no-results' : 'empty'}
+                  title={hasActiveFilters ? 'Курсы не найдены' : 'Курсов пока нет'}
                 />
               ) : (
                 courses.map((course) => (

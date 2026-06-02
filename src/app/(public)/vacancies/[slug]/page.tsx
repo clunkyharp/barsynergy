@@ -1,40 +1,59 @@
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { PublicContentDetailPage } from '@/components/public/public-content-detail-page';
 import { PublicRelatedContentSection } from '@/components/public/public-related-content-section';
-import { VacancyApplicationForms } from '@/components/public/vacancy-application-forms';
-import { arePublicApplicationFormsEnabled } from '@/lib/applications/public-forms';
-import {
-  getPublicApplicationResult,
-  getPublicApplicationUtm
-} from '@/lib/applications/public-form-helpers';
-import { getPublishedVacancies, getVacancyApplicationFormOptions, type PublicContentSearchParams } from '@/lib/public/content';
+import { JsonLd } from '@/components/seo/json-ld';
+import { getPublishedVacancies } from '@/lib/public/content';
 import { getPublishedVacancyDetail } from '@/lib/public/content-details';
-import { getEnv } from '@/lib/validation/env';
+import { buildMissingPublicContentMetadata, buildPublicContentMetadata } from '@/lib/public/metadata';
+import { buildBreadcrumbJsonLd, buildPublicContentJsonLd } from '@/lib/public/structured-data';
 
 type VacancyDetailPageProps = {
   params: Promise<{ slug: string }>;
-  searchParams?: Promise<PublicContentSearchParams>;
 };
 
-export default async function VacancyDetailPage({ params, searchParams }: VacancyDetailPageProps) {
+export async function generateMetadata({ params }: VacancyDetailPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const query = (await searchParams) ?? {};
-  const [vacancy, related, formOptions] = await Promise.all([
+  const vacancy = await getPublishedVacancyDetail(slug);
+
+  if (!vacancy) {
+    return buildMissingPublicContentMetadata({
+      title: 'Вакансия не найдена',
+      description: 'Вакансия удалена или еще не опубликована.'
+    });
+  }
+
+  return buildPublicContentMetadata({
+    detail: vacancy,
+    path: `/vacancies/${vacancy.slug}`
+  });
+}
+
+export default async function VacancyDetailPage({ params }: VacancyDetailPageProps) {
+  const { slug } = await params;
+  const [vacancy, related] = await Promise.all([
     getPublishedVacancyDetail(slug),
-    getPublishedVacancies({ pageSize: '4' }),
-    getVacancyApplicationFormOptions()
+    getPublishedVacancies({ pageSize: '4' })
   ]);
 
   if (!vacancy) {
     notFound();
   }
+  const detailPath = `/vacancies/${vacancy.slug}`;
   const relatedItems = related.items.filter((item) => item.slug !== slug).slice(0, 3);
-  const applicationFormsEnabled = arePublicApplicationFormsEnabled(getEnv());
-  const applicationResult = getPublicApplicationResult(query);
-  const applicationUtm = getPublicApplicationUtm(query);
 
   return (
     <>
+      <JsonLd
+        data={[
+          buildBreadcrumbJsonLd([
+            { name: 'Главная', path: '/' },
+            { name: 'Вакансии', path: '/vacancies' },
+            { name: vacancy.title, path: detailPath }
+          ]),
+          buildPublicContentJsonLd({ detail: vacancy, path: detailPath, kind: 'vacancy' })
+        ]}
+      />
       <PublicContentDetailPage
         backHref="/vacancies"
         backLabel="Ко всем вакансиям"
@@ -44,25 +63,10 @@ export default async function VacancyDetailPage({ params, searchParams }: Vacanc
         imageUrl={vacancy.imageUrl}
         label={vacancy.label}
         meta={vacancy.meta}
-        primaryLink={{ href: '#vacancy-response', label: 'Откликнуться' }}
-        secondaryLink={{ href: '/vacancies', label: 'Вернуться к списку' }}
+        primaryLink={{ href: `/contacts?topic=vacancy-response&position=${encodeURIComponent(vacancy.title)}#contact-form`, label: 'Написать по вакансии' }}
         sections={vacancy.sections}
         summary={vacancy.summary}
         title={vacancy.title}
-      />
-      <VacancyApplicationForms
-        enabled={applicationFormsEnabled}
-        mode="detail"
-        options={formOptions}
-        result={applicationResult}
-        selectedVacancy={{
-          id: vacancy.id,
-          slug: vacancy.slug,
-          title: vacancy.title,
-          companyName: vacancy.companyName ?? '',
-          cityName: vacancy.cityName
-        }}
-        utm={applicationUtm}
       />
       <PublicRelatedContentSection
         basePath="/vacancies"

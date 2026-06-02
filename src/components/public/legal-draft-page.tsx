@@ -8,12 +8,18 @@ type LegalDraftPageProps = {
 };
 
 export function LegalDraftPage({ document }: LegalDraftPageProps) {
-  const { title, description, updatedAt, scope, sections } = document;
+  const { title, description, updatedAt, summary, scope, sections } = document;
   const operator = getLegalOperatorProfile();
+  const relatedDocuments = [
+    { href: '/legal/privacy', label: 'Политика' },
+    { href: '/legal/personal-data-consent', label: 'Согласие' },
+    { href: '/legal/terms', label: 'Условия' },
+    { href: '/legal/cookies', label: 'Cookies' }
+  ].filter((item) => item.href !== `/legal/${document.slug}`);
 
   return (
     <article>
-      <section className="editorial-grid border-b border-black/20 py-10 md:py-14">
+      <section className="editorial-grid border-b border-[var(--line)] py-10 md:py-14">
         <div className="container grid gap-8 xl:grid-cols-[0.72fr_0.72fr_0.56fr]">
           <div className="min-w-0">
             <PublicEyebrow>Юридический раздел</PublicEyebrow>
@@ -21,26 +27,36 @@ export function LegalDraftPage({ document }: LegalDraftPageProps) {
               {title}
             </PublicDisplayTitle>
           </div>
-          <div className="min-w-0 xl:border-l xl:border-black/20 xl:pl-5">
+          <div className="min-w-0 xl:border-l xl:border-[var(--line)] xl:pl-5">
             <PublicBodyText className="max-w-[19rem] sm:max-w-full md:max-w-2xl" size="md" tone="default">
               {description}
             </PublicBodyText>
             <PublicBodyText className="mt-5 max-w-2xl" size="sm">
               Актуальная редакция: {updatedAt}. Документ описывает текущую логику сайта и должен обновляться вместе с изменением форм, кабинетов и пользовательских сценариев.
             </PublicBodyText>
-          </div>
-          <div className="grid gap-5 rounded-[28px] border border-black/12 bg-black/[0.03] p-6">
-            <div>
-              <PublicEyebrow>Где применяется</PublicEyebrow>
+            <div className="mt-6 rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--surface-wash)] p-5">
+              <PublicEyebrow>Коротко</PublicEyebrow>
               <ul className="mt-3 grid gap-2 text-sm leading-7 text-[var(--text)]">
-                {scope.map((item) => (
-                  <li className="border-l border-black/16 pl-3" key={item}>
+                {summary.map((item) => (
+                  <li className="border-l border-[var(--accent)]/45 pl-3" key={item}>
                     {item}
                   </li>
                 ))}
               </ul>
             </div>
-            <div className="border-t border-black/10 pt-5">
+          </div>
+          <div className="grid gap-5 rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--surface-wash)] p-6">
+            <div>
+              <PublicEyebrow>Где применяется</PublicEyebrow>
+              <ul className="mt-3 grid gap-2 text-sm leading-7 text-[var(--text)]">
+                {scope.map((item) => (
+                  <li className="border-l border-[var(--border-subtle)] pl-3" key={item}>
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="border-t border-[var(--line)] pt-5">
               <PublicEyebrow>Оператор данных</PublicEyebrow>
               <div className="mt-3 grid gap-2 text-sm leading-7 text-[var(--text)]">
                 <p>
@@ -65,12 +81,12 @@ export function LegalDraftPage({ document }: LegalDraftPageProps) {
                 ) : null}
               </div>
               {!operator.isConfiguredForPublicForms ? (
-                <div className="mt-4 rounded-[20px] border border-[var(--warning-border)] bg-[var(--warning-surface)] px-4 py-3 text-sm leading-6 text-[var(--text)]">
-                  Реквизиты оператора ещё не заполнены полностью. До публичного запуска сбора персональных данных этот блок должен быть доведён до финальной версии.
+                <div className="mt-4 rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--surface-muted)] px-4 py-3 text-sm leading-6 text-[var(--muted)]">
+                  Реквизиты оператора уточняются. Актуальные данные доступны по запросу через страницу контактов.
                 </div>
               ) : null}
             </div>
-            <div className="border-t border-black/10 pt-5">
+            <div className="border-t border-[var(--line)] pt-5">
               <PublicEyebrow>По вопросам</PublicEyebrow>
               <PublicBodyText className="mt-3" size="sm">
                 Если нужен рабочий комментарий по данным, заявкам или доступу, используйте страницу <InlineLink href="/contacts">контактов</InlineLink>
@@ -82,35 +98,63 @@ export function LegalDraftPage({ document }: LegalDraftPageProps) {
       </section>
 
       <section className="editorial-grid py-10 md:py-14">
-        <div className="container max-w-4xl">
-          {sections.map((section) => (
-            <section className="border-t border-black/20 py-7" id={section.id} key={section.title}>
-              <h2 className="text-xl font-semibold uppercase leading-7">{section.title}</h2>
-              {section.paragraphs?.length ? (
-                <div className="mt-4 grid gap-4">
-                  {section.paragraphs.map((paragraph) => (
-                    <PublicBodyText key={paragraph} size="sm">
-                      {paragraph}
-                    </PublicBodyText>
-                  ))}
-                </div>
-              ) : null}
-              {section.items?.length ? (
-                <ul className="mt-4 grid gap-3 text-sm leading-7 text-[var(--muted)]">
-                  {section.items.map((item) => (
-                    <li className="border-l border-black/20 pl-4" key={item}>
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              ) : null}
-              {section.note ? (
-                <div className="mt-5 rounded-[22px] border border-black/10 bg-black/[0.03] px-5 py-4 text-sm leading-7 text-[var(--text)]">
-                  {section.note}
-                </div>
-              ) : null}
-            </section>
-          ))}
+        <div className="container grid gap-8 xl:grid-cols-[15rem_minmax(0,65ch)] xl:items-start xl:justify-center">
+          <aside className="legal-toc hidden xl:block xl:sticky xl:top-24">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--accent)]">Оглавление</p>
+            <nav aria-label="Оглавление документа" className="mt-4 grid gap-1">
+              {sections.map((section, index) => (
+                <a
+                  aria-current={index === 0 ? 'location' : undefined}
+                  className="rounded-[var(--radius-sm)] border border-transparent px-3 py-2 text-sm leading-5 text-[var(--muted)] transition-colors hover:border-[var(--border-default)] hover:bg-[var(--surface-wash)] hover:text-[var(--text)] aria-current:border-[var(--accent)]/35 aria-current:text-[var(--accent)]"
+                  href={`#${section.id}`}
+                  key={section.id}
+                >
+                  {section.title.replace(/^\d+\.\s*/, '')}
+                </a>
+              ))}
+            </nav>
+            <div className="mt-6 border-t border-[var(--line)] pt-5">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--accent)]">Связанные документы</p>
+              <div className="mt-3 grid gap-1">
+                {relatedDocuments.map((item) => (
+                  <InlineLink href={item.href} key={item.href}>
+                    {item.label}
+                  </InlineLink>
+                ))}
+              </div>
+            </div>
+          </aside>
+
+          <div className="legal-document-body max-w-[65ch]">
+            {sections.map((section) => (
+              <section className="border-t border-[var(--line)] py-7 scroll-mt-28" id={section.id} key={section.title}>
+                <h2 className="text-xl font-semibold uppercase leading-7">{section.title}</h2>
+                {section.paragraphs?.length ? (
+                  <div className="mt-4 grid gap-4">
+                    {section.paragraphs.map((paragraph) => (
+                      <PublicBodyText className="legal-document-text" key={paragraph} size="sm">
+                        {paragraph}
+                      </PublicBodyText>
+                    ))}
+                  </div>
+                ) : null}
+                {section.items?.length ? (
+                  <ul className="mt-4 grid gap-3 text-sm leading-[1.7] text-[var(--muted)]">
+                    {section.items.map((item) => (
+                      <li className="border-l border-[var(--border-subtle)] pl-4" key={item}>
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
+                {section.note ? (
+                  <div className="mt-5 rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--surface-wash)] px-5 py-4 text-sm leading-[1.7] text-[var(--text)]">
+                    {section.note}
+                  </div>
+                ) : null}
+              </section>
+            ))}
+          </div>
         </div>
       </section>
     </article>

@@ -68,6 +68,24 @@ For orchestrated project reviews, stop after ranked synthesis unless remediation
 
 Keep changes minimal. Preserve existing architecture, naming, routing, styling, and file organization unless the task explicitly asks for refactoring.
 
+## Spec-Driven And Test-Driven Default
+
+Development in this repository uses a mixed spec-driven and test-driven process.
+
+Before implementation work, freeze the smallest useful mini-spec:
+
+- goal and user/system behavior;
+- in scope and out of scope;
+- affected files, routes, data contracts or UI states;
+- acceptance criteria;
+- validation path.
+
+For new features, bug fixes, refactors and behavior changes, the default order is mandatory when the behavior is testable: write or update the smallest meaningful failing test first, run or record that failing check when practical, and only then change production code. Then implement the minimum code needed to pass, rerun the targeted test, and broaden validation only as risk requires.
+
+If a failing automated test is not practical, state why before implementation and define the substitute proof before editing production code: source test, type/lint check, browser smoke, visual QA, manual reproduction, or an explicit verification gap.
+
+Documentation-only, configuration-only and owner-approved exploratory work may use the mini-spec plus targeted validation without a failing code test, but the exception must be explicit in the closeout.
+
 ## Git Rules
 
 - Main development branch: `dev`.

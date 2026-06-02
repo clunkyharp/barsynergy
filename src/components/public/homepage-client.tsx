@@ -2,23 +2,22 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import {
   ArrowUpRight,
   BookOpen,
   BriefcaseBusiness,
+  CalendarDays,
   ChevronDown,
   ChevronUp,
-  Handshake,
+  Coffee,
   PackageCheck,
-  Search,
-  School,
-  Store,
+  Calculator,
   type LucideIcon
 } from 'lucide-react';
-import { GeneralSponsorCard } from './general-sponsor-card';
 import { ToolTeaser } from './platform-ui';
 import { SocialLinkCard } from './social-card';
+import { PublicDisplayTitle, PublicEyebrow } from '@/components/public/public-primitives';
 import { Button } from '@/components/ui/button';
 import { accentFont, displayFont } from '@/lib/fonts';
 import type { HomepageData, HomepageLiveCard, HomepageSocialBlock } from '@/lib/public/home';
@@ -33,52 +32,92 @@ function compactMeta(card: HomepageLiveCard) {
 
 function InlineIcon({ icon: Icon }: { icon: LucideIcon }) {
   return (
-    <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[var(--accent-soft)] text-[var(--accent)]">
+    <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[var(--radius-sm)] bg-[var(--accent)] text-white">
       <Icon size={20} strokeWidth={1.8} />
     </span>
   );
 }
 
-const roleRouterCards = [
+const homeSectionCards = [
   {
-    title: 'Я специалист',
-    description: 'Найдите обучение, события, вакансии и материалы.',
+    title: 'Обучение',
+    description: 'Курсы для бариста и обучение команды: от базовой экстракции до авторских молочных программ.',
     href: '/education',
-    icon: School
+    status: 'Открыто',
+    icon: Coffee
   },
   {
-    title: 'Я представляю заведение',
-    description: 'Подберите поставщиков, вакансии, консультацию или цифровой инструмент.',
-    href: '/business',
-    icon: Store
+    title: 'Афиша',
+    description: 'Каппинги, открытые тренинги, отраслевые встречи и чемпионаты бариста по всему СКФО.',
+    href: '/events',
+    status: 'Сезон',
+    icon: CalendarDays
   },
   {
-    title: 'Я поставщик',
-    description: 'Добавьте компанию в каталог и получайте заявки от заведений.',
+    title: 'Вакансии',
+    description: 'Specialty-кофейни и кофейные бары ищут бариста, управляющих и технологов.',
+    href: '/vacancies',
+    status: 'Найм',
+    icon: BriefcaseBusiness
+  },
+  {
+    title: 'Материалы',
+    description: 'Экстракция, обжарка, себестоимость напитка, работа с зерном: читать и применять сразу.',
+    href: '/articles',
+    status: 'Редакция',
+    icon: BookOpen
+  },
+  {
+    title: 'Калькулятор',
+    description: 'Считает себестоимость эспрессо, альтернативы или коктейля и показывает рекомендованную цену.',
+    href: '/tools/cost-calculator',
+    status: 'Инструмент',
+    icon: Calculator
+  },
+  {
+    title: 'Поставщики',
+    description: 'Обжарщики, дистрибьюторы зерна и оборудования, которые работают с кофейными барами СКФО.',
     href: '/suppliers',
+    status: 'Каталог',
     icon: PackageCheck
-  },
-  {
-    title: 'Я бренд / партнёр',
-    description: 'Обсудите спонсорство, событие, материал или спецпроект.',
-    href: '/partners',
-    icon: Handshake
   }
 ] as const;
 
-const heroQuickLinks = [
-  { label: 'Обучение', href: '/education' },
-  { label: 'События', href: '/events' },
-  { label: 'Вакансии', href: '/vacancies' },
-  { label: 'Поставщики', href: '/suppliers' },
-  { label: 'Партнёры', href: '/partners' }
-] as const;
+function HomeStatsLine({ stats }: { stats: HomepageData['stats'] }) {
+  const statItems = useMemo(() => {
+    const items = [
+      { value: stats.vacancies, label: 'вакансии' },
+      { value: stats.suppliers, label: 'поставщика' },
+      { value: stats.articles, label: 'материалов' }
+    ];
 
-function HomeHeroRouter() {
+    // No live counters are better than showing a zeroed platform on the first screen.
+    return items.filter((item) => item.value > 0);
+  }, [stats.articles, stats.suppliers, stats.vacancies]);
+
+  if (statItems.length === 0) {
+    return null;
+  }
+
+  return (
+    <dl className="mt-8 flex flex-wrap gap-x-5 gap-y-3 text-[13px] text-[rgba(255,253,249,0.66)]">
+      {statItems.map((item) => (
+        <div className="flex items-baseline gap-2 border-r border-[rgba(255,253,249,0.24)] pr-5 last:border-r-0 last:pr-0" key={item.label}>
+          <dt className="order-2 uppercase tracking-[0.08em]">{item.label}</dt>
+          <dd aria-label={`${item.value} ${item.label}`} className="order-1 text-[1.55rem] font-bold leading-none tabular-nums text-[var(--accent)]">
+            {item.value}
+          </dd>
+        </div>
+      ))}
+    </dl>
+  );
+}
+
+function HomeHeroRouter({ stats }: { stats: HomepageData['stats'] }) {
   return (
     <section
       aria-labelledby="home-hero-title"
-      className="relative isolate flex min-h-[680px] items-center overflow-hidden border-b border-[var(--line)] bg-[#15110e] text-[#fffdf9] md:min-h-[720px] lg:min-h-[760px]"
+      className="relative isolate flex min-h-[100svh] items-center overflow-hidden border-b border-[var(--line)] bg-[#15110e] text-[#fffdf9] md:min-h-[720px] lg:min-h-[760px]"
     >
       <div className="absolute inset-0 z-0">
         <Image
@@ -95,199 +134,70 @@ function HomeHeroRouter() {
         className="absolute inset-0 z-[1]"
         style={{
           background:
-            'linear-gradient(90deg, rgba(18,14,12,0.98), rgba(18,14,12,0.83) 43%, rgba(18,14,12,0.32) 74%, rgba(18,14,12,0.14)), linear-gradient(0deg, rgba(18,14,12,0.68), rgba(18,14,12,0.08) 54%), radial-gradient(circle at 18% 34%, rgba(157,9,14,0.18), transparent 24rem)'
+            'linear-gradient(90deg, rgba(18,14,12,0.98), rgba(18,14,12,0.83) 43%, rgba(18,14,12,0.32) 74%, rgba(18,14,12,0.14)), linear-gradient(0deg, rgba(18,14,12,0.68), rgba(18,14,12,0.08) 54%), radial-gradient(circle at 18% 34%, rgba(200,132,42,0.16), transparent 24rem)'
         }}
       />
-      <div className="container relative z-[2] py-16 md:py-24">
+      <div className="container relative z-[2] py-24 md:py-32">
         <div className="max-w-[58rem]">
-          <p className={`${accentFont.className} text-[11px] font-semibold uppercase tracking-[0.18em] text-[#f2b0a8]`}>
+          <p className={`${accentFont.className} text-[11px] font-semibold uppercase tracking-[0.18em] text-[#e0c09a]`}>
             BARSYNERGY / Барная индустрия СКФО
           </p>
           <h1 className={`${displayFont.className} mt-4 max-w-[55rem] text-[clamp(2.8rem,5vw,4.8rem)] font-semibold leading-[1.04] text-balance text-[#fffdf9] max-[640px]:max-w-[15ch] max-[640px]:text-[clamp(2.25rem,9.6vw,2.55rem)]`} id="home-hero-title">
-            Платформа, которая объединяет людей индустрии кофе и бара
+            Обучение, вакансии и поставщики для кофейных баров Северного Кавказа
           </h1>
           <p className="mt-5 max-w-2xl text-[15px] leading-7 text-[rgba(255,253,249,0.78)] md:text-base">
-            Обучение, события, вакансии, поставщики, расчёты и партнёрские заявки для баров, кофеен, команд и брендов региона.
+            Обучение, вакансии, поставщики, события и инструменты — всё в одном месте для специалистов и заведений СКФО.
           </p>
-          <form
-            action="/articles"
-            aria-label="Поиск по материалам BARSYNERGY"
-            className="home-hero-search mt-8 grid min-h-16 w-full max-w-[43rem] grid-cols-[2.75rem_minmax(0,1fr)_auto] items-center border-b border-[rgba(255,253,249,0.46)] text-[rgba(255,253,249,0.9)] max-[640px]:grid-cols-[2.35rem_minmax(0,1fr)] max-[640px]:gap-y-3 max-[640px]:pb-4"
-            method="get"
-            role="search"
-          >
-            <Search aria-hidden="true" size={24} strokeWidth={1.8} />
-            <input
-              aria-label="Поиск по материалам"
-              className="home-hero-search-input min-w-0 bg-transparent text-[clamp(1.05rem,2vw,1.45rem)] leading-[1.4] text-[rgba(255,253,249,0.92)] outline-none placeholder:text-[rgba(255,253,249,0.56)]"
-              name="q"
-              placeholder="Поиск по платформе"
-              type="search"
-            />
-            <button
-              className="min-h-11 rounded-[var(--radius-md)] border border-[var(--accent-burgundy)] bg-[var(--accent-burgundy)] px-4 text-sm font-bold text-[var(--accent-burgundy-contrast)] transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] hover:border-[var(--accent-burgundy-strong)] hover:bg-[var(--accent-burgundy-strong)] focus-visible:border-[var(--accent-burgundy-strong)] focus-visible:bg-[var(--accent-burgundy-strong)] motion-reduce:transition-none max-[640px]:col-span-2 max-[640px]:w-full"
-              type="submit"
-            >
-              Искать
-            </button>
-          </form>
-          <nav aria-label="Быстрые направления" className="mt-5 flex flex-wrap gap-2.5">
-            {heroQuickLinks.map((link) => (
-              <Link
-                className="inline-flex min-h-10 items-center rounded-[var(--radius-pill)] border border-[rgba(255,253,249,0.3)] px-3 py-1.5 text-[13px] font-bold text-[rgba(255,253,249,0.8)] transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] hover:border-[rgba(255,253,249,0.68)] hover:bg-[rgba(255,253,249,0.08)] hover:text-[#fffdf9] focus-visible:border-[rgba(255,253,249,0.68)] focus-visible:bg-[rgba(255,253,249,0.08)] focus-visible:text-[#fffdf9] motion-reduce:transition-none"
-                href={link.href}
-                key={link.href}
-              >
-                {link.label}
-              </Link>
-            ))}
-          </nav>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function HomeRoleRouter() {
-  return (
-    <section className="background-zone background-zone-ivory scroll-mt-28 border-b border-[var(--line)] py-8 md:py-12" id="home-role-router">
-      <div className="container">
-        <div className="mb-6">
-          <p className={`${accentFont.className} text-[11px] uppercase tracking-[0.18em] text-[var(--accent)]`}>Разделы</p>
-          <h2 className={`${displayFont.className} mt-2 text-[2.3rem] font-semibold leading-none text-[var(--text)] md:text-[3.1rem]`}>
-            Выберите свое направление
-          </h2>
-        </div>
-        <ul className="home-role-list border-t border-[var(--line)]">
-          {roleRouterCards.map((card) => {
-            const Icon = card.icon;
-
-            return (
-              <li className="min-w-0" key={card.title}>
-                <Link
-                  aria-label={`Перейти в раздел: ${card.title}`}
-                  className="home-role-row group grid grid-cols-[minmax(0,1fr)_2.75rem] items-center gap-x-3 gap-y-2 border-b border-[var(--line)] py-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] md:grid-cols-[minmax(0,0.58fr)_minmax(0,1fr)_auto] md:gap-5"
-                  href={card.href}
-                >
-                  <span className="flex min-w-0 items-center gap-3 max-md:col-start-1 max-md:row-start-1">
-                    <span className="home-role-row-icon" aria-hidden="true">
-                      <Icon size={18} strokeWidth={1.8} />
-                    </span>
-                    <h3 className={`${displayFont.className} text-[1.45rem] font-semibold leading-[1.05] text-[var(--text)] md:text-[1.8rem]`}>
-                      {card.title}
-                    </h3>
-                  </span>
-                  <span className="min-w-0 text-sm leading-6 text-[var(--muted)] max-md:col-start-1 max-md:row-start-2">{card.description}</span>
-                  <span className="flex items-center justify-end gap-3 max-md:col-start-2 max-md:row-span-2 max-md:row-start-1 max-md:self-center md:justify-end">
-                    <span className="home-role-card-nav" aria-hidden="true">
-                      <ArrowUpRight size={15} strokeWidth={1.8} />
-                    </span>
-                  </span>
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
-      </div>
-    </section>
-  );
-}
-
-const businessDigitalServices = [
-  {
-    label: 'Сайты и лендинги',
-    pain: 'Нужно быстро показать событие, набор, партнёрский проект или новое меню.',
-    result: 'Страница с понятной структурой, формой заявки, аналитикой и базовой SEO-настройкой.'
-  },
-  {
-    label: 'Telegram-боты',
-    pain: 'Заявки, записи и напоминания сейчас собираются вручную в личных чатах.',
-    result: 'Бот задаёт нужные вопросы и передаёт ответы команде.'
-  },
-  {
-    label: 'Mini Apps',
-    pain: 'Гостю, участнику или партнёру нужен короткий путь внутри Telegram без отдельной регистрации.',
-    result: 'Мини-приложение для записи, каталога, анкеты или программы события.'
-  },
-  {
-    label: 'Автоматизация процессов',
-    pain: 'Команда тратит время на проверки, таблицы, пересылки и ручные статусы.',
-    result: 'Формы, уведомления, таблицы или внутренняя панель в одном рабочем сценарии.'
-  }
-] as const;
-
-const businessDigitalProcessSteps = [
-  {
-    value: '1',
-    title: 'Задача',
-    description: 'Фиксируем сценарий: заявка, запись, каталог, партнёрская страница или внутренняя форма.'
-  },
-  {
-    value: '2',
-    title: 'Сборка',
-    description: 'Собираем рабочий экран, вопросы, уведомления и точки передачи заявки команде.'
-  },
-  {
-    value: '3',
-    title: 'Запуск',
-    description: 'Передаём ссылку, проверяем путь пользователя и оставляем понятный процесс обработки.'
-  }
-] as const;
-
-function BusinessDigitalSolutionsSection() {
-  return (
-    <section className="background-zone background-zone-ivory render-deferred-section scroll-mt-28 border-b border-[var(--line)] py-10 md:py-14" id="home-digital-solutions">
-      <div className="container">
-        <div className="grid gap-8 lg:grid-cols-[minmax(0,0.88fr)_minmax(0,1.12fr)] lg:items-stretch">
-          <div className="home-digital-intro flex min-w-0 flex-col">
-            <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--accent)]">Цифровые решения</p>
-            <h2 className={`${displayFont.className} mt-3 text-[2.1rem] font-semibold leading-[1.04] text-[var(--text)] md:text-[2.85rem]`}>
-              Сайты, боты и автоматизация для бизнеса
-            </h2>
-            <p className="mt-4 text-sm leading-7 text-[var(--muted)] md:text-[15px]">
-              Соберём страницу, Telegram-бот, Mini App или внутреннюю форму под задачу бара, школы, поставщика или партнёра.
-            </p>
-            <Button className="mt-7 w-full max-w-[17rem] rounded-[var(--radius-md)]" href="/contacts?topic=other#contact-form">
-              Оставить заявку
-              <ArrowUpRight size={16} />
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+            <Button className="min-h-12 rounded-[var(--radius-sm)] px-8 text-[13px] uppercase tracking-[0.1em]" href="/education">
+              Найти обучение
             </Button>
-            <div className="home-digital-process mt-9 border-t border-[var(--line)] pt-5 lg:mt-10 lg:pt-6">
-              <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--muted)]">От задачи к запуску</p>
-              <ol className="mt-4 grid gap-3">
-                {businessDigitalProcessSteps.map((step) => (
-                  <li className="home-digital-process-step grid grid-cols-[2.4rem_minmax(0,1fr)] gap-3" key={step.value}>
-                    <span className="home-digital-process-index">{step.value}</span>
-                    <span>
-                      <span className="block text-sm font-semibold leading-5 text-[var(--text)]">{step.title}</span>
-                      <span className="mt-1 block text-sm leading-6 text-[var(--muted)]">{step.description}</span>
-                    </span>
-                  </li>
-                ))}
-              </ol>
-            </div>
+            <Link
+              className="inline-flex min-h-12 items-center justify-center rounded-[var(--radius-sm)] px-3 text-[13px] font-semibold uppercase tracking-[0.1em] text-[rgba(255,253,249,0.76)] transition-colors hover:text-[var(--accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
+              href="/events"
+            >
+              Смотреть афишу
+              <ArrowUpRight aria-hidden="true" size={15} strokeWidth={1.8} />
+            </Link>
           </div>
+          <HomeStatsLine stats={stats} />
+        </div>
+      </div>
+    </section>
+  );
+}
 
-          <div className="grid gap-3 sm:grid-cols-2">
-            {businessDigitalServices.map((service) => (
-              <article
-                className="public-card-shell flex min-h-[16rem] flex-col p-4 md:p-5"
-                key={service.label}
-              >
-                <h3 className={`${displayFont.className} text-[1.55rem] font-semibold leading-[1.04] text-[var(--text)]`}>
-                  {service.label}
-                </h3>
-                <dl className="mt-4 grid gap-3 border-t border-[var(--line)] pt-4">
-                  <div>
-                    <dt className="text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--muted)]">Задача</dt>
-                    <dd className="mt-1 text-sm leading-6 text-[var(--text)]">{service.pain}</dd>
-                  </div>
-                  <div>
-                    <dt className="text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--muted)]">Результат</dt>
-                    <dd className="mt-1 text-sm leading-6 text-[var(--muted)]">{service.result}</dd>
-                  </div>
-                </dl>
-              </article>
-            ))}
+function HomeSectionCards() {
+  return (
+    <section className="background-zone background-zone-ivory scroll-mt-28 border-b border-[var(--line)] py-12 md:py-16" id="home-sections">
+      <div className="container">
+        <div className="grid gap-8 xl:grid-cols-[minmax(0,0.48fr)_minmax(0,1.52fr)]">
+          <div className="xl:pr-4">
+            <PublicEyebrow>Разделы</PublicEyebrow>
+            <PublicDisplayTitle className="mt-4 md:text-[44px]">Разделы платформы</PublicDisplayTitle>
+          </div>
+          <div className="grid gap-5 md:grid-cols-2 md:gap-4 xl:grid-cols-3">
+            {homeSectionCards.map((card) => {
+              const Icon = card.icon;
+
+              return (
+                <Link className="home-section-card group relative min-h-[140px] rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--surface-card)] p-5 text-[var(--text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)]" href={card.href} key={card.title}>
+                  <span className="flex items-start justify-between gap-4">
+                    <span className="inline-flex h-10 w-10 items-center justify-center rounded-[var(--radius-sm)] bg-[var(--accent)] text-white">
+                      <Icon size={18} strokeWidth={1.5} />
+                    </span>
+                    <span className="rounded-[var(--radius-sm)] border border-[var(--border-default)] px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--muted)]">
+                      {card.status}
+                    </span>
+                  </span>
+                  <span className={`${displayFont.className} mt-5 block text-[1.5rem] font-semibold leading-none text-[var(--text)]`}>
+                    {card.title}
+                  </span>
+                  <span className="mt-3 block text-sm leading-6 text-[var(--muted)]">{card.description}</span>
+                  <ArrowUpRight aria-hidden="true" className="absolute bottom-5 right-5 text-[var(--accent)]" size={18} strokeWidth={1.5} />
+                </Link>
+              );
+            })}
           </div>
         </div>
       </div>
@@ -343,6 +253,58 @@ function CommunityChannelRows({ channels }: { channels: HomepageSocialBlock[] })
         })}
       </div>
     </div>
+  );
+}
+
+function HomeSponsorLogoStrip({ sponsors }: { sponsors: HomepageData['generalSponsors'] }) {
+  return (
+    <section className="background-zone background-zone-sponsor render-deferred-section border-t border-[var(--line)] py-14" aria-labelledby="home-sponsors-title">
+      <div className="container">
+        <div className="mx-auto max-w-[860px]">
+          <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-4">
+            <span className="h-px bg-[rgba(168,124,56,0.38)]" aria-hidden="true" />
+            <h2 className={`${accentFont.className} text-center text-[10px] font-bold uppercase tracking-[0.14em] text-[#A87C38]`} id="home-sponsors-title">
+              Генеральные спонсоры сезона
+            </h2>
+            <span className="h-px bg-[rgba(168,124,56,0.38)]" aria-hidden="true" />
+          </div>
+          <div className="mt-8 grid gap-4 md:grid-cols-2">
+            {sponsors.map((sponsor) => (
+              <article
+                className="grid min-w-0 justify-items-center rounded-[10px] border border-[rgba(229,210,188,0.16)] bg-[rgba(255,253,249,0.035)] px-5 py-7 text-center"
+                key={sponsor.id}
+              >
+                <div className="flex min-h-[10rem] w-full items-center justify-center">
+                  {sponsor.logoSrc ? (
+                    <Image
+                      alt={sponsor.logoAlt}
+                      className="h-auto max-h-36 w-auto max-w-[18rem] object-contain"
+                      height={160}
+                      sizes="288px"
+                      src={sponsor.logoSrc}
+                      width={288}
+                    />
+                  ) : (
+                    <span className={`${displayFont.className} text-center text-3xl font-semibold leading-none text-[#F2E8D9]`}>
+                      {sponsor.name}
+                    </span>
+                  )}
+                </div>
+                <div className="mt-5 min-w-0">
+                  <h3 className="text-base font-semibold text-[#F2E8D9]">{sponsor.name}</h3>
+                  <p className="mx-auto mt-2 max-w-[24rem] text-sm leading-6 text-[rgba(242,232,217,0.66)]">
+                    {sponsor.shortDescription}
+                  </p>
+                  <Link className="mt-3 inline-flex text-sm font-semibold text-[var(--accent)] hover:text-[var(--accent-strong)]" href={`/general-sponsors#${sponsor.name.toLowerCase().includes('hustle brew') ? 'hustle-brew' : sponsor.name.toLowerCase().includes('gelabo') ? 'gelabo' : sponsor.id}`}>
+                    Смотреть профиль →
+                  </Link>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -415,7 +377,7 @@ function FeaturedNowCard({ card }: { card: HomepageLiveCard }) {
 
   return (
     <Link
-      className="public-card-shell featured-now-card group grid overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] md:rounded-[var(--radius-xl)] lg:grid-cols-[minmax(0,0.78fr)_minmax(0,1fr)] xl:self-start"
+      className="public-card-shell featured-now-card group grid overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] md:rounded-[var(--radius-xl)] lg:grid-cols-[minmax(0,0.78fr)_minmax(0,1fr)]"
       href={card.href}
     >
       <span
@@ -454,6 +416,64 @@ function FeaturedNowCard({ card }: { card: HomepageLiveCard }) {
   );
 }
 
+function HomeEventsStrip({ event }: { event: HomepageLiveCard }) {
+  return (
+    <section className="background-zone background-zone-ivory border-b border-[var(--line)] py-10 md:py-14" id="home-events">
+      <div className="container">
+        <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
+          <h2 className={`${displayFont.className} text-[2.35rem] font-semibold leading-none text-[var(--text)] md:text-[3.2rem]`}>
+            Ближайшие события
+          </h2>
+          <Button className="px-0 text-sm tracking-normal" href="/events" variant="link">
+            Вся афиша
+            <ArrowUpRight size={16} />
+          </Button>
+        </div>
+        <div className="home-events-scroll flex gap-3 overflow-x-auto pb-2 md:grid md:grid-cols-3 md:overflow-visible md:pb-0">
+          {[event, fallbackEventFormats.intensive, fallbackEventFormats.cupping].map((item) => (
+            <Link
+              className="home-event-card min-w-[18rem] rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--surface-card)] p-5 text-[var(--text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] md:min-w-0"
+              href={item.href}
+              key={item.title}
+            >
+              <span className="block text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--accent)]">{item.eyebrow}</span>
+              <span className={`${displayFont.className} mt-4 block text-[1.7rem] font-semibold leading-none text-[var(--text)]`}>{item.title}</span>
+              <span className="mt-3 block text-sm leading-6 text-[var(--muted)]">{item.summary}</span>
+              <span className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-[var(--accent)]">
+                {item.actionLabel}
+                <ArrowUpRight size={15} />
+              </span>
+            </Link>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+const fallbackEventFormats: Record<'intensive' | 'cupping', HomepageLiveCard> = {
+  intensive: {
+    kind: 'event',
+    eyebrow: 'Открытый тренинг',
+    title: 'Тренинг по экстракции',
+    summary: 'Формат для бариста и команд: помол, рецепт, стабильность эспрессо и работа на смене.',
+    meta: ['Формат'],
+    href: '/events',
+    actionLabel: 'Смотреть событие',
+    isFallback: true
+  },
+  cupping: {
+    kind: 'event',
+    eyebrow: 'Каппинг',
+    title: 'Дегустация зерна',
+    summary: 'Встреча с обжарщиками и поставщиками: профиль, обработка, цена и поставки в регионе.',
+    meta: ['Формат'],
+    href: '/events',
+    actionLabel: 'Смотреть событие',
+    isFallback: true
+  }
+};
+
 const homepageFaqItems = [
   {
     question: 'Что уже можно сделать на платформе?',
@@ -461,19 +481,19 @@ const homepageFaqItems = [
   },
   {
     question: 'Кому подходит BARSYNERGY?',
-    answer: 'Платформа рассчитана на барменов, управляющих, владельцев заведений, поставщиков, бренды и специалистов, которые работают с HoReCa в СКФО.'
+    answer: 'Платформа рассчитана на бариста, управляющих, владельцев заведений, поставщиков, бренды и специалистов, которые работают с HoReCa в СКФО.'
   },
   {
     question: 'Можно ли предложить своё событие или материал?',
     answer: 'Да. Через раздел контактов можно отправить идею события, партнёрского проекта, обучающего формата или публикации.'
   },
   {
-    question: 'Есть ли инструменты для бизнеса?',
+    question: 'Есть ли инструменты для заведений?',
     answer: 'Да. На главной уже есть калькулятор себестоимости, а для заведений доступны заявки по цифровым решениям, вакансиям, поставщикам и консалтингу.'
   },
   {
-    question: 'Как связаться с командой?',
-    answer: 'Откройте форму в контактах и выберите тему обращения. Так заявка сразу попадёт в правильный рабочий сценарий.'
+    question: 'Сколько стоит размещение в каталоге?',
+    answer: 'Размещение в каталоге заведений и поставщиков сейчас бесплатное. Для спонсорских форматов условия обсуждаются отдельно.'
   }
 ] as const;
 
@@ -547,16 +567,18 @@ function HomeCtaFaqSection() {
 export function HomepageClient({ data }: HomepageClientProps) {
   return (
     <div className="overflow-x-hidden">
-      <HomeHeroRouter />
+      <HomeHeroRouter stats={data.stats} />
 
-      <HomeRoleRouter />
+      <HomeSectionCards />
 
-      <section className="background-zone background-zone-beige scroll-mt-28 border-b border-[var(--line)] py-8 md:py-14" id="home-current">
+      <HomeEventsStrip event={data.event} />
+
+      <section className="background-zone background-zone-beige scroll-mt-28 border-b border-[var(--line)] py-14 md:py-20" id="home-fresh">
         <div className="container">
           <div className="mb-7 flex flex-wrap items-end justify-between gap-4">
             <div>
               <h2 className={`${displayFont.className} text-[2.35rem] font-semibold leading-none text-[var(--text)] md:text-[3.2rem]`}>
-                Актуальное
+                Свежее на платформе
               </h2>
             </div>
             <Button className="px-0 text-sm tracking-normal" href="/articles" variant="link">
@@ -564,36 +586,20 @@ export function HomepageClient({ data }: HomepageClientProps) {
               <ArrowUpRight size={16} />
             </Button>
           </div>
-          <div className="home-current-layout grid gap-4">
+          <div className="home-current-layout grid gap-4 lg:grid-cols-[minmax(0,0.62fr)_minmax(0,0.38fr)]">
             <FeaturedNowCard card={data.article} />
-            <div className="home-current-support-grid border-y border-[var(--line)] sm:grid sm:grid-cols-2 sm:gap-3 sm:border-y-0 xl:grid-cols-3">
+            <div className="home-current-support-grid sm:grid sm:grid-cols-2 sm:gap-3 lg:grid-cols-1 [&>a:last-child]:border-b-0">
               <NowCard actionLabel="Откликнуться" card={data.vacancy} href="/vacancies" icon={BriefcaseBusiness} label="Вакансии" />
               <NowCard actionLabel="Читать" card={data.secondaryArticle} fallbackMeta="Другие материалы" href="/articles" icon={BookOpen} label="Материалы" />
-              <NowCard actionLabel="Перейти в каталог" card={data.supplier} href="/suppliers" icon={PackageCheck} label="Поставщики" />
+              <NowCard actionLabel="Смотреть поставщиков" card={data.supplier} href="/suppliers" icon={PackageCheck} label="Поставщики" />
             </div>
           </div>
         </div>
       </section>
 
+      {data.generalSponsors.length > 0 ? <HomeSponsorLogoStrip sponsors={data.generalSponsors} /> : null}
+
       {data.calculatorTeaser ? <ToolTeaser teaser={data.calculatorTeaser} /> : null}
-
-      {data.generalSponsors.length > 0 ? (
-        <section className="background-zone background-zone-sponsor render-deferred-section border-b border-[var(--line)] py-10 md:py-14">
-          <div className="container">
-            <div className="mb-7 flex items-center gap-5">
-              <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--text)]">Генеральный спонсор</p>
-              <span className="h-px flex-1 bg-[var(--line)]" />
-            </div>
-            <div className="grid gap-5">
-              {data.generalSponsors.map((sponsor, index) => (
-                <GeneralSponsorCard key={sponsor.id} priority={index === 0} sponsor={sponsor} variant="home" />
-              ))}
-            </div>
-          </div>
-        </section>
-      ) : null}
-
-      <BusinessDigitalSolutionsSection />
 
       <HomeCtaFaqSection />
 
@@ -615,14 +621,14 @@ export function HomepageClient({ data }: HomepageClientProps) {
                 </p>
               ) : null}
               <Button
-                className="w-full max-w-[17rem] rounded-[var(--radius-md)] border-[var(--accent-burgundy)] bg-[var(--accent-burgundy)] text-[var(--accent-burgundy-contrast)] shadow-none hover:border-[var(--accent-burgundy-strong)] hover:bg-[var(--accent-burgundy-strong)]"
+                className="w-full max-w-[17rem] rounded-[var(--radius-md)] border-[var(--accent)] bg-[var(--accent)] text-[var(--accent-contrast)] shadow-none hover:border-[var(--accent-strong)] hover:bg-[var(--accent-strong)]"
                 href={data.ctaBlock.primaryHref}
               >
                 {data.ctaBlock.primaryLabel}
               </Button>
               {data.ctaBlock.secondaryHref && data.ctaBlock.secondaryLabel ? (
                 <Link
-                  className="inline-flex min-h-10 items-center gap-2 rounded-[var(--radius-sm)] text-sm font-semibold text-[var(--editorial-dark-muted)] transition hover:text-[var(--editorial-dark-text)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent-burgundy)]"
+                  className="inline-flex min-h-10 items-center gap-2 rounded-[var(--radius-sm)] text-sm font-semibold text-[var(--editorial-dark-muted)] transition hover:text-[var(--editorial-dark-text)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
                   href={data.ctaBlock.secondaryHref}
                 >
                   {data.ctaBlock.secondaryLabel}
@@ -638,6 +644,7 @@ export function HomepageClient({ data }: HomepageClientProps) {
           </div>
         </section>
       ) : null}
+
     </div>
   );
 }

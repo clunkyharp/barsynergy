@@ -89,6 +89,43 @@ test('custom Select supports keyboard selection, Escape and form value submissio
   await expect(topicTrigger).toBeFocused();
   await expect(page.locator('select[name="topic"]')).toHaveValue('event');
 
+  const selectGeometry = await page.locator('.custom-select').first().evaluate((root) => {
+    const nativeSelect = root.querySelector<HTMLSelectElement>('select.custom-select-native');
+    const trigger = root.querySelector<HTMLElement>('.custom-select-trigger');
+
+    if (!nativeSelect || !trigger) {
+      throw new Error('custom Select structure is missing');
+    }
+
+    const nativeRect = nativeSelect.getBoundingClientRect();
+    const nativeStyle = window.getComputedStyle(nativeSelect);
+    const triggerRect = trigger.getBoundingClientRect();
+
+    return {
+      nativeSelect: {
+        ariaHidden: nativeSelect.getAttribute('aria-hidden'),
+        clipPath: nativeStyle.clipPath,
+        height: nativeRect.height,
+        tabIndex: nativeSelect.tabIndex,
+        width: nativeRect.width
+      },
+      trigger: {
+        height: triggerRect.height,
+        width: triggerRect.width
+      }
+    };
+  });
+
+  expect(selectGeometry.nativeSelect).toMatchObject({
+    ariaHidden: 'true',
+    height: 1,
+    tabIndex: -1,
+    width: 1
+  });
+  expect(selectGeometry.nativeSelect.clipPath).toContain('inset');
+  expect(selectGeometry.trigger.width, 'QA should evaluate the visible custom Select trigger, not the hidden native select').toBeGreaterThan(44);
+  expect(selectGeometry.trigger.height, 'visible custom Select trigger should keep a usable hit area').toBeGreaterThanOrEqual(44);
+
   const submittedTopic = await page.locator('form.editorial-form-shell').evaluate((form) => new FormData(form as HTMLFormElement).get('topic'));
   expect(submittedTopic).toBe('event');
 

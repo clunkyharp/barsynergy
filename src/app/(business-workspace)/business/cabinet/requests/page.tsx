@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { AdminActionAlert } from '@/components/admin/content-admin-controls';
 import { RequestLedger } from '@/components/business/business-cabinet';
 import { BusinessRequestForm } from '@/components/business/business-request-form';
@@ -5,10 +6,16 @@ import { PageHeader } from '@/components/ui/page-header';
 import type { AdminContentSearchParams } from '@/lib/admin/content-utils';
 import { requireBusinessAccountAccess } from '@/lib/auth/require-business-account';
 import { prisma } from '@/lib/db/prisma';
+import { buildPrivatePageMetadata } from '@/lib/public/metadata';
 
 type BusinessRequestsPageProps = {
   searchParams?: Promise<AdminContentSearchParams>;
 };
+
+export const metadata: Metadata = buildPrivatePageMetadata({
+  title: 'Заявки компании',
+  description: 'Закрытый раздел BARSYNERGY для создания и отслеживания заявок компании.'
+});
 
 export default async function BusinessRequestsPage({ searchParams }: BusinessRequestsPageProps) {
   const { businessAccount } = await requireBusinessAccountAccess();

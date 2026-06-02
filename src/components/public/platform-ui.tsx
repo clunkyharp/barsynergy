@@ -366,17 +366,18 @@ export function EventAgendaSection({
   return (
     <section className="public-catalog-section background-zone background-zone-ivory editorial-grid border-b border-[var(--line)] py-10 md:py-14" id="events-list">
       <div className="container grid gap-6 md:gap-8 xl:grid-cols-[minmax(16rem,0.48fr)_minmax(0,1.52fr)] xl:gap-8">
-        <aside className="public-catalog-sidebar min-w-0 xl:sticky xl:top-24 xl:self-start">
-          <PublicDisplayTitle className="public-catalog-title max-w-sm">{isPastArchive ? 'Прошедшие события' : 'Афиша'}</PublicDisplayTitle>
-          <div className="mt-5">{filters}</div>
+        <aside className="public-catalog-sidebar min-w-0">
+          {filters}
         </aside>
 
         <Panel className="public-catalog-list-panel min-w-0 overflow-hidden border-[var(--border-default)] bg-[var(--surface-card)]" padding="none">
           <div className="public-catalog-toolbar flex flex-wrap items-center justify-between gap-3">
             <div className="flex flex-wrap items-center gap-2.5">
-              <MetaChip className="border-[var(--border-default)] bg-[var(--accent-soft)] text-[var(--accent)]" variant="filter">
-                Найдено событий: {content.total}
-              </MetaChip>
+              {content.total > 0 ? (
+                <MetaChip className="border-[var(--border-default)] bg-[var(--accent-soft)] text-[var(--accent)]" variant="filter">
+                  Событий: {content.total}
+                </MetaChip>
+              ) : null}
               <MetaChip className="border-[var(--border-default)] bg-transparent text-[var(--muted)]" variant="filter">
                 {isPastArchive ? 'Архив' : 'Афиша'}
               </MetaChip>
@@ -384,31 +385,51 @@ export function EventAgendaSection({
                 {isPastArchive ? 'Сначала свежие прошедшие' : 'Сначала ближайшие'}
               </MetaChip>
             </div>
-            <Button className="gap-2 px-0 text-sm tracking-normal" href="/contacts?topic=event#contact-form" size="sm" variant="link">
-              Добавить событие
-              <ArrowUpRight size={14} />
-            </Button>
           </div>
 
           {content.items.length === 0 ? (
-            <div className="event-empty-state grid gap-4 p-5 md:p-6">
+            <div className="event-empty-state grid gap-6 p-5 md:p-6">
               <div className="min-w-0">
                 <PublicEyebrow tone="muted">Афиша</PublicEyebrow>
                 <h3 className="mt-2 text-xl font-semibold leading-7">
                   {isTrueUpcomingEmpty
-                    ? 'Предстоящих событий пока нет'
+                    ? 'Готовим новые события'
                     : isPastArchive && !hasActiveEventFilters
                       ? 'Архив событий пока пуст'
                       : 'По этим параметрам ничего не найдено'}
                 </h3>
                 <PublicBodyText className="mt-2 max-w-2xl text-sm leading-6">
                   {isTrueUpcomingEmpty
-                    ? 'Новые события появятся после подтверждения даты. Архив и новые форматы будут доступны после публикации материалов.'
+                    ? 'Подпишитесь, чтобы узнать первыми, или предложите встречу для кофейного бара.'
                     : isPastArchive && !hasActiveEventFilters
                       ? 'Прошедшие встречи появятся здесь после публикации архива.'
-                      : 'Измените параметры поиска или сбросьте фильтры в панели слева.'}
+                      : 'Измените параметры поиска или сбросьте фильтры над списком.'}
                 </PublicBodyText>
               </div>
+              {isTrueUpcomingEmpty ? (
+                <>
+                  <div className="grid gap-3 md:grid-cols-3">
+                    {[
+                      ['Интенсив', 'Практическая встреча по экстракции, молоку, сервису или запуску смены.'],
+                      ['Каппинг', 'Дегустация зерна с обжарщиками, поставщиками и командами кофеен.'],
+                      ['Гостевая смена', 'Встреча на площадке: бариста, бренд, меню и живой контакт с гостями.']
+                    ].map(([title, description]) => (
+                      <div className="rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--surface-wash)] p-4" key={title}>
+                        <p className="text-sm font-semibold text-[var(--text)]">{title}</p>
+                        <p className="mt-2 text-sm leading-6 text-[var(--muted)]">{description}</p>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="flex flex-wrap gap-3">
+                    <Button href="/contacts?topic=event-news#contact-form" variant="secondary">
+                      Подписаться на анонсы
+                    </Button>
+                    <Button href="/contacts?topic=event#contact-form">
+                      Предложить событие
+                    </Button>
+                  </div>
+                </>
+              ) : null}
             </div>
           ) : (
             <div className="public-catalog-list-rows grid gap-10">

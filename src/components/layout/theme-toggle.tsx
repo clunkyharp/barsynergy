@@ -48,7 +48,7 @@ export function ThemeToggle({ className, compact = false }: ThemeToggleProps) {
       aria-pressed={isDark}
       className={cn(
         'inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--surface-elevated)] px-3 text-[12px] font-semibold text-[var(--text)] shadow-[var(--shadow-card)] transition-[background-color,border-color,color,box-shadow] duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] hover:border-[var(--accent)]/40 hover:text-[var(--accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] motion-reduce:transition-none',
-        compact ? 'h-11 w-11 px-0' : 'whitespace-nowrap',
+        compact ? 'h-9 min-h-9 w-9 rounded-[8px] px-0' : 'whitespace-nowrap',
         className
       )}
       onClick={() => {
@@ -61,5 +61,46 @@ export function ThemeToggle({ className, compact = false }: ThemeToggleProps) {
       {isDark ? <Sun size={16} strokeWidth={1.9} /> : <Moon size={16} strokeWidth={1.9} />}
       {compact ? null : <span>{isDark ? 'Светлая' : 'Тёмная'}</span>}
     </button>
+  );
+}
+
+export function ThemeSegmentedToggle({ className }: { className?: string }) {
+  const [theme, setTheme] = useState<Theme>('light');
+
+  useEffect(() => {
+    const initialTheme = getInitialTheme();
+    setTheme(initialTheme);
+    applyTheme(initialTheme);
+  }, []);
+
+  function selectTheme(nextTheme: Theme) {
+    setTheme(nextTheme);
+    applyTheme(nextTheme);
+  }
+
+  return (
+    <div className={cn('flex items-center justify-between gap-4 px-1 py-1', className)}>
+      <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">Тема</span>
+      <div className="flex shrink-0 gap-1 rounded-full border border-[var(--border-default)] bg-[var(--surface-wash)] p-0.5">
+        {(['light', 'dark'] as const).map((option) => {
+          const selected = theme === option;
+
+          return (
+            <button
+              aria-pressed={selected}
+              className={cn(
+                'min-h-9 rounded-full px-3 text-sm font-semibold transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] motion-reduce:transition-none',
+                selected ? 'bg-[var(--accent)] text-[var(--accent-contrast)]' : 'text-[var(--muted)] hover:text-[var(--text)]'
+              )}
+              key={option}
+              onClick={() => selectTheme(option)}
+              type="button"
+            >
+              {option === 'light' ? 'Светлая' : 'Тёмная'}
+            </button>
+          );
+        })}
+      </div>
+    </div>
   );
 }

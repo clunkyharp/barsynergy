@@ -20,31 +20,60 @@ const CONTACTS_PATH = '/contacts';
 const contactTopicValues = [
   'education-program',
   'event',
+  'event-news',
+  'vacancy-response',
   'vacancy-placement',
+  'supplier-contact',
   'supplier',
   'partnership',
   'sponsorship',
   'consulting',
   'article-topic',
+  'calculator-question',
+  'bug-report',
   'other'
 ] as const;
 
-const contactTopicLabels: Record<(typeof contactTopicValues)[number], string> = {
-  'education-program': 'Обучение',
-  event: 'Событие',
-  'vacancy-placement': 'Вакансия',
-  supplier: 'Поставщик',
-  partnership: 'Партнёрство',
-  sponsorship: 'Спонсорство',
-  consulting: 'Консалтинг',
-  'article-topic': 'Материал или интервью',
-  other: 'Другое'
-};
+type ContactTopic = (typeof contactTopicValues)[number];
+
+function getContactTopicLabel(topic: ContactTopic) {
+  switch (topic) {
+    case 'education-program':
+      return 'Обучение';
+    case 'event':
+      return 'Событие';
+    case 'event-news':
+      return 'Анонсы событий';
+    case 'vacancy-response':
+      return 'Отклик на вакансию';
+    case 'vacancy-placement':
+      return 'Вакансия';
+    case 'supplier-contact':
+      return 'Контакт с поставщиком';
+    case 'supplier':
+      return 'Поставщик';
+    case 'partnership':
+      return 'Партнёрство';
+    case 'sponsorship':
+      return 'Спонсорство';
+    case 'consulting':
+      return 'Консалтинг';
+    case 'article-topic':
+      return 'Материал или интервью';
+    case 'calculator-question':
+      return 'Вопрос по калькулятору';
+    case 'bug-report':
+      return 'Что-то сломалось';
+    case 'other':
+      return 'Другое';
+  }
+}
 
 const contactMessageSchema = baseContactSchema
   .merge(utmSchema)
   .extend({
     name: z.string().trim().min(2).max(160),
+    contact: z.string().trim().max(180).optional(),
     cityId: z.string().trim().max(120).optional(),
     topic: z.enum(contactTopicValues),
     message: z.string().trim().min(20).max(4000),
@@ -66,36 +95,34 @@ const contactMessageSchema = baseContactSchema
     consent: z.literal('accepted')
   })
   .superRefine((data, context) => {
-    if (!data.email && !data.phone && !data.telegram) {
+    if (!data.email && !data.phone && !data.telegram && !data.contact) {
       context.addIssue({
         code: z.ZodIssueCode.custom,
         message: 'contact is required',
-        path: ['email']
+        path: ['contact']
       });
     }
 
-    if (data.topic === 'vacancy-placement') {
-      if (!data.companyName) {
-        context.addIssue({ code: z.ZodIssueCode.custom, message: 'required', path: ['companyName'] });
-      }
-      if (!data.position) {
-        context.addIssue({ code: z.ZodIssueCode.custom, message: 'required', path: ['position'] });
-      }
-    }
-
-    if (data.topic === 'supplier') {
-      if (!data.companyName) {
-        context.addIssue({ code: z.ZodIssueCode.custom, message: 'required', path: ['companyName'] });
-      }
-      if (!data.serviceArea) {
-        context.addIssue({ code: z.ZodIssueCode.custom, message: 'required', path: ['serviceArea'] });
-      }
-    }
-
-    if (data.topic === 'event' && !data.eventTitle) {
-      context.addIssue({ code: z.ZodIssueCode.custom, message: 'required', path: ['eventTitle'] });
-    }
+    // Topic-specific fields are optional because the public contact form keeps details collapsed.
   });
+
+function splitContactChannel(contact?: string) {
+  const value = contact?.trim();
+
+  if (!value) {
+    return {};
+  }
+
+  if (value.includes('@') && !value.startsWith('@')) {
+    return { email: value };
+  }
+
+  if (value.startsWith('@') || value.toLowerCase().includes('t.me/')) {
+    return { telegram: value };
+  }
+
+  return { phone: value };
+}
 
 function redirectWithContactsResult(result: { type: 'success' | 'error'; message: string }): never {
   redirect(getPublicApplicationResultPath(CONTACTS_PATH, result));
@@ -109,11 +136,13 @@ export async function submitContactMessage(formData: FormData) {
     successMessage: 'Сообщение получено. Мы свяжемся с вами после проверки обращения.',
     redirectWithResult: redirectWithContactsResult,
     parse: async (data) => {
+      const contactChannels = splitContactChannel(getString(data, 'contact'));
       const parsed = contactMessageSchema.parse({
         name: getString(data, 'name'),
-        email: optionalString(getString(data, 'email')),
-        phone: optionalString(getString(data, 'phone')),
-        telegram: optionalString(getString(data, 'telegram')),
+        contact: optionalString(getString(data, 'contact')),
+        email: optionalString(getString(data, 'email')) ?? contactChannels.email,
+        phone: optionalString(getString(data, 'phone')) ?? contactChannels.phone,
+        telegram: optionalString(getString(data, 'telegram')) ?? contactChannels.telegram,
         cityId: optionalString(getString(data, 'cityId')),
         topic: getString(data, 'topic'),
         message: getString(data, 'message'),
@@ -138,7 +167,7 @@ export async function submitContactMessage(formData: FormData) {
         utmCampaign: optionalString(getString(data, 'utmCampaign'))
       });
       const city = await assertActiveCity(parsed.cityId);
-      const topicLabel = contactTopicLabels[parsed.topic];
+      const topicLabel = getContactTopicLabel(parsed.topic);
 
       return { parsed, city, topicLabel };
     },

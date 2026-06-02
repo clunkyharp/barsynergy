@@ -1,5 +1,8 @@
+'use client';
+
 import type { HTMLAttributes, ReactNode } from 'react';
-import { ArrowUpRight } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { ArrowUpRight, BookOpen, BriefcaseBusiness, CalendarDays, Coffee, Handshake, Settings2, Store, Users } from 'lucide-react';
 import { PublicBodyText, PublicDisplayTitle, PublicEyebrow } from '@/components/public/public-primitives';
 import { AppLink } from '@/components/ui/app-link';
 import { displayFont } from '@/lib/fonts';
@@ -63,10 +66,9 @@ export type PartnerFormatTableItem = {
 };
 
 export type SponsorBenefitSheetItem = {
-  area: ReactNode;
-  summary: ReactNode;
-  detail: ReactNode;
-  touchpoint: ReactNode;
+  benefit: ReactNode;
+  brandVisibility: ReactNode;
+  result: ReactNode;
 };
 
 export type SponsorPackageComparisonItem = {
@@ -105,29 +107,29 @@ function InlineAction({ action, className }: { action: EditorialAction; classNam
 
 function CompactMark({ children }: { children: ReactNode }) {
   return (
-    <span className="inline-flex min-h-8 min-w-8 shrink-0 items-center justify-center border border-[var(--border-default)] px-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--accent)]">
+    <span className="public-route-label">
       {children}
     </span>
   );
 }
 
-function MetaText({ children }: { children: ReactNode }) {
-  return <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">{children}</span>;
+function MetaText({ children, className }: { children: ReactNode; className?: string }) {
+  return <span className={cn('public-meta-label', className)}>{children}</span>;
 }
 
 function StatusPill({ children, accent = false }: { children: ReactNode; accent?: boolean }) {
   return (
     <span
-      className={cn(
-        'inline-flex w-fit rounded-[var(--radius-sm)] border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em]',
-        accent
-          ? 'border-[var(--accent)]/24 bg-[var(--accent-soft)] text-[var(--accent)]'
-          : 'border-[var(--border-default)] bg-transparent text-[var(--muted)]'
-      )}
+      className="public-status-badge"
+      data-tone={accent ? 'accent' : 'muted'}
     >
       {children}
     </span>
   );
+}
+
+function textValue(value: ReactNode) {
+  return typeof value === 'string' || typeof value === 'number' ? String(value) : '';
 }
 
 function PrimitiveShell({ eyebrow, title, description, className, children, ...props }: PrimitiveShellProps) {
@@ -200,7 +202,7 @@ function StructuredCard({
   return (
     <article
       className={cn(
-        'public-card-shell flex h-full flex-col p-4 md:p-5',
+        'public-card-shell flex flex-col p-4 md:p-5',
         className
       )}
     >
@@ -210,11 +212,11 @@ function StructuredCard({
         </div>
         {status ? <StatusPill accent>{status}</StatusPill> : null}
       </div>
-      <h3 className={`${displayFont.className} mt-4 text-[1.55rem] font-semibold leading-none text-[var(--text)] md:min-h-[4.1rem] md:text-[1.8rem]`}>
+      <h3 className={`${displayFont.className} mt-4 text-[1.55rem] font-semibold leading-none text-[var(--text)] md:text-[1.8rem]`}>
         {title}
       </h3>
-      {description ? <p className="mt-4 text-sm leading-6 text-[var(--muted)] md:min-h-[4.5rem]">{description}</p> : null}
-      {children ? <div className="mt-5 md:min-h-[10.5rem]">{children}</div> : null}
+      {description ? <p className="mt-4 text-sm leading-6 text-[var(--muted)]">{description}</p> : null}
+      {children ? <div className="mt-5">{children}</div> : null}
       {footer ? <div className="mt-6 border-t border-[var(--line)] pt-5">{footer}</div> : null}
       {action ? (
         <div className="mt-auto pt-5">
@@ -303,39 +305,90 @@ export function ProgramFormatMatrix({
   className,
   ...props
 }: PrimitiveShellProps & { items: ProgramFormatMatrixItem[] }) {
+  const [audienceFilter, setAudienceFilter] = useState<'all' | 'barista' | 'manager' | 'owner'>('all');
+  const filters = [
+    { id: 'all' as const, label: 'Все' },
+    { id: 'barista' as const, label: 'Бариста' },
+    { id: 'manager' as const, label: 'Менеджер' },
+    { id: 'owner' as const, label: 'Владелец' }
+  ];
+  const icons = [Coffee, BookOpen, Users, Settings2, Handshake, BriefcaseBusiness, CalendarDays];
+  const filteredItems = useMemo(() => {
+    if (audienceFilter === 'all') {
+      return items;
+    }
+
+    const matches: Record<Exclude<typeof audienceFilter, 'all'>, RegExp> = {
+      barista: /бариста|специалист/i,
+      manager: /менеджер|управля|шеф|команд/i,
+      owner: /владел|собствен|заведен|команд/i
+    };
+
+    return items.filter((item) => matches[audienceFilter].test(textValue(item.audience)));
+  }, [audienceFilter, items]);
+
   return (
     <PrimitiveShell className={className} {...props}>
-      <div className="grid items-stretch gap-4 md:grid-cols-2 xl:grid-cols-3">
-        {items.map((item, index) => (
-          <article
+      <div className="mb-5 flex flex-wrap gap-2">
+        {filters.map((filter) => (
+          <button
+            aria-pressed={audienceFilter === filter.id}
             className={cn(
-              'public-card-shell flex h-full min-h-0 flex-col p-4 md:p-5'
+              'inline-flex min-h-10 items-center rounded-[var(--radius-sm)] border px-3 text-sm font-semibold transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] motion-reduce:transition-none',
+              audienceFilter === filter.id
+                ? 'border-[var(--accent)] bg-[var(--accent)] text-[var(--accent-contrast)]'
+                : 'border-[var(--border-default)] bg-[var(--surface-wash)] text-[var(--text)] hover:border-[var(--accent)]/35'
             )}
-            key={index}
+            key={filter.id}
+            onClick={() => setAudienceFilter(filter.id)}
+            type="button"
           >
-            <div className="flex flex-wrap items-start justify-between gap-3">
-              <MetaText>Формат</MetaText>
-            </div>
-            <div className="mt-4">
-              <h3 className={`${displayFont.className} text-[1.55rem] font-semibold leading-none text-[var(--text)] md:text-[1.8rem]`}>
-                {item.format}
-              </h3>
-            </div>
-            <p className="mt-3 text-sm leading-6 text-[var(--muted)]">{item.includes}</p>
-            <div className="mt-4">
-              <FactList
-                compact
-                items={[
-                  { label: 'Для кого', value: item.audience },
-                  { label: 'Результат', value: item.result }
-                ]}
-              />
-            </div>
-            <div className="mt-auto flex flex-wrap items-center justify-end gap-3 pt-3">
-              <InlineAction action={item.action} />
-            </div>
-          </article>
+            {filter.label}
+          </button>
         ))}
+      </div>
+      <div className="grid gap-3">
+        {filteredItems.map((item, index) => {
+          const Icon = icons[index % icons.length] ?? Coffee;
+
+          return (
+            <details
+              className="group rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--surface-card)] p-0 open:border-[var(--accent)]/28"
+              key={index}
+              open={index < 3}
+            >
+              <summary className="grid cursor-pointer list-none gap-3 p-4 marker:hidden md:grid-cols-[2.5rem_minmax(0,1fr)_auto] md:items-start md:p-5 [&::-webkit-details-marker]:hidden">
+                <span className="grid h-10 w-10 place-items-center rounded-[var(--radius-sm)] border border-[var(--accent)]/22 bg-[var(--accent-soft)] text-[var(--accent)]">
+                  <Icon size={18} strokeWidth={1.8} />
+                </span>
+                <span className="min-w-0">
+                  <span className="flex flex-wrap items-center gap-2">
+                    <MetaText>Формат</MetaText>
+                    <StatusPill>{item.status}</StatusPill>
+                  </span>
+                  <span className={`${displayFont.className} mt-2 block text-[1.45rem] font-semibold leading-none text-[var(--text)] md:text-[1.8rem]`}>
+                    {item.format}
+                  </span>
+                  <span className="mt-2 block text-sm leading-6 text-[var(--muted)] line-clamp-2">{item.includes}</span>
+                </span>
+                <span className="text-sm font-semibold text-[var(--accent)] group-open:hidden">Раскрыть</span>
+                <span className="hidden text-sm font-semibold text-[var(--accent)] group-open:inline">Свернуть</span>
+              </summary>
+              <div className="grid gap-4 border-t border-[var(--line)] p-4 md:grid-cols-[minmax(0,1fr)_auto] md:p-5">
+                <FactList
+                  compact
+                  items={[
+                    { label: 'Для кого', value: item.audience },
+                    { label: 'Результат', value: item.result }
+                  ]}
+                />
+                <div className="md:justify-self-end">
+                  <InlineAction action={item.action} />
+                </div>
+              </div>
+            </details>
+          );
+        })}
       </div>
     </PrimitiveShell>
   );
@@ -346,27 +399,34 @@ export function PartnerFormatTable({
   className,
   ...props
 }: PrimitiveShellProps & { items: PartnerFormatTableItem[] }) {
+  const icons = [CalendarDays, BookOpen, Coffee, Store, Handshake];
+
   return (
     <PrimitiveShell className={className} {...props}>
-      <div className="grid items-stretch gap-4 lg:grid-cols-2">
-        {items.map((item, index) => (
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        {items.map((item, index) => {
+          const Icon = icons[index % icons.length] ?? Handshake;
+
+          return (
           <article
-            className="public-card-shell flex h-full min-h-0 flex-col p-4 md:p-5"
+            className="public-card-shell flex min-h-[21rem] flex-col p-4 md:p-5"
             key={index}
           >
-            <div className="flex flex-wrap items-start justify-between gap-3">
+            <div className="flex items-start justify-between gap-4">
               <MetaText>Партнёрский формат</MetaText>
-              <StatusPill accent>Выбор</StatusPill>
+              <span className="grid h-10 w-10 place-items-center rounded-[var(--radius-sm)] border border-[var(--accent)]/22 bg-[var(--accent-soft)] text-[var(--accent)]">
+                <Icon size={18} strokeWidth={1.8} />
+              </span>
             </div>
-            <h3 className={`${displayFont.className} mt-5 text-[1.75rem] font-semibold leading-none text-[var(--text)] md:text-[2.2rem]`}>
-              {item.format}
+            <h3 className={`${displayFont.className} mt-4 text-[1.65rem] font-semibold leading-none text-[var(--text)] md:text-[2rem]`}>
+                {item.format}
             </h3>
-            <div className="mt-5">
+            <div className="mt-5 min-w-0">
               <FactList
+                compact
                 items={[
                   { label: 'Кому подходит', value: item.fit },
                   { label: 'Что нужно', value: item.partnerProvides },
-                  { label: 'Что делаем', value: item.barsynergyProvides },
                   { label: 'Следующий шаг', value: item.nextStep }
                 ]}
               />
@@ -377,7 +437,8 @@ export function PartnerFormatTable({
               </div>
             ) : null}
           </article>
-        ))}
+          );
+        })}
       </div>
     </PrimitiveShell>
   );
@@ -390,23 +451,29 @@ export function SponsorBenefitSheet({
 }: PrimitiveShellProps & { items: readonly SponsorBenefitSheetItem[] }) {
   return (
     <PrimitiveShell className={className} {...props}>
-      <div className="grid items-stretch gap-4 md:grid-cols-2">
+      <ol className="sponsor-benefit-sheet divide-y divide-[var(--line)] border-y border-[var(--line)]">
         {items.map((item, index) => (
-          <StructuredCard
-            description={item.detail}
+          <li
+            className="grid gap-4 py-4 md:grid-cols-[minmax(9rem,0.34fr)_minmax(0,1fr)_minmax(12rem,0.5fr)] md:px-3 md:py-5"
             key={index}
-            mark="Польза"
-            title={item.area}
           >
-            <FactList
-              items={[
-                { label: 'Польза', value: item.summary },
-                { label: 'Где контакт', value: item.touchpoint }
-              ]}
-            />
-          </StructuredCard>
+            <div className="min-w-0">
+              <MetaText>Выгода</MetaText>
+              <h3 className={`${displayFont.className} mt-2 text-[1.55rem] font-semibold leading-none text-[var(--text)] md:text-[1.95rem]`}>
+                {item.benefit}
+              </h3>
+            </div>
+            <div className="min-w-0">
+              <MetaText>Где бренд виден</MetaText>
+              <p className="mt-2 text-sm leading-6 text-[var(--muted)]">{item.brandVisibility}</p>
+            </div>
+            <div className="min-w-0">
+              <MetaText>Результат</MetaText>
+              <p className="mt-2 text-sm font-semibold leading-6 text-[var(--text)]">{item.result}</p>
+            </div>
+          </li>
         ))}
-      </div>
+      </ol>
     </PrimitiveShell>
   );
 }
@@ -418,35 +485,61 @@ export function SponsorPackageComparison({
 }: PrimitiveShellProps & { items: SponsorPackageComparisonItem[] }) {
   return (
     <PrimitiveShell className={className} {...props}>
-      <div className="grid items-stretch gap-4 lg:grid-cols-3">
+      <div className="sponsor-package-table border-y border-[var(--line)]">
+        <div
+          aria-hidden="true"
+          className="hidden border-b border-[var(--line)] px-3 py-3 md:grid md:grid-cols-[minmax(10rem,0.82fr)_minmax(8rem,0.52fr)_minmax(11rem,0.82fr)_minmax(12rem,1fr)_minmax(10rem,0.82fr)_minmax(9rem,0.62fr)] md:gap-4"
+        >
+          <MetaText>Пакет</MetaText>
+          <MetaText>Период</MetaText>
+          <MetaText>Где виден бренд</MetaText>
+          <MetaText>Что входит</MetaText>
+          <MetaText>Материалы</MetaText>
+          <MetaText>Действие</MetaText>
+        </div>
         {items.map((item, index) => (
-          <StructuredCard
-            action={item.action}
-            className={item.recommended ? 'border-[var(--card-border-hover)] bg-[var(--surface-card-hover)]' : undefined}
-            footer={
-              item.priceStatus ? (
-                <div className="flex flex-wrap items-center gap-2">
-                  <MetaText>Стоимость</MetaText>
-                  <span className="text-sm text-[var(--muted)]">—</span>
-                  <span className="text-sm font-semibold text-[var(--text)]">{item.priceStatus}</span>
-                </div>
-              ) : undefined
-            }
+          <article
+            className="sponsor-package-row grid gap-4 border-b border-[var(--line)] py-4 last:border-b-0 md:grid-cols-[minmax(10rem,0.82fr)_minmax(8rem,0.52fr)_minmax(11rem,0.82fr)_minmax(12rem,1fr)_minmax(10rem,0.82fr)_minmax(9rem,0.62fr)] md:items-start md:gap-4 md:px-3 md:py-5"
+            data-recommended={item.recommended || undefined}
             key={index}
-            mark="Пакет"
-            status={item.recommended ? 'Основной' : undefined}
-            title={item.packageName}
           >
-            <FactList
-              items={[
-                { label: 'Для кого / задача', value: item.scope },
-                { label: 'Где виден бренд', value: item.visibility },
-                { label: 'Период', value: item.periodStatus },
-                { label: 'Что входит', value: item.includedPlacements },
-                { label: 'Материалы', value: item.requiredAssets }
-              ]}
-            />
-          </StructuredCard>
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-2">
+                <h3 className={`${displayFont.className} text-[1.45rem] font-semibold leading-none text-[var(--text)] md:text-[1.7rem]`}>
+                  {item.packageName}
+                </h3>
+                {item.recommended ? <StatusPill accent>Основной</StatusPill> : null}
+              </div>
+              <p className="mt-2 text-sm leading-6 text-[var(--muted)]">{item.scope}</p>
+              {item.priceStatus ? (
+                <p className="mt-2 text-sm font-semibold leading-5 text-[var(--text)]">
+                  <MetaText className="mr-2 inline">Стоимость</MetaText>
+                  {item.priceStatus}
+                </p>
+              ) : null}
+            </div>
+            <div className="min-w-0">
+              <MetaText className="md:hidden">Период</MetaText>
+              <p className="mt-1 text-sm leading-6 text-[var(--text)] md:mt-0">{item.periodStatus}</p>
+            </div>
+            <div className="min-w-0">
+              <MetaText className="md:hidden">Где виден бренд</MetaText>
+              <p className="mt-1 text-sm leading-6 text-[var(--muted)] md:mt-0">{item.visibility}</p>
+            </div>
+            <div className="min-w-0">
+              <MetaText className="md:hidden">Что входит</MetaText>
+              <p className="mt-1 text-sm leading-6 text-[var(--text)] md:mt-0">{item.includedPlacements}</p>
+            </div>
+            <div className="min-w-0">
+              <MetaText className="md:hidden">Материалы</MetaText>
+              <p className="mt-1 text-sm leading-6 text-[var(--muted)] md:mt-0">{item.requiredAssets}</p>
+            </div>
+            {item.action ? (
+              <div className="md:justify-self-end">
+                <InlineAction action={item.action} className="sponsor-package-action" />
+              </div>
+            ) : null}
+          </article>
         ))}
       </div>
     </PrimitiveShell>

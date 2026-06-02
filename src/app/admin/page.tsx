@@ -2,15 +2,6 @@ import { ApplicationStatus, ApplicationType, BusinessAccountStatus, ContentStatu
 import { AppLink } from '@/components/ui/app-link';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import {
-  DataTable,
-  DataTableBody,
-  DataTableCell,
-  DataTableFrame,
-  DataTableHead,
-  DataTableHeaderCell,
-  DataTableRow
-} from '@/components/ui/data-table';
 import { Panel } from '@/components/ui/panel';
 import { StatCard } from '@/components/ui/stat-card';
 import { StatusBadge, type StatusBadgeVariant } from '@/components/ui/status-badge';
@@ -23,7 +14,6 @@ import { contentStatusBadgeVariants, contentStatusLabels } from '@/lib/admin/con
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
 import { canAccessAdminSection } from '@/lib/auth/permissions';
 import { prisma } from '@/lib/db/prisma';
-import { displayFont } from '@/lib/fonts';
 import { cn } from '@/lib/utils';
 
 export const dynamic = 'force-dynamic';
@@ -183,7 +173,7 @@ export default async function AdminPage() {
     },
     {
       count: publishedSuppliersWithoutCity,
-      href: `/admin/suppliers?status=${ContentStatus.PUBLISHED}`,
+      href: `/admin/suppliers?status=${ContentStatus.PUBLISHED}&filter=no-city`,
       label: 'Поставщики без города',
       nextStep: 'добавить город в опубликованные карточки',
       owner: 'каталог'
@@ -235,14 +225,14 @@ export default async function AdminPage() {
       area: 'Курсы',
       href: '/admin/courses',
       note: `Опубликовано: ${publishedCourses}`,
-      status: publishedCourses > 0 ? 'есть публикации' : 'нет опубликованных курсов',
+      status: publishedCourses > 0 ? 'есть публикации' : 'нет публикаций',
       variant: publishedCourses > 0 ? 'success' : 'warning'
     },
     {
       area: 'Партнёры',
       href: '/admin/partners',
       note: `Опубликовано: ${publishedPartners}`,
-      status: publishedPartners > 0 ? 'есть публикации' : 'нет опубликованных партнёров',
+      status: publishedPartners > 0 ? 'есть публикации' : 'нет публикаций',
       variant: publishedPartners > 0 ? 'success' : 'warning'
     },
     {
@@ -254,7 +244,7 @@ export default async function AdminPage() {
     },
     {
       area: 'Поставщики',
-      href: '/admin/suppliers',
+      href: publishedSuppliersWithoutCity > 0 ? '/admin/suppliers?filter=no-city' : '/admin/suppliers',
       note: `Опубликовано: ${publishedSuppliers}`,
       status: publishedSuppliersWithoutCity > 0 ? 'есть записи без города' : 'города заполнены',
       variant: publishedSuppliersWithoutCity > 0 ? 'warning' : 'success'
@@ -274,7 +264,7 @@ export default async function AdminPage() {
       <Panel className="grid gap-4 md:grid-cols-[1fr_auto] md:items-end" padding="lg" tone="elevated">
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">BARSYNERGY / админка</p>
-          <h1 className={`${displayFont.className} mt-3 text-[2.4rem] font-semibold leading-none tracking-normal md:text-[3.1rem]`}>
+          <h1 className="mt-3 text-[2rem] font-semibold leading-tight tracking-normal md:text-[2.6rem]">
             Рабочая очередь
           </h1>
           <p className="mt-3 max-w-2xl text-sm leading-6 text-[var(--muted)]">
@@ -290,24 +280,28 @@ export default async function AdminPage() {
       <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard
           delta={`${newApplications} новых`}
+          description="Активная очередь входящих форм"
           label="Заявки в работе"
           status="модерация"
           value={activeApplicationTotal}
         />
         <StatCard
           delta={`${pendingBusinessAccounts} ждут`}
+          description="Подключение и проверка бизнес-кабинетов"
           label="Бизнес-доступы"
           status={canManageUsers ? 'админ' : 'просмотр'}
           value={pendingBusinessAccounts}
         />
         <StatCard
           delta={`${draftArticles + draftEvents + draftVacancies} материалов`}
+          description="Черновики перед публикацией"
           label="Черновики"
           status="публикация"
           value={draftContentTotal}
         />
         <StatCard
           delta={contentWarningCount > 0 ? 'проверить' : 'чисто'}
+          description="Разделы с незакрытыми замечаниями"
           label="Проверки контента"
           status="контроль"
           value={contentWarningCount}
@@ -317,7 +311,7 @@ export default async function AdminPage() {
       <section className="grid gap-5 xl:grid-cols-12">
         <AdminWorkQueue className="xl:col-span-8" items={queueItems} />
         <PublishingStatusRail className="xl:col-span-4" items={publishingRailItems} />
-        <ContentHealthTable className="xl:col-span-7" rows={contentHealthRows} />
+        <ContentHealthTable className="xl:col-span-12" rows={contentHealthRows} />
         <ModerationActionLane className="xl:col-span-5" applications={prioritizedApplications} />
       </section>
     </div>
@@ -344,7 +338,10 @@ function AdminWorkQueue({ className, items }: { className?: string; items: Queue
         <div className="divide-y divide-[var(--line)]">
           {items.map((item) => (
             <div
-              className="grid gap-3 px-4 py-4 md:grid-cols-[minmax(7rem,1fr)_3.5rem_6rem_minmax(8rem,1fr)_5rem] md:items-center md:gap-4"
+              className={cn(
+                'grid gap-3 px-4 py-4 md:grid-cols-[minmax(7rem,1fr)_3.5rem_6rem_minmax(8rem,1fr)_5rem] md:items-center md:gap-4',
+                item.count === 0 && 'opacity-50'
+              )}
               key={item.label}
             >
               <div>
@@ -362,7 +359,7 @@ function AdminWorkQueue({ className, items }: { className?: string; items: Queue
               <Button
                 className="min-h-9 w-full px-2 py-1.5 text-xs md:w-auto"
                 href={item.href}
-                variant={item.count > 0 ? 'primary' : 'secondary'}
+                variant="secondary"
               >
                 Перейти
               </Button>
@@ -376,58 +373,34 @@ function AdminWorkQueue({ className, items }: { className?: string; items: Queue
 
 function ContentHealthTable({ className, rows }: { className?: string; rows: HealthRow[] }) {
   return (
-    <Card className={cn('overflow-hidden', className)}>
-      <SectionHeader eyebrow="Контроль контента" title="Состояние разделов" />
-      <div className="divide-y divide-[var(--line)] border-t border-[var(--line)] md:hidden">
+    <Card className={cn('p-5', className)}>
+      <div className="flex flex-col gap-3 border-b border-[var(--line)] pb-4 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Контроль контента</p>
+          <h2 className="mt-2 text-lg font-semibold">Состояние разделов</h2>
+        </div>
+        <StatusBadge variant={rows.some((row) => row.variant !== 'success') ? 'warning' : 'success'}>
+          {rows.some((row) => row.variant !== 'success') ? 'нужна проверка' : 'в норме'}
+        </StatusBadge>
+      </div>
+      <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-5">
         {rows.map((row) => (
-          <div className="grid gap-3 px-4 py-4" key={row.area}>
+          <div className="rounded-[var(--radius-md)] border border-[var(--line)] bg-[var(--surface-muted)] p-4" key={row.area}>
             <div className="flex items-start justify-between gap-3">
               <p className="font-semibold">{row.area}</p>
               <StatusBadge variant={row.variant}>{row.status}</StatusBadge>
             </div>
-            <p className="text-sm leading-6 text-[var(--muted)]">{row.note}</p>
+            <p className="mt-3 text-sm leading-6 text-[var(--muted)]">{row.note}</p>
             {row.href ? (
-              <Button className="min-h-9 w-full px-3 py-1.5 text-xs" href={row.href} variant="secondary">
-                Открыть
+              <Button className="mt-4 min-h-9 w-full px-3 py-1.5 text-xs" href={row.href} variant="secondary">
+                Перейти
               </Button>
             ) : (
-              <span className="text-xs font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">нет доступа</span>
+              <span className="mt-4 inline-flex text-xs font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">нет доступа</span>
             )}
           </div>
         ))}
       </div>
-      <DataTableFrame className="hidden rounded-none border-0 border-t md:block">
-        <DataTable className="table-fixed" minWidth="100%">
-          <DataTableHead>
-            <tr>
-              <DataTableHeaderCell className="w-[22%]">Раздел</DataTableHeaderCell>
-              <DataTableHeaderCell className="w-[30%]">Статус</DataTableHeaderCell>
-              <DataTableHeaderCell className="w-[30%]">Данные</DataTableHeaderCell>
-              <DataTableHeaderCell className="w-[18%] text-right">Действие</DataTableHeaderCell>
-            </tr>
-          </DataTableHead>
-          <DataTableBody>
-            {rows.map((row) => (
-              <DataTableRow key={row.area}>
-                <DataTableCell className="font-semibold">{row.area}</DataTableCell>
-                <DataTableCell>
-                  <StatusBadge variant={row.variant}>{row.status}</StatusBadge>
-                </DataTableCell>
-                <DataTableCell className="text-[var(--muted)]">{row.note}</DataTableCell>
-                <DataTableCell className="text-right">
-                  {row.href ? (
-                    <Button className="min-h-9 px-3 py-1.5 text-xs" href={row.href} variant="secondary">
-                      Открыть
-                    </Button>
-                  ) : (
-                    <span className="text-xs font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">нет доступа</span>
-                  )}
-                </DataTableCell>
-              </DataTableRow>
-            ))}
-          </DataTableBody>
-        </DataTable>
-      </DataTableFrame>
     </Card>
   );
 }
@@ -498,7 +471,7 @@ function ModerationActionLane({ applications, className }: { applications: Dashb
                 <p className="text-sm font-semibold leading-6">
                   {application.subject?.trim() || application.name?.trim() || 'Заявка без названия'}
                 </p>
-                <Button className="min-h-9 px-3 py-1.5 text-xs" href={`/admin/applications/${application.id}`} variant="secondary">
+                <Button className="min-h-9 px-3 py-1.5 text-xs" href={`/admin/applications/${application.id}`} variant="ghost">
                   Открыть
                 </Button>
               </div>
@@ -554,9 +527,13 @@ function MetricPill({
       <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">{label}</span>
       <span className="mt-1 flex items-center justify-between gap-2">
         <span className="text-lg font-semibold text-[var(--text)]">{value}</span>
-        <StatusBadge className="px-2 py-0.5 text-[10px]" variant={variant}>
-          {value > 0 ? 'есть' : '0'}
-        </StatusBadge>
+        {value > 0 ? (
+          <StatusBadge className="px-2 py-0.5 text-[10px]" variant={variant}>
+            есть
+          </StatusBadge>
+        ) : (
+          <span className="text-xs text-[var(--muted)]">—</span>
+        )}
       </span>
     </span>
   );

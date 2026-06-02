@@ -134,20 +134,48 @@ test.describe('authenticated admin QA', () => {
     });
   }
 
-  test('admin mobile viewport shows the authenticated wide-screen fallback', async ({ page }) => {
-    await page.setViewportSize({ width: 390, height: 844 });
+  test('admin viewports below 1024px show the authenticated wide-screen fallback', async ({ page }) => {
+    for (const viewport of [
+      { width: 390, height: 844 },
+      { width: 768, height: 900 },
+      { width: 1023, height: 900 }
+    ]) {
+      await page.setViewportSize(viewport);
 
-    const response = await page.goto('/admin/articles');
+      const response = await page.goto('/admin/applications');
 
-    expect(response?.ok(), 'admin route should render for authenticated mobile fallback').toBe(true);
-    await expect(page.getByRole('heading', { name: 'Нужен широкий экран' })).toBeVisible();
-    await expect(page.locator('.admin-shell')).toBeVisible();
+      expect(response?.ok(), 'admin route should render for authenticated sub-desktop fallback').toBe(true);
+      await expect(page.getByRole('heading', { name: 'Нужен широкий экран' })).toBeVisible();
+      await expect(page.locator('.admin-layout-grid')).toBeHidden();
+      await expect(page.locator('.admin-shell')).toBeVisible();
 
-    const overflow = await getOverflowState(page);
-    expect(overflow, 'admin mobile fallback should not create horizontal overflow').toEqual({
-      bodyOverflow: 0,
-      documentOverflow: 0
-    });
+      const overflow = await getOverflowState(page);
+      expect(overflow, 'admin sub-desktop fallback should not create horizontal overflow').toEqual({
+        bodyOverflow: 0,
+        documentOverflow: 0
+      });
+    }
+  });
+
+  test('admin applications work area starts at 1024px without document overflow', async ({ page }) => {
+    for (const viewport of [
+      { width: 1024, height: 900 },
+      { width: 1280, height: 900 }
+    ]) {
+      await page.setViewportSize(viewport);
+
+      const response = await page.goto('/admin/applications');
+
+      expect(response?.ok(), 'admin applications should render for authenticated desktop shell').toBe(true);
+      await expect(page.getByRole('heading', { name: 'Нужен широкий экран' })).toBeHidden();
+      await expect(page.locator('.admin-layout-grid')).toBeVisible();
+
+      const overflow = await getOverflowState(page);
+      expect(overflow, 'admin desktop shell should keep wide tables inside their scroll frame').toEqual({
+        bodyOverflow: 0,
+        documentOverflow: 0
+      });
+    }
   });
 
   test('admin upload endpoint accepts a valid image and rejects an invalid file', async ({ page }, testInfo) => {

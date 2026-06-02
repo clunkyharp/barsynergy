@@ -6,6 +6,7 @@ import {
   ApplicationStatus,
   ApplicationType,
   BusinessAccountStatus,
+  Prisma,
   UserStatus
 } from '@prisma/client';
 import {
@@ -81,10 +82,22 @@ const notificationStatusLabels: Record<ApplicationNotificationStatus, string> = 
   [ApplicationNotificationStatus.FAILED]: 'Ошибка'
 };
 
+type ApplicationNotificationListItem = {
+  id: string;
+  channel: ApplicationNotificationChannel;
+  status: ApplicationNotificationStatus;
+  attempts: number;
+  sentAt: Date | null;
+  lastError: string | null;
+  createdAt: Date;
+};
+
 type AdminApplicationDetailPageProps = {
   params: Promise<{ applicationId: string }>;
   searchParams?: Promise<AdminContentSearchParams>;
 };
+
+let notificationStorageAvailable: boolean | null = null;
 
 function formatFileSize(bytes: number) {
   if (bytes < 1024) {
@@ -96,6 +109,54 @@ function formatFileSize(bytes: number) {
   }
 
   return `${(bytes / 1024 / 1024).toFixed(1)} МБ`;
+}
+
+function isMissingNotificationStorageError(error: unknown) {
+  return (
+    error instanceof Prisma.PrismaClientKnownRequestError &&
+    (error.code === 'P2021' || error.code === 'P2022')
+  );
+}
+
+async function getApplicationNotifications(applicationId: string): Promise<ApplicationNotificationListItem[]> {
+  if (notificationStorageAvailable !== true) {
+    const tableState = await prisma.$queryRaw<Array<{ exists: boolean }>>`
+      SELECT EXISTS (
+        SELECT 1
+        FROM information_schema.tables
+        WHERE table_schema = current_schema()
+          AND table_name = 'ApplicationNotification'
+      ) AS "exists"
+    `;
+
+    if (!tableState[0]?.exists) {
+      return [];
+    }
+
+    notificationStorageAvailable = true;
+  }
+
+  try {
+    return await prisma.applicationNotification.findMany({
+      where: { applicationId },
+      select: {
+        id: true,
+        channel: true,
+        status: true,
+        attempts: true,
+        sentAt: true,
+        lastError: true,
+        createdAt: true
+      },
+      orderBy: { createdAt: 'asc' }
+    });
+  } catch (error) {
+    if (isMissingNotificationStorageError(error)) {
+      return [];
+    }
+
+    throw error;
+  }
 }
 
 export default async function AdminApplicationDetailPage({ params, searchParams }: AdminApplicationDetailPageProps) {
@@ -147,9 +208,6 @@ export default async function AdminApplicationDetailPage({ params, searchParams 
             }
           }
         }
-      },
-      notifications: {
-        orderBy: { createdAt: 'asc' }
       }
     }
   });
@@ -158,6 +216,7 @@ export default async function AdminApplicationDetailPage({ params, searchParams 
     notFound();
   }
 
+  const notifications = await getApplicationNotifications(application.id);
   const entries = getApplicationPayloadEntries(application.type, application.payload);
   const messageTitle =
     application.type === ApplicationType.BUSINESS_SOLUTION
@@ -329,9 +388,9 @@ export default async function AdminApplicationDetailPage({ params, searchParams 
 
           <Card className="p-5">
             <h2 className="text-lg font-semibold">Уведомления</h2>
-            {application.notifications.length > 0 ? (
+            {notifications.length > 0 ? (
               <dl className="mt-4 grid gap-3 text-sm">
-                {application.notifications.map((notification) => (
+                {notifications.map((notification) => (
                   <div key={notification.id} className="rounded-[var(--radius-sm)] border border-[var(--border-default)] p-3">
                     <dt className="font-semibold">{notificationChannelLabels[notification.channel]}</dt>
                     <dd className="mt-1 text-[var(--muted)]">
@@ -413,7 +472,11 @@ export default async function AdminApplicationDetailPage({ params, searchParams 
                     <HiddenRedirect value={currentPath} />
                     <input name="applicationId" type="hidden" value={application.id} />
                     <input name="target" type="hidden" value="vacancy" />
-                    <Button type="submit" disabled={!canPublishApplicationContent}>
+                    <Button
+                      type="submit"
+                      disabled={!canPublishApplicationContent}
+                      title={!canPublishApplicationContent ? 'Доступно после подтверждения заявки и наличия согласия' : undefined}
+                    >
                       Опубликовать вакансию
                     </Button>
                   </form>
@@ -451,7 +514,11 @@ export default async function AdminApplicationDetailPage({ params, searchParams 
                   <HiddenRedirect value={currentPath} />
                   <input name="applicationId" type="hidden" value={application.id} />
                   <input name="target" type="hidden" value="supplier" />
-                  <Button type="submit" disabled={!canPublishApplicationContent}>
+                  <Button
+                    type="submit"
+                    disabled={!canPublishApplicationContent}
+                    title={!canPublishApplicationContent ? 'Доступно после подтверждения заявки и наличия согласия' : undefined}
+                  >
                     Опубликовать поставщика
                   </Button>
                 </form>
@@ -481,7 +548,11 @@ export default async function AdminApplicationDetailPage({ params, searchParams 
                   <HiddenRedirect value={currentPath} />
                   <input name="applicationId" type="hidden" value={application.id} />
                   <input name="target" type="hidden" value="partner" />
-                  <Button type="submit" disabled={!canPublishApplicationContent}>
+                  <Button
+                    type="submit"
+                    disabled={!canPublishApplicationContent}
+                    title={!canPublishApplicationContent ? 'Доступно после подтверждения заявки и наличия согласия' : undefined}
+                  >
                     Опубликовать партнёра
                   </Button>
                 </form>

@@ -39,7 +39,7 @@ export function PartnerApplicationForm({ enabled, result, utm, cities, defaults 
       disclosureAliases={['applications']}
       disclosureFocusSelector="#partnerCompanyName"
       disclosureId="partner-request"
-      disclosureOpenLabel="Оставить заявку"
+      disclosureOpenLabel="Описать партнёрскую задачу"
       disclosureTitle="Обсудить партнёрство"
       disclosureDescription="Укажите компанию, формат, город, ссылку и короткое описание задачи."
       disclosureDefaultOpen={Boolean(defaults.partnerType)}
@@ -69,7 +69,7 @@ export function PartnerApplicationForm({ enabled, result, utm, cities, defaults 
 
             <div className="mt-8 border-t border-white/10 pt-5">
               <PublicEyebrow tone="inverse">Что подготовить</PublicEyebrow>
-              <ul className="mt-4 space-y-3 text-sm leading-6 text-white/74">
+              <ul className="mt-4 space-y-3 text-sm leading-6 text-white/85">
                 {preparationNotes.map((item) => (
                   <li className="flex gap-3" key={item}>
                     <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--accent)]" />
