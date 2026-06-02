@@ -37,6 +37,11 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
     getEventFilterOptions()
   ]);
 
+  const hasActiveSearch = Boolean(
+    contentParams.q || contentParams.category || contentParams.city || contentParams.format || (contentParams.period && contentParams.period !== 'upcoming')
+  );
+  const showFilters = content.total > 0 || hasActiveSearch;
+
   return (
     <>
       <EditorialPublicPage
@@ -61,7 +66,7 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
       >
         <EventAgendaSection
           content={content}
-          filters={
+          filters={showFilters ? (
             <PublicFilters
               activeSummaryLabel="Выбрано в афише"
               categories={categories}
@@ -91,7 +96,7 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
               tone="directory"
               variant="sidebar"
             />
-          }
+          ) : null}
         />
       </Suspense>
     </>

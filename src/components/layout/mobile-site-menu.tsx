@@ -21,24 +21,28 @@ type MobileSiteMenuProps = {
 const MENU_TOGGLE_SIZE_CLASS = 'h-11 w-11';
 const MOBILE_MENU_CONTENT_TOP_CLASS = 'pt-[72px] sm:pt-[76px]';
 
-const flatNavOrder = [
-  '/events',
-  '/education',
-  '/vacancies',
-  '/suppliers',
-  '/articles',
-  '/business',
-  '/partners',
-  '/general-sponsors',
-  '/consulting',
-  '/about',
-  '/contacts'
+const navGroups = [
+  {
+    label: 'Платформа',
+    hrefs: ['/events', '/education', '/vacancies', '/suppliers', '/articles']
+  },
+  {
+    label: 'Сотрудничество',
+    hrefs: ['/business', '/partners', '/general-sponsors', '/consulting']
+  },
+  {
+    label: 'О нас',
+    hrefs: ['/about', '/contacts']
+  }
 ];
 
-function getFlatNavItems(navItems: MobileSiteMenuProps['navItems']) {
-  return flatNavOrder
-    .map((href) => navItems.find((item) => item.href === href))
-    .filter((item): item is MobileSiteMenuProps['navItems'][number] => Boolean(item));
+function getGroupNavItems(navItems: MobileSiteMenuProps['navItems']) {
+  return navGroups.map((group) => ({
+    label: group.label,
+    items: group.hrefs
+      .map((href) => navItems.find((item) => item.href === href))
+      .filter((item): item is MobileSiteMenuProps['navItems'][number] => Boolean(item))
+  })).filter((group) => group.items.length > 0);
 }
 
 function isActiveMobileItem(pathname: string | null, href: string) {
@@ -60,7 +64,7 @@ export function MobileSiteMenu({ isOpen, navItems, onOpenChange }: MobileSiteMen
   const dialogTitleId = useId();
   const overlayId = 'mobile-menu';
   const portalTarget = typeof document !== 'undefined' ? document.querySelector('.site-shell') ?? document.body : null;
-  const flatItems = getFlatNavItems(navItems);
+  const groups = getGroupNavItems(navItems);
   const loginItem = navItems.find((item) => item.href === '/auth/login');
 
   useEffect(() => {
@@ -203,26 +207,35 @@ export function MobileSiteMenu({ isOpen, navItems, onOpenChange }: MobileSiteMen
                 </h2>
 
                 <nav aria-label="Мобильная навигация" className="mt-6">
-                  <div>
-                    {flatItems.map((item) => {
-                      const isActive = isActiveMobileItem(pathname, item.href);
+                  <div className="grid gap-6">
+                    {groups.map((group) => (
+                      <div key={group.label}>
+                        <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--editorial-dark-muted)]">
+                          {group.label}
+                        </p>
+                        <div>
+                          {group.items.map((item) => {
+                            const isActive = isActiveMobileItem(pathname, item.href);
 
-                      return (
-                        <AppLink
-                          aria-current={isActive ? 'page' : undefined}
-                          className={cn(
-                            displayFont.className,
-                            'flex min-h-[3.25rem] w-full items-center border-b border-[var(--editorial-dark-border)] py-3.5 text-[28px] font-normal leading-[1.1] text-[var(--editorial-dark-text)] transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] hover:text-[var(--accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] motion-reduce:transition-none last:border-b-0 sm:text-[32px]',
-                            isActive && 'text-[var(--accent)]'
-                          )}
-                          href={item.href}
-                          key={item.href}
-                          onClick={() => onOpenChange(false)}
-                        >
-                          {item.label}
-                        </AppLink>
-                      );
-                    })}
+                            return (
+                              <AppLink
+                                aria-current={isActive ? 'page' : undefined}
+                                className={cn(
+                                  displayFont.className,
+                                  'flex min-h-[2.75rem] w-full items-center border-b border-[var(--editorial-dark-border)] py-2.5 text-[24px] font-normal leading-[1.1] text-[var(--editorial-dark-text)] transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] hover:text-[var(--accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] motion-reduce:transition-none last:border-b-0 sm:text-[28px]',
+                                  isActive && 'text-[var(--accent)]'
+                                )}
+                                href={item.href}
+                                key={item.href}
+                                onClick={() => onOpenChange(false)}
+                              >
+                                {item.label}
+                              </AppLink>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </nav>
 

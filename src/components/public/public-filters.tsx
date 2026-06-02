@@ -527,7 +527,7 @@ function PublicFiltersContent({
                 aria-controls={filterPanelId}
                 aria-expanded={showFilters}
                 className={cn(
-                  'inline-flex min-h-11 items-center justify-center gap-2 whitespace-nowrap rounded-[var(--radius-sm)] border border-[var(--border-default)] px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--text)] transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] hover:border-[var(--accent)]/35 motion-reduce:transition-none',
+                  'inline-flex min-h-11 items-center justify-center gap-2 whitespace-nowrap rounded-[var(--radius-sm)] border border-[var(--border-default)] px-3 py-2 text-[12px] font-semibold tracking-normal text-[var(--text)] transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] hover:border-[var(--accent)]/35 motion-reduce:transition-none',
                   isDirectoryTone && 'border-[var(--accent)]/22 bg-[var(--surface-wash)]'
                 )}
                 onClick={() => setShowFilters((value) => !value)}
@@ -634,7 +634,7 @@ function PublicFiltersContent({
               aria-controls={filterPanelId}
               aria-expanded={!areSidebarFieldsCollapsed}
               className={cn(
-                'mt-3 inline-flex min-h-9 w-full items-center justify-center gap-1.5 whitespace-nowrap rounded-[var(--radius-sm)] border border-[var(--border-default)] px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)] transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] hover:border-[var(--accent)]/35 hover:text-[var(--text)] motion-reduce:transition-none',
+                'mt-3 inline-flex min-h-9 w-full items-center justify-center gap-1.5 whitespace-nowrap rounded-[var(--radius-sm)] border border-[var(--border-default)] px-2.5 py-1.5 text-[12px] font-semibold tracking-normal text-[var(--muted)] transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] hover:border-[var(--accent)]/35 hover:text-[var(--text)] motion-reduce:transition-none',
                 isDirectoryTone && 'border-[var(--accent)]/22 bg-[var(--surface-wash)]'
               )}
               onClick={() => setAreSidebarFieldsCollapsed((value) => !value)}

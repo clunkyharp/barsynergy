@@ -45,10 +45,11 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   const params = (await searchParams) ?? {};
   const error = firstParam(params.error);
   const success = firstParam(params.success);
+  const wasSubmitted = firstParam(params['_s']) === '1';
   const isRoleMismatch = error === 'role-mismatch';
   const isRequestSent = success === 'business-request-created';
   const topSuccess = success && success !== 'business-request-created' ? successMessages[success] : null;
-  const formError = error && errorMessages[error] ? errorMessages[error] : null;
+  const formError = error && wasSubmitted && errorMessages[error] ? errorMessages[error] : null;
 
   return (
     <div className="auth-login-screen min-h-screen bg-[var(--background)]">
@@ -73,6 +74,9 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
             <h1 className="auth-login-title text-center text-[28px] font-bold leading-[1.18] tracking-normal text-[var(--text)]">
               Вход в кабинет
             </h1>
+            <p className="mt-2 text-center text-sm leading-6 text-[var(--muted)]">
+              Для заведений и специалистов BARSYNERGY
+            </p>
 
             <div className="auth-login-form-block mt-5 w-full">
               {formError ? (

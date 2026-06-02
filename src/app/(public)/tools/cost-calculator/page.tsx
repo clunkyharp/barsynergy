@@ -19,10 +19,9 @@ export default function CostCalculatorPage() {
         path="/tools/cost-calculator"
         metrics={[]}
         rows={[]}
-        secondaryLink={{ label: 'К материалам', href: '/articles' }}
         summary="Подходит, если нужно быстро проверить цену, подготовить меню или разобрать расчёт с командой."
         summaryHeading="Для меню и обучения"
-        title="Сколько стоит ваш напиток"
+        title="Рассчитайте себестоимость напитка"
       />
       <div className="scroll-mt-24 md:scroll-mt-28" id="calculator">
         <CostCalculatorClient />

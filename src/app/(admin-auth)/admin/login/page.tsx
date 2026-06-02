@@ -46,7 +46,8 @@ export default async function AdminLoginPage({ searchParams }: AdminLoginPagePro
 
   const params = (await searchParams) ?? {};
   const error = firstParam(params.error);
-  const formError = error && errorMessages[error] ? errorMessages[error] : null;
+  const wasSubmitted = firstParam(params['_s']) === '1';
+  const formError = error && wasSubmitted && errorMessages[error] ? errorMessages[error] : null;
 
   return (
     <div className="min-h-screen bg-[var(--background)] text-[var(--text)]">

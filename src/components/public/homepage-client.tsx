@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   ArrowUpRight,
   BookOpen,
@@ -142,11 +142,11 @@ function HomeHeroRouter({ stats }: { stats: HomepageData['stats'] }) {
           <p className={`${accentFont.className} text-[11px] font-semibold uppercase tracking-[0.18em] text-[#e0c09a]`}>
             BARSYNERGY / Барная индустрия СКФО
           </p>
-          <h1 className={`${displayFont.className} mt-4 max-w-[55rem] text-[clamp(2.8rem,5vw,4.8rem)] font-semibold leading-[1.04] text-balance text-[#fffdf9] max-[640px]:max-w-[15ch] max-[640px]:text-[clamp(2.25rem,9.6vw,2.55rem)]`} id="home-hero-title">
-            Обучение, вакансии и поставщики для кофейных баров Северного Кавказа
+          <h1 className={`${displayFont.className} mt-4 max-w-[44rem] text-[clamp(2.8rem,5vw,4.8rem)] font-semibold leading-[1.04] text-balance text-[#fffdf9] max-[640px]:max-w-[15ch] max-[640px]:text-[clamp(2.25rem,9.6vw,2.55rem)]`} id="home-hero-title">
+            Платформа для кофейных баров СКФО
           </h1>
           <p className="mt-5 max-w-2xl text-[15px] leading-7 text-[rgba(255,253,249,0.78)] md:text-base">
-            Обучение, вакансии, поставщики, события и инструменты — всё в одном месте для специалистов и заведений СКФО.
+            Обучение, вакансии, поставщики, события и инструменты — всё в одном месте для бариста, команд и заведений региона.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Button className="min-h-12 rounded-[var(--radius-sm)] px-8 text-[13px] uppercase tracking-[0.1em]" href="/education">
@@ -169,7 +169,7 @@ function HomeHeroRouter({ stats }: { stats: HomepageData['stats'] }) {
 
 function HomeSectionCards() {
   return (
-    <section className="background-zone background-zone-ivory scroll-mt-28 border-b border-[var(--line)] py-12 md:py-16" id="home-sections">
+    <section className="background-zone background-zone-ivory scroll-mt-28 border-b border-[var(--line)] py-10 md:py-14" id="home-sections" style={{ '--zone-surface': 'var(--background-band)' } as React.CSSProperties}>
       <div className="container">
         <div className="grid gap-8 xl:grid-cols-[minmax(0,0.48fr)_minmax(0,1.52fr)]">
           <div className="xl:pr-4">
@@ -181,7 +181,7 @@ function HomeSectionCards() {
               const Icon = card.icon;
 
               return (
-                <Link className="home-section-card group relative min-h-[140px] rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--surface-card)] p-5 text-[var(--text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)]" href={card.href} key={card.title}>
+                <Link className="home-section-card group relative min-h-[140px] rounded-[var(--radius-lg)] border border-[var(--border-strong)] bg-[var(--surface-card)] p-5 text-[var(--text)] shadow-[var(--shadow-card)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)]" href={card.href} key={card.title}>
                   <span className="flex items-start justify-between gap-4">
                     <span className="inline-flex h-10 w-10 items-center justify-center rounded-[var(--radius-sm)] bg-[var(--accent)] text-white">
                       <Icon size={18} strokeWidth={1.5} />

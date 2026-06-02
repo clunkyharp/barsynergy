@@ -63,6 +63,9 @@ const businessAccessActivationSchema = z
 function authResultPath(path: string, result: { type: 'success' | 'error'; code: string }) {
   const url = new URL(path, 'http://localhost');
   url.searchParams.set(result.type, result.code);
+  if (result.type === 'error') {
+    url.searchParams.set('_s', '1');
+  }
   return `${url.pathname}${url.search}`;
 }
 

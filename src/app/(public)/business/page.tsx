@@ -83,7 +83,7 @@ export default async function BusinessPage({ searchParams }: BusinessPageProps) 
       <EditorialPublicPage
         eyebrow="Каталог заведений"
         path="/business"
-        title="Каталог заведений СКФО"
+        title="Разместите заведение в каталоге"
         description="Добавляем кофейные бары, кофейни, обжарочные и близкие форматы в профильный каталог BARSYNERGY."
         summary="Заполните карточку заведения — команда проверит данные и подготовит публикацию в каталоге BARSYNERGY."
         summaryHeading="Каталог"

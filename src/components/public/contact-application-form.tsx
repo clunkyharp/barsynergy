@@ -162,7 +162,7 @@ export function ContactApplicationForm({ enabled, result, utm, cities, defaultTo
       <HoneypotField id="contact-message-website" />
       <PublicFormShellHeader
         eyebrow="Сообщение"
-        title="Форма обращения"
+        title="Напишите нам"
         description="Укажите контакт и коротко опишите задачу. Детали можно добавить ниже, если они нужны."
         headingLevel="h2"
       />
