@@ -2,10 +2,14 @@
 
 import { Suspense, type ReactNode, useEffect, useId, useMemo, useState, useTransition } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { ChevronDown, RotateCcw, SlidersHorizontal, X } from 'lucide-react';
+import { ChevronDown, RotateCcw, SlidersHorizontal } from 'lucide-react';
+import {
+  PublicFiltersActiveChip,
+  PublicFiltersResetButton,
+  PublicFiltersSearchField,
+  PublicFiltersSelectField
+} from '@/components/public/public-filters-fields';
 import { Panel } from '@/components/ui/panel';
-import { SearchInput } from '@/components/ui/search-input';
-import { Select } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
 
 type CategoryOption = {
@@ -357,52 +361,17 @@ function PublicFiltersContent({
       ? `${activeSummaryLabel}: ${activeFilters.length}.`
       : 'Фильтры не выбраны.';
 
-  function renderDirectoryFieldLabel(label: string, htmlFor: string) {
-    return (
-      <label className={fieldLabelClassName} htmlFor={htmlFor}>
-        {label}
-      </label>
-    );
-  }
-
-  function renderClearButton(name: string, label: string, activeValue: string) {
-    if (!activeValue) {
-      return null;
-    }
-
-    return (
-      <button
-        aria-label={`Сбросить фильтр: ${label}`}
-        className="inline-flex min-h-9 items-center gap-1.5 justify-self-start rounded-[var(--radius-sm)] border border-[var(--border-default)] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--muted)] transition-colors hover:border-[var(--accent)]/35 hover:text-[var(--text)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] motion-reduce:transition-none"
-        onClick={() => clearSingleFilter(name)}
-        type="button"
-      >
-        <X aria-hidden="true" size={12} />
-        Сбросить
-      </button>
-    );
-  }
-
   const searchField = (
-    <div className={fieldShellClassName}>
-      <label className={shouldShowSearchLabel ? fieldLabelClassName : 'sr-only'} htmlFor={searchInputId}>
-        Поиск по списку
-      </label>
-      <SearchInput
-        aria-label="Поиск по списку"
-        autoComplete="off"
-        enterKeyHint="search"
-        id={searchInputId}
-        inputMode="search"
-        name="q"
-        className={controlClassName}
-        onChange={(e) => setDraftQuery(e.target.value)}
-        placeholder={placeholder}
-        spellCheck={false}
-        type="search"
-        value={draftQuery}
-      />
-    </div>
+    <PublicFiltersSearchField
+      controlClassName={controlClassName}
+      fieldLabelClassName={fieldLabelClassName}
+      id={searchInputId}
+      onChange={(event) => setDraftQuery(event.target.value)}
+      placeholder={placeholder}
+      shouldShowLabel={shouldShowSearchLabel}
+      value={draftQuery}
+      wrapperClassName={fieldShellClassName}
+    />
   );
 
   const contextSummary =
@@ -426,72 +395,58 @@ function PublicFiltersContent({
   const filterFields = (
     <>
       {categories.length > 0 ? (
-        <div className={fieldShellClassName}>
-          {renderDirectoryFieldLabel(categoryLabel, `${filterIdPrefix}-category`)}
-          <Select
-            aria-label={categoryLabel}
-            className={controlClassName}
-            id={`${filterIdPrefix}-category`}
-            name="category"
-            value={currentCategory}
-            onChange={(e) => handleFilter('category', e.target.value)}
-          >
-            <option value="">{categoryAllLabel}</option>
-            {categories.map((cat) => (
-              <option key={cat.id} value={cat.slug}>
-                {cat.name}
-              </option>
-            ))}
-          </Select>
-          {renderClearButton('category', categoryLabel, currentCategory)}
-        </div>
+        <PublicFiltersSelectField
+          activeValue={currentCategory}
+          allLabel={categoryAllLabel}
+          ariaLabel={categoryLabel}
+          controlClassName={controlClassName}
+          fieldLabelClassName={fieldLabelClassName}
+          id={`${filterIdPrefix}-category`}
+          label={categoryLabel}
+          name="category"
+          onChange={(event) => handleFilter('category', event.target.value)}
+          onClear={clearSingleFilter}
+          options={categories.map((category) => ({ label: category.name, value: category.slug }))}
+          wrapperClassName={fieldShellClassName}
+        />
       ) : null}
 
       {cities.length > 0 ? (
-        <div className={fieldShellClassName}>
-          {renderDirectoryFieldLabel(cityLabel, `${filterIdPrefix}-city`)}
-          <Select
-            aria-label={cityLabel}
-            className={controlClassName}
-            id={`${filterIdPrefix}-city`}
-            name="city"
-            value={currentCity}
-            onChange={(e) => handleFilter('city', e.target.value)}
-          >
-            <option value="">{cityAllLabel}</option>
-            {cities.map((city) => (
-              <option key={city.id} value={city.slug}>
-                {city.name}
-              </option>
-            ))}
-          </Select>
-          {renderClearButton('city', cityLabel, currentCity)}
-        </div>
+        <PublicFiltersSelectField
+          activeValue={currentCity}
+          allLabel={cityAllLabel}
+          ariaLabel={cityLabel}
+          controlClassName={controlClassName}
+          fieldLabelClassName={fieldLabelClassName}
+          id={`${filterIdPrefix}-city`}
+          label={cityLabel}
+          name="city"
+          onChange={(event) => handleFilter('city', event.target.value)}
+          onClear={clearSingleFilter}
+          options={cities.map((city) => ({ label: city.name, value: city.slug }))}
+          wrapperClassName={fieldShellClassName}
+        />
       ) : null}
 
       {extraFilters.map((filter) => {
         const currentValue = searchParams?.get(filter.name) ?? '';
 
         return (
-          <div className={fieldShellClassName} key={filter.name}>
-            {renderDirectoryFieldLabel(filter.label, `${filterIdPrefix}-${filter.name}`)}
-            <Select
-              aria-label={filter.label}
-              className={controlClassName}
-              id={`${filterIdPrefix}-${filter.name}`}
-              name={filter.name}
-              value={currentValue}
-              onChange={(e) => handleFilter(filter.name, e.target.value)}
-            >
-              <option value="">{filter.allLabel ?? filter.label}</option>
-              {filter.options.map((option) => (
-                <option key={`${filter.name}-${option.value}`} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </Select>
-            {renderClearButton(filter.name, filter.label, currentValue)}
-          </div>
+          <PublicFiltersSelectField
+            activeValue={currentValue}
+            allLabel={filter.allLabel ?? filter.label}
+            ariaLabel={filter.label}
+            controlClassName={controlClassName}
+            fieldLabelClassName={fieldLabelClassName}
+            id={`${filterIdPrefix}-${filter.name}`}
+            key={filter.name}
+            label={filter.label}
+            name={filter.name}
+            onChange={(event) => handleFilter(filter.name, event.target.value)}
+            onClear={clearSingleFilter}
+            options={filter.options}
+            wrapperClassName={fieldShellClassName}
+          />
         );
       })}
     </>
@@ -572,14 +527,7 @@ function PublicFiltersContent({
                   </span>
                 ) : null}
                 {hasActiveFilters ? (
-                  <button
-                    className="inline-flex min-h-11 items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--accent)] transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] hover:text-[var(--accent-strong)] motion-reduce:transition-none"
-                    onClick={clearAllFilters}
-                    type="button"
-                  >
-                    <RotateCcw size={14} strokeWidth={1.8} />
-                    Сбросить
-                  </button>
+                  <PublicFiltersResetButton onClick={clearAllFilters} />
                 ) : null}
               </div>
             </div>
@@ -588,17 +536,12 @@ function PublicFiltersContent({
           {hasActiveFilters ? (
             <div className={cn('flex flex-wrap', compact ? 'mt-3 gap-1.5' : 'mt-4 gap-2')}>
               {activeFilters.map((filter) => (
-                <button
-                  aria-label={`Убрать фильтр: ${filter.label} ${filter.value}`}
+                <PublicFiltersActiveChip
                   className={activeChipClassName}
+                  filter={filter}
                   key={`${filter.name}-${filter.value}`}
-                  onClick={() => clearSingleFilter(filter.name)}
-                  type="button"
-                >
-                  <span className="font-semibold uppercase tracking-[0.12em]">{filter.label}</span>
-                  <span className="break-words text-[var(--text)]">{filter.value}</span>
-                  <X size={12} strokeWidth={1.8} />
-                </button>
+                  onClear={clearSingleFilter}
+                />
               ))}
             </div>
           ) : null}
@@ -654,17 +597,12 @@ function PublicFiltersContent({
           {hasActiveFilters ? (
             <div className="mt-4 flex flex-wrap gap-2">
               {activeFilters.map((filter) => (
-                <button
-                  aria-label={`Убрать фильтр: ${filter.label} ${filter.value}`}
+                <PublicFiltersActiveChip
                   className={activeChipClassName}
+                  filter={filter}
                   key={`${filter.name}-${filter.value}`}
-                  onClick={() => clearSingleFilter(filter.name)}
-                  type="button"
-                >
-                  <span className="font-semibold uppercase tracking-[0.12em]">{filter.label}</span>
-                  <span className="break-words text-[var(--text)]">{filter.value}</span>
-                  <X size={12} />
-                </button>
+                  onClear={clearSingleFilter}
+                />
               ))}
             </div>
           ) : null}
@@ -779,17 +717,12 @@ function PublicFiltersContent({
           {hasActiveFilters ? (
             <div className="mt-4 flex flex-wrap gap-2">
               {activeFilters.map((filter) => (
-                <button
-                  aria-label={`Убрать фильтр: ${filter.label} ${filter.value}`}
+                <PublicFiltersActiveChip
                   className={activeChipClassName}
+                  filter={filter}
                   key={`${filter.name}-${filter.value}`}
-                  onClick={() => clearSingleFilter(filter.name)}
-                  type="button"
-                >
-                  <span className="font-semibold uppercase tracking-[0.12em]">{filter.label}</span>
-                  <span className="break-words text-[var(--text)]">{filter.value}</span>
-                  <X size={12} />
-                </button>
+                  onClear={clearSingleFilter}
+                />
               ))}
             </div>
           ) : null}

@@ -30,8 +30,10 @@ test('public desktop header navigation is readable and keeps overlap guards', ()
   assert.match(source, /xl:gap-x-6/);
   assert.match(source, /xl:min-w-\[176px\]/);
   assert.match(source, /const desktopPrimaryNavItems = getNavItems\(\['\/education', '\/events', '\/articles', '\/vacancies', '\/suppliers', '\/business'\]\)/);
-  assert.match(source, /const desktopMoreNavItems = getNavItems\(\['\/consulting', '\/partners', '\/general-sponsors', '\/contacts'\]\)/);
-  assert.match(source, /2xl:inline-flex/);
+  assert.match(source, /const desktopMoreNavItems = getNavItems\(\['\/about', '\/consulting', '\/partners', '\/general-sponsors', '\/contacts'\]\)/);
+  assert.match(source, /xl:inline-flex/);
+  assert.doesNotMatch(source, /href="\/vacancies#vacancy-form"/);
+  assert.match(source, /href="\/contacts\?topic=vacancy-placement#contact-form"/);
 });
 
 test('public desktop more menu opens by click and closes predictably', () => {

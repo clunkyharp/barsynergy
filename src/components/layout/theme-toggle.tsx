@@ -27,18 +27,31 @@ function getInitialTheme(): Theme {
 
 function applyTheme(theme: Theme) {
   document.documentElement.dataset.theme = theme;
-  document.documentElement.style.colorScheme = theme;
   window.localStorage.setItem('barsynergy-theme', theme);
 }
 
 export function ThemeToggle({ className, compact = false }: ThemeToggleProps) {
-  const [theme, setTheme] = useState<Theme>('light');
+  const [theme, setTheme] = useState<Theme | null>(null);
 
   useEffect(() => {
     const initialTheme = getInitialTheme();
     setTheme(initialTheme);
     applyTheme(initialTheme);
   }, []);
+
+  if (theme === null) {
+    return (
+      <div
+        aria-hidden
+        className={cn(
+          'inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--surface-elevated)] shadow-[var(--shadow-card)]',
+          compact ? 'h-9 min-h-9 w-9 rounded-[8px] px-0' : 'px-3'
+        )}
+      >
+        <span className={cn('block', compact ? 'h-4 w-4' : 'h-[16px] w-[37px]')} />
+      </div>
+    );
+  }
 
   const isDark = theme === 'dark';
 
@@ -65,13 +78,25 @@ export function ThemeToggle({ className, compact = false }: ThemeToggleProps) {
 }
 
 export function ThemeSegmentedToggle({ className }: { className?: string }) {
-  const [theme, setTheme] = useState<Theme>('light');
+  const [theme, setTheme] = useState<Theme | null>(null);
 
   useEffect(() => {
     const initialTheme = getInitialTheme();
     setTheme(initialTheme);
     applyTheme(initialTheme);
   }, []);
+
+  if (theme === null) {
+    return (
+      <div aria-hidden className={cn('flex items-center justify-between gap-4 px-1 py-1', className)}>
+        <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">Тема</span>
+        <div className="flex shrink-0 gap-1 rounded-full border border-[var(--border-default)] bg-[var(--surface-wash)] p-0.5">
+          <span className="min-h-9 rounded-full px-3 text-sm">&nbsp;</span>
+          <span className="min-h-9 rounded-full px-3 text-sm">&nbsp;</span>
+        </div>
+      </div>
+    );
+  }
 
   function selectTheme(nextTheme: Theme) {
     setTheme(nextTheme);

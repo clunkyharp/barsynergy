@@ -19,9 +19,8 @@ import { submitPublicApplicationAction } from '@/lib/applications/submit-public-
 const CONTACTS_PATH = '/contacts';
 const contactTopicValues = [
   'education-program',
+  'education-launch',
   'event',
-  'event-news',
-  'vacancy-response',
   'vacancy-placement',
   'supplier-contact',
   'supplier',
@@ -29,7 +28,6 @@ const contactTopicValues = [
   'sponsorship',
   'consulting',
   'article-topic',
-  'calculator-question',
   'bug-report',
   'other'
 ] as const;
@@ -40,12 +38,10 @@ function getContactTopicLabel(topic: ContactTopic) {
   switch (topic) {
     case 'education-program':
       return 'Обучение';
+    case 'education-launch':
+      return 'Хочу предложить программу обучения';
     case 'event':
       return 'Событие';
-    case 'event-news':
-      return 'Анонсы событий';
-    case 'vacancy-response':
-      return 'Отклик на вакансию';
     case 'vacancy-placement':
       return 'Вакансия';
     case 'supplier-contact':
@@ -60,8 +56,6 @@ function getContactTopicLabel(topic: ContactTopic) {
       return 'Консалтинг';
     case 'article-topic':
       return 'Материал или интервью';
-    case 'calculator-question':
-      return 'Вопрос по калькулятору';
     case 'bug-report':
       return 'Что-то сломалось';
     case 'other':
@@ -75,7 +69,7 @@ const contactMessageSchema = baseContactSchema
     name: z.string().trim().min(2).max(160),
     contact: z.string().trim().max(180).optional(),
     cityId: z.string().trim().max(120).optional(),
-    topic: z.enum(contactTopicValues),
+    topic: z.enum(contactTopicValues).optional().default('other'),
     message: z.string().trim().min(20).max(4000),
     companyName: z.string().trim().max(180).optional(),
     teamSize: z.string().trim().max(80).optional(),
@@ -103,7 +97,7 @@ const contactMessageSchema = baseContactSchema
       });
     }
 
-    // Topic-specific fields are optional because the public contact form keeps details collapsed.
+    // Topic-specific fields are optional because the public contact form keeps them in the topic section.
   });
 
 function splitContactChannel(contact?: string) {

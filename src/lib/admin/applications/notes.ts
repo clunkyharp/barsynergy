@@ -25,11 +25,11 @@ export async function updateApplicationBusinessNotesById({
 }) {
   const application = await prisma.application.findUniqueOrThrow({
     where: { id: applicationId },
-    select: { businessAccountId: true }
+    select: { businessAccountId: true, status: true }
   });
 
   if (!canUpdateApplicationBusinessNotes(application)) {
-    throw new Error('business notes require linked business account');
+    throw new Error('business notes require linked business account and editable status');
   }
 
   await prisma.application.update({

@@ -192,3 +192,18 @@ test('CSP builder emits strict script policy while preserving current asset sour
   assert.equal(shouldApplyCsp('/_next/static/chunk.js'), false);
   assert.equal(shouldApplyCsp('/favicon.ico'), false);
 });
+
+test('middleware keeps auth routing edge-safe and preserves login returnTo redirects', () => {
+  const source = readProjectFile('src/middleware.ts');
+
+  assert.match(source, /from '@\/lib\/auth\/session-constants'/);
+  assert.doesNotMatch(source, /from '@\/lib\/auth\/session'/);
+  assert.match(source, /request\.nextUrl\.pathname === '\/profile' \|\| request\.nextUrl\.pathname\.startsWith\('\/profile\/'\)/);
+  assert.match(source, /loginUrl\.searchParams\.set\('returnTo', request\.nextUrl\.pathname\)/);
+  assert.match(
+    source,
+    /request\.nextUrl\.pathname === '\/business\/cabinet'[\s\S]*request\.nextUrl\.pathname\.startsWith\('\/business\/cabinet\/'\)[\s\S]*loginUrl\.searchParams\.set\('returnTo', '\/business\/cabinet'\)/
+  );
+  assert.match(source, /request\.nextUrl\.pathname === '\/admin' \|\| request\.nextUrl\.pathname\.startsWith\('\/admin\/'\)/);
+  assert.match(source, /NextResponse\.json\(\{ error: 'Unauthorized\.' \}, \{ status: 401 \}\)/);
+});

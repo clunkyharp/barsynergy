@@ -8,8 +8,9 @@ import {
   type PublicApplicationFormProps
 } from '@/components/public/application-form-section';
 import { PublicBodyText, PublicDisplayTitle, PublicEyebrow } from '@/components/public/public-primitives';
+import { PublicFormValidation } from '@/components/public/public-form-validation';
 import { ConsentField } from '@/components/ui/consent-field';
-import { FormField } from '@/components/ui/form-field';
+import { FormField, FormSection } from '@/components/ui/form-field';
 import { InlineLink } from '@/components/ui/inline-link';
 import { Input } from '@/components/ui/input';
 import { MetaChip } from '@/components/ui/meta-chip';
@@ -44,7 +45,8 @@ export function ConsultingRequestForm({ enabled, result, utm, cities, defaults =
       result={result}
       sectionId="consulting-request"
     >
-      <form action={submitConsultingRequest} className="editorial-form-shell public-form-shell">
+      <form action={submitConsultingRequest} className="editorial-form-shell public-form-shell" noValidate>
+        <PublicFormValidation />
         <HiddenUtmFields utm={utm} />
         <HoneypotField id="consulting-request-website" />
         <div className="relative grid lg:grid-cols-[0.42fr_0.58fr]">
@@ -85,20 +87,22 @@ export function ConsultingRequestForm({ enabled, result, utm, cities, defaults =
           </div>
 
           <div className="relative p-5 md:p-6">
-            <div className="grid gap-4 md:grid-cols-2">
-              <FormField htmlFor="consultingContactName" label="Контактное лицо">
-                <Input
-                  autoComplete="name"
-                  defaultValue={defaults.contactName}
-                  id="consultingContactName"
-                  maxLength={160}
-                  minLength={2}
-                  name="contactName"
-                  required
-                />
-              </FormField>
-              <FormField htmlFor="consultingCityId" label="Город">
-                <Select id="consultingCityId" name="cityId" defaultValue={defaults.cityId ?? ''} required>
+            <FormSection title="Контакт">
+              <div className="grid items-start gap-4 md:grid-cols-2">
+                <FormField htmlFor="consultingContactName" label="Контактное лицо">
+                  <Input
+                    autoComplete="name"
+                    defaultValue={defaults.contactName}
+                    id="consultingContactName"
+                    maxLength={160}
+                    minLength={2}
+                    name="contactName"
+                    placeholder="Иван Иванов"
+                    required
+                  />
+                </FormField>
+                <FormField htmlFor="consultingCityId" hint="Нужен для подбора эксперта в вашем городе" label="Город">
+                  <Select id="consultingCityId" name="cityId" defaultValue={defaults.cityId ?? ''} required>
                   <option value="" disabled>
                     Выберите город
                   </option>
@@ -110,6 +114,10 @@ export function ConsultingRequestForm({ enabled, result, utm, cities, defaults =
                 </Select>
               </FormField>
               <ContactChannelFieldset className="md:col-span-2" emailId="consultingEmail" phoneId="consultingPhone" telegramId="consultingTelegram" />
+            </div>
+            </FormSection>
+            <FormSection title="О бизнесе">
+            <div className="grid gap-4 md:grid-cols-2">
               <FormField htmlFor="consultingBusinessType" label="Тип бизнеса">
                 <Select id="consultingBusinessType" name="businessType" defaultValue={defaults.businessType ?? ''} required>
                   <option value="" disabled>
@@ -156,6 +164,10 @@ export function ConsultingRequestForm({ enabled, result, utm, cities, defaults =
                   ))}
                 </Select>
               </FormField>
+            </div>
+            </FormSection>
+            <FormSection title="Задача">
+            <div className="grid gap-4 md:grid-cols-2">
               <div className="md:col-span-2">
                 <FormField htmlFor="consultingTaskDescription" hint="Опишите задачу и что должно стать понятнее после консультации." label="Описание задачи">
                   <Textarea
@@ -165,12 +177,15 @@ export function ConsultingRequestForm({ enabled, result, utm, cities, defaults =
                     maxLength={4000}
                     minLength={20}
                     name="taskDescription"
+                    placeholder="Например: нужно пересобрать барную карту и понять, как снизить себестоимость без потери качества."
                     required
                   />
                 </FormField>
               </div>
-              <div className="md:col-span-2 border-t border-black/10 pt-1">
-                <ConsentField>
+            </div>
+            </FormSection>
+            <div className="md:col-span-2 border-t border-black/10 pt-1">
+              <ConsentField>
                   Согласен с <InlineLink href="/legal/privacy">политикой обработки персональных данных</InlineLink> и даю{' '}
                   <InlineLink href="/legal/personal-data-consent">согласие на обработку персональных данных</InlineLink> для этой заявки.
                 </ConsentField>
@@ -178,7 +193,6 @@ export function ConsultingRequestForm({ enabled, result, utm, cities, defaults =
               <PublicFormShellFooter className="md:col-span-2" note="После отправки уточним задачу и формат консультации.">
                 <SubmitButton>Отправить заявку</SubmitButton>
               </PublicFormShellFooter>
-            </div>
           </div>
         </div>
       </form>

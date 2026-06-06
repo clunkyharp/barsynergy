@@ -154,6 +154,11 @@
   overflow-wrap: anywhere;
 }
 
+.featured-now-support {
+  width: fit-content;
+  max-width: 100%;
+}
+
 .featured-now-footer {
   width: 100%;
 }
@@ -386,6 +391,8 @@
   --home-service-border: rgb(28 28 30 / 0.14);
   --home-service-chip-bg: rgb(255 255 255 / 0.36);
   --home-service-chip-border: rgb(28 28 30 / 0.14);
+  --home-service-action-bg: rgb(28 28 30 / 0.82);
+  --home-service-action-fg: #f5f7fb;
 }
 
 .home-service-card--consulting-team {
@@ -395,6 +402,8 @@
   --home-service-border: rgb(28 28 30 / 0.14);
   --home-service-chip-bg: rgb(255 255 255 / 0.36);
   --home-service-chip-border: rgb(28 28 30 / 0.14);
+  --home-service-action-bg: rgb(28 28 30 / 0.82);
+  --home-service-action-fg: #f5f7fb;
 }
 
 .home-service-card--consulting-cost {

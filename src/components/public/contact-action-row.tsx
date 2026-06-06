@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import type { CSSProperties } from 'react';
 import { ArrowUpRight, type LucideIcon } from 'lucide-react';
+import { getChannelAccentVar, type ChannelAccentTone } from '@/components/public/channel-accent';
 import { AppLink } from '@/components/ui/app-link';
 import { cn } from '@/lib/utils';
 
@@ -15,26 +16,16 @@ type ContactActionRowProps = {
   iconAlt?: string;
   className?: string;
   layout?: 'row' | 'card';
-  tone?: 'neutral' | 'telegram' | 'whatsapp' | 'instagram' | 'phone' | 'email' | 'website';
+  tone?: ChannelAccentTone;
   wrapDescriptor?: boolean;
 };
-
-const contactAccentByTone = {
-  email: '#8f3d32',
-  instagram: '#c14f7a',
-  neutral: '#8f3d32',
-  phone: '#7a5d45',
-  telegram: '#2a86d9',
-  website: '#5f4a3d',
-  whatsapp: '#238c46'
-} as const;
 
 function inferTone({
   href,
   serviceName,
   tone,
   typeLabel
-}: Pick<ContactActionRowProps, 'href' | 'serviceName' | 'tone' | 'typeLabel'>): keyof typeof contactAccentByTone {
+}: Pick<ContactActionRowProps, 'href' | 'serviceName' | 'tone' | 'typeLabel'>): ChannelAccentTone {
   if (tone) {
     return tone;
   }
@@ -104,7 +95,7 @@ export function ContactActionRow({
   const isExternal = href?.startsWith('http');
   const isActionable = Boolean(href);
   const isCard = layout === 'card';
-  const accent = contactAccentByTone[inferTone({ href, serviceName, tone, typeLabel })];
+  const accent = getChannelAccentVar(inferTone({ href, serviceName, tone, typeLabel }));
   const style = { '--contact-accent': accent } as CSSProperties;
   const content = (
     <>

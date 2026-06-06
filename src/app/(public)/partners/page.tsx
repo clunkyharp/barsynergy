@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { ArrowUpRight } from 'lucide-react';
+import { ArrowUpRight, Handshake } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { PartnerFormatTable } from '@/components/public/editorial-display-primitives';
 import { EditorialPublicPage } from '@/components/public/editorial-public-page';
@@ -133,6 +133,8 @@ export default function PartnersPage() {
         rows={[]}
         primaryLink={{ label: 'Описать партнёрскую задачу', href: getPartnerContactHref() }}
         secondaryLink={{ label: 'Смотреть спонсорство', href: '/general-sponsors' }}
+        accentGradient="radial-gradient(ellipse 90% 60% at 40% 20%, rgba(200,80,120,0.08), transparent)"
+        accentIcon={Handshake}
       />
       <section className="background-zone background-zone-beige editorial-grid border-b border-[var(--line)] py-10 md:py-14">
         <div className="container">

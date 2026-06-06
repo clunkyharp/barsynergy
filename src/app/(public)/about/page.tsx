@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
-import Link from 'next/link';
+import { AppLink } from '@/components/ui/app-link';
 import {
   BadgeCheck,
   PanelsTopLeft,
@@ -179,26 +179,28 @@ export default function AboutPage() {
       <section className="background-zone background-zone-cta py-14 md:py-20">
         <div className="mx-auto max-w-[1240px] px-5 md:px-12">
           <div className="rounded-[var(--radius-xl)] border border-[var(--editorial-dark-border)] bg-[var(--editorial-dark-surface)] p-6 text-white md:p-10 xl:p-12">
-            <div className="grid gap-8 xl:grid-cols-[minmax(0,0.55fr)_minmax(22rem,0.45fr)] xl:items-start">
+            <div className="grid gap-8 xl:grid-cols-[minmax(0,0.55fr)_minmax(16rem,0.38fr)] xl:items-start">
               <div>
-                <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-white/58">Следующий шаг</p>
+                <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--editorial-dark-label)]">Следующий шаг</p>
                 <h2 className={`${displayFont.className} mt-4 max-w-4xl text-[clamp(2.55rem,5vw,4rem)] font-semibold leading-none text-white`}>
                   Хотите добавить событие, компанию, вакансию или партнёрскую идею?
                 </h2>
-                <p className="mt-6 max-w-3xl text-base leading-8 text-white/72 md:text-lg md:leading-9">
+                <p className="mt-6 max-w-3xl text-base leading-8 text-[var(--editorial-dark-muted)] md:text-lg md:leading-9">
                   Напишите команде. Мы уточним задачу и подскажем, какой раздел или формат подходит для первого шага.
                 </p>
               </div>
-              <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap xl:flex-col xl:items-stretch">
-                <Button className="h-12 w-full rounded-[var(--radius-md)] px-7" href="/contacts?topic=other#contact-form" size="lg">
+              <div className="flex flex-col gap-3 items-start xl:items-stretch">
+                <Button className="h-12 w-full rounded-[var(--radius-md)] px-7 self-stretch" href="/contacts?topic=other#contact-form" size="lg">
                   Связаться с командой
                 </Button>
-                <Link className="inline-flex min-h-11 w-full items-center justify-center rounded-[var(--radius-md)] border border-white/15 px-5 text-sm font-semibold text-white/78 underline-offset-4 hover:border-white/28 hover:text-white hover:underline" href="/contacts?topic=event#contact-form">
-                  Предложить событие
-                </Link>
-                <Link className="inline-flex min-h-11 w-full items-center justify-center rounded-[var(--radius-md)] border border-white/15 px-5 text-sm font-semibold text-white/78 underline-offset-4 hover:border-white/28 hover:text-white hover:underline" href="/contacts?topic=partnership#contact-form">
-                  Стать партнёром
-                </Link>
+                <div className="mt-3 flex gap-4 text-sm text-white/60">
+                  <AppLink className="hover:text-white transition-colors" href="/contacts?topic=event#contact-form">
+                    Предложить событие
+                  </AppLink>
+                  <AppLink className="hover:text-white transition-colors" href="/contacts?topic=partnership#contact-form">
+                    Стать партнёром
+                  </AppLink>
+                </div>
               </div>
             </div>
             <div className="mt-8 flex items-center gap-3 border-t border-white/15 pt-5 text-sm leading-6 text-white/68">

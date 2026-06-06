@@ -19,7 +19,7 @@ const ADMIN_VACANCIES_PATH = '/admin/vacancies';
 export default async function AdminVacanciesCreatePage() {
   await requireAdminSectionAccess('vacancies');
 
-  const [categories, cities] = await Promise.all([
+  const [categories, cities, businessAccounts] = await Promise.all([
     prisma.category.findMany({
       where: { type: CategoryType.VACANCY, isActive: true },
       orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
@@ -29,6 +29,11 @@ export default async function AdminVacanciesCreatePage() {
       where: { isActive: true },
       orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
       select: { id: true, name: true }
+    }),
+    prisma.businessAccount.findMany({
+      where: { status: 'ACTIVE' },
+      orderBy: { companyName: 'asc' },
+      select: { id: true, companyName: true }
     })
   ]);
 
@@ -126,6 +131,16 @@ export default async function AdminVacanciesCreatePage() {
                 {vacancyExperienceOptions.map((option) => (
                   <option key={option.value} value={option.value}>
                     {option.label}
+                  </option>
+                ))}
+              </Select>
+            </FormField>
+            <FormField htmlFor="vacancy-businessAccountId" label="Бизнес-аккаунт">
+              <Select id="vacancy-businessAccountId" name="businessAccountId" defaultValue="">
+                <option value="">Без привязки</option>
+                {businessAccounts.map((account) => (
+                  <option key={account.id} value={account.id}>
+                    {account.companyName}
                   </option>
                 ))}
               </Select>

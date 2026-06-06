@@ -182,6 +182,47 @@ export function getApplicationPayloadText(
   return null;
 }
 
+const applicationPayloadLabels: Partial<Record<ApplicationType, Record<string, string>>> = {
+  [ApplicationType.VACANCY_RESPONSE]: {
+    roleSummary: 'Опыт и текущая роль',
+    resumeUrl: 'Ссылка на резюме',
+    employerCompanyName: 'Компания'
+  },
+  [ApplicationType.VACANCY_SUBMISSION]: {
+    companyName: 'Компания',
+    position: 'Позиция',
+    employmentType: 'Формат',
+    salaryLabel: 'Зарплата',
+    experienceLabel: 'Опыт',
+    shortDescription: 'Описание роли'
+  },
+  [ApplicationType.CONTACT_MESSAGE]: {
+    topic: 'Тема',
+    topicLabel: 'Тема',
+    companyName: 'Компания',
+    teamSize: 'Размер команды',
+    topicTitle: 'Название',
+    position: 'Позиция',
+    employmentType: 'Формат',
+    salaryLabel: 'Зарплата',
+    supplierCategory: 'Категория поставщика',
+    serviceArea: 'Направление',
+    websiteUrl: 'Сайт',
+    eventTitle: 'Событие',
+    eventDate: 'Дата события',
+    venueName: 'Площадка',
+    formatLabel: 'Формат',
+    registrationUrl: 'Ссылка регистрации',
+    partnerType: 'Тип партнёрства'
+  },
+  [ApplicationType.COURSE_APPLICATION]: {
+    courseTitle: 'Программа'
+  },
+  [ApplicationType.EVENT_APPLICATION]: {
+    eventTitle: 'Событие'
+  }
+};
+
 export function getApplicationPayloadEntries(type: ApplicationType, payload: unknown) {
   const parsed = safeParseApplicationPayload(type, payload);
 
@@ -192,4 +233,17 @@ export function getApplicationPayloadEntries(type: ApplicationType, payload: unk
   return Object.entries(parsed.data as Record<string, unknown>).filter(
     ([, value]) => value !== null && value !== undefined && value !== ''
   );
+}
+
+export function getApplicationPayloadDisplayEntries(type: ApplicationType, payload: unknown) {
+  const entries = getApplicationPayloadEntries(type, payload);
+  const labels = applicationPayloadLabels[type] ?? {};
+
+  return entries
+    .filter(([key]) => key !== 'source')
+    .map(([key, value]) => ({
+      key,
+      label: labels[key] ?? key,
+      value: String(value)
+    }));
 }

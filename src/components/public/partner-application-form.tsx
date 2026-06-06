@@ -83,10 +83,10 @@ export function PartnerApplicationForm({ enabled, result, utm, cities, defaults 
           <div className="relative p-5 md:p-6">
             <div className="grid gap-4 md:grid-cols-2">
               <FormField htmlFor="partnerCompanyName" label="Компания">
-                <Input id="partnerCompanyName" name="companyName" required maxLength={180} minLength={2} />
+                <Input id="partnerCompanyName" name="companyName" required maxLength={180} minLength={2} placeholder="Например, Coffee Point" />
               </FormField>
               <FormField htmlFor="partnerContactName" label="Контактное лицо">
-                <Input id="partnerContactName" name="contactName" required maxLength={160} minLength={2} />
+                <Input id="partnerContactName" name="contactName" required maxLength={160} minLength={2} placeholder="Иван Иванов" />
               </FormField>
               <ContactChannelFieldset className="md:col-span-2" emailId="partnerEmail" phoneId="partnerPhone" telegramId="partnerTelegram" />
               <FormField htmlFor="partnerCityId" label="Город">
@@ -100,10 +100,10 @@ export function PartnerApplicationForm({ enabled, result, utm, cities, defaults 
                 </Select>
               </FormField>
               <FormField htmlFor="partnerType" label="Тип партнёрства">
-                <Input id="partnerType" name="partnerType" defaultValue={defaults.partnerType} required maxLength={160} minLength={2} />
+                <Input id="partnerType" name="partnerType" defaultValue={defaults.partnerType} required maxLength={160} minLength={2} placeholder="Например, совместное событие" />
               </FormField>
               <FormField htmlFor="partnerWebsiteUrl" label="Сайт">
-                <Input id="partnerWebsiteUrl" name="websiteUrl" type="url" maxLength={500} />
+                <Input id="partnerWebsiteUrl" name="websiteUrl" type="url" placeholder="https://example.ru" maxLength={500} />
               </FormField>
               <div className="md:col-span-2">
                 <FormField htmlFor="partnerProposal" label="Предложение">
@@ -114,6 +114,7 @@ export function PartnerApplicationForm({ enabled, result, utm, cities, defaults 
                     className="min-h-36"
                     maxLength={4000}
                     minLength={20}
+                    placeholder="Например: хотим провести совместную дегустацию и серию материалов для специалистов региона."
                   />
                 </FormField>
               </div>

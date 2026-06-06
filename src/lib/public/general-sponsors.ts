@@ -19,6 +19,7 @@ export type GeneralSponsorLink = {
 
 export type GeneralSponsor = {
   id: string;
+  slug: string;
   name: string;
   status: string;
   title: string;
@@ -215,6 +216,7 @@ export async function getPublishedGeneralSponsors(limit?: number): Promise<Gener
 
     return {
       id: sponsor.id,
+      slug: sponsor.slug,
       name: sponsor.name,
       status: sponsor.seasonLabel ?? 'Генеральный спонсор',
       title: sponsorTitle(brands),

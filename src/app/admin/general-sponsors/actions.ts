@@ -7,22 +7,18 @@ import {
   assertActiveContentRelations,
   contentStatusValues,
   deleteUploadedFileIfUnused,
-  formatAdminActionError,
   getString,
   initialPublicationDates,
   nullableString,
   optionalString,
   persistWithUniqueSlugRetry,
-  redirectWithAdminActionResult,
   resolveCoverImageId,
-  safeAdminRedirectPath,
   slugify,
   statusTransitionDates
 } from '@/lib/admin/content-utils';
 import { deleteContentDraft, updateContentStatus } from '@/lib/admin/content-lifecycle';
-import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
 import { prisma } from '@/lib/db/prisma';
-import { assertSameOriginServerAction } from '@/lib/security/server-action-origin';
+import { withAdminAction } from '@/lib/server-action-wrappers';
 import { normalizeExternalUrlInput } from '@/lib/validation/external-url';
 
 const ADMIN_GENERAL_SPONSORS_PATH = '/admin/general-sponsors';
@@ -119,293 +115,113 @@ function revalidateGeneralSponsorPaths() {
 }
 
 export async function createGeneralSponsor(formData: FormData) {
-  const redirectTo = safeAdminRedirectPath(formData, ADMIN_GENERAL_SPONSORS_PATH);
-  let result: { type: 'success' | 'error'; message: string };
   let uploadedLogoImageId: string | null = null;
   let uploadedCoverImageId: string | null = null;
 
-  try {
-    await assertSameOriginServerAction();
-    const user = await requireAdminSectionAccess('generalSponsors');
-    const parsed = readGeneralSponsorForm(formData);
-    const slug = slugify(parsed.slug ?? parsed.name);
+  await withAdminAction({
+    formData,
+    section: 'generalSponsors',
+    defaultRedirectPath: ADMIN_GENERAL_SPONSORS_PATH,
+    cleanup: () => Promise.all([deleteUploadedFileIfUnused(uploadedLogoImageId), deleteUploadedFileIfUnused(uploadedCoverImageId)]),
+    handler: async ({ formData, user }) => {
+      const parsed = readGeneralSponsorForm(formData);
+      const slug = slugify(parsed.slug ?? parsed.name);
+      if (!slug) throw new Error('GeneralSponsor slug is required.');
 
-    if (!slug) {
-      throw new Error('GeneralSponsor slug is required.');
-    }
+      await assertActiveContentRelations({ entityName: 'GeneralSponsor', cityId: parsed.cityId });
 
-    await assertActiveContentRelations({
-      entityName: 'GeneralSponsor',
-      cityId: parsed.cityId
-    });
+      const [logoImageId, coverImageId] = await Promise.all([
+        resolveCoverImageId({ formData, userId: user.id, formDataKey: 'logoImage', removeFormDataKey: 'removeLogoImage', onUploadedImageId: (fileId) => { uploadedLogoImageId = fileId; } }),
+        resolveCoverImageId({ formData, userId: user.id, formDataKey: 'coverImage', onUploadedImageId: (fileId) => { uploadedCoverImageId = fileId; } })
+      ]);
 
-    const [logoImageId, coverImageId] = await Promise.all([
-      resolveCoverImageId({
-        formData,
-        userId: user.id,
-        formDataKey: 'logoImage',
-        removeFormDataKey: 'removeLogoImage',
-        onUploadedImageId: (fileId) => {
-          uploadedLogoImageId = fileId;
-        }
-      }),
-      resolveCoverImageId({
-        formData,
-        userId: user.id,
-        formDataKey: 'coverImage',
-        onUploadedImageId: (fileId) => {
-          uploadedCoverImageId = fileId;
-        }
-      })
-    ]);
-
-    await persistWithUniqueSlugRetry({
-      baseSlug: slug,
-      exists: async (candidate) =>
-        Boolean(
-          await prisma.generalSponsor.findFirst({
-            where: { slug: candidate },
-            select: { id: true }
-          })
-        ),
-      persist: (uniqueSlug) =>
-        prisma.generalSponsor.create({
-          data: {
-            name: parsed.name,
-            slug: uniqueSlug,
-            status: parsed.status,
-            logoImageId,
-            logoImageAlt: nullableString(parsed.logoImageAlt),
-            logoPath: nullableString(parsed.logoPath),
-            coverImageId,
-            coverImageAlt: nullableString(parsed.coverImageAlt),
-            coverImagePath: nullableString(parsed.coverImagePath),
-            shortDescription: parsed.shortDescription,
-            fullDescription: parsed.fullDescription,
-            seasonLabel: nullableString(parsed.seasonLabel),
-            priority: parsed.priority,
-            isFeatured: parsed.isFeatured,
-            websiteUrl: nullableString(parsed.websiteUrl),
-            instagramUrl: nullableString(parsed.instagramUrl),
-            whatsappUrl: nullableString(parsed.whatsappUrl),
-            telegramUrl: nullableString(parsed.telegramUrl),
-            contactName: nullableString(parsed.contactName),
-            contactPhone: nullableString(parsed.contactPhone),
-            contactEmail: nullableString(parsed.contactEmail),
-            representedBrands: nullableString(parsed.representedBrands),
-            benefitsForVenues: nullableString(parsed.benefitsForVenues),
-            cityId: nullableString(parsed.cityId),
-            createdById: user.id,
-            updatedById: user.id,
-            ...initialPublicationDates(parsed.status)
-          }
+      await persistWithUniqueSlugRetry({
+        baseSlug: slug, exists: async (candidate) => Boolean(await prisma.generalSponsor.findFirst({ where: { slug: candidate }, select: { id: true } })),
+        persist: (uniqueSlug) => prisma.generalSponsor.create({
+          data: { name: parsed.name, slug: uniqueSlug, status: parsed.status, logoImageId, logoImageAlt: nullableString(parsed.logoImageAlt), logoPath: nullableString(parsed.logoPath), coverImageId, coverImageAlt: nullableString(parsed.coverImageAlt), coverImagePath: nullableString(parsed.coverImagePath), shortDescription: parsed.shortDescription, fullDescription: parsed.fullDescription, seasonLabel: nullableString(parsed.seasonLabel), priority: parsed.priority, isFeatured: parsed.isFeatured, websiteUrl: nullableString(parsed.websiteUrl), instagramUrl: nullableString(parsed.instagramUrl), whatsappUrl: nullableString(parsed.whatsappUrl), telegramUrl: nullableString(parsed.telegramUrl), contactName: nullableString(parsed.contactName), contactPhone: nullableString(parsed.contactPhone), contactEmail: nullableString(parsed.contactEmail), representedBrands: nullableString(parsed.representedBrands), benefitsForVenues: nullableString(parsed.benefitsForVenues), cityId: nullableString(parsed.cityId), createdById: user.id, updatedById: user.id, ...initialPublicationDates(parsed.status) }
         })
-    });
+      });
 
-    revalidateGeneralSponsorPaths();
-    result = { type: 'success', message: 'Генеральный спонсор создан.' };
-  } catch (error) {
-    await Promise.all([deleteUploadedFileIfUnused(uploadedLogoImageId), deleteUploadedFileIfUnused(uploadedCoverImageId)]);
-    result = { type: 'error', message: formatAdminActionError(error) };
-  }
-
-  redirectWithAdminActionResult(redirectTo, result);
+      revalidateGeneralSponsorPaths();
+      return { type: 'success', message: 'Генеральный спонсор создан.' };
+    }
+  });
 }
 
 export async function updateGeneralSponsor(formData: FormData) {
-  const sponsorId = getString(formData, 'sponsorId');
-  const fallbackPath = sponsorId ? `${ADMIN_GENERAL_SPONSORS_PATH}/${sponsorId}/edit` : ADMIN_GENERAL_SPONSORS_PATH;
-  const redirectTo = safeAdminRedirectPath(formData, fallbackPath, [ADMIN_GENERAL_SPONSORS_PATH, fallbackPath]);
-  let result: { type: 'success' | 'error'; message: string };
   let uploadedLogoImageId: string | null = null;
   let uploadedCoverImageId: string | null = null;
-  let previousLogoImageId: string | null = null;
-  let previousCoverImageId: string | null = null;
 
-  try {
-    await assertSameOriginServerAction();
-    const user = await requireAdminSectionAccess('generalSponsors');
-    const parsed = generalSponsorFormSchema
-      .extend({
-        sponsorId: z.string().trim().min(1)
-      })
-      .parse({
-        ...readGeneralSponsorForm(formData),
-        sponsorId: getString(formData, 'sponsorId')
+  await withAdminAction({
+    formData,
+    section: 'generalSponsors',
+    defaultRedirectPath: ADMIN_GENERAL_SPONSORS_PATH,
+    cleanup: () => Promise.all([deleteUploadedFileIfUnused(uploadedLogoImageId), deleteUploadedFileIfUnused(uploadedCoverImageId)]),
+    handler: async ({ formData, user }) => {
+      const sponsorId = getString(formData, 'sponsorId');
+      const parsed = generalSponsorFormSchema.extend({ sponsorId: z.string().trim().min(1) }).parse({
+        ...readGeneralSponsorForm(formData), sponsorId
       });
-    const slug = slugify(parsed.slug ?? parsed.name);
+      const slug = slugify(parsed.slug ?? parsed.name);
+      if (!slug) throw new Error('GeneralSponsor slug is required.');
 
-    if (!slug) {
-      throw new Error('GeneralSponsor slug is required.');
-    }
+      const existingSponsor = await prisma.generalSponsor.findUniqueOrThrow({ where: { id: parsed.sponsorId }, select: { logoImageId: true, coverImageId: true, publishedAt: true } });
+      const previousLogoImageId = existingSponsor.logoImageId;
+      const previousCoverImageId = existingSponsor.coverImageId;
 
-    const existingSponsor = await prisma.generalSponsor.findUniqueOrThrow({
-      where: { id: parsed.sponsorId },
-      select: { logoImageId: true, coverImageId: true, publishedAt: true }
-    });
-    previousLogoImageId = existingSponsor.logoImageId;
-    previousCoverImageId = existingSponsor.coverImageId;
+      await assertActiveContentRelations({ entityName: 'GeneralSponsor', cityId: parsed.cityId });
 
-    await assertActiveContentRelations({
-      entityName: 'GeneralSponsor',
-      cityId: parsed.cityId
-    });
+      const [logoImageId, coverImageId] = await Promise.all([
+        resolveCoverImageId({ formData, userId: user.id, currentCoverImageId: existingSponsor.logoImageId, formDataKey: 'logoImage', removeFormDataKey: 'removeLogoImage', onUploadedImageId: (fileId) => { uploadedLogoImageId = fileId; } }),
+        resolveCoverImageId({ formData, userId: user.id, currentCoverImageId: existingSponsor.coverImageId, formDataKey: 'coverImage', onUploadedImageId: (fileId) => { uploadedCoverImageId = fileId; } })
+      ]);
 
-    const [logoImageId, coverImageId] = await Promise.all([
-      resolveCoverImageId({
-        formData,
-        userId: user.id,
-        currentCoverImageId: existingSponsor.logoImageId,
-        formDataKey: 'logoImage',
-        removeFormDataKey: 'removeLogoImage',
-        onUploadedImageId: (fileId) => {
-          uploadedLogoImageId = fileId;
-        }
-      }),
-      resolveCoverImageId({
-        formData,
-        userId: user.id,
-        currentCoverImageId: existingSponsor.coverImageId,
-        formDataKey: 'coverImage',
-        onUploadedImageId: (fileId) => {
-          uploadedCoverImageId = fileId;
-        }
-      })
-    ]);
-
-    await persistWithUniqueSlugRetry({
-      baseSlug: slug,
-      exists: async (candidate) =>
-        Boolean(
-          await prisma.generalSponsor.findFirst({
-            where: { slug: candidate, id: { not: parsed.sponsorId } },
-            select: { id: true }
-          })
-        ),
-      persist: (uniqueSlug) =>
-        prisma.generalSponsor.update({
-          where: { id: parsed.sponsorId },
-          data: {
-            name: parsed.name,
-            slug: uniqueSlug,
-            status: parsed.status,
-            logoImageId,
-            logoImageAlt: nullableString(parsed.logoImageAlt),
-            logoPath: nullableString(normalizePublicAssetPath(parsed.logoPath)),
-            coverImageId,
-            coverImageAlt: nullableString(parsed.coverImageAlt),
-            coverImagePath: nullableString(normalizePublicAssetPath(parsed.coverImagePath)),
-            shortDescription: parsed.shortDescription,
-            fullDescription: parsed.fullDescription,
-            seasonLabel: nullableString(parsed.seasonLabel),
-            priority: parsed.priority,
-            isFeatured: parsed.isFeatured,
-            websiteUrl: nullableString(normalizeExternalUrlInput(parsed.websiteUrl)),
-            instagramUrl: nullableString(normalizeExternalUrlInput(parsed.instagramUrl)),
-            whatsappUrl: nullableString(normalizeExternalUrlInput(parsed.whatsappUrl)),
-            telegramUrl: nullableString(normalizeExternalUrlInput(parsed.telegramUrl)),
-            contactName: nullableString(parsed.contactName),
-            contactPhone: nullableString(parsed.contactPhone),
-            contactEmail: nullableString(parsed.contactEmail),
-            representedBrands: nullableString(parsed.representedBrands),
-            benefitsForVenues: nullableString(parsed.benefitsForVenues),
-            cityId: nullableString(parsed.cityId),
-            updatedById: user.id,
-            ...statusTransitionDates(parsed.status, existingSponsor.publishedAt)
-          }
+      await persistWithUniqueSlugRetry({
+        baseSlug: slug, exists: async (candidate) => Boolean(await prisma.generalSponsor.findFirst({ where: { slug: candidate, id: { not: parsed.sponsorId } }, select: { id: true } })),
+        persist: (uniqueSlug) => prisma.generalSponsor.update({
+          where: { id: parsed.sponsorId }, data: { name: parsed.name, slug: uniqueSlug, status: parsed.status, logoImageId, logoImageAlt: nullableString(parsed.logoImageAlt), logoPath: nullableString(normalizePublicAssetPath(parsed.logoPath)), coverImageId, coverImageAlt: nullableString(parsed.coverImageAlt), coverImagePath: nullableString(normalizePublicAssetPath(parsed.coverImagePath)), shortDescription: parsed.shortDescription, fullDescription: parsed.fullDescription, seasonLabel: nullableString(parsed.seasonLabel), priority: parsed.priority, isFeatured: parsed.isFeatured, websiteUrl: nullableString(normalizeExternalUrlInput(parsed.websiteUrl)), instagramUrl: nullableString(normalizeExternalUrlInput(parsed.instagramUrl)), whatsappUrl: nullableString(normalizeExternalUrlInput(parsed.whatsappUrl)), telegramUrl: nullableString(normalizeExternalUrlInput(parsed.telegramUrl)), contactName: nullableString(parsed.contactName), contactPhone: nullableString(parsed.contactPhone), contactEmail: nullableString(parsed.contactEmail), representedBrands: nullableString(parsed.representedBrands), benefitsForVenues: nullableString(parsed.benefitsForVenues), cityId: nullableString(parsed.cityId), updatedById: user.id, ...statusTransitionDates(parsed.status, existingSponsor.publishedAt) }
         })
-    });
+      });
 
-    await Promise.all([
-      previousLogoImageId !== logoImageId ? deleteUploadedFileIfUnused(previousLogoImageId) : Promise.resolve(),
-      previousCoverImageId !== coverImageId ? deleteUploadedFileIfUnused(previousCoverImageId) : Promise.resolve()
-    ]);
+      await Promise.all([previousLogoImageId !== logoImageId ? deleteUploadedFileIfUnused(previousLogoImageId) : Promise.resolve(), previousCoverImageId !== coverImageId ? deleteUploadedFileIfUnused(previousCoverImageId) : Promise.resolve()]);
 
-    revalidateGeneralSponsorPaths();
-    revalidatePath(fallbackPath);
-    result = { type: 'success', message: 'Генеральный спонсор обновлен.' };
-  } catch (error) {
-    await Promise.all([deleteUploadedFileIfUnused(uploadedLogoImageId), deleteUploadedFileIfUnused(uploadedCoverImageId)]);
-    result = { type: 'error', message: formatAdminActionError(error) };
-  }
-
-  redirectWithAdminActionResult(redirectTo, result);
+      revalidateGeneralSponsorPaths();
+      revalidatePath(`${ADMIN_GENERAL_SPONSORS_PATH}/${parsed.sponsorId}/edit`);
+      return { type: 'success', message: 'Генеральный спонсор обновлен.' };
+    }
+  });
 }
 
 export async function updateGeneralSponsorStatus(formData: FormData) {
-  const redirectTo = safeAdminRedirectPath(formData, ADMIN_GENERAL_SPONSORS_PATH);
-  let result: { type: 'success' | 'error'; message: string };
+  await withAdminAction({
+    formData,
+    section: 'generalSponsors',
+    defaultRedirectPath: ADMIN_GENERAL_SPONSORS_PATH,
+    handler: async ({ user }) => {
+      const parsed = statusFormSchema.parse({ sponsorId: getString(formData, 'sponsorId'), status: getString(formData, 'status') });
 
-  try {
-    await assertSameOriginServerAction();
-    const user = await requireAdminSectionAccess('generalSponsors');
-    const parsed = statusFormSchema.parse({
-      sponsorId: getString(formData, 'sponsorId'),
-      status: getString(formData, 'status')
-    });
+      await updateContentStatus({ status: parsed.status, userId: user.id, findCurrent: (tx) => tx.generalSponsor.findUniqueOrThrow({ where: { id: parsed.sponsorId }, select: { publishedAt: true } }), update: (tx, data) => tx.generalSponsor.update({ where: { id: parsed.sponsorId }, data }) });
 
-    await updateContentStatus({
-      status: parsed.status,
-      userId: user.id,
-      findCurrent: (tx) =>
-        tx.generalSponsor.findUniqueOrThrow({
-          where: { id: parsed.sponsorId },
-          select: { publishedAt: true }
-        }),
-      update: (tx, data) =>
-        tx.generalSponsor.update({
-          where: { id: parsed.sponsorId },
-          data
-        })
-    });
-
-    revalidateGeneralSponsorPaths();
-    result = { type: 'success', message: 'Статус генерального спонсора обновлен.' };
-  } catch (error) {
-    result = { type: 'error', message: formatAdminActionError(error) };
-  }
-
-  redirectWithAdminActionResult(redirectTo, result);
+      revalidateGeneralSponsorPaths();
+      return { type: 'success', message: 'Статус генерального спонсора обновлен.' };
+    }
+  });
 }
 
 export async function deleteGeneralSponsorDraft(formData: FormData) {
-  const redirectTo = safeAdminRedirectPath(formData, ADMIN_GENERAL_SPONSORS_PATH);
-  let result: { type: 'success' | 'error'; message: string };
+  await withAdminAction({
+    formData,
+    section: 'generalSponsors',
+    defaultRedirectPath: ADMIN_GENERAL_SPONSORS_PATH,
+    handler: async () => {
+      const parsed = deleteFormSchema.parse({ sponsorId: getString(formData, 'sponsorId') });
 
-  try {
-    await assertSameOriginServerAction();
-    await requireAdminSectionAccess('generalSponsors');
-    const parsed = deleteFormSchema.parse({
-      sponsorId: getString(formData, 'sponsorId')
-    });
+      const deletedSponsor = await deleteContentDraft({ findRecord: (tx) => tx.generalSponsor.findUnique({ where: { id: parsed.sponsorId }, select: { logoImageId: true, coverImageId: true } }), deleteDraft: (tx) => tx.generalSponsor.deleteMany({ where: { id: parsed.sponsorId, status: ContentStatus.DRAFT } }) });
 
-    const deletedSponsor = await deleteContentDraft({
-      findRecord: (tx) =>
-        tx.generalSponsor.findUnique({
-          where: {
-            id: parsed.sponsorId
-          },
-          select: { logoImageId: true, coverImageId: true }
-        }),
-      deleteDraft: (tx) =>
-        tx.generalSponsor.deleteMany({
-          where: {
-            id: parsed.sponsorId,
-            status: ContentStatus.DRAFT
-          }
-        })
-    });
+      await Promise.all([deleteUploadedFileIfUnused(deletedSponsor.logoImageId), deleteUploadedFileIfUnused(deletedSponsor.coverImageId)]);
 
-    await Promise.all([
-      deleteUploadedFileIfUnused(deletedSponsor.logoImageId),
-      deleteUploadedFileIfUnused(deletedSponsor.coverImageId)
-    ]);
-
-    revalidateGeneralSponsorPaths();
-    result = { type: 'success', message: 'Генеральный спонсор удален.' };
-  } catch (error) {
-    result = { type: 'error', message: formatAdminActionError(error) };
-  }
-
-  redirectWithAdminActionResult(redirectTo, result);
+      revalidateGeneralSponsorPaths();
+      return { type: 'success', message: 'Генеральный спонсор удален.' };
+    }
+  });
 }

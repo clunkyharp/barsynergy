@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { CategoryType } from '@prisma/client';
+import { Briefcase } from 'lucide-react';
 import { EditorialPublicPage } from '@/components/public/editorial-public-page';
 import { PublishedContentSection } from '@/components/public/published-content-section';
 import { PublicFilters } from '@/components/public/public-filters';
@@ -32,7 +33,7 @@ export default async function VacanciesPage({ searchParams }: VacanciesPageProps
     getPublicCityFilterOptions(),
     getVacancyFilterOptions()
   ]);
-  const vacancyContactHref = '/contacts?topic=vacancy-placement#contact-form';
+  const vacancyContactHref = '/vacancies#submit-vacancy';
 
   return (
     <>
@@ -42,10 +43,13 @@ export default async function VacanciesPage({ searchParams }: VacanciesPageProps
         title="Вакансии"
         description="Открытые позиции в барах, кофейнях, обжарках и сервисных командах региона."
         summary="Поиск виден сразу. Дополнительные фильтры раскрываются по кнопке."
+        chips={['Бариста', 'Управляющие', 'Тренеры']}
         density="compact"
         metrics={[]}
         rows={[]}
         primaryLink={{ label: 'Добавить вакансию для команды', href: vacancyContactHref }}
+        accentGradient="radial-gradient(ellipse 90% 60% at 20% 30%, rgba(210,150,50,0.14), transparent)"
+        accentIcon={Briefcase}
       />
       <PublishedContentSection
         basePath="/vacancies"

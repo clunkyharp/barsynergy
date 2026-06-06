@@ -3,14 +3,12 @@ import Image from 'next/image';
 import { ArrowLeft } from 'lucide-react';
 import { loginAction } from '@/app/auth/actions';
 import { AppLink } from '@/components/ui/app-link';
-import { Button } from '@/components/ui/button';
 import { InlineAlert } from '@/components/ui/inline-alert';
 import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
 import { SubmitButton } from '@/components/ui/submit-button';
 import { PublicFormValidation } from '@/components/public/public-form-validation';
 import { buildPrivatePageMetadata } from '@/lib/public/metadata';
-import { cn } from '@/lib/utils';
 
 const errorMessages: Record<string, string> = {
   invalid: 'Неверный email или пароль.',
@@ -23,7 +21,9 @@ const errorMessages: Record<string, string> = {
 
 const successMessages: Record<string, string> = {
   'business-request-created': 'Заявку получили. После проверки напишем, как открыть доступ.',
-  'logged-out': 'Вы вышли из аккаунта.'
+  'business-request-duplicate': 'Заявка по этому email уже получена. Мы свяжемся по мере проверки.',
+  'logged-out': 'Вы вышли из аккаунта.',
+  'password-reset': 'Пароль успешно изменён. Войдите с новым паролем.'
 };
 
 type LoginPageProps = {
@@ -45,15 +45,23 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   const params = (await searchParams) ?? {};
   const error = firstParam(params.error);
   const success = firstParam(params.success);
+  const returnTo = firstParam(params.returnTo);
   const wasSubmitted = firstParam(params['_s']) === '1';
   const isRoleMismatch = error === 'role-mismatch';
-  const isRequestSent = success === 'business-request-created';
-  const topSuccess = success && success !== 'business-request-created' ? successMessages[success] : null;
+  const topSuccess = success && successMessages[success] ? successMessages[success] : null;
   const formError = error && wasSubmitted && errorMessages[error] ? errorMessages[error] : null;
 
   return (
-    <div className="auth-login-screen min-h-screen bg-[var(--background)]">
-      <div className="auth-login-container container max-w-[1440px] py-5 md:py-6">
+    <div className="auth-login-screen min-h-screen bg-[var(--background)] relative overflow-hidden">
+      <AppLink
+        className="absolute top-4 left-4 sm:top-5 sm:left-6 inline-flex items-center gap-1.5 text-sm text-[var(--muted)] transition-colors hover:text-[var(--text)]"
+        href="/"
+      >
+        <ArrowLeft size={14} strokeWidth={1.8} />
+        Вернуться на сайт
+      </AppLink>
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(150,112,30,0.08),transparent)]" />
+      <div className="auth-login-container relative container max-w-[1440px] py-5 md:py-6">
         <header className="auth-login-header mx-auto mb-5 flex max-w-[440px] flex-col items-center gap-3 text-center">
           <AppLink
             aria-label="BARSYNERGY"
@@ -63,10 +71,6 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
             <Image alt="BARSYNERGY" className="theme-logo-light h-auto w-[176px] md:w-[198px]" height={70} priority src="/brand/barsynergy-lockup.svg" width={360} />
             <Image alt="BARSYNERGY" className="theme-logo-dark h-auto w-[176px] md:w-[198px]" height={70} priority src="/brand/barsynergy-lockup-light.svg" width={360} />
           </AppLink>
-          <Button className="auth-login-back rounded-[var(--radius-md)] px-4" href="/" size="sm" variant="secondary">
-            <ArrowLeft aria-hidden size={15} strokeWidth={1.8} />
-            Вернуться на сайт
-          </Button>
         </header>
 
         <main className="auth-login-layout mx-auto max-w-[440px]">
@@ -75,7 +79,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
               Вход в кабинет
             </h1>
             <p className="mt-2 text-center text-sm leading-6 text-[var(--muted)]">
-              Для заведений и специалистов BARSYNERGY
+              Для заведений и специалистов BARSYNERGY.
             </p>
 
             <div className="auth-login-form-block mt-5 w-full">
@@ -93,12 +97,14 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
               <form action={loginAction} className="auth-login-form grid gap-3.5" data-public-validation="true" noValidate>
                 <PublicFormValidation />
                 <input name="surface" type="hidden" value="public" />
+                {returnTo ? <input name="returnTo" type="hidden" value={returnTo} /> : null}
                 <FormField htmlFor="email" label="Email" labelClassName={authLabelClassName} required={false}>
                   <Input
                     id="email"
                     name="email"
                     type="email"
                     autoComplete="username"
+                    placeholder="name@example.com"
                     required
                   />
                 </FormField>
@@ -108,20 +114,31 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
                     name="password"
                     type="password"
                     autoComplete="current-password"
+                    placeholder="Введите пароль"
                     required
                   />
                 </FormField>
-                <AppLink className="-mt-1 justify-self-end text-sm font-semibold leading-5 text-[var(--accent)] transition-colors hover:text-[var(--accent-strong)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]" href="/contacts?topic=other">
-                  Не можете войти? Напишите нам
+                <AppLink className="-mt-1 justify-self-end text-sm font-semibold leading-5 text-[var(--accent)] transition-colors hover:text-[var(--accent-strong)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]" href="/auth/password-reset">
+                  Забыли пароль?
                 </AppLink>
                 <SubmitButton className="auth-login-submit mt-2 w-full" pendingText="Входим…">
                   Войти
                 </SubmitButton>
-                <AppLink className="justify-self-center text-sm font-semibold leading-5 text-[var(--muted)] transition-colors hover:text-[var(--accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]" href="/auth/register">
-                  Подать заявку на подключение
-                </AppLink>
+                <p className="mt-1 text-center text-xs text-[var(--muted)]">
+                  Проблемы с доступом?{' '}
+                  <AppLink className="text-[var(--accent)] transition-colors hover:text-[var(--accent-strong)]" href="/contacts?topic=other#contact-form">
+                    Написать команде
+                  </AppLink>
+                </p>
+                <div className="mt-2 flex flex-col items-center gap-2">
+                  <AppLink className="text-sm font-semibold leading-5 text-[var(--accent)] transition-colors hover:text-[var(--accent-strong)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]" href="/auth/register/user">
+                    Зарегистрироваться как участник
+                  </AppLink>
+                  <AppLink className="text-sm font-semibold leading-5 text-[var(--accent)] transition-colors hover:text-[var(--accent-strong)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]" href="/auth/register">
+                    Запросить бизнес-доступ
+                  </AppLink>
+                </div>
               </form>
-              <AccessNotice sent={isRequestSent} />
             </div>
           </section>
         </main>
@@ -130,22 +147,3 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   );
 }
 
-function AccessNotice({ sent }: { sent: boolean }) {
-  return (
-    <div
-      className={cn(
-        'auth-access-notice mt-3 rounded-[var(--radius-md)] border p-3',
-        sent ? 'border-[var(--success-border)] bg-[var(--success-bg)] text-[var(--success-text)]' : 'border-[var(--border-default)] bg-[var(--surface-wash)] text-[var(--muted)]'
-      )}
-      data-state={sent ? 'sent' : 'idle'}
-      role={sent ? 'status' : undefined}
-    >
-      <p className={cn('text-sm font-semibold leading-5', sent ? 'text-[var(--success-text)]' : 'text-[var(--text)]')}>
-        {sent ? 'Заявка отправлена.' : 'Нет доступа?'}
-      </p>
-      <p className="mt-1 text-sm leading-6">
-        {sent ? 'Мы проверим доступ и свяжемся с вами.' : 'Отправьте запрос. Мы проверим роль и свяжемся с вами.'}
-      </p>
-    </div>
-  );
-}

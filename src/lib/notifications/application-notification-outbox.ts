@@ -1,15 +1,10 @@
+import { ApplicationNotificationChannel, ApplicationNotificationStatus, type Prisma } from '@prisma/client';
 import {
-  ApplicationNotificationChannel,
-  ApplicationNotificationStatus,
-  type Prisma
-} from '@prisma/client';
-import {
-  hasAdminEmailNotificationConfig,
-  hasSmtpNotificationConfig,
-  hasTelegramAdminNotificationConfig
+  hasAdminEmailNotificationConfig, hasSmtpNotificationConfig, hasTelegramAdminNotificationConfig
 } from './application-notification-format.ts';
 import type { ApplicationNotificationInput } from './application-notification-dispatch.ts';
 import type { AppEnv } from '../validation/env.ts';
+import { getErrorMessage, getNextAttemptAt, processNotificationQueue } from './process-queue.ts';
 
 const MAX_NOTIFICATION_ATTEMPTS = 5;
 const NOTIFICATION_RETRY_BASE_DELAY_MS = 60_000;
@@ -22,45 +17,18 @@ type ApplicationNotificationJob = {
 
 type ApplicationNotificationTx = Pick<Prisma.TransactionClient, 'applicationNotification'>;
 
-function getNextAttemptAt(attempts: number, now: Date) {
-  const delay = Math.min(
-    NOTIFICATION_RETRY_BASE_DELAY_MS * 2 ** Math.max(0, attempts - 1),
-    NOTIFICATION_RETRY_MAX_DELAY_MS
-  );
-
-  return new Date(now.getTime() + delay);
-}
-
-function getErrorMessage(error: unknown) {
-  if (error instanceof Error) {
-    return error.message.slice(0, 1000);
-  }
-
-  return String(error).slice(0, 1000);
-}
-
 export function buildApplicationNotificationJobs(
   input: ApplicationNotificationInput,
-  env: Pick<
-    AppEnv,
-    | 'SMTP_HOST'
-    | 'SMTP_PORT'
-    | 'SMTP_FROM'
-    | 'ADMIN_NOTIFICATION_EMAIL'
-    | 'TELEGRAM_BOT_TOKEN'
-    | 'TELEGRAM_ADMIN_CHAT_ID'
-  >
+  env: Pick<AppEnv, 'SMTP_HOST' | 'SMTP_PORT' | 'SMTP_FROM' | 'ADMIN_NOTIFICATION_EMAIL' | 'TELEGRAM_BOT_TOKEN' | 'TELEGRAM_ADMIN_CHAT_ID'>
 ): ApplicationNotificationJob[] {
   const jobs: ApplicationNotificationJob[] = [];
 
   if (hasTelegramAdminNotificationConfig(env)) {
     jobs.push({ channel: ApplicationNotificationChannel.ADMIN_TELEGRAM, payload: input });
   }
-
   if (hasAdminEmailNotificationConfig(env)) {
     jobs.push({ channel: ApplicationNotificationChannel.ADMIN_EMAIL, payload: input });
   }
-
   if (input.userEmail && hasSmtpNotificationConfig(env)) {
     jobs.push({ channel: ApplicationNotificationChannel.USER_EMAIL, payload: input });
   }
@@ -73,10 +41,7 @@ export async function queueApplicationNotifications(
   applicationId: string,
   jobs: ApplicationNotificationJob[]
 ) {
-  if (jobs.length === 0) {
-    return;
-  }
-
+  if (jobs.length === 0) return;
   await tx.applicationNotification.createMany({
     data: jobs.map((job) => ({
       applicationId,
@@ -92,29 +57,40 @@ export async function processApplicationNotificationQueue(input: {
   now?: Date;
   logger?: Pick<Console, 'error'>;
 } = {}) {
-  const { prisma } = await import('../db/prisma.ts');
-  const now = input.now ?? new Date();
-  const logger = input.logger ?? console;
-  const notifications = await prisma.applicationNotification.findMany({
-    where: {
-      ...(input.applicationId ? { applicationId: input.applicationId } : {}),
-      status: { in: [ApplicationNotificationStatus.PENDING, ApplicationNotificationStatus.FAILED] },
-      attempts: { lt: MAX_NOTIFICATION_ATTEMPTS },
-      nextAttemptAt: { lte: now }
+  return processNotificationQueue({
+    maxAttempts: MAX_NOTIFICATION_ATTEMPTS,
+    retryBaseDelayMs: NOTIFICATION_RETRY_BASE_DELAY_MS,
+    retryMaxDelayMs: NOTIFICATION_RETRY_MAX_DELAY_MS,
+    limit: input.limit,
+    logger: input.logger,
+
+    findPending: async (now, limit) => {
+      const { prisma } = await import('../db/prisma.ts');
+      return prisma.applicationNotification.findMany({
+        where: {
+          ...(input.applicationId ? { applicationId: input.applicationId } : {}),
+          status: { in: [ApplicationNotificationStatus.PENDING, ApplicationNotificationStatus.FAILED] },
+          attempts: { lt: MAX_NOTIFICATION_ATTEMPTS },
+          nextAttemptAt: { lte: now }
+        },
+        orderBy: { createdAt: 'asc' },
+        take: limit
+      }) as unknown as Array<{ id: string; attempts: number; nextAttemptAt: Date }>;
     },
-    orderBy: { createdAt: 'asc' },
-    take: input.limit ?? 20
-  });
 
-  for (const notification of notifications) {
-    const attempts = notification.attempts + 1;
-
-    try {
+    send: async (record) => {
       const { sendApplicationNotification } = await import('./application-notifications.ts');
+      const notification = record as unknown as {
+        channel: ApplicationNotificationChannel;
+        payload: ApplicationNotificationInput;
+      };
+      await sendApplicationNotification(notification.channel, notification.payload);
+    },
 
-      await sendApplicationNotification(notification.channel, notification.payload as ApplicationNotificationInput);
+    onSuccess: async (record, attempts) => {
+      const { prisma } = await import('../db/prisma.ts');
       await prisma.applicationNotification.update({
-        where: { id: notification.id },
+        where: { id: record.id },
         data: {
           attempts,
           status: ApplicationNotificationStatus.SENT,
@@ -122,31 +98,35 @@ export async function processApplicationNotificationQueue(input: {
           lastError: null
         }
       });
-    } catch (error) {
-      const finalFailure = attempts >= MAX_NOTIFICATION_ATTEMPTS;
+    },
 
-      logger.error('Application notification attempt failed.', error);
+    onFailure: async (record, attempts, error, now) => {
+      const { prisma } = await import('../db/prisma.ts');
+      const finalFailure = attempts >= MAX_NOTIFICATION_ATTEMPTS;
       await prisma.applicationNotification.update({
-        where: { id: notification.id },
+        where: { id: record.id },
         data: {
           attempts,
           status: ApplicationNotificationStatus.FAILED,
-          nextAttemptAt: finalFailure ? notification.nextAttemptAt : getNextAttemptAt(attempts, now),
+          nextAttemptAt: finalFailure ? record.nextAttemptAt : getNextAttemptAt(attempts, now, NOTIFICATION_RETRY_BASE_DELAY_MS, NOTIFICATION_RETRY_MAX_DELAY_MS),
           lastError: getErrorMessage(error)
         }
       });
     }
-  }
-
-  return notifications.length;
+  });
 }
 
 export function dispatchApplicationNotificationQueue(input: {
   applicationId: string;
   logger?: Pick<Console, 'error'>;
 }) {
-  const logger = input.logger ?? console;
+  if (process.env.NEXT_RUNTIME === 'edge') {
+    const edgeLogger = input.logger ?? console;
+    edgeLogger.error('Application notification queue dispatch is not supported in edge runtime.');
+    return;
+  }
 
+  const logger = input.logger ?? console;
   void processApplicationNotificationQueue({
     applicationId: input.applicationId,
     logger

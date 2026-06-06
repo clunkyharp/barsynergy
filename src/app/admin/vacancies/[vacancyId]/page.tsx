@@ -32,7 +32,7 @@ export default async function AdminVacancyEditPage({ params }: AdminVacancyEditP
   await requireAdminSectionAccess('vacancies');
   const { vacancyId } = await params;
 
-  const [vacancy, categories, cities] = await Promise.all([
+  const [vacancy, categories, cities, businessAccounts] = await Promise.all([
     prisma.vacancy.findUnique({
       where: { id: vacancyId },
       include: {
@@ -49,6 +49,11 @@ export default async function AdminVacancyEditPage({ params }: AdminVacancyEditP
       where: { isActive: true },
       orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
       select: { id: true, name: true }
+    }),
+    prisma.businessAccount.findMany({
+      where: { status: 'ACTIVE' },
+      orderBy: { companyName: 'asc' },
+      select: { id: true, companyName: true }
     })
   ]);
 
@@ -176,6 +181,16 @@ export default async function AdminVacancyEditPage({ params }: AdminVacancyEditP
                 {withCurrentValueOption([...vacancyExperienceOptions], vacancy.experienceLabel).map((option) => (
                   <option key={option.value} value={option.value}>
                     {option.label}
+                  </option>
+                ))}
+              </Select>
+            </FormField>
+            <FormField htmlFor="vacancy-businessAccountId" label="Бизнес-аккаунт">
+              <Select id="vacancy-businessAccountId" name="businessAccountId" defaultValue={vacancy.businessAccountId ?? ''}>
+                <option value="">Без привязки</option>
+                {businessAccounts.map((account) => (
+                  <option key={account.id} value={account.id}>
+                    {account.companyName}
                   </option>
                 ))}
               </Select>

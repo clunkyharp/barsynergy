@@ -143,6 +143,7 @@
 .checkbox-control,
 .radio-control {
   appearance: none;
+  color-scheme: light;
   border: 1.5px solid var(--border-strong);
   background: var(--field-surface);
   cursor: pointer;
@@ -163,7 +164,7 @@
 
 :root[data-theme="dark"] .checkbox-control,
 :root[data-theme="dark"] .radio-control {
-  background: var(--field-surface);
+  border-color: rgb(224 226 232 / 0.52);
 }
 
 .checkbox-control {
@@ -251,6 +252,13 @@
   margin-top: 0.22rem;
 }
 
+.checkbox-field-label,
+.radio-field-label,
+.consent-field-label {
+  min-width: 0;
+  cursor: pointer;
+}
+
 .checkbox-field .field-error,
 .consent-field .field-error {
   grid-column: 2;
@@ -269,6 +277,11 @@
 :root[data-theme="dark"] .consent-field,
 :root[data-theme="dark"] .form-choice-group {
   background: var(--surface-wash);
+}
+
+.consent-field .checkbox-control {
+  position: relative;
+  z-index: 1;
 }
 
 .file-upload {
@@ -371,6 +384,15 @@
   border-radius: var(--radius-md);
   background: var(--accent-soft);
   color: var(--accent);
+}
+
+.file-upload-preview {
+  height: 2.6rem;
+  width: 2.6rem;
+  flex-shrink: 0;
+  border-radius: var(--radius-md);
+  object-fit: cover;
+  border: 1px solid var(--field-border-hover);
 }
 
 .file-upload.is-invalid .file-upload-icon {

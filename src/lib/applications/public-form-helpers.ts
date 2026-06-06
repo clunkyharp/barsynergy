@@ -62,6 +62,15 @@ export function getPublicApplicationUtm(params: PublicContentSearchParams): Publ
 
 export function getString(formData: FormData, key: string) {
   const value = formData.get(key);
+  if (typeof value !== 'string') {
+    if (process.env.NODE_ENV === 'development') {
+      if (value instanceof File) {
+        console.warn('getString: expected string for key', key, 'got File');
+      } else {
+        console.warn('getString: expected string for key', key, 'got', typeof value);
+      }
+    }
+  }
   return typeof value === 'string' ? value : '';
 }
 

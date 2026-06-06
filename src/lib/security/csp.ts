@@ -69,7 +69,9 @@ export function isProtectedAppPath(pathname: string) {
     pathname === '/admin' ||
     pathname.startsWith('/admin/') ||
     pathname === '/business/cabinet' ||
-    pathname.startsWith('/business/cabinet/')
+    pathname.startsWith('/business/cabinet/') ||
+    pathname === '/profile' ||
+    pathname.startsWith('/profile/')
   );
 }
 

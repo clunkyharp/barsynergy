@@ -4,6 +4,8 @@
 
 See `.env.example`.
 
+`THROTTLE_SECRET` is an optional production HMAC key for rate-limiting hashes. A development fallback is used when both `THROTTLE_SECRET` and `SESSION_SECRET` are unset.
+
 ## Required Production Variables
 
 See `.env.production.example`.
@@ -12,9 +14,10 @@ Important production values:
 
 ```txt
 NODE_ENV=production
-APP_URL=https://barsynergy.ru
+APP_URL=https://<production-host>
 DATABASE_URL=postgresql://barsynergy:<password>@postgres:5432/barsynergy
 SESSION_SECRET=<long-random-secret>
+THROTTLE_SECRET=<long-random-secret>
 NEXT_SERVER_ACTIONS_ENCRYPTION_KEY=<base64-aes-key>
 STORAGE_DRIVER=s3
 S3_ENDPOINT=https://s3.twcstorage.ru

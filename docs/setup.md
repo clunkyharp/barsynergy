@@ -2,7 +2,7 @@
 
 ## Goal
 
-Run the Phase 0 foundation locally with Next.js and PostgreSQL.
+Run the project locally with Next.js and PostgreSQL for development and testing.
 
 ## Steps
 

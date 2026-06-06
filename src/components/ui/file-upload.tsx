@@ -1,6 +1,6 @@
 'use client';
 
-import { forwardRef, useId, useState, type ChangeEvent, type InputHTMLAttributes } from 'react';
+import { forwardRef, useEffect, useId, useState, type ChangeEvent, type InputHTMLAttributes } from 'react';
 import { useFormStatus } from 'react-dom';
 import { CheckCircle2, FileLock2, Loader2, TriangleAlert, Upload } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -40,7 +40,14 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(function
   ref
 ) {
   const [fileName, setFileName] = useState('');
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const { pending } = useFormStatus();
+
+  useEffect(() => {
+    return () => {
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+    };
+  }, [previewUrl]);
   const generatedId = useId();
   const fieldId = id ?? generatedId;
   const errorId = `${fieldId}-error`;
@@ -63,6 +70,8 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(function
     onChange?.(event);
     const file = event.currentTarget.files?.[0];
     setFileName(file?.name ?? '');
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
+    setPreviewUrl(file?.type.startsWith('image/') ? URL.createObjectURL(file) : null);
   }
 
   return (
@@ -95,19 +104,28 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(function
         {...props}
       />
       <label className="file-upload-panel" htmlFor={fieldId}>
-        <span className="file-upload-icon" aria-hidden>
-          {error ? (
-            <TriangleAlert size={20} strokeWidth={1.8} />
-          ) : isUploading ? (
-            <Loader2 className="file-upload-spinner" size={20} strokeWidth={1.8} />
-          ) : effectiveSuccess || fileName ? (
-            <CheckCircle2 size={20} strokeWidth={1.8} />
-          ) : privacy === 'private' ? (
-            <FileLock2 size={20} strokeWidth={1.8} />
-          ) : (
-            <Upload size={20} strokeWidth={1.8} />
-          )}
-        </span>
+        {previewUrl && !error ? (
+          <img
+            alt=""
+            aria-hidden
+            className="file-upload-preview"
+            src={previewUrl}
+          />
+        ) : (
+          <span className="file-upload-icon" aria-hidden>
+            {error ? (
+              <TriangleAlert size={20} strokeWidth={1.8} />
+            ) : isUploading ? (
+              <Loader2 className="file-upload-spinner" size={20} strokeWidth={1.8} />
+            ) : effectiveSuccess || fileName ? (
+              <CheckCircle2 size={20} strokeWidth={1.8} />
+            ) : privacy === 'private' ? (
+              <FileLock2 size={20} strokeWidth={1.8} />
+            ) : (
+              <Upload size={20} strokeWidth={1.8} />
+            )}
+          </span>
+        )}
         <span className="min-w-0">
           <span className="file-upload-title">{fileName || title}</span>
           <span className="file-upload-description">

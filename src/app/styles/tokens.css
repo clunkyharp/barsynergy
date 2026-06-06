@@ -102,11 +102,19 @@
   --accent-strong: #c89a00;
   --accent-contrast: #1c1c1e;
   --accent-soft: #fff4c4;
+  --editorial-dark-label: rgb(232 176 0 / 0.84);
   --support-coral: #ffc6c6;
   --support-rose: #fde0f0;
   --support-aqua: #c3faf5;
   --support-peach: #ffe6cd;
   --support-lilac: #f5f3ff;
+  --channel-neutral: #8f3d32;
+  --channel-email: #8f3d32;
+  --channel-phone: #7a5d45;
+  --channel-website: #5f4a3d;
+  --channel-telegram: #2a86d9;
+  --channel-whatsapp: #238c46;
+  --channel-instagram: #c14f7a;
   --admin-nav-active-bg: color-mix(in oklab, var(--accent) 22%, var(--surface));
   --admin-nav-active-border: color-mix(in oklab, var(--accent) 44%, var(--border-default));
   --admin-nav-active-text: color-mix(in oklab, var(--accent-contrast) 78%, var(--text));
@@ -136,7 +144,7 @@
   --editorial-dark-surface: #1b1e25;
   --editorial-dark-surface-muted: #232731;
   --editorial-dark-text: #f5f7fb;
-  --editorial-dark-muted: #a5a8b5;
+  --editorial-dark-muted: #bcc1cf;
   --editorial-dark-border: rgb(224 226 232 / 0.16);
   --graphite: #1c1c1e;
   --success: #2f7a59;
@@ -181,9 +189,9 @@
   --warning-bg: rgb(252 185 0 / 0.14);
   --warning-border: rgb(252 185 0 / 0.34);
   --warning-text: #845100;
-  --danger-bg: #d92d20;
-  --danger-border: #d92d20;
-  --danger-text: #ffffff;
+  --danger-bg: rgb(180 35 24 / 0.07);
+  --danger-border: rgb(180 35 24 / 0.28);
+  --danger-text: #b42318;
   --field-error-text: #b42318;
   --field-success-text: #2f7a59;
   --focus-ring: rgb(var(--accent-rgb) / 0.22);
@@ -265,6 +273,7 @@
   --accent-strong: #fcb900;
   --accent-contrast: #1c1c1e;
   --accent-soft: rgb(255 208 47 / 0.18);
+  --editorial-dark-label: rgb(255 208 47 / 0.86);
   --support-coral: #ffc6c6;
   --support-rose: #fde0f0;
   --support-aqua: #c3faf5;
@@ -283,7 +292,7 @@
   --editorial-dark-surface: #161920;
   --editorial-dark-surface-muted: #1e222b;
   --editorial-dark-text: #f5f7fb;
-  --editorial-dark-muted: #a5a8b5;
+  --editorial-dark-muted: #bcc1cf;
   --editorial-dark-border: rgb(224 226 232 / 0.16);
   --graphite: #1c1c1e;
   --success: #7dd3a6;

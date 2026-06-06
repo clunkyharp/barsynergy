@@ -83,7 +83,7 @@ export default async function BusinessDashboardPage({ searchParams }: BusinessDa
               { label: 'Всего', value: requestCount, detail: 'Все заявки компании' },
               { label: 'В работе', value: activeRequestCount, detail: 'Отправленные и неархивные', tone: 'pending' },
               { label: 'Черновики', value: draftRequestCount, detail: 'Можно открыть и отправить', tone: 'neutral' },
-              { label: 'Закрытые', value: closedRequestCount, detail: 'Завершены, отклонены или в архиве', tone: 'success' }
+              { label: 'Закрытые', value: closedRequestCount, detail: 'Завершены, отклонены или в архиве', tone: 'neutral' }
             ]}
           />
           <NextActionPanel
@@ -101,13 +101,14 @@ export default async function BusinessDashboardPage({ searchParams }: BusinessDa
               {
                 label: 'Создать заявку',
                 detail: 'Вакансия, поставщик, партнёрство, обучение или сертификат.',
-                href: '/business/cabinet/requests'
+                href: '/business/cabinet/requests',
+                status: undefined
               },
               {
                 label: 'Проверить журнал',
                 detail: 'Откройте последнюю запись, если изменился статус или появился комментарий.',
                 href: latestApplications[0] ? `/business/cabinet/requests/${latestApplications[0].id}` : '/business/cabinet/requests',
-                status: activeRequestCount > 0 ? 'есть работа' : 'нет активных'
+                status: undefined
               }
             ]}
             primaryAction={{ href: '/business/cabinet/requests', label: 'Открыть журнал заявок' }}
@@ -115,7 +116,7 @@ export default async function BusinessDashboardPage({ searchParams }: BusinessDa
         </div>
       </section>
 
-      <RequestLedger applications={latestApplications} title="Последние заявки" />
+      <RequestLedger applications={latestApplications} title="Последние заявки" viewAllHref="/business/cabinet/requests" />
     </div>
   );
 }

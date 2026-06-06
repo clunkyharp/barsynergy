@@ -212,7 +212,7 @@ function buildVacancyLead(item: PublishedContentItem) {
   return (
     <span>
       <span className="mr-2 text-[0.7em] font-semibold uppercase tracking-widest text-[var(--text-muted)]">Зарплата</span>
-      {value}
+      <span className="font-semibold text-[var(--accent)]">{value}</span>
     </span>
   );
 }
@@ -312,7 +312,9 @@ function buildListMedia(item: PublishedContentItem, rowVariant: 'default' | 'opp
         {item.imageUrl ? (
           <span aria-hidden="true" className="h-full w-full bg-cover bg-center" style={{ backgroundImage: `url("${item.imageUrl}")` }} />
         ) : (
-          <span>{titleInitials(item.subtitle ?? item.title)}</span>
+          <span className="grid size-10 place-items-center rounded-[var(--radius-sm)] bg-[var(--accent-soft)] text-sm font-bold text-[var(--accent)]">
+            {titleInitials(item.subtitle ?? item.title)}
+          </span>
         )}
       </div>
     );
@@ -384,25 +386,21 @@ export function PublishedContentSection({
   const emptyStateActions = buildEmptyActions(basePath, hasActiveFilters, resolvedEmptyActions);
   const listToolbar = (
     <div className="public-catalog-toolbar flex flex-wrap items-center justify-between gap-3">
-      <div className="flex flex-wrap items-center gap-2.5">
-        <MetaChip className="border-[var(--border-default)] bg-[var(--accent-soft)] text-[var(--accent)]" variant="filter">
-          {countLabel}: {content.total}
-        </MetaChip>
-        <MetaChip className="border-[var(--border-default)] bg-transparent text-[var(--muted)]" variant="filter">
-          {listLabel}
-        </MetaChip>
+      <div className="flex items-center gap-2">
+        <span className="text-sm font-semibold text-[var(--accent)]">{content.total} {countLabel.toLowerCase()}</span>
+        <span className="text-xs text-[var(--muted)]">{listLabel}</span>
+      </div>
+      <div className="flex items-center gap-3">
         {sortLabel ? (
-          <MetaChip className="border-[var(--border-default)] bg-transparent text-[var(--muted)]" variant="filter">
-            {sortLabel}
-          </MetaChip>
+          <span className="text-xs text-[var(--muted)]">↓ {sortLabel}</span>
+        ) : null}
+        {listAction ? (
+          <Button className="gap-2 px-4 text-sm tracking-normal" href={listAction.href} size="sm" variant={listAction.variant ?? 'link'}>
+            {listAction.label}
+            <ArrowUpRight size={14} />
+          </Button>
         ) : null}
       </div>
-      {listAction ? (
-        <Button className="gap-2 px-4 text-sm tracking-normal" href={listAction.href} size="sm" variant={listAction.variant ?? 'link'}>
-          {listAction.label}
-          <ArrowUpRight size={14} />
-        </Button>
-      ) : null}
     </div>
   );
 
@@ -494,16 +492,14 @@ export function PublishedContentSection({
             </div>
 
             <div className="public-catalog-pagination flex flex-wrap items-center justify-between gap-3">
-              <MetaChip className="border-[var(--border-default)] bg-transparent text-[var(--muted)]" variant="default">
-                Страница {content.page} из {content.totalPages}
-              </MetaChip>
               {content.totalPages > 1 ? (
-                <div className="flex flex-wrap gap-3">
+                <div className="flex w-full items-center justify-between gap-3">
                   <Button disabled={content.page <= 1} href={pageHref(content, basePath, content.page - 1)} variant="secondary">
-                    Назад
+                    ← Назад
                   </Button>
+                  <span className="text-sm text-[var(--muted)]">{content.page} / {content.totalPages}</span>
                   <Button disabled={content.page >= content.totalPages} href={pageHref(content, basePath, content.page + 1)} variant="secondary">
-                    Вперед
+                    Вперед →
                   </Button>
                 </div>
               ) : null}

@@ -1,3 +1,4 @@
+import { after } from 'next/dist/server/after';
 import { ApplicationStatus, ApplicationType, type Prisma } from '@prisma/client';
 import { applicationTypeLabels } from '@/lib/admin/application-utils';
 import { prisma } from '@/lib/db/prisma';
@@ -11,6 +12,7 @@ import { getEnv } from '@/lib/validation/env';
 export type CreatePublicApplicationInput = {
   type: ApplicationType;
   status?: ApplicationStatus;
+  userId?: string | null;
   subject?: string | null;
   message?: string | null;
   name?: string | null;
@@ -46,6 +48,7 @@ export async function createPublicApplication(input: CreatePublicApplicationInpu
       data: {
         type: input.type,
         status: input.status ?? ApplicationStatus.NEW,
+        userId: input.userId ?? null,
         subject: input.subject ?? null,
         message: input.message ?? null,
         name: input.name ?? null,
@@ -81,8 +84,10 @@ export async function createPublicApplication(input: CreatePublicApplicationInpu
     return createdApplication;
   });
 
-  dispatchApplicationNotificationQueue({
-    applicationId: application.id,
+  after(() => {
+    dispatchApplicationNotificationQueue({
+      applicationId: application.id,
+    });
   });
 
   return application;

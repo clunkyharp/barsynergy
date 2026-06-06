@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState, useActionState } from 'react';
 import { submitVacancyPlacementApplication, submitVacancyResponseApplication } from '@/app/(public)/vacancies/actions';
 import {
   ContactChannelFieldset,
@@ -9,8 +10,10 @@ import {
   PublicFormShellFooter,
   PublicFormShellHeader
 } from '@/components/public/application-form-section';
+import { AppLink } from '@/components/ui/app-link';
 import { Button } from '@/components/ui/button';
 import { ConsentField } from '@/components/ui/consent-field';
+import { Dialog } from '@/components/ui/dialog';
 import { EditorialShell } from '@/components/ui/editorial-shell';
 import { FileUpload } from '@/components/ui/file-upload';
 import { FormField, FormSection } from '@/components/ui/form-field';
@@ -30,6 +33,14 @@ type SelectedVacancy = {
   cityName?: string;
 };
 
+type ProfilePrefill = {
+  fullName?: string;
+  cityId?: string;
+  email?: string;
+  phone?: string;
+  telegram?: string;
+};
+
 type VacancyApplicationFormsProps = {
   enabled: boolean;
   options: VacancyApplicationFormOptions;
@@ -42,18 +53,20 @@ type VacancyApplicationFormsProps = {
     medium?: string;
     campaign?: string;
   };
-  mode?: 'listing' | 'detail';
-  selectedVacancy?: SelectedVacancy;
 };
 
 function VacancyResponseForm({
   options,
   selectedVacancy,
-  utm
+  utm,
+  profile,
+  action
 }: {
   options: VacancyApplicationFormOptions;
   selectedVacancy?: SelectedVacancy;
   utm: VacancyApplicationFormsProps['utm'];
+  profile?: ProfilePrefill;
+  action: (formData: FormData) => void;
 }) {
   const hasVacancies = options.vacancies.length > 0;
 
@@ -77,7 +90,7 @@ function VacancyResponseForm({
   }
 
   return (
-    <form action={submitVacancyResponseApplication} className="editorial-form-shell public-form-shell" id="vacancy-response-form">
+    <form action={action} className="editorial-form-shell public-form-shell" id="vacancy-response-form">
       <HiddenUtmFields utm={utm} />
       <HoneypotField id="vacancy-response-website" />
       {selectedVacancy ? <input name="vacancyId" type="hidden" value={selectedVacancy.id} /> : null}
@@ -92,6 +105,28 @@ function VacancyResponseForm({
         }
       />
       <div className="relative p-5 md:p-6">
+        {!profile ? (
+          <div className="mb-5 rounded-[var(--radius-md)] border border-[var(--accent)]/30 bg-[var(--accent-soft)] p-4 text-sm leading-6 text-[var(--text)]">
+            <p className="font-semibold">Уже зарегистрированы?</p>
+            <p className="mt-1 text-[var(--muted)]">
+              <AppLink className="text-[var(--accent)] transition-colors hover:text-[var(--accent-strong)]" href={`/auth/login${selectedVacancy?.slug ? `?returnTo=/vacancies/${selectedVacancy.slug}` : ''}`}>
+                Войдите
+              </AppLink>
+              {' '}или{' '}
+              <AppLink className="text-[var(--accent)] transition-colors hover:text-[var(--accent-strong)]" href="/auth/register/user">
+                зарегистрируйтесь
+              </AppLink>
+              , чтобы поля заполнились автоматически и отклик сохранился в истории.
+            </p>
+          </div>
+        ) : !profile.fullName && !profile.phone && !profile.telegram ? (
+          <div className="mb-5 rounded-[var(--radius-md)] border border-[var(--warning-border)] bg-[var(--warning-bg)] p-4 text-sm leading-6 text-[var(--text)]">
+            <p className="font-semibold">Заполните профиль</p>
+            <p className="mt-1 text-[var(--muted)]">
+              Перейдите в <AppLink className="text-[var(--accent)] transition-colors hover:text-[var(--accent-strong)]" href="/profile/settings">настройки профиля</AppLink>, чтобы данные подставлялись автоматически.
+            </p>
+          </div>
+        ) : null}
         {selectedVacancy ? (
           <EditorialShell className="mb-5 border-[var(--line)] bg-[var(--surface-wash)] p-4 shadow-none">
             <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Вы откликаетесь на</p>
@@ -120,10 +155,10 @@ function VacancyResponseForm({
           >
             <div className="grid gap-4 md:grid-cols-2">
               <FormField htmlFor="candidateName" label="Имя">
-                <Input id="candidateName" name="candidateName" required maxLength={160} minLength={2} />
+                <Input defaultValue={profile?.fullName ?? ''} id="candidateName" name="candidateName" placeholder="Иван Иванов" required maxLength={160} minLength={2} />
               </FormField>
               <FormField htmlFor="responseCityId" label="Город">
-                <Select id="responseCityId" name="cityId" defaultValue="">
+                <Select defaultValue={profile?.cityId ?? ''} id="responseCityId" name="cityId">
                   <option value="">Не указан</option>
                   {options.cities.map((city) => (
                     <option key={city.id} value={city.id}>
@@ -133,21 +168,21 @@ function VacancyResponseForm({
                 </Select>
               </FormField>
             </div>
-            <ContactChannelFieldset emailId="responseEmail" phoneId="responsePhone" telegramId="responseTelegram" />
+            <ContactChannelFieldset defaults={{ email: profile?.email, phone: profile?.phone, telegram: profile?.telegram }} emailId="responseEmail" phoneId="responsePhone" telegramId="responseTelegram" />
           </FormSection>
 
           <FormSection title="Опыт" description="Коротко опишите текущую роль и что важно сказать работодателю.">
             <FormField htmlFor="roleSummary" label="Опыт и текущая роль">
-              <Textarea id="roleSummary" name="roleSummary" required maxLength={500} minLength={4} />
+              <Textarea id="roleSummary" name="roleSummary" required maxLength={500} minLength={4} placeholder="Например: работал(а) барменом 2 года, делаю классику и авторские коктейли" />
             </FormField>
             <FormField htmlFor="responseMessage" label="Сообщение работодателю">
-              <Textarea id="responseMessage" name="message" required className="min-h-40" maxLength={3000} minLength={10} />
+              <Textarea id="responseMessage" name="message" required className="min-h-40" maxLength={3000} minLength={10} placeholder="Например: могу выйти в смены по выходным, готов(а) к стажировке на следующей неделе." />
             </FormField>
           </FormSection>
 
           <FormSection title="Резюме" description="Можно оставить ссылку, приложить файл или использовать оба варианта.">
             <FormField htmlFor="resumeUrl" label="Ссылка на резюме">
-              <Input id="resumeUrl" name="resumeUrl" maxLength={500} type="url" />
+              <Input id="resumeUrl" name="resumeUrl" maxLength={500} placeholder="https://example.ru/resume" type="url" />
             </FormField>
             <FormField
               htmlFor="resumeFile"
@@ -202,10 +237,10 @@ function VacancySubmissionForm({
       <div className="relative p-5 md:p-6">
         <div className="grid gap-4">
           <FormField htmlFor="companyName" label="Компания">
-            <Input id="companyName" name="companyName" required maxLength={180} minLength={2} />
+            <Input id="companyName" name="companyName" required maxLength={180} minLength={2} placeholder="Например, Coffee Point" />
           </FormField>
           <FormField htmlFor="contactName" label="Контактное лицо">
-            <Input id="contactName" name="contactName" required maxLength={160} minLength={2} />
+            <Input id="contactName" name="contactName" required maxLength={160} minLength={2} placeholder="Иван Иванов" />
           </FormField>
           <ContactChannelFieldset emailId="submissionEmail" phoneId="submissionPhone" telegramId="submissionTelegram" />
           <div className="grid gap-4 sm:grid-cols-2">
@@ -239,13 +274,13 @@ function VacancySubmissionForm({
             </FormField>
           </div>
           <FormField htmlFor="experienceLabel" label="Опыт">
-            <Input id="experienceLabel" name="experienceLabel" maxLength={120} />
+            <Input id="experienceLabel" name="experienceLabel" maxLength={120} placeholder="Например, от 1 года" />
           </FormField>
           <FormField htmlFor="shortDescription" label="Описание роли">
-            <Textarea id="shortDescription" name="shortDescription" required maxLength={500} minLength={10} />
+            <Textarea id="shortDescription" name="shortDescription" required maxLength={500} minLength={10} placeholder="Например: смены в баре, работа с гостями, классика и сезонные позиции." />
           </FormField>
-          <FormField htmlFor="details" label="Детали вакансии">
-            <Textarea id="details" name="details" required className="min-h-40" maxLength={4000} minLength={20} />
+          <FormField htmlFor="details" label="Требования">
+            <Textarea id="details" name="details" required className="min-h-40" maxLength={4000} minLength={20} placeholder="Например: опыт работы с кофемашиной, аккуратность в сервисе, готовность к вечерним сменам." />
           </FormField>
           <ConsentField>
             Согласен с <InlineLink href="/legal/privacy">политикой обработки персональных данных</InlineLink> и даю{' '}
@@ -262,36 +297,70 @@ function VacancySubmissionForm({
   );
 }
 
+export function VacancyResponseDialog({
+  options,
+  selectedVacancy,
+  utm,
+  profile,
+  enabled
+}: {
+  options: VacancyApplicationFormOptions;
+  selectedVacancy: SelectedVacancy;
+  utm: VacancyApplicationFormsProps['utm'];
+  profile?: ProfilePrefill;
+  enabled: boolean;
+}) {
+  const [open, setOpen] = useState(false);
+  const [state, formAction] = useActionState(submitVacancyResponseApplication, null);
+
+  useEffect(() => {
+    if (state?.type === 'success') {
+      const t = setTimeout(() => setOpen(false), 2500);
+      return () => clearTimeout(t);
+    }
+  }, [state]);
+
+  if (!enabled) return null;
+
+  return (
+    <>
+      <Button
+        className="w-full min-w-0 justify-center rounded-[var(--radius-sm)] px-4 !whitespace-normal leading-5"
+        onClick={() => setOpen(true)}
+      >
+        Откликнуться
+      </Button>
+      <Dialog
+        open={open}
+        onOpenChange={setOpen}
+        title="Отклик на вакансию"
+        size="lg"
+      >
+        {state?.type === 'success' ? (
+          <div className="py-8 text-center">
+            <p className="text-lg font-semibold">Отклик отправлен</p>
+            <p className="mt-2 text-sm text-[var(--muted)]">Спасибо! Мы передадим вашу кандидатуру работодателю.</p>
+          </div>
+        ) : (
+          <VacancyResponseForm
+            action={formAction}
+            options={options}
+            selectedVacancy={selectedVacancy}
+            utm={utm}
+            profile={profile}
+          />
+        )}
+      </Dialog>
+    </>
+  );
+}
+
 export function VacancyApplicationForms({
   enabled,
-  mode = 'listing',
   options,
   result,
-  selectedVacancy,
   utm
 }: VacancyApplicationFormsProps) {
-  if (mode === 'detail' && selectedVacancy) {
-    return (
-      <PublicApplicationSection
-        eyebrow="Вакансии / Отклик"
-        title="Откликнуться на вакансию"
-        description="Форма привязана к конкретной вакансии."
-        disclosureAliases={['applications']}
-        disclosureFocusSelector="#candidateName"
-        disclosureId="vacancy-response"
-        disclosureOpenLabel="Откликнуться на вакансию"
-        disclosureTitle="Отклик на вакансию"
-        disclosureDescription="Оставьте контакт, опыт, сообщение работодателю и ссылку или файл резюме."
-        enabled={enabled}
-        result={result}
-      >
-        <div id="vacancy-forms">
-          <VacancyResponseForm options={options} selectedVacancy={selectedVacancy} utm={utm} />
-        </div>
-      </PublicApplicationSection>
-    );
-  }
-
   return (
     <PublicApplicationSection
       eyebrow="Вакансии / Заявки"

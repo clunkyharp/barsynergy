@@ -134,6 +134,11 @@ export function optionalString(value: string) {
   return trimmed.length > 0 ? trimmed : undefined;
 }
 
+export function getArray(formData: FormData, key: string): string[] {
+  const raw = formData.getAll(key);
+  return raw.filter((v): v is string => typeof v === 'string' && v.length > 0);
+}
+
 export function nullableString(value?: string) {
   return value && value.length > 0 ? value : null;
 }

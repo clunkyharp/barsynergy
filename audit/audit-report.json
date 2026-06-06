@@ -1,0 +1,123 @@
+{
+  "date": "2026-06-04T11:09:00.362Z",
+  "totalFindings": 19,
+  "findings": [
+    {
+      "severity": "minor",
+      "page": "/auth/register/user",
+      "component": "field[fullName]",
+      "description": "Нет placeholder на поле fullName"
+    },
+    {
+      "severity": "minor",
+      "page": "/auth/register/user",
+      "component": "field[email]",
+      "description": "Нет placeholder на поле email"
+    },
+    {
+      "severity": "minor",
+      "page": "/auth/register/user",
+      "component": "field[password]",
+      "description": "Нет placeholder на поле password"
+    },
+    {
+      "severity": "minor",
+      "page": "/profile",
+      "component": "overview",
+      "description": "Поля не видны на странице: fullName, profession, city, phone, company, bio"
+    },
+    {
+      "severity": "minor",
+      "page": "/profile/responses",
+      "component": "filters",
+      "description": "Поле поиска не найдено"
+    },
+    {
+      "severity": "critical",
+      "page": "/vacancies",
+      "component": "VacancySubmissionForm",
+      "description": "Форма не найдена на странице"
+    },
+    {
+      "severity": "critical",
+      "page": "/suppliers",
+      "component": "SupplierForm",
+      "description": "Форма не найдена на странице"
+    },
+    {
+      "severity": "critical",
+      "page": "/partners",
+      "component": "PartnerForm",
+      "description": "Форма не найдена на странице"
+    },
+    {
+      "severity": "critical",
+      "page": "/events",
+      "component": "EventForm",
+      "description": "Форма не найдена на странице"
+    },
+    {
+      "severity": "minor",
+      "page": "/contacts",
+      "component": "field[topic]",
+      "description": "Нет label и placeholder на поле topic"
+    },
+    {
+      "severity": "minor",
+      "page": "/contacts",
+      "component": "field[cityId]",
+      "description": "Нет label и placeholder на поле cityId"
+    },
+    {
+      "severity": "minor",
+      "page": "/consulting",
+      "component": "field[cityId]",
+      "description": "Нет label и placeholder на поле cityId"
+    },
+    {
+      "severity": "minor",
+      "page": "/consulting",
+      "component": "field[businessType]",
+      "description": "Нет label и placeholder на поле businessType"
+    },
+    {
+      "severity": "minor",
+      "page": "/consulting",
+      "component": "field[projectStage]",
+      "description": "Нет label и placeholder на поле projectStage"
+    },
+    {
+      "severity": "minor",
+      "page": "/consulting",
+      "component": "field[consultingDirection]",
+      "description": "Нет label и placeholder на поле consultingDirection"
+    },
+    {
+      "severity": "minor",
+      "page": "/consulting",
+      "component": "field[preferredExpert]",
+      "description": "Нет label и placeholder на поле preferredExpert"
+    },
+    {
+      "severity": "minor",
+      "page": "/business",
+      "component": "field[cityId]",
+      "description": "Нет label и placeholder на поле cityId"
+    },
+    {
+      "severity": "minor",
+      "page": "/business",
+      "component": "field[solutionType]",
+      "description": "Нет label и placeholder на поле solutionType"
+    },
+    {
+      "severity": "major",
+      "page": "/education",
+      "component": "forms",
+      "description": "Ожидалось 3 формы (курс, корп. обучение, сертификат), найдено: 0"
+    }
+  ],
+  "consoleErrors": {
+    "register": []
+  }
+}

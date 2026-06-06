@@ -24,6 +24,7 @@ const envSchema = z
     APP_URL: z.string().url().default('http://localhost:3000'),
     DATABASE_URL: optionalString,
     SESSION_SECRET: z.preprocess(emptyToUndefined, z.string().min(16).optional()),
+    THROTTLE_SECRET: z.preprocess(emptyToUndefined, z.string().min(16).optional()),
     NEXT_SERVER_ACTIONS_ENCRYPTION_KEY: optionalString,
     APP_DEPLOYMENT_ID: optionalString,
     STORAGE_DRIVER: z.enum(['local', 's3']).default('local'),

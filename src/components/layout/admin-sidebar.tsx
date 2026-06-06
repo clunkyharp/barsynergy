@@ -3,6 +3,7 @@
 import type { UserRole } from '@prisma/client';
 import {
   BadgePercent,
+  BrainCircuit,
   BriefcaseBusiness,
   CalendarDays,
   Files,
@@ -39,7 +40,8 @@ const adminLinks: { icon: LucideIcon; label: string; href: string; section: Admi
   { icon: Users, label: 'Бизнес-доступы', href: '/admin/users', section: 'users', available: true },
   { icon: Tags, label: 'Категории', href: '/admin/categories', section: 'categories', available: true },
   { icon: MapPin, label: 'Города', href: '/admin/cities', section: 'cities', available: true },
-  { icon: Hash, label: 'Теги', href: '/admin/tags', section: 'tags', available: true }
+  { icon: Hash, label: 'Теги', href: '/admin/tags', section: 'tags', available: true },
+  { icon: BrainCircuit, label: 'Навыки', href: '/admin/skills', section: 'skills', available: true }
 ];
 
 const adminSidebarGroups: { title: string; sections: AdminSection[] }[] = [
@@ -50,7 +52,7 @@ const adminSidebarGroups: { title: string; sections: AdminSection[] }[] = [
   },
   { title: 'Заявки', sections: ['applications'] },
   { title: 'Бизнес', sections: ['users'] },
-  { title: 'Справочники', sections: ['categories', 'cities', 'tags'] }
+  { title: 'Справочники', sections: ['categories', 'cities', 'tags', 'skills'] }
 ];
 
 type AdminSidebarProps = {

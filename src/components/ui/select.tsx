@@ -461,7 +461,7 @@ export function Select({
         title={title}
         type="button"
       >
-        <span className={cn('min-w-0 flex-1 truncate', !selectedValue && 'text-[var(--field-placeholder)]')}>
+        <span className="min-w-0 flex-1 truncate" data-placeholder={!selectedValue || undefined}>
           {selectedOption?.label ?? 'Выберите значение'}
         </span>
         <ChevronDown aria-hidden className={cn('custom-select-chevron', open && 'rotate-180')} size={17} strokeWidth={1.8} />

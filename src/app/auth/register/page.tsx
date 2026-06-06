@@ -6,7 +6,7 @@ import { AppLink } from '@/components/ui/app-link';
 import { Button } from '@/components/ui/button';
 import { InlineAlert } from '@/components/ui/inline-alert';
 import { Panel } from '@/components/ui/panel';
-import { RegisterRequestForm } from '@/components/public/register-request-form';
+import { BusinessRequestForm } from '@/components/public/business-request-form';
 import { arePublicApplicationFormsEnabled } from '@/lib/applications/public-forms';
 import { prisma } from '@/lib/db/prisma';
 import { buildPrivatePageMetadata } from '@/lib/public/metadata';
@@ -27,8 +27,8 @@ type RegisterPageProps = {
 };
 
 export const metadata: Metadata = buildPrivatePageMetadata({
-  title: 'Заявка на подключение',
-  description: 'Форма заявки на подключение компании или профессионального участника к BARSYNERGY.'
+  title: 'Заявка на бизнес-доступ',
+  description: 'Форма заявки на бизнес-доступ для заведений, брендов, поставщиков и партнёров BARSYNERGY.'
 });
 
 function firstParam(value: string | string[] | undefined) {
@@ -62,18 +62,15 @@ export default async function RegisterPage({ searchParams }: RegisterPageProps) 
               Вернуться на сайт
             </Button>
           </div>
-          <p className="mt-10 text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Профессиональное сообщество</p>
+          <p className="mt-10 text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Бизнес-доступ</p>
           <h1 className="auth-register-title display-tight mt-8 max-w-[15ch] text-[clamp(2rem,9vw,2.375rem)] font-semibold tracking-normal md:text-[52px]">
-            Заявка на подключение
+            Заявка на бизнес-доступ
           </h1>
           <p className="mt-4 max-w-md text-base leading-7 text-[var(--muted)]">
-            Для баров, брендов, поставщиков и специалистов, которым нужен рабочий контакт с BARSYNERGY.
+            Для заведений, брендов, поставщиков и партнёров, которым нужен рабочий кабинет в BARSYNERGY.
           </p>
           <div className="mt-6 grid gap-2">
             <span className="rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--surface-wash)] px-4 py-3 text-sm font-semibold text-[var(--text)]">
-              Я работаю в баре
-            </span>
-            <span className="rounded-[var(--radius-md)] border border-[var(--accent)]/35 bg-[var(--accent-soft)] px-4 py-3 text-sm font-semibold text-[var(--text)]">
               Я владею заведением или представляю бренд
             </span>
           </div>
@@ -82,11 +79,11 @@ export default async function RegisterPage({ searchParams }: RegisterPageProps) 
             <ul className="mt-4 grid gap-3 text-sm leading-6 text-[var(--muted)]">
               <li className="grid grid-cols-[0.5rem_minmax(0,1fr)] gap-3">
                 <span className="mt-2 h-2 w-2 rounded-full bg-[var(--accent)]" />
-                <span>Шаг 1: email, имя и роль.</span>
+                <span>Шаг 1: контактные данные.</span>
               </li>
               <li className="grid grid-cols-[0.5rem_minmax(0,1fr)] gap-3">
                 <span className="mt-2 h-2 w-2 rounded-full bg-[var(--accent)]" />
-                <span>Шаг 2: данные компании и удобный контакт.</span>
+                <span>Шаг 2: информация о компании.</span>
               </li>
             </ul>
           </div>
@@ -126,10 +123,10 @@ export default async function RegisterPage({ searchParams }: RegisterPageProps) 
           ) : (
             <>
               <div className="border-b border-black/10 bg-[var(--surface-wash)] px-5 py-5 md:px-6 md:py-6">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Заявка на подключение</p>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Заявка на бизнес-доступ</p>
                 <h2 className="auth-register-form-title mt-3 text-[clamp(1.55rem,7vw,2rem)] font-semibold leading-tight tracking-normal md:text-[2rem]">Данные для рассмотрения</h2>
                 <p className="mt-3 max-w-xl text-sm leading-7 text-[var(--muted)]">
-                  Напишите, кто вы и какой доступ нужен. Мы ответим по указанному контакту.
+                  Оставьте контакты и информацию о компании. Мы рассмотрим заявку и напишем вам.
                 </p>
               </div>
               <div className="p-5 md:p-6">
@@ -138,7 +135,7 @@ export default async function RegisterPage({ searchParams }: RegisterPageProps) 
                     {errorMessages[error]}
                   </InlineAlert>
                 ) : null}
-                <RegisterRequestForm cities={cities} />
+                <BusinessRequestForm cities={cities} />
               </div>
             </>
           )}

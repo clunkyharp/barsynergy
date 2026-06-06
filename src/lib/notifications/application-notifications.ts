@@ -15,22 +15,16 @@ const SMTP_CONNECTION_TIMEOUT_MS = 10_000;
 const SMTP_GREETING_TIMEOUT_MS = 10_000;
 const SMTP_SOCKET_TIMEOUT_MS = 30_000;
 
-let smtpTransporter: nodemailer.Transporter | null = null;
-
-function getSmtpTransporter(env: AppEnv) {
-  if (!smtpTransporter) {
-    smtpTransporter = nodemailer.createTransport({
-      host: env.SMTP_HOST,
-      port: env.SMTP_PORT,
-      secure: env.SMTP_PORT === 465,
-      connectionTimeout: SMTP_CONNECTION_TIMEOUT_MS,
-      greetingTimeout: SMTP_GREETING_TIMEOUT_MS,
-      socketTimeout: SMTP_SOCKET_TIMEOUT_MS,
-      auth: env.SMTP_USER && env.SMTP_PASSWORD ? { user: env.SMTP_USER, pass: env.SMTP_PASSWORD } : undefined
-    });
-  }
-
-  return smtpTransporter;
+function createSmtpTransporter(env: AppEnv) {
+  return nodemailer.createTransport({
+    host: env.SMTP_HOST,
+    port: env.SMTP_PORT,
+    secure: env.SMTP_PORT === 465,
+    connectionTimeout: SMTP_CONNECTION_TIMEOUT_MS,
+    greetingTimeout: SMTP_GREETING_TIMEOUT_MS,
+    socketTimeout: SMTP_SOCKET_TIMEOUT_MS,
+    auth: env.SMTP_USER && env.SMTP_PASSWORD ? { user: env.SMTP_USER, pass: env.SMTP_PASSWORD } : undefined
+  });
 }
 
 function createTimeoutSignal(timeoutMs: number) {
@@ -69,7 +63,7 @@ async function sendAdminTelegramNotification(env: AppEnv, input: ApplicationNoti
 }
 
 async function sendAdminEmailNotification(env: AppEnv, input: ApplicationNotificationInput) {
-  const transporter = getSmtpTransporter(env);
+  const transporter = createSmtpTransporter(env);
 
   await transporter.sendMail({
     from: env.SMTP_FROM,
@@ -81,7 +75,7 @@ async function sendAdminEmailNotification(env: AppEnv, input: ApplicationNotific
 }
 
 async function sendUserConfirmationEmail(env: AppEnv, input: ApplicationNotificationInput) {
-  const transporter = getSmtpTransporter(env);
+  const transporter = createSmtpTransporter(env);
   const greeting = input.userName ? `Здравствуйте, ${input.userName}.` : 'Здравствуйте.';
 
   await transporter.sendMail({

@@ -13,9 +13,8 @@ type ContactsPageProps = {
 
 const contactTopicAliases: Record<string, string> = {
   'education-program': 'education-program',
-  'education-launch': 'education-program',
-  vacancy: 'vacancy-response',
-  'vacancy-response': 'vacancy-response',
+  'education-launch': 'education-launch',
+  vacancy: 'vacancy-placement',
   'vacancy-placement': 'vacancy-placement',
   partnership: 'partnership',
   'partnership-format': 'partnership',
@@ -26,9 +25,6 @@ const contactTopicAliases: Record<string, string> = {
   'supplier-contact': 'supplier-contact',
   supplier: 'supplier',
   event: 'event',
-  'event-news': 'event-news',
-  calculator: 'calculator-question',
-  'calculator-question': 'calculator-question',
   bug: 'bug-report',
   'bug-report': 'bug-report',
   'article-topic': 'article-topic',
@@ -77,13 +73,14 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
   return (
     <>
       <EditorialPublicPage
-        eyebrow="Контакты"
+        eyebrow="Команда"
         path="/contacts"
-        title="Контакты"
-        description="Пишите по любому вопросу — отвечаем в течение рабочего дня."
+        title="Напишите нам"
+        description="Отвечаем в течение рабочего дня. Выберите тему — форма подстроится."
         summary="Форма — основной способ связаться с командой. Email и Telegram оставили ниже как запасной вариант."
         density="compact"
         summaryHeading="Связь"
+        accentGradient="radial-gradient(ellipse 90% 60% at 60% 40%, rgba(180,120,60,0.08), transparent)"
         metrics={[]}
         rows={[]}
       />

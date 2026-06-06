@@ -1,7 +1,7 @@
 'use server';
 
 import { redirect } from 'next/navigation';
-import { ApplicationType, ContentStatus } from '@prisma/client';
+import { ApplicationType, ContentStatus, UserRole } from '@prisma/client';
 import { z } from 'zod';
 import { deleteUploadedFileIfUnused } from '@/lib/admin/content-utils';
 import { buildApplicationPayload } from '@/lib/applications/application-payloads';
@@ -28,8 +28,11 @@ import {
 import { prisma } from '@/lib/db/prisma';
 import { assertSameOriginServerAction } from '@/lib/security/server-action-origin';
 import { vacancyPositionValues } from '@/lib/vacancies/positions';
+import { getCurrentUser } from '@/lib/auth/current-user';
 
 const VACANCIES_PATH = '/vacancies';
+
+export type VacancyResponseActionResult = { type: 'success' | 'error'; message: string } | null;
 
 const vacancySubmissionSchema = baseContactSchema
   .merge(utmSchema)
@@ -59,16 +62,6 @@ const vacancyResponseSchema = baseContactSchema
     consent: z.literal('accepted')
   })
   .refine((data) => data.email || data.phone || data.telegram, { message: 'contact is required' });
-
-function getVacancyReturnPath(formData: FormData) {
-  const returnPath = getString(formData, 'returnPath');
-
-  if (returnPath === VACANCIES_PATH || returnPath.startsWith(`${VACANCIES_PATH}/`)) {
-    return returnPath;
-  }
-
-  return VACANCIES_PATH;
-}
 
 function redirectWithApplicationResult(
   result: { type: 'success' | 'error'; message: string },
@@ -135,18 +128,18 @@ export async function submitVacancyPlacementApplication(formData: FormData) {
   });
 }
 
-export async function submitVacancyResponseApplication(formData: FormData) {
-  let result: { type: 'success' | 'error'; message: string };
+export async function submitVacancyResponseApplication(
+  prevState: VacancyResponseActionResult,
+  formData: FormData
+): Promise<VacancyResponseActionResult> {
   let uploadedResumeFileId: string | null = null;
-  const returnPath = getVacancyReturnPath(formData);
 
   try {
     await assertSameOriginServerAction();
     assertPublicApplicationFormsEnabled();
 
     if (hasHoneypotValue(getString(formData, 'website'))) {
-      result = { type: 'success', message: 'Отклик отправлен.' };
-      redirectWithApplicationResult(result, returnPath);
+      return { type: 'success', message: 'Отклик отправлен.' };
     }
 
     const parsed = vacancyResponseSchema.parse({
@@ -181,8 +174,11 @@ export async function submitVacancyResponseApplication(formData: FormData) {
     const uploadedResume = await uploadPrivateResumeFromFormData(formData, 'resumeFile');
     uploadedResumeFileId = uploadedResume?.id ?? null;
 
+    const currentUser = await getCurrentUser();
+
     await createPublicApplication({
       type: ApplicationType.VACANCY_RESPONSE,
+      userId: currentUser?.role === UserRole.USER ? currentUser.id : null,
       subject: `Отклик: ${vacancy.title}`,
       message: parsed.message,
       name: parsed.candidateName,
@@ -206,11 +202,9 @@ export async function submitVacancyResponseApplication(formData: FormData) {
       })
     });
 
-    result = { type: 'success', message: 'Отклик отправлен.' };
+    return { type: 'success', message: 'Отклик отправлен.' };
   } catch (error) {
     await deleteUploadedFileIfUnused(uploadedResumeFileId);
-    result = { type: 'error', message: resolvePublicApplicationActionError('public:vacancy-response', error) };
+    return { type: 'error', message: resolvePublicApplicationActionError('public:vacancy-response', error) };
   }
-
-  redirectWithApplicationResult(result, returnPath);
 }

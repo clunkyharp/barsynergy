@@ -568,7 +568,7 @@ test('public contact CTAs map to form topics and defaults', () => {
   assert.doesNotMatch(sectionSource, /vacancyTitle: item\.title/);
   assert.match(sectionSource, /label: 'Подробнее'/);
   assert.doesNotMatch(sectionSource, /label: 'Откликнуться'/);
-  assert.match(vacancyDetailSource, /topic=vacancy-response&position=/);
+  assert.doesNotMatch(vacancyDetailSource, /topic=vacancy-response&position=/);
   assert.doesNotMatch(vacancyDetailSource, /topic=vacancy#/);
   assert.match(platformSource, /topic=event-news#contact-form/);
 });
@@ -589,13 +589,14 @@ test('vacancy list rows separate facts from company and description', () => {
   assert.match(rowSource, /public-list-row-primary-action/);
 });
 
-test('vacancy detail page does not render a bottom response form block', () => {
+test('vacancy detail page renders the real vacancy response form', () => {
   const source = readProjectFile('src/app/(public)/vacancies/[slug]/page.tsx');
 
-  assert.doesNotMatch(source, /VacancyApplicationForms/);
-  assert.doesNotMatch(source, /#vacancy-response/);
-  assert.doesNotMatch(source, /getVacancyApplicationFormOptions/);
-  assert.doesNotMatch(source, /arePublicApplicationFormsEnabled/);
-  assert.doesNotMatch(source, /getPublicApplicationResult/);
-  assert.doesNotMatch(source, /getPublicApplicationUtm/);
+  assert.match(source, /VacancyApplicationForms/);
+  assert.match(source, /mode=.*detail/);
+  assert.match(source, /getVacancyApplicationFormOptions/);
+  assert.match(source, /arePublicApplicationFormsEnabled/);
+  assert.match(source, /getPublicApplicationResult/);
+  assert.match(source, /getPublicApplicationUtm/);
+  assert.doesNotMatch(source, /topic=vacancy-response/);
 });

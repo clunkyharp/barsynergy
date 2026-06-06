@@ -16,7 +16,12 @@ export function getApplicationThrottleKeyHash(input: {
   userAgent?: string;
   secret?: string;
 }) {
-  const secret = input.secret ?? process.env.SESSION_SECRET ?? DEVELOPMENT_THROTTLE_SECRET;
+  const secret = input.secret ?? process.env.THROTTLE_SECRET ?? (process.env.NODE_ENV === 'production' ? undefined : DEVELOPMENT_THROTTLE_SECRET);
+
+  if (!secret) {
+    throw new Error('THROTTLE_SECRET is required for application rate limiting');
+  }
+
   return createHmac('sha256', secret)
     .update([input.applicationType, input.ip].join(':'))
     .digest('hex');

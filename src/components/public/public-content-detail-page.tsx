@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { InlineLink } from '@/components/ui/inline-link';
 import { MetaChip } from '@/components/ui/meta-chip';
 import { Panel } from '@/components/ui/panel';
+import type { ReactNode } from 'react';
 import type { PublicContentDetailFact, PublicContentDetailSection, PublicContentImage } from '@/lib/public/content-details';
 
 type DetailLink = {
@@ -27,6 +28,8 @@ type PublicContentDetailPageProps = {
   sections?: PublicContentDetailSection[];
   primaryLink?: DetailLink;
   secondaryLink?: DetailLink;
+  actionsSlot?: ReactNode;
+  actionsBottomSlot?: ReactNode;
 };
 
 type DetailKind = 'article' | 'event' | 'course' | 'vacancy' | 'supplier' | 'partner';
@@ -201,7 +204,9 @@ export function PublicContentDetailPage({
   facts = [],
   sections = [],
   primaryLink,
-  secondaryLink
+  secondaryLink,
+  actionsSlot,
+  actionsBottomSlot
 }: PublicContentDetailPageProps) {
   const rawParagraphs = paragraphsFromBody(body);
   const paragraphs =
@@ -310,16 +315,6 @@ export function PublicContentDetailPage({
                   </PublicBodyText>
                 )}
 
-                {primaryLink ? (
-                  <Button
-                    className="mt-5 w-full min-w-0 justify-center rounded-[var(--radius-sm)] px-4 !whitespace-normal leading-5"
-                    href={primaryLink.href}
-                    rel={primaryLink.external ? 'noreferrer noopener' : undefined}
-                    target={primaryLink.external ? '_blank' : undefined}
-                  >
-                    <span className="min-w-0 break-words">{primaryLink.label}</span>
-                  </Button>
-                ) : null}
               </Panel>
             </div>
           </aside>
@@ -327,12 +322,6 @@ export function PublicContentDetailPage({
           <div className="order-1 xl:order-2">
             <div className="mx-auto max-w-3xl">
               <PublicEyebrow tone="muted">{copy.bodyLabel}</PublicEyebrow>
-              <div className="mt-5 border-t border-[var(--line)] pt-6">
-                <h2 className="max-w-2xl text-[24px] font-semibold leading-[1.26] tracking-normal text-[var(--text)] md:text-[30px]">
-                  {summary}
-                </h2>
-              </div>
-
               {paragraphs.length > 0 ? (
                 <div className="mt-8 grid gap-5">
                   {paragraphs.map((paragraph) => (
@@ -374,29 +363,26 @@ export function PublicContentDetailPage({
 
           <aside className="order-3 xl:self-start">
             <div className="space-y-4">
-              <Panel className="bg-[var(--surface-wash)]" padding="lg">
-                <PublicEyebrow tone="muted">Действия</PublicEyebrow>
-                <div className="mt-4 grid gap-3">
-                  {secondaryLink ? (
-                    <Button
-                      className="w-full min-w-0 justify-center rounded-[var(--radius-sm)] px-4 !whitespace-normal leading-5"
-                      href={secondaryLink.href}
-                      rel={secondaryLink.external ? 'noreferrer noopener' : undefined}
-                      target={secondaryLink.external ? '_blank' : undefined}
-                      variant="secondary"
-                    >
-                      <span className="min-w-0 break-words">{secondaryLink.label}</span>
-                    </Button>
-                  ) : null}
-                  <Button
-                    className="w-full min-w-0 justify-center rounded-[var(--radius-sm)] px-4 !whitespace-normal leading-5"
-                    href={backHref}
-                    variant="secondary"
-                  >
-                    <span className="min-w-0 break-words">{backLabel}</span>
-                  </Button>
-                </div>
-              </Panel>
+              {(actionsSlot || secondaryLink || actionsBottomSlot) ? (
+                <Panel className="bg-[var(--surface-wash)]" padding="lg">
+                  <PublicEyebrow tone="muted">Действия</PublicEyebrow>
+                  <div className="mt-4 grid gap-3">
+                    {actionsSlot ? <>{actionsSlot}</> : null}
+                    {secondaryLink ? (
+                      <Button
+                        className="w-full min-w-0 justify-center rounded-[var(--radius-sm)] px-4 !whitespace-normal leading-5"
+                        href={secondaryLink.href}
+                        rel={secondaryLink.external ? 'noreferrer noopener' : undefined}
+                        target={secondaryLink.external ? '_blank' : undefined}
+                        variant="secondary"
+                      >
+                        <span className="min-w-0 break-words">{secondaryLink.label}</span>
+                      </Button>
+                    ) : null}
+                    {actionsBottomSlot ? <div className="border-t border-[var(--line)] pt-3">{actionsBottomSlot}</div> : null}
+                  </div>
+                </Panel>
+              ) : null}
 
               {heroMeta.length > 0 ? (
                 <Panel padding="lg">

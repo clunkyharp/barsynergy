@@ -62,7 +62,7 @@ export function PublicEyebrow({
         'text-[11px] font-bold uppercase tracking-[0.16em]',
         tone === 'accent' && 'text-[var(--accent)]',
         tone === 'muted' && 'text-[var(--muted)]',
-        tone === 'inverse' && 'text-white/58',
+        tone === 'inverse' && 'text-[var(--editorial-dark-label)]',
         className
       )}
       {...props}

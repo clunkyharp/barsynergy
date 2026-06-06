@@ -1,8 +1,6 @@
 import type { ReactNode } from 'react';
 import { ApplicationStatus } from '@prisma/client';
-import { logoutAction } from '@/app/auth/actions';
 import { BusinessSidebar } from '@/components/layout/business-sidebar';
-import { SubmitButton } from '@/components/ui/submit-button';
 import { requireBusinessAccountAccess } from '@/lib/auth/require-business-account';
 import { prisma } from '@/lib/db/prisma';
 
@@ -26,11 +24,6 @@ export default async function BusinessLayout({ children }: { children: ReactNode
             cityName={businessAccount.city?.name}
             companyName={businessAccount.companyName}
           />
-          <form action={logoutAction}>
-            <SubmitButton className="w-full rounded-[var(--radius-md)]" variant="secondary">
-              Выйти
-            </SubmitButton>
-          </form>
         </div>
         <div className="min-w-0">{children}</div>
       </div>

@@ -2,7 +2,7 @@
 
 import type { HTMLAttributes, ReactNode } from 'react';
 import { useMemo, useState } from 'react';
-import { ArrowUpRight, BookOpen, BriefcaseBusiness, CalendarDays, Coffee, Handshake, Settings2, Store, Users } from 'lucide-react';
+import { ArrowUpRight, BookOpen, BriefcaseBusiness, CalendarDays, Check, Coffee, Handshake, Settings2, Store, User, Users } from 'lucide-react';
 import { PublicBodyText, PublicDisplayTitle, PublicEyebrow } from '@/components/public/public-primitives';
 import { AppLink } from '@/components/ui/app-link';
 import { displayFont } from '@/lib/fonts';
@@ -347,46 +347,46 @@ export function ProgramFormatMatrix({
           </button>
         ))}
       </div>
-      <div className="grid gap-3">
+      <div className="grid gap-4">
         {filteredItems.map((item, index) => {
           const Icon = icons[index % icons.length] ?? Coffee;
 
           return (
-            <details
-              className="group rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--surface-card)] p-0 open:border-[var(--accent)]/28"
+            <article
+              className="public-card-shell flex flex-col gap-4 p-4 md:p-5"
               key={index}
-              open={index < 3}
             >
-              <summary className="grid cursor-pointer list-none gap-3 p-4 marker:hidden md:grid-cols-[2.5rem_minmax(0,1fr)_auto] md:items-start md:p-5 [&::-webkit-details-marker]:hidden">
-                <span className="grid h-10 w-10 place-items-center rounded-[var(--radius-sm)] border border-[var(--accent)]/22 bg-[var(--accent-soft)] text-[var(--accent)]">
-                  <Icon size={18} strokeWidth={1.8} />
-                </span>
-                <span className="min-w-0">
-                  <span className="flex flex-wrap items-center gap-2">
-                    <MetaText>Формат</MetaText>
-                    <StatusPill>{item.status}</StatusPill>
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex min-w-0 items-center gap-3">
+                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[var(--radius-sm)] border border-[var(--accent)]/22 bg-[var(--accent-soft)] text-[var(--accent)]">
+                    <Icon size={18} strokeWidth={1.8} />
                   </span>
-                  <span className={`${displayFont.className} mt-2 block text-[1.45rem] font-semibold leading-none text-[var(--text)] md:text-[1.8rem]`}>
+                  <h3 className={`${displayFont.className} text-[1.35rem] font-semibold leading-tight text-[var(--text)] md:text-[1.65rem]`}>
                     {item.format}
-                  </span>
-                  <span className="mt-2 block text-sm leading-6 text-[var(--muted)] line-clamp-2">{item.includes}</span>
-                </span>
-                <span className="text-sm font-semibold text-[var(--accent)] group-open:hidden">Раскрыть</span>
-                <span className="hidden text-sm font-semibold text-[var(--accent)] group-open:inline">Свернуть</span>
-              </summary>
-              <div className="grid gap-4 border-t border-[var(--line)] p-4 md:grid-cols-[minmax(0,1fr)_auto] md:p-5">
-                <FactList
-                  compact
-                  items={[
-                    { label: 'Для кого', value: item.audience },
-                    { label: 'Результат', value: item.result }
-                  ]}
-                />
-                <div className="md:justify-self-end">
-                  <InlineAction action={item.action} />
+                  </h3>
+                </div>
+                <StatusPill>{item.status}</StatusPill>
+              </div>
+
+              <p className="text-sm leading-7 text-[var(--muted)]">
+                {item.includes}
+              </p>
+
+              <div className="grid gap-2 text-sm leading-6">
+                <div className="flex items-center gap-2 text-[var(--text)]">
+                  <User size={15} strokeWidth={1.8} className="shrink-0 text-[var(--accent)]" />
+                  <span>{item.audience}</span>
+                </div>
+                <div className="flex items-center gap-2 text-[var(--text)]">
+                  <Check size={15} strokeWidth={1.8} className="shrink-0 text-[var(--accent)]" />
+                  <span>{item.result}</span>
                 </div>
               </div>
-            </details>
+
+              <div className="pt-2">
+                <InlineAction action={item.action} />
+              </div>
+            </article>
           );
         })}
       </div>

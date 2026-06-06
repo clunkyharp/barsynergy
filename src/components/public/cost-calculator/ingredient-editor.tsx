@@ -165,7 +165,7 @@ export function IngredientEditor({
           Добавить ингредиент
         </Button>
         <p className="max-w-xl text-xs leading-5 text-[var(--muted)]">
-          Пример: <span className="font-semibold text-[var(--text)]">Зерно · 2400 ₽ · 1 кг · 18 г → 43,20 ₽</span>
+          Пример: <span className="font-semibold text-[var(--text)]">Зерно · 2{'\u00a0'}400 ₽ · 1 кг · 18 г → 43,20 ₽</span>
         </p>
       </div>
     </>

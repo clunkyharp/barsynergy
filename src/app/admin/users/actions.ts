@@ -11,6 +11,7 @@ import {
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
 import { prisma } from '@/lib/db/prisma';
 import { assertSameOriginServerAction } from '@/lib/security/server-action-origin';
+import { hasErrorMessage, resolveServerActionError } from '@/lib/actions/server-action-errors';
 
 const ADMIN_USERS_PATH = '/admin/users';
 
@@ -71,17 +72,24 @@ export async function updateBusinessUserAccess(formData: FormData) {
       message: parsed.status === 'active' ? 'Бизнес-доступ открыт.' : 'Бизнес-доступ заблокирован.'
     };
   } catch (error) {
-    if (error instanceof Error && error.message === 'pending business activation is disabled') {
-      result = {
-        type: 'error',
-        message: 'Для новых заявок доступ больше не открывается напрямую. Сначала завершите отдельную подготовку доступа.'
-      };
-      redirectWithAdminActionResult(redirectTo, result);
-    }
-
     result = {
       type: 'error',
-      message: 'Не удалось изменить доступ. Проверьте, что у пользователя есть бизнес-аккаунт.'
+      message: resolveServerActionError({
+        action: 'admin:users',
+        error,
+        zodMessage: 'Проверьте корректность переданных данных.',
+        known: [
+          {
+            matches: (e) => hasErrorMessage(e, 'pending business activation is disabled'),
+            message: 'Для новых заявок доступ больше не открывается напрямую. Сначала завершите отдельную подготовку доступа.'
+          },
+          {
+            matches: (e) => hasErrorMessage(e, 'business account is missing'),
+            message: 'Не удалось изменить доступ. Проверьте, что у пользователя есть бизнес-аккаунт.'
+          }
+        ],
+        fallbackMessage: 'Не удалось изменить доступ.'
+      })
     };
   }
 

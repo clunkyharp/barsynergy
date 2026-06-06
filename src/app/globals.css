@@ -1,8 +1,10 @@
-@import "tailwindcss";
-@import "./styles/tokens.css";
-@import "./styles/base.css";
-@import "./styles/forms.css";
-@import "./styles/calculator.css";
-@import "./styles/ui-primitives.css";
-@import "./styles/public.css";
-@import "./styles/admin.css";
+@layer tokens, base, forms, calculator, ui-primitives, public, admin;
+
+@import "tailwindcss" layer(base);
+@import "./styles/tokens.css" layer(tokens);
+@import "./styles/base.css" layer(base);
+@import "./styles/forms.css" layer(forms);
+@import "./styles/calculator.css" layer(calculator);
+@import "./styles/ui-primitives.css" layer(ui-primitives);
+@import "./styles/public.css" layer(public);
+@import "./styles/admin.css" layer(admin);

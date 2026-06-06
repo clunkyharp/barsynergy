@@ -4,12 +4,24 @@ import { useEffect, useRef, useState } from 'react';
 import { ChevronDown, UserRound } from 'lucide-react';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
+import { AccountMenu } from '@/components/layout/account-menu';
 import { MobileSiteMenu } from '@/components/layout/mobile-site-menu';
-import { ThemeToggle } from '@/components/layout/theme-toggle';
 import { AppLink } from '@/components/ui/app-link';
 import { cn } from '@/lib/utils';
 
-const navItems = [
+type HeaderUser = {
+  id: string;
+  email: string;
+  role: string;
+  displayName: string | null;
+  avatarUrl: string | null;
+};
+
+type SiteHeaderProps = {
+  user?: HeaderUser | null;
+};
+
+const guestNavItems = [
   { label: 'О проекте', href: '/about' },
   { label: 'Обучение', href: '/education' },
   { label: 'События', href: '/events' },
@@ -26,12 +38,12 @@ const navItems = [
 
 function getNavItems(hrefs: string[]) {
   return hrefs
-    .map((href) => navItems.find((item) => item.href === href))
-    .filter((item): item is (typeof navItems)[number] => Boolean(item));
+    .map((href) => guestNavItems.find((item) => item.href === href))
+    .filter((item): item is (typeof guestNavItems)[number] => Boolean(item));
 }
 
 const desktopPrimaryNavItems = getNavItems(['/education', '/events', '/articles', '/vacancies', '/suppliers', '/business']);
-const desktopMoreNavItems = getNavItems(['/consulting', '/partners', '/general-sponsors', '/contacts']);
+const desktopMoreNavItems = getNavItems(['/about', '/consulting', '/partners', '/general-sponsors', '/contacts']);
 
 function isWorkspacePath(pathname: string | null) {
   return Boolean(pathname?.startsWith('/admin') || pathname?.startsWith('/business/cabinet') || pathname?.startsWith('/auth'));
@@ -49,7 +61,7 @@ function isActiveItem(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-export function SiteHeader() {
+export function SiteHeader({ user }: SiteHeaderProps) {
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMoreNavOpen, setIsMoreNavOpen] = useState(false);
@@ -225,47 +237,49 @@ export function SiteHeader() {
             ) : null}
           </nav>
           <div className="hidden shrink-0 items-center justify-end gap-2 xl:flex xl:w-full">
-            <ThemeToggle
-              className={cn(
-                'h-11 min-h-11 w-11 rounded-[8px] px-0 shadow-none',
-                isHomeTop
-                  ? 'border-[rgba(255,253,249,0.18)] bg-[rgba(255,253,249,0.12)] text-[var(--editorial-dark-text)] hover:border-[rgba(255,253,249,0.28)] hover:bg-[rgba(255,253,249,0.2)] hover:text-[var(--editorial-dark-text)]'
-                  : 'border-[var(--border-default)] bg-[var(--surface-elevated)] text-[var(--text)] hover:border-[var(--accent)]/40 hover:bg-[var(--surface-wash)] hover:text-[var(--accent)]'
-              )}
-              compact
-            />
-            <AppLink
-              className={cn(
-                'hidden min-h-10 shrink-0 items-center justify-center whitespace-nowrap rounded-[var(--radius-sm)] border-[1.5px] border-[var(--accent)] bg-[var(--accent-soft)] px-3 text-[11px] font-bold uppercase tracking-[0.1em] text-[var(--accent)] transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] hover:bg-[var(--accent)] hover:text-[var(--accent-contrast)] motion-reduce:transition-none 2xl:inline-flex 2xl:px-4',
-                focusClassName
-              )}
-              href="/vacancies#vacancy-form"
-            >
-              Разместить вакансию
-            </AppLink>
-            <AppLink
-              className={cn(
-                'inline-flex min-h-10 shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-[var(--radius-md)] px-3 text-[12px] font-semibold text-inherit transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] hover:bg-[rgba(255,253,249,0.12)] motion-reduce:transition-none',
-                focusClassName
-              )}
-              href="/auth/login"
-              aria-label="Войти в кабинет"
-            >
-              <UserRound size={16} strokeWidth={1.8} />
-              <span>Войти</span>
-            </AppLink>
+            {user?.role === 'BUSINESS' ? (
+              <AppLink
+                className={cn(
+                  'hidden min-h-10 shrink-0 items-center justify-center whitespace-nowrap rounded-[var(--radius-sm)] border-[1.5px] border-[var(--accent)] bg-[var(--accent-soft)] px-3 text-[11px] font-bold uppercase tracking-[0.1em] text-[var(--accent)] transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] hover:bg-[var(--accent)] hover:text-[var(--accent-contrast)] motion-reduce:transition-none xl:inline-flex xl:px-4',
+                  focusClassName
+                )}
+                href="/vacancies#submit-vacancy"
+              >
+                Разместить вакансию
+              </AppLink>
+            ) : user?.role === 'USER' ? (
+              <AppLink
+                className={cn(
+                  'hidden min-h-10 shrink-0 items-center justify-center whitespace-nowrap rounded-[var(--radius-sm)] border-[1.5px] px-3 text-[11px] font-bold uppercase tracking-[0.1em] transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] motion-reduce:transition-none xl:inline-flex xl:px-4',
+                  isHomeTop
+                    ? 'border-white/20 bg-white/10 text-[var(--editorial-dark-text)] hover:bg-white/18 hover:text-white'
+                    : 'border-[var(--border-strong)] bg-[var(--surface-elevated)] text-[var(--text)] hover:border-[var(--accent)] hover:bg-[var(--surface-wash)] hover:text-[var(--accent-strong)]',
+                  focusClassName
+                )}
+                href="/vacancies"
+              >
+                Найти вакансии
+              </AppLink>
+            ) : null}
+            {user ? (
+              <AccountMenu user={user} />
+            ) : (
+              <AppLink
+                className={cn(
+                  'inline-flex min-h-10 shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-[var(--radius-md)] px-3 text-[12px] font-semibold text-inherit transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] hover:bg-[rgba(255,253,249,0.12)] motion-reduce:transition-none',
+                  focusClassName
+                )}
+                href="/auth/login"
+                aria-label="Войти в кабинет"
+              >
+                <UserRound size={16} strokeWidth={1.8} />
+                <span>Войти</span>
+              </AppLink>
+            )}
           </div>
           <div className="flex shrink-0 items-center gap-2 xl:hidden">
-            <ThemeToggle
-              className={cn(
-                'shadow-none',
-                isHomeTop
-                  ? 'border-[rgba(255,253,249,0.18)] bg-[rgba(255,253,249,0.12)] text-[var(--editorial-dark-text)] hover:border-[rgba(255,253,249,0.28)] hover:bg-[rgba(255,253,249,0.2)] hover:text-[var(--editorial-dark-text)]'
-                  : 'border-[var(--border-default)] bg-[var(--surface-elevated)] text-[var(--text)] hover:border-[var(--accent)]/40 hover:bg-[var(--surface-wash)] hover:text-[var(--accent)]'
-              )}
-              compact
-            />
-            <MobileSiteMenu isOpen={isMobileMenuOpen} navItems={navItems} onOpenChange={setIsMobileMenuOpen} />
+            {user ? <AccountMenu user={user} /> : null}
+            <MobileSiteMenu isOpen={isMobileMenuOpen} navItems={guestNavItems} user={user} onOpenChange={setIsMobileMenuOpen} />
           </div>
         </div>
       </div>

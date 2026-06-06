@@ -49,7 +49,7 @@ export function StatCard({
           <p
             className={cn(
               'text-[11px] font-semibold uppercase tracking-[0.16em]',
-              isInverse ? 'text-white/58' : 'text-[var(--muted)]',
+              isInverse ? 'text-[var(--editorial-dark-label)]' : 'text-[var(--muted)]',
               labelClassName
             )}
           >
@@ -60,16 +60,33 @@ export function StatCard({
           </div>
         </div>
         {status ? (
-          <div className={cn(isInverse ? 'text-xs font-semibold text-white/72' : 'text-xs font-semibold text-[var(--muted)]', statusClassName)}>
+          <div
+            className={cn(
+              isInverse ? 'text-xs font-semibold text-[var(--editorial-dark-muted)]' : 'text-xs font-semibold text-[var(--muted)]',
+              statusClassName
+            )}
+          >
             {status}
           </div>
         ) : null}
       </div>
       {description || delta ? (
-        <div className={cn('flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1 text-sm leading-6', isInverse ? 'text-white/72' : 'text-[var(--muted)]', descriptionClassName)}>
+        <div
+          className={cn(
+            'flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1 text-sm leading-6',
+            isInverse ? 'text-[var(--editorial-dark-muted)]' : 'text-[var(--muted)]',
+            descriptionClassName
+          )}
+        >
           {description ? <span>{description}</span> : null}
           {delta ? (
-            <span className={cn('text-xs font-semibold uppercase tracking-[0.08em]', isInverse ? 'text-white/72' : 'text-[var(--muted)]', deltaClassName)}>
+            <span
+              className={cn(
+                'text-xs font-semibold uppercase tracking-[0.08em]',
+                isInverse ? 'text-[var(--editorial-dark-muted)]' : 'text-[var(--muted)]',
+                deltaClassName
+              )}
+            >
               {delta}
             </span>
           ) : null}

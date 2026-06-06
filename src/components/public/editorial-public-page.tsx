@@ -1,4 +1,4 @@
-import { ArrowUpRight } from 'lucide-react';
+import { ArrowUpRight, type LucideIcon } from 'lucide-react';
 import { PublicActionRow, PublicBodyText, PublicBreadcrumbs, PublicDisplayTitle, PublicEyebrow } from '@/components/public/public-primitives';
 import { JsonLd } from '@/components/seo/json-ld';
 import { Button } from '@/components/ui/button';
@@ -28,6 +28,7 @@ type EditorialPublicPageProps = {
   summary: string;
   path?: string;
   breadcrumbLabel?: string;
+  chips?: string[];
   density?: 'editorial' | 'compact' | 'task' | 'offer';
   summaryHeading?: string;
   heroSummaryVariant?: 'default' | 'expanded';
@@ -38,6 +39,8 @@ type EditorialPublicPageProps = {
   rowsHeading?: string;
   primaryLink?: LinkItem;
   secondaryLink?: LinkItem;
+  accentGradient?: string;
+  accentIcon?: LucideIcon;
 };
 
 export function EditorialPublicPage({
@@ -47,6 +50,7 @@ export function EditorialPublicPage({
   summary,
   path,
   breadcrumbLabel,
+  chips,
   density = 'editorial',
   summaryHeading = 'Коротко',
   heroVariant = 'minimal',
@@ -55,7 +59,9 @@ export function EditorialPublicPage({
   rows,
   rowsHeading = 'Разделы',
   primaryLink,
-  secondaryLink
+  secondaryLink,
+  accentGradient,
+  accentIcon: AccentIcon
 }: EditorialPublicPageProps) {
   const hasDetails = metrics.length > 0 || rows.length > 0;
   const detailsTitle = rowsHeading === 'Разделы' ? 'Направления' : rowsHeading;
@@ -97,8 +103,9 @@ export function EditorialPublicPage({
       <section
         className={cn(
           'background-zone background-zone-hero border-b border-[var(--line)]',
-          isCompact ? 'py-5 md:py-7' : 'py-10 md:py-14',
-          isCoverHero && 'relative isolate overflow-hidden bg-[var(--editorial-dark-surface)] text-[var(--editorial-dark-text)]'
+          isCompact ? 'py-7 md:py-10' : 'py-10 md:py-14',
+          isCoverHero && 'relative isolate overflow-hidden bg-[var(--editorial-dark-surface)] text-[var(--editorial-dark-text)]',
+          accentGradient && !isCoverHero && 'relative overflow-hidden'
         )}
       >
         {isCoverHero ? (
@@ -106,23 +113,46 @@ export function EditorialPublicPage({
             aria-hidden="true"
             className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_18%_20%,rgba(150,112,30,0.2),transparent_24rem),linear-gradient(135deg,rgba(17,16,14,0.98),rgba(23,19,17,0.82)_58%,rgba(95,18,18,0.34))]"
           />
+        ) : accentGradient ? (
+          <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10" style={{ background: accentGradient }} />
         ) : null}
         <div className="container relative">
           {isCompact && !useSplitHero ? (
             <>
-              <PublicBreadcrumbs current={breadcrumbLabel ?? eyebrow} />
+              <div className="flex items-center gap-3">
+                {AccentIcon ? (
+                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-[var(--radius-sm)] bg-[var(--accent)] text-white">
+                    <AccentIcon size={17} strokeWidth={1.8} />
+                  </span>
+                ) : null}
+                <PublicBreadcrumbs current={breadcrumbLabel ?? eyebrow} />
+              </div>
               <PublicDisplayTitle
                 as="h1"
-                className="mt-3 max-w-3xl break-words text-[28px] sm:text-[32px] md:text-[36px] xl:text-[40px]"
+                className="mt-3 max-w-3xl break-words text-[32px] sm:text-[38px] md:text-[44px] xl:text-[50px]"
                 size="section"
               >
                 {title}
               </PublicDisplayTitle>
-              <div className="mt-3 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-                <PublicBodyText className="max-w-2xl text-[var(--muted)]" size="sm" tone="default">
-                  {description}
-                </PublicBodyText>
-                {actionRow}
+              {chips && chips.length > 0 ? (
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {chips.map((chip) => (
+                    <span
+                      key={chip}
+                      className="inline-flex cursor-default items-center rounded-full border border-[var(--border-subtle)] px-3 py-1 text-xs text-[var(--muted)] transition-opacity hover:opacity-80"
+                    >
+                      {chip}
+                    </span>
+                  ))}
+                </div>
+              ) : null}
+              <div className="mt-5 border-t border-[var(--line)] pt-4">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                  <PublicBodyText className="max-w-2xl text-[var(--text)]" size="sm" tone="default">
+                    {description}
+                  </PublicBodyText>
+                  {actionRow}
+                </div>
               </div>
             </>
           ) : (

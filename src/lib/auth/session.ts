@@ -1,6 +1,6 @@
 import { createHmac, randomBytes } from 'node:crypto';
 
-export const SESSION_COOKIE_NAME = 'barsynergy_session';
+export { SESSION_COOKIE_NAME } from '@/lib/auth/session-constants';
 const DEVELOPMENT_SESSION_SECRET = 'barsynergy-development-session-secret';
 
 export function createSessionToken() {
@@ -21,7 +21,7 @@ export function getSessionCookieOptions() {
   return {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax' as const,
+    sameSite: 'strict' as const,
     path: '/',
     maxAge: 60 * 60 * 24 * 30
   };
@@ -30,3 +30,5 @@ export function getSessionCookieOptions() {
 export function getSessionExpiresAt() {
   return new Date(Date.now() + getSessionCookieOptions().maxAge * 1000);
 }
+
+export const SESSION_REFRESH_THRESHOLD_MS = 7 * 24 * 60 * 60 * 1000;

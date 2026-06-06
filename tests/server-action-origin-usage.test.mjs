@@ -26,7 +26,11 @@ const guardedActionFiles = [
   'src/app/admin/taxonomy/actions.ts',
   'src/app/admin/users/actions.ts',
   'src/app/admin/vacancies/actions.ts',
-  'src/app/auth/actions.ts',
+  'src/app/auth/login/actions.ts',
+  'src/app/auth/register/actions.ts',
+  'src/app/auth/verify-email/actions.ts',
+  'src/app/auth/password-reset/actions.ts',
+  'src/app/auth/business-activation/actions.ts',
   'src/lib/business/actions.ts'
 ];
 

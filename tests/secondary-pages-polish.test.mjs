@@ -106,10 +106,10 @@ test('auth surfaces use minimal login, progressive register and admin dark mode'
   assert.doesNotMatch(loginSource, /name="role"/);
   assert.match(loginSource, /Вход в кабинет/);
   assert.match(loginSource, /Не можете войти\? Напишите нам/);
-  assert.match(registerSource, /RegisterRequestForm/);
+  assert.match(registerSource, /BusinessRequestForm/);
   assert.match(registerSource, /Шаг 1/);
   assert.match(registerSource, /Шаг 2/);
-  assert.match(registerSource, /Я работаю в баре/);
+  assert.doesNotMatch(registerSource, /Я работаю в баре/);
   assert.match(registerSource, /Я владею заведением или представляю бренд/);
   assert.match(activateSource, /ShieldCheck/);
   assert.match(adminSource, /bg-\[var\(--background\)\]/);

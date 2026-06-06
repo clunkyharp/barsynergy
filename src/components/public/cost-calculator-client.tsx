@@ -138,7 +138,7 @@ function PricingModeFields({
           <FormField
             error={foodCostError ?? undefined}
             htmlFor="calculatorFoodCost"
-            label="Целевая доля себестоимости, %"
+            label="Доля себестоимости, %"
           >
             <Input
               aria-invalid={foodCostError ? true : undefined}
@@ -210,12 +210,12 @@ function FormulaHelpGrid({ className }: { className: string }) {
   return (
     <div className={className}>
       <div className="grid gap-3 md:col-span-2">
-        <p>
+        <div>
           <span className="block font-semibold text-[var(--text)]">Как пользоваться</span>
-          1.&nbsp;Добавьте ингредиенты — название, цену упаковки, размер и расход на порцию.
-          2.&nbsp;Выберите режим: авто (по целевой доле) или ручной (проверить свою цену).
-          3.&nbsp;Итог и цена появятся справа после заполнения.
-        </p>
+          <p className="mt-1">1. Добавьте ингредиенты — название, цену упаковки, размер и расход на порцию.</p>
+          <p className="mt-1">2. Выберите режим: авто (по целевой доле) или ручной (проверить свою цену).</p>
+          <p className="mt-1">3. Итог и цена появятся справа после заполнения.</p>
+        </div>
         <p>
           <span className="block font-semibold text-[var(--text)]">Формула строки</span>
           Цена упаковки <DivisionSign /> размер упаковки × расход на порцию = себестоимость ингредиента.
@@ -239,7 +239,7 @@ function FormulaHelpGrid({ className }: { className: string }) {
 
 function DivisionSign() {
   return (
-    <span className="mx-1 inline-flex h-[1em] w-[0.72em] translate-y-[0.12em] items-center justify-center">
+    <span className="mx-1 inline-flex h-[1em] w-[0.72em] items-center justify-center">
       <span className="sr-only">÷</span>
       <span className="inline-flex h-[1em] w-[0.72em] flex-col items-center justify-center gap-[0.12em]" aria-hidden="true">
         <span className="size-[3px] rounded-full bg-current" />
@@ -284,7 +284,6 @@ export function CostCalculatorClient() {
           salePriceError={calculator.salePriceError}
         />
         <CalculatorMobileResultStrip summary={calculator.summary} />
-        <CalculatorFormulaHelp />
         <IngredientEditor
           hasAnyInput={calculator.hasAnyInput}
           onAddIngredient={calculator.addIngredient}
@@ -296,6 +295,7 @@ export function CostCalculatorClient() {
           rowStatusText={calculator.rowStatusText}
           rows={calculator.rows}
         />
+        <CalculatorFormulaHelp />
       </div>
     </CalculatorShell>
   );

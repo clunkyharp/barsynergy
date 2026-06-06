@@ -4,6 +4,7 @@ import { useEffect, useId, useRef, useState, type RefObject } from 'react';
 import { createPortal } from 'react-dom';
 import { Menu, X } from 'lucide-react';
 import { usePathname } from 'next/navigation';
+import { logoutAction } from '@/app/auth/login/actions';
 import { AppLink } from '@/components/ui/app-link';
 import { focusFirstElement, trapFocusInContainer } from '@/components/ui/focus-trap';
 import { displayFont } from '@/lib/fonts';
@@ -16,6 +17,13 @@ type MobileSiteMenuProps = {
     href: string;
   }>;
   onOpenChange: (nextState: boolean) => void;
+  user?: {
+    id: string;
+    email: string;
+    role: string;
+    displayName: string | null;
+    avatarUrl: string | null;
+  } | null;
 };
 
 const MENU_TOGGLE_SIZE_CLASS = 'h-11 w-11';
@@ -31,7 +39,7 @@ const navGroups = [
     hrefs: ['/business', '/partners', '/general-sponsors', '/consulting']
   },
   {
-    label: 'О нас',
+    label: 'О проекте',
     hrefs: ['/about', '/contacts']
   }
 ];
@@ -55,7 +63,7 @@ function isActiveMobileItem(pathname: string | null, href: string) {
   return pathname === pathOnly || pathname.startsWith(`${pathOnly}/`);
 }
 
-export function MobileSiteMenu({ isOpen, navItems, onOpenChange }: MobileSiteMenuProps) {
+export function MobileSiteMenu({ isOpen, navItems, onOpenChange, user }: MobileSiteMenuProps) {
   const pathname = usePathname();
   const [isRendered, setIsRendered] = useState(false);
   const dialogRef = useRef<HTMLDivElement>(null);
@@ -239,23 +247,33 @@ export function MobileSiteMenu({ isOpen, navItems, onOpenChange }: MobileSiteMen
                   </div>
                 </nav>
 
-                <div className="mt-auto flex items-center justify-between border-t border-[var(--editorial-dark-border)] pt-5 text-[13px] text-[var(--editorial-dark-muted)]">
+                <div className="mt-auto border-t border-[var(--editorial-dark-border)] pt-5 text-[13px] text-[var(--editorial-dark-muted)]">
                   {loginItem ? (
+                    <div className="flex items-center justify-between">
+                      <AppLink
+                        className="transition-colors duration-[var(--motion-duration-fast)] hover:text-[var(--editorial-dark-text)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] motion-reduce:transition-none"
+                        href="/auth/login"
+                        onClick={() => onOpenChange(false)}
+                      >
+                        {loginItem.label}
+                      </AppLink>
+                      <AppLink
+                        className="transition-colors duration-[var(--motion-duration-fast)] hover:text-[var(--editorial-dark-text)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] motion-reduce:transition-none"
+                        href="https://t.me/barsynergy"
+                        onClick={() => onOpenChange(false)}
+                      >
+                        Telegram
+                      </AppLink>
+                    </div>
+                  ) : (
                     <AppLink
                       className="transition-colors duration-[var(--motion-duration-fast)] hover:text-[var(--editorial-dark-text)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] motion-reduce:transition-none"
-                      href="/auth/login"
+                      href="https://t.me/barsynergy"
                       onClick={() => onOpenChange(false)}
                     >
-                      {loginItem.label}
+                      Telegram
                     </AppLink>
-                  ) : null}
-                  <AppLink
-                    className="transition-colors duration-[var(--motion-duration-fast)] hover:text-[var(--editorial-dark-text)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] motion-reduce:transition-none"
-                    href="https://t.me/barsynergy"
-                    onClick={() => onOpenChange(false)}
-                  >
-                    Telegram
-                  </AppLink>
+                  )}
                 </div>
               </div>
             </div>,

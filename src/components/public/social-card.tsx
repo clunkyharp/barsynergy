@@ -1,18 +1,19 @@
 import Image from 'next/image';
 import type { CSSProperties } from 'react';
 import { ArrowUpRight } from 'lucide-react';
+import { getChannelAccentVar } from '@/components/public/channel-accent';
 import { displayFont } from '@/lib/fonts';
 import { cn } from '@/lib/utils';
 
 const variantStyles = {
   telegram: {
-    accent: '#2a86d9'
+    accent: getChannelAccentVar('telegram')
   },
   whatsapp: {
-    accent: '#238c46'
+    accent: getChannelAccentVar('whatsapp')
   },
   instagram: {
-    accent: '#c14f7a'
+    accent: getChannelAccentVar('instagram')
   }
 } as const;
 

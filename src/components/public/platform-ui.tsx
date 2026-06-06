@@ -1,5 +1,5 @@
 import type { ComponentType, ReactNode } from 'react';
-import { ArrowUpRight } from 'lucide-react';
+import { ArrowUpRight, CalendarDays } from 'lucide-react';
 import { PublicBodyText, PublicDisplayTitle, PublicEyebrow } from '@/components/public/public-primitives';
 import { CardActionRow, IconBadge } from '@/components/public/public-ui-adaptation';
 import { AppLink } from '@/components/ui/app-link';
@@ -363,73 +363,74 @@ export function EventAgendaSection({
     return acc;
   }, []);
 
+  const noFilters = !filters;
+
   return (
     <section className="public-catalog-section background-zone background-zone-ivory editorial-grid border-b border-[var(--line)] py-10 md:py-14" id="events-list">
-      <div className="container grid gap-6 md:gap-8 xl:grid-cols-[minmax(16rem,0.48fr)_minmax(0,1.52fr)] xl:gap-8">
-        <aside className="public-catalog-sidebar min-w-0">
-          {filters}
-        </aside>
+      <div className={cn('container grid gap-6 md:gap-8 xl:gap-8', noFilters ? 'xl:grid-cols-1' : 'xl:grid-cols-[minmax(16rem,0.48fr)_minmax(0,1.52fr)]')}>
+        {noFilters ? null : (
+          <aside className="public-catalog-sidebar min-w-0">
+            {filters}
+          </aside>
+        )}
 
         <Panel className="public-catalog-list-panel min-w-0 overflow-hidden border-[var(--border-default)] bg-[var(--surface-card)]" padding="none">
-          <div className="public-catalog-toolbar flex flex-wrap items-center justify-between gap-3">
-            <div className="flex flex-wrap items-center gap-2.5">
-              {content.total > 0 ? (
+          {content.items.length > 0 ? (
+            <div className="public-catalog-toolbar flex flex-wrap items-center justify-between gap-3">
+              <div className="flex flex-wrap items-center gap-2.5">
                 <MetaChip className="border-[var(--border-default)] bg-[var(--accent-soft)] text-[var(--accent)]" variant="filter">
                   Событий: {content.total}
                 </MetaChip>
-              ) : null}
-              <MetaChip className="border-[var(--border-default)] bg-transparent text-[var(--muted)]" variant="filter">
-                {isPastArchive ? 'Архив' : 'Афиша'}
-              </MetaChip>
-              <MetaChip className="border-[var(--border-default)] bg-transparent text-[var(--muted)]" variant="filter">
-                {isPastArchive ? 'Сначала свежие прошедшие' : 'Сначала ближайшие'}
-              </MetaChip>
+                <MetaChip className="border-[var(--border-default)] bg-transparent text-[var(--muted)]" variant="filter">
+                  {isPastArchive ? 'Архив' : 'Афиша'}
+                </MetaChip>
+                <MetaChip className="border-[var(--border-default)] bg-transparent text-[var(--muted)]" variant="filter">
+                  {isPastArchive ? 'Сначала свежие прошедшие' : 'Сначала ближайшие'}
+                </MetaChip>
+              </div>
             </div>
-          </div>
+          ) : null}
 
           {content.items.length === 0 ? (
-            <div className="event-empty-state grid gap-6 p-5 md:p-6">
-              <div className="min-w-0">
-                <PublicEyebrow tone="muted">Афиша</PublicEyebrow>
-                <h3 className="mt-2 text-xl font-semibold leading-7">
-                  {isTrueUpcomingEmpty
-                    ? 'Готовим новые события'
-                    : isPastArchive && !hasActiveEventFilters
+            <div className="event-empty-state grid p-5 md:p-6">
+              {isTrueUpcomingEmpty ? (
+                <div className="mx-auto max-w-sm py-6 text-center md:py-10">
+                  <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-[var(--accent-soft)] text-[var(--accent)]">
+                    <CalendarDays size={28} strokeWidth={1.5} />
+                  </div>
+                  <h3 className={`${displayFont.className} mt-5 text-[1.6rem] font-semibold leading-tight text-[var(--text)]`}>
+                    События появятся совсем скоро
+                  </h3>
+                  <p className="mt-3 text-[15px] leading-7 text-[var(--muted)]">
+                    Подпишитесь — пришлём анонс первыми, когда откроем запись на интенсив или каппинг.
+                  </p>
+                  <Button className="mt-6" href="/contacts#contact-form">
+                    Подписаться на анонсы
+                  </Button>
+                  <div className="mt-4">
+                    <AppLink
+                      className="inline-flex items-center gap-1 text-sm font-semibold text-[var(--accent)] transition-colors hover:text-[var(--accent-strong)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
+                      href="/contacts?topic=event#contact-form"
+                    >
+                      Хотите провести своё? <ArrowUpRight size={14} strokeWidth={1.8} />
+                    </AppLink>
+                  </div>
+                </div>
+              ) : (
+                <div className="min-w-0">
+                  <PublicEyebrow tone="muted">Афиша</PublicEyebrow>
+                  <h3 className="mt-2 text-xl font-semibold leading-7">
+                    {isPastArchive && !hasActiveEventFilters
                       ? 'Архив событий пока пуст'
                       : 'По этим параметрам ничего не найдено'}
-                </h3>
-                <PublicBodyText className="mt-2 max-w-2xl text-sm leading-6">
-                  {isTrueUpcomingEmpty
-                    ? 'Подпишитесь, чтобы узнать первыми, или предложите встречу для кофейного бара.'
-                    : isPastArchive && !hasActiveEventFilters
+                  </h3>
+                  <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--muted)]">
+                    {isPastArchive && !hasActiveEventFilters
                       ? 'Прошедшие встречи появятся здесь после публикации архива.'
                       : 'Измените параметры поиска или сбросьте фильтры над списком.'}
-                </PublicBodyText>
-              </div>
-              {isTrueUpcomingEmpty ? (
-                <>
-                  <div className="grid gap-3 md:grid-cols-3">
-                    {[
-                      ['Интенсив', 'Практическая встреча по экстракции, молоку, сервису или запуску смены.'],
-                      ['Каппинг', 'Дегустация зерна с обжарщиками, поставщиками и командами кофеен.'],
-                      ['Гостевая смена', 'Встреча на площадке: бариста, бренд, меню и живой контакт с гостями.']
-                    ].map(([title, description]) => (
-                      <div className="rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--surface-wash)] p-4" key={title}>
-                        <p className="text-sm font-semibold text-[var(--text)]">{title}</p>
-                        <p className="mt-2 text-sm leading-6 text-[var(--muted)]">{description}</p>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="flex flex-wrap gap-3">
-                    <Button href="/contacts?topic=event-news#contact-form" variant="secondary">
-                      Подписаться на анонсы
-                    </Button>
-                    <Button href="/contacts?topic=event#contact-form">
-                      Предложить событие
-                    </Button>
-                  </div>
-                </>
-              ) : null}
+                  </p>
+                </div>
+              )}
             </div>
           ) : (
             <div className="public-catalog-list-rows grid gap-10">

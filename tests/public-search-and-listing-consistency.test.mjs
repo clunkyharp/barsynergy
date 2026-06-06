@@ -131,3 +131,14 @@ test('public visible copy avoids internal vague labels', () => {
   assert.match(source, /Направления/);
   assert.match(source, /Материал/);
 });
+
+test('article materials search preserves category filters and resets page', () => {
+  const source = readProjectFile('src/components/public/article-grid-section.tsx');
+
+  assert.match(source, /function listingHref\(/);
+  assert.match(source, /params\.delete\('page'\)/);
+  assert.match(source, /useSearchParams\(\)/);
+  assert.match(source, /router\.push\(buildSearchHref\(nextQuery\), \{ scroll: false \}\)/);
+  assert.match(source, /href=\{listingHref\(content, basePath, \{ category: null \}\)\}/);
+  assert.match(source, /href=\{listingHref\(content, basePath, \{ category: cat\.slug \}\)\}/);
+});

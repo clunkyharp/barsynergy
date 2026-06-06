@@ -10,15 +10,14 @@ import { AdminActionAlert } from '@/components/admin/content-admin-controls';
 import { NextActionPanel } from '@/components/business/business-cabinet';
 import { ActionRow } from '@/components/ui/action-row';
 import { Button } from '@/components/ui/button';
-import { CheckboxField } from '@/components/ui/checkbox-field';
 import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
-import { InlineLink } from '@/components/ui/inline-link';
 import { PageHeader } from '@/components/ui/page-header';
 import { Panel } from '@/components/ui/panel';
 import { Select } from '@/components/ui/select';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { SubmitButton } from '@/components/ui/submit-button';
+import { ConfirmSubmitButton } from '@/components/ui/confirm-submit-button';
 import { Textarea } from '@/components/ui/textarea';
 import {
   applicationStatusBadgeVariants,
@@ -208,10 +207,6 @@ export default async function BusinessRequestDetailPage({ params, searchParams }
               <FormField htmlFor="details" label="Подробности">
                 <Textarea id="details" name="details" required maxLength={4000} rows={6} defaultValue={application.message ?? ''} />
               </FormField>
-              <CheckboxField defaultChecked name="consent" required value="accepted">
-                Согласен с <InlineLink href="/legal/privacy">политикой обработки персональных данных</InlineLink> и даю{' '}
-                <InlineLink href="/legal/personal-data-consent">согласие на обработку персональных данных</InlineLink> для этой заявки.
-              </CheckboxField>
               <ActionRow className="border-t-0 pt-0">
                 <SubmitButton>Сохранить изменения</SubmitButton>
               </ActionRow>
@@ -219,17 +214,17 @@ export default async function BusinessRequestDetailPage({ params, searchParams }
           ) : (
             <dl className="mt-5 grid gap-4 text-sm">
               <div>
-                <dt className="font-semibold">Город</dt>
-                <dd className="mt-1 text-[var(--muted)]">{application.city?.name ?? 'Не указан'}</dd>
+                <dt className="font-semibold text-[var(--muted)]">Город</dt>
+                <dd className="mt-1 text-[var(--text)]">{application.city?.name ?? 'Не указан'}</dd>
               </div>
               <div>
-                <dt className="font-semibold">Подробности</dt>
-                <dd className="mt-1 whitespace-pre-wrap leading-7 text-[var(--muted)]">{application.message ?? '-'}</dd>
+                <dt className="font-semibold text-[var(--muted)]">Подробности</dt>
+                <dd className="mt-1 whitespace-pre-wrap leading-7 text-[var(--text)]">{application.message ?? '-'}</dd>
               </div>
               {application.businessNotes ? (
                 <div>
-                  <dt className="font-semibold">Комментарий администратора</dt>
-                  <dd className="mt-1 whitespace-pre-wrap leading-7 text-[var(--muted)]">{application.businessNotes}</dd>
+                  <dt className="font-semibold text-[var(--muted)]">Комментарий администратора</dt>
+                  <dd className="mt-1 whitespace-pre-wrap leading-7 text-[var(--text)]">{application.businessNotes}</dd>
                 </div>
               ) : null}
             </dl>
@@ -262,13 +257,19 @@ export default async function BusinessRequestDetailPage({ params, searchParams }
                 </form>
                 <form action={archiveBusinessDraftApplication}>
                   <input name="applicationId" type="hidden" value={application.id} />
-                  <SubmitButton className="w-full" variant="secondary">
+                  <ConfirmSubmitButton
+                    className="w-full"
+                    confirmActionLabel="В архив"
+                    confirmText="Черновик будет скрыт из списка активных заявок."
+                    confirmTitle="Перенести в архив?"
+                    variant="secondary"
+                  >
                     Перенести в архив
-                  </SubmitButton>
+                  </ConfirmSubmitButton>
                 </form>
               </>
             ) : null}
-            <Button href="/business/cabinet/requests" variant="ghost">
+            <Button href="/business/cabinet/requests" variant="secondary">
               Вернуться к заявкам
             </Button>
           </div>

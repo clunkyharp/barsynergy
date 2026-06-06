@@ -1,3 +1,4 @@
+import { revalidatePath } from 'next/cache';
 import {
   getPublishedArticles,
   getPublishedCourses,
@@ -9,6 +10,8 @@ import {
 import { getPublishedGeneralSponsors, type GeneralSponsor } from '@/lib/public/general-sponsors';
 import { ContentStatus } from '@prisma/client';
 import { prisma } from '@/lib/db/prisma';
+
+const HOMEPAGE_CACHE_TTL_MS = 30_000;
 
 type SharedListItem = Awaited<ReturnType<typeof getPublishedArticles>>['items'][number];
 
@@ -247,7 +250,18 @@ function toHomepageCard(
   };
 }
 
+const homepageCache = new Map<string, { data: HomepageData; expiresAt: number }>();
+
+export function revalidateHomepageCache() {
+  homepageCache.delete('homepage');
+  revalidatePath('/');
+}
+
 export async function getHomepageData(): Promise<HomepageData> {
+  const cached = homepageCache.get('homepage');
+  if (cached && cached.expiresAt > Date.now()) {
+    return cached.data;
+  }
   const [
     courses,
     upcomingEvents,
@@ -302,7 +316,7 @@ export async function getHomepageData(): Promise<HomepageData> {
       ? partners.items.map((item) => item.title)
       : ['События с партнёрами', 'Локальные бренды', 'Школы и площадки', 'Совместные проекты'];
 
-  return {
+  const result: HomepageData = {
     hero: homepageHero
       ? {
           eyebrow: homepageHero.eyebrow,
@@ -381,4 +395,7 @@ export async function getHomepageData(): Promise<HomepageData> {
       partners: partners.total
     }
   };
+
+  homepageCache.set('homepage', { data: result, expiresAt: Date.now() + HOMEPAGE_CACHE_TTL_MS });
+  return result;
 }

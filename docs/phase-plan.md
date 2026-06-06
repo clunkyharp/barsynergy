@@ -300,7 +300,10 @@ Current status:
 - auth, business and specialist-profile screens have an additional shared-UI consistency pass: page headers, action rows, stat blocks, sidebars and helper panels are normalized around the internal UI kit without changing the Phase 4 business logic;
 - focused browser smoke is rerun for `/business/cabinet` and `/business/cabinet/requests` after activating local demo access for QA only;
 - admin application detail can store business-visible notes inside the unified processing block;
-- email-based password reset is deferred until production email is configured, but one-time admin-prepared activation links are implemented for the current Phase 4 flow.
+- email-based password reset is deferred until production email is configured, but one-time admin-prepared activation links are implemented for the current Phase 4 flow;
+- 2026-06-04: public user registration (`UserRole.USER`) added as `ACTIVE` self-registration at `/auth/register/user` with dedicated form and action, separate from the business-access request flow; `registerUserAction` in the existing code was broken (created `PENDING` users that no guard can pass) and is now fixed; CTA links on `/auth/login` are split into two explicit paths. No schema changes or new dependencies.
+- 2026-06-04: duplicate business-request false-success fixed — `createBusinessAccountRequestAction` now distinguishes genuine new requests from duplicates and shows an honest success message in both cases.
+- 2026-06-04: public header is now server-aware of auth state — `SiteHeaderServer` fetches `currentUser` and passes serialized data to client `SiteHeader`; authenticated users see `AccountMenu` (DropdownMenu-based with role-based items) instead of static "Войти"; mobile menu shows auth block with user info, role-based links and logout.
 
 ## Phase 5: Filters, Search And Directory Quality
 
@@ -345,7 +348,8 @@ Current status:
 - current schema has `CategoryType.SERVICE` as taxonomy preparation, but it does not yet have `ServiceSpecialist`, `ApplicationType.SERVICE_SPECIALIST_SUBMISSION`, `/services` or `/admin/services`;
 - Phase 5 remains gated by final stabilization sign-off in `docs/remediation-plan.md`, especially production scheduler confirmation; the mobile admin read-only/actions layer is a separate product decision;
 - it must not interrupt Phase 4 auth and first business account work unless the owner explicitly records a roadmap reorder;
-- first version has no specialist personal cabinet and no direct public publishing.
+- first version has no specialist personal cabinet and no direct public publishing;
+- `/search` exists as a route but is intentionally excluded from primary public navigation by owner decision until Phase 5 search/discovery work begins; its absence from nav is not an active remediation item.
 
 ## Phase 6: Monetization Without Online Payment
 

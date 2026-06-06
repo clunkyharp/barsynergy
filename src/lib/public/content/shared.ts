@@ -143,17 +143,17 @@ export function formatUpdatedLabel(date: Date) {
   const monthMs = dayMs * 30;
 
   if (Math.abs(diffMs) < dayMs) {
-    const hours = Math.round(diffMs / hourMs) || -1;
+    const hours = Math.floor(diffMs / hourMs) || -1;
     return `обновлено ${relativeTimeFormatter.format(hours, 'hour')}`;
   }
 
   if (Math.abs(diffMs) < weekMs) {
-    const days = Math.round(diffMs / dayMs);
+    const days = Math.floor(diffMs / dayMs);
     return `обновлено ${relativeTimeFormatter.format(days, 'day')}`;
   }
 
   if (Math.abs(diffMs) < monthMs) {
-    const weeks = Math.round(diffMs / weekMs);
+    const weeks = Math.floor(diffMs / weekMs);
     return `обновлено ${relativeTimeFormatter.format(weeks, 'week')}`;
   }
 

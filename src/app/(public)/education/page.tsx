@@ -1,8 +1,10 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
+import { BookOpen } from 'lucide-react';
 import { CategoryType } from '@prisma/client';
 import { ProgramFormatMatrix } from '@/components/public/editorial-display-primitives';
 import { EditorialPublicPage } from '@/components/public/editorial-public-page';
+import { Button } from '@/components/ui/button';
 import { PublishedContentSection } from '@/components/public/published-content-section';
 import { PublicFeaturedContent } from '@/components/public/public-featured-content';
 import { PublicFilters } from '@/components/public/public-filters';
@@ -183,10 +185,13 @@ export default async function EducationPage({ searchParams }: EducationPageProps
         title="Обучение"
         description="Интенсивы, каппинг-разборы и командные сессии для кофейных баров."
         summary="Выберите формат или откройте фильтры опубликованных программ."
+        chips={['Бариста', 'Команды', 'Управляющие', 'Сертификаты']}
         density="compact"
         metrics={[]}
         rows={[]}
         primaryLink={{ label: 'Посмотреть форматы обучения', href: '#education-formats' }}
+        accentGradient="radial-gradient(ellipse 90% 60% at 50% 10%, rgba(80,180,120,0.14), transparent)"
+        accentIcon={BookOpen}
       />
       <EducationFormatsGrid />
       {!isPrelaunchEmpty ? (
@@ -240,7 +245,16 @@ export default async function EducationPage({ searchParams }: EducationPageProps
             title="Программы"
           />
         </>
-      ) : null}
+      ) : (
+        <section className="background-zone background-zone-ivory border-b border-[var(--line)] py-16">
+          <div className="container text-center">
+            <p className="text-[var(--muted)]">Первые программы готовятся к публикации.</p>
+            <Button className="mt-6" href="/contacts?topic=education-program#contact-form">
+              Предложить программу
+            </Button>
+          </div>
+        </section>
+      )}
     </>
   );
 }

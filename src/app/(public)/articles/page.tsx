@@ -1,11 +1,11 @@
 import type { Metadata } from 'next';
 import { CategoryType } from '@prisma/client';
+import { ArticleGridSection } from '@/components/public/article-grid-section';
+import { FileText } from 'lucide-react';
 import { EditorialPublicPage } from '@/components/public/editorial-public-page';
-import { PublishedContentSection } from '@/components/public/published-content-section';
-import { PublicFeaturedContent } from '@/components/public/public-featured-content';
-import { PublicFilters } from '@/components/public/public-filters';
 import { getPublishedArticles, hasActivePublicContentParams, type PublicContentSearchParams } from '@/lib/public/content';
 import { getPublicCategoryOptions } from '@/lib/public/filter-options';
+import { Button } from '@/components/ui/button';
 import { buildPublicPageMetadata } from '@/lib/public/metadata';
 
 type ArticlesPageProps = {
@@ -28,21 +28,6 @@ export default async function ArticlesPage({ searchParams }: ArticlesPageProps) 
   const hasActiveFilters = hasActivePublicContentParams(params, ['q', 'category', 'city', 'tag']);
   const featuredItem = !hasActiveFilters && content.page === 1 ? content.items[0] : undefined;
   const isPrelaunchEmpty = isEmpty && !hasActiveFilters;
-  const filters = (
-    <PublicFilters
-      activeSummaryLabel="Выбрано в материалах"
-      categories={categories}
-      categoryAllLabel="Все темы"
-      categoryLabel="Тема"
-      compact
-      description="Поиск по названию, теме или краткому описанию."
-      embedded
-      placeholder="Название, тема или описание..."
-      title="Фильтры"
-      variant="sidebar"
-    />
-  );
-
   return (
     <>
       <EditorialPublicPage
@@ -51,43 +36,31 @@ export default async function ArticlesPage({ searchParams }: ArticlesPageProps) 
         title="Материалы"
         description="Статьи, интервью и разборы для работы с меню, сервисом и командой."
         summary={isPrelaunchEmpty ? 'Первые материалы готовятся. Уже можно предложить тему для публикации.' : 'Читайте интервью, разборы, рабочие тексты и подборки.'}
+        chips={['Разборы', 'Интервью', 'Практика', 'Подборки']}
         density="compact"
         metrics={[]}
         rows={[]}
         primaryLink={{ label: 'Предложить тему', href: '/contacts?topic=article-topic#contact-form' }}
+        accentGradient="radial-gradient(ellipse 90% 60% at 30% 40%, rgba(160,80,200,0.14), transparent)"
+        accentIcon={FileText}
       />
-      {isPrelaunchEmpty ? null : (
-        <>
-          <PublicFeaturedContent
-            actionLabel="Читать материал"
-            basePath="/articles"
-            eyebrow="Рекомендуем"
-            item={featuredItem}
-            title="Рекомендуемый материал"
-          />
-          <PublishedContentSection
-            basePath="/articles"
-            content={content}
-            countLabel="Материалов"
-            emptyActions={[
-              { href: '/contacts?topic=article-topic#contact-form', label: 'Предложить тему' }
-            ]}
-            emptyDescription="Сбросьте выбранную тему или предложите материал, которого сейчас не хватает."
-            emptyTitle="По этим параметрам материалов нет"
-            excludedItemIds={featuredItem ? [featuredItem.id] : []}
-            filters={filters}
-            listLabel="Материалы"
-            rowActionLabel="Читать материал"
-            sectionId="articles-list"
-            secondaryEmptyActions={[
-              { href: '/contacts?topic=article-topic#contact-form', label: 'Предложить тему' }
-            ]}
-            secondaryEmptyDescription="Главная рекомендация уже показана выше. Другие материалы появятся здесь после публикации."
-            secondaryEmptyTitle="Других материалов пока нет"
-            showSidebarTitle={false}
-            title="Последние публикации"
-          />
-        </>
+      {isPrelaunchEmpty ? (
+        <section className="background-zone background-zone-ivory border-b border-[var(--line)] py-16">
+          <div className="container text-center">
+            <p className="text-[var(--muted)]">Первые материалы готовятся к публикации.</p>
+            <Button className="mt-6" href="/contacts?topic=article-topic#contact-form">
+              Предложить тему
+            </Button>
+          </div>
+        </section>
+      ) : (
+        <ArticleGridSection
+          basePath="/articles"
+          categories={categories}
+          content={content}
+          featuredItem={featuredItem}
+          title="Последние публикации"
+        />
       )}
     </>
   );

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { CategoryType } from '@prisma/client';
+import { PackageCheck } from 'lucide-react';
 import { EditorialPublicPage } from '@/components/public/editorial-public-page';
 import { PublishedContentSection } from '@/components/public/published-content-section';
 import { PublicFilters } from '@/components/public/public-filters';
@@ -46,6 +47,8 @@ export default async function SuppliersPage({ searchParams }: SuppliersPageProps
         rows={[]}
         primaryLink={{ label: 'Добавить свою компанию', href: supplierContactHref }}
         secondaryLink={isEmpty ? { label: 'Связаться с нами', href: supplierContactHref } : undefined}
+        accentGradient="radial-gradient(ellipse 90% 60% at 70% 50%, rgba(40,180,180,0.08), transparent)"
+        accentIcon={PackageCheck}
       />
       {isPrelaunchEmpty ? (
         <PublicPrelaunchSection

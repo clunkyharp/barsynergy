@@ -72,12 +72,18 @@ export function ContactChannelFieldset({
   emailId,
   phoneId,
   telegramId,
-  className
+  className,
+  defaults
 }: {
   emailId: string;
   phoneId: string;
   telegramId: string;
   className?: string;
+  defaults?: {
+    email?: string;
+    phone?: string;
+    telegram?: string;
+  };
 }) {
   const hintId = `${emailId}-contact-channel-hint`;
 
@@ -90,13 +96,13 @@ export function ContactChannelFieldset({
         Укажите email, телефон или Telegram.
       </p>
       <FormField htmlFor={emailId} label="Email">
-        <Input autoComplete="email" id={emailId} name="email" spellCheck={false} type="email" maxLength={180} />
+        <Input autoComplete="email" defaultValue={defaults?.email ?? ''} id={emailId} name="email" placeholder="name@example.com" spellCheck={false} type="email" maxLength={180} />
       </FormField>
       <FormField htmlFor={phoneId} label="Телефон">
-        <Input autoComplete="tel" id={phoneId} name="phone" inputMode="tel" maxLength={80} />
+        <Input autoComplete="tel" defaultValue={defaults?.phone ?? ''} id={phoneId} name="phone" inputMode="tel" placeholder="+7 999 123 45 67" maxLength={80} />
       </FormField>
       <FormField htmlFor={telegramId} label="Telegram">
-        <Input autoComplete="off" id={telegramId} name="telegram" spellCheck={false} maxLength={80} />
+        <Input autoComplete="off" defaultValue={defaults?.telegram ?? ''} id={telegramId} name="telegram" placeholder="@username" spellCheck={false} maxLength={80} />
       </FormField>
     </fieldset>
   );

@@ -8,8 +8,9 @@ import {
   type PublicApplicationFormProps
 } from '@/components/public/application-form-section';
 import { PublicBodyText, PublicDisplayTitle, PublicEyebrow } from '@/components/public/public-primitives';
+import { PublicFormValidation } from '@/components/public/public-form-validation';
 import { ConsentField } from '@/components/ui/consent-field';
-import { FormField } from '@/components/ui/form-field';
+import { FormField, FormSection } from '@/components/ui/form-field';
 import { InlineLink } from '@/components/ui/inline-link';
 import { Input } from '@/components/ui/input';
 import { MetaChip } from '@/components/ui/meta-chip';
@@ -39,7 +40,8 @@ export function BusinessSolutionForm({ enabled, result, utm, cities, defaults = 
       result={result}
       sectionId="business-request"
     >
-      <form action={submitBusinessSolutionRequest} className="editorial-form-shell public-form-shell">
+      <form action={submitBusinessSolutionRequest} className="editorial-form-shell public-form-shell" noValidate>
+        <PublicFormValidation />
         <HiddenUtmFields utm={utm} />
         <HoneypotField id="business-solution-website" />
         <div className="relative grid lg:grid-cols-[0.42fr_0.58fr]">
@@ -80,31 +82,38 @@ export function BusinessSolutionForm({ enabled, result, utm, cities, defaults = 
           </div>
 
           <div className="relative p-5 md:p-6">
-            <div className="grid gap-4 md:grid-cols-2">
-              <FormField htmlFor="businessProjectName" label="Название заведения">
-                <Input
-                  autoComplete="organization"
-                  defaultValue={defaults.projectName}
-                  id="businessProjectName"
-                  maxLength={180}
-                  minLength={2}
-                  name="projectName"
-                  required
-                />
-              </FormField>
-              <FormField htmlFor="businessContactName" label="Контактное лицо">
-                <Input
-                  autoComplete="name"
-                  defaultValue={defaults.contactName}
-                  id="businessContactName"
-                  maxLength={160}
-                  minLength={2}
-                  name="contactName"
-                  required
-                />
-              </FormField>
-              <ContactChannelFieldset className="md:col-span-2" emailId="businessEmail" phoneId="businessPhone" telegramId="businessTelegram" />
-              <FormField htmlFor="businessCityId" label="Город">
+            <FormSection title="Контакт">
+              <div className="grid gap-4 md:grid-cols-2">
+                <FormField htmlFor="businessProjectName" label="Название заведения">
+                  <Input
+                    autoComplete="organization"
+                    defaultValue={defaults.projectName}
+                    id="businessProjectName"
+                    maxLength={180}
+                    minLength={2}
+                    name="projectName"
+                    placeholder="Например, Brew Yard"
+                    required
+                  />
+                </FormField>
+                <FormField htmlFor="businessContactName" label="Контактное лицо">
+                  <Input
+                    autoComplete="name"
+                    defaultValue={defaults.contactName}
+                    id="businessContactName"
+                    maxLength={160}
+                    minLength={2}
+                    name="contactName"
+                    placeholder="Иван Иванов"
+                    required
+                  />
+                </FormField>
+                <ContactChannelFieldset className="md:col-span-2" emailId="businessEmail" phoneId="businessPhone" telegramId="businessTelegram" />
+              </div>
+            </FormSection>
+            <FormSection title="О заведении">
+              <div className="grid gap-4 md:grid-cols-2">
+                <FormField htmlFor="businessCityId" label="Город">
                 <Select id="businessCityId" name="cityId" defaultValue={defaults.cityId ?? ''} required>
                   <option value="" disabled>
                     Выберите город
@@ -128,29 +137,35 @@ export function BusinessSolutionForm({ enabled, result, utm, cities, defaults = 
                   ))}
                 </Select>
               </FormField>
-              <div className="md:col-span-2">
-                <FormField htmlFor="businessComment" hint="Укажите сайт или соцсети, особенности заведения и что важно показать в каталоге." label="Комментарий">
-                  <Textarea
-                    className="min-h-40"
-                    defaultValue={defaults.comment}
-                    id="businessComment"
-                    maxLength={4000}
-                    minLength={20}
-                    name="comment"
-                    required
-                  />
-                </FormField>
-              </div>
-              <div className="md:col-span-2 border-t border-black/10 pt-1">
-                <ConsentField>
+            </div>
+            </FormSection>
+            <FormSection title="Уточнения">
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="md:col-span-2">
+                  <FormField htmlFor="businessComment" hint="Укажите сайт или соцсети, особенности заведения и что важно показать в каталоге." label="Комментарий">
+                    <Textarea
+                      className="min-h-40"
+                      defaultValue={defaults.comment}
+                      id="businessComment"
+                      maxLength={4000}
+                      minLength={20}
+                      name="comment"
+                      placeholder="Например: кофейный бар в центре Пятигорска, хотим карточку с меню завтраков, кофе и ссылками на соцсети."
+                      required
+                    />
+                  </FormField>
+                </div>
+            </div>
+            </FormSection>
+            <div className="border-t border-black/10 pt-1">
+              <ConsentField>
                   Согласен с <InlineLink href="/legal/privacy">политикой обработки персональных данных</InlineLink> и даю{' '}
                   <InlineLink href="/legal/personal-data-consent">согласие на обработку персональных данных</InlineLink> для этой заявки.
                 </ConsentField>
               </div>
-              <PublicFormShellFooter className="md:col-span-2" note="После отправки свяжемся по указанному способу связи.">
+              <PublicFormShellFooter note="После отправки свяжемся по указанному способу связи.">
                 <SubmitButton>Отправить заявку</SubmitButton>
               </PublicFormShellFooter>
-            </div>
           </div>
         </div>
       </form>

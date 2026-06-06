@@ -14,7 +14,8 @@ export const adminSections = [
   'users',
   'categories',
   'cities',
-  'tags'
+  'tags',
+  'skills'
 ] as const;
 
 export type AdminSection = (typeof adminSections)[number];
@@ -33,7 +34,8 @@ const adminSectionRoles = {
   users: [UserRole.ADMIN],
   categories: [UserRole.ADMIN],
   cities: [UserRole.ADMIN],
-  tags: [UserRole.ADMIN]
+  tags: [UserRole.ADMIN],
+  skills: [UserRole.ADMIN]
 } satisfies Record<AdminSection, readonly UserRole[]>;
 
 export function canAccessAdmin(role?: UserRole | null) {

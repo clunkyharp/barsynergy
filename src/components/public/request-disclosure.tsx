@@ -84,7 +84,7 @@ export function RequestDisclosure({
   className,
   closedPanelClassName,
   closedContent,
-  defaultOpen = false,
+  defaultOpen = true,
   description = 'Откройте форму, заполните поля и отправьте заявку.',
   focusSelector = defaultFocusSelector,
   headingLevel = 'h3',
@@ -149,7 +149,7 @@ export function RequestDisclosure({
   }, [focusSelector, id, open]);
 
   function handleOpenClick() {
-    window.history.replaceState(null, '', `#${id}`);
+    window.history.pushState(null, '', `#${id}`);
     setOpen(true);
   }
 

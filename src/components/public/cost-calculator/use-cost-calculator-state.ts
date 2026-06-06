@@ -92,7 +92,7 @@ export function useCostCalculatorState() {
     ? 'В составе есть ошибки, итоговая цена пока не считается.'
     : hasPartialRows
       ? 'В одной из строк не хватает числа, поэтому она пока не входит в итог.'
-      : `${completedRows} ${completedRows === 1 ? 'строка участвует' : 'строк участвуют'} в расчёте.`;
+      : `${completedRows.toLocaleString('ru-RU')} ${completedRows === 1 ? 'строка участвует' : 'строк участвуют'} в расчёте.`;
   const salePriceTone = hasManualSalePrice ? 'Задана вручную' : 'Рассчитана по целевой доле';
 
   function scheduleCopyReset(state: 'idle', delay: number) {

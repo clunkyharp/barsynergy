@@ -68,21 +68,21 @@ export function CookieNotice() {
       role="region"
     >
       <div className="rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[color-mix(in_oklab,var(--paper)_97%,transparent)] p-3 shadow-[var(--shadow-overlay)] backdrop-blur-md">
-        <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
+        <div className="grid gap-3">
           <div className="min-w-0">
             <p className="text-sm font-semibold leading-5 text-[var(--text)]">Куки для работы сайта</p>
             <p className="text-[12px] leading-5 text-[var(--muted)]">
               Только вход, формы и сессия. Рекламной аналитики нет.
             </p>
           </div>
-          <div className="flex gap-2">
-            <Button className="min-h-11 rounded-[var(--radius-md)] px-4 text-sm" onClick={saveCookieChoice} type="button">
+          <div className="flex w-full gap-2">
+            <Button className="min-h-11 flex-1 rounded-[var(--radius-md)] px-4 text-sm" onClick={saveCookieChoice} type="button">
               Принять
             </Button>
             <Button
               aria-controls={cookieSettingsPanelId}
               aria-expanded={settingsOpen}
-              className="min-h-11 rounded-[var(--radius-md)] px-4 text-sm"
+              className="min-h-11 flex-1 rounded-[var(--radius-md)] px-4 text-sm"
               onClick={() => setSettingsOpen((current) => !current)}
               type="button"
               variant="secondary"

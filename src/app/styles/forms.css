@@ -38,7 +38,6 @@
 .form-field {
   display: grid;
   gap: 0.55rem;
-  align-items: start;
   min-width: 0;
 }
 
@@ -95,6 +94,10 @@
 }
 
 .field-base::placeholder {
+  color: var(--field-placeholder);
+}
+
+.custom-select-trigger [data-placeholder] {
   color: var(--field-placeholder);
 }
 
@@ -378,7 +381,8 @@
   grid-column: 1 / -1;
 }
 
-.public-form-shell .consent-field {
+.public-form-shell .consent-field,
+.editorial-form-shell .consent-field {
   border: none;
   border-top: 1px solid color-mix(in oklab, var(--line) 64%, transparent);
   border-radius: 0;
@@ -471,6 +475,19 @@
   color: var(--muted);
   font-size: 13px;
   line-height: 1.65;
+}
+
+.form-details-panel[open] {
+  background: var(--surface-card);
+  border-color: var(--border-strong);
+}
+
+.form-details-panel[open] .form-details-chevron {
+  transform: rotate(180deg);
+}
+
+.form-details-hint {
+  color: var(--muted);
 }
 
 .public-submission-feedback.inline-alert {

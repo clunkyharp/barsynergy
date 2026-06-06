@@ -1,9 +1,12 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
+import { Building2, FileText, Users } from 'lucide-react';
+import { logoutAction } from '@/app/auth/actions';
 import { AppLink } from '@/components/ui/app-link';
 import { Panel } from '@/components/ui/panel';
 import { StatusBadge } from '@/components/ui/status-badge';
+import { SubmitButton } from '@/components/ui/submit-button';
 import { cn } from '@/lib/utils';
 
 type BusinessSidebarProps = {
@@ -13,8 +16,9 @@ type BusinessSidebarProps = {
 };
 
 const links = [
-  { href: '/business/cabinet', label: 'Компания' },
-  { href: '/business/cabinet/requests', label: 'Заявки' }
+  { href: '/business/cabinet', label: 'Компания', icon: Building2 },
+  { href: '/business/cabinet/requests', label: 'Заявки', icon: FileText },
+  { href: '/business/cabinet/responses', label: 'Отклики', icon: Users }
 ];
 
 export function BusinessSidebar({ activeRequestCount, cityName, companyName }: BusinessSidebarProps) {
@@ -38,7 +42,11 @@ export function BusinessSidebar({ activeRequestCount, cityName, companyName }: B
         </div>
         <div className="mt-4 flex flex-wrap items-center gap-2 text-xs text-[var(--muted)]">
           {cityName ? <span>{cityName}</span> : null}
-          <span>Заявок в работе: {activeRequestCount}</span>
+          {activeRequestCount > 0 ? (
+            <StatusBadge showDot={false} variant="pending">
+              Заявок в работе: {activeRequestCount}
+            </StatusBadge>
+          ) : null}
         </div>
       </div>
       <nav className="mt-5 grid gap-1 text-sm" aria-label="Разделы кабинета компании">
@@ -52,20 +60,28 @@ export function BusinessSidebar({ activeRequestCount, cityName, companyName }: B
             <AppLink
               aria-current={isActive ? 'page' : undefined}
               className={cn(
-                'flex min-h-10 items-center rounded-[var(--radius-md)] border-l-2 border-l-transparent px-3 py-2 font-semibold text-[var(--text)] transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)]',
+                'flex min-h-10 items-center gap-3 rounded-[var(--radius-md)] border-l-2 border-l-transparent px-3 py-2 font-semibold text-[var(--text)] transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)]',
                 isActive ? 'border-l-[var(--accent)] bg-[var(--surface-wash)]' : 'hover:bg-[var(--surface-muted)]'
               )}
               href={link.href}
               key={link.href}
             >
+              <link.icon aria-hidden="true" size={16} strokeWidth={1.8} />
               {link.label}
             </AppLink>
           );
         })}
       </nav>
-      <Panel className="mt-5 border-[var(--line)] bg-[var(--surface-wash)] text-sm leading-6 text-[var(--muted)] shadow-none" padding="sm">
-        Сначала проверьте профиль и текущие заявки. Новые запросы лучше отправлять после заполнения основных данных компании.
-      </Panel>
+      {activeRequestCount === 0 ? (
+        <Panel className="mt-5 border-[var(--line)] bg-[var(--surface-wash)] text-sm leading-6 text-[var(--muted)] shadow-none" padding="sm">
+          Сначала проверьте профиль и текущие заявки. Новые запросы лучше отправлять после заполнения основных данных компании.
+        </Panel>
+      ) : null}
+      <form action={logoutAction} className="mt-4">
+        <SubmitButton className="w-full rounded-[var(--radius-md)]" variant="secondary">
+          Выйти
+        </SubmitButton>
+      </form>
     </Panel>
   );
 }

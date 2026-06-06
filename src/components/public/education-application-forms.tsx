@@ -115,7 +115,7 @@ export function EducationApplicationForms({ enabled, result, utm, cities, defaul
             <div className="relative p-5 md:p-6">
               <div className="grid gap-4">
                 <FormField htmlFor="courseName" label="Имя">
-                  <Input id="courseName" name="name" required maxLength={160} minLength={2} />
+                  <Input id="courseName" name="name" required maxLength={160} minLength={2} placeholder="Иван Иванов" />
                 </FormField>
                 <ContactChannelFieldset emailId="courseEmail" phoneId="coursePhone" telegramId="courseTelegram" />
                 <div className="grid gap-4 sm:grid-cols-2">
@@ -131,10 +131,10 @@ export function EducationApplicationForms({ enabled, result, utm, cities, defaul
                   </FormField>
                 </div>
                 <FormField htmlFor="courseTitle" label="Интересующая программа или тема">
-                  <Input id="courseTitle" name="courseTitle" defaultValue={defaults.courseTitle} required maxLength={180} minLength={2} />
+                  <Input id="courseTitle" name="courseTitle" defaultValue={defaults.courseTitle} required maxLength={180} minLength={2} placeholder="Например, базовый курс по кофе" />
                 </FormField>
                 <FormField htmlFor="courseGoals" label="Что нужно разобрать">
-                  <Textarea id="courseGoals" name="goals" required className="min-h-36" maxLength={3000} minLength={10} />
+                  <Textarea id="courseGoals" name="goals" required className="min-h-36" maxLength={3000} minLength={10} placeholder="Например: хочу разобраться в воронке, настройке помола и базовой латте-арт технике." />
                 </FormField>
                 <ConsentField>
                   Согласен с <InlineLink href="/legal/privacy">политикой обработки персональных данных</InlineLink> и даю{' '}
@@ -162,10 +162,10 @@ export function EducationApplicationForms({ enabled, result, utm, cities, defaul
             <div className="relative p-5 md:p-6">
               <div className="grid gap-4">
                 <FormField htmlFor="trainingCompanyName" label="Компания">
-                  <Input id="trainingCompanyName" name="companyName" required maxLength={180} minLength={2} />
+                  <Input id="trainingCompanyName" name="companyName" required maxLength={180} minLength={2} placeholder="Например, Coffee Point" />
                 </FormField>
                 <FormField htmlFor="trainingContactName" label="Контактное лицо">
-                  <Input id="trainingContactName" name="contactName" required maxLength={160} minLength={2} />
+                  <Input id="trainingContactName" name="contactName" required maxLength={160} minLength={2} placeholder="Иван Иванов" />
                 </FormField>
                 <ContactChannelFieldset emailId="trainingEmail" phoneId="trainingPhone" telegramId="trainingTelegram" />
                 <div className="grid gap-4 sm:grid-cols-2">
@@ -181,7 +181,7 @@ export function EducationApplicationForms({ enabled, result, utm, cities, defaul
                   </FormField>
                 </div>
                 <FormField htmlFor="trainingTeamSize" label="Размер команды">
-                  <Input id="trainingTeamSize" name="teamSize" required maxLength={80} minLength={1} />
+                  <Input id="trainingTeamSize" name="teamSize" required maxLength={80} minLength={1} placeholder="Например, 10 человек" />
                 </FormField>
                 <FormField htmlFor="trainingRequest" label="Задача команды">
                   <Textarea
@@ -192,6 +192,7 @@ export function EducationApplicationForms({ enabled, result, utm, cities, defaul
                     className="min-h-36"
                     maxLength={4000}
                     minLength={20}
+                    placeholder="Например: нужно подтянуть сервис и скорость работы на утреннем потоке, команда из 10 человек."
                   />
                 </FormField>
                 <ConsentField>
@@ -220,10 +221,10 @@ export function EducationApplicationForms({ enabled, result, utm, cities, defaul
             <div className="relative p-5 md:p-6">
               <div className="grid gap-4 md:grid-cols-2">
                 <FormField htmlFor="certificateCustomerName" label="Ваше имя">
-                  <Input id="certificateCustomerName" name="name" required maxLength={160} minLength={2} />
+                  <Input id="certificateCustomerName" name="name" required maxLength={160} minLength={2} placeholder="Иван Иванов" />
                 </FormField>
                 <FormField htmlFor="recipientName" label="Получатель сертификата">
-                  <Input id="recipientName" name="recipientName" required maxLength={160} minLength={2} />
+                  <Input id="recipientName" name="recipientName" required maxLength={160} minLength={2} placeholder="Мария Петрова" />
                 </FormField>
                 <ContactChannelFieldset className="md:col-span-2" emailId="certificateEmail" phoneId="certificatePhone" telegramId="certificateTelegram" />
                 <FormField htmlFor="certificateCityId" label="Город">
@@ -236,11 +237,11 @@ export function EducationApplicationForms({ enabled, result, utm, cities, defaul
                     ))}
                   </Select>
                 </FormField>
-                <FormField htmlFor="certificateAmount" label="Номинал или сумма">
-                  <Input id="certificateAmount" name="amountLabel" required maxLength={120} minLength={1} />
+                <FormField htmlFor="certificateAmount" hint="Например: 1500 рублей" label="Номинал или сумма">
+                  <Input id="certificateAmount" name="amountLabel" required maxLength={120} minLength={1} placeholder="Например, 1500 рублей" />
                 </FormField>
                 <FormField className="md:col-span-2" htmlFor="certificateMessage" label="Комментарий к сертификату">
-                  <Textarea id="certificateMessage" name="message" required className="min-h-36" maxLength={3000} minLength={10} />
+                  <Textarea id="certificateMessage" name="message" required className="min-h-36" maxLength={3000} minLength={10} placeholder="Например: нужен подарочный сертификат ко дню рождения, можно без фиксированной даты." />
                 </FormField>
                 <div className="md:col-span-2">
                   <ConsentField>

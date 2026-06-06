@@ -114,10 +114,10 @@ export default async function ActivateBusinessAccessPage({ searchParams }: Activ
                 <PublicFormValidation />
                 <input name="token" type="hidden" value={token} />
                 <FormField htmlFor="password" label="Пароль" hint="Минимум 8 символов. Лучше взять отдельный пароль для кабинета.">
-                  <Input id="password" name="password" type="password" minLength={8} autoComplete="new-password" required />
+                  <Input id="password" name="password" type="password" minLength={8} autoComplete="new-password" placeholder="Минимум 8 символов" required />
                 </FormField>
                 <FormField htmlFor="confirmPassword" label="Повторите пароль">
-                  <Input id="confirmPassword" name="confirmPassword" type="password" minLength={8} autoComplete="new-password" required />
+                  <Input id="confirmPassword" name="confirmPassword" type="password" minLength={8} autoComplete="new-password" placeholder="Повторите пароль" required />
                 </FormField>
                 <ActionRow>
                   <SubmitButton className="rounded-[var(--radius-md)]" size="lg">

@@ -35,6 +35,12 @@ Before meaningful project work, read the smallest relevant set of docs:
 
 Use `docs/project-plan.md` as the canonical product plan and `docs/phase-plan.md` as the implementation roadmap.
 
+**Core engineering references (read before implementation):**
+- `docs/engineering-standards.md` — component limits, CSS rules, TypeScript rules, form rules
+- `docs/architecture.md` — layers, patterns, anti-patterns, pending decisions
+- `docs/pr-checklist.md` — pre-merge checks for every branch
+- `docs/scaling-playbook.md` — step-by-step guides for new content types, roles, notifications
+
 ## Documentation And Kanban Sync
 
 Every meaningful change must include a documentation sync decision before closeout.
@@ -131,6 +137,7 @@ Validation:
 
 ```bash
 npm run lint
+npm test
 npm run typecheck
 ./node_modules/.bin/prisma validate
 ```
@@ -162,17 +169,52 @@ When both build and typecheck are required, run them sequentially. Next.js type 
 
 ## Code Guidelines
 
-- Keep server data access, route handlers, and client components clearly separated.
+Full standards are in `docs/engineering-standards.md`. Key rules enforced inline:
+
+**Architecture:**
+- Keep server data access, route handlers, and client components clearly separated. See layer table in `docs/architecture.md`.
+- Pages call lib functions. Lib functions call prisma. Pages never call prisma directly.
+- New content types follow the 7-phase checklist in `docs/architecture.md`.
+- `getCurrentUser()` must be wrapped in React `cache()` — see `docs/engineering-standards.md` §2.
+- `src/middleware.ts` is the edge-safe route guard + CSP injector. Keep auth cookie constants in `src/lib/auth/session-constants.ts` and do not import `src/lib/auth/session.ts` into middleware.
+
+**Components:**
 - Prefer existing components in `src/components/ui`, `src/components/layout`, and `src/components/public`.
-- Keep public UI responsive and check mobile behavior for visible page changes.
+- Hard limit: no component file exceeds 350 lines. Split before merging.
+- Variant props that drive structural layout (not just style) require separate components, not new variant values.
+- Do not add `rowVariant` values to `PublishedContentSection` — create a dedicated section component.
+
+**Forms:**
+- `required` fields must not be inside `<details>` blocks marked «по желанию».
+- All consent checkboxes use `<ConsentField>`, never a bare `<input type="checkbox">`.
+- New public forms follow the checklist in `docs/pr-checklist.md` → "New Public Form".
+
+**CSS:**
+- No new CSS files. Add rules to the most specific existing file.
+- No hardcoded hex colors in component `className` strings — use CSS tokens.
+- New CSS variables go in `tokens.css`. The import order in `globals.css` must not change.
+- Dark mode: do not set `document.documentElement.style.colorScheme` outside `app/layout.tsx` inline script.
+
+**TypeScript:**
+- No `any`. Use `unknown` + type guards or a proper type.
+- All server actions return `{ type: 'error' | 'success', message: string }`. Never throw unhandled from an action.
+
+**Public copy:**
 - Keep public and user-facing Russian copy simple, literal and easy to scan. Avoid vague promo wording, internal workflow jargon and text that sounds machine-generated.
 - When editing or rewriting connected Russian user-facing prose, apply the `humanizer-ru` cleanup principle by default. Do not apply it to code, logs, commands, schemas or exact quotations.
+
+**QA:**
 - For small visible UI fixes, prefer concrete browser diff evidence, screenshot notes, page URL, and target element over a generic `поправь дизайн` prompt.
 - For visual QA, state which tool actually verified the screen: built-in browser, Playwright screenshot, HTML/source smoke, or an explicit unverified visual gap.
-- After visual QA, delete generated screenshots, browser dumps, JSON result files and other temporary QA artifacts from the project before closeout unless the owner explicitly asks to preserve them. Keep only concise validation notes in status/docs.
+- After visual QA, delete generated screenshots, browser dumps, JSON result files and other temporary QA artifacts from the project before closeout unless the owner explicitly asks to preserve them.
+
+**Schema:**
 - Use Prisma migrations for schema changes. Do not edit generated Prisma client files.
-- Keep validation close to boundaries using existing Zod/env patterns.
+- Migration names must be descriptive. See naming rules in `docs/engineering-standards.md` §9.
+
+**Dependencies:**
 - Do not introduce new libraries unless they are necessary and consistent with the stack.
+- Keep validation close to boundaries using existing Zod/env patterns.
 
 ## Verification And Closeout
 

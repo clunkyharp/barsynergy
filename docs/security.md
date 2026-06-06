@@ -25,7 +25,7 @@
 - Local `/uploads/...` serving is allowed only for local storage, path-contained files and public `UploadedFile` records.
 - Production Nginx sets baseline security headers, including HSTS, clickjacking protection, `nosniff`, referrer policy and permissions policy.
 - Nginx overwrites `X-Forwarded-For` with `$remote_addr` before forwarding to the app, so app-level throttles do not trust spoofed inbound forwarding chains from direct clients.
-- The app generates CSP in Next proxy with a per-request nonce. Production `script-src` uses the nonce without `unsafe-inline` or `unsafe-eval`; development keeps only `unsafe-eval` for local tooling.
+- The app generates CSP in Next proxy (`src/proxy.ts`, exported as `proxy`) with a per-request nonce. Production `script-src` uses the nonce without `unsafe-inline` or `unsafe-eval`; development keeps only `unsafe-eval` for local tooling. **Do not rename this file back to `middleware.ts`** — Next.js deprecated the `middleware` file convention in favour of `proxy`.
 - Current dependency remediation pins `next` to the fixed exact release and overrides the transitive `fast-xml-builder` advisory path through npm `overrides`. Project `.npmrc` enables exact saves and audit by default.
 - Admin draft deletion actions enforce `ContentStatus.DRAFT` inside the server-side delete filter before image cleanup can run.
 - Business-access invites can be activated only while the application is `APPROVED`, the user is `PENDING`, the business account is `PENDING`, the invite is unused and the token has not expired. Stale or racing activation attempts fail inside one transaction.

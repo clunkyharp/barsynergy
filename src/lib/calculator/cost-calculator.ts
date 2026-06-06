@@ -154,7 +154,7 @@ export function calculateCostSummary({
   const foodCost = foodCostInput && foodCostInput > 0 && foodCostInput <= 100 ? foodCostInput / 100 : 0;
   const isManualMode = pricingMode === 'manual';
   const manualSalePriceInput = parseCalculatorNumberInput(salePrice);
-  const salePriceError = isManualMode && (salePrice.trim() === '' || manualSalePriceInput === null || manualSalePriceInput <= 0)
+  const salePriceError = isManualMode && salePrice.trim() !== '' && (manualSalePriceInput === null || manualSalePriceInput <= 0)
     ? 'В ручном режиме цена продажи должна быть больше нуля.'
     : null;
   const manualSalePrice = manualSalePriceInput && manualSalePriceInput > 0 ? manualSalePriceInput : 0;

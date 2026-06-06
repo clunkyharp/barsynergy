@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { headers } from 'next/headers';
 import './globals.css';
 import { SiteFooter } from '@/components/layout/site-footer';
-import { SiteHeader } from '@/components/layout/site-header';
+import { SiteHeaderServer } from '@/components/layout/site-header-server';
 import { CookieNotice } from '@/components/public/cookie-notice';
 import { ViewportReveal } from '@/components/public/viewport-reveal';
 import { ScrollToTopButton } from '@/components/layout/scroll-to-top-button';
@@ -62,7 +62,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
         <JsonLd data={buildSiteJsonLd()} />
         <ToastProvider>
           <div className="site-shell overflow-x-clip">
-            <SiteHeader />
+            <SiteHeaderServer />
             <main className="site-main overflow-x-hidden w-full max-w-full">{children}</main>
             <SiteFooter />
             <ViewportReveal />

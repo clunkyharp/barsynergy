@@ -299,7 +299,13 @@ export function DropdownMenuContent({ children, className, style, ...props }: HT
       id={`${id}-content`}
       ref={contentRef}
       role="menu"
-      style={{ ...contentStyle, ...style, visibility: contentStyle ? 'visible' : 'hidden', zIndex: 'var(--z-overlay)' }}
+      style={{
+        position: 'fixed',
+        visibility: contentStyle ? 'visible' : 'hidden',
+        zIndex: 'var(--z-overlay)',
+        ...(contentStyle ?? { left: '-9999px', top: '-9999px' }),
+        ...style
+      }}
       className={cn('dropdown-menu-content motion-reduce:transition-none', className)}
       {...props}
     >

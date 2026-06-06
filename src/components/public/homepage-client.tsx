@@ -1,20 +1,17 @@
-'use client';
-
 import Image from 'next/image';
 import Link from 'next/link';
-import React, { useMemo, useState } from 'react';
+import type { CSSProperties } from 'react';
 import {
   ArrowUpRight,
   BookOpen,
   BriefcaseBusiness,
   CalendarDays,
-  ChevronDown,
-  ChevronUp,
   Coffee,
   PackageCheck,
   Calculator,
   type LucideIcon
 } from 'lucide-react';
+import { HomeCtaFaqSection } from './home-cta-faq-section';
 import { ToolTeaser } from './platform-ui';
 import { SocialLinkCard } from './social-card';
 import { PublicDisplayTitle, PublicEyebrow } from '@/components/public/public-primitives';
@@ -84,16 +81,11 @@ const homeSectionCards = [
 ] as const;
 
 function HomeStatsLine({ stats }: { stats: HomepageData['stats'] }) {
-  const statItems = useMemo(() => {
-    const items = [
-      { value: stats.vacancies, label: 'вакансии' },
-      { value: stats.suppliers, label: 'поставщика' },
-      { value: stats.articles, label: 'материалов' }
-    ];
-
-    // No live counters are better than showing a zeroed platform on the first screen.
-    return items.filter((item) => item.value > 0);
-  }, [stats.articles, stats.suppliers, stats.vacancies]);
+  const statItems = [
+    { value: stats.vacancies, label: 'вакансии' },
+    { value: stats.suppliers, label: 'поставщика' },
+    { value: stats.articles, label: 'материалов' }
+  ].filter((item) => item.value > 0);
 
   if (statItems.length === 0) {
     return null;
@@ -117,7 +109,7 @@ function HomeHeroRouter({ stats }: { stats: HomepageData['stats'] }) {
   return (
     <section
       aria-labelledby="home-hero-title"
-      className="relative isolate flex min-h-[100svh] items-center overflow-hidden border-b border-[var(--line)] bg-[#15110e] text-[#fffdf9] md:min-h-[720px] lg:min-h-[760px]"
+      className="relative isolate flex min-h-[100svh] items-center overflow-hidden border-b border-[var(--line)] bg-[var(--editorial-dark-surface)] text-[var(--editorial-dark-text)] md:min-h-[720px] lg:min-h-[760px]"
     >
       <div className="absolute inset-0 z-0">
         <Image
@@ -139,13 +131,13 @@ function HomeHeroRouter({ stats }: { stats: HomepageData['stats'] }) {
       />
       <div className="container relative z-[2] py-24 md:py-32">
         <div className="max-w-[58rem]">
-          <p className={`${accentFont.className} text-[11px] font-semibold uppercase tracking-[0.18em] text-[#e0c09a]`}>
+          <PublicEyebrow className={`${accentFont.className} tracking-[0.18em]`} tone="inverse">
             BARSYNERGY / Барная индустрия СКФО
-          </p>
-          <h1 className={`${displayFont.className} mt-4 max-w-[44rem] text-[clamp(2.8rem,5vw,4.8rem)] font-semibold leading-[1.04] text-balance text-[#fffdf9] max-[640px]:max-w-[15ch] max-[640px]:text-[clamp(2.25rem,9.6vw,2.55rem)]`} id="home-hero-title">
+          </PublicEyebrow>
+          <h1 className={`${displayFont.className} mt-4 max-w-[44rem] text-[clamp(2.8rem,5vw,4.8rem)] font-semibold leading-[1.04] text-balance text-[var(--editorial-dark-text)] max-[640px]:max-w-[15ch] max-[640px]:text-[clamp(2.25rem,9.6vw,2.55rem)]`} id="home-hero-title">
             Платформа для кофейных баров СКФО
           </h1>
-          <p className="mt-5 max-w-2xl text-[15px] leading-7 text-[rgba(255,253,249,0.78)] md:text-base">
+          <p className="mt-5 max-w-2xl text-[15px] leading-7 text-[var(--editorial-dark-muted)] md:text-base">
             Обучение, вакансии, поставщики, события и инструменты — всё в одном месте для бариста, команд и заведений региона.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -153,7 +145,7 @@ function HomeHeroRouter({ stats }: { stats: HomepageData['stats'] }) {
               Найти обучение
             </Button>
             <Link
-              className="inline-flex min-h-12 items-center justify-center rounded-[var(--radius-sm)] px-3 text-[13px] font-semibold uppercase tracking-[0.1em] text-[rgba(255,253,249,0.76)] transition-colors hover:text-[var(--accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
+              className="inline-flex min-h-12 items-center justify-center rounded-[var(--radius-sm)] px-3 text-[13px] font-semibold uppercase tracking-[0.1em] text-[var(--editorial-dark-muted)] transition-colors hover:text-[var(--accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
               href="/events"
             >
               Смотреть афишу
@@ -169,7 +161,7 @@ function HomeHeroRouter({ stats }: { stats: HomepageData['stats'] }) {
 
 function HomeSectionCards() {
   return (
-    <section className="background-zone background-zone-ivory scroll-mt-28 border-b border-[var(--line)] py-10 md:py-14" id="home-sections" style={{ '--zone-surface': 'var(--background-band)' } as React.CSSProperties}>
+    <section className="background-zone background-zone-ivory scroll-mt-28 border-b border-[var(--line)] py-10 md:py-14" id="home-sections" style={{ '--zone-surface': 'var(--background-band)' } as CSSProperties}>
       <div className="container">
         <div className="grid gap-8 xl:grid-cols-[minmax(0,0.48fr)_minmax(0,1.52fr)]">
           <div className="xl:pr-4">
@@ -263,7 +255,7 @@ function HomeSponsorLogoStrip({ sponsors }: { sponsors: HomepageData['generalSpo
         <div className="mx-auto max-w-[860px]">
           <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-4">
             <span className="h-px bg-[rgba(168,124,56,0.38)]" aria-hidden="true" />
-            <h2 className={`${accentFont.className} text-center text-[10px] font-bold uppercase tracking-[0.14em] text-[#A87C38]`} id="home-sponsors-title">
+            <h2 className={`${accentFont.className} text-center text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--accent)]`} id="home-sponsors-title">
               Генеральные спонсоры сезона
             </h2>
             <span className="h-px bg-[rgba(168,124,56,0.38)]" aria-hidden="true" />
@@ -271,7 +263,7 @@ function HomeSponsorLogoStrip({ sponsors }: { sponsors: HomepageData['generalSpo
           <div className="mt-8 grid gap-4 md:grid-cols-2">
             {sponsors.map((sponsor) => (
               <article
-                className="grid min-w-0 justify-items-center rounded-[10px] border border-[rgba(229,210,188,0.16)] bg-[rgba(255,253,249,0.035)] px-5 py-7 text-center"
+                className="grid min-w-0 justify-items-center rounded-[10px] border border-[var(--editorial-dark-border)] bg-[rgb(255_255_255_/_0.035)] px-5 py-7 text-center"
                 key={sponsor.id}
               >
                 <div className="flex min-h-[10rem] w-full items-center justify-center">
@@ -285,17 +277,17 @@ function HomeSponsorLogoStrip({ sponsors }: { sponsors: HomepageData['generalSpo
                       width={288}
                     />
                   ) : (
-                    <span className={`${displayFont.className} text-center text-3xl font-semibold leading-none text-[#F2E8D9]`}>
+                    <span className={`${displayFont.className} text-center text-3xl font-semibold leading-none text-[var(--editorial-dark-text)]`}>
                       {sponsor.name}
                     </span>
                   )}
                 </div>
                 <div className="mt-5 min-w-0">
-                  <h3 className="text-base font-semibold text-[#F2E8D9]">{sponsor.name}</h3>
-                  <p className="mx-auto mt-2 max-w-[24rem] text-sm leading-6 text-[rgba(242,232,217,0.66)]">
+                  <h3 className="text-base font-semibold text-[var(--editorial-dark-text)]">{sponsor.name}</h3>
+                  <p className="mx-auto mt-2 max-w-[24rem] text-sm leading-6 text-[var(--editorial-dark-muted)]">
                     {sponsor.shortDescription}
                   </p>
-                  <Link className="mt-3 inline-flex text-sm font-semibold text-[var(--accent)] hover:text-[var(--accent-strong)]" href={`/general-sponsors#${sponsor.name.toLowerCase().includes('hustle brew') ? 'hustle-brew' : sponsor.name.toLowerCase().includes('gelabo') ? 'gelabo' : sponsor.id}`}>
+                  <Link className="mt-3 inline-flex text-sm font-semibold text-[var(--accent)] hover:text-[var(--accent-strong)]" href={`/general-sponsors#general-sponsor-${sponsor.slug}`}>
                     Смотреть профиль →
                   </Link>
                 </div>
@@ -372,12 +364,23 @@ function getVisibleFeaturedMeta(card: HomepageLiveCard) {
     .slice(0, 3);
 }
 
+const featuredKindConfig: Record<string, { icon: LucideIcon; label: string }> = {
+  article: { icon: BookOpen, label: 'Материал' },
+  course: { icon: Coffee, label: 'Курс' },
+  event: { icon: CalendarDays, label: 'Событие' },
+  vacancy: { icon: BriefcaseBusiness, label: 'Вакансия' },
+  supplier: { icon: PackageCheck, label: 'Поставщик' }
+};
+
 function FeaturedNowCard({ card }: { card: HomepageLiveCard }) {
   const visibleMeta = getVisibleFeaturedMeta(card);
+  const supportMeta = card.meta.filter(Boolean).slice(0, 2);
+  const kindInfo = featuredKindConfig[card.kind] ?? { icon: BookOpen, label: 'Материал' };
+  const KindIcon = kindInfo.icon;
 
   return (
     <Link
-      className="public-card-shell featured-now-card group grid overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] md:rounded-[var(--radius-xl)] lg:grid-cols-[minmax(0,0.78fr)_minmax(0,1fr)]"
+      className="public-card-shell featured-now-card group grid overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] md:rounded-[var(--radius-xl)] lg:grid-cols-[minmax(0,0.82fr)_minmax(0,1fr)]"
       href={card.href}
     >
       <span
@@ -386,29 +389,40 @@ function FeaturedNowCard({ card }: { card: HomepageLiveCard }) {
         style={card.imageUrl ? { backgroundImage: `url("${card.imageUrl}")` } : undefined}
       />
       <span className="featured-now-content flex min-w-0 flex-col p-4 md:p-6">
-        <span>
-          <span className="featured-now-meta-row flex flex-wrap gap-2">
-            <span className="public-card-label w-fit">
-              {card.eyebrow}
+        <span className="featured-now-meta-row flex flex-wrap gap-2">
+          <span className="public-card-label w-fit">
+            {card.eyebrow}
+          </span>
+          {visibleMeta.map((entry) => (
+            <span
+              className="public-card-meta w-fit text-[var(--muted)]"
+              key={entry}
+            >
+              {entry}
             </span>
-            {visibleMeta.map((entry) => (
-              <span
-                className="public-card-meta w-fit text-[var(--muted)]"
-                key={entry}
-              >
-                {entry}
-              </span>
-            ))}
-          </span>
-          <span className={`${displayFont.className} featured-now-title mt-3 block text-[1.8rem] font-semibold leading-none text-[var(--text)] md:mt-4 md:text-[2.45rem]`}>
-            {card.title}
-          </span>
-          <span className="featured-now-summary mt-3 block max-h-[4.5rem] max-w-2xl overflow-hidden text-sm leading-6 text-[var(--muted)] md:mt-4 md:max-h-[5.2rem] md:leading-7 md:text-[15px]">{card.summary}</span>
+          ))}
         </span>
-        <span className="featured-now-footer mt-5 flex flex-wrap items-center gap-3 border-t border-[var(--line)] pt-4 md:mt-6">
+        <span className={`${displayFont.className} featured-now-title mt-3 block text-[1.8rem] font-semibold leading-none text-[var(--text)] md:mt-4 md:text-[2.45rem]`}>
+          {card.title}
+        </span>
+        <span className="featured-now-summary mt-3 block max-h-[4.5rem] max-w-2xl overflow-hidden text-sm leading-6 text-[var(--muted)] md:mt-4 md:max-h-[5.2rem] md:leading-7 md:text-[15px]">{card.summary}</span>
+        <span className="featured-now-support mt-4 inline-flex items-center gap-2.5 rounded-[var(--radius-sm)] bg-[var(--surface-card-muted)] px-3 py-2.5 text-xs md:mt-5">
+          <KindIcon size={16} strokeWidth={1.5} className="shrink-0 text-[var(--accent)]" />
+          <span className="font-semibold text-[var(--text)]">{kindInfo.label}</span>
+          {supportMeta.length > 0 && (
+            <>
+              <span className="h-3 w-px bg-[var(--line)]" aria-hidden="true" />
+              <span className="text-[var(--muted)]">{supportMeta.join(' · ')}</span>
+            </>
+          )}
+        </span>
+        <span className="featured-now-footer mt-auto flex flex-wrap items-center justify-between gap-3 border-t border-[var(--line)] pt-4 md:pt-5">
           <span className="featured-now-action inline-flex items-center gap-2 text-sm font-semibold text-[var(--accent)]">
             {card.actionLabel}
             <ArrowUpRight className="transition-transform duration-[var(--motion-duration-base)] ease-[var(--motion-ease-move)] group-hover:translate-x-1 motion-reduce:transition-none" size={16} />
+          </span>
+          <span className="text-[11px] font-medium uppercase tracking-[0.1em] text-[var(--muted)]">
+            {kindInfo.label}
           </span>
         </span>
       </span>
@@ -474,96 +488,6 @@ const fallbackEventFormats: Record<'intensive' | 'cupping', HomepageLiveCard> = 
   }
 };
 
-const homepageFaqItems = [
-  {
-    question: 'Что уже можно сделать на платформе?',
-    answer: 'Можно читать материалы, смотреть образовательные форматы, проверять вакансии, находить поставщиков и оставлять заявки на партнёрские задачи.'
-  },
-  {
-    question: 'Кому подходит BARSYNERGY?',
-    answer: 'Платформа рассчитана на бариста, управляющих, владельцев заведений, поставщиков, бренды и специалистов, которые работают с HoReCa в СКФО.'
-  },
-  {
-    question: 'Можно ли предложить своё событие или материал?',
-    answer: 'Да. Через раздел контактов можно отправить идею события, партнёрского проекта, обучающего формата или публикации.'
-  },
-  {
-    question: 'Есть ли инструменты для заведений?',
-    answer: 'Да. На главной уже есть калькулятор себестоимости, а для заведений доступны заявки по цифровым решениям, вакансиям, поставщикам и консалтингу.'
-  },
-  {
-    question: 'Сколько стоит размещение в каталоге?',
-    answer: 'Размещение в каталоге заведений и поставщиков сейчас бесплатное. Для спонсорских форматов условия обсуждаются отдельно.'
-  }
-] as const;
-
-function HomeCtaFaqSection() {
-  const [activeIndex, setActiveIndex] = useState<number | null>(0);
-
-  const toggleFaq = (index: number) => {
-    setActiveIndex((currentIndex) => (currentIndex === index ? null : index));
-  };
-
-  return (
-    <section
-      className="background-zone background-zone-ivory render-deferred-section border-b border-[var(--line)] py-16 text-[var(--text)] max-[900px]:py-[60px]"
-      id="home-platform-help"
-    >
-      <div className="mx-auto w-full max-w-[1100px] px-5">
-        <div className="grid grid-cols-[1.6fr_1fr] items-stretch gap-[30px] max-[900px]:grid-cols-1 max-[900px]:gap-[60px]">
-          <div
-            className="bars-home-gradient flex flex-col items-center justify-center rounded-[var(--radius-xl)] border border-[var(--editorial-dark-border)] px-10 py-20 text-center text-[var(--editorial-dark-text)] max-[640px]:px-6 max-[640px]:py-14"
-            style={{ boxShadow: 'var(--shadow-panel)' }}
-          >
-            <h2
-              className={`${displayFont.className} mb-[15px] text-[3.35rem] font-semibold leading-[1.04] max-[640px]:text-[2.45rem]`}
-            >
-              Напишите команде
-              <br />
-              BARSYNERGY
-            </h2>
-            <p className="mb-[30px] max-w-[34rem] text-[0.95rem] font-medium leading-7 text-[var(--editorial-dark-muted)]">
-              Ответим на вопрос, примем идею события или поможем выбрать нужный раздел.
-            </p>
-          </div>
-
-          <div className="home-help-faq-list flex flex-col gap-3">
-            {homepageFaqItems.map((item, index) => {
-              const isActive = activeIndex === index;
-
-              return (
-                <button
-                  aria-expanded={isActive}
-                  aria-controls={`home-faq-answer-${index}`}
-                  className="home-help-faq-item cursor-pointer rounded-[var(--radius-md)] border bg-[var(--surface-card)] px-5 py-[18px] text-left transition-[background-color,border-color,box-shadow,color] duration-[var(--motion-duration-base)] ease-[var(--motion-ease-standard)] hover:border-[var(--card-border-hover)] hover:bg-[var(--surface-card-hover)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] motion-reduce:transition-none"
-                  data-active={isActive ? 'true' : 'false'}
-                  key={item.question}
-                  onClick={() => toggleFaq(index)}
-                  style={{
-                    borderColor: isActive ? 'var(--card-border-hover)' : 'var(--card-border)',
-                    boxShadow: isActive ? 'var(--shadow-card)' : 'none'
-                  }}
-                  type="button"
-                >
-                  <span className="flex items-center justify-between gap-4 text-[0.9rem] font-semibold text-[var(--text)]">
-                    <span>{item.question}</span>
-                    {isActive ? <ChevronUp aria-hidden="true" size={20} /> : <ChevronDown aria-hidden="true" size={20} />}
-                  </span>
-                  {isActive ? (
-                    <span className="home-help-faq-answer mt-3 block text-[0.9rem] leading-[1.6] text-[var(--muted)]" id={`home-faq-answer-${index}`}>
-                      {item.answer}
-                    </span>
-                  ) : null}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
 export function HomepageClient({ data }: HomepageClientProps) {
   return (
     <div className="overflow-x-hidden">
@@ -578,7 +502,7 @@ export function HomepageClient({ data }: HomepageClientProps) {
           <div className="mb-7 flex flex-wrap items-end justify-between gap-4">
             <div>
               <h2 className={`${displayFont.className} text-[2.35rem] font-semibold leading-none text-[var(--text)] md:text-[3.2rem]`}>
-                Свежее на платформе
+                Актуальное
               </h2>
             </div>
             <Button className="px-0 text-sm tracking-normal" href="/articles" variant="link">

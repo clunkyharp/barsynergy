@@ -18,16 +18,8 @@ function sponsorVisualState(status: string) {
   return /архив|заверш|неактив|inactive|archived/i.test(status) ? 'archived' : 'active';
 }
 
-function sponsorAnchorId(name: string) {
-  if (name.toLowerCase().includes('hustle brew')) {
-    return 'hustle-brew';
-  }
-
-  if (name.toLowerCase().includes('gelabo')) {
-    return 'gelabo';
-  }
-
-  return undefined;
+function sponsorAnchorId(slug: string) {
+  return `general-sponsor-${slug}`;
 }
 
 function SponsorContactCompactLink({
@@ -233,7 +225,7 @@ export function GeneralSponsorCard({ priority = false, sponsor, variant = 'full'
       className="general-sponsor-card overflow-hidden border-[var(--border-default)] bg-[var(--surface-elevated)] shadow-[var(--shadow-panel)]"
       data-sponsor-state={visualState}
       data-sponsor-variant="full"
-      id={sponsorAnchorId(sponsor.name)}
+      id={sponsorAnchorId(sponsor.slug)}
       padding="none"
     >
       <div className="general-sponsor-layout grid gap-0 lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)]">

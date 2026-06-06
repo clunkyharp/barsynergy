@@ -16,21 +16,37 @@ export class AuthRateLimitError extends Error {
   }
 }
 
+function getAuthScopes(action: AuthAttemptAction, email: string, clientIp: string) {
+  switch (action) {
+    case 'login':
+      return [
+        { scope: 'loginEmail' as const, identifier: email },
+        { scope: 'loginIp' as const, identifier: clientIp }
+      ];
+    case 'register':
+      return [
+        { scope: 'registerEmail' as const, identifier: email },
+        { scope: 'registerIp' as const, identifier: clientIp }
+      ];
+    case 'password-reset':
+      return [
+        { scope: 'passwordResetEmail' as const, identifier: email },
+        { scope: 'passwordResetIp' as const, identifier: clientIp }
+      ];
+    case 'verify-email':
+      return [
+        { scope: 'verifyEmailEmail' as const, identifier: email },
+        { scope: 'verifyEmailIp' as const, identifier: clientIp }
+      ];
+  }
+}
+
 export async function assertAuthAttemptAllowed(input: { action: AuthAttemptAction; email: string }) {
   const headerList = await headers();
   const clientIp = getClientIpFromHeaders(headerList);
   const now = new Date();
   const windowBoundary = new Date(now.getTime() - AUTH_THROTTLE_WINDOW_MS);
-  const scopes =
-    input.action === 'login'
-      ? [
-          { scope: 'loginEmail' as const, identifier: input.email },
-          { scope: 'loginIp' as const, identifier: clientIp }
-        ]
-      : [
-          { scope: 'registerEmail' as const, identifier: input.email },
-          { scope: 'registerIp' as const, identifier: clientIp }
-        ];
+  const scopes = getAuthScopes(input.action, input.email, clientIp);
 
   await prisma.$transaction(async (tx) => {
     for (const scope of scopes) {

@@ -40,6 +40,7 @@ Mode: `IMPLEMENTATION` on `feature/stabilization-remediation`, after a separate 
 - Applied the public/auth visual stabilization slice: `/general-sponsors` benefit/package blocks use editorial rows instead of nested cards, sponsor contacts are compact links, `/business` and `/consulting` use service rows with type/result columns, contact/register forms are sectioned, and shared public card/label/form states use quieter neutral borders without hover-lift or glow.
 - Applied the coffee-bar redesign Batch 1 foundation slice: runtime/design tokens now use warm graphite plus amber, cookie notice is bottom-right with a six-month localStorage choice, homepage hero badges and the digital-services promo block are removed, homepage sponsors are a compact logo strip, and `/about` no longer renders the redundant next-links table.
 - Applied the 2026-05-30 fix-plan v2 remediation slice: public header white-logo/action spacing/mobile-menu theme fixes, global anchor scroll padding, article query/empty-state behavior, events and education empty-state cleanup, auth/profile/404/admin/business form polish, custom checkbox checked color, brand/action token documentation, and source audit for the reported floating `N`/issue badge.
+- Applied the 2026-06-05 quality remediation slice: homepage FAQ state now lives in a separate `home-cta-faq-section.tsx` client island so `homepage-client.tsx` no longer hydrates the whole homepage; shared Telegram/WhatsApp/Instagram/email/phone/site accent colors were moved from duplicated component literals into semantic tokens plus `channel-accent.ts`; repeated public filter field/chip/reset markup was extracted from `public-filters.tsx` into `public-filters-fields.tsx` to reduce mixed concerns without changing query-param behavior or copy.
 
 ### Still Open
 
@@ -77,6 +78,7 @@ Mode: `IMPLEMENTATION` on `feature/stabilization-remediation`, after a separate 
 - Fix-plan v2 remediation passed `git diff --check`, targeted `node --test tests/site-header-navigation.test.mjs tests/home-feature-card-density.test.mjs tests/public-cta-copy.test.mjs tests/cost-calculator-formula.test.mjs`, full `npm test` with 141/141 tests, `npm run lint`, `npm run typecheck`, `./node_modules/.bin/prisma validate`, and Playwright DOM smoke on `http://127.0.0.1:3100` for header, mobile menu, auth error/role state, calculator copy error, 404 and legacy article query behavior.
 - Focused standalone runtime check: passed for admin application detail on the current build; notification-history fallback no longer logs the missing local notification table as a page failure.
 - Browser QA is current for this branch as of 2026-05-27.
+- 2026-06-05 focused runtime smoke passed against the existing local `http://127.0.0.1:3000` dev server: `/` and `/suppliers` at desktop, plus `/suppliers` at mobile, all returned HTTP 200 with zero console/page errors and zero horizontal overflow after the homepage/client-island and public-filter refactor.
 
 ## Current Use
 
@@ -112,6 +114,10 @@ Out of scope:
 - payment, LMS, subscriptions or public profiles;
 - active penetration testing;
 - full visual redesign.
+
+### Product Deferral: `/search` Not In Primary Navigation
+
+`/search` remains a future-facing public route. By owner decision, it is not part of the primary public navigation in the current stabilization scope. Current discovery should rely on section-level listings and filters. This must not be treated as an active UX bug until Phase 5 search/discovery work starts.
 
 ## Current State Summary
 
