@@ -34,10 +34,10 @@ type DialogProps = {
 } & Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'title'>;
 
 const dialogSizes: Record<DialogSize, string> = {
-  confirm: 'max-w-[235px]',
-  sm: 'max-w-sm',
-  md: 'max-w-lg',
-  lg: 'max-w-2xl'
+  confirm: 'max-w-[min(235px,90vw)]',
+  sm: 'max-w-[min(24rem,90vw)]',
+  md: 'max-w-[min(32rem,90vw)]',
+  lg: 'max-w-[min(42rem,90vw)]'
 };
 
 export function Dialog({
@@ -131,8 +131,8 @@ export function Dialog({
         aria-labelledby={titleId}
         aria-modal="true"
         className={cn(
-          'dialog-panel w-full rounded-[18px] border border-[var(--line)] bg-[var(--surface)] p-6 text-left text-[var(--text)] shadow-[var(--shadow-overlay)] motion-reduce:transition-none',
-          size === 'confirm' && 'border-[#ded2c2] bg-white shadow-none',
+          'dialog-panel w-full rounded-[var(--radius-xl)] border border-[var(--line)] bg-[var(--surface)] p-6 text-left text-[var(--text)] shadow-[var(--shadow-overlay)] motion-reduce:transition-none',
+          size === 'confirm' && 'border-[var(--border-strong)] bg-[var(--surface)] shadow-none',
           dialogSizes[size],
           className
         )}
@@ -156,7 +156,7 @@ export function Dialog({
           {showCloseButton ? (
             <button
               aria-label={closeLabel}
-              className="inline-flex min-h-10 min-w-10 shrink-0 items-center justify-center rounded-[var(--radius-sm)] border border-[var(--line)] text-lg leading-none text-[var(--muted)] transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] hover:border-[var(--border-strong)] hover:text-[var(--text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] motion-reduce:transition-none"
+              className="inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-[var(--radius-sm)] border border-[var(--line)] text-lg leading-none text-[var(--muted)] transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] hover:border-[var(--border-strong)] hover:text-[var(--text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-1 motion-reduce:transition-none"
               onClick={closeDialog}
               type="button"
             >

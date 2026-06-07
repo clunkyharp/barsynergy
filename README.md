@@ -156,7 +156,6 @@ The VPS deploys from `prod`; keep that branch clean from agent memory, generated
 - [Backup](docs/backup.md)
 - [Security](docs/security.md)
 - [Personal data launch checklist](docs/personal-data-launch-checklist.md)
-- [Features](docs/features.md)
 - [Monetization](docs/monetization.md)
 - [Git workflow](docs/git-workflow.md)
 - [Legal notes](docs/legal-notes.md)

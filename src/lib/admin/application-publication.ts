@@ -1,6 +1,7 @@
 import { ApplicationStatus, ApplicationType, ContentStatus, type Prisma } from '@prisma/client';
 import { normalizeExternalUrlInput } from '../validation/external-url.ts';
 import { getVacancyDraftFieldsFromApplication } from './vacancy-application-drafts.ts';
+import { parseApplicationPayload } from '../applications/application-payloads.ts';
 
 export const applicationPublicationStatusValues = [
   ApplicationStatus.NEW,
@@ -24,15 +25,6 @@ type PublishableApplication = {
   consentAcceptedAt: Date | null;
   payload: Prisma.JsonValue | null;
 };
-
-function payloadString(payload: Prisma.JsonValue | null, key: string) {
-  if (!payload || Array.isArray(payload) || typeof payload !== 'object') {
-    return undefined;
-  }
-
-  const value = (payload as Record<string, Prisma.JsonValue>)[key];
-  return typeof value === 'string' && value.trim().length > 0 ? value.trim() : undefined;
-}
 
 function compactText(value?: string | null) {
   return value?.replace(/\s+/g, ' ').trim();
@@ -100,18 +92,16 @@ export function getSupplierPublicationFieldsFromApplication(application: Publish
     throw new Error('supplier publication already exists for application');
   }
 
-  const companyName = requiredApplicationText(
-    payloadString(application.payload, 'companyName'),
-    'supplier publication requires company name'
-  );
-  const serviceArea = payloadString(application.payload, 'serviceArea') ?? null;
-  const title = payloadString(application.payload, 'title') ?? companyName;
+  const payload = parseApplicationPayload(ApplicationType.SUPPLIER_SUBMISSION, application.payload);
+  const companyName = requiredApplicationText(payload.companyName, 'supplier publication requires company name');
+  const serviceArea = payload.serviceArea ?? null;
+  const title = payload.title ?? companyName;
   const description = requiredApplicationText(application.message, 'supplier publication requires description');
-  const websiteUrl = normalizeExternalUrlInput(payloadString(application.payload, 'websiteUrl')) ?? null;
+  const websiteUrl = normalizeExternalUrlInput(payload.websiteUrl) ?? null;
 
   return {
     title,
-    summary: firstSummary(payloadString(application.payload, 'title'), serviceArea ? `${companyName}: ${serviceArea}` : null, description),
+    summary: firstSummary(payload.title, serviceArea ? `${companyName}: ${serviceArea}` : null, description),
     description,
     status: ContentStatus.PUBLISHED,
     cityId: application.cityId,
@@ -135,18 +125,16 @@ export function getPartnerPublicationFieldsFromApplication(application: Publisha
     throw new Error('partner publication already exists for application');
   }
 
-  const companyName = requiredApplicationText(
-    payloadString(application.payload, 'companyName'),
-    'partner publication requires company name'
-  );
-  const partnerType = payloadString(application.payload, 'partnerType') ?? null;
-  const title = payloadString(application.payload, 'title') ?? companyName;
+  const payload = parseApplicationPayload(ApplicationType.PARTNER_APPLICATION, application.payload);
+  const companyName = requiredApplicationText(payload.companyName, 'partner publication requires company name');
+  const partnerType = payload.partnerType ?? null;
+  const title = payload.title ?? companyName;
   const description = requiredApplicationText(application.message, 'partner publication requires description');
-  const websiteUrl = normalizeExternalUrlInput(payloadString(application.payload, 'websiteUrl')) ?? null;
+  const websiteUrl = normalizeExternalUrlInput(payload.websiteUrl) ?? null;
 
   return {
     title,
-    summary: firstSummary(payloadString(application.payload, 'title'), partnerType ? `${companyName}: ${partnerType}` : null, description),
+    summary: firstSummary(payload.title, partnerType ? `${companyName}: ${partnerType}` : null, description),
     description,
     status: ContentStatus.PUBLISHED,
     categoryId: null,

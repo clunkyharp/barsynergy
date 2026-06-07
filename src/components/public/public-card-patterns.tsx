@@ -37,23 +37,26 @@ type FeatureCardProps = {
   details?: FeatureCardDetail[];
   eyebrow?: ReactNode;
   footer?: ReactNode;
+  index?: ReactNode;
+  kind?: ReactNode;
   presentation?: 'card' | 'row';
+  result?: ReactNode;
+  resultLabel?: ReactNode;
   title: ReactNode;
 };
 
 function CardLabel({ children }: { children: ReactNode }) {
-  return <span className="public-card-label">{children}</span>;
+  return <span className="public-meta-label public-card-label">{children}</span>;
 }
 
 function CardCode({ children }: { children: ReactNode }) {
-  return <span className="public-card-code">{children}</span>;
+  return <span className="public-route-label public-card-code">{children}</span>;
 }
 
 export function RoleTaskCard({
   action,
   className,
   code,
-  density = 'standard',
   description,
   eyebrow,
   meta,
@@ -131,8 +134,7 @@ export function RoleTaskCard({
   return (
     <article
       className={cn(
-        'public-card-shell group flex h-full min-h-0 flex-col p-4 md:p-5',
-        density === 'compact' ? 'sm:min-h-[12rem]' : 'md:min-h-[13rem]',
+        'public-card-shell group flex min-h-0 flex-col p-4 md:p-5',
         className
       )}
       data-priority={priority || undefined}
@@ -146,15 +148,14 @@ export function RoleTaskCard({
       <h3
         className={cn(
           `${displayFont.className} text-[1.45rem] font-semibold leading-[1.08] text-[var(--text)] md:text-[1.65rem]`,
-          hasHeaderMeta && 'mt-4',
-          density === 'compact' ? 'sm:min-h-[3.4rem]' : 'md:min-h-[3.5rem]'
+          hasHeaderMeta && 'mt-4'
         )}
       >
         {title}
       </h3>
 
       <div className="flex flex-1 flex-col">
-        <p className={cn('text-sm leading-6 text-[var(--muted)]', density === 'compact' ? 'sm:min-h-[3rem]' : 'md:min-h-[3.2rem]')}>
+        <p className={cn('text-sm leading-6 text-[var(--muted)]')}>
           {description}
         </p>
 
@@ -204,27 +205,43 @@ export function RoleTaskCard({
   );
 }
 
-export function FeatureCard({ action, className, code, description, details, eyebrow, footer, presentation = 'card', title }: FeatureCardProps) {
+export function FeatureCard({
+  action,
+  className,
+  code,
+  description,
+  details,
+  eyebrow,
+  footer,
+  index,
+  kind,
+  presentation = 'card',
+  result,
+  resultLabel = 'Результат',
+  title
+}: FeatureCardProps) {
   if (presentation === 'row') {
+    const hasLeftMeta = Boolean(index || kind || code || eyebrow);
+
     return (
       <article
         className={cn(
-          'grid gap-3 border-b border-[var(--line)] py-4 md:grid-cols-[minmax(0,0.72fr)_minmax(0,1.1fr)_auto] md:items-center md:gap-5',
+          'group grid gap-3 border-b border-[var(--line)] py-4 transition-colors duration-[var(--motion-duration-base)] ease-[var(--motion-ease-standard)] hover:bg-[var(--surface-wash)] focus-within:bg-[var(--surface-wash)] motion-reduce:transition-none md:grid-cols-[minmax(7rem,0.28fr)_minmax(0,1fr)_minmax(12rem,0.46fr)] md:items-start md:gap-5 md:px-3 md:py-5',
           className
         )}
       >
-        <div className="min-w-0">
-          <div className="flex flex-wrap items-center gap-2">
-            {eyebrow ? <CardLabel>{eyebrow}</CardLabel> : null}
-            {code ? <CardCode>{code}</CardCode> : null}
-          </div>
-          <h3 className={`${displayFont.className} mt-3 text-[1.45rem] font-semibold leading-[1.08] text-[var(--text)] md:text-[1.75rem]`}>
-            {title}
-          </h3>
+        <div className="flex min-w-0 flex-wrap items-center gap-2 md:block">
+          {index ? <span className="public-route-label">{index}</span> : null}
+          {kind ? <span className="public-meta-label md:mt-3 md:flex">{kind}</span> : null}
+          {!kind && eyebrow ? <CardLabel>{eyebrow}</CardLabel> : null}
+          {!index && code ? <CardCode>{code}</CardCode> : null}
         </div>
 
         <div className="min-w-0">
-          <p className="text-sm leading-6 text-[var(--muted)]">{description}</p>
+          <h3 className={`${displayFont.className} text-[1.45rem] font-semibold leading-[1.08] text-[var(--text)] md:text-[1.75rem]`}>
+            {title}
+          </h3>
+          <p className="mt-2 text-sm leading-6 text-[var(--muted)]">{description}</p>
           {details?.length ? (
             <dl className="mt-3 grid gap-2">
               {details.map((detail, index) => (
@@ -237,11 +254,17 @@ export function FeatureCard({ action, className, code, description, details, eye
           ) : null}
         </div>
 
-        <div className="flex flex-wrap items-center gap-3 md:justify-self-end">
+        <div className={cn('min-w-0', !hasLeftMeta && 'md:col-start-3')}>
+          {result ? (
+            <>
+              <span className="public-meta-label">{resultLabel}</span>
+              <p className="mt-2 text-sm font-semibold leading-6 text-[var(--text)]">{result}</p>
+            </>
+          ) : null}
           {footer ? <div className="text-sm font-semibold leading-6 text-[var(--accent)]">{footer}</div> : null}
           {action ? (
             <Link
-              className="inline-flex min-h-11 items-center gap-2 rounded-[var(--radius-sm)] text-sm font-semibold text-[var(--accent)] transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] hover:text-[var(--accent-strong)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--field-focus-ring)] motion-reduce:transition-none"
+              className="mt-3 inline-flex min-h-11 items-center gap-2 rounded-[var(--radius-sm)] text-sm font-semibold text-[var(--accent)] transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] hover:text-[var(--accent-strong)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--field-focus-ring)] motion-reduce:transition-none"
               href={action.href}
             >
               {action.label}
@@ -256,7 +279,7 @@ export function FeatureCard({ action, className, code, description, details, eye
   return (
     <article
       className={cn(
-        'public-card-shell flex h-full min-h-0 flex-col p-4 md:p-5',
+        'public-card-shell flex min-h-0 flex-col p-4 md:p-5',
         className
       )}
     >
@@ -264,13 +287,13 @@ export function FeatureCard({ action, className, code, description, details, eye
         {eyebrow ? <CardLabel>{eyebrow}</CardLabel> : <span aria-hidden="true" className="h-px w-12 bg-[var(--accent)]/45" />}
         {code ? <CardCode>{code}</CardCode> : null}
       </div>
-      <h3 className={`${displayFont.className} mt-4 text-[1.45rem] font-semibold leading-[1.05] text-[var(--text)] md:min-h-[3.6rem] md:text-[1.7rem]`}>
+      <h3 className={`${displayFont.className} mt-4 text-[1.45rem] font-semibold leading-[1.05] text-[var(--text)] md:text-[1.7rem]`}>
         {title}
       </h3>
-      <p className="mt-3 text-sm leading-6 text-[var(--muted)] md:min-h-[4.5rem]">{description}</p>
+      <p className="mt-3 text-sm leading-6 text-[var(--muted)]">{description}</p>
 
       {details?.length ? (
-        <dl className="mt-4 grid gap-2 md:min-h-[8.8rem]">
+        <dl className="mt-4 grid gap-2">
           {details.map((detail, index) => (
             <div className="grid grid-cols-[5rem_minmax(0,1fr)] gap-3 rounded-[var(--radius-sm)] border border-[var(--border-subtle)] bg-[var(--surface-card-muted)] px-3 py-2.5" key={index}>
               <dt className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">{detail.label}</dt>

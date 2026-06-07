@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { SESSION_COOKIE_NAME } from '@/lib/auth/session';
+import { SESSION_COOKIE_NAME } from '@/lib/auth/session-constants';
 import {
   buildContentSecurityPolicy,
   createCspNonce,
@@ -43,11 +43,22 @@ export function proxy(request: NextRequest) {
       return withSecurityHeaders(NextResponse.json({ error: 'Unauthorized.' }, { status: 401 }));
     }
 
-    const loginPath = request.nextUrl.pathname === '/admin' || request.nextUrl.pathname.startsWith('/admin/')
-      ? '/admin/login'
-      : '/auth/login';
+    if (request.nextUrl.pathname === '/admin' || request.nextUrl.pathname.startsWith('/admin/')) {
+      return withSecurityHeaders(NextResponse.redirect(new URL('/admin/login', request.url)));
+    }
 
-    return withSecurityHeaders(NextResponse.redirect(new URL(loginPath, request.url)));
+    const loginUrl = new URL('/auth/login', request.url);
+
+    if (request.nextUrl.pathname === '/profile' || request.nextUrl.pathname.startsWith('/profile/')) {
+      loginUrl.searchParams.set('returnTo', request.nextUrl.pathname);
+    } else if (
+      request.nextUrl.pathname === '/business/cabinet' ||
+      request.nextUrl.pathname.startsWith('/business/cabinet/')
+    ) {
+      loginUrl.searchParams.set('returnTo', '/business/cabinet');
+    }
+
+    return withSecurityHeaders(NextResponse.redirect(loginUrl));
   }
 
   return withSecurityHeaders(

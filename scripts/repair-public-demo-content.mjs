@@ -35,11 +35,52 @@ async function main() {
     });
   }
 
+  // Fix Hustle Brew supplier — wrong data (beer/cider) was added by an agent.
+  // Hustle Brew actually supplies coffee, cocoa, and concentrated juices.
+  const hustleBrewFix = await prisma.supplier.updateMany({
+    where: {
+      companyName: 'Hustle Brew',
+      OR: [
+        { summary: { contains: 'пиво' } },
+        { summary: { contains: 'сидр' } },
+        { description: { contains: 'пиво' } },
+        { description: { contains: 'сидр' } }
+      ]
+    },
+    data: {
+      title: 'Кофе, какао и концентрированные соки для заведений',
+      summary: 'Кофе, какао, концентрированные соки и рабочие поставки для кофеен, баров и HoReCa-команд.',
+      description: 'Hustle Brew работает с кофейным и барным направлением: поставляет кофе, какао, концентрированные соки и позиции для ежедневной работы заведения. Команда представляет KOF и Vérle и помогает быстро собрать поставку под бар, кофейню или учебный формат.',
+      isVerified: true,
+      contactLabel: '@hustle.brew / 8 928 866 70 02 / 8 989 441 95 95',
+      serviceArea: 'СКФО'
+    }
+  });
+
+  // Also fix GeneralSponsor record if it was corrupted with wrong data
+  const hustleBrewSponsorFix = await prisma.generalSponsor.updateMany({
+    where: {
+      slug: 'hustle-brew',
+      OR: [
+        { shortDescription: { contains: 'пиво' } },
+        { shortDescription: { contains: 'сидр' } },
+        { fullDescription: { contains: 'пиво' } },
+        { fullDescription: { contains: 'сидр' } }
+      ]
+    },
+    data: {
+      shortDescription: 'Кофе, какао, концентрированные соки и рабочие поставки для кофеен, баров и HoReCa-команд.',
+      fullDescription: 'Hustle Brew работает с кофейным и барным направлением: поставляет кофе, какао, концентрированные соки и позиции для ежедневной работы заведения. Команда представляет KOF и Vérle и помогает быстро собрать поставку под бар, кофейню или учебный формат.'
+    }
+  });
+
   console.log(
     JSON.stringify(
       {
         deletedVacancies: deletedVacancies.count,
-        updatedEvents: publishedEventUpdates.map((event) => event.slug)
+        updatedEvents: publishedEventUpdates.map((event) => event.slug),
+        hustleBrewSupplierFixed: hustleBrewFix.count,
+        hustleBrewSponsorFixed: hustleBrewSponsorFix.count
       },
       null,
       2

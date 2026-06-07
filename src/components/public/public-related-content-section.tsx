@@ -65,7 +65,7 @@ export function PublicRelatedContentSection({
           {description ? <PublicBodyText className="mt-5 max-w-md">{description}</PublicBodyText> : null}
         </div>
 
-        <div className="border-y border-[var(--line)]">
+        <div>
           {items.map((item, index) => (
             <article className="grid gap-4 border-b border-[var(--line)] py-5 last:border-b-0 md:grid-cols-[auto_minmax(0,1fr)_auto] md:items-start md:gap-6" key={item.id}>
               <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">

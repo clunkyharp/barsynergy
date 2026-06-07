@@ -7,10 +7,12 @@ export function parseCalculatorNumberInput(value: string): number | null {
     return null;
   }
 
-  if (!DECIMAL_NUMBER_PATTERN.test(trimmedValue)) {
+  const normalized = trimmedValue.replace(/[\s\u00a0\u202f\u2009]/g, '');
+
+  if (!DECIMAL_NUMBER_PATTERN.test(normalized)) {
     return null;
   }
 
-  const parsed = Number(trimmedValue.replace(',', '.'));
+  const parsed = Number(normalized.replace(',', '.'));
   return Number.isFinite(parsed) ? parsed : null;
 }

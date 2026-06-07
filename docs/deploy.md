@@ -249,7 +249,7 @@ Unsupported production mode for the current repo without a separate ingress revi
 
 Status note, 2026-05-05: this single-node Nginx/TLS contract is the current launch-readiness target. Older notes about a trusted external edge are historical unless the owner explicitly reopens that architecture.
 
-The tracked `.env.production.example` and `docker/nginx/nginx.conf` currently contain `72.56.1.69.sslip.io`. Treat that value as an example or current temporary host name, not as the canonical public domain. For a real release, align `APP_URL`, Nginx `server_name`, certificate paths and smoke-check URLs to the owner-approved production host.
+The canonical public domain is `https://barsynergy.ru`. Keep `APP_URL`, Nginx `server_name`, certificate paths and smoke-check URLs aligned to that domain. `www.barsynergy.ru` and the temporary `72.56.1.69.sslip.io` host must return `301` to `https://barsynergy.ru$request_uri`; apply the same redirect in the real host Nginx when production runs from the host checkout.
 
 ## Single-Node Fallback Contract
 

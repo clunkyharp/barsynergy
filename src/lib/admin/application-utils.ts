@@ -31,7 +31,8 @@ export const applicationTypeValues = [
   ApplicationType.CONSULTING_REQUEST,
   ApplicationType.CONTACT_MESSAGE,
   ApplicationType.CORPORATE_TRAINING_APPLICATION,
-  ApplicationType.CERTIFICATE_ORDER
+  ApplicationType.CERTIFICATE_ORDER,
+  ApplicationType.SUPPLIER_INQUIRY
 ] as const;
 
 export const applicationStatusValues = [
@@ -60,7 +61,8 @@ export const applicationTypeLabels: Record<ApplicationType, string> = {
   [ApplicationType.CONSULTING_REQUEST]: 'Консалтинг',
   [ApplicationType.CONTACT_MESSAGE]: 'Контактное сообщение',
   [ApplicationType.CORPORATE_TRAINING_APPLICATION]: 'Корпоративное обучение',
-  [ApplicationType.CERTIFICATE_ORDER]: 'Заказ сертификата'
+  [ApplicationType.CERTIFICATE_ORDER]: 'Заказ сертификата',
+  [ApplicationType.SUPPLIER_INQUIRY]: 'Запрос поставщику'
 };
 
 export const applicationStatusLabels: Record<ApplicationStatus, string> = {

@@ -38,7 +38,7 @@ test('CSP builder separates production hardening from development allowances', (
   assert.equal(getDirective(productionPolicy, 'default-src'), "default-src 'self'");
   assert.equal(getDirective(productionPolicy, 'base-uri'), "base-uri 'self'");
   assert.equal(getDirective(productionPolicy, 'form-action'), "form-action 'self'");
-  assert.equal(getDirective(productionPolicy, 'frame-ancestors'), "frame-ancestors 'self'");
+  assert.equal(getDirective(productionPolicy, 'frame-ancestors'), "frame-ancestors 'none'");
   assert.equal(getDirective(productionPolicy, 'object-src'), "object-src 'none'");
   assert.match(getDirective(productionPolicy, 'script-src'), /'nonce-prod-nonce'/);
   assert.match(getDirective(productionPolicy, 'script-src'), /'strict-dynamic'/);

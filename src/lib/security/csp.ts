@@ -44,7 +44,7 @@ export function buildContentSecurityPolicy({
     [`default-src`, `'self'`],
     [`base-uri`, `'self'`],
     [`form-action`, `'self'`],
-    [`frame-ancestors`, `'self'`],
+    [`frame-ancestors`, `'none'`],
     [`object-src`, `'none'`],
     [`script-src`, ...scriptSources],
     [`style-src`, `'self'`, `'unsafe-inline'`],
@@ -69,7 +69,9 @@ export function isProtectedAppPath(pathname: string) {
     pathname === '/admin' ||
     pathname.startsWith('/admin/') ||
     pathname === '/business/cabinet' ||
-    pathname.startsWith('/business/cabinet/')
+    pathname.startsWith('/business/cabinet/') ||
+    pathname === '/profile' ||
+    pathname.startsWith('/profile/')
   );
 }
 

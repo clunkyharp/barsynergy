@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { FileText } from 'lucide-react';
 import { ApplicationStatus, ApplicationType } from '@prisma/client';
 import { Button } from '@/components/ui/button';
 import { FormField } from '@/components/ui/form-field';
@@ -11,8 +12,7 @@ import {
   applicationStatusBadgeVariants,
   applicationStatusLabels,
   applicationTypeLabels
-} from '@/lib/admin/application-utils';
-import { displayFont } from '@/lib/fonts';
+} from '@/modules/content/shared/labels';
 import { cn } from '@/lib/utils';
 
 type BusinessFormAction = (formData: FormData) => void | Promise<void>;
@@ -54,6 +54,7 @@ type RequestLedgerProps = {
   description?: string;
   emptyDescription?: string;
   title?: string;
+  viewAllHref?: string;
 };
 
 type RequestStatusRailItem = {
@@ -114,7 +115,7 @@ export function BusinessProfileSheet({ account, action, cities }: BusinessProfil
       <div className="grid gap-4 border-b border-[var(--line)] px-5 py-5 md:px-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Профильный лист</p>
-          <h2 className={`${displayFont.className} mt-3 text-[2rem] font-semibold leading-none tracking-normal`}>
+          <h2 className="mt-3 text-[1.65rem] font-semibold leading-tight tracking-normal">
             Данные компании
           </h2>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--muted)]">
@@ -128,10 +129,10 @@ export function BusinessProfileSheet({ account, action, cities }: BusinessProfil
         <SheetSection title="Компания">
           <div className="grid gap-5 md:grid-cols-2">
             <FormField htmlFor="companyName" label="Компания">
-              <Input id="companyName" name="companyName" required maxLength={160} defaultValue={account.companyName} />
+              <Input id="companyName" name="companyName" required maxLength={160} placeholder="Например, Coffee Point" defaultValue={account.companyName} />
             </FormField>
             <FormField htmlFor="contactPerson" label="Контактное лицо">
-              <Input id="contactPerson" name="contactPerson" required maxLength={120} defaultValue={account.contactPerson ?? ''} />
+              <Input id="contactPerson" name="contactPerson" required maxLength={120} placeholder="Иван Иванов" defaultValue={account.contactPerson ?? ''} />
             </FormField>
             <FormField htmlFor="cityId" label="Город">
               <Select id="cityId" name="cityId" defaultValue={account.cityId ?? ''}>
@@ -149,13 +150,13 @@ export function BusinessProfileSheet({ account, action, cities }: BusinessProfil
         <SheetSection title="Контакты">
           <div className="grid gap-5 md:grid-cols-3">
             <FormField htmlFor="phone" label="Телефон">
-              <Input id="phone" name="phone" maxLength={80} defaultValue={account.phone ?? ''} />
+              <Input id="phone" name="phone" maxLength={80} placeholder="+7 999 123 45 67" defaultValue={account.phone ?? ''} />
             </FormField>
             <FormField htmlFor="telegram" label="Telegram">
-              <Input id="telegram" name="telegram" maxLength={80} defaultValue={account.telegram ?? ''} />
+              <Input id="telegram" name="telegram" maxLength={80} placeholder="@username" defaultValue={account.telegram ?? ''} />
             </FormField>
             <FormField htmlFor="websiteUrl" label="Сайт">
-              <Input id="websiteUrl" name="websiteUrl" type="url" maxLength={240} defaultValue={account.websiteUrl ?? ''} />
+              <Input id="websiteUrl" name="websiteUrl" type="url" placeholder="https://example.ru" maxLength={240} defaultValue={account.websiteUrl ?? ''} />
             </FormField>
           </div>
         </SheetSection>
@@ -168,6 +169,7 @@ export function BusinessProfileSheet({ account, action, cities }: BusinessProfil
               className="min-h-36"
               maxLength={1000}
               rows={5}
+              placeholder="Например: кофейня в центре города, завтраки весь день, спешелти-кофе и вечерние события."
               defaultValue={account.description ?? ''}
             />
           </FormField>
@@ -212,14 +214,22 @@ export function RequestLedger({
   className,
   description = 'Последние записи, статусы и рабочие комментарии по компании.',
   emptyDescription = 'Когда компания создаст заявку, здесь появится её статус и рабочий комментарий.',
-  title = 'Журнал заявок'
+  title = 'Журнал заявок',
+  viewAllHref
 }: RequestLedgerProps) {
   return (
     <section className={cn('rounded-[var(--radius-lg)] border border-[var(--line)] bg-[var(--surface-elevated)]', className)}>
-      <div className="border-b border-[var(--line)] px-5 py-4">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Реестр заявок</p>
-        <h2 className="mt-2 text-xl font-semibold">{title}</h2>
-        <p className="mt-1 max-w-3xl text-sm leading-6 text-[var(--muted)]">{description}</p>
+      <div className="flex flex-wrap items-start justify-between gap-3 border-b border-[var(--line)] px-5 py-4">
+        <div>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Реестр заявок</p>
+          <h2 className="mt-2 text-xl font-semibold">{title}</h2>
+          <p className="mt-1 max-w-3xl text-sm leading-6 text-[var(--muted)]">{description}</p>
+        </div>
+        {viewAllHref ? (
+          <Button className="shrink-0" href={viewAllHref} size="sm" variant="secondary">
+            Смотреть все
+          </Button>
+        ) : null}
       </div>
 
       {applications.length > 0 ? (
@@ -241,7 +251,7 @@ export function RequestLedger({
                 )}
               </div>
               <div className="flex flex-wrap items-center gap-2 lg:justify-end">
-                <StatusBadge variant={applicationStatusBadgeVariants[application.status]}>
+                <StatusBadge variant={applicationStatusBadgeVariants[application.status] as StatusBadgeVariant}>
                   {applicationStatusLabels[application.status]}
                 </StatusBadge>
                 <Button href={`/business/cabinet/requests/${application.id}`} size="sm" variant="secondary">
@@ -252,7 +262,12 @@ export function RequestLedger({
           ))}
         </div>
       ) : (
-        <div className="px-5 py-6 text-sm leading-6 text-[var(--muted)]">{emptyDescription}</div>
+        <div className="flex flex-col items-start gap-4 px-5 py-6">
+          <span className="inline-flex h-11 w-11 items-center justify-center rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--accent-soft)] text-[var(--accent)]">
+            <FileText aria-hidden="true" size={20} strokeWidth={1.8} />
+          </span>
+          <p className="text-sm leading-6 text-[var(--muted)]">{emptyDescription}</p>
+        </div>
       )}
     </section>
   );

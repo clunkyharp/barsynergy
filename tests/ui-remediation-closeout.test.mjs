@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import process from 'node:process';
 import test from 'node:test';
+import { readGlobalStyles } from './helpers/global-styles.mjs';
 
 const repoRoot = process.cwd();
 
@@ -20,7 +21,7 @@ test('root layout installs the shared toast provider', () => {
 
 test('file upload exposes an adjacent error state without glow styling', () => {
   const componentSource = readProjectFile('src/components/ui/file-upload.tsx');
-  const cssSource = readProjectFile('src/app/globals.css');
+  const cssSource = readGlobalStyles();
 
   assert.match(componentSource, /error\?: string/);
   assert.match(componentSource, /aria-invalid=\{error \? true : ariaInvalid\}/);

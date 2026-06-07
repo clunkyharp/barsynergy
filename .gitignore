@@ -25,11 +25,12 @@ yarn-error.log*
 .codex/
 .agents/
 .mempalace/
+.codegraph/
 qa/
 references/
 test-results
 .playwright-cli
-output/playwright
+output/
 docs/output
 
 ssh.md

@@ -1,19 +1,19 @@
-import { Noto_Sans, Noto_Serif_Display } from 'next/font/google';
+import { Cormorant_Garamond, Manrope } from 'next/font/google';
 
-export const bodyFont = Noto_Sans({
+export const bodyFont = Manrope({
   subsets: ['latin', 'cyrillic'],
-  weight: ['400', '500', '600', '700'],
+  weight: ['400', '500', '600', '700', '800'],
   display: 'swap'
 });
 
-export const displayFont = Noto_Serif_Display({
+export const displayFont = Cormorant_Garamond({
+  subsets: ['latin', 'cyrillic'],
+  weight: ['400', '600', '700'],
+  display: 'swap'
+});
+
+export const accentFont = Manrope({
   subsets: ['latin', 'cyrillic'],
   weight: ['500', '600', '700', '800'],
-  display: 'swap'
-});
-
-export const accentFont = Noto_Sans({
-  subsets: ['latin', 'cyrillic'],
-  weight: ['500', '600', '700'],
   display: 'swap'
 });

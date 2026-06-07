@@ -1,7 +1,8 @@
-import { CategoryType, ContentStatus, type Prisma } from '@prisma/client';
+import { CategoryType, ContentStatus, type Prisma } from '@/modules/admin/queries';
 import { deleteSupplierDraft, updateSupplierStatus } from '@/app/admin/suppliers/actions';
 import {
   AdminActionAlert,
+  AdminContentStatusTabs,
   AdminContentRowActions,
   AdminListFilters,
   AdminPagination
@@ -37,7 +38,7 @@ import {
   type AdminContentSearchParams
 } from '@/lib/admin/content-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
-import { prisma } from '@/lib/db/prisma';
+import { prisma } from '@/modules/admin/queries';
 
 export const dynamic = 'force-dynamic';
 
@@ -64,6 +65,8 @@ export default async function AdminSuppliersPage({ searchParams }: AdminSupplier
   const categoryId = getAdminStringFilter(params, 'categoryId');
   const cityId = getAdminStringFilter(params, 'cityId');
   const verifiedFilter = getAdminStringFilter(params, 'verified');
+  const quickFilter = getAdminStringFilter(params, 'filter');
+  const isNoCityFilter = quickFilter === 'no-city';
   const isVerified = getAdminBooleanFilter(params, 'verified');
   const searchWhere: Prisma.SupplierWhereInput = q
     ? {
@@ -76,12 +79,18 @@ export default async function AdminSuppliersPage({ searchParams }: AdminSupplier
         ]
       }
     : {};
+  const noCityWhere: Prisma.SupplierWhereInput = isNoCityFilter
+    ? {
+        OR: [{ cityId: null }, { cityId: '' }]
+      }
+    : {};
+  const andWhere = [searchWhere, noCityWhere].filter((item) => Object.keys(item).length > 0);
   const where: Prisma.SupplierWhereInput = {
     status,
     categoryId,
-    cityId,
+    cityId: isNoCityFilter ? undefined : cityId,
     isVerified,
-    ...searchWhere
+    ...(andWhere.length > 0 ? { AND: andWhere } : {})
   };
 
   const [total, suppliers, supplierStatusCounts, categories, cities] = await Promise.all([
@@ -116,7 +125,7 @@ export default async function AdminSuppliersPage({ searchParams }: AdminSupplier
   ]);
   const totalPages = getAdminTotalPages(total);
   const supplierCountByStatus = new Map(supplierStatusCounts.map((item) => [item.status, item._count._all] as const));
-  const hasActiveFilters = Boolean(q || status || categoryId || cityId || verifiedFilter);
+  const hasActiveFilters = Boolean(q || status || categoryId || cityId || verifiedFilter || isNoCityFilter);
 
   return (
     <div className="space-y-8">
@@ -132,8 +141,10 @@ export default async function AdminSuppliersPage({ searchParams }: AdminSupplier
       />
 
       <AdminActionAlert params={params} />
+      <AdminContentStatusTabs basePath={ADMIN_SUPPLIERS_PATH} params={params} />
       <AdminListFilters
         basePath={ADMIN_SUPPLIERS_PATH}
+        includeStatus={false}
         filters={[
           { name: 'categoryId', label: 'Категория', allLabel: 'Все категории', options: categories.map((category) => ({ value: category.id, label: category.name })) },
           { name: 'cityId', label: 'Город', allLabel: 'Все города', options: cities.map((city) => ({ value: city.id, label: city.name })) },
@@ -150,6 +161,16 @@ export default async function AdminSuppliersPage({ searchParams }: AdminSupplier
         params={params}
         searchPlaceholder="Поиск по названию"
       />
+      <div className="flex flex-wrap items-center gap-2">
+        <Button href={`${ADMIN_SUPPLIERS_PATH}?filter=no-city`} variant={isNoCityFilter ? 'primary' : 'secondary'}>
+          Без города
+        </Button>
+        {isNoCityFilter ? (
+          <Button href={ADMIN_SUPPLIERS_PATH} variant="ghost">
+            Сбросить быстрый фильтр
+          </Button>
+        ) : null}
+      </div>
 
       <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard label="Всего" value={total} />

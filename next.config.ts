@@ -31,6 +31,7 @@ const deploymentId = readDeploymentId();
 const nextConfig: NextConfig = {
   deploymentId,
   allowedDevOrigins: tunnelOrigins,
+  devIndicators: false,
   experimental: {
     ...(shouldAllowTunnelServerActions
       ? {

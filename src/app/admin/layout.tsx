@@ -8,14 +8,14 @@ import { canAccessAdmin } from '@/lib/auth/permissions';
 
 function AdminMobileUnsupportedState() {
   return (
-    <div className="grid min-h-screen place-items-center px-4 py-6 md:hidden">
+    <div className="grid min-h-screen place-items-center px-4 py-6 lg:hidden">
       <Panel aria-labelledby="admin-mobile-title" className="w-full max-w-md" padding="lg" tone="elevated">
         <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Админка BARSYNERGY</p>
         <h1 className="mt-3 text-2xl font-semibold leading-tight" id="admin-mobile-title">
           Нужен широкий экран
         </h1>
         <p className="mt-4 text-sm leading-6 text-[var(--muted)]">
-          Таблицы, формы публикации и рабочие действия админки рассчитаны на планшет или desktop. Откройте раздел на экране от 768px.
+          Таблицы, формы публикации и рабочие действия админки рассчитаны на широкий экран. Откройте раздел на экране от 1024px.
         </p>
         <div className="mt-6 flex flex-wrap gap-3">
           <AppLink
@@ -44,7 +44,7 @@ export default async function AdminLayout({ children }: { children: ReactNode })
   return (
     <div className="admin-shell min-h-screen">
       <AdminMobileUnsupportedState />
-      <AdminShellFrame role={user.role}>{children}</AdminShellFrame>
+      <AdminShellFrame email={user.email} role={user.role}>{children}</AdminShellFrame>
     </div>
   );
 }

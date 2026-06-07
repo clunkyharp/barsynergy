@@ -2,7 +2,7 @@ import { createGeneralSponsor } from '@/app/admin/general-sponsors/actions';
 import { GeneralSponsorForm } from '@/app/admin/general-sponsors/general-sponsor-form';
 import { Button } from '@/components/ui/button';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
-import { prisma } from '@/lib/db/prisma';
+import { prisma } from '@/modules/admin/queries';
 
 export const dynamic = 'force-dynamic';
 

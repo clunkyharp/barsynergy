@@ -1,4 +1,4 @@
-import { CategoryType, ContentStatus } from '@prisma/client';
+import { CategoryType, ContentStatus } from '@/modules/admin/queries';
 import { createEvent } from '@/app/admin/events/actions';
 import { AdminCmsActions, AdminCmsForm, AdminCmsGrid, AdminCmsSection } from '@/components/admin/admin-cms-form';
 import { CoverImageField, HiddenRedirect } from '@/components/admin/content-admin-controls';
@@ -9,7 +9,7 @@ import { Select } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { PUBLICATION_STATUS_HINT, contentStatusLabels, eventFormatOptions, eventRegistrationModeOptions } from '@/lib/admin/content-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
-import { prisma } from '@/lib/db/prisma';
+import { prisma } from '@/modules/admin/queries';
 
 export const dynamic = 'force-dynamic';
 
@@ -116,6 +116,9 @@ export default async function AdminEventsCreatePage() {
                     </option>
                   ))}
                 </Select>
+              </FormField>
+              <FormField htmlFor="event-registrationUrl" label="Ссылка для записи или регистрации" hint="Будет использована в кнопке «Записаться» на странице события. Если поле пустое, кнопка ведёт на контакты.">
+                <Input id="event-registrationUrl" name="registrationUrl" maxLength={500} placeholder="https://..." type="url" />
               </FormField>
             </AdminCmsGrid>
           </AdminCmsSection>

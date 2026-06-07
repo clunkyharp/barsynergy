@@ -4,16 +4,13 @@ import { revalidatePath } from 'next/cache';
 import { CategoryType } from '@prisma/client';
 import { z } from 'zod';
 import {
-  formatAdminActionError,
   getString,
   nullableString,
   optionalString,
-  redirectWithAdminActionResult,
-  safeAdminRedirectPath,
   slugify
 } from '@/lib/admin/content-utils';
-import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
 import { prisma } from '@/lib/db/prisma';
+import { withAdminAction } from '@/lib/server-action-wrappers';
 
 const ADMIN_CATEGORIES_PATH = '/admin/categories';
 const ADMIN_CITIES_PATH = '/admin/cities';
@@ -79,161 +76,145 @@ function readBooleanFormValue(formData: FormData, key: string, fallback: boolean
 }
 
 export async function createCategory(formData: FormData) {
-  const redirectTo = safeAdminRedirectPath(formData, ADMIN_CATEGORIES_PATH);
-  let result: { type: 'success' | 'error'; message: string };
+  await withAdminAction({
+    formData,
+    section: 'categories',
+    defaultRedirectPath: ADMIN_CATEGORIES_PATH,
+    handler: async () => {
+      const parsed = categorySchema.parse({
+        name: getString(formData, 'name'),
+        slug: optionalString(getString(formData, 'slug')),
+        type: getString(formData, 'type'),
+        description: optionalString(getString(formData, 'description')),
+        isActive: readBooleanFormValue(formData, 'isActive', true),
+        sortOrder: getString(formData, 'sortOrder') || '0'
+      });
+      const slug = readSlug(parsed.slug, parsed.name, 'Category');
 
-  try {
-    await requireAdminSectionAccess('categories');
-    const parsed = categorySchema.parse({
-      name: getString(formData, 'name'),
-      slug: optionalString(getString(formData, 'slug')),
-      type: getString(formData, 'type'),
-      description: optionalString(getString(formData, 'description')),
-      isActive: readBooleanFormValue(formData, 'isActive', true),
-      sortOrder: getString(formData, 'sortOrder') || '0'
-    });
-    const slug = readSlug(parsed.slug, parsed.name, 'Category');
+      await prisma.category.create({
+        data: {
+          name: parsed.name, slug,
+          type: parsed.type,
+          description: nullableString(parsed.description),
+          isActive: parsed.isActive,
+          sortOrder: parsed.sortOrder
+        }
+      });
 
-    await prisma.category.create({
-      data: {
-        name: parsed.name,
-        slug,
-        type: parsed.type,
-        description: nullableString(parsed.description),
-        isActive: parsed.isActive,
-        sortOrder: parsed.sortOrder
-      }
-    });
-
-    revalidateTaxonomyPaths();
-    result = { type: 'success', message: 'Категория создана.' };
-  } catch (error) {
-    result = { type: 'error', message: formatAdminActionError(error) };
-  }
-
-  redirectWithAdminActionResult(redirectTo, result);
+      revalidateTaxonomyPaths();
+      return { type: 'success', message: 'Категория создана.' };
+    }
+  });
 }
 
 export async function updateCategory(formData: FormData) {
-  const redirectTo = safeAdminRedirectPath(formData, ADMIN_CATEGORIES_PATH);
-  let result: { type: 'success' | 'error'; message: string };
+  await withAdminAction({
+    formData,
+    section: 'categories',
+    defaultRedirectPath: ADMIN_CATEGORIES_PATH,
+    handler: async () => {
+      const categoryId = getString(formData, 'categoryId');
+      const parsed = categorySchema.parse({
+        name: getString(formData, 'name'),
+        slug: optionalString(getString(formData, 'slug')),
+        type: getString(formData, 'type'),
+        description: optionalString(getString(formData, 'description')),
+        isActive: readBooleanFormValue(formData, 'isActive', true),
+        sortOrder: getString(formData, 'sortOrder') || '0'
+      });
+      const slug = readSlug(parsed.slug, parsed.name, 'Category');
+      const conflict = await prisma.category.findUnique({
+        where: { slug_type: { slug, type: parsed.type } },
+        select: { id: true }
+      });
 
-  try {
-    await requireAdminSectionAccess('categories');
-    const categoryId = getString(formData, 'categoryId');
-    const parsed = categorySchema.parse({
-      name: getString(formData, 'name'),
-      slug: optionalString(getString(formData, 'slug')),
-      type: getString(formData, 'type'),
-      description: optionalString(getString(formData, 'description')),
-      isActive: readBooleanFormValue(formData, 'isActive', true),
-      sortOrder: getString(formData, 'sortOrder') || '0'
-    });
-    const slug = readSlug(parsed.slug, parsed.name, 'Category');
-    const conflict = await prisma.category.findUnique({
-      where: { slug_type: { slug, type: parsed.type } },
-      select: { id: true }
-    });
-
-    if (conflict && conflict.id !== categoryId) {
-      throw new Error('Category slug is already used.');
-    }
-
-    await prisma.category.update({
-      where: { id: categoryId },
-      data: {
-        name: parsed.name,
-        slug,
-        type: parsed.type,
-        description: nullableString(parsed.description),
-        isActive: parsed.isActive,
-        sortOrder: parsed.sortOrder
+      if (conflict && conflict.id !== categoryId) {
+        throw new Error('Category slug is already used.');
       }
-    });
 
-    revalidateTaxonomyPaths();
-    result = { type: 'success', message: 'Категория обновлена.' };
-  } catch (error) {
-    result = { type: 'error', message: formatAdminActionError(error) };
-  }
+      await prisma.category.update({
+        where: { id: categoryId },
+        data: {
+          name: parsed.name, slug,
+          type: parsed.type,
+          description: nullableString(parsed.description),
+          isActive: parsed.isActive,
+          sortOrder: parsed.sortOrder
+        }
+      });
 
-  redirectWithAdminActionResult(redirectTo, result);
+      revalidateTaxonomyPaths();
+      return { type: 'success', message: 'Категория обновлена.' };
+    }
+  });
 }
 
 export async function createCity(formData: FormData) {
-  const redirectTo = safeAdminRedirectPath(formData, ADMIN_CITIES_PATH);
-  let result: { type: 'success' | 'error'; message: string };
+  await withAdminAction({
+    formData,
+    section: 'cities',
+    defaultRedirectPath: ADMIN_CITIES_PATH,
+    handler: async () => {
+      const parsed = citySchema.parse({
+        name: getString(formData, 'name'),
+        slug: optionalString(getString(formData, 'slug')),
+        region: optionalString(getString(formData, 'region')),
+        isActive: readBooleanFormValue(formData, 'isActive', true),
+        sortOrder: getString(formData, 'sortOrder') || '0'
+      });
+      const slug = readSlug(parsed.slug, parsed.name, 'City');
 
-  try {
-    await requireAdminSectionAccess('cities');
-    const parsed = citySchema.parse({
-      name: getString(formData, 'name'),
-      slug: optionalString(getString(formData, 'slug')),
-      region: optionalString(getString(formData, 'region')),
-      isActive: readBooleanFormValue(formData, 'isActive', true),
-      sortOrder: getString(formData, 'sortOrder') || '0'
-    });
-    const slug = readSlug(parsed.slug, parsed.name, 'City');
+      await prisma.city.create({
+        data: {
+          name: parsed.name, slug,
+          region: parsed.region,
+          isActive: parsed.isActive,
+          sortOrder: parsed.sortOrder
+        }
+      });
 
-    await prisma.city.create({
-      data: {
-        name: parsed.name,
-        slug,
-        region: parsed.region,
-        isActive: parsed.isActive,
-        sortOrder: parsed.sortOrder
-      }
-    });
-
-    revalidateTaxonomyPaths();
-    result = { type: 'success', message: 'Город создан.' };
-  } catch (error) {
-    result = { type: 'error', message: formatAdminActionError(error) };
-  }
-
-  redirectWithAdminActionResult(redirectTo, result);
+      revalidateTaxonomyPaths();
+      return { type: 'success', message: 'Город создан.' };
+    }
+  });
 }
 
 export async function updateCity(formData: FormData) {
-  const redirectTo = safeAdminRedirectPath(formData, ADMIN_CITIES_PATH);
-  let result: { type: 'success' | 'error'; message: string };
+  await withAdminAction({
+    formData,
+    section: 'cities',
+    defaultRedirectPath: ADMIN_CITIES_PATH,
+    handler: async () => {
+      const cityId = getString(formData, 'cityId');
+      const parsed = citySchema.parse({
+        name: getString(formData, 'name'),
+        slug: optionalString(getString(formData, 'slug')),
+        region: optionalString(getString(formData, 'region')),
+        isActive: readBooleanFormValue(formData, 'isActive', true),
+        sortOrder: getString(formData, 'sortOrder') || '0'
+      });
+      const slug = readSlug(parsed.slug, parsed.name, 'City');
+      const conflict = await prisma.city.findUnique({
+        where: { slug },
+        select: { id: true }
+      });
 
-  try {
-    await requireAdminSectionAccess('cities');
-    const cityId = getString(formData, 'cityId');
-    const parsed = citySchema.parse({
-      name: getString(formData, 'name'),
-      slug: optionalString(getString(formData, 'slug')),
-      region: optionalString(getString(formData, 'region')),
-      isActive: readBooleanFormValue(formData, 'isActive', true),
-      sortOrder: getString(formData, 'sortOrder') || '0'
-    });
-    const slug = readSlug(parsed.slug, parsed.name, 'City');
-    const conflict = await prisma.city.findUnique({
-      where: { slug },
-      select: { id: true }
-    });
-
-    if (conflict && conflict.id !== cityId) {
-      throw new Error('City slug is already used.');
-    }
-
-    await prisma.city.update({
-      where: { id: cityId },
-      data: {
-        name: parsed.name,
-        slug,
-        region: parsed.region,
-        isActive: parsed.isActive,
-        sortOrder: parsed.sortOrder
+      if (conflict && conflict.id !== cityId) {
+        throw new Error('City slug is already used.');
       }
-    });
 
-    revalidateTaxonomyPaths();
-    result = { type: 'success', message: 'Город обновлен.' };
-  } catch (error) {
-    result = { type: 'error', message: formatAdminActionError(error) };
-  }
+      await prisma.city.update({
+        where: { id: cityId },
+        data: {
+          name: parsed.name, slug,
+          region: parsed.region,
+          isActive: parsed.isActive,
+          sortOrder: parsed.sortOrder
+        }
+      });
 
-  redirectWithAdminActionResult(redirectTo, result);
+      revalidateTaxonomyPaths();
+      return { type: 'success', message: 'Город обновлён.' };
+    }
+  });
 }

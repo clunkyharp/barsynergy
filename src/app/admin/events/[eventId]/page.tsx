@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { CategoryType, ContentStatus } from '@prisma/client';
+import { CategoryType, ContentStatus } from '@/modules/admin/queries';
 import { updateEvent, updateEventStatus } from '@/app/admin/events/actions';
 import { AdminCmsActions, AdminCmsForm, AdminCmsGrid, AdminCmsSection, AdminCmsSummary } from '@/components/admin/admin-cms-form';
 import { AdminContentVisibilityPanel, CoverImageField, HiddenRedirect } from '@/components/admin/content-admin-controls';
@@ -17,7 +17,7 @@ import {
   withCurrentValueOption
 } from '@/lib/admin/content-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
-import { prisma } from '@/lib/db/prisma';
+import { prisma } from '@/modules/admin/queries';
 
 export const dynamic = 'force-dynamic';
 
@@ -170,6 +170,9 @@ export default async function AdminEventEditPage({ params }: AdminEventEditPageP
                     </option>
                   ))}
                 </Select>
+              </FormField>
+              <FormField htmlFor="event-registrationUrl" label="Ссылка для записи или регистрации" hint="Будет использована в кнопке «Записаться» на странице события. Если поле пустое, кнопка ведёт на контакты.">
+                <Input id="event-registrationUrl" name="registrationUrl" maxLength={500} placeholder="https://..." type="url" defaultValue={event.registrationUrl ?? ''} />
               </FormField>
             </AdminCmsGrid>
           </AdminCmsSection>

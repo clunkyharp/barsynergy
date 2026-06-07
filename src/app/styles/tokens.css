@@ -1,0 +1,376 @@
+@property --bars-cta-x1 {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 8%;
+}
+
+@property --bars-cta-y1 {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 12%;
+}
+
+@property --bars-cta-x2 {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 92%;
+}
+
+@property --bars-cta-y2 {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 18%;
+}
+
+@property --bars-cta-x3 {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 18%;
+}
+
+@property --bars-cta-y3 {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 88%;
+}
+
+@property --bars-cta-x4 {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 86%;
+}
+
+@property --bars-cta-y4 {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 86%;
+}
+
+@property --bars-cta-s1 {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 48%;
+}
+
+@property --bars-cta-s2 {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 42%;
+}
+
+@property --bars-cta-s3 {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 44%;
+}
+
+@property --bars-cta-s4 {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 40%;
+}
+
+:root {
+  --background: #ffffff;
+  --background-cream-strong: #ffffff;
+  --background-band: #f7f8fa;
+  --background-band-soft: #fbfbfc;
+  --background-band-gray: #eef0f4;
+  --background-graphite-band: #eef2f7;
+  --background-accent-glow: rgb(255 208 47 / 0.14);
+  --background-support-glow: rgb(245 243 255 / 0.42);
+  --background-paper-grain-opacity: 0.02;
+  --surface: #f7f8fa;
+  --surface-muted: #eef0f4;
+  --surface-elevated: rgb(255 255 255 / 0.96);
+  --surface-inverse: #1c1c1e;
+  --surface-inverse-card: #252833;
+  --paper: var(--surface-elevated);
+  --text: #1c1c1e;
+  --muted: #555a6a;
+  --line: rgb(28 28 30 / 0.1);
+  --border-subtle: rgb(28 28 30 / 0.06);
+  --border-default: #e0e2e8;
+  --border-strong: #c7cad5;
+  --border-inverse: rgb(255 255 255 / 0.22);
+  --border-inverse-soft: rgb(255 255 255 / 0.14);
+  --brand: #e8b000;
+  --brand-strong: #c89a00;
+  --brand-soft: rgb(232 176 0 / 0.16);
+  --accent-rgb: 232 176 0;
+  --accent: #e8b000;
+  --accent-strong: #c89a00;
+  --accent-contrast: #1c1c1e;
+  --accent-soft: #fff4c4;
+  --editorial-dark-label: rgb(232 176 0 / 0.84);
+  --support-coral: #ffc6c6;
+  --support-rose: #fde0f0;
+  --support-aqua: #c3faf5;
+  --support-peach: #ffe6cd;
+  --support-lilac: #f5f3ff;
+  --channel-neutral: #8f3d32;
+  --channel-email: #8f3d32;
+  --channel-phone: #7a5d45;
+  --channel-website: #5f4a3d;
+  --channel-telegram: #2a86d9;
+  --channel-whatsapp: #238c46;
+  --channel-instagram: #c14f7a;
+  --admin-nav-active-bg: color-mix(in oklab, var(--accent) 22%, var(--surface));
+  --admin-nav-active-border: color-mix(in oklab, var(--accent) 44%, var(--border-default));
+  --admin-nav-active-text: color-mix(in oklab, var(--accent-contrast) 78%, var(--text));
+  --admin-nav-active-hover: color-mix(in oklab, var(--accent) 28%, var(--surface));
+  --admin-label: color-mix(in oklab, var(--muted) 84%, var(--text));
+  --admin-structure-accent: color-mix(in oklab, var(--border-strong) 78%, var(--accent));
+  --admin-secondary-bg: rgb(255 255 255 / 0.96);
+  --admin-secondary-bg-hover: color-mix(in oklab, var(--surface) 70%, white);
+  --admin-secondary-border: var(--border-default);
+  --admin-secondary-border-hover: color-mix(in oklab, var(--accent) 35%, var(--border-strong));
+  --admin-secondary-text: var(--text);
+  --admin-secondary-text-hover: var(--text);
+  --admin-filter-active-bg: color-mix(in oklab, var(--accent) 18%, var(--surface));
+  --admin-filter-active-border: color-mix(in oklab, var(--accent) 36%, var(--border-default));
+  --admin-filter-active-text: var(--text);
+  --admin-filter-active-hover: color-mix(in oklab, var(--accent) 24%, var(--surface));
+  --admin-action-bg: color-mix(in oklab, var(--surface) 84%, white);
+  --admin-action-bg-hover: color-mix(in oklab, var(--surface) 64%, var(--accent-soft));
+  --admin-action-border: var(--border-default);
+  --admin-action-border-hover: color-mix(in oklab, var(--accent) 34%, var(--border-strong));
+  --admin-action-text: var(--text);
+  --admin-action-text-hover: var(--text);
+  --admin-confirm-bg: var(--accent);
+  --admin-confirm-border: var(--accent);
+  --admin-confirm-text: var(--accent-contrast);
+  --admin-confirm-bg-hover: var(--accent-strong);
+  --editorial-dark-surface: #1b1e25;
+  --editorial-dark-surface-muted: #232731;
+  --editorial-dark-text: #f5f7fb;
+  --editorial-dark-muted: #bcc1cf;
+  --editorial-dark-border: rgb(224 226 232 / 0.16);
+  --graphite: #1c1c1e;
+  --success: #2f7a59;
+  --warning: #9a6d0a;
+  --danger: #b42318;
+  --danger-action-bg: var(--danger);
+  --danger-action-bg-hover: color-mix(in oklab, var(--danger) 84%, #3f0f0f);
+  --danger-action-text: #ffffff;
+  --field-bg: rgb(255 255 255 / 0.96);
+  --field-bg-hover: #ffffff;
+  --field-bg-disabled: #eef0f4;
+  --field-surface: rgb(255 255 255 / 0.96);
+  --field-surface-hover: #ffffff;
+  --field-surface-filled: #f7f8fa;
+  --field-surface-disabled: rgb(238 240 244 / 0.78);
+  --field-border: rgb(85 90 106 / 0.24);
+  --field-border-hover: rgb(85 90 106 / 0.32);
+  --field-border-focus: rgb(85 90 106 / 0.46);
+  --field-border-error: rgb(180 35 24 / 0.5);
+  --field-border-success: rgb(47 122 89 / 0.44);
+  --field-label: #555a6a;
+  --field-hint: #6b6f7e;
+  --field-placeholder: rgb(85 90 106 / 0.76);
+  --field-disabled-text: #8e91a0;
+  --field-focus-ring: rgb(85 90 106 / 0.08);
+  --field-focus-line: rgb(85 90 106 / 0.48);
+  --label-route-bg: color-mix(in oklab, var(--surface) 76%, white);
+  --label-route-border: var(--border-default);
+  --label-route-text: var(--text);
+  --label-meta-bg: transparent;
+  --label-meta-border: var(--border-subtle);
+  --label-meta-text: var(--muted);
+  --status-badge-bg: var(--surface-card-muted);
+  --status-badge-border: var(--border-default);
+  --status-badge-text: var(--text);
+  --status-badge-accent-bg: var(--accent);
+  --status-badge-accent-border: var(--accent);
+  --status-badge-accent-text: var(--accent-contrast);
+  --success-bg: #12b76a;
+  --success-border: #12b76a;
+  --success-text: #ffffff;
+  --warning-bg: rgb(252 185 0 / 0.14);
+  --warning-border: rgb(252 185 0 / 0.34);
+  --warning-text: #845100;
+  --danger-bg: rgb(180 35 24 / 0.07);
+  --danger-border: rgb(180 35 24 / 0.28);
+  --danger-text: #b42318;
+  --field-error-text: #b42318;
+  --field-success-text: #2f7a59;
+  --focus-ring: rgb(var(--accent-rgb) / 0.22);
+  --focus-ring-danger: rgb(180 35 24 / 0.14);
+  --selected-bg: var(--accent);
+  --selected-border: var(--accent);
+  --pending-bg: rgb(85 90 106 / 0.08);
+  --skeleton-fill: rgb(85 90 106 / 0.08);
+  --radius-none: 0;
+  --radius-sm: 0.35rem;
+  --radius-md: 0.55rem;
+  --radius-lg: 0.8rem;
+  --radius-xl: 1rem;
+  --radius-pill: 999px;
+  --shadow-none: none;
+  --shadow-card: 0 12px 28px rgb(28 28 30 / 0.05);
+  --shadow-panel: 0 28px 64px rgb(28 28 30 / 0.08);
+  --shadow-overlay: 0 20px 48px rgb(28 28 30 / 0.14);
+  --shadow-action: 0 12px 28px rgb(var(--accent-rgb) / 0.2);
+  --shadow-focus: 0 0 0 3px rgb(var(--accent-rgb) / 0.22);
+  --z-overlay: 80;
+  --divider-public: rgb(28 28 30 / 0.12);
+  --divider-product: rgb(28 28 30 / 0.1);
+  --header-bg: rgb(255 255 255 / 0.96);
+  --footer-bg: rgb(247 248 250 / 0.92);
+  --mobile-menu-bg:
+    radial-gradient(circle at 78% 10%, rgb(var(--accent-rgb) / 0.22), transparent 22rem),
+    radial-gradient(circle at 16% 84%, rgb(245 243 255 / 0.82), transparent 20rem),
+    linear-gradient(145deg, #ffffff 0%, #f7f8fa 56%, #eef0f4 100%);
+  --surface-wash: rgb(255 255 255 / 0.72);
+  --surface-wash-strong: rgb(255 255 255 / 0.9);
+  --surface-card: rgb(255 255 255 / 0.94);
+  --surface-card-muted: rgb(247 248 250 / 0.82);
+  --surface-card-hover: #ffffff;
+  --card-border: var(--border-default);
+  --card-border-hover: color-mix(in oklab, var(--accent) 28%, var(--border-strong));
+  --card-border-selected: color-mix(in oklab, var(--accent) 48%, var(--border-default));
+  --admin-surface: rgb(255 255 255 / 0.96);
+  --admin-surface-muted: color-mix(in oklab, var(--surface) 72%, white);
+  --admin-table-header: #f4f5f7;
+  --admin-table-row-hover: #f7f8fa;
+  --motion-ease-standard: cubic-bezier(0.22, 1, 0.36, 1);
+  --motion-ease-move: cubic-bezier(0.25, 1, 0.5, 1);
+  --motion-duration-fast: 180ms;
+  --motion-duration-base: 220ms;
+  --motion-duration-panel: 280ms;
+  --motion-duration-media: 820ms;
+}
+
+:root[data-theme="dark"] {
+  --background: #14161b;
+  --background-cream-strong: #111318;
+  --background-band: #171a20;
+  --background-band-soft: #1b1f26;
+  --background-band-gray: #20242c;
+  --background-graphite-band: #101216;
+  --background-accent-glow: rgb(255 208 47 / 0.08);
+  --background-support-glow: rgb(195 250 245 / 0.08);
+  --background-paper-grain-opacity: 0.028;
+  --surface: #1b1e25;
+  --surface-muted: #232731;
+  --surface-elevated: rgb(27 30 37 / 0.96);
+  --surface-inverse: #f7f8fa;
+  --surface-inverse-card: #ffffff;
+  --paper: var(--surface-elevated);
+  --text: #f5f7fb;
+  --muted: #a5a8b5;
+  --line: rgb(224 226 232 / 0.12);
+  --border-subtle: rgb(224 226 232 / 0.08);
+  --border-default: rgb(224 226 232 / 0.16);
+  --border-strong: rgb(224 226 232 / 0.28);
+  --border-inverse: rgb(28 28 30 / 0.18);
+  --border-inverse-soft: rgb(224 226 232 / 0.16);
+  --brand: #ffd02f;
+  --brand-strong: #fcb900;
+  --brand-soft: rgb(255 208 47 / 0.18);
+  --accent-rgb: 255 208 47;
+  --accent: #ffd02f;
+  --accent-strong: #fcb900;
+  --accent-contrast: #1c1c1e;
+  --accent-soft: rgb(255 208 47 / 0.18);
+  --editorial-dark-label: rgb(255 208 47 / 0.86);
+  --support-coral: #ffc6c6;
+  --support-rose: #fde0f0;
+  --support-aqua: #c3faf5;
+  --support-peach: #ffe6cd;
+  --support-lilac: #f5f3ff;
+  --admin-secondary-bg: rgb(35 39 49 / 0.74);
+  --admin-secondary-bg-hover: color-mix(in oklab, var(--surface-muted) 86%, var(--accent) 10%);
+  --admin-secondary-border: var(--border-default);
+  --admin-secondary-border-hover: color-mix(in oklab, var(--accent) 34%, var(--border-strong));
+  --admin-secondary-text: var(--text);
+  --admin-secondary-text-hover: var(--text);
+  --admin-confirm-bg: var(--accent);
+  --admin-confirm-border: var(--accent);
+  --admin-confirm-text: var(--accent-contrast);
+  --admin-confirm-bg-hover: var(--accent-strong);
+  --editorial-dark-surface: #161920;
+  --editorial-dark-surface-muted: #1e222b;
+  --editorial-dark-text: #f5f7fb;
+  --editorial-dark-muted: #bcc1cf;
+  --editorial-dark-border: rgb(224 226 232 / 0.16);
+  --graphite: #1c1c1e;
+  --success: #7dd3a6;
+  --warning: #ffd86b;
+  --danger: #ff7a70;
+  --danger-action-bg: color-mix(in oklab, var(--danger) 78%, #3f0f0f);
+  --danger-action-bg-hover: color-mix(in oklab, var(--danger) 86%, #3f0f0f);
+  --danger-action-text: #ffffff;
+  --field-bg: #181b21;
+  --field-bg-hover: #1d2129;
+  --field-bg-disabled: #16191f;
+  --field-surface: #181b21;
+  --field-surface-hover: #1d2129;
+  --field-surface-filled: #21252f;
+  --field-surface-disabled: rgb(22 25 31 / 0.82);
+  --field-border: rgb(224 226 232 / 0.16);
+  --field-border-hover: rgb(224 226 232 / 0.24);
+  --field-border-focus: rgb(224 226 232 / 0.34);
+  --field-border-error: rgb(255 122 112 / 0.52);
+  --field-border-success: rgb(125 211 166 / 0.48);
+  --field-label: #a5a8b5;
+  --field-hint: rgb(165 168 181 / 0.8);
+  --field-placeholder: rgb(165 168 181 / 0.58);
+  --field-disabled-text: rgb(165 168 181 / 0.66);
+  --field-focus-ring: rgb(224 226 232 / 0.1);
+  --field-focus-line: rgb(224 226 232 / 0.4);
+  --label-route-bg: color-mix(in oklab, var(--surface-muted) 82%, var(--surface));
+  --label-route-border: var(--border-default);
+  --label-route-text: var(--text);
+  --label-meta-bg: transparent;
+  --label-meta-border: var(--border-subtle);
+  --label-meta-text: var(--muted);
+  --status-badge-bg: var(--surface-card-muted);
+  --status-badge-border: var(--border-default);
+  --status-badge-text: var(--text);
+  --status-badge-accent-bg: var(--accent);
+  --status-badge-accent-border: var(--accent);
+  --status-badge-accent-text: var(--accent-contrast);
+  --success-bg: rgb(125 211 166 / 0.12);
+  --success-border: rgb(125 211 166 / 0.32);
+  --success-text: #98e1b9;
+  --warning-bg: rgb(255 208 47 / 0.12);
+  --warning-border: rgb(255 208 47 / 0.3);
+  --warning-text: #ffe48f;
+  --danger-bg: rgb(255 122 112 / 0.12);
+  --danger-border: rgb(255 122 112 / 0.34);
+  --danger-text: #ffb0a8;
+  --field-error-text: #ffb0a8;
+  --field-success-text: #98e1b9;
+  --focus-ring: rgb(var(--accent-rgb) / 0.22);
+  --focus-ring-danger: rgb(255 122 112 / 0.16);
+  --selected-bg: var(--accent);
+  --selected-border: var(--accent);
+  --pending-bg: rgb(224 226 232 / 0.08);
+  --skeleton-fill: rgb(224 226 232 / 0.08);
+  --shadow-card: 0 1px 0 rgb(224 226 232 / 0.025);
+  --shadow-panel: 0 16px 40px rgb(0 0 0 / 0.22);
+  --shadow-overlay: 0 22px 54px rgb(0 0 0 / 0.28);
+  --shadow-action: 0 8px 24px rgb(var(--accent-rgb) / 0.18);
+  --shadow-focus: 0 0 0 2px rgb(var(--accent-rgb) / 0.22);
+  --divider-public: rgb(224 226 232 / 0.14);
+  --divider-product: rgb(224 226 232 / 0.12);
+  --header-bg: rgb(20 22 27 / 0.96);
+  --footer-bg: rgb(17 19 24 / 0.92);
+  --mobile-menu-bg:
+    radial-gradient(circle at 82% 12%, rgb(var(--accent-rgb) / 0.18), transparent 22rem),
+    radial-gradient(circle at 18% 82%, rgb(195 250 245 / 0.08), transparent 18rem),
+    linear-gradient(150deg, #14161b 0%, #171a20 48%, #1e222b 100%);
+  --surface-wash: rgb(35 39 49 / 0.74);
+  --surface-wash-strong: rgb(35 39 49 / 0.92);
+  --surface-card: rgb(27 30 37 / 0.92);
+  --surface-card-muted: rgb(224 226 232 / 0.08);
+  --surface-card-hover: rgb(35 39 49 / 0.96);
+  --card-border: var(--border-default);
+  --card-border-hover: color-mix(in oklab, var(--accent) 34%, var(--border-default));
+  --card-border-selected: color-mix(in oklab, var(--accent) 42%, var(--border-default));
+  --admin-surface: rgb(27 30 37 / 0.96);
+  --admin-surface-muted: color-mix(in oklab, var(--surface-muted) 74%, var(--surface));
+  --admin-table-header: #20242c;
+  --admin-table-row-hover: #232731;
+}

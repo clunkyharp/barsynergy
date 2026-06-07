@@ -138,7 +138,7 @@ export function AdminActionMenuButton({
         footer={
           <>
             <button
-              className="inline-flex min-h-[38px] items-center justify-center rounded-[10px] border border-[var(--admin-secondary-border)] px-4 text-[13px] font-semibold text-[var(--text)] transition-[background-color,border-color,color,box-shadow] duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] hover:border-[var(--admin-secondary-border-hover)] hover:bg-[var(--admin-secondary-bg-hover)] hover:text-[var(--admin-secondary-text-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] motion-reduce:transition-none"
+              className="inline-flex min-h-[38px] items-center justify-center rounded-[var(--radius-md)] border border-[var(--admin-secondary-border)] px-4 text-[13px] font-semibold text-[var(--text)] transition-[background-color,border-color,color,box-shadow] duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] hover:border-[var(--admin-secondary-border-hover)] hover:bg-[var(--admin-secondary-bg-hover)] hover:text-[var(--admin-secondary-text-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] motion-reduce:transition-none"
               onClick={closeConfirm}
               ref={cancelButtonRef}
               type="button"
@@ -147,7 +147,7 @@ export function AdminActionMenuButton({
             </button>
             <button
               className={cn(
-                'inline-flex min-h-[38px] items-center justify-center rounded-[10px] border px-4 text-[13px] font-semibold transition-[background-color,border-color,color,box-shadow] duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] focus-visible:outline-none focus-visible:ring-2 motion-reduce:transition-none',
+                'inline-flex min-h-[38px] items-center justify-center rounded-[var(--radius-md)] border px-4 text-[13px] font-semibold transition-[background-color,border-color,color,box-shadow] duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] focus-visible:outline-none focus-visible:ring-2 motion-reduce:transition-none',
                 tone === 'danger'
                   ? 'border-[var(--danger-action-bg)] bg-[var(--danger-action-bg)] text-[var(--danger-action-text)] hover:bg-[var(--danger-action-bg-hover)] focus-visible:ring-[var(--focus-ring-danger)]'
                   : 'border-[var(--admin-confirm-border)] bg-[var(--admin-confirm-bg)] text-[var(--admin-confirm-text)] hover:bg-[var(--admin-confirm-bg-hover)] focus-visible:ring-[var(--focus-ring)]'

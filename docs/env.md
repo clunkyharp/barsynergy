@@ -4,6 +4,8 @@
 
 See `.env.example`.
 
+`THROTTLE_SECRET` is an optional production HMAC key for rate-limiting hashes. A development fallback is used when both `THROTTLE_SECRET` and `SESSION_SECRET` are unset.
+
 ## Required Production Variables
 
 See `.env.production.example`.
@@ -15,6 +17,7 @@ NODE_ENV=production
 APP_URL=https://<production-host>
 DATABASE_URL=postgresql://barsynergy:<password>@postgres:5432/barsynergy
 SESSION_SECRET=<long-random-secret>
+THROTTLE_SECRET=<long-random-secret>
 NEXT_SERVER_ACTIONS_ENCRYPTION_KEY=<base64-aes-key>
 STORAGE_DRIVER=s3
 S3_ENDPOINT=https://s3.twcstorage.ru
@@ -32,7 +35,7 @@ POSTGRES_PASSWORD=<password>
 
 `DATABASE_URL` for production compose must use `postgres` host from Docker network, not `localhost`.
 
-`APP_URL` must match the real production host used for the release. The tracked `.env.production.example` and `docker/nginx/nginx.conf` currently use `72.56.1.69.sslip.io` as a temporary/example host; replace it with the owner-approved production host before public launch.
+`APP_URL` must match the canonical production host used for the release. The canonical public domain is `https://barsynergy.ru`; `www.barsynergy.ru` and the temporary `72.56.1.69.sslip.io` host must redirect to it before public launch.
 
 `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` must stay stable across production builds and app instances. Use a base64-encoded AES key with 16, 24 or 32 bytes.
 
@@ -97,6 +100,7 @@ Public application notifications are optional and env-driven.
 - Admin email notifications for new public applications are sent to `ADMIN_NOTIFICATION_EMAIL` only when SMTP is configured.
 - Short Telegram admin notifications are sent only when both `TELEGRAM_BOT_TOKEN` and `TELEGRAM_ADMIN_CHAT_ID` are configured.
 - Missing notification env must not block public form submission.
+- Cloudflare Turnstile (`NEXT_PUBLIC_TURNSTILE_SITE_KEY` + `TURNSTILE_SECRET_KEY`) is optional. When both are set, the Turnstile challenge is rendered on sensitive public forms (business registration, participant registration, vacancy response, vacancy submission) and verified server-side. When absent, the forms work without the challenge layer.
 
 ## Secret Hygiene
 

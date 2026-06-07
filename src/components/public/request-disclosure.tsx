@@ -84,7 +84,7 @@ export function RequestDisclosure({
   className,
   closedPanelClassName,
   closedContent,
-  defaultOpen = false,
+  defaultOpen = true,
   description = 'Откройте форму, заполните поля и отправьте заявку.',
   focusSelector = defaultFocusSelector,
   headingLevel = 'h3',
@@ -149,12 +149,12 @@ export function RequestDisclosure({
   }, [focusSelector, id, open]);
 
   function handleOpenClick() {
-    window.history.replaceState(null, '', `#${id}`);
+    window.history.pushState(null, '', `#${id}`);
     setOpen(true);
   }
 
   return (
-    <div className={cn('scroll-mt-28', className)} id={id} ref={sectionRef}>
+    <div className={cn('scroll-mt-36 md:scroll-mt-44', className)} id={id} ref={sectionRef}>
       {open ? (
         <div id={panelId}>{children}</div>
       ) : (

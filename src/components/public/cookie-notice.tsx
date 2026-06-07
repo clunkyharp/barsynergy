@@ -3,19 +3,52 @@
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
 
-export const COOKIE_NOTICE_STORAGE_KEY = 'barsynergy_cookie_notice_accepted';
+export const COOKIE_NOTICE_STORAGE_KEY = 'barsynergy_cookie_consent';
+const LEGACY_COOKIE_NOTICE_STORAGE_KEY = 'barsynergy_cookie_notice_accepted';
+export const COOKIE_NOTICE_TTL_MS = 183 * 24 * 60 * 60 * 1000;
 const cookieSettingsPanelId = 'cookie-settings-panel';
+
+export function buildCookieNoticeChoice(now = Date.now()) {
+  return JSON.stringify({
+    acceptedAt: now,
+    expiresAt: now + COOKIE_NOTICE_TTL_MS
+  });
+}
+
+export function isCookieNoticeChoiceValid(value: string | null, now = Date.now()) {
+  if (value === 'true') {
+    return true;
+  }
+
+  if (!value) {
+    return false;
+  }
+
+  try {
+    const parsed = JSON.parse(value) as { expiresAt?: unknown };
+
+    return typeof parsed.expiresAt === 'number' && parsed.expiresAt > now;
+  } catch {
+    return false;
+  }
+}
 
 export function CookieNotice() {
   const pathname = usePathname();
   const [isVisible, setIsVisible] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const isCostCalculatorPage = pathname === '/tools/cost-calculator';
 
   useEffect(() => {
-    setIsVisible(window.localStorage.getItem(COOKIE_NOTICE_STORAGE_KEY) !== 'true');
+    const storedChoice = window.localStorage.getItem(COOKIE_NOTICE_STORAGE_KEY) ?? window.localStorage.getItem(LEGACY_COOKIE_NOTICE_STORAGE_KEY);
+    const hasValidChoice = isCookieNoticeChoiceValid(storedChoice);
+
+    if (!hasValidChoice) {
+      window.localStorage.removeItem(COOKIE_NOTICE_STORAGE_KEY);
+      window.localStorage.removeItem(LEGACY_COOKIE_NOTICE_STORAGE_KEY);
+    }
+
+    setIsVisible(!hasValidChoice);
   }, []);
 
   if (!isVisible || pathname?.startsWith('/admin') || pathname?.startsWith('/business/cabinet') || pathname?.startsWith('/auth')) {
@@ -23,41 +56,38 @@ export function CookieNotice() {
   }
 
   function saveCookieChoice() {
-    window.localStorage.setItem(COOKIE_NOTICE_STORAGE_KEY, 'true');
+    window.localStorage.setItem(COOKIE_NOTICE_STORAGE_KEY, buildCookieNoticeChoice());
+    window.localStorage.removeItem(LEGACY_COOKIE_NOTICE_STORAGE_KEY);
     setIsVisible(false);
   }
 
   return (
     <div
       aria-label="Настройки файлов cookie"
-      className={cn(
-        isCostCalculatorPage
-          ? 'relative z-10 mx-auto my-4 w-[calc(100%-1.5rem)] max-w-[420px]'
-          : 'fixed inset-x-3 bottom-[calc(0.75rem+env(safe-area-inset-bottom))] z-40 md:inset-x-auto md:left-1/2 md:right-auto md:w-[min(680px,calc(100%-2rem))] md:-translate-x-1/2'
-      )}
+      className="fixed bottom-[calc(0.75rem+env(safe-area-inset-bottom))] left-3 right-3 z-50 sm:bottom-[calc(1.5rem+env(safe-area-inset-bottom))] sm:left-auto sm:right-6 sm:max-w-[360px]"
       role="region"
     >
-      <div className="rounded-[12px] border border-[var(--border-subtle)] bg-[color-mix(in_oklab,var(--paper)_94%,transparent)] p-2 shadow-none md:p-3">
-        <div className={cn('grid gap-2 md:grid-cols-[minmax(0,1fr)_auto] md:items-center md:gap-4', isCostCalculatorPage && 'gap-3')}>
+      <div className="rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[color-mix(in_oklab,var(--paper)_97%,transparent)] p-3 shadow-[var(--shadow-overlay)] backdrop-blur-md">
+        <div className="grid gap-3">
           <div className="min-w-0">
-            <p className="text-sm font-semibold leading-5 text-[var(--text)]">Файлы куки</p>
-            <p className="text-[12px] leading-5 text-[var(--muted)] md:text-[13px]">
-              Нужны для работы сайта. Дополнительные куки не включены.
+            <p className="text-sm font-semibold leading-5 text-[var(--text)]">Куки для работы сайта</p>
+            <p className="text-[12px] leading-5 text-[var(--muted)]">
+              Только вход, формы и сессия. Рекламной аналитики нет.
             </p>
           </div>
-          <div className="grid grid-cols-2 gap-2 md:w-[260px]">
-            <Button className="min-h-11 w-full rounded-[var(--radius-md)] text-sm" onClick={saveCookieChoice} type="button">
+          <div className="flex w-full gap-2">
+            <Button className="min-h-11 flex-1 rounded-[var(--radius-md)] px-4 text-sm" onClick={saveCookieChoice} type="button">
               Принять
             </Button>
             <Button
               aria-controls={cookieSettingsPanelId}
               aria-expanded={settingsOpen}
-              className="min-h-11 w-full rounded-[var(--radius-md)] text-sm"
+              className="min-h-11 flex-1 rounded-[var(--radius-md)] px-4 text-sm"
               onClick={() => setSettingsOpen((current) => !current)}
               type="button"
               variant="secondary"
             >
-              Настроить
+              Подробнее
             </Button>
           </div>
         </div>
@@ -66,11 +96,11 @@ export function CookieNotice() {
             className="mt-2 border-t border-[var(--line)] pt-2 text-sm leading-6 text-[var(--muted)]"
             id={cookieSettingsPanelId}
           >
-            <p className="font-semibold text-[var(--text)]">Настройки куки</p>
+            <p className="font-semibold text-[var(--text)]">Подробнее о куки</p>
             <label className="mt-2 flex items-start gap-2">
               <input checked className="mt-1 accent-[var(--accent)]" disabled type="checkbox" />
               <span>
-                Технические куки обязательны для входа, защиты форм и сохранения сессии. Дополнительные куки на сайте не включены.
+                Технические куки нужны для входа, защиты форм и сохранения сессии. Рекламные и маркетинговые куки не используем.
               </span>
             </label>
             <Button className="mt-3 min-h-11 w-full rounded-[var(--radius-md)]" onClick={saveCookieChoice} type="button">

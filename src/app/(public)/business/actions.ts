@@ -3,9 +3,9 @@
 import { redirect } from 'next/navigation';
 import { ApplicationType } from '@prisma/client';
 import { z } from 'zod';
-import { createPublicApplication } from '@/lib/applications/create-public-application';
+import { buildApplicationPayload } from '@/lib/applications/application-payloads';
 import {
-  businessSolutionTypeOptions,
+  businessVenueTypeOptions,
   getOptionLabel
 } from '@/lib/applications/b2b-request-options';
 import {
@@ -16,19 +16,14 @@ import {
   nullableString,
   optionalString,
   PERSONAL_DATA_CONSENT_TEXT,
-  resolvePublicApplicationActionError,
   utmSchema
 } from '@/lib/applications/public-form-helpers';
-import {
-  assertPublicApplicationFormsEnabled,
-  assertPublicApplicationSubmissionAllowed,
-  hasHoneypotValue
-} from '@/lib/applications/public-submission-guards';
+import { submitPublicApplicationAction } from '@/lib/applications/submit-public-application-action';
 
 const BUSINESS_PATH = '/business';
-const businessSolutionTypeValues = businessSolutionTypeOptions.map((option) => option.value) as [
-  (typeof businessSolutionTypeOptions)[number]['value'],
-  ...(typeof businessSolutionTypeOptions)[number]['value'][]
+const businessVenueTypeValues = businessVenueTypeOptions.map((option) => option.value) as [
+  (typeof businessVenueTypeOptions)[number]['value'],
+  ...(typeof businessVenueTypeOptions)[number]['value'][]
 ];
 
 const businessSolutionSchema = baseContactSchema
@@ -37,7 +32,7 @@ const businessSolutionSchema = baseContactSchema
     projectName: z.string().trim().min(2).max(180),
     contactName: z.string().trim().min(2).max(160),
     cityId: z.string().trim().min(1).max(120),
-    solutionType: z.enum(businessSolutionTypeValues),
+    solutionType: z.enum(businessVenueTypeValues),
     comment: z.string().trim().min(20).max(4000),
     consent: z.literal('accepted')
   })
@@ -48,37 +43,35 @@ function redirectWithBusinessResult(result: { type: 'success' | 'error'; message
 }
 
 export async function submitBusinessSolutionRequest(formData: FormData) {
-  let result: { type: 'success' | 'error'; message: string };
+  await submitPublicApplicationAction({
+    actionName: 'public:business-solution',
+    applicationType: ApplicationType.BUSINESS_SOLUTION,
+    formData,
+    successMessage: 'Заявку на размещение получили. Если понадобится уточнение, мы свяжемся с вами.',
+    redirectWithResult: redirectWithBusinessResult,
+    parse: async (data) => {
+      const parsed = businessSolutionSchema.parse({
+        projectName: getString(data, 'projectName'),
+        contactName: getString(data, 'contactName'),
+        email: optionalString(getString(data, 'email')),
+        phone: optionalString(getString(data, 'phone')),
+        telegram: optionalString(getString(data, 'telegram')),
+        cityId: optionalString(getString(data, 'cityId')),
+        solutionType: getString(data, 'solutionType'),
+        comment: getString(data, 'comment'),
+        consent: getString(data, 'consent'),
+        utmSource: optionalString(getString(data, 'utmSource')),
+        utmMedium: optionalString(getString(data, 'utmMedium')),
+        utmCampaign: optionalString(getString(data, 'utmCampaign'))
+      });
+      const city = await assertActiveCity(parsed.cityId);
+      const solutionTypeLabel = getOptionLabel(businessVenueTypeOptions, parsed.solutionType) ?? parsed.solutionType;
 
-  try {
-    assertPublicApplicationFormsEnabled();
-
-    if (hasHoneypotValue(getString(formData, 'website'))) {
-      result = { type: 'success', message: 'Заявку получили. Если понадобится уточнение, мы свяжемся с вами.' };
-      redirectWithBusinessResult(result);
-    }
-
-    const parsed = businessSolutionSchema.parse({
-      projectName: getString(formData, 'projectName'),
-      contactName: getString(formData, 'contactName'),
-      email: optionalString(getString(formData, 'email')),
-      phone: optionalString(getString(formData, 'phone')),
-      telegram: optionalString(getString(formData, 'telegram')),
-      cityId: optionalString(getString(formData, 'cityId')),
-      solutionType: getString(formData, 'solutionType'),
-      comment: getString(formData, 'comment'),
-      consent: getString(formData, 'consent'),
-      utmSource: optionalString(getString(formData, 'utmSource')),
-      utmMedium: optionalString(getString(formData, 'utmMedium')),
-      utmCampaign: optionalString(getString(formData, 'utmCampaign'))
-    });
-    const city = await assertActiveCity(parsed.cityId);
-    const solutionTypeLabel = getOptionLabel(businessSolutionTypeOptions, parsed.solutionType) ?? parsed.solutionType;
-
-    await assertPublicApplicationSubmissionAllowed(ApplicationType.BUSINESS_SOLUTION);
-    await createPublicApplication({
+      return { parsed, city, solutionTypeLabel };
+    },
+    buildApplication: ({ parsed, city, solutionTypeLabel }) => ({
       type: ApplicationType.BUSINESS_SOLUTION,
-      subject: `Бизнес-решение: ${parsed.projectName}`,
+      subject: `Размещение в каталоге: ${parsed.projectName}`,
       message: parsed.comment,
       name: parsed.contactName,
       email: nullableString(parsed.email),
@@ -92,18 +85,12 @@ export async function submitBusinessSolutionRequest(formData: FormData) {
         medium: nullableString(parsed.utmMedium),
         campaign: nullableString(parsed.utmCampaign)
       },
-      payload: {
+      payload: buildApplicationPayload(ApplicationType.BUSINESS_SOLUTION, {
         source: 'public_form',
         projectName: parsed.projectName,
         solutionType: parsed.solutionType,
         solutionTypeLabel
-      }
-    });
-
-    result = { type: 'success', message: 'Заявку получили. Если понадобится уточнение, мы свяжемся с вами.' };
-  } catch (error) {
-    result = { type: 'error', message: resolvePublicApplicationActionError('public:business-solution', error) };
-  }
-
-  redirectWithBusinessResult(result);
+      })
+    })
+  });
 }

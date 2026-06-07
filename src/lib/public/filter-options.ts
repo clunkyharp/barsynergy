@@ -4,10 +4,10 @@ import {
   courseFormatOptions,
   courseLevelOptions,
   eventFormatOptions,
-  getAdminOptionLabel,
+  getOptionLabel as getAdminOptionLabel,
   partnerTypeOptions,
   vacancyEmploymentTypeOptions
-} from '@/lib/admin/content-labels';
+} from '@/modules/content/shared/labels';
 
 export type PublicTaxonomyOption = {
   id: string;

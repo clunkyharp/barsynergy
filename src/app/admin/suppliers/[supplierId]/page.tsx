@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { CategoryType, ContentStatus } from '@prisma/client';
+import { CategoryType, ContentStatus } from '@/modules/admin/queries';
 import { updateSupplier, updateSupplierStatus } from '@/app/admin/suppliers/actions';
 import { AdminCmsActions, AdminCmsForm, AdminCmsGrid, AdminCmsSection, AdminCmsSummary } from '@/components/admin/admin-cms-form';
 import { AdminContentVisibilityPanel, CoverImageField, HiddenRedirect } from '@/components/admin/content-admin-controls';
@@ -10,7 +10,7 @@ import { Select } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { PUBLICATION_STATUS_HINT, contentStatusLabels } from '@/lib/admin/content-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
-import { prisma } from '@/lib/db/prisma';
+import { prisma } from '@/modules/admin/queries';
 
 export const dynamic = 'force-dynamic';
 

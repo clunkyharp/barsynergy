@@ -1,3 +1,4 @@
+import { revalidatePath } from 'next/cache';
 import {
   getPublishedArticles,
   getPublishedCourses,
@@ -9,6 +10,8 @@ import {
 import { getPublishedGeneralSponsors, type GeneralSponsor } from '@/lib/public/general-sponsors';
 import { ContentStatus } from '@prisma/client';
 import { prisma } from '@/lib/db/prisma';
+
+const HOMEPAGE_CACHE_TTL_MS = 30_000;
 
 type SharedListItem = Awaited<ReturnType<typeof getPublishedArticles>>['items'][number];
 
@@ -118,7 +121,7 @@ const HOMEPAGE_SOCIAL_BLOCK_LIMIT = 3;
 
 const fallbackCards: Record<HomepageCardKind, Omit<HomepageLiveCard, 'kind'>> = {
   course: {
-    eyebrow: 'Образование',
+    eyebrow: 'Обучение',
     title: 'Обучение для команд и специалистов',
     summary: 'Интенсивы, командные программы и материалы для задач сервиса, меню и смены.',
     meta: ['Очные и онлайн-занятия', 'СКФО'],
@@ -160,7 +163,7 @@ const fallbackCards: Record<HomepageCardKind, Omit<HomepageLiveCard, 'kind'>> = 
     summary: 'Компании для закупок, расходников, оборудования и сервисных задач по региону.',
     meta: ['Закупки и сервис', 'Для заведений'],
     href: '/suppliers',
-    actionLabel: 'Перейти в каталог',
+    actionLabel: 'Смотреть поставщиков',
     isFallback: true
   }
 };
@@ -202,19 +205,19 @@ function normalizePublicActionLabel(label: string) {
     'Написать команде': 'Связаться с нами',
     'Открыть обучение': 'Выбрать программу',
     'Посмотреть обучение': 'Выбрать программу',
-    'Открыть каталог': 'Перейти в каталог',
-    'Смотреть каталог': 'Перейти в каталог',
+    'Открыть каталог': 'Смотреть поставщиков',
+    'Смотреть каталог': 'Смотреть поставщиков',
     'Открыть калькулятор': 'Рассчитать себестоимость',
-    'Перейти к расчёту': 'Рассчитать себестоимость',
+    'Открыть расчёт': 'Рассчитать себестоимость',
     'Открыть программу': 'Смотреть программу',
     'Открыть профиль': 'Смотреть профиль',
     'Открыть форму заявки': 'Оставить заявку',
     'Открыть отклик': 'Откликнуться на вакансию',
     'Открыть Telegram': 'Написать в Telegram',
     'Открыть WhatsApp': 'Написать в WhatsApp',
-    'Открыть Instagram': 'Перейти в Instagram',
-    'Открыть сайт': 'Перейти на сайт',
-    'Открыть канал': 'Перейти в канал'
+    'Открыть Instagram': 'Смотреть Instagram',
+    'Открыть сайт': 'Смотреть сайт',
+    'Открыть канал': 'Смотреть канал'
   };
 
   return replacements[trimmedLabel] ?? trimmedLabel;
@@ -247,7 +250,18 @@ function toHomepageCard(
   };
 }
 
+const homepageCache = new Map<string, { data: HomepageData; expiresAt: number }>();
+
+export function revalidateHomepageCache() {
+  homepageCache.delete('homepage');
+  revalidatePath('/');
+}
+
 export async function getHomepageData(): Promise<HomepageData> {
+  const cached = homepageCache.get('homepage');
+  if (cached && cached.expiresAt > Date.now()) {
+    return cached.data;
+  }
   const [
     courses,
     upcomingEvents,
@@ -302,7 +316,7 @@ export async function getHomepageData(): Promise<HomepageData> {
       ? partners.items.map((item) => item.title)
       : ['События с партнёрами', 'Локальные бренды', 'Школы и площадки', 'Совместные проекты'];
 
-  return {
+  const result: HomepageData = {
     hero: homepageHero
       ? {
           eyebrow: homepageHero.eyebrow,
@@ -322,7 +336,7 @@ export async function getHomepageData(): Promise<HomepageData> {
       imagePath: card.imagePath ?? undefined,
       iconKey: card.iconKey ?? undefined
     })),
-    course: toHomepageCard(courses.items[0], 'course', '/education', 'Выбрать программу', 'Образование'),
+    course: toHomepageCard(courses.items[0], 'course', '/education', 'Выбрать программу', 'Обучение'),
     event: toHomepageCard(featuredEvent, 'event', '/events', 'Выбрать событие', 'Ближайшее событие'),
     article: toHomepageCard(
       articles.items[0],
@@ -335,7 +349,7 @@ export async function getHomepageData(): Promise<HomepageData> {
       ? toHomepageCard(articles.items[1], 'article', `/articles/${articles.items[1].slug}`, 'Читать материал', 'Материал')
       : undefined,
     vacancy: toHomepageCard(vacancies.items[0], 'vacancy', '/vacancies', 'Найти вакансию', 'Открытая вакансия'),
-    supplier: toHomepageCard(featuredSupplier, 'supplier', '/suppliers', 'Перейти в каталог', 'Поставщик'),
+    supplier: toHomepageCard(featuredSupplier, 'supplier', '/suppliers', 'Смотреть поставщиков', 'Поставщик'),
     generalSponsors,
     socialBlocks: socialBlocks.map((block) => ({
       id: block.id,
@@ -381,4 +395,7 @@ export async function getHomepageData(): Promise<HomepageData> {
       partners: partners.total
     }
   };
+
+  homepageCache.set('homepage', { data: result, expiresAt: Date.now() + HOMEPAGE_CACHE_TTL_MS });
+  return result;
 }

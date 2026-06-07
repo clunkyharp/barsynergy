@@ -1,6 +1,6 @@
-import { ApplicationStatus, ApplicationType, type Prisma } from '@prisma/client';
+import { ApplicationStatus, ApplicationType, type Prisma } from '@/modules/admin/queries';
 import { publishContentFromApplication } from '@/app/admin/applications/actions';
-import { AdminFilterBar, AdminPagination, HiddenRedirect } from '@/components/admin/content-admin-controls';
+import { AdminFilterBar, AdminPagination, AdminStatusTabs, HiddenRedirect } from '@/components/admin/content-admin-controls';
 import { AdminPageIntro } from '@/components/admin/admin-page-intro';
 import { Button } from '@/components/ui/button';
 import {
@@ -24,7 +24,6 @@ import { AdminStatusChip } from '@/components/ui/status-badge';
 import {
   applicationStatusBadgeVariants,
   applicationStatusLabels,
-  applicationStatusValues,
   applicationTypeLabels,
   applicationTypeValues,
   parseApplicationStatus,
@@ -38,7 +37,8 @@ import {
   type AdminContentSearchParams
 } from '@/lib/admin/content-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
-import { prisma } from '@/lib/db/prisma';
+import { getApplicationPayloadText } from '@/lib/applications/application-payloads';
+import { prisma } from '@/modules/admin/queries';
 
 export const dynamic = 'force-dynamic';
 
@@ -58,12 +58,6 @@ const quickStatusFilters = [
   { label: 'Одобрены', status: ApplicationStatus.APPROVED },
   { label: 'Завершены', status: ApplicationStatus.COMPLETED }
 ] as const;
-
-const activeQuickFilterStyle = {
-  background: 'var(--admin-filter-active-bg)',
-  borderColor: 'var(--admin-filter-active-border)',
-  color: 'var(--admin-filter-active-text)'
-};
 
 type ApplicationPublicationTarget = 'partner' | 'supplier' | 'vacancy';
 
@@ -146,22 +140,6 @@ function applicationPublicationTarget(application: {
   return null;
 }
 
-function getPayloadText(payload: Prisma.JsonValue | null, keys: string[]) {
-  if (!payload || Array.isArray(payload) || typeof payload !== 'object') {
-    return null;
-  }
-
-  for (const key of keys) {
-    const value = (payload as Record<string, Prisma.JsonValue>)[key];
-
-    if (typeof value === 'string' && value.trim()) {
-      return value.trim();
-    }
-  }
-
-  return null;
-}
-
 function applicationPersonOrCompany(application: {
   businessAccount: { companyName: string } | null;
   email: string | null;
@@ -170,8 +148,11 @@ function applicationPersonOrCompany(application: {
   phone: string | null;
   subject: string | null;
   telegram: string | null;
+  type: ApplicationType;
 }) {
-  const companyName = application.businessAccount?.companyName ?? getPayloadText(application.payload, ['projectName', 'companyName', 'employerCompanyName']);
+  const companyName =
+    application.businessAccount?.companyName ??
+    getApplicationPayloadText(application.type, application.payload, ['projectName', 'companyName', 'employerCompanyName']);
   const primary = companyName ?? application.name?.trim() ?? application.subject?.trim() ?? application.email ?? 'Не указано';
   const secondary = [application.name && companyName ? application.name : null, application.email, application.phone, application.telegram]
     .filter(Boolean)
@@ -195,7 +176,11 @@ export default async function AdminApplicationsPage({ searchParams }: AdminAppli
           { name: { contains: search, mode: 'insensitive' } },
           { email: { contains: search, mode: 'insensitive' } },
           { phone: { contains: search, mode: 'insensitive' } },
-          { telegram: { contains: search, mode: 'insensitive' } }
+          { telegram: { contains: search, mode: 'insensitive' } },
+          { businessAccount: { companyName: { contains: search, mode: 'insensitive' } } },
+          { payload: { path: ['companyName'], string_contains: search } },
+          { payload: { path: ['projectName'], string_contains: search } },
+          { payload: { path: ['employerCompanyName'], string_contains: search } }
         ]
       }
     : {};
@@ -263,10 +248,19 @@ export default async function AdminApplicationsPage({ searchParams }: AdminAppli
         title="Заявки"
       />
 
-      <AdminFilterBar
-        action={ADMIN_APPLICATIONS_PATH}
-        summary="Поиск по входящим заявкам, типам и рабочим статусам."
-      >
+      <AdminStatusTabs
+        items={[
+          { current: !selectedStatus, href: ADMIN_APPLICATIONS_PATH, label: 'Все' },
+          ...quickStatusFilters.map((item) => ({
+            current: selectedStatus === item.status,
+            href: `${ADMIN_APPLICATIONS_PATH}?status=${encodeURIComponent(item.status)}`,
+            label: item.label
+          }))
+        ]}
+        label="Статусы заявок"
+      />
+
+      <AdminFilterBar action={ADMIN_APPLICATIONS_PATH}>
         <FormField htmlFor="search" label="Поиск">
           <Input id="search" name="search" defaultValue={search} placeholder="Поиск по заявке" />
         </FormField>
@@ -280,16 +274,6 @@ export default async function AdminApplicationsPage({ searchParams }: AdminAppli
             ))}
           </Select>
         </FormField>
-        <FormField htmlFor="status" label="Статус">
-          <Select id="status" name="status" defaultValue={selectedStatus ?? ''}>
-            <option value="">Все статусы</option>
-            {applicationStatusValues.map((status) => (
-              <option key={status} value={status}>
-                {applicationStatusLabels[status]}
-              </option>
-            ))}
-          </Select>
-        </FormField>
         <DataTableActionRow className="justify-start xl:col-span-full">
           <Button type="submit" variant="secondary">
             Применить
@@ -299,30 +283,6 @@ export default async function AdminApplicationsPage({ searchParams }: AdminAppli
           </Button>
         </DataTableActionRow>
       </AdminFilterBar>
-
-      <DataTableActionRow className="justify-start">
-        <Button
-          className={!selectedStatus ? 'admin-filter-active' : undefined}
-          href={ADMIN_APPLICATIONS_PATH}
-          size="sm"
-          style={!selectedStatus ? activeQuickFilterStyle : undefined}
-          variant="secondary"
-        >
-          Все
-        </Button>
-        {quickStatusFilters.map((item) => (
-          <Button
-            href={`${ADMIN_APPLICATIONS_PATH}?status=${encodeURIComponent(item.status)}`}
-            key={item.status}
-            size="sm"
-            className={selectedStatus === item.status ? 'admin-filter-active' : undefined}
-            style={selectedStatus === item.status ? activeQuickFilterStyle : undefined}
-            variant="secondary"
-          >
-            {item.label}
-          </Button>
-        ))}
-      </DataTableActionRow>
 
       <section className="space-y-4">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">

@@ -1,5 +1,5 @@
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { ApplicationStatus, ApplicationType } from '@prisma/client';
 import {
   archiveBusinessDraftApplication,
   submitBusinessDraftApplication,
@@ -9,24 +9,29 @@ import { AdminActionAlert } from '@/components/admin/content-admin-controls';
 import { NextActionPanel } from '@/components/business/business-cabinet';
 import { ActionRow } from '@/components/ui/action-row';
 import { Button } from '@/components/ui/button';
-import { CheckboxField } from '@/components/ui/checkbox-field';
 import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
-import { InlineLink } from '@/components/ui/inline-link';
 import { PageHeader } from '@/components/ui/page-header';
 import { Panel } from '@/components/ui/panel';
 import { Select } from '@/components/ui/select';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { SubmitButton } from '@/components/ui/submit-button';
+import { ConfirmSubmitButton } from '@/components/ui/confirm-submit-button';
 import { Textarea } from '@/components/ui/textarea';
 import {
   applicationStatusBadgeVariants,
   applicationStatusLabels,
   applicationTypeLabels
 } from '@/lib/admin/application-utils';
-import type { AdminContentSearchParams } from '@/lib/admin/content-utils';
+import { vacancyEmploymentTypeOptions, withCurrentValueOption, type AdminContentSearchParams } from '@/lib/admin/content-utils';
+import { getApplicationPayloadText } from '@/lib/applications/application-payloads';
 import { requireBusinessAccountAccess } from '@/lib/auth/require-business-account';
-import { prisma } from '@/lib/db/prisma';
+import { buildPrivatePageMetadata } from '@/lib/public/metadata';
+import {
+  getBusinessRequestDetail,
+  ApplicationStatus,
+  ApplicationType
+} from '@/modules/business/queries';
 import { isVacancyPosition, vacancyPositionValues } from '@/lib/vacancies/positions';
 
 type BusinessRequestDetailPageProps = {
@@ -34,13 +39,13 @@ type BusinessRequestDetailPageProps = {
   searchParams?: Promise<AdminContentSearchParams>;
 };
 
-function payloadValue(payload: unknown, key: string) {
-  if (!payload || Array.isArray(payload) || typeof payload !== 'object') {
-    return '';
-  }
+export const metadata: Metadata = buildPrivatePageMetadata({
+  title: 'Заявка компании',
+  description: 'Закрытая страница BARSYNERGY для просмотра и редактирования заявки компании.'
+});
 
-  const value = (payload as Record<string, unknown>)[key];
-  return typeof value === 'string' ? value : '';
+function payloadValue(type: ApplicationType, payload: unknown, key: string) {
+  return getApplicationPayloadText(type, payload, [key]) ?? '';
 }
 
 function renderDraftTypeFields(type: ApplicationType, payload: unknown) {
@@ -53,7 +58,7 @@ function renderDraftTypeFields(type: ApplicationType, payload: unknown) {
               id="position"
               name="position"
               required
-              defaultValue={isVacancyPosition(payloadValue(payload, 'position')) ? payloadValue(payload, 'position') : ''}
+              defaultValue={isVacancyPosition(payloadValue(type, payload, 'position')) ? payloadValue(type, payload, 'position') : ''}
             >
               <option value="">Не выбрана</option>
               {vacancyPositionValues.map((position) => (
@@ -64,13 +69,20 @@ function renderDraftTypeFields(type: ApplicationType, payload: unknown) {
             </Select>
           </FormField>
           <FormField htmlFor="employmentType" label="Тип занятости">
-            <Input id="employmentType" name="employmentType" maxLength={100} defaultValue={payloadValue(payload, 'employmentType')} />
+            <Select id="employmentType" name="employmentType" defaultValue={payloadValue(type, payload, 'employmentType')}>
+              <option value="">— Выбрать —</option>
+              {withCurrentValueOption([...vacancyEmploymentTypeOptions], payloadValue(type, payload, 'employmentType')).map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </Select>
           </FormField>
           <FormField htmlFor="salaryLabel" label="Зарплата">
-            <Input id="salaryLabel" name="salaryLabel" maxLength={120} defaultValue={payloadValue(payload, 'salaryLabel')} />
+            <Input id="salaryLabel" name="salaryLabel" maxLength={120} defaultValue={payloadValue(type, payload, 'salaryLabel')} />
           </FormField>
           <FormField htmlFor="experienceLabel" label="Опыт">
-            <Input id="experienceLabel" name="experienceLabel" maxLength={120} defaultValue={payloadValue(payload, 'experienceLabel')} />
+            <Input id="experienceLabel" name="experienceLabel" maxLength={120} defaultValue={payloadValue(type, payload, 'experienceLabel')} />
           </FormField>
           <FormField className="md:col-span-2" htmlFor="shortDescription" label="Краткое описание роли">
             <Input
@@ -78,7 +90,7 @@ function renderDraftTypeFields(type: ApplicationType, payload: unknown) {
               name="shortDescription"
               required
               maxLength={500}
-              defaultValue={payloadValue(payload, 'shortDescription')}
+              defaultValue={payloadValue(type, payload, 'shortDescription')}
             />
           </FormField>
         </>
@@ -87,10 +99,10 @@ function renderDraftTypeFields(type: ApplicationType, payload: unknown) {
       return (
         <>
           <FormField htmlFor="serviceArea" label="Зона поставки">
-            <Input id="serviceArea" name="serviceArea" required maxLength={160} defaultValue={payloadValue(payload, 'serviceArea')} />
+            <Input id="serviceArea" name="serviceArea" required maxLength={160} defaultValue={payloadValue(type, payload, 'serviceArea')} />
           </FormField>
           <FormField htmlFor="shortDescription" label="Кратко о предложении">
-            <Input id="shortDescription" name="shortDescription" maxLength={500} defaultValue={payloadValue(payload, 'shortDescription')} />
+            <Input id="shortDescription" name="shortDescription" maxLength={500} defaultValue={payloadValue(type, payload, 'shortDescription')} />
           </FormField>
         </>
       );
@@ -98,10 +110,10 @@ function renderDraftTypeFields(type: ApplicationType, payload: unknown) {
       return (
         <>
           <FormField htmlFor="partnerType" label="Тип партнёрства">
-            <Input id="partnerType" name="partnerType" required maxLength={160} defaultValue={payloadValue(payload, 'partnerType')} />
+            <Input id="partnerType" name="partnerType" required maxLength={160} defaultValue={payloadValue(type, payload, 'partnerType')} />
           </FormField>
           <FormField htmlFor="shortDescription" label="Краткое описание формата">
-            <Input id="shortDescription" name="shortDescription" maxLength={500} defaultValue={payloadValue(payload, 'shortDescription')} />
+            <Input id="shortDescription" name="shortDescription" maxLength={500} defaultValue={payloadValue(type, payload, 'shortDescription')} />
           </FormField>
         </>
       );
@@ -109,10 +121,10 @@ function renderDraftTypeFields(type: ApplicationType, payload: unknown) {
       return (
         <>
           <FormField htmlFor="teamSize" label="Размер команды">
-            <Input id="teamSize" name="teamSize" required maxLength={80} defaultValue={payloadValue(payload, 'teamSize')} />
+            <Input id="teamSize" name="teamSize" required maxLength={80} defaultValue={payloadValue(type, payload, 'teamSize')} />
           </FormField>
           <FormField htmlFor="shortDescription" label="Кратко о задаче обучения">
-            <Input id="shortDescription" name="shortDescription" maxLength={500} defaultValue={payloadValue(payload, 'shortDescription')} />
+            <Input id="shortDescription" name="shortDescription" maxLength={500} defaultValue={payloadValue(type, payload, 'shortDescription')} />
           </FormField>
         </>
       );
@@ -120,10 +132,10 @@ function renderDraftTypeFields(type: ApplicationType, payload: unknown) {
       return (
         <>
           <FormField htmlFor="amountLabel" label="Сумма сертификата">
-            <Input id="amountLabel" name="amountLabel" required maxLength={120} defaultValue={payloadValue(payload, 'amountLabel')} />
+            <Input id="amountLabel" name="amountLabel" required maxLength={120} defaultValue={payloadValue(type, payload, 'amountLabel')} />
           </FormField>
           <FormField htmlFor="recipientName" label="Получатель сертификата">
-            <Input id="recipientName" name="recipientName" required maxLength={160} defaultValue={payloadValue(payload, 'recipientName')} />
+            <Input id="recipientName" name="recipientName" required maxLength={160} defaultValue={payloadValue(type, payload, 'recipientName')} />
           </FormField>
         </>
       );
@@ -136,22 +148,7 @@ export default async function BusinessRequestDetailPage({ params, searchParams }
   const { businessAccount } = await requireBusinessAccountAccess();
   const { applicationId } = await params;
   const query = (await searchParams) ?? {};
-  const [cities, application] = await Promise.all([
-    prisma.city.findMany({
-      where: { isActive: true },
-      orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
-      select: { id: true, name: true }
-    }),
-    prisma.application.findFirst({
-      where: {
-        id: applicationId,
-        businessAccountId: businessAccount.id
-      },
-      include: {
-        city: { select: { name: true } }
-      }
-    })
-  ]);
+  const { cities, application } = await getBusinessRequestDetail(businessAccount.id, applicationId);
 
   if (!application) {
     notFound();
@@ -181,7 +178,7 @@ export default async function BusinessRequestDetailPage({ params, searchParams }
                   <p className="mt-1 text-xs leading-5 text-[var(--muted)]">Тип фиксируется для черновика, чтобы показывать только нужные поля.</p>
                 </div>
                 <FormField htmlFor="title" label="Короткое название">
-                  <Input id="title" name="title" required maxLength={180} defaultValue={payloadValue(application.payload, 'title')} />
+                  <Input id="title" name="title" required maxLength={180} defaultValue={payloadValue(application.type, application.payload, 'title')} />
                 </FormField>
                 <FormField htmlFor="cityId" label="Город">
                   <Select id="cityId" name="cityId" defaultValue={application.cityId ?? businessAccount.cityId ?? ''}>
@@ -198,10 +195,6 @@ export default async function BusinessRequestDetailPage({ params, searchParams }
               <FormField htmlFor="details" label="Подробности">
                 <Textarea id="details" name="details" required maxLength={4000} rows={6} defaultValue={application.message ?? ''} />
               </FormField>
-              <CheckboxField defaultChecked name="consent" required value="accepted">
-                Согласен с <InlineLink href="/legal/privacy">политикой обработки персональных данных</InlineLink> и даю{' '}
-                <InlineLink href="/legal/personal-data-consent">согласие на обработку персональных данных</InlineLink> для этой заявки.
-              </CheckboxField>
               <ActionRow className="border-t-0 pt-0">
                 <SubmitButton>Сохранить изменения</SubmitButton>
               </ActionRow>
@@ -209,17 +202,17 @@ export default async function BusinessRequestDetailPage({ params, searchParams }
           ) : (
             <dl className="mt-5 grid gap-4 text-sm">
               <div>
-                <dt className="font-semibold">Город</dt>
-                <dd className="mt-1 text-[var(--muted)]">{application.city?.name ?? 'Не указан'}</dd>
+                <dt className="font-semibold text-[var(--muted)]">Город</dt>
+                <dd className="mt-1 text-[var(--text)]">{application.city?.name ?? 'Не указан'}</dd>
               </div>
               <div>
-                <dt className="font-semibold">Подробности</dt>
-                <dd className="mt-1 whitespace-pre-wrap leading-7 text-[var(--muted)]">{application.message ?? '-'}</dd>
+                <dt className="font-semibold text-[var(--muted)]">Подробности</dt>
+                <dd className="mt-1 whitespace-pre-wrap leading-7 text-[var(--text)]">{application.message ?? '-'}</dd>
               </div>
               {application.businessNotes ? (
                 <div>
-                  <dt className="font-semibold">Комментарий администратора</dt>
-                  <dd className="mt-1 whitespace-pre-wrap leading-7 text-[var(--muted)]">{application.businessNotes}</dd>
+                  <dt className="font-semibold text-[var(--muted)]">Комментарий администратора</dt>
+                  <dd className="mt-1 whitespace-pre-wrap leading-7 text-[var(--text)]">{application.businessNotes}</dd>
                 </div>
               ) : null}
             </dl>
@@ -252,13 +245,19 @@ export default async function BusinessRequestDetailPage({ params, searchParams }
                 </form>
                 <form action={archiveBusinessDraftApplication}>
                   <input name="applicationId" type="hidden" value={application.id} />
-                  <SubmitButton className="w-full" variant="secondary">
+                  <ConfirmSubmitButton
+                    className="w-full"
+                    confirmActionLabel="В архив"
+                    confirmText="Черновик будет скрыт из списка активных заявок."
+                    confirmTitle="Перенести в архив?"
+                    variant="secondary"
+                  >
                     Перенести в архив
-                  </SubmitButton>
+                  </ConfirmSubmitButton>
                 </form>
               </>
             ) : null}
-            <Button href="/business/cabinet/requests" variant="ghost">
+            <Button href="/business/cabinet/requests" variant="secondary">
               Вернуться к заявкам
             </Button>
           </div>

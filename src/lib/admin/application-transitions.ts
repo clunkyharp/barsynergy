@@ -1,5 +1,16 @@
 import { ApplicationStatus, ApplicationType } from '@prisma/client';
 
+const EDITABLE_BUSINESS_NOTES_STATUSES: readonly ApplicationStatus[] = [
+  ApplicationStatus.DRAFT,
+  ApplicationStatus.NEW,
+  ApplicationStatus.IN_REVIEW,
+  ApplicationStatus.CONTACTED,
+  ApplicationStatus.APPROVED,
+  ApplicationStatus.PAYMENT_PENDING,
+  ApplicationStatus.PAID_MANUALLY,
+  ApplicationStatus.FORWARDED_TO_EMPLOYER
+];
+
 type ApplicationTransitionRecord = {
   type: ApplicationType;
   status: ApplicationStatus;
@@ -27,8 +38,8 @@ export function getAvailableApplicationStatuses(
   );
 }
 
-export function canUpdateApplicationBusinessNotes(application: { businessAccountId: string | null }) {
-  return Boolean(application.businessAccountId);
+export function canUpdateApplicationBusinessNotes(application: { businessAccountId: string | null; status: ApplicationStatus }) {
+  return Boolean(application.businessAccountId) && EDITABLE_BUSINESS_NOTES_STATUSES.includes(application.status);
 }
 
 export function getApplicationStatusUpdate(input: {

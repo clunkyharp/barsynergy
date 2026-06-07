@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { ApplicationType } from '@prisma/client';
-import { createBusinessApplication } from '@/lib/business/actions';
 import { ActionRow } from '@/components/ui/action-row';
 import { ConsentField } from '@/components/ui/consent-field';
 import { FormField } from '@/components/ui/form-field';
@@ -12,8 +11,7 @@ import { Select } from '@/components/ui/select';
 import { SegmentedControl } from '@/components/ui/segmented-control';
 import { SubmitButton } from '@/components/ui/submit-button';
 import { Textarea } from '@/components/ui/textarea';
-import { applicationTypeLabels } from '@/lib/admin/application-utils';
-import { displayFont } from '@/lib/fonts';
+import { applicationTypeLabels, vacancyEmploymentTypeOptions } from '@/modules/content/shared/labels';
 import { vacancyPositionValues } from '@/lib/vacancies/positions';
 
 type CityOption = {
@@ -24,6 +22,7 @@ type CityOption = {
 type BusinessRequestFormProps = {
   cities: CityOption[];
   defaultCityId?: string | null;
+  action: (formData: FormData) => void | Promise<void>;
 };
 
 const requestCards = [
@@ -64,7 +63,7 @@ const requestRequirements: Record<BusinessRequestCardType, string[]> = {
   [ApplicationType.CERTIFICATE_ORDER]: ['сумма или формат сертификата', 'получатель', 'пожелания по использованию']
 };
 
-export function BusinessRequestForm({ cities, defaultCityId }: BusinessRequestFormProps) {
+export function BusinessRequestForm({ cities, defaultCityId, action }: BusinessRequestFormProps) {
   const [selectedType, setSelectedType] = useState<BusinessRequestCardType>(ApplicationType.VACANCY_SUBMISSION);
   const selectedRequest = requestCards.find((card) => card.type === selectedType) ?? requestCards[0];
 
@@ -72,9 +71,9 @@ export function BusinessRequestForm({ cities, defaultCityId }: BusinessRequestFo
     <section className="overflow-hidden rounded-[var(--radius-lg)] border border-[var(--line)] bg-[var(--surface-elevated)] shadow-[var(--shadow-panel)]">
       <div className="border-b border-[var(--line)] px-5 py-5 md:px-6">
         <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Новая заявка</p>
-        <h2 className={`${displayFont.className} mt-3 text-[2rem] font-semibold leading-none tracking-normal`}>Выберите тип заявки</h2>
+        <h2 className="mt-3 text-[1.65rem] font-semibold leading-tight tracking-normal">Выберите тип заявки</h2>
       </div>
-      <form action={createBusinessApplication} className="grid gap-6 p-5 md:p-6">
+      <form action={action} className="grid gap-6 p-5 md:p-6">
         <input name="type" type="hidden" value={selectedType} />
 
         <SegmentedControl
@@ -104,7 +103,7 @@ export function BusinessRequestForm({ cities, defaultCityId }: BusinessRequestFo
 
         <div className="grid gap-5 md:grid-cols-2">
           <FormField htmlFor="title" label="Короткое название">
-            <Input id="title" name="title" required maxLength={180} />
+            <Input id="title" name="title" required maxLength={180} placeholder="Например, Бариста в утреннюю смену" />
           </FormField>
           <FormField htmlFor="cityId" label="Город">
             <Select id="cityId" name="cityId" defaultValue={defaultCityId ?? ''}>
@@ -130,16 +129,23 @@ export function BusinessRequestForm({ cities, defaultCityId }: BusinessRequestFo
                 </Select>
               </FormField>
               <FormField htmlFor="employmentType" label="Тип занятости">
-                <Input id="employmentType" name="employmentType" maxLength={100} />
+                <Select id="employmentType" name="employmentType" defaultValue="">
+                  <option value="">— Выбрать —</option>
+                  {vacancyEmploymentTypeOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </Select>
               </FormField>
               <FormField htmlFor="salaryLabel" label="Зарплата">
-                <Input id="salaryLabel" name="salaryLabel" maxLength={120} />
+                <Input id="salaryLabel" name="salaryLabel" maxLength={120} placeholder="Например, 80 000 + бонусы" />
               </FormField>
               <FormField htmlFor="experienceLabel" label="Опыт">
-                <Input id="experienceLabel" name="experienceLabel" maxLength={120} />
+                <Input id="experienceLabel" name="experienceLabel" maxLength={120} placeholder="Например, от 1 года" />
               </FormField>
               <FormField className="md:col-span-2" htmlFor="shortDescription" label="Краткое описание роли">
-                <Input id="shortDescription" name="shortDescription" maxLength={500} />
+                <Input id="shortDescription" name="shortDescription" maxLength={500} placeholder="Например, работа с гостями, классика и открытие смены." />
               </FormField>
             </>
           ) : null}
@@ -147,10 +153,10 @@ export function BusinessRequestForm({ cities, defaultCityId }: BusinessRequestFo
           {selectedType === ApplicationType.SUPPLIER_SUBMISSION ? (
             <>
               <FormField htmlFor="serviceArea" label="Зона поставки">
-                <Input id="serviceArea" name="serviceArea" maxLength={160} />
+                <Input id="serviceArea" name="serviceArea" maxLength={160} placeholder="Например, СКФО и ЮФО" />
               </FormField>
               <FormField htmlFor="shortDescription" label="Кратко о предложении">
-                <Input id="shortDescription" name="shortDescription" maxLength={500} />
+                <Input id="shortDescription" name="shortDescription" maxLength={500} placeholder="Например, поставляем зерно и расходники для кофеен." />
               </FormField>
             </>
           ) : null}
@@ -158,10 +164,10 @@ export function BusinessRequestForm({ cities, defaultCityId }: BusinessRequestFo
           {selectedType === ApplicationType.PARTNER_APPLICATION ? (
             <>
               <FormField htmlFor="partnerType" label="Тип партнёрства">
-                <Input id="partnerType" name="partnerType" maxLength={160} />
+                <Input id="partnerType" name="partnerType" maxLength={160} placeholder="Например, совместное событие" />
               </FormField>
               <FormField htmlFor="shortDescription" label="Краткое описание формата">
-                <Input id="shortDescription" name="shortDescription" maxLength={500} />
+                <Input id="shortDescription" name="shortDescription" maxLength={500} placeholder="Например, хотим провести серию дегустаций для заведений." />
               </FormField>
             </>
           ) : null}
@@ -169,10 +175,10 @@ export function BusinessRequestForm({ cities, defaultCityId }: BusinessRequestFo
           {selectedType === ApplicationType.CORPORATE_TRAINING_APPLICATION ? (
             <>
               <FormField htmlFor="teamSize" label="Размер команды">
-                <Input id="teamSize" name="teamSize" maxLength={80} />
+                <Input id="teamSize" name="teamSize" maxLength={80} placeholder="Например, 12 человек" />
               </FormField>
               <FormField htmlFor="shortDescription" label="Кратко о задаче обучения">
-                <Input id="shortDescription" name="shortDescription" maxLength={500} />
+                <Input id="shortDescription" name="shortDescription" maxLength={500} placeholder="Например, нужно подтянуть сервис и работу в час пик." />
               </FormField>
             </>
           ) : null}
@@ -180,17 +186,17 @@ export function BusinessRequestForm({ cities, defaultCityId }: BusinessRequestFo
           {selectedType === ApplicationType.CERTIFICATE_ORDER ? (
             <>
               <FormField htmlFor="amountLabel" label="Сумма сертификата">
-                <Input id="amountLabel" name="amountLabel" maxLength={120} />
+                <Input id="amountLabel" name="amountLabel" maxLength={120} placeholder="Например, 3000 рублей" />
               </FormField>
               <FormField htmlFor="recipientName" label="Получатель сертификата">
-                <Input id="recipientName" name="recipientName" maxLength={160} />
+                <Input id="recipientName" name="recipientName" maxLength={160} placeholder="Мария Петрова" />
               </FormField>
             </>
           ) : null}
         </div>
 
         <FormField htmlFor="details" label="Подробности">
-          <Textarea id="details" name="details" className="min-h-40" required maxLength={4000} rows={6} />
+          <Textarea id="details" name="details" className="min-h-40" required maxLength={4000} rows={6} placeholder="Например: нужны 2 бариста на сменный график, старт в июле, важен опыт работы с потоком и сервисом." />
         </FormField>
 
         <ConsentField>

@@ -16,18 +16,27 @@ test('public desktop header navigation is readable and keeps overlap guards', ()
 
   assert.match(source, /<div className="container">/);
   assert.doesNotMatch(source, /w-\[min\(1840px,calc\(100vw-40px\)\)\]/);
-  assert.match(navClass, /text-\[13px\]/);
+  assert.match(navClass, /text-\[11px\]/);
+  assert.match(navClass, /tracking-\[0\.06em\]/);
   assert.match(navClass, /min-w-0/);
   assert.match(navClass, /xl:flex/);
-  assert.match(source, /xl:grid-cols-\[176px_minmax\(0,1fr\)_176px\]/);
-  assert.match(source, /2xl:grid-cols-\[220px_minmax\(0,1fr\)_184px\]/);
+  assert.match(navClass, /xl:justify-self-start/);
+  assert.match(source, /xl:grid-cols-\[176px_minmax\(0,1fr\)_max-content\]/);
+  assert.match(source, /2xl:grid-cols-\[220px_minmax\(0,1fr\)_max-content\]/);
+  assert.match(source, /src="\/brand\/barsynergy-lockup-light\.svg"/);
   assert.match(source, /whitespace-nowrap/);
   assert.doesNotMatch(source, /href="\/contacts\?topic=other#contact-form"/);
   assert.doesNotMatch(source, /<ArrowUpRight/);
-  assert.doesNotMatch(navClass, /text-\[12px\]/);
+  assert.match(source, /xl:gap-x-6/);
+  assert.match(source, /xl:min-w-\[176px\]/);
+  assert.match(source, /const desktopPrimaryNavItems = getNavItems\(\['\/education', '\/events', '\/articles', '\/vacancies', '\/suppliers', '\/business'\]\)/);
+  assert.match(source, /const desktopMoreNavItems = getNavItems\(\['\/about', '\/consulting', '\/partners', '\/general-sponsors', '\/contacts'\]\)/);
+  assert.match(source, /xl:inline-flex/);
+  assert.doesNotMatch(source, /href="\/vacancies#vacancy-form"/);
+  assert.match(source, /href="\/contacts\?topic=vacancy-placement#contact-form"/);
 });
 
-test('public desktop more menu opens on hover and closes predictably', () => {
+test('public desktop more menu opens by click and closes predictably', () => {
   const source = readProjectFile('src/components/layout/site-header.tsx');
   const detailsStart = source.indexOf('<details');
   const detailsEnd = source.indexOf('</details>');
@@ -35,8 +44,8 @@ test('public desktop more menu opens on hover and closes predictably', () => {
 
   assert.match(source, /const \[isMoreNavOpen, setIsMoreNavOpen\] = useState\(false\)/);
   assert.match(source, /setIsMoreNavOpen\(false\);/);
-  assert.match(detailsSource, /onMouseEnter=\{\(\) => setIsMoreNavOpen\(true\)\}/);
-  assert.match(detailsSource, /onMouseLeave=\{\(\) => setIsMoreNavOpen\(false\)\}/);
+  assert.doesNotMatch(detailsSource, /onMouseEnter/);
+  assert.doesNotMatch(detailsSource, /onMouseLeave/);
   assert.match(detailsSource, /onToggle=\{\(event\) => setIsMoreNavOpen\(event\.currentTarget\.open\)\}/);
   assert.match(detailsSource, /open=\{isMoreNavOpen\}/);
   assert.match(detailsSource, /event\.key === 'Escape'/);
@@ -53,8 +62,6 @@ test('main public pages expose consistent breadcrumbs in their hero sections', (
   assert.match(editorialSource, /<PublicBreadcrumbs current=\{breadcrumbLabel \?\? eyebrow\}/);
 
   const standalonePages = [
-    ['src/app/(public)/events/page.tsx', /<PublicBreadcrumbs current="События"/],
-    ['src/app/(public)/vacancies/page.tsx', /<PublicBreadcrumbs current="Вакансии"/],
     ['src/app/(public)/general-sponsors/page.tsx', /<PublicBreadcrumbs current="Спонсорство"/],
     ['src/app/(public)/about/page.tsx', /<PublicBreadcrumbs current="О проекте"/]
   ];
@@ -63,5 +70,7 @@ test('main public pages expose consistent breadcrumbs in their hero sections', (
     assert.match(readProjectFile(file), pattern, file);
   }
 
+  assert.match(readProjectFile('src/app/(public)/events/page.tsx'), /<EditorialPublicPage[\s\S]*eyebrow="События"[\s\S]*path="\/events"/);
+  assert.match(readProjectFile('src/app/(public)/vacancies/page.tsx'), /<EditorialPublicPage[\s\S]*eyebrow="Вакансии"[\s\S]*path="\/vacancies"/);
   assert.match(readProjectFile('src/app/(public)/tools/cost-calculator/page.tsx'), /breadcrumbLabel="Калькулятор себестоимости"/);
 });

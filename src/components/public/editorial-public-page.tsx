@@ -1,6 +1,8 @@
-import { ArrowUpRight } from 'lucide-react';
+import { ArrowUpRight, type LucideIcon } from 'lucide-react';
 import { PublicActionRow, PublicBodyText, PublicBreadcrumbs, PublicDisplayTitle, PublicEyebrow } from '@/components/public/public-primitives';
+import { JsonLd } from '@/components/seo/json-ld';
 import { Button } from '@/components/ui/button';
+import { buildStaticPageBreadcrumbJsonLd } from '@/lib/public/structured-data';
 import { cn } from '@/lib/utils';
 
 type Metric = {
@@ -24,15 +26,21 @@ type EditorialPublicPageProps = {
   title: string;
   description: string;
   summary: string;
+  path?: string;
   breadcrumbLabel?: string;
+  chips?: string[];
   density?: 'editorial' | 'compact' | 'task' | 'offer';
   summaryHeading?: string;
   heroSummaryVariant?: 'default' | 'expanded';
+  heroVariant?: 'minimal' | 'split' | 'cover';
+  showHeroSummary?: boolean;
   metrics: Metric[];
   rows: Row[];
   rowsHeading?: string;
   primaryLink?: LinkItem;
   secondaryLink?: LinkItem;
+  accentGradient?: string;
+  accentIcon?: LucideIcon;
 };
 
 export function EditorialPublicPage({
@@ -40,82 +48,142 @@ export function EditorialPublicPage({
   title,
   description,
   summary,
+  path,
   breadcrumbLabel,
+  chips,
   density = 'editorial',
   summaryHeading = 'Коротко',
-  heroSummaryVariant = 'expanded',
+  heroVariant = 'minimal',
+  showHeroSummary = true,
   metrics,
   rows,
   rowsHeading = 'Разделы',
   primaryLink,
-  secondaryLink
+  secondaryLink,
+  accentGradient,
+  accentIcon: AccentIcon
 }: EditorialPublicPageProps) {
   const hasDetails = metrics.length > 0 || rows.length > 0;
-  const detailsTitle = rowsHeading === 'Разделы' ? 'Что здесь можно сделать' : rowsHeading;
+  const detailsTitle = rowsHeading === 'Разделы' ? 'Направления' : rowsHeading;
   const isCompact = density !== 'editorial';
-  const useExpandedSummary = heroSummaryVariant === 'expanded' && !isCompact;
+  const useSplitHero = showHeroSummary && heroVariant === 'split';
+  const isCoverHero = heroVariant === 'cover';
+  const actionRow = primaryLink || secondaryLink ? (
+    <PublicActionRow className={cn(isCompact ? '' : 'mt-6', 'shrink-0')}>
+      {primaryLink ? (
+        <Button
+          className={cn(
+            'w-full max-w-full rounded-[var(--radius-md)] leading-5 tracking-normal sm:w-auto',
+            isCompact ? 'min-h-10 px-4 text-sm' : 'min-h-12 px-5'
+          )}
+          href={primaryLink.href}
+        >
+          {primaryLink.label}
+          <ArrowUpRight size={isCompact ? 16 : 18} />
+        </Button>
+      ) : null}
+      {secondaryLink ? (
+        <Button
+          className={cn(
+            'w-full max-w-full rounded-[var(--radius-md)] leading-5 tracking-normal sm:w-auto',
+            isCompact ? 'min-h-10 px-4 text-sm' : 'min-h-12 px-5'
+          )}
+          href={secondaryLink.href}
+          variant="secondary"
+        >
+          {secondaryLink.label}
+        </Button>
+      ) : null}
+    </PublicActionRow>
+  ) : null;
 
   return (
     <div>
-      <section className={cn('background-zone background-zone-hero border-b border-[var(--line)]', isCompact ? 'py-7 md:py-10' : 'py-10 md:py-14')}>
-        <div
-          className={
-            useExpandedSummary
-              ? 'container relative grid gap-8 xl:grid-cols-[minmax(0,0.82fr)_minmax(30rem,0.78fr)] xl:items-start'
-              : 'container relative grid gap-6 xl:grid-cols-[1fr_0.58fr] xl:items-start'
-          }
-        >
-          <div className={cn('min-w-0', isCompact ? 'xl:pt-1' : 'xl:pt-4')}>
-            <PublicBreadcrumbs current={breadcrumbLabel ?? eyebrow} />
-            <PublicEyebrow className="mt-5" tone="muted">{eyebrow}</PublicEyebrow>
-            <PublicDisplayTitle
-              as="h1"
-              className={cn(
-                'mt-3 max-w-5xl break-words text-[32px]',
-                isCompact ? 'sm:text-[42px] md:text-[50px] xl:text-[56px]' : 'sm:text-[44px] md:text-[64px] xl:text-[78px]'
-              )}
-              size="section"
-            >
-              {title}
-            </PublicDisplayTitle>
-          </div>
+      {path ? <JsonLd data={buildStaticPageBreadcrumbJsonLd(path, breadcrumbLabel ?? eyebrow)} /> : null}
+      <section
+        className={cn(
+          'background-zone background-zone-hero border-b border-[var(--line)]',
+          isCompact ? 'py-7 md:py-10' : 'py-10 md:py-14',
+          isCoverHero && 'relative isolate overflow-hidden bg-[var(--editorial-dark-surface)] text-[var(--editorial-dark-text)]',
+          accentGradient && !isCoverHero && 'relative overflow-hidden'
+        )}
+      >
+        {isCoverHero ? (
           <div
-            className={
-              useExpandedSummary
-                ? 'public-card-shell min-w-0 p-5 md:p-6 xl:p-7'
-                : 'min-w-0 border-t border-[var(--line)] pt-5 xl:border-l xl:border-t-0 xl:pl-5 xl:pt-4'
-            }
-          >
-            <PublicEyebrow tone="muted">{summaryHeading}</PublicEyebrow>
-            <PublicBodyText className="mt-3 max-w-none text-[var(--text)]" size="md" tone="default">
-              {description}
-            </PublicBodyText>
-            <PublicBodyText className="mt-5 max-w-none" size="sm">
-              {summary}
-            </PublicBodyText>
-            {primaryLink || secondaryLink ? (
-              <PublicActionRow>
-                {primaryLink ? (
-                  <Button
-                    className="min-h-12 w-full max-w-full rounded-[var(--radius-md)] px-5 leading-5 tracking-normal sm:w-auto"
-                    href={primaryLink.href}
-                  >
-                    {primaryLink.label}
-                    <ArrowUpRight size={18} />
-                  </Button>
+            aria-hidden="true"
+            className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_18%_20%,rgba(150,112,30,0.2),transparent_24rem),linear-gradient(135deg,rgba(17,16,14,0.98),rgba(23,19,17,0.82)_58%,rgba(95,18,18,0.34))]"
+          />
+        ) : accentGradient ? (
+          <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10" style={{ background: accentGradient }} />
+        ) : null}
+        <div className="container relative">
+          {isCompact && !useSplitHero ? (
+            <>
+              <div className="flex items-center gap-3">
+                {AccentIcon ? (
+                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-[var(--radius-sm)] bg-[var(--accent)] text-white">
+                    <AccentIcon size={17} strokeWidth={1.8} />
+                  </span>
                 ) : null}
-                {secondaryLink ? (
-                  <Button
-                    className="min-h-12 w-full max-w-full rounded-[var(--radius-md)] px-5 leading-5 tracking-normal sm:w-auto"
-                    href={secondaryLink.href}
-                    variant="secondary"
-                  >
-                    {secondaryLink.label}
-                  </Button>
-                ) : null}
-              </PublicActionRow>
-            ) : null}
-          </div>
+                <PublicBreadcrumbs current={breadcrumbLabel ?? eyebrow} />
+              </div>
+              <PublicDisplayTitle
+                as="h1"
+                className="mt-3 max-w-3xl break-words text-[32px] sm:text-[38px] md:text-[44px] xl:text-[50px]"
+                size="section"
+              >
+                {title}
+              </PublicDisplayTitle>
+              {chips && chips.length > 0 ? (
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {chips.map((chip) => (
+                    <span
+                      key={chip}
+                      className="inline-flex cursor-default items-center rounded-full border border-[var(--border-subtle)] px-3 py-1 text-xs text-[var(--muted)] transition-opacity hover:opacity-80"
+                    >
+                      {chip}
+                    </span>
+                  ))}
+                </div>
+              ) : null}
+              <div className="mt-5 border-t border-[var(--line)] pt-4">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                  <PublicBodyText className="max-w-2xl text-[var(--text)]" size="sm" tone="default">
+                    {description}
+                  </PublicBodyText>
+                  {actionRow}
+                </div>
+              </div>
+            </>
+          ) : (
+            <div className={useSplitHero ? 'grid gap-7 xl:grid-cols-[minmax(0,0.82fr)_minmax(20rem,0.5fr)] xl:items-end' : undefined}>
+              <div className={cn('min-w-0', 'xl:pt-4')}>
+                <PublicBreadcrumbs current={breadcrumbLabel ?? eyebrow} />
+                <PublicDisplayTitle
+                  as="h1"
+                  className="mt-5 max-w-4xl break-words text-[32px] sm:text-[44px] md:text-[58px] xl:text-[68px]"
+                  size="section"
+                >
+                  {title}
+                </PublicDisplayTitle>
+                <div className="mt-5 flex max-w-5xl flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+                  <PublicBodyText className="max-w-3xl text-[var(--text)]" size="md" tone="default">
+                    {description}
+                  </PublicBodyText>
+                  {useSplitHero ? null : actionRow}
+                </div>
+              </div>
+              {useSplitHero ? (
+                <div className="min-w-0 border-t border-[var(--line)] pt-5 xl:border-l xl:border-t-0 xl:pl-6 xl:pt-0">
+                  <PublicEyebrow tone="muted">{summaryHeading}</PublicEyebrow>
+                  <PublicBodyText className="mt-3 max-w-none" size="sm">
+                    {summary}
+                  </PublicBodyText>
+                  {actionRow}
+                </div>
+              ) : null}
+            </div>
+          )}
         </div>
       </section>
       {hasDetails ? (

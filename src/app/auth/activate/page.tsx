@@ -1,4 +1,5 @@
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, ShieldCheck } from 'lucide-react';
+import type { Metadata } from 'next';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { activateBusinessAccessAction } from '@/app/auth/actions';
@@ -7,14 +8,16 @@ import { Button } from '@/components/ui/button';
 import { FormField } from '@/components/ui/form-field';
 import { InlineAlert } from '@/components/ui/inline-alert';
 import { Input } from '@/components/ui/input';
+import { PasswordPairValidation } from '@/components/ui/password-pair-validation';
 import { Panel } from '@/components/ui/panel';
 import { SubmitButton } from '@/components/ui/submit-button';
+import { PublicFormValidation } from '@/components/public/public-form-validation';
 import {
   BUSINESS_ACCESS_ACTIVATION_COOKIE_NAME,
   findActiveBusinessAccessInvite,
   parseBusinessAccessRequestPayload
 } from '@/lib/auth/business-access';
-import { displayFont } from '@/lib/fonts';
+import { buildPrivatePageMetadata } from '@/lib/public/metadata';
 
 const errorMessages: Record<string, string> = {
   invalid: 'Ссылка активации недействительна или уже использована.',
@@ -26,6 +29,11 @@ const errorMessages: Record<string, string> = {
 type ActivatePageProps = {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 };
+
+export const metadata: Metadata = buildPrivatePageMetadata({
+  title: 'Активация доступа',
+  description: 'Закрытая страница для активации бизнес-доступа BARSYNERGY.'
+});
 
 function firstParam(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] : value;
@@ -67,7 +75,10 @@ export default async function ActivateBusinessAccessPage({ searchParams }: Activ
             </Button>
           </div>
           <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Бизнес-аккаунт</p>
-          <h1 className={`${displayFont.className} display-tight mt-4 text-[40px] md:text-[54px]`}>Завершить подключение</h1>
+          <span className="mt-6 grid size-14 place-items-center rounded-[var(--radius-pill)] border border-[var(--accent)]/35 bg-[var(--accent-soft)] text-[var(--accent)]">
+            <ShieldCheck aria-hidden size={26} strokeWidth={1.7} />
+          </span>
+          <h1 className="display-tight mt-4 text-[40px] font-semibold tracking-normal md:text-[54px]">Завершить подключение</h1>
           <p className="mt-4 max-w-md text-base leading-7 text-[var(--muted)]">
             Установите пароль для первого входа в кабинет компании. Ссылка действует недолго и открывается один раз.
           </p>
@@ -85,7 +96,7 @@ export default async function ActivateBusinessAccessPage({ searchParams }: Activ
         <section className="editorial-form-shell overflow-hidden">
           <div className="border-b border-black/10 bg-[var(--surface-wash)] px-5 py-5 md:px-6 md:py-6">
             <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Активация</p>
-            <h2 className={`${displayFont.className} mt-3 text-[2rem] font-semibold leading-none`}>Создайте пароль</h2>
+            <h2 className="mt-3 text-[2rem] font-semibold leading-tight tracking-normal">Создайте пароль</h2>
             <p className="mt-3 max-w-xl text-sm leading-7 text-[var(--muted)]">
               После активации вы попадёте в кабинет и сможете работать с заявками компании.
             </p>
@@ -100,13 +111,15 @@ export default async function ActivateBusinessAccessPage({ searchParams }: Activ
             {!token || !invite ? (
               <InlineAlert tone="error">Ссылка активации недействительна или уже использована.</InlineAlert>
             ) : (
-              <form action={activateBusinessAccessAction} className="grid gap-4">
+              <form action={activateBusinessAccessAction} className="grid gap-4" data-public-validation="true" noValidate>
+                <PublicFormValidation />
+                <PasswordPairValidation />
                 <input name="token" type="hidden" value={token} />
-                <FormField htmlFor="password" label="Пароль" hint="Минимум 8 символов. Лучше взять отдельный пароль для кабинета.">
-                  <Input id="password" name="password" type="password" minLength={8} autoComplete="new-password" required />
+                <FormField htmlFor="new-password" label="Пароль" hint="Минимум 8 символов. Лучше взять отдельный пароль для кабинета.">
+                  <Input id="new-password" name="password" type="password" minLength={8} autoComplete="new-password" placeholder="Минимум 8 символов" required />
                 </FormField>
-                <FormField htmlFor="confirmPassword" label="Повторите пароль">
-                  <Input id="confirmPassword" name="confirmPassword" type="password" minLength={8} autoComplete="new-password" required />
+                <FormField htmlFor="confirm-password" label="Повторите пароль">
+                  <Input id="confirm-password" name="confirmPassword" type="password" minLength={8} autoComplete="new-password" placeholder="Повторите пароль" required />
                 </FormField>
                 <ActionRow>
                   <SubmitButton className="rounded-[var(--radius-md)]" size="lg">

@@ -1,16 +1,37 @@
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { PublicContentDetailPage } from '@/components/public/public-content-detail-page';
 import { PublicRelatedContentSection } from '@/components/public/public-related-content-section';
+import { JsonLd } from '@/components/seo/json-ld';
 import { getPublishedSuppliers } from '@/lib/public/content';
-import { getPublishedSupplierDetail } from '@/lib/public/content-details';
+import { getPublishedSupplierDetail } from '@/lib/public/content';
+import { buildMissingPublicContentMetadata, buildPublicContentMetadata } from '@/lib/public/metadata';
+import { buildBreadcrumbJsonLd, buildPublicContentJsonLd } from '@/lib/public/structured-data';
 
 type SupplierDetailPageProps = {
   params: Promise<{ slug: string }>;
 };
 
+export async function generateMetadata({ params }: SupplierDetailPageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const supplier = await getPublishedSupplierDetail(slug);
+
+  if (!supplier) {
+    return buildMissingPublicContentMetadata({
+      title: 'Поставщик не найден',
+      description: 'Поставщик удалён или ещё не опубликован.'
+    });
+  }
+
+  return buildPublicContentMetadata({
+    detail: supplier,
+    path: `/suppliers/${supplier.slug}`
+  });
+}
+
 function supplierContactHref(input: { title: string; companyName?: string; label?: string; externalUrl?: string }) {
   const params = new URLSearchParams({
-    topic: 'supplier',
+    topic: 'supplier-contact',
     companyName: input.companyName ?? input.title
   });
 
@@ -32,10 +53,21 @@ export default async function SupplierDetailPage({ params }: SupplierDetailPageP
   if (!supplier) {
     notFound();
   }
+  const detailPath = `/suppliers/${supplier.slug}`;
   const relatedItems = related.items.filter((item) => item.slug !== slug).slice(0, 3);
 
   return (
     <>
+      <JsonLd
+        data={[
+          buildBreadcrumbJsonLd([
+            { name: 'Главная', path: '/' },
+            { name: 'Поставщики', path: '/suppliers' },
+            { name: supplier.title, path: detailPath }
+          ]),
+          buildPublicContentJsonLd({ detail: supplier, path: detailPath, kind: 'organization' })
+        ]}
+      />
       <PublicContentDetailPage
         backHref="/suppliers"
         backLabel="Ко всем поставщикам"

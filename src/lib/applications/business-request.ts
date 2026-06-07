@@ -1,6 +1,7 @@
 import { ApplicationType, type Prisma } from '@prisma/client';
 import { z } from 'zod';
 import { vacancyPositionValues } from '../vacancies/positions.ts';
+import { buildApplicationPayload } from './application-payloads.ts';
 
 export const businessApplicationTypes = [
   ApplicationType.VACANCY_SUBMISSION,
@@ -72,38 +73,38 @@ export function buildBusinessApplicationPayload(
     source: 'business_cabinet',
     companyName: input.companyName,
     title: input.title
-  };
+  } as const;
 
   switch (input.type) {
     case ApplicationType.VACANCY_SUBMISSION:
-      return {
+      return buildApplicationPayload(input.type, {
         ...basePayload,
         position: input.position,
         employmentType: input.employmentType ?? null,
         salaryLabel: input.salaryLabel ?? null,
         experienceLabel: input.experienceLabel ?? null,
         shortDescription: input.shortDescription
-      };
+      });
     case ApplicationType.SUPPLIER_SUBMISSION:
-      return {
+      return buildApplicationPayload(input.type, {
         ...basePayload,
         serviceArea: input.serviceArea
-      };
+      });
     case ApplicationType.PARTNER_APPLICATION:
-      return {
+      return buildApplicationPayload(input.type, {
         ...basePayload,
         partnerType: input.partnerType
-      };
+      });
     case ApplicationType.CORPORATE_TRAINING_APPLICATION:
-      return {
+      return buildApplicationPayload(input.type, {
         ...basePayload,
         teamSize: input.teamSize
-      };
+      });
     case ApplicationType.CERTIFICATE_ORDER:
-      return {
+      return buildApplicationPayload(input.type, {
         ...basePayload,
         recipientName: input.recipientName,
         amountLabel: input.amountLabel
-      };
+      });
   }
 }

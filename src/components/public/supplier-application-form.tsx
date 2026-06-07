@@ -1,4 +1,3 @@
-import { submitSupplierApplication } from '@/app/(public)/suppliers/actions';
 import {
   ContactChannelFieldset,
   HiddenUtmFields,
@@ -16,7 +15,7 @@ import { Select } from '@/components/ui/select';
 import { SubmitButton } from '@/components/ui/submit-button';
 import { Textarea } from '@/components/ui/textarea';
 
-export function SupplierApplicationForm({ enabled, result, utm, cities }: PublicApplicationFormProps) {
+export function SupplierApplicationForm({ enabled, result, utm, cities, action }: PublicApplicationFormProps & { action?: (formData: FormData) => void }) {
   return (
     <PublicApplicationSection
       eyebrow="Поставщики / Заявка"
@@ -25,14 +24,14 @@ export function SupplierApplicationForm({ enabled, result, utm, cities }: Public
       disclosureAliases={['applications']}
       disclosureFocusSelector="#supplierCompanyName"
       disclosureId="supplier-request"
-      disclosureOpenLabel="Добавить компанию"
+      disclosureOpenLabel="Добавить свою компанию"
       disclosureTitle="Заявка поставщика"
       disclosureDescription="Укажите компанию, категорию, географию, продукты или услуги и контакт для заведений. Логотип или фото нужны перед публикацией профиля."
       enabled={enabled}
       introVariant="compact"
       result={result}
     >
-      <form action={submitSupplierApplication} className="editorial-form-shell public-form-shell">
+      <form action={action} className="editorial-form-shell public-form-shell">
         <HiddenUtmFields utm={utm} />
         <HoneypotField id="supplier-application-website" />
         <PublicFormShellHeader
@@ -43,10 +42,10 @@ export function SupplierApplicationForm({ enabled, result, utm, cities }: Public
         <div className="relative p-5 md:p-6">
           <div className="grid gap-4 md:grid-cols-2">
             <FormField htmlFor="supplierCompanyName" label="Компания">
-              <Input id="supplierCompanyName" name="companyName" required maxLength={180} minLength={2} />
+              <Input id="supplierCompanyName" name="companyName" required maxLength={180} minLength={2} placeholder="Например, Roaster Lab" />
             </FormField>
             <FormField htmlFor="supplierContactName" label="Контактное лицо">
-              <Input id="supplierContactName" name="contactName" required maxLength={160} minLength={2} />
+              <Input id="supplierContactName" name="contactName" required maxLength={160} minLength={2} placeholder="Иван Иванов" />
             </FormField>
             <ContactChannelFieldset className="md:col-span-2" emailId="supplierEmail" phoneId="supplierPhone" telegramId="supplierTelegram" />
             <FormField htmlFor="supplierCityId" label="Город">
@@ -60,14 +59,14 @@ export function SupplierApplicationForm({ enabled, result, utm, cities }: Public
               </Select>
             </FormField>
             <FormField htmlFor="supplierWebsiteUrl" label="Сайт">
-              <Input id="supplierWebsiteUrl" name="websiteUrl" type="url" maxLength={500} />
+              <Input id="supplierWebsiteUrl" name="websiteUrl" type="url" placeholder="https://example.ru" maxLength={500} />
             </FormField>
             <FormField htmlFor="supplierServiceArea" label="Категория и география">
-              <Input id="supplierServiceArea" name="serviceArea" required maxLength={160} minLength={2} />
+              <Input id="supplierServiceArea" name="serviceArea" required maxLength={160} minLength={2} placeholder="Например, кофе, сиропы и доставка по СКФО" />
             </FormField>
             <div className="md:col-span-2">
               <FormField htmlFor="supplierDescription" label="Описание">
-                <Textarea id="supplierDescription" name="description" required className="min-h-40" maxLength={4000} minLength={20} />
+                <Textarea id="supplierDescription" name="description" required className="min-h-40" maxLength={4000} minLength={20} placeholder="Например: поставляем зерно и расходники для кофеен, работаем с небольшими партиями и быстрыми отгрузками." />
               </FormField>
             </div>
             <div className="md:col-span-2">

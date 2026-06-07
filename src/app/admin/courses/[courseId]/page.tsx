@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { CategoryType, ContentStatus } from '@prisma/client';
+import { CategoryType, ContentStatus } from '@/modules/admin/queries';
 import { updateCourse, updateCourseStatus } from '@/app/admin/courses/actions';
 import { AdminCmsActions, AdminCmsForm, AdminCmsGrid, AdminCmsSection, AdminCmsSummary } from '@/components/admin/admin-cms-form';
 import { AdminContentVisibilityPanel, CoverImageField } from '@/components/admin/content-admin-controls';
@@ -17,7 +17,7 @@ import {
   withCurrentValueOption
 } from '@/lib/admin/content-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
-import { prisma } from '@/lib/db/prisma';
+import { prisma } from '@/modules/admin/queries';
 
 export const dynamic = 'force-dynamic';
 

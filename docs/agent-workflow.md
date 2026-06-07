@@ -27,6 +27,31 @@ The central agent must:
 
 The central agent does not blindly trust subagent output.
 
+## Spec-Driven And Test-Driven Development
+
+Default implementation workflow:
+
+1. Freeze a small mini-spec before editing code.
+2. Translate the expected behavior into the smallest useful test or verification check.
+3. For testable behavior changes, write or update the smallest meaningful test and run it in the failing state before implementation.
+4. Do not edit production code first unless the no-failing-test exception is explicit before editing.
+5. Implement the minimum change that satisfies the spec and makes the test pass.
+6. Refactor only after the targeted test is green.
+7. Rerun targeted validation and broaden to lint, typecheck, browser QA or build only when the changed surface requires it.
+
+The mini-spec must identify:
+
+- goal;
+- user-visible or system behavior;
+- scope and out of scope;
+- affected contracts, routes, modules or UI states;
+- acceptance criteria;
+- validation path.
+
+Automated tests are expected for new features, bug fixes, refactors and behavior changes when the behavior is reasonably testable. If an automated failing test is not practical, the agent must say so before editing production code and name the substitute proof, such as a source-level assertion, type/lint check, browser smoke, visual QA, manual reproduction or explicit verification gap.
+
+Documentation-only, configuration-only and owner-approved exploratory batches still need a short spec and validation decision, but they do not require a failing code test unless the change affects runtime behavior.
+
 ## Subagent Roles
 
 Product Agent:

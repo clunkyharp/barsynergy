@@ -9,6 +9,7 @@ type FormFieldProps = {
   hint?: string;
   className?: string;
   labelClassName?: string;
+  labelSize?: 'default' | 'sm';
   children: ReactNode;
   required?: boolean;
   success?: string;
@@ -18,15 +19,17 @@ export function FieldLabel({
   children,
   className,
   htmlFor,
-  required
+  required,
+  size
 }: {
   children: ReactNode;
   className?: string;
   htmlFor: string;
   required?: boolean;
+  size?: 'default' | 'sm';
 }) {
   return (
-    <label className={cn('field-label', className)} htmlFor={htmlFor}>
+    <label className={cn('field-label', size === 'sm' && 'field-label-compact', className)} htmlFor={htmlFor}>
       {children}
       {required ? <span aria-hidden="true" className="text-[var(--accent)]"> *</span> : null}
     </label>
@@ -57,7 +60,7 @@ export function FieldSuccess({ children, className, id }: { children: ReactNode;
   );
 }
 
-export function FormField({ label, htmlFor, error, hint, className, labelClassName, children, required, success }: FormFieldProps) {
+export function FormField({ label, htmlFor, error, hint, className, labelClassName, labelSize, children, required, success }: FormFieldProps) {
   const errorId = `${htmlFor}-error`;
   const hintId = `${htmlFor}-hint`;
   const successId = `${htmlFor}-success`;
@@ -82,7 +85,7 @@ export function FormField({ label, htmlFor, error, hint, className, labelClassNa
 
   return (
     <div className={cn('form-field', className)} data-state={error ? 'error' : success ? 'success' : undefined}>
-      <FieldLabel className={labelClassName} htmlFor={htmlFor} required={isRequired}>{label}</FieldLabel>
+      <FieldLabel className={labelClassName} htmlFor={htmlFor} required={isRequired} size={labelSize}>{label}</FieldLabel>
       {field}
       {hint ? <FieldHint id={hintId}>{hint}</FieldHint> : null}
       {success ? <FieldSuccess id={successId}>{success}</FieldSuccess> : null}

@@ -3,7 +3,7 @@
 import { redirect } from 'next/navigation';
 import { ApplicationType } from '@prisma/client';
 import { z } from 'zod';
-import { createPublicApplication } from '@/lib/applications/create-public-application';
+import { buildApplicationPayload } from '@/lib/applications/application-payloads';
 import {
   assertActiveCity,
   baseContactSchema,
@@ -12,14 +12,9 @@ import {
   nullableString,
   optionalString,
   PERSONAL_DATA_CONSENT_TEXT,
-  resolvePublicApplicationActionError,
   utmSchema
 } from '@/lib/applications/public-form-helpers';
-import {
-  assertPublicApplicationFormsEnabled,
-  assertPublicApplicationSubmissionAllowed,
-  hasHoneypotValue
-} from '@/lib/applications/public-submission-guards';
+import { submitPublicApplicationAction } from '@/lib/applications/submit-public-application-action';
 
 const SUPPLIERS_PATH = '/suppliers';
 
@@ -41,35 +36,33 @@ function redirectWithSuppliersResult(result: { type: 'success' | 'error'; messag
 }
 
 export async function submitSupplierApplication(formData: FormData) {
-  let result: { type: 'success' | 'error'; message: string };
+  await submitPublicApplicationAction({
+    actionName: 'public:supplier-submission',
+    applicationType: ApplicationType.SUPPLIER_SUBMISSION,
+    formData,
+    successMessage: 'Заявку поставщика получили.',
+    redirectWithResult: redirectWithSuppliersResult,
+    parse: async (data) => {
+      const parsed = supplierApplicationSchema.parse({
+        companyName: getString(data, 'companyName'),
+        contactName: getString(data, 'contactName'),
+        email: optionalString(getString(data, 'email')),
+        phone: optionalString(getString(data, 'phone')),
+        telegram: optionalString(getString(data, 'telegram')),
+        cityId: optionalString(getString(data, 'cityId')),
+        websiteUrl: optionalString(getString(data, 'websiteUrl')),
+        serviceArea: getString(data, 'serviceArea'),
+        description: getString(data, 'description'),
+        consent: getString(data, 'consent'),
+        utmSource: optionalString(getString(data, 'utmSource')),
+        utmMedium: optionalString(getString(data, 'utmMedium')),
+        utmCampaign: optionalString(getString(data, 'utmCampaign'))
+      });
+      const city = await assertActiveCity(parsed.cityId);
 
-  try {
-    assertPublicApplicationFormsEnabled();
-
-    if (hasHoneypotValue(getString(formData, 'website'))) {
-      result = { type: 'success', message: 'Заявку поставщика получили.' };
-      redirectWithSuppliersResult(result);
-    }
-
-    const parsed = supplierApplicationSchema.parse({
-      companyName: getString(formData, 'companyName'),
-      contactName: getString(formData, 'contactName'),
-      email: optionalString(getString(formData, 'email')),
-      phone: optionalString(getString(formData, 'phone')),
-      telegram: optionalString(getString(formData, 'telegram')),
-      cityId: optionalString(getString(formData, 'cityId')),
-      websiteUrl: optionalString(getString(formData, 'websiteUrl')),
-      serviceArea: getString(formData, 'serviceArea'),
-      description: getString(formData, 'description'),
-      consent: getString(formData, 'consent'),
-      utmSource: optionalString(getString(formData, 'utmSource')),
-      utmMedium: optionalString(getString(formData, 'utmMedium')),
-      utmCampaign: optionalString(getString(formData, 'utmCampaign'))
-    });
-
-    const city = await assertActiveCity(parsed.cityId);
-    await assertPublicApplicationSubmissionAllowed(ApplicationType.SUPPLIER_SUBMISSION);
-    await createPublicApplication({
+      return { parsed, city };
+    },
+    buildApplication: ({ parsed, city }) => ({
       type: ApplicationType.SUPPLIER_SUBMISSION,
       subject: `Поставщик: ${parsed.companyName}`,
       message: parsed.description,
@@ -85,17 +78,11 @@ export async function submitSupplierApplication(formData: FormData) {
         medium: nullableString(parsed.utmMedium),
         campaign: nullableString(parsed.utmCampaign)
       },
-      payload: {
+      payload: buildApplicationPayload(ApplicationType.SUPPLIER_SUBMISSION, {
         companyName: parsed.companyName,
         websiteUrl: parsed.websiteUrl ?? null,
         serviceArea: parsed.serviceArea
-      }
-    });
-
-    result = { type: 'success', message: 'Заявку поставщика получили.' };
-  } catch (error) {
-    result = { type: 'error', message: resolvePublicApplicationActionError('public:supplier-submission', error) };
-  }
-
-  redirectWithSuppliersResult(result);
+      })
+    })
+  });
 }

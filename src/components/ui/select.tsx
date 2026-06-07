@@ -1,86 +1,20 @@
 'use client';
 
 import {
-  Children,
-  isValidElement,
-  useCallback,
   useEffect,
   useId,
-  useLayoutEffect,
   useMemo,
   useRef,
   useState,
-  type CSSProperties,
-  type ChangeEvent,
   type FocusEvent,
   type FormEvent,
-  type KeyboardEvent,
-  type ReactElement,
-  type ReactNode,
-  type SelectHTMLAttributes
+  type KeyboardEvent
 } from 'react';
-import { createPortal } from 'react-dom';
-import { Check, ChevronDown } from 'lucide-react';
-import { getOverlayPosition } from '@/lib/ui/overlay-position';
+import { ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
-
-type OptionElementProps = {
-  children?: ReactNode;
-  disabled?: boolean;
-  value?: string | number;
-};
-
-type SelectOption = {
-  disabled: boolean;
-  label: string;
-  value: string;
-};
-
-type SelectProps = Omit<SelectHTMLAttributes<HTMLSelectElement>, 'children' | 'size' | 'multiple'> & {
-  children: ReactNode;
-  'data-state'?: string;
-};
-
-const SELECT_OPEN_EVENT = 'barsynergy-select-open';
-const SELECT_MENU_MAX_HEIGHT = 320;
-
-function optionLabel(children: ReactNode) {
-  return Children.toArray(children)
-    .map((child) => (typeof child === 'string' || typeof child === 'number' ? String(child) : ''))
-    .join('')
-    .trim();
-}
-
-function extractOptions(children: ReactNode): SelectOption[] {
-  return Children.toArray(children).flatMap((child) => {
-    if (!isValidElement(child)) {
-      return [];
-    }
-
-    const element = child as ReactElement<OptionElementProps>;
-
-    if (element.type !== 'option') {
-      return [];
-    }
-
-    const label = optionLabel(element.props.children);
-
-    return [
-      {
-        disabled: Boolean(element.props.disabled),
-        label,
-        value: String(element.props.value ?? label)
-      }
-    ];
-  });
-}
-
-function buildSyntheticChange(value: string) {
-  return {
-    currentTarget: { value },
-    target: { value }
-  } as ChangeEvent<HTMLSelectElement>;
-}
+import { extractOptions, SELECT_OPEN_EVENT, type SelectProps } from './select-utils';
+import { useSelectPosition } from './select-position';
+import { SelectMenu } from './select-menu';
 
 export function Select({
   'aria-describedby': ariaDescribedBy,
@@ -117,7 +51,6 @@ export function Select({
   const [nativeInvalid, setNativeInvalid] = useState(false);
   const [typed, setTyped] = useState('');
   const [portalTarget, setPortalTarget] = useState<HTMLElement | null>(null);
-  const [menuStyle, setMenuStyle] = useState<CSSProperties | null>(null);
   const selectInstanceId = useId();
   const rootRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
@@ -129,6 +62,8 @@ export function Select({
   const isFilled = selectedValue.length > 0;
   const triggerState = nativeInvalid ? 'error' : dataState;
   const triggerAriaInvalid = nativeInvalid ? true : ariaInvalid;
+
+  const menuStyle = useSelectPosition(open, activeIndex, options.length, buttonRef, menuRef);
 
   useEffect(() => {
     setPortalTarget(document.body);
@@ -163,7 +98,6 @@ export function Select({
 
   useEffect(() => {
     if (!open) {
-      setMenuStyle(null);
       return;
     }
 
@@ -185,64 +119,6 @@ export function Select({
     return () => document.removeEventListener('mousedown', handlePointerDown);
   }, [open]);
 
-  const updateMenuPosition = useCallback(() => {
-    if (!buttonRef.current || !menuRef.current) {
-      return;
-    }
-
-    const triggerRect = buttonRef.current.getBoundingClientRect();
-    const overlayRect = {
-      height: Math.min(menuRef.current.scrollHeight, SELECT_MENU_MAX_HEIGHT),
-      width: Math.max(menuRef.current.offsetWidth, triggerRect.width)
-    };
-    const position = getOverlayPosition({
-      align: 'start',
-      matchTriggerWidth: true,
-      maxHeight: SELECT_MENU_MAX_HEIGHT,
-      overlayRect,
-      sideOffset: 8,
-      triggerRect,
-      viewportHeight: window.innerHeight,
-      viewportPadding: 12,
-      viewportWidth: window.innerWidth
-    });
-
-    setMenuStyle({
-      left: position.left,
-      maxHeight: position.maxHeight,
-      position: 'fixed',
-      top: position.top,
-      transformOrigin: position.transformOrigin,
-      width: position.width
-    });
-  }, []);
-
-  useLayoutEffect(() => {
-    if (!open) {
-      return;
-    }
-
-    updateMenuPosition();
-  }, [activeIndex, open, options.length, updateMenuPosition]);
-
-  useEffect(() => {
-    if (!open) {
-      return;
-    }
-
-    function handleViewportChange() {
-      updateMenuPosition();
-    }
-
-    window.addEventListener('resize', handleViewportChange);
-    window.addEventListener('scroll', handleViewportChange, true);
-
-    return () => {
-      window.removeEventListener('resize', handleViewportChange);
-      window.removeEventListener('scroll', handleViewportChange, true);
-    };
-  }, [open, updateMenuPosition]);
-
   useEffect(() => {
     if (!typed) {
       return;
@@ -263,7 +139,10 @@ export function Select({
       setInternalValue(nextValue);
     }
 
-    onChange?.(buildSyntheticChange(nextValue));
+    onChange?.({
+      currentTarget: { value: nextValue },
+      target: { value: nextValue }
+    } as React.ChangeEvent<HTMLSelectElement>);
     setNativeInvalid(false);
     setOpen(false);
 
@@ -404,36 +283,6 @@ export function Select({
     }
   }
 
-  const menu = open ? (
-    <div
-      className="custom-select-menu"
-      id={listboxId}
-      ref={menuRef}
-      role="listbox"
-      style={{ ...menuStyle, visibility: menuStyle ? 'visible' : 'hidden' }}
-    >
-      {options.map((option, index) => (
-        <button
-          aria-disabled={option.disabled || undefined}
-          aria-selected={option.value === selectedValue}
-          className="custom-select-option"
-          data-active={index === activeIndex || undefined}
-          data-selected={option.value === selectedValue || undefined}
-          disabled={option.disabled}
-          id={`${baseId}-option-${index}`}
-          key={`${option.value}-${index}`}
-          onClick={() => selectValue(option.value)}
-          onMouseEnter={() => setActiveIndex(index)}
-          role="option"
-          type="button"
-        >
-          <span className="min-w-0 flex-1">{option.label}</span>
-          {option.value === selectedValue ? <Check aria-hidden className="custom-select-option-check" size={14} strokeWidth={2} /> : null}
-        </button>
-      ))}
-    </div>
-  ) : null;
-
   return (
     <div className="custom-select" onBlur={handleRootBlur} ref={rootRef}>
       <button
@@ -461,7 +310,7 @@ export function Select({
         title={title}
         type="button"
       >
-        <span className={cn('min-w-0 flex-1 truncate', !selectedValue && 'text-[var(--field-placeholder)]')}>
+        <span className="min-w-0 flex-1 truncate" data-placeholder={!selectedValue || undefined}>
           {selectedOption?.label ?? 'Выберите значение'}
         </span>
         <ChevronDown aria-hidden className={cn('custom-select-chevron', open && 'rotate-180')} size={17} strokeWidth={1.8} />
@@ -480,7 +329,19 @@ export function Select({
       >
         {children}
       </select>
-      {portalTarget && menu ? createPortal(menu, portalTarget) : null}
+      <SelectMenu
+        open={open}
+        menuStyle={menuStyle}
+        listboxId={listboxId}
+        options={options}
+        selectedValue={selectedValue}
+        baseId={baseId}
+        activeIndex={activeIndex}
+        portalTarget={portalTarget}
+        menuRef={menuRef}
+        onSelect={selectValue}
+        onActiveIndexChange={setActiveIndex}
+      />
     </div>
   );
 }

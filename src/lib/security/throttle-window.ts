@@ -20,7 +20,12 @@ type ConsumeThrottleWindowInput = {
 };
 
 export function getPersistentThrottleKeyHash(input: { scope: string; identifier: string; secret?: string }) {
-  const secret = input.secret ?? process.env.SESSION_SECRET ?? DEVELOPMENT_PERSISTENT_THROTTLE_SECRET;
+  const secret = input.secret ?? process.env.THROTTLE_SECRET ?? (process.env.NODE_ENV === 'production' ? undefined : DEVELOPMENT_PERSISTENT_THROTTLE_SECRET);
+
+  if (!secret) {
+    throw new Error('THROTTLE_SECRET is required for persistent throttling');
+  }
+
   return createHmac('sha256', secret)
     .update([input.scope.trim().toLowerCase(), input.identifier.trim().toLowerCase()].join(':'))
     .digest('hex');

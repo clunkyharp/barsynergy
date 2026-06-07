@@ -1,4 +1,3 @@
-import { submitConsultingRequest } from '@/app/(public)/consulting/actions';
 import {
   ContactChannelFieldset,
   HiddenUtmFields,
@@ -8,8 +7,9 @@ import {
   type PublicApplicationFormProps
 } from '@/components/public/application-form-section';
 import { PublicBodyText, PublicDisplayTitle, PublicEyebrow } from '@/components/public/public-primitives';
+import { PublicFormValidation } from '@/components/public/public-form-validation';
 import { ConsentField } from '@/components/ui/consent-field';
-import { FormField } from '@/components/ui/form-field';
+import { FormField, FormSection } from '@/components/ui/form-field';
 import { InlineLink } from '@/components/ui/inline-link';
 import { Input } from '@/components/ui/input';
 import { MetaChip } from '@/components/ui/meta-chip';
@@ -23,7 +23,12 @@ import {
   consultingProjectStageOptions
 } from '@/lib/applications/b2b-request-options';
 
-export function ConsultingRequestForm({ enabled, result, utm, cities, defaults = {} }: PublicApplicationFormProps) {
+type ConsultingRequestFormProps = PublicApplicationFormProps & {
+  direct?: boolean;
+  action: (formData: FormData) => void;
+};
+
+export function ConsultingRequestForm({ enabled, result, utm, cities, defaults = {}, direct = false, action }: ConsultingRequestFormProps) {
   return (
     <PublicApplicationSection
       eyebrow="Консалтинг / Заявка"
@@ -32,17 +37,20 @@ export function ConsultingRequestForm({ enabled, result, utm, cities, defaults =
       disclosureAliases={['applications']}
       disclosureDescription="Укажите формат бизнеса, стадию проекта, направление и задачу."
       disclosureFocusSelector="#consultingContactName"
-      disclosureId="consulting-request"
-      disclosureOpenLabel="Оставить заявку"
+      disclosureId={direct ? undefined : 'consulting-request'}
+      disclosureOpenLabel="Описать задачу"
       disclosureTitle="Заявка на консультацию"
       enabled={enabled}
+      introVariant={direct ? 'compact' : undefined}
       result={result}
+      sectionId="consulting-request"
     >
-      <form action={submitConsultingRequest} className="editorial-form-shell public-form-shell">
+      <form action={action} className="editorial-form-shell public-form-shell" noValidate>
+        <PublicFormValidation />
         <HiddenUtmFields utm={utm} />
         <HoneypotField id="consulting-request-website" />
         <div className="relative grid lg:grid-cols-[0.42fr_0.58fr]">
-          <div className="relative border-b border-white/10 bg-[var(--graphite)] px-5 py-6 text-white md:px-6 md:py-7 lg:border-b-0 lg:border-r lg:border-white/10">
+          <div className="relative border-b border-[var(--editorial-dark-border)] bg-[var(--editorial-dark-surface)] px-5 py-6 text-[var(--editorial-dark-text)] md:px-6 md:py-7 lg:border-b-0 lg:border-r lg:border-[var(--editorial-dark-border)]">
             <PublicEyebrow tone="inverse">Экспертная помощь</PublicEyebrow>
             <PublicDisplayTitle as="h3" className="mt-3 text-white" size="card">
               Разбор задачи без календаря и оплаты на сайте
@@ -61,7 +69,7 @@ export function ConsultingRequestForm({ enabled, result, utm, cities, defaults =
 
             <div className="mt-8 border-t border-white/10 pt-5">
               <PublicEyebrow tone="inverse">Что подготовить</PublicEyebrow>
-              <ul className="mt-4 space-y-3 text-sm leading-6 text-white/74">
+              <ul className="mt-4 space-y-3 text-sm leading-6 text-white/85">
                 <li className="flex gap-3">
                   <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--accent)]" />
                   <span>Стадию проекта: идея, запуск, действующее заведение или перезапуск.</span>
@@ -79,20 +87,22 @@ export function ConsultingRequestForm({ enabled, result, utm, cities, defaults =
           </div>
 
           <div className="relative p-5 md:p-6">
-            <div className="grid gap-4 md:grid-cols-2">
-              <FormField htmlFor="consultingContactName" label="Контактное лицо">
-                <Input
-                  autoComplete="name"
-                  defaultValue={defaults.contactName}
-                  id="consultingContactName"
-                  maxLength={160}
-                  minLength={2}
-                  name="contactName"
-                  required
-                />
-              </FormField>
-              <FormField htmlFor="consultingCityId" label="Город">
-                <Select id="consultingCityId" name="cityId" defaultValue={defaults.cityId ?? ''} required>
+            <FormSection title="Контакт">
+              <div className="grid items-start gap-4 md:grid-cols-2">
+                <FormField htmlFor="consultingContactName" label="Контактное лицо">
+                  <Input
+                    autoComplete="name"
+                    defaultValue={defaults.contactName}
+                    id="consultingContactName"
+                    maxLength={160}
+                    minLength={2}
+                    name="contactName"
+                    placeholder="Иван Иванов"
+                    required
+                  />
+                </FormField>
+                <FormField htmlFor="consultingCityId" hint="Нужен для подбора эксперта в вашем городе" label="Город">
+                  <Select id="consultingCityId" name="cityId" defaultValue={defaults.cityId ?? ''} required>
                   <option value="" disabled>
                     Выберите город
                   </option>
@@ -104,6 +114,10 @@ export function ConsultingRequestForm({ enabled, result, utm, cities, defaults =
                 </Select>
               </FormField>
               <ContactChannelFieldset className="md:col-span-2" emailId="consultingEmail" phoneId="consultingPhone" telegramId="consultingTelegram" />
+            </div>
+            </FormSection>
+            <FormSection title="О бизнесе">
+            <div className="grid gap-4 md:grid-cols-2">
               <FormField htmlFor="consultingBusinessType" label="Тип бизнеса">
                 <Select id="consultingBusinessType" name="businessType" defaultValue={defaults.businessType ?? ''} required>
                   <option value="" disabled>
@@ -150,6 +164,10 @@ export function ConsultingRequestForm({ enabled, result, utm, cities, defaults =
                   ))}
                 </Select>
               </FormField>
+            </div>
+            </FormSection>
+            <FormSection title="Задача">
+            <div className="grid gap-4 md:grid-cols-2">
               <div className="md:col-span-2">
                 <FormField htmlFor="consultingTaskDescription" hint="Опишите задачу и что должно стать понятнее после консультации." label="Описание задачи">
                   <Textarea
@@ -159,12 +177,15 @@ export function ConsultingRequestForm({ enabled, result, utm, cities, defaults =
                     maxLength={4000}
                     minLength={20}
                     name="taskDescription"
+                    placeholder="Например: нужно пересобрать барную карту и понять, как снизить себестоимость без потери качества."
                     required
                   />
                 </FormField>
               </div>
-              <div className="md:col-span-2 border-t border-black/10 pt-1">
-                <ConsentField>
+            </div>
+            </FormSection>
+            <div className="md:col-span-2 border-t border-black/10 pt-1">
+              <ConsentField>
                   Согласен с <InlineLink href="/legal/privacy">политикой обработки персональных данных</InlineLink> и даю{' '}
                   <InlineLink href="/legal/personal-data-consent">согласие на обработку персональных данных</InlineLink> для этой заявки.
                 </ConsentField>
@@ -172,7 +193,6 @@ export function ConsultingRequestForm({ enabled, result, utm, cities, defaults =
               <PublicFormShellFooter className="md:col-span-2" note="После отправки уточним задачу и формат консультации.">
                 <SubmitButton>Отправить заявку</SubmitButton>
               </PublicFormShellFooter>
-            </div>
           </div>
         </div>
       </form>

@@ -1,8 +1,11 @@
+import type { Metadata } from 'next';
 import { EditorialPublicPage } from '@/components/public/editorial-public-page';
 import { ContactApplicationForm } from '@/components/public/contact-application-form';
+import { submitContactMessage } from '@/app/(public)/contacts/actions';
 import { arePublicApplicationFormsEnabled } from '@/lib/applications/public-forms';
 import { getApplicationCityOptions } from '@/lib/applications/form-options';
 import { getPublicApplicationResult, getPublicApplicationUtm } from '@/lib/applications/public-form-helpers';
+import { buildPublicPageMetadata } from '@/lib/public/metadata';
 import { getEnv } from '@/lib/validation/env';
 
 type ContactsPageProps = {
@@ -11,7 +14,8 @@ type ContactsPageProps = {
 
 const contactTopicAliases: Record<string, string> = {
   'education-program': 'education-program',
-  'education-launch': 'education-program',
+  'education-launch': 'education-launch',
+  vacancy: 'vacancy-placement',
   'vacancy-placement': 'vacancy-placement',
   partnership: 'partnership',
   'partnership-format': 'partnership',
@@ -19,8 +23,11 @@ const contactTopicAliases: Record<string, string> = {
   'sponsorship-presentation': 'sponsorship',
   consulting: 'consulting',
   'consulting-request': 'consulting',
+  'supplier-contact': 'supplier-contact',
   supplier: 'supplier',
   event: 'event',
+  bug: 'bug-report',
+  'bug-report': 'bug-report',
   'article-topic': 'article-topic',
   'article-interview': 'article-topic',
   'article-launch': 'article-topic'
@@ -44,14 +51,20 @@ const contextParamKeys = [
   'partnerType'
 ] as const;
 
+export const metadata: Metadata = buildPublicPageMetadata({
+  title: 'Контакты',
+  description: 'Связь с командой BARSYNERGY по обучению, событиям, партнёрствам, вакансиям, поставщикам и материалам.',
+  path: '/contacts'
+});
+
 function firstParam(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] : value;
 }
 
 export default async function ContactsPage({ searchParams }: ContactsPageProps) {
   const params = (await searchParams) ?? {};
-  const [cities] = await Promise.all([getApplicationCityOptions()]);
   const applicationFormsEnabled = arePublicApplicationFormsEnabled(getEnv());
+  const cities = applicationFormsEnabled ? await getApplicationCityOptions() : [];
   const topicParam = firstParam(params.topic);
   const defaultTopic = topicParam ? contactTopicAliases[topicParam] ?? topicParam : undefined;
   const defaults: Record<string, string | undefined> = Object.fromEntries(
@@ -61,12 +74,14 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
   return (
     <>
       <EditorialPublicPage
-        eyebrow="Контакты"
-        title="Связь с командой"
-        description="Пишите по обучению, событиям, партнёрствам, вакансиям и поставщикам."
-        summary="Выберите тему обращения. Так мы быстрее поймём, кто должен ответить и какие детали нужны."
-        density="task"
-        summaryHeading="Каналы связи"
+        eyebrow="Команда"
+        path="/contacts"
+        title="Напишите нам"
+        description="Отвечаем в течение рабочего дня. Выберите тему — форма подстроится."
+        summary="Форма — основной способ связаться с командой. Email и Telegram оставили ниже как запасной вариант."
+        density="compact"
+        summaryHeading="Связь"
+        accentGradient="radial-gradient(ellipse 90% 60% at 60% 40%, rgba(180,120,60,0.08), transparent)"
         metrics={[]}
         rows={[]}
       />
@@ -77,6 +92,7 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
         utm={getPublicApplicationUtm(params)}
         defaults={defaults}
         cities={cities}
+        action={submitContactMessage}
       />
     </>
   );

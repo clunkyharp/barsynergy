@@ -4,11 +4,11 @@ This document is the working UI contract for BARSYNERGY. It exists to keep runti
 
 ## Status
 
-Current status: `v0.3 photo-reference redesign`.
+Current status: `v0.5 Miro palette migration`.
 
-The project is being aligned to the supplied photo references: warm off-white pages, serif editorial headlines, burgundy actions, thin dividers, low-radius cards and compact product screens. The goal is to keep that visual direction while preserving current routes, data, auth, applications and admin permissions.
+The project now uses a Miro-inspired product palette: white and light-gray neutral surfaces, one yellow interactive accent, restrained pastel support colors, serif editorial headlines, thin dividers, low-radius cards and compact product screens. The goal stays the same: keep current routes, data, auth, applications and admin permissions while replacing the previous coffee-bar/red direction with a clearer product UI system.
 
-Latest background update: public pages use a quiet editorial background system with a warm ivory paper base, low-opacity grain, subtle burgundy/graphite radial accents and reusable `background-zone-*` section bands. Dark theme uses a separate warm graphite editorial stack instead of a direct inversion of the light palette: graphite page, panel and elevated surfaces, warm low-opacity borders, ivory text and restrained burgundy focus/action states. Square grids, index-map lines, dot matrices and tech patterns are not part of the runtime background contract.
+Latest background update: public pages use a quiet neutral background system with low-opacity grain, yellow/pastel radial accents and reusable `background-zone-*` section bands. Dark theme is now a derived Miro-neutral stack instead of the earlier warm graphite inversion: deep blue-gray page and panel surfaces, cool low-opacity borders, near-white text, the same yellow interactive accent and restrained pastel ambient glow. Square grids, index-map lines, dot matrices and tech patterns are not part of the runtime background contract.
 
 ## Source Of Truth
 
@@ -18,8 +18,7 @@ Use this order when rules conflict:
 2. `src/app/globals.css`
 3. `src/components/ui`
 4. `design-tokens.json`
-5. `public/design-system-preview.html`
-6. this file
+5. this file
 
 Rules:
 
@@ -27,19 +26,21 @@ Rules:
 - `design-tokens.json` must describe the current runtime contract, not an aspirational one.
 - New repeated UI belongs in `src/components/ui` before it spreads through pages.
 - Do not introduce a third-party UI kit as the main design-system layer.
+- The retired static `public/design-system-preview.html` is no longer a source of truth; verify repeated primitives in runtime routes and focused visual QA instead.
 
 ## Design Direction
 
 BARSYNERGY keeps one visual identity across the product:
 
-- warm ivory and cream surfaces;
+- warm near-black and raised graphite surfaces;
 - high-contrast serif public and auth headings;
-- dark graphite typography;
-- burgundy primary actions;
+- near-white typography on dark surfaces;
+- yellow primary actions, links and active marks;
+- pastel atmospheric backgrounds and glow;
 - thin dividers;
 - editorial structure on public surfaces;
 - low-opacity paper grain without square or dotted patterns;
-- section zones for hero, ivory, beige, warm gray, graphite sponsor, social, tool and CTA areas;
+- section zones for hero, graphite, muted warm surfaces, sponsor, social, tool and CTA areas;
 - compact, readable product density for admin and business flows;
 - small card/button radius instead of large rounded cards.
 
@@ -67,16 +68,16 @@ Avoid:
 
 Runtime fonts:
 
-- body: `Noto Sans`
-- display: `Noto Serif Display`
-- accent: `Noto Sans`
+- body: `Manrope`
+- display: `Cormorant Garamond`
+- accent: `Manrope`
 
 Rules:
 
-- `Noto Serif Display` is for public, auth and selected workspace headings.
-- `Noto Sans` is the default body, control and product/workspace font.
+- `Cormorant Garamond` is for large public H1/H2 editorial headings.
+- `Manrope` is the default body, control, form, table, menu, calculator and product/workspace font.
 - The accent role is limited to short labels and brand-adjacent text; it should not replace body copy.
-- Russian helper labels and long Russian copy must stay on `Noto Sans`, not on the display font.
+- Russian helper labels and long Russian copy must stay on `Manrope`, not on the display font.
 - Long Russian text stays in body typography.
 - Do not use display sizing for dense product workflows.
 
@@ -110,7 +111,7 @@ Use semantic roles, not raw color names, in component APIs.
 | Success | `--success` | positive state |
 | Warning | `--warning` | warning state |
 | Danger | `--danger` | destructive/error state |
-| Focus ring | `--focus-ring` | neutral focus emphasis |
+| Focus ring | `--focus-ring` | accent-derived interactive focus emphasis |
 | Focus ring danger | `--focus-ring-danger` | invalid/error focus |
 
 Status surfaces:
@@ -139,17 +140,19 @@ Field surfaces:
 - `--field-focus-ring`
 - `--field-focus-line`
 
-Light field hover, focus and active states use neutral graphite values from the runtime contract: `--field-border-hover: rgba(48, 40, 35, 0.26)`, `--field-border-focus: rgba(48, 40, 35, 0.42)`, `--field-focus-ring: rgba(48, 40, 35, 0.1)` and `--field-focus-line: rgba(48, 40, 35, 0.48)`. Burgundy is reserved for actions, selected states and errors where the semantic token calls for it.
+Light field hover, focus and active states use neutral values from the runtime contract: `--field-border-hover: rgba(85, 90, 106, 0.32)`, `--field-border-focus: rgba(85, 90, 106, 0.46)`, `--field-focus-ring: rgba(85, 90, 106, 0.08)` and `--field-focus-line: rgba(85, 90, 106, 0.48)`. Text-field focus stays neutral; yellow is reserved for actions, links, active nav and selected states, while errors keep the dedicated danger token.
 
 Dark theme contract:
 
-- page graphite: `#11100e`;
-- panel graphite: `#191612`;
-- elevated graphite: `rgba(34, 29, 24, 0.96)`;
-- warm dark borders: low-opacity ivory, usually `rgba(229, 210, 188, 0.07-0.20)`;
-- primary text: warm ivory `#f3ecdf`;
-- secondary text: muted warm clay `#b3a795`;
-- accent: restrained burgundy `#b46967`, used sparingly for actions, active states and short labels;
+- page background: `#14161b`;
+- panel surface: `#1b1e25`;
+- elevated surface: `rgba(27, 30, 37, 0.96)`;
+- dark borders: low-opacity cool neutral, usually `rgba(224, 226, 232, 0.08-0.28)`;
+- primary text: `#f5f7fb`;
+- secondary text: `#a5a8b5`;
+- shared accent: yellow `#FFD02F`, used for primary buttons, links, active nav, selected controls and status emphasis in both themes;
+- accent hover: `#FCB900`;
+- support palette: `#ffc6c6`, `#fde0f0`, `#c3faf5`, `#ffe6cd`, `#f5f3ff`, used only for decorative surfaces and ambient layers;
 - dark separation should rely on dividers and surface shifts before shadows, glow or blur.
 
 Dark mode still keeps a scoped legacy bridge in `src/app/globals.css` for older arbitrary light utility classes inside `.site-shell`. New components should use semantic tokens or shared primitives instead of depending on class-substring overrides; a full removal is deferred to a separate cleanup batch.

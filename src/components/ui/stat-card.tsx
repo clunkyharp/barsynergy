@@ -45,35 +45,51 @@ export function StatCard({
       {...props}
     >
       <div className="flex min-w-0 items-start justify-between gap-3">
-        <p
-          className={cn(
-            'text-[11px] font-semibold uppercase tracking-[0.16em]',
-            isInverse ? 'text-white/58' : 'text-[var(--muted)]',
-            labelClassName
-          )}
-        >
-          {label}
-        </p>
+        <div className="min-w-0">
+          <p
+            className={cn(
+              'text-[11px] font-semibold uppercase tracking-[0.16em]',
+              isInverse ? 'text-[var(--editorial-dark-label)]' : 'text-[var(--muted)]',
+              labelClassName
+            )}
+          >
+            {label}
+          </p>
+          <div className={cn('mt-3 text-[32px] font-semibold leading-none tracking-[-0.03em] text-[var(--text)]', isInverse && 'text-white', valueClassName)}>
+            {value}
+          </div>
+        </div>
         {status ? (
-          <div className={cn(isInverse ? 'text-xs font-semibold text-white/72' : 'text-xs font-semibold text-[var(--muted)]', statusClassName)}>
+          <div
+            className={cn(
+              isInverse ? 'text-xs font-semibold text-[var(--editorial-dark-muted)]' : 'text-xs font-semibold text-[var(--muted)]',
+              statusClassName
+            )}
+          >
             {status}
           </div>
         ) : null}
       </div>
-      <div className={cn('h-px w-full', isInverse ? 'bg-white/14' : 'bg-[var(--line)]')} />
-      <div className="flex min-w-0 items-baseline justify-between gap-3">
-        <div className={cn('min-w-0 text-2xl font-semibold tracking-normal text-[var(--text)]', isInverse && 'text-white', valueClassName)}>
-          {value}
-        </div>
-        {delta ? (
-          <div className={cn(isInverse ? 'text-xs font-semibold text-white/72' : 'text-xs font-semibold text-[var(--muted)]', deltaClassName)}>
-            {delta}
-          </div>
-        ) : null}
-      </div>
-      {description ? (
-        <div className={cn(isInverse ? 'text-sm leading-6 text-white/72' : 'text-sm leading-6 text-[var(--muted)]', descriptionClassName)}>
-          {description}
+      {description || delta ? (
+        <div
+          className={cn(
+            'flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1 text-sm leading-6',
+            isInverse ? 'text-[var(--editorial-dark-muted)]' : 'text-[var(--muted)]',
+            descriptionClassName
+          )}
+        >
+          {description ? <span>{description}</span> : null}
+          {delta ? (
+            <span
+              className={cn(
+                'text-xs font-semibold uppercase tracking-[0.08em]',
+                isInverse ? 'text-[var(--editorial-dark-muted)]' : 'text-[var(--muted)]',
+                deltaClassName
+              )}
+            >
+              {delta}
+            </span>
+          ) : null}
         </div>
       ) : null}
     </Panel>

@@ -1,58 +1,62 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
-import { CategoryType } from '@prisma/client';
+import { BookOpen } from 'lucide-react';
+import { CategoryType } from '@/modules/content/shared/types';
 import { ProgramFormatMatrix } from '@/components/public/editorial-display-primitives';
 import { EditorialPublicPage } from '@/components/public/editorial-public-page';
-import { PublishedContentSection } from '@/components/public/published-content-section';
+import { Button } from '@/components/ui/button';
+import { PublishedContentSectionCourse } from '@/components/public/published-content-section';
 import { PublicFeaturedContent } from '@/components/public/public-featured-content';
 import { PublicFilters } from '@/components/public/public-filters';
 import { stripPublicApplicationResultParams } from '@/lib/applications/public-form-helpers';
 import { getPublishedCourses, hasActivePublicContentParams, type PublicContentSearchParams } from '@/lib/public/content';
 import { getCourseFilterOptions, getPublicCategoryOptions, getPublicCityFilterOptions } from '@/lib/public/filter-options';
+import { buildPublicPageMetadata } from '@/lib/public/metadata';
 
 type EducationPageProps = {
   searchParams?: Promise<PublicContentSearchParams>;
 };
 
-export const metadata: Metadata = {
-  title: 'Образование',
-  description: 'Практические форматы обучения для специалистов и команд барной индустрии.'
-};
+export const metadata: Metadata = buildPublicPageMetadata({
+  title: 'Обучение',
+  description: 'Обучение для бариста, управляющих и команд кофейных баров.',
+  path: '/education'
+});
 
 type EducationFormType = 'course' | 'corporate' | 'certificate';
 
 const educationFormats = [
   {
     label: 'Интенсив',
-    title: 'Интенсив для специалистов',
-    description: 'Короткий практический формат по сервису, меню, технике и работе с гостем.',
-    audience: 'Для специалистов и руководителей, которым нужно быстро разобрать рабочую тему.',
-    outcome: 'Концентрированная программа и работа над реальным кейсом.',
+    title: 'Интенсив для бариста',
+    description: 'Разберёте параметры экстракции, настроите помол под зерно и отработаете стабильный эспрессо.',
+    audience: 'Для бариста, которые работают за стойкой и хотят точнее управлять вкусом.',
+    outcome: 'Понятный рецепт, контроль помола и повторяемая чашка на смене.',
     formType: 'course',
     meta: []
   },
   {
     label: 'Лекция',
-    title: 'Лекция или разбор',
-    description: 'Встреча по одной теме: продукт, команда, сезон, сервис или задача заведения.',
-    audience: 'Для тех, кому нужен короткий разбор одной рабочей темы.',
-    outcome: 'Короткая встреча по выбранной теме и ответы на вопросы.',
+    title: 'Лекция или каппинг-разбор',
+    description: 'Одна тема за встречу: зерно, обработка, молоко, сервис или сезонное меню.',
+    audience: 'Для специалистов и команд, которым нужен быстрый профессиональный разбор.',
+    outcome: 'Конспект, ответы на вопросы и список действий для следующей смены.',
     formType: 'course',
     meta: []
   },
   {
     label: 'Команда',
     title: 'Корпоративное обучение',
-    description: 'Программа под заведение, смену, запуск или внутреннюю задачу команды.',
-    audience: 'Для команд и компаний, которым нужно учиться вместе.',
-    outcome: 'Программа под задачи заведения и уровень команды.',
+    description: 'Программа под кофейный бар: эспрессо, молочные напитки, стандарты смены и контроль качества.',
+    audience: 'Для владельцев и управляющих, которые обучают команду целиком.',
+    outcome: 'Единый протокол напитков, смены и проверки результата.',
     formType: 'corporate',
     meta: []
   },
   {
     label: 'Меню',
     title: 'Разбор меню',
-    description: 'Практическая сессия по напиткам, себестоимости, сезонным позициям и подаче.',
+    description: 'Практическая сессия по эспрессо, фильтру, авторским напиткам, себестоимости и подаче.',
     audience: 'Для шефов, бар-менеджеров и концепт-команд.',
     outcome: 'Разбор меню и список правок для запуска.',
     formType: 'course',
@@ -61,7 +65,7 @@ const educationFormats = [
   {
     label: 'Сервис',
     title: 'Сервисная сессия',
-    description: 'Работа со стандартами, гостевым опытом, сменой и действиями команды.',
+    description: 'Работа со стандартами смены, скоростью выдачи, коммуникацией с гостем и качеством напитка.',
     audience: 'Для команд зала и сервиса, которым нужно договориться о работе смены.',
     outcome: 'Разбор сервиса, стандартов и действий в смене.',
     formType: 'course',
@@ -70,7 +74,7 @@ const educationFormats = [
   {
     label: 'Управление',
     title: 'Программа для управляющих',
-    description: 'Программа для управляющих: команда, закупки, деньги и процессы.',
+    description: 'Команда, закупки зерна и молока, списания, себестоимость и операционные процессы.',
     audience: 'Для управляющих ресторанов и тех, кто отвечает за работу точки.',
     outcome: 'План по команде, закупкам, деньгам и процессам.',
     formType: 'course',
@@ -130,7 +134,7 @@ function getEducationActionLabel(format: (typeof educationFormats)[number]) {
     return 'Записаться на программу';
   }
 
-  return 'Оставить заявку на обучение';
+  return 'Описать задачу обучения';
 }
 
 function EducationFormatsGrid() {
@@ -168,23 +172,26 @@ export default async function EducationPage({ searchParams }: EducationPageProps
     getPublicCategoryOptions(CategoryType.COURSE),
     getCourseFilterOptions()
   ]);
-  const featuredItem = content.page === 1 ? content.items[0] : undefined;
   const isEmpty = content.total === 0;
   const hasActiveFilters = hasActivePublicContentParams(contentParams, ['q', 'category', 'city', 'format', 'level']);
+  const featuredItem = !hasActiveFilters && content.page === 1 ? content.items[0] : undefined;
   const isPrelaunchEmpty = isEmpty && !hasActiveFilters;
 
   return (
     <>
       <EditorialPublicPage
-        eyebrow="Образование"
-        title="Программы, интенсивы и практические занятия"
-        description="Практические форматы для специалистов и команд: занятие, разбор, интенсив или программа под задачу заведения."
-        summary="Можно выбрать очное занятие, материал для самостоятельной работы или обучение для команды."
+        eyebrow="Обучение"
+        path="/education"
+        title="Обучение"
+        description="Интенсивы, каппинг-разборы и командные сессии для кофейных баров."
+        summary="Выберите формат или откройте фильтры опубликованных программ."
+        chips={['Бариста', 'Команды', 'Управляющие', 'Сертификаты']}
         density="compact"
         metrics={[]}
         rows={[]}
         primaryLink={{ label: 'Посмотреть форматы обучения', href: '#education-formats' }}
-        secondaryLink={{ label: 'Посмотреть события', href: '/events' }}
+        accentGradient="radial-gradient(ellipse 90% 60% at 50% 10%, rgba(80,180,120,0.14), transparent)"
+        accentIcon={BookOpen}
       />
       <EducationFormatsGrid />
       {!isPrelaunchEmpty ? (
@@ -206,6 +213,7 @@ export default async function EducationPage({ searchParams }: EducationPageProps
                 { name: 'format', label: 'Все форматы', options: filterOptions.formats },
                 { name: 'level', label: 'Все уровни', options: filterOptions.levels }
               ]}
+              variant="sidebar"
             />
           </Suspense>
           <PublicFeaturedContent
@@ -215,10 +223,10 @@ export default async function EducationPage({ searchParams }: EducationPageProps
             item={featuredItem}
             title="Программа в фокусе"
           />
-          <PublishedContentSection
+          <PublishedContentSectionCourse
             basePath="/education"
             content={content}
-            countLabel="Программ в списке"
+            countLabel="Все программы"
             emptyDescription="Список пока пуст. Можно сразу написать, какое обучение вам нужно."
             emptyActions={[
               { href: '/contacts?topic=education-program#contact-form', label: 'Предложить программу' },
@@ -227,12 +235,26 @@ export default async function EducationPage({ searchParams }: EducationPageProps
             ]}
             emptyTitle="Программ пока нет"
             excludedItemIds={featuredItem ? [featuredItem.id] : []}
-            rowActionLabel="Смотреть программу"
+            rowActionLabel="Записаться"
             sectionId="education-list"
+            secondaryEmptyActions={[
+              { href: '/contacts?topic=education-program#contact-form', label: 'Написать' }
+            ]}
+            secondaryEmptyDescription="Напишите нам, если нужен другой формат."
+            secondaryEmptyTitle="Больше программ скоро"
             title="Программы"
           />
         </>
-      ) : null}
+      ) : (
+        <section className="background-zone background-zone-ivory border-b border-[var(--line)] py-16">
+          <div className="container text-center">
+            <p className="text-[var(--muted)]">Первые программы готовятся к публикации.</p>
+            <Button className="mt-6" href="/contacts?topic=education-program#contact-form">
+              Предложить программу
+            </Button>
+          </div>
+        </section>
+      )}
     </>
   );
 }

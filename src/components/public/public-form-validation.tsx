@@ -149,16 +149,29 @@ export function PublicFormValidation() {
   const markerRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
-    const form = markerRef.current?.closest('form.public-form-shell');
+    const form = markerRef.current?.closest('form.public-form-shell, form[data-public-validation="true"]');
 
     if (!(form instanceof HTMLFormElement)) {
       return;
     }
 
     const formElement = form;
+    const submittedFlag = 'publicValidationSubmitted';
+
+    function hasSubmittedAttempt() {
+      return formElement.dataset[submittedFlag] === 'true';
+    }
+
+    function markSubmittedAttempt() {
+      formElement.dataset[submittedFlag] = 'true';
+    }
 
     function handleBlur(event: FocusEvent) {
       if (!isValidatableControl(event.target)) {
+        return;
+      }
+
+      if (!hasSubmittedAttempt() && !event.target.dataset.publicValidationActive) {
         return;
       }
 
@@ -174,6 +187,7 @@ export function PublicFormValidation() {
     }
 
     function validateForm() {
+      markSubmittedAttempt();
       const controls = getFormControls(formElement);
       const invalidControls = controls.filter((control) => !control.validity.valid);
 

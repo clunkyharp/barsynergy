@@ -1,4 +1,3 @@
-import { submitEventApplication } from '@/app/(public)/events/actions';
 import {
   ContactChannelFieldset,
   HiddenUtmFields,
@@ -16,7 +15,7 @@ import { Select } from '@/components/ui/select';
 import { SubmitButton } from '@/components/ui/submit-button';
 import { Textarea } from '@/components/ui/textarea';
 
-export function EventApplicationForm({ enabled, result, utm, cities, defaults = {} }: PublicApplicationFormProps) {
+export function EventApplicationForm({ enabled, result, utm, cities, defaults = {}, action }: PublicApplicationFormProps & { action: (formData: FormData) => void }) {
   const hasEventContext = Boolean(defaults.eventTitle);
 
   return (
@@ -33,7 +32,7 @@ export function EventApplicationForm({ enabled, result, utm, cities, defaults = 
       enabled={enabled}
       result={result}
     >
-      <form action={submitEventApplication} className="editorial-form-shell public-form-shell">
+      <form action={action} className="editorial-form-shell public-form-shell">
         <HiddenUtmFields utm={utm} />
         <HoneypotField id="event-application-website" />
         <PublicFormShellHeader
@@ -44,10 +43,10 @@ export function EventApplicationForm({ enabled, result, utm, cities, defaults = 
         <div className="relative p-5 md:p-6">
           <div className="grid gap-4 md:grid-cols-2">
             <FormField htmlFor="eventName" label="Имя">
-              <Input id="eventName" name="name" required maxLength={160} minLength={2} />
+              <Input id="eventName" name="name" required maxLength={160} minLength={2} placeholder="Иван Иванов" />
             </FormField>
             <FormField htmlFor="eventTitle" label="Событие или тема">
-              <Input id="eventTitle" name="eventTitle" defaultValue={defaults.eventTitle} required maxLength={180} minLength={2} />
+              <Input id="eventTitle" name="eventTitle" defaultValue={defaults.eventTitle} required maxLength={180} minLength={2} placeholder="Например, гостевая смена" />
             </FormField>
             <ContactChannelFieldset className="md:col-span-2" emailId="eventEmail" phoneId="eventPhone" telegramId="eventTelegram" />
             <FormField htmlFor="eventCityId" label="Город">
@@ -62,7 +61,7 @@ export function EventApplicationForm({ enabled, result, utm, cities, defaults = 
             </FormField>
             <div className="md:col-span-2">
               <FormField htmlFor="eventMessage" label="Комментарий">
-                <Textarea id="eventMessage" name="message" required className="min-h-40" maxLength={3000} minLength={10} />
+                <Textarea id="eventMessage" name="message" required className="min-h-40" maxLength={3000} minLength={10} placeholder="Например: хотим добавить событие в афишу, ожидаем 40 гостей, нужна страница с регистрацией." />
               </FormField>
             </div>
             <div className="md:col-span-2">

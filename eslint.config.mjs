@@ -11,8 +11,9 @@ export default tseslint.config(
       'public/**',
       'references/**',
       'scripts/**/*.cjs',
+      'audit/**',
       'test-results/**',
-      'output/playwright/**',
+      'output/**',
       '.playwright-cli/**'
     ]
   },
@@ -31,6 +32,42 @@ export default tseslint.config(
         console: 'readonly',
         process: 'readonly'
       }
+    }
+  },
+  {
+    files: ['src/**/page.tsx', 'src/**/layout.tsx'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [
+            {
+              name: '@prisma/client',
+              message: 'Pages/layouts must not import Prisma directly. Use lib/public/, lib/admin/, or modules/ queries.'
+            },
+            {
+              name: '@/lib/db/prisma',
+              message: 'Pages/layouts must not import Prisma directly. Use lib/public/, lib/admin/, or modules/ queries.'
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    files: ['src/components/**'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['@/app/**/actions', '@/app/**/actions/*'],
+              message: 'Components must not import server actions from app/. Pass actions as props from page.tsx.'
+            }
+          ]
+        }
+      ]
     }
   }
 );

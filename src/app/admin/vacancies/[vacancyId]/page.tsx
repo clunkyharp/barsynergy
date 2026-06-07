@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { CategoryType, ContentStatus } from '@prisma/client';
+import { CategoryType, ContentStatus } from '@/modules/admin/queries';
 import { updateVacancy, updateVacancyStatus } from '@/app/admin/vacancies/actions';
 import { AdminCmsActions, AdminCmsForm, AdminCmsGrid, AdminCmsSection, AdminCmsSummary } from '@/components/admin/admin-cms-form';
 import { AdminContentVisibilityPanel, CoverImageField, HiddenRedirect } from '@/components/admin/content-admin-controls';
@@ -17,7 +17,7 @@ import {
   withCurrentValueOption
 } from '@/lib/admin/content-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
-import { prisma } from '@/lib/db/prisma';
+import { prisma } from '@/modules/admin/queries';
 import { vacancyPositionValues } from '@/lib/vacancies/positions';
 
 export const dynamic = 'force-dynamic';
@@ -32,7 +32,7 @@ export default async function AdminVacancyEditPage({ params }: AdminVacancyEditP
   await requireAdminSectionAccess('vacancies');
   const { vacancyId } = await params;
 
-  const [vacancy, categories, cities] = await Promise.all([
+  const [vacancy, categories, cities, businessAccounts] = await Promise.all([
     prisma.vacancy.findUnique({
       where: { id: vacancyId },
       include: {
@@ -49,6 +49,11 @@ export default async function AdminVacancyEditPage({ params }: AdminVacancyEditP
       where: { isActive: true },
       orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
       select: { id: true, name: true }
+    }),
+    prisma.businessAccount.findMany({
+      where: { status: 'ACTIVE' },
+      orderBy: { companyName: 'asc' },
+      select: { id: true, companyName: true }
     })
   ]);
 
@@ -176,6 +181,16 @@ export default async function AdminVacancyEditPage({ params }: AdminVacancyEditP
                 {withCurrentValueOption([...vacancyExperienceOptions], vacancy.experienceLabel).map((option) => (
                   <option key={option.value} value={option.value}>
                     {option.label}
+                  </option>
+                ))}
+              </Select>
+            </FormField>
+            <FormField htmlFor="vacancy-businessAccountId" label="Бизнес-аккаунт">
+              <Select id="vacancy-businessAccountId" name="businessAccountId" defaultValue={vacancy.businessAccountId ?? ''}>
+                <option value="">Без привязки</option>
+                {businessAccounts.map((account) => (
+                  <option key={account.id} value={account.id}>
+                    {account.companyName}
                   </option>
                 ))}
               </Select>

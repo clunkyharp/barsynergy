@@ -3,7 +3,7 @@
 import { redirect } from 'next/navigation';
 import { ApplicationType } from '@prisma/client';
 import { z } from 'zod';
-import { createPublicApplication } from '@/lib/applications/create-public-application';
+import { buildApplicationPayload } from '@/lib/applications/application-payloads';
 import {
   consultingBusinessTypeOptions,
   consultingDirectionOptions,
@@ -19,14 +19,9 @@ import {
   nullableString,
   optionalString,
   PERSONAL_DATA_CONSENT_TEXT,
-  resolvePublicApplicationActionError,
   utmSchema
 } from '@/lib/applications/public-form-helpers';
-import {
-  assertPublicApplicationFormsEnabled,
-  assertPublicApplicationSubmissionAllowed,
-  hasHoneypotValue
-} from '@/lib/applications/public-submission-guards';
+import { submitPublicApplicationAction } from '@/lib/applications/submit-public-application-action';
 
 const CONSULTING_PATH = '/consulting';
 const consultingBusinessTypeValues = consultingBusinessTypeOptions.map((option) => option.value) as [
@@ -65,40 +60,52 @@ function redirectWithConsultingResult(result: { type: 'success' | 'error'; messa
 }
 
 export async function submitConsultingRequest(formData: FormData) {
-  let result: { type: 'success' | 'error'; message: string };
+  await submitPublicApplicationAction({
+    actionName: 'public:consulting-request',
+    applicationType: ApplicationType.CONSULTING_REQUEST,
+    formData,
+    successMessage: 'Заявку на консультацию получили.',
+    redirectWithResult: redirectWithConsultingResult,
+    parse: async (data) => {
+      const parsed = consultingRequestSchema.parse({
+        contactName: getString(data, 'contactName'),
+        email: optionalString(getString(data, 'email')),
+        phone: optionalString(getString(data, 'phone')),
+        telegram: optionalString(getString(data, 'telegram')),
+        cityId: optionalString(getString(data, 'cityId')),
+        businessType: getString(data, 'businessType'),
+        projectStage: getString(data, 'projectStage'),
+        consultingDirection: getString(data, 'consultingDirection'),
+        preferredExpert: optionalString(getString(data, 'preferredExpert')),
+        taskDescription: getString(data, 'taskDescription'),
+        consent: getString(data, 'consent'),
+        utmSource: optionalString(getString(data, 'utmSource')),
+        utmMedium: optionalString(getString(data, 'utmMedium')),
+        utmCampaign: optionalString(getString(data, 'utmCampaign'))
+      });
+      const city = await assertActiveCity(parsed.cityId);
+      const consultingDirectionLabel = getOptionLabel(consultingDirectionOptions, parsed.consultingDirection) ?? parsed.consultingDirection;
+      const businessTypeLabel = getOptionLabel(consultingBusinessTypeOptions, parsed.businessType) ?? parsed.businessType;
+      const projectStageLabel = getOptionLabel(consultingProjectStageOptions, parsed.projectStage) ?? parsed.projectStage;
+      const preferredExpertLabel = getOptionLabel(consultingExpertOptions, parsed.preferredExpert);
 
-  try {
-    assertPublicApplicationFormsEnabled();
-
-    if (hasHoneypotValue(getString(formData, 'website'))) {
-      result = { type: 'success', message: 'Заявку на консультацию получили.' };
-      redirectWithConsultingResult(result);
-    }
-
-    const parsed = consultingRequestSchema.parse({
-      contactName: getString(formData, 'contactName'),
-      email: optionalString(getString(formData, 'email')),
-      phone: optionalString(getString(formData, 'phone')),
-      telegram: optionalString(getString(formData, 'telegram')),
-      cityId: optionalString(getString(formData, 'cityId')),
-      businessType: getString(formData, 'businessType'),
-      projectStage: getString(formData, 'projectStage'),
-      consultingDirection: getString(formData, 'consultingDirection'),
-      preferredExpert: optionalString(getString(formData, 'preferredExpert')),
-      taskDescription: getString(formData, 'taskDescription'),
-      consent: getString(formData, 'consent'),
-      utmSource: optionalString(getString(formData, 'utmSource')),
-      utmMedium: optionalString(getString(formData, 'utmMedium')),
-      utmCampaign: optionalString(getString(formData, 'utmCampaign'))
-    });
-    const city = await assertActiveCity(parsed.cityId);
-    const consultingDirectionLabel = getOptionLabel(consultingDirectionOptions, parsed.consultingDirection) ?? parsed.consultingDirection;
-    const businessTypeLabel = getOptionLabel(consultingBusinessTypeOptions, parsed.businessType) ?? parsed.businessType;
-    const projectStageLabel = getOptionLabel(consultingProjectStageOptions, parsed.projectStage) ?? parsed.projectStage;
-    const preferredExpertLabel = getOptionLabel(consultingExpertOptions, parsed.preferredExpert);
-
-    await assertPublicApplicationSubmissionAllowed(ApplicationType.CONSULTING_REQUEST);
-    await createPublicApplication({
+      return {
+        parsed,
+        city,
+        businessTypeLabel,
+        consultingDirectionLabel,
+        preferredExpertLabel,
+        projectStageLabel
+      };
+    },
+    buildApplication: ({
+      parsed,
+      city,
+      businessTypeLabel,
+      consultingDirectionLabel,
+      preferredExpertLabel,
+      projectStageLabel
+    }) => ({
       type: ApplicationType.CONSULTING_REQUEST,
       subject: `Консалтинг: ${consultingDirectionLabel}`,
       message: parsed.taskDescription,
@@ -114,7 +121,7 @@ export async function submitConsultingRequest(formData: FormData) {
         medium: nullableString(parsed.utmMedium),
         campaign: nullableString(parsed.utmCampaign)
       },
-      payload: {
+      payload: buildApplicationPayload(ApplicationType.CONSULTING_REQUEST, {
         source: 'public_form',
         businessType: parsed.businessType,
         businessTypeLabel,
@@ -124,13 +131,7 @@ export async function submitConsultingRequest(formData: FormData) {
         consultingDirectionLabel,
         preferredExpert: parsed.preferredExpert ?? null,
         preferredExpertLabel: preferredExpertLabel ?? null
-      }
-    });
-
-    result = { type: 'success', message: 'Заявку на консультацию получили.' };
-  } catch (error) {
-    result = { type: 'error', message: resolvePublicApplicationActionError('public:consulting-request', error) };
-  }
-
-  redirectWithConsultingResult(result);
+      })
+    })
+  });
 }

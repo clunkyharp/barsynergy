@@ -5,181 +5,18 @@ import { Button } from '@/components/ui/button';
 import { InlineLink } from '@/components/ui/inline-link';
 import { MetaChip } from '@/components/ui/meta-chip';
 import { Panel } from '@/components/ui/panel';
-import type { PublicContentDetailFact, PublicContentDetailSection, PublicContentImage } from '@/lib/public/content-details';
+import {
+  type PublicContentDetailPageProps,
+  detailKindFromBackHref,
+  detailCopy,
+  fallbackImage,
+  normalizeImage,
+  paragraphsFromBody,
+  normalizeText,
+} from './public-content-detail-page-helpers';
 
-type DetailLink = {
-  href: string;
-  label: string;
-  external?: boolean;
-};
-
-type PublicContentDetailPageProps = {
-  eyebrow: string;
-  backHref: string;
-  backLabel: string;
-  title: string;
-  summary: string;
-  label?: string;
-  meta?: string[];
-  body?: string;
-  imageUrl?: string | PublicContentImage;
-  facts?: PublicContentDetailFact[];
-  sections?: PublicContentDetailSection[];
-  primaryLink?: DetailLink;
-  secondaryLink?: DetailLink;
-};
-
-type DetailKind = 'article' | 'event' | 'course' | 'vacancy' | 'supplier' | 'partner';
-
-function paragraphsFromBody(body?: string) {
-  if (!body) {
-    return [];
-  }
-
-  return body
-    .split(/\n{2,}/)
-    .map((part) => part.trim())
-    .filter(Boolean);
-}
-
-function normalizeText(value: string) {
-  return value.replace(/\s+/g, ' ').trim().toLowerCase();
-}
-
-function normalizeImage(value: string | PublicContentImage | undefined, fallbackAlt: string): PublicContentImage | undefined {
-  if (!value) {
-    return undefined;
-  }
-
-  if (typeof value === 'string') {
-    return {
-      src: value,
-      alt: fallbackAlt
-    };
-  }
-
-  return {
-    src: value.src,
-    alt: value.alt.trim() || fallbackAlt
-  };
-}
-
-function fallbackImage(backHref: string, fallbackAlt: string): PublicContentImage {
-  if (backHref === '/events') {
-    return {
-      src: '/images/generated/program-events.jpg',
-      alt: fallbackAlt
-    };
-  }
-
-  if (backHref === '/education') {
-    return {
-      src: '/images/generated/program-intensive.jpg',
-      alt: fallbackAlt
-    };
-  }
-
-  if (backHref === '/vacancies') {
-    return {
-      src: '/images/home/audience-specialists-coffee.jpg',
-      alt: fallbackAlt
-    };
-  }
-
-  if (backHref === '/suppliers') {
-    return {
-      src: '/images/generated/hustle-brew-lineup-v1.png',
-      alt: fallbackAlt
-    };
-  }
-
-  if (backHref === '/partners') {
-    return {
-      src: '/images/generated/sponsorship-coffee-bar.jpg',
-      alt: fallbackAlt
-    };
-  }
-
-  return {
-    src: '/images/generated/content-guide.jpg',
-    alt: fallbackAlt
-  };
-}
-
-function detailKindFromBackHref(backHref: string): DetailKind {
-  if (backHref === '/events') {
-    return 'event';
-  }
-
-  if (backHref === '/education') {
-    return 'course';
-  }
-
-  if (backHref === '/vacancies') {
-    return 'vacancy';
-  }
-
-  if (backHref === '/suppliers') {
-    return 'supplier';
-  }
-
-  if (backHref === '/partners') {
-    return 'partner';
-  }
-
-  return 'article';
-}
-
-function detailCopy(kind: DetailKind) {
-  const copy: Record<
-    DetailKind,
-    {
-      bodyLabel: string;
-      contextLabel: string;
-      fallbackBody: string;
-      factsFallback: string;
-    }
-  > = {
-    article: {
-      bodyLabel: 'Текст материала',
-      contextLabel: 'Материал',
-      fallbackBody: 'Основная информация собрана в кратком описании и метках материала.',
-      factsFallback: 'Источник, автор и дата указаны в описании материала.'
-    },
-    event: {
-      bodyLabel: 'О событии',
-      contextLabel: 'Событие',
-      fallbackBody: 'Основная информация собрана в описании, фактах и форме записи.',
-      factsFallback: 'Дата, место и формат указаны в описании события.'
-    },
-    course: {
-      bodyLabel: 'Программа обучения',
-      contextLabel: 'Программа',
-      fallbackBody: 'Программа и условия собраны в фактах и блоках ниже.',
-      factsFallback: 'Формат, уровень и условия указаны в описании программы.'
-    },
-    vacancy: {
-      bodyLabel: 'О роли',
-      contextLabel: 'Вакансия',
-      fallbackBody: 'Условия роли собраны в фактах и блоке отклика.',
-      factsFallback: 'Компания, позиция и условия указаны в описании вакансии.'
-    },
-    supplier: {
-      bodyLabel: 'Профиль компании',
-      contextLabel: 'Поставщик',
-      fallbackBody: 'Профиль поставщика собран в фактах и контактном действии.',
-      factsFallback: 'Категория, город и условия контакта указаны в профиле.'
-    },
-    partner: {
-      bodyLabel: 'Формат партнёрства',
-      contextLabel: 'Партнёр',
-      fallbackBody: 'Формат партнёрства собран в описании и контактном действии.',
-      factsFallback: 'Компания и тип партнёрства указаны в профиле.'
-    }
-  };
-
-  return copy[kind];
-}
+export type { DetailLink, PublicContentDetailPageProps } from './public-content-detail-page-helpers';
+export { paragraphsFromBody, normalizeText, normalizeImage, fallbackImage, detailKindFromBackHref, detailCopy } from './public-content-detail-page-helpers';
 
 export function PublicContentDetailPage({
   eyebrow,
@@ -194,7 +31,9 @@ export function PublicContentDetailPage({
   facts = [],
   sections = [],
   primaryLink,
-  secondaryLink
+  secondaryLink,
+  actionsSlot,
+  actionsBottomSlot
 }: PublicContentDetailPageProps) {
   const rawParagraphs = paragraphsFromBody(body);
   const paragraphs =
@@ -208,14 +47,14 @@ export function PublicContentDetailPage({
     <div className="public-detail-page" data-detail-kind={detailKind}>
       <section className="background-zone background-zone-graphite relative overflow-hidden border-b border-[var(--line)] py-7 md:py-9">
         <div className="container relative">
-          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--line)] pb-5">
+          <div className="flex flex-wrap items-center justify-between gap-3">
             <InlineLink className="inline-flex items-center gap-2 text-sm text-[var(--muted)] hover:text-[var(--text)]" href={backHref}>
               <ArrowLeft size={16} />
               {backLabel}
             </InlineLink>
           </div>
 
-          <Panel className="mt-6 overflow-hidden border-[var(--border-default)] bg-[var(--surface)] p-0" padding="none">
+          <Panel className="mt-5 overflow-hidden border-[var(--border-default)] bg-[var(--surface)] p-0 md:mt-6" padding="none">
             <div className="grid gap-0 lg:grid-cols-[minmax(0,1.45fr)_minmax(16rem,0.55fr)] lg:items-stretch">
               <div className="grid min-w-0 content-center px-5 py-8 sm:px-7 md:px-8 md:py-10 xl:px-9">
                 <div className="flex flex-wrap gap-2">
@@ -284,8 +123,8 @@ export function PublicContentDetailPage({
 
       <section className="background-zone background-zone-beige border-b border-[var(--line)] py-9 md:py-12">
         <div className="container grid gap-7 xl:grid-cols-[minmax(14rem,0.36fr)_minmax(0,1fr)_minmax(14rem,0.38fr)]">
-          <aside className="order-2 xl:order-1">
-            <div className="space-y-4 xl:sticky xl:top-28">
+          <aside className="order-2 xl:order-1 xl:self-start">
+            <div className="space-y-4">
               <Panel className="bg-[var(--surface-wash-strong)]" padding="lg">
                 <PublicEyebrow tone="muted">{copy.contextLabel}</PublicEyebrow>
                 {facts.length > 0 ? (
@@ -303,16 +142,6 @@ export function PublicContentDetailPage({
                   </PublicBodyText>
                 )}
 
-                {primaryLink ? (
-                  <Button
-                    className="mt-5 w-full min-w-0 justify-center rounded-[var(--radius-sm)] px-4 !whitespace-normal leading-5"
-                    href={primaryLink.href}
-                    rel={primaryLink.external ? 'noreferrer noopener' : undefined}
-                    target={primaryLink.external ? '_blank' : undefined}
-                  >
-                    <span className="min-w-0 break-words">{primaryLink.label}</span>
-                  </Button>
-                ) : null}
               </Panel>
             </div>
           </aside>
@@ -320,12 +149,6 @@ export function PublicContentDetailPage({
           <div className="order-1 xl:order-2">
             <div className="mx-auto max-w-3xl">
               <PublicEyebrow tone="muted">{copy.bodyLabel}</PublicEyebrow>
-              <div className="mt-5 border-t border-[var(--line)] pt-6">
-                <h2 className="max-w-2xl text-[24px] font-semibold leading-[1.26] tracking-normal text-[var(--text)] md:text-[30px]">
-                  {summary}
-                </h2>
-              </div>
-
               {paragraphs.length > 0 ? (
                 <div className="mt-8 grid gap-5">
                   {paragraphs.map((paragraph) => (
@@ -365,35 +188,32 @@ export function PublicContentDetailPage({
             </div>
           </div>
 
-          <aside className="order-3">
-            <div className="space-y-4 xl:sticky xl:top-28">
-              <Panel className="bg-[var(--surface-wash)]" padding="lg">
-                <PublicEyebrow tone="muted">Действия</PublicEyebrow>
-                <div className="mt-4 grid gap-3">
-                  {secondaryLink ? (
-                    <Button
-                      className="w-full min-w-0 justify-center rounded-[var(--radius-sm)] px-4 !whitespace-normal leading-5"
-                      href={secondaryLink.href}
-                      rel={secondaryLink.external ? 'noreferrer noopener' : undefined}
-                      target={secondaryLink.external ? '_blank' : undefined}
-                      variant="secondary"
-                    >
-                      <span className="min-w-0 break-words">{secondaryLink.label}</span>
-                    </Button>
-                  ) : null}
-                  <Button
-                    className="w-full min-w-0 justify-center rounded-[var(--radius-sm)] px-4 !whitespace-normal leading-5"
-                    href={backHref}
-                    variant="secondary"
-                  >
-                    <span className="min-w-0 break-words">{backLabel}</span>
-                  </Button>
-                </div>
-              </Panel>
+          <aside className="order-3 xl:self-start">
+            <div className="space-y-4">
+              {(actionsSlot || secondaryLink || actionsBottomSlot) ? (
+                <Panel className="bg-[var(--surface-wash)]" padding="lg">
+                  <PublicEyebrow tone="muted">Действия</PublicEyebrow>
+                  <div className="mt-4 grid gap-3">
+                    {actionsSlot ? <>{actionsSlot}</> : null}
+                    {secondaryLink ? (
+                      <Button
+                        className="w-full min-w-0 justify-center rounded-[var(--radius-sm)] px-4 !whitespace-normal leading-5"
+                        href={secondaryLink.href}
+                        rel={secondaryLink.external ? 'noreferrer noopener' : undefined}
+                        target={secondaryLink.external ? '_blank' : undefined}
+                        variant="secondary"
+                      >
+                        <span className="min-w-0 break-words">{secondaryLink.label}</span>
+                      </Button>
+                    ) : null}
+                    {actionsBottomSlot ? <div className="border-t border-[var(--line)] pt-3">{actionsBottomSlot}</div> : null}
+                  </div>
+                </Panel>
+              ) : null}
 
               {heroMeta.length > 0 ? (
                 <Panel padding="lg">
-                  <PublicEyebrow tone="muted">Метки</PublicEyebrow>
+                  <PublicEyebrow tone="muted">{copy.metaLabel}</PublicEyebrow>
                   <div className="mt-4 flex flex-wrap gap-2">
                     {heroMeta.slice(0, 6).map((entry, index) => (
                       <MetaChip key={`${entry}-${index}`} variant="filter">

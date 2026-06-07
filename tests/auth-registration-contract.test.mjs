@@ -1,0 +1,231 @@
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import process from 'node:process';
+import test from 'node:test';
+
+const repoRoot = process.cwd();
+
+function readProjectFile(path) {
+  return readFileSync(join(repoRoot, path), 'utf8');
+}
+
+test('login page has separate CTA for user registration and business access', () => {
+  const pageSource = readProjectFile('src/app/auth/login/page.tsx');
+
+  assert.match(pageSource, /href="\/auth\/register\/user"/);
+  assert.match(pageSource, /Зарегистрироваться как участник/);
+  assert.match(pageSource, /href="\/auth\/register"/);
+  assert.match(pageSource, /Запросить бизнес-доступ/);
+
+  assert.doesNotMatch(pageSource, /Подать заявку на подключение/);
+});
+
+test('register user page renders registration form with required fields', () => {
+  const pageSource = readProjectFile('src/app/auth/register/user/page.tsx');
+
+  assert.match(pageSource, /Регистрация участника/);
+  assert.match(pageSource, /Для специалистов бара/);
+  assert.match(pageSource, /import \{ RegisterUserForm \}/);
+  assert.match(pageSource, /buildPrivatePageMetadata/);
+  assert.match(pageSource, /email-used/);
+  assert.match(pageSource, /rate-limited/);
+  assert.match(pageSource, /failed/);
+  assert.match(pageSource, /invalid/);
+});
+
+test('register user form has fullName, email, password and consent', () => {
+  const formSource = readProjectFile('src/components/public/register-user-form.tsx');
+
+  assert.match(formSource, /fullName/);
+  assert.match(formSource, /email/);
+  assert.match(formSource, /password/);
+  assert.match(formSource, /ConsentField/);
+  assert.match(formSource, /PasswordPairValidation/);
+  assert.match(formSource, /id="new-password"/);
+  assert.match(formSource, /id="confirm-password"/);
+  assert.match(formSource, /action: \(formData: FormData\) => void/);
+  assert.match(formSource, /Зарегистрироваться/);
+  assert.match(formSource, /data-public-validation="true"/);
+  assert.match(formSource, /noValidate/);
+});
+
+test('register business page uses BusinessRequestForm without participant promises', () => {
+  const pageSource = readProjectFile('src/app/auth/register/page.tsx');
+
+  assert.match(pageSource, /Заявка на бизнес-доступ/);
+  assert.match(pageSource, /import \{ BusinessRequestForm \}/);
+  assert.match(pageSource, /Для заведений, брендов, поставщиков/);
+  assert.doesNotMatch(pageSource, /Я работаю в баре/);
+  assert.doesNotMatch(pageSource, /RegisterRequestForm/);
+});
+
+test('business request form no longer uses role selection', () => {
+  const formSource = readProjectFile('src/components/public/business-request-form.tsx');
+
+  assert.doesNotMatch(formSource, /RegisterRole/);
+  assert.doesNotMatch(formSource, /participant/);
+  assert.doesNotMatch(formSource, /name="role"/);
+  assert.doesNotMatch(formSource, /Я работаю в баре/);
+  assert.match(formSource, /BusinessRequestForm/);
+  assert.match(formSource, /createBusinessAccountRequestAction/);
+});
+
+test('register user action creates ACTIVE user and handles duplicate email', () => {
+  const actionsSource = readProjectFile('src/app/auth/register/actions.ts');
+
+  assert.match(actionsSource, /status: UserStatus\.ACTIVE/);
+  assert.match(actionsSource, /role: UserRole\.USER/);
+
+  assert.match(actionsSource, /Prisma\.PrismaClientKnownRequestError/);
+  assert.match(actionsSource, /error\.code === 'P2002'/);
+  assert.match(actionsSource, /email-used/);
+  assert.match(actionsSource, /redirectWithAuthResult\('\/auth\/register\/user'/);
+
+  assert.doesNotMatch(actionsSource, /status: UserStatus\.PENDING/);
+});
+
+test('business register action handles forms-disabled, invalid, duplicate and rate-limit', () => {
+  const actionsSource = readProjectFile('src/app/auth/register/actions.ts');
+
+  assert.match(actionsSource, /arePublicApplicationFormsEnabled/);
+  assert.match(actionsSource, /redirectWithAuthResult\('\/auth\/register',.*'disabled'/);
+  assert.match(actionsSource, /businessRequestSchema\.safeParse/);
+  assert.match(actionsSource, /redirectWithAuthResult\('\/auth\/register',.*'invalid'/);
+  assert.match(actionsSource, /AuthRateLimitError/);
+  assert.match(actionsSource, /redirectWithAuthResult\('\/auth\/register',.*'rate-limited'/);
+  assert.match(actionsSource, /let created = false/);
+  assert.match(actionsSource, /existingUser \|\| existingRequest/);
+  assert.match(actionsSource, /business-request-created/);
+  assert.match(actionsSource, /business-request-duplicate/);
+  assert.match(actionsSource, /if \(created\)/);
+  assert.match(actionsSource, /} else \{[\s\S]*business-request-duplicate/);
+});
+
+test('login page shows duplicate business request message', () => {
+  const pageSource = readProjectFile('src/app/auth/login/page.tsx');
+
+  assert.match(pageSource, /business-request-duplicate/);
+  assert.match(pageSource, /Заявка по этому email уже получена/);
+  assert.match(pageSource, /business-request-created/);
+  assert.match(pageSource, /isRequestSent.*business-request-created/);
+  assert.doesNotMatch(pageSource, /isRequestSent.*business-request-duplicate/);
+});
+
+test('activate page guards with invalid-invite, blocked-user and mismatch error states', () => {
+  const pageSource = readProjectFile('src/app/auth/activate/page.tsx');
+
+  assert.match(pageSource, /errorMessages/);
+  assert.match(pageSource, /invalid: 'Ссылка активации недействительна или уже использована\.'/);
+  assert.match(pageSource, /mismatch: 'Пароль и подтверждение должны совпадать\.'/);
+  assert.match(pageSource, /blocked: 'Доступ временно заблокирован/);
+  assert.match(pageSource, /failed: 'Не удалось завершить активацию/);
+  assert.match(pageSource, /activateBusinessAccessAction/);
+  assert.match(pageSource, /PasswordPairValidation/);
+  assert.match(pageSource, /id="new-password"/);
+  assert.match(pageSource, /id="confirm-password"/);
+  assert.match(pageSource, /findActiveBusinessAccessInvite/);
+  assert.match(pageSource, /BUSINESS_ACCESS_ACTIVATION_COOKIE_NAME/);
+  assert.match(pageSource, /parseBusinessAccessRequestPayload/);
+});
+
+test('all new-password forms share password pair validation helper', () => {
+  const resetSource = readProjectFile('src/app/auth/password-reset/confirm/page.tsx');
+  const profileSource = readProjectFile('src/app/profile/settings/page.tsx');
+  const helperSource = readProjectFile('src/components/ui/password-pair-validation.tsx');
+
+  assert.match(helperSource, /confirmTouched = false/);
+  assert.match(helperSource, /addEventListener\('blur', onConfirmBlur\)/);
+  assert.match(helperSource, /addEventListener\('submit', checkMatch, true\)/);
+  assert.match(resetSource, /PasswordPairValidation/);
+  assert.match(profileSource, /PasswordPairValidation passwordName="newPassword"/);
+  assert.match(profileSource, /autoComplete="current-password"/);
+  assert.match(profileSource, /autoComplete="new-password"/);
+});
+
+test('activate consume route validates token and sets or clears cookie', () => {
+  const routeSource = readProjectFile('src/app/auth/activate/consume/route.ts');
+
+  assert.match(routeSource, /findActiveBusinessAccessInvite/);
+  assert.match(routeSource, /BUSINESS_ACCESS_ACTIVATION_COOKIE_NAME/);
+  assert.match(routeSource, /getBusinessAccessActivationCookieOptions/);
+  assert.match(routeSource, /invalid/);
+  assert.match(routeSource, /\/\^\[A-Za-z0-9_-\]\{20,200\}\$\/\.test/);
+  assert.match(routeSource, /response\.cookies\.set\(BUSINESS_ACCESS_ACTIVATION_COOKIE_NAME, token/);
+  assert.match(routeSource, /invalidResponse\.cookies\.set\(BUSINESS_ACCESS_ACTIVATION_COOKIE_NAME, '',[\s\S]*maxAge: 0/);
+});
+
+test('no PENDING user can reach /profile without valid activation flow', () => {
+  const currentUserSource = readProjectFile('src/lib/auth/current-user.ts');
+  const registerActionSource = readProjectFile('src/app/auth/register/actions.ts');
+
+  assert.match(currentUserSource, /session\.user\.status !== UserStatus\.ACTIVE/);
+  assert.doesNotMatch(registerActionSource, /status: UserStatus\.PENDING/);
+  assert.match(registerActionSource, /UserStatus\.ACTIVE/);
+});
+
+test('auth route files exist for all expected public auth paths', () => {
+  const loginPage = readProjectFile('src/app/auth/login/page.tsx');
+  const registerPage = readProjectFile('src/app/auth/register/page.tsx');
+  const registerUserPage = readProjectFile('src/app/auth/register/user/page.tsx');
+  const activatePage = readProjectFile('src/app/auth/activate/page.tsx');
+
+  assert.match(loginPage, /auth-login-screen/);
+  assert.match(registerPage, /Заявка на бизнес-доступ/);
+  assert.match(registerUserPage, /Регистрация участника/);
+  assert.match(activatePage, /Завершить подключение/);
+});
+
+test('header shows login link for guest and account menu for authenticated user', () => {
+  const headerSource = readProjectFile('src/components/layout/site-header.tsx');
+
+  assert.match(headerSource, /Войти/);
+  assert.match(headerSource, /href="\/auth\/login"/);
+  assert.match(headerSource, /AccountMenu/);
+  assert.match(headerSource, /\{user \?/);
+  assert.match(headerSource, /<AccountMenu user=\{user\}/);
+
+  assert.doesNotMatch(headerSource, /const navItems = \[/);
+  assert.match(headerSource, /const guestNavItems = \[/);
+});
+
+test('site-header-server passes serialized user to SiteHeader', () => {
+  const serverSource = readProjectFile('src/components/layout/site-header-server.tsx');
+
+  assert.match(serverSource, /getCurrentUser/);
+  assert.match(serverSource, /import \{ SiteHeader \}/);
+  assert.match(serverSource, /headerUser/);
+  assert.match(serverSource, /displayName/);
+});
+
+test('mobile-site-menu shows auth block when user is authenticated', () => {
+  const mobileSource = readProjectFile('src/components/layout/mobile-site-menu.tsx');
+
+  assert.match(mobileSource, /user\?:/);
+  assert.match(mobileSource, /UserRound/);
+  assert.match(mobileSource, /logoutAction/);
+  assert.match(mobileSource, /getMobileAuthItems/);
+  assert.match(mobileSource, /Профиль/);
+  assert.match(mobileSource, /Выйти/);
+});
+
+test('account-menu has role-based menu items for USER role', () => {
+  const menuSource = readProjectFile('src/components/layout/account-menu.tsx');
+
+  assert.match(menuSource, /Профиль/);
+  assert.match(menuSource, /Мои отклики/);
+  assert.match(menuSource, /Выйти/);
+  assert.match(menuSource, /logoutAction/);
+  assert.match(menuSource, /DropdownMenu/);
+  assert.match(menuSource, /role="menuitem"/);
+  assert.match(menuSource, /BUSINESS/);
+  assert.match(menuSource, /Кабинет компании/);
+  assert.match(menuSource, /Админ-панель/);
+});
+
+test('root layout uses SiteHeaderServer', () => {
+  const layoutSource = readProjectFile('src/app/layout.tsx');
+
+  assert.match(layoutSource, /SiteHeaderServer/);
+  assert.doesNotMatch(layoutSource, /import \{ SiteHeader \}/);
+});

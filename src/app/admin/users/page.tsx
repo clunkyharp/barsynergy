@@ -1,4 +1,4 @@
-import { ApplicationType, BusinessAccountStatus, UserRole, UserStatus, type Prisma } from '@prisma/client';
+import { ApplicationType, BusinessAccountStatus, UserRole, UserStatus, type Prisma } from '@/modules/admin/queries';
 import { updateBusinessUserAccess } from '@/app/admin/users/actions';
 import { AdminActionAlert, HiddenRedirect } from '@/components/admin/content-admin-controls';
 import { AdminPageIntro } from '@/components/admin/admin-page-intro';
@@ -16,7 +16,7 @@ import { ContextualEmptyState } from '@/components/ui/empty-state';
 import { AdminStatusChip, type StatusBadgeVariant } from '@/components/ui/status-badge';
 import { applicationStatusLabels } from '@/lib/admin/application-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
-import { prisma } from '@/lib/db/prisma';
+import { prisma } from '@/modules/admin/queries';
 import { firstParam, getAdminCurrentPath, type AdminContentSearchParams } from '@/lib/admin/content-utils';
 import { cn } from '@/lib/utils';
 

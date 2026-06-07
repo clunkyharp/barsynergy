@@ -99,7 +99,7 @@ Current status:
 - personal-data launch checklist is documented in `docs/personal-data-launch-checklist.md`;
 - shared header, footer and public page templates are implemented;
 - `/general-sponsors` is implemented as a separate visible public screen with homepage and navigation entry points;
-- route-level loading, error and not-found states are implemented;
+- route-level error and not-found states are implemented; the root `loading.tsx` boundary is intentionally absent because it can turn missing dynamic detail pages into streamed soft-404 responses;
 - design-system foundation is documented in `DESIGN.md` and `design-tokens.json`;
 - lint, typecheck, build, Prisma validate, public route smoke and desktop/mobile homepage spot checks pass;
 - the homepage has been rebuilt as a live CMS-fed front page with a new public shell, GSAP-driven narrative sections, stronger B2B routing and renewed desktop/mobile screenshot checks;
@@ -121,6 +121,7 @@ Current status:
 - editorial background follow-up is applied locally: the public base background now uses warm ivory/deep graphite layers, subtle paper grain, no square grid layers and burgundy/graphite radial accents; homepage sections now have explicit hero, ivory, beige, warm gray, graphite tool, sponsor, social and CTA zones with Playwright fallback screenshots across mobile/tablet/desktop in light/dark and no horizontal overflow;
 - branded form system follow-up is applied locally: public, auth, business and admin field surfaces now share custom BARSYNERGY form primitives for input, textarea, select, checkbox, radio, upload, search, labels, hints, errors, sections and actions; the vacancy response form is the reference implementation, and existing form names/actions/validation remain unchanged;
 - dark graphite editorial theme polish is applied locally: dark mode now uses explicit graphite page/panel/elevated tokens, warm low-opacity borders, ivory and muted-clay text, calmer burgundy accents, reduced heavy shadows/glows and flat graphite form fields; Playwright fallback screenshots/checks cover the requested public/auth routes at desktop/mobile widths with no runtime errors or horizontal overflow;
+- 2026-06-01 Miro palette migration is applied at code/token level: yellow is now the single interactive accent across buttons, links, active nav and selected states; light/dark surfaces now use Miro-style white, gray and derived blue-gray neutrals; pastel support colors moved into decorative cards and ambient layers; admin surfaces inherit the shared accent contract, and field-focus styling stays neutral;
 - homepage browser-comment cleanup is applied locally: the hero text now uses `партнёрские предложения`, the first-screen audience action panel is removed, the featured knowledge card has a bitmap fallback image, and social cards no longer repeat platform names in uppercase labels plus titles; Playwright fallback checks cover `/` at `1175x813` and `822x813` with no horizontal overflow;
 - sponsor data is now shared between the homepage and `/general-sponsors`, so the separate sponsors page renders the same real entries and no longer keeps a separate test showcase list;
 - partner/sponsor follow-up is applied locally: `/partners` now leads with clearer plain-Russian copy, shows the current general sponsor directly on the page, the `Hustle Brew` block now reads as an editorial partner profile instead of a promo slab, social promo cards no longer let their oversized logos collide with the right-side divider treatment, and the public header no longer overflows or shifts its desktop nav/actions on medium desktop widths;
@@ -231,13 +232,15 @@ Current status:
 - public `/education`, `/events`, `/suppliers`, `/partners`, `/business`, `/consulting` and `/contacts` now write the remaining MVP request types into `Application`;
 - `ApplicationType.BUSINESS_SOLUTION` and `ApplicationType.CONSULTING_REQUEST` are backed by migration `20260515120000_business_consulting_application_types`;
 - production public forms are disabled by default through `APPLICATION_FORMS_ENABLED`;
-- public forms include a honeypot and per-client rate limit;
+- public forms share the common public application submission helper and include form availability checks, same-origin protection, honeypot validation and per-client rate limiting;
+- `Application.payload` now has typed Zod parse/build helpers while the Prisma `Json?` field remains unchanged;
 - admin `/admin/applications` supports queue-style list/detail review, readable payload labels, private resume download, related-record cards, unified status/business-note/internal-note processing and manual `forwarded_to_employer` metadata;
+- admin application server actions are split by workflow area behind the existing facade, with transaction/business rules in `src/lib/admin/applications/*`;
 - employer-forwarding status is guarded so only consented vacancy responses can be marked as forwarded;
 - admins can create a draft `Vacancy` from a `vacancy_submission` application and keep publication manual;
 - admins can explicitly publish a vacancy, supplier or partner from an approved/reviewed application; the created public record is linked back to `Application.vacancyId`, `Application.supplierId` or `Application.partnerId`;
 - admin-only private resume download is available at `/admin/applications/[applicationId]/resume`;
-- user confirmation emails are sent when `SMTP_*` is configured, and short Telegram admin notifications are sent when Telegram env config is present;
+- user confirmation emails and short Telegram admin notifications are queued through `ApplicationNotification`; immediate dispatch runs after commit and failed attempts can be retried with `npm run notifications:retry`;
 - Phase 3 is complete at source level for the current MVP applications contract;
 - legal text and operator/Roskomnadzor readiness still need owner/legal review before personal-data forms are enabled in production.
 
@@ -297,7 +300,10 @@ Current status:
 - auth, business and specialist-profile screens have an additional shared-UI consistency pass: page headers, action rows, stat blocks, sidebars and helper panels are normalized around the internal UI kit without changing the Phase 4 business logic;
 - focused browser smoke is rerun for `/business/cabinet` and `/business/cabinet/requests` after activating local demo access for QA only;
 - admin application detail can store business-visible notes inside the unified processing block;
-- email-based password reset is deferred until production email is configured, but one-time admin-prepared activation links are implemented for the current Phase 4 flow.
+- email-based password reset is deferred until production email is configured, but one-time admin-prepared activation links are implemented for the current Phase 4 flow;
+- 2026-06-04: public user registration (`UserRole.USER`) added as `ACTIVE` self-registration at `/auth/register/user` with dedicated form and action, separate from the business-access request flow; `registerUserAction` in the existing code was broken (created `PENDING` users that no guard can pass) and is now fixed; CTA links on `/auth/login` are split into two explicit paths. No schema changes or new dependencies.
+- 2026-06-04: duplicate business-request false-success fixed — `createBusinessAccountRequestAction` now distinguishes genuine new requests from duplicates and shows an honest success message in both cases.
+- 2026-06-04: public header is now server-aware of auth state — `SiteHeaderServer` fetches `currentUser` and passes serialized data to client `SiteHeader`; authenticated users see `AccountMenu` (DropdownMenu-based with role-based items) instead of static "Войти"; mobile menu shows auth block with user info, role-based links and logout.
 
 ## Phase 5: Filters, Search And Directory Quality
 
@@ -340,8 +346,10 @@ Current status:
 
 - service-specialist module is planned as a Phase 5 catalog expansion;
 - current schema has `CategoryType.SERVICE` as taxonomy preparation, but it does not yet have `ServiceSpecialist`, `ApplicationType.SERVICE_SPECIALIST_SUBMISSION`, `/services` or `/admin/services`;
+- Phase 5 remains gated by final stabilization sign-off in `docs/remediation-plan.md`, especially production scheduler confirmation; the mobile admin read-only/actions layer is a separate product decision;
 - it must not interrupt Phase 4 auth and first business account work unless the owner explicitly records a roadmap reorder;
-- first version has no specialist personal cabinet and no direct public publishing.
+- first version has no specialist personal cabinet and no direct public publishing;
+- `/search` exists as a route but is intentionally excluded from primary public navigation by owner decision until Phase 5 search/discovery work begins; its absence from nav is not an active remediation item.
 
 ## Phase 6: Monetization Without Online Payment
 
@@ -373,6 +381,48 @@ Done when:
 - admin can process them manually;
 - potentially paid applications are clear;
 - MVP remains simple.
+
+## Phase Pre-7: UI Polish Pass
+
+Goal:
+
+Apply the 14-point UX/UI improvement plan recorded in owner audit 2026-06-07 across 10 screens. Stay strictly within the existing data model, routes, server actions and dependencies. No new content types, no schema changes, no new libraries.
+
+Source plan: owner audit 2026-06-07 — homepage, navigation, vacancies, profile, articles, suppliers, education, auth, events, business cabinet.
+
+In scope:
+
+- Sprint A — quick wins (XS/S complexity): hero stats resize, vacancy salary prefix removal, vacancy CTA label wiring, profile salary/employment/visibility panel merge, articles aspect ratio fix, supplier logo always visible on mobile.
+- Sprint B — cards and rows (S/M): vacancy «Новая» badges, supplier directory contact actions in listing, event date block, course duration/level row, featured article horizontal layout.
+- Sprint C — structural (M): profile hero card with avatar, auth two-column desktop layout, homepage restructure (remove HomeSectionCards, fix events fallbacks), mobile nav auth strip + grouping.
+- Sprint D — cabinet (M): business cabinet card-list instead of DataTable, cabinet overview dashboard.
+
+Out of scope:
+
+- new Prisma models or migrations;
+- new public routes;
+- new server actions or action wrappers;
+- new third-party libraries;
+- copy rewrites outside the listed elements;
+- mobile admin redesign;
+- dark-mode refactor;
+- pre-Phase-5 stabilization items still tracked in `docs/remediation-plan.md`.
+
+Done when:
+
+- each sprint closes with `npm run lint`, `npm run typecheck`, `npm test` no worse than the recorded pre-sprint baseline;
+- public visual smoke confirms each changed surface renders without horizontal overflow at desktop 1280px and mobile 390px;
+- `PROJECT_STATUS.md` and Obsidian Kanban reflect sprint completion;
+- no out-of-scope file (server actions, Prisma schema, migrations, dependencies, production env values) is modified.
+
+Sprint sequencing:
+
+1. Sprint A → recorded baseline (lint, typecheck, test counts) → implementation → re-validation → closeout.
+2. Sprint B/C/D only start after the previous sprint has closeout and owner sign-off.
+
+Current status:
+
+- 2026-06-07 Sprint A in progress on `fix/code-review-remediation`: hero stats, vacancy salary prefix, vacancy CTA label wiring, profile salary panels merge, articles aspect ratio, supplier logo visibility.
 
 ## Phase 7: Stabilization And Release 1.0
 

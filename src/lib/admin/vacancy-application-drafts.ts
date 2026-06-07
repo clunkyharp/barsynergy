@@ -1,6 +1,7 @@
 import { ApplicationType, ContentStatus } from '@prisma/client';
 import type { Prisma } from '@prisma/client';
 import { isVacancyPosition } from '../vacancies/positions.ts';
+import { parseApplicationPayload } from '../applications/application-payloads.ts';
 
 type VacancySubmissionApplication = {
   type: ApplicationType;
@@ -14,15 +15,6 @@ type VacancySubmissionApplication = {
   consentAcceptedAt: Date | null;
   payload: Prisma.JsonValue | null;
 };
-
-function payloadString(payload: Prisma.JsonValue | null, key: string) {
-  if (!payload || Array.isArray(payload) || typeof payload !== 'object') {
-    return undefined;
-  }
-
-  const value = payload[key];
-  return typeof value === 'string' && value.trim().length > 0 ? value.trim() : undefined;
-}
 
 function getContactMode(application: VacancySubmissionApplication) {
   const contacts = [
@@ -48,9 +40,10 @@ export function getVacancyDraftFieldsFromApplication(application: VacancySubmiss
     throw new Error('vacancy draft requires consent');
   }
 
-  const companyName = payloadString(application.payload, 'companyName');
-  const position = payloadString(application.payload, 'position');
-  const shortDescription = payloadString(application.payload, 'shortDescription');
+  const payload = parseApplicationPayload(ApplicationType.VACANCY_SUBMISSION, application.payload);
+  const companyName = payload.companyName;
+  const position = payload.position;
+  const shortDescription = payload.shortDescription;
   const description = application.message?.trim() || shortDescription;
 
   if (!companyName || !position || !isVacancyPosition(position) || !shortDescription || !description) {
@@ -66,9 +59,9 @@ export function getVacancyDraftFieldsFromApplication(application: VacancySubmiss
     categoryId: null,
     companyName,
     position,
-    employmentType: payloadString(application.payload, 'employmentType') ?? null,
-    salaryLabel: payloadString(application.payload, 'salaryLabel') ?? null,
-    experienceLabel: payloadString(application.payload, 'experienceLabel') ?? null,
+    employmentType: payload.employmentType ?? null,
+    salaryLabel: payload.salaryLabel ?? null,
+    experienceLabel: payload.experienceLabel ?? null,
     contactMode: getContactMode(application)
   };
 }

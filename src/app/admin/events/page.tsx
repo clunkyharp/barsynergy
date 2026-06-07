@@ -1,7 +1,8 @@
-import { CategoryType, type Prisma } from '@prisma/client';
+import { CategoryType, type Prisma } from '@/modules/admin/queries';
 import { deleteEventDraft, updateEventStatus } from '@/app/admin/events/actions';
 import {
   AdminActionAlert,
+  AdminContentStatusTabs,
   AdminContentRowActions,
   AdminListFilters,
   AdminPagination
@@ -36,7 +37,7 @@ import {
   type AdminContentSearchParams
 } from '@/lib/admin/content-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
-import { prisma } from '@/lib/db/prisma';
+import { prisma } from '@/modules/admin/queries';
 
 export const dynamic = 'force-dynamic';
 
@@ -124,8 +125,10 @@ export default async function AdminEventsPage({ searchParams }: AdminEventsPageP
       />
 
       <AdminActionAlert params={params} />
+      <AdminContentStatusTabs basePath={ADMIN_EVENTS_PATH} params={params} />
       <AdminListFilters
         basePath={ADMIN_EVENTS_PATH}
+        includeStatus={false}
         filters={[
           { name: 'categoryId', label: 'Категория', allLabel: 'Все категории', options: categories.map((category) => ({ value: category.id, label: category.name })) },
           { name: 'cityId', label: 'Город', allLabel: 'Все города', options: cities.map((city) => ({ value: city.id, label: city.name })) },

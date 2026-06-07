@@ -1,21 +1,24 @@
 import type { Metadata } from 'next';
-import { CategoryType } from '@prisma/client';
+import { CategoryType } from '@/modules/content/shared/types';
+import { PackageCheck } from 'lucide-react';
 import { EditorialPublicPage } from '@/components/public/editorial-public-page';
-import { PublishedContentSection } from '@/components/public/published-content-section';
+import { PublishedContentSectionDirectory } from '@/components/public/published-content-section';
 import { PublicFilters } from '@/components/public/public-filters';
 import { PublicPrelaunchSection } from '@/components/public/public-prelaunch-section';
 import { stripPublicApplicationResultParams } from '@/lib/applications/public-form-helpers';
 import { getPublishedSuppliers, hasActivePublicContentParams, type PublicContentSearchParams } from '@/lib/public/content';
 import { getPublicCategoryOptions, getPublicCityFilterOptions } from '@/lib/public/filter-options';
+import { buildPublicPageMetadata } from '@/lib/public/metadata';
 
 type SuppliersPageProps = {
   searchParams?: Promise<PublicContentSearchParams>;
 };
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildPublicPageMetadata({
   title: 'Поставщики',
-  description: 'Каталог поставщиков, оборудования, сервисов и контактов для заведений.'
-};
+  description: 'Каталог поставщиков, оборудования, сервисов и контактов для заведений.',
+  path: '/suppliers'
+});
 
 export default async function SuppliersPage({ searchParams }: SuppliersPageProps) {
   const params = (await searchParams) ?? {};
@@ -34,20 +37,23 @@ export default async function SuppliersPage({ searchParams }: SuppliersPageProps
     <>
       <EditorialPublicPage
         eyebrow="Поставщики"
-        title="Поставщики, сервисы и рабочие контакты"
-        description="Каталог для заведений: поставки, сервис, оборудование и контакты компаний."
-        summary="В карточке видно категорию, географию, статус проверки и контакт компании."
+        path="/suppliers"
+        title="Поставщики"
+        description="Компании, оборудование, сервис и контакты для заведений региона."
+        summary="Каталог пополняется. Фильтры по направлению, городу и статусу раскрываются по кнопке."
         density="compact"
         summaryHeading="В фокусе"
         metrics={[]}
         rows={[]}
-        primaryLink={{ label: 'Добавить компанию', href: supplierContactHref }}
+        primaryLink={{ label: 'Добавить свою компанию', href: supplierContactHref }}
         secondaryLink={isEmpty ? { label: 'Связаться с нами', href: supplierContactHref } : undefined}
+        accentGradient="radial-gradient(ellipse 90% 60% at 70% 50%, rgba(40,180,180,0.08), transparent)"
+        accentIcon={PackageCheck}
       />
       {isPrelaunchEmpty ? (
         <PublicPrelaunchSection
           actions={[
-            { href: supplierContactHref, label: 'Добавить компанию' },
+            { href: supplierContactHref, label: 'Добавить свою компанию' },
             { href: supplierContactHref, label: 'Связаться с нами', variant: 'secondary' }
           ]}
           badges={['Каталог уже принимает заявки', 'Подходит для поставок, сервиса и оборудования']}
@@ -70,10 +76,10 @@ export default async function SuppliersPage({ searchParams }: SuppliersPageProps
           title="Какие компании можно добавить"
         />
       ) : (
-        <PublishedContentSection
+        <PublishedContentSectionDirectory
           basePath="/suppliers"
           content={content}
-          emptyDescription="Сейчас каталог пуст. Новые компании и сервисы появятся после публикации."
+          emptyDescription="Каталог пополняется. Добавьте компанию, если она работает с кофейными барами, зерном, оборудованием или сервисом в регионе."
           emptyTitle="Поставщиков пока нет"
           filters={
             <PublicFilters
@@ -100,9 +106,10 @@ export default async function SuppliersPage({ searchParams }: SuppliersPageProps
             />
           }
           listLabel="Поставщики"
+          countLabel="В базе"
           rowActionLabel="Смотреть профиль"
-          rowVariant="directory"
           sectionId="suppliers-list"
+          showSidebarTitle={false}
           title="Каталог"
         />
       )}

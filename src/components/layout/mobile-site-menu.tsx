@@ -2,6 +2,7 @@
 
 import { useEffect, useId, useRef, useState, type RefObject } from 'react';
 import { createPortal } from 'react-dom';
+import { ArrowUpRight, LogIn, Menu, X } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { AppLink } from '@/components/ui/app-link';
 import { focusFirstElement, trapFocusInContainer } from '@/components/ui/focus-trap';
@@ -15,23 +16,40 @@ type MobileSiteMenuProps = {
     href: string;
   }>;
   onOpenChange: (nextState: boolean) => void;
+  user?: {
+    id: string;
+    email: string;
+    role: string;
+    displayName: string | null;
+    avatarUrl: string | null;
+  } | null;
 };
 
 const MENU_TOGGLE_SIZE_CLASS = 'h-11 w-11';
-const MENU_TOGGLE_ICON_SIZE_CLASS = 'h-[18px] w-[18px]';
-const MOBILE_MENU_CONTENT_TOP_CLASS = 'pt-[84px] sm:pt-[88px]';
-const MENU_TOGGLE_LINE_LENGTH = 14;
-const MENU_TOGGLE_LINE_THICKNESS = 1.5;
-const MENU_TOGGLE_ICON_OFFSET = 4;
+const MOBILE_MENU_CONTENT_TOP_CLASS = 'pt-[72px] sm:pt-[76px]';
 
-const primaryNavOrder = ['/events', '/education', '/vacancies', '/suppliers', '/articles'];
-const businessNavOrder = ['/business', '/partners', '/general-sponsors', '/consulting'];
-const teamNavOrder = ['/about', '/contacts', '/auth/login'];
+const navGroups = [
+  {
+    label: 'Платформа',
+    hrefs: ['/events', '/education', '/vacancies', '/suppliers', '/articles']
+  },
+  {
+    label: 'Сотрудничество',
+    hrefs: ['/business', '/partners', '/general-sponsors', '/consulting']
+  },
+  {
+    label: 'О проекте',
+    hrefs: ['/about', '/contacts']
+  }
+];
 
-function getMobileNavItems(navItems: MobileSiteMenuProps['navItems'], hrefs: string[]) {
-  return hrefs
-    .map((href) => navItems.find((item) => item.href === href))
-    .filter((item): item is MobileSiteMenuProps['navItems'][number] => Boolean(item));
+function getGroupNavItems(navItems: MobileSiteMenuProps['navItems']) {
+  return navGroups.map((group) => ({
+    label: group.label,
+    items: group.hrefs
+      .map((href) => navItems.find((item) => item.href === href))
+      .filter((item): item is MobileSiteMenuProps['navItems'][number] => Boolean(item))
+  })).filter((group) => group.items.length > 0);
 }
 
 function isActiveMobileItem(pathname: string | null, href: string) {
@@ -41,14 +59,20 @@ function isActiveMobileItem(pathname: string | null, href: string) {
 
   const [pathOnly] = href.split('?');
 
-  if (pathOnly === '/auth/login') {
-    return pathname.startsWith('/auth');
-  }
-
   return pathname === pathOnly || pathname.startsWith(`${pathOnly}/`);
 }
 
-export function MobileSiteMenu({ isOpen, navItems, onOpenChange }: MobileSiteMenuProps) {
+function userInitials(user: NonNullable<MobileSiteMenuProps['user']>) {
+  return (user.displayName ?? user.email).slice(0, 2).toUpperCase();
+}
+
+function profileHref(role: string) {
+  if (role === 'BUSINESS') return '/business/cabinet';
+  if (role === 'ADMIN' || role === 'MODERATOR') return '/admin';
+  return '/profile';
+}
+
+export function MobileSiteMenu({ isOpen, navItems, onOpenChange, user }: MobileSiteMenuProps) {
   const pathname = usePathname();
   const [isRendered, setIsRendered] = useState(false);
   const dialogRef = useRef<HTMLDivElement>(null);
@@ -57,9 +81,8 @@ export function MobileSiteMenu({ isOpen, navItems, onOpenChange }: MobileSiteMen
   const dialogTitleId = useId();
   const overlayId = 'mobile-menu';
   const portalTarget = typeof document !== 'undefined' ? document.querySelector('.site-shell') ?? document.body : null;
-  const primaryNavItems = getMobileNavItems(navItems, primaryNavOrder);
-  const businessNavItems = getMobileNavItems(navItems, businessNavOrder);
-  const teamNavItems = getMobileNavItems(navItems, teamNavOrder);
+  const groups = getGroupNavItems(navItems);
+  const loginItem = navItems.find((item) => item.href === '/auth/login');
 
   useEffect(() => {
     if (isOpen) {
@@ -179,19 +202,17 @@ export function MobileSiteMenu({ isOpen, navItems, onOpenChange }: MobileSiteMen
             <div
               aria-hidden={!isOpen}
               id={overlayId}
-              style={{ background: 'var(--mobile-menu-bg)' }}
               className={cn(
-                'mobile-menu-overlay fixed inset-0 z-[45] overflow-y-auto overscroll-contain text-[var(--text)] transition-opacity duration-[var(--motion-duration-panel)] ease-[var(--motion-ease-standard)] motion-reduce:transition-none xl:hidden',
+                'fixed inset-0 z-[45] overflow-y-auto overscroll-contain bg-[var(--editorial-dark-surface)] transition-opacity duration-[var(--motion-duration-panel)] ease-[var(--motion-ease-standard)] motion-reduce:transition-none xl:hidden',
                 isOpen ? 'opacity-100' : 'pointer-events-none opacity-0'
               )}
             >
-              <div aria-hidden="true" className="absolute inset-0 bg-[url('/images/grain.svg')] opacity-[0.22]" />
               <div
                 aria-modal="true"
                 aria-labelledby={dialogTitleId}
                 role="dialog"
                 className={cn(
-                  'container relative min-h-[100dvh] px-0 pb-8 transition-[opacity,transform] duration-[var(--motion-duration-panel)] ease-[var(--motion-ease-move)] motion-reduce:transition-none',
+                  'container relative flex min-h-[100dvh] flex-col pb-8 transition-[opacity,transform] duration-[var(--motion-duration-panel)] ease-[var(--motion-ease-move)] motion-reduce:transition-none',
                   MOBILE_MENU_CONTENT_TOP_CLASS,
                   isOpen ? 'translate-y-0 opacity-100' : 'translate-y-2 opacity-0'
                 )}
@@ -201,70 +222,90 @@ export function MobileSiteMenu({ isOpen, navItems, onOpenChange }: MobileSiteMen
                 <h2 className="sr-only" id={dialogTitleId}>
                   Мобильная навигация
                 </h2>
-                <nav aria-label="Мобильная навигация" className="grid content-start gap-4 sm:gap-5">
-                  <MobileMenuGroup label="Разделы" items={primaryNavItems} onNavigate={() => onOpenChange(false)} pathname={pathname} />
-                  {businessNavItems.length > 0 ? (
-                    <MobileMenuGroup
-                      label="Для бизнеса"
-                      items={businessNavItems}
-                      onNavigate={() => onOpenChange(false)}
-                      pathname={pathname}
-                      withDivider
-                    />
-                  ) : null}
-                  <MobileMenuGroup label="Команда" items={teamNavItems} onNavigate={() => onOpenChange(false)} pathname={pathname} withDivider />
+
+                {user ? (
+                  <AppLink
+                    className="mb-5 mt-6 flex items-center gap-4 rounded-[var(--radius-lg)] border border-[var(--editorial-dark-border)] bg-[rgba(255,255,255,0.04)] p-4 transition-colors hover:bg-[rgba(255,255,255,0.08)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
+                    href={profileHref(user.role)}
+                    onClick={() => onOpenChange(false)}
+                  >
+                    <span className="grid size-10 shrink-0 place-items-center rounded-full bg-[var(--accent-soft)] text-sm font-bold text-[var(--accent)]">
+                      {userInitials(user)}
+                    </span>
+                    <span className="min-w-0">
+                      <span className="block text-sm font-semibold text-[var(--editorial-dark-text)] truncate">
+                        {user.displayName ?? user.email}
+                      </span>
+                      <span className="block text-xs text-[var(--editorial-dark-muted)]">
+                        {user.displayName ? user.email : null}
+                        <span className="inline-flex items-center gap-1 text-[var(--accent)] ml-auto">
+                          Кабинет <ArrowUpRight size={12} strokeWidth={1.8} />
+                        </span>
+                      </span>
+                    </span>
+                  </AppLink>
+                ) : null}
+
+                <nav aria-label="Мобильная навигация">
+                  <div className="grid gap-6">
+                    {groups.map((group) => (
+                      <div key={group.label}>
+                        <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--editorial-dark-muted)]">
+                          {group.label}
+                        </p>
+                        <div>
+                          {group.items.map((item) => {
+                            const isActive = isActiveMobileItem(pathname, item.href);
+
+                            return (
+                              <AppLink
+                                aria-current={isActive ? 'page' : undefined}
+                                className={cn(
+                                  displayFont.className,
+                                  'flex min-h-[2.75rem] w-full items-center border-b border-[var(--editorial-dark-border)] py-2.5 text-[24px] font-normal leading-[1.1] text-[var(--editorial-dark-text)] transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] hover:text-[var(--accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] motion-reduce:transition-none last:border-b-0 sm:text-[28px]',
+                                  isActive && 'text-[var(--accent)]'
+                                )}
+                                href={item.href}
+                                key={item.href}
+                                onClick={() => onOpenChange(false)}
+                              >
+                                {item.label}
+                              </AppLink>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </nav>
+
+                <div className="mt-auto border-t border-[var(--editorial-dark-border)] pt-5 text-[13px] text-[var(--editorial-dark-muted)]">
+                  <div className="flex items-center justify-between">
+                    {user ? null : loginItem ? (
+                      <AppLink
+                        className="inline-flex items-center gap-2 rounded-[var(--radius-md)] bg-[var(--accent)] px-4 py-2.5 text-sm font-semibold text-[var(--accent-contrast)] transition-colors hover:bg-[var(--accent-strong)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
+                        href="/auth/login"
+                        onClick={() => onOpenChange(false)}
+                      >
+                        <LogIn size={15} strokeWidth={1.8} />
+                        {loginItem.label}
+                      </AppLink>
+                    ) : null}
+                    <AppLink
+                      className="transition-colors duration-[var(--motion-duration-fast)] hover:text-[var(--editorial-dark-text)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] motion-reduce:transition-none"
+                      href="https://t.me/barsynergy"
+                      onClick={() => onOpenChange(false)}
+                    >
+                      Telegram
+                    </AppLink>
+                  </div>
+                </div>
               </div>
             </div>,
             portalTarget
           )
         : null}
     </>
-  );
-}
-
-function MobileMenuGroup({
-  items,
-  label,
-  onNavigate,
-  pathname,
-  withDivider = false
-}: {
-  items: MobileSiteMenuProps['navItems'];
-  label: string;
-  onNavigate: () => void;
-  pathname: string | null;
-  withDivider?: boolean;
-}) {
-  if (items.length === 0) {
-    return null;
-  }
-
-  return (
-    <div className={cn('grid gap-1.5', withDivider && 'border-t border-[var(--line)] pt-4')}>
-      <p className="text-[9px] font-bold uppercase tracking-[0.08em] text-[var(--accent)]">{label}</p>
-      <div className="grid gap-1">
-        {items.map((item) => {
-          const isActive = isActiveMobileItem(pathname, item.href);
-
-          return (
-            <AppLink
-              aria-current={isActive ? 'page' : undefined}
-              className={cn(
-                displayFont.className,
-                'display-tight block min-h-11 w-fit rounded-[var(--radius-sm)] py-1 pr-2 text-[18px] font-bold leading-[1.12] text-[var(--text)] transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] hover:text-[var(--accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] motion-reduce:transition-none sm:text-[19px]',
-                isActive && 'border-l-2 border-[var(--accent)] pl-3 text-[var(--accent)]'
-              )}
-              href={item.href}
-              key={item.href}
-              onClick={onNavigate}
-            >
-              {item.label}
-            </AppLink>
-          );
-        })}
-      </div>
-    </div>
   );
 }
 
@@ -292,48 +333,11 @@ function MenuToggle({
       ref={triggerRef}
       type="button"
     >
-      <span className="grid h-full w-full place-items-center">
-        <MenuToggleIcon isOpen={isOpen} />
-      </span>
+      {isOpen ? (
+        <X aria-hidden="true" size={18} strokeWidth={1.8} />
+      ) : (
+        <Menu aria-hidden="true" size={18} strokeWidth={1.8} />
+      )}
     </button>
-  );
-}
-
-function MenuToggleIcon({ isOpen }: { isOpen: boolean }) {
-  const lineBaseClass =
-    'absolute left-1/2 top-1/2 block rounded-full bg-current transition-[transform,opacity] duration-[var(--motion-duration-panel)] ease-[var(--motion-ease-move)] motion-reduce:transition-none';
-
-  return (
-    <span aria-hidden="true" className={cn('relative block', MENU_TOGGLE_ICON_SIZE_CLASS)}>
-      <span
-        className={lineBaseClass}
-        style={{
-          width: `${MENU_TOGGLE_LINE_LENGTH}px`,
-          height: `${MENU_TOGGLE_LINE_THICKNESS}px`,
-          transform: isOpen
-            ? 'translate(-50%, -50%) rotate(45deg)'
-            : `translate(-50%, calc(-50% - ${MENU_TOGGLE_ICON_OFFSET}px)) rotate(0deg)`
-        }}
-      />
-      <span
-        className={lineBaseClass}
-        style={{
-          width: `${MENU_TOGGLE_LINE_LENGTH}px`,
-          height: `${MENU_TOGGLE_LINE_THICKNESS}px`,
-          opacity: isOpen ? 0 : 1,
-          transform: 'translate(-50%, -50%)'
-        }}
-      />
-      <span
-        className={lineBaseClass}
-        style={{
-          width: `${MENU_TOGGLE_LINE_LENGTH}px`,
-          height: `${MENU_TOGGLE_LINE_THICKNESS}px`,
-          transform: isOpen
-            ? 'translate(-50%, -50%) rotate(-45deg)'
-            : `translate(-50%, calc(-50% + ${MENU_TOGGLE_ICON_OFFSET}px)) rotate(0deg)`
-        }}
-      />
-    </span>
   );
 }

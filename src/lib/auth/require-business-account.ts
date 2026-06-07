@@ -7,7 +7,7 @@ export async function requireBusinessAccountAccess() {
   const user = await getCurrentUser();
 
   if (!user) {
-    redirect('/auth/login');
+    redirect('/auth/login?returnTo=/business/cabinet');
   }
 
   if (user.role !== UserRole.BUSINESS) {

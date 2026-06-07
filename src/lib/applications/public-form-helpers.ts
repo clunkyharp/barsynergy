@@ -62,6 +62,15 @@ export function getPublicApplicationUtm(params: PublicContentSearchParams): Publ
 
 export function getString(formData: FormData, key: string) {
   const value = formData.get(key);
+  if (typeof value !== 'string') {
+    if (process.env.NODE_ENV === 'development') {
+      if (value instanceof File) {
+        console.warn('getString: expected string for key', key, 'got File');
+      } else {
+        console.warn('getString: expected string for key', key, 'got', typeof value);
+      }
+    }
+  }
   return typeof value === 'string' ? value : '';
 }
 
@@ -156,6 +165,10 @@ export function resolvePublicApplicationActionError(action: string, error: unkno
       {
         matches: (candidate) => hasErrorMessage(candidate, 'private resume file is too large'),
         message: 'Файл резюме превышает допустимый размер.'
+      },
+      {
+        matches: (candidate) => hasErrorMessage(candidate, 'captcha failed'),
+        message: 'Проверка не пройдена. Попробуйте ещё раз.'
       }
     ],
     fallbackMessage: 'Не получилось отправить заявку. Проверьте поля и попробуйте ещё раз.'

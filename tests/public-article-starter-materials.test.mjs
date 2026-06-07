@@ -8,53 +8,53 @@ const repoRoot = process.cwd();
 
 const readProjectFile = (path) => readFileSync(join(repoRoot, path), 'utf8');
 
-const starterMaterials = [
-  'how-to-calculate-drink-cost',
-  'what-to-include-in-vacancy',
-  'how-to-choose-supplier',
-  'how-to-prepare-guest-shift',
-  'skfo-bar-industry-map'
+const removedArticleDetailLinks = [
+  '/articles/how-to-calculate-drink-cost',
+  '/articles/what-to-include-in-vacancy',
+  '/articles/how-to-choose-supplier',
+  '/articles/how-to-prepare-guest-shift',
+  '/articles/skfo-bar-industry-map'
 ];
 
-test('starter article cards point to seeded test materials', () => {
+test('articles index does not render hardcoded starter cards', () => {
   const articlesPage = readProjectFile('src/app/(public)/articles/page.tsx');
-  const demoSeed = readProjectFile('scripts/seed-demo-screens.mjs');
 
-  for (const slug of starterMaterials) {
-    assert.match(articlesPage, new RegExp(`href: '/articles/${slug}'`));
-    assert.match(demoSeed, new RegExp(`slug: '${slug}'`));
+  for (const href of removedArticleDetailLinks) {
+    assert.doesNotMatch(articlesPage, new RegExp(href));
   }
 
-  assert.match(demoSeed, /status: ContentStatus\.PUBLISHED/);
-  assert.match(demoSeed, /type: CategoryType\.ARTICLE/);
-  assert.match(demoSeed, /Published test articles:/);
+  assert.doesNotMatch(articlesPage, /starterReadingQueueItems/);
+  assert.doesNotMatch(articlesPage, /KnowledgeStarterSection/);
+  assert.doesNotMatch(articlesPage, /Стартовые материалы/);
 });
 
-test('articles index exposes search before the latest publications list', () => {
+test('articles index passes sidebar filters into the latest publications section', () => {
   const articlesPage = readProjectFile('src/app/(public)/articles/page.tsx');
   const filterStart = articlesPage.indexOf('<PublicFilters');
-  const latestStart = articlesPage.indexOf('<ArticleGridSection');
+  const latestStart = articlesPage.indexOf('<PublishedContentSection');
+  const sectionStart = articlesPage.indexOf('filters={filters}');
 
   assert.ok(filterStart > -1);
   assert.ok(latestStart > filterStart);
-  assert.match(articlesPage, /placeholder="Название, тема или описание…"/);
+  assert.ok(sectionStart > latestStart);
+  assert.match(articlesPage, /placeholder="Название, тема или описание\.\.\."/);
   assert.match(articlesPage, /categoryAllLabel="Все темы"/);
+  assert.match(articlesPage, /embedded/);
+  assert.match(articlesPage, /filters=\{filters\}/);
+  assert.match(articlesPage, /rowActionLabel="Читать материал"/);
   assert.doesNotMatch(articlesPage, /knowledgeTopics/);
   assert.doesNotMatch(articlesPage, /<FilterChip/);
+  assert.doesNotMatch(articlesPage, /<Suspense/);
 });
 
-test('latest article cards keep a compact editorial reference layout', () => {
+test('latest articles use the shared published content section', () => {
   const articlesPage = readProjectFile('src/app/(public)/articles/page.tsx');
-  const gridStart = articlesPage.indexOf('function ArticleGridSection');
-  const gridEnd = articlesPage.indexOf('function ArticleEmptyResults');
-  const gridSource = articlesPage.slice(gridStart, gridEnd);
 
-  assert.match(gridSource, /md:grid md:gap-6/);
-  assert.match(gridSource, /md:flex md:h-full md:flex-col/);
-  assert.match(gridSource, /md:aspect-\[1\.55\/1\]/);
-  assert.match(gridSource, /BARSYNERGY/);
-  assert.match(gridSource, /Знания/);
-  assert.match(gridSource, /md:line-clamp-3/);
-  assert.match(gridSource, /md:mt-auto md:pt-5/);
-  assert.doesNotMatch(gridSource, /md:min-h-\[220px\]/);
+  assert.match(articlesPage, /PublishedContentSection/);
+  assert.match(articlesPage, /excludedItemIds=\{featuredItem \? \[featuredItem\.id\] : \[\]\}/);
+  assert.match(articlesPage, /showSidebarTitle=\{false\}/);
+  assert.match(articlesPage, /secondaryEmptyTitle="Других материалов пока нет"/);
+  assert.doesNotMatch(articlesPage, /function ArticleGridSection/);
+  assert.doesNotMatch(articlesPage, /function ArticleEmptyResults/);
+  assert.doesNotMatch(articlesPage, /md:min-h-\[220px\]/);
 });
