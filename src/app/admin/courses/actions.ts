@@ -125,7 +125,7 @@ export async function updateCourse(formData: FormData) {
       if (previousCoverImageId !== coverImageId) await deleteUploadedFileIfUnused(previousCoverImageId);
 
       revalidatePath(ADMIN_COURSES_PATH);
-      return { type: 'success', message: 'Курс обновлен.' };
+      return { type: 'success', message: 'Курс обновлён.' };
     }
   });
 }
@@ -141,7 +141,7 @@ export async function updateCourseStatus(formData: FormData) {
       await updateContentStatus({ status: parsed.status, userId: user.id, findCurrent: (tx) => tx.course.findUniqueOrThrow({ where: { id: parsed.courseId }, select: { publishedAt: true } }), update: (tx, data) => tx.course.update({ where: { id: parsed.courseId }, data }) });
 
       revalidatePath(ADMIN_COURSES_PATH);
-      return { type: 'success', message: 'Статус курса обновлен.' };
+      return { type: 'success', message: 'Статус курса обновлён.' };
     }
   });
 }
@@ -159,7 +159,7 @@ export async function deleteCourseDraft(formData: FormData) {
       await deleteUploadedFileIfUnused(deletedCourse.coverImageId);
 
       revalidatePath(ADMIN_COURSES_PATH);
-      return { type: 'success', message: 'Курс удален.' };
+      return { type: 'success', message: 'Курс удалён.' };
     }
   });
 }

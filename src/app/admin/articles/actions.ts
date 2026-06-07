@@ -188,7 +188,7 @@ export async function updateArticleStatus(formData: FormData) {
       await updateContentStatus({ status: parsed.status, userId: user.id, findCurrent: (tx) => tx.article.findUniqueOrThrow({ where: { id: parsed.articleId }, select: { publishedAt: true } }), update: (tx, data) => tx.article.update({ where: { id: parsed.articleId }, data }) });
 
       revalidatePath(ADMIN_ARTICLES_PATH);
-      return { type: 'success', message: 'Статус статьи обновлен.' };
+      return { type: 'success', message: 'Статус статьи обновлён.' };
     }
   });
 }

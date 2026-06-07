@@ -1,8 +1,9 @@
 import { cookies } from 'next/headers';
 import { notFound } from 'next/navigation';
-import { ApplicationStatus, ApplicationType, BusinessAccountStatus, UserStatus } from '@prisma/client';
+import { ApplicationStatus, ApplicationType, BusinessAccountStatus, ConversationSender, UserStatus } from '@/modules/admin/queries';
 import { AdminActionAlert } from '@/components/admin/content-admin-controls';
 import { Button } from '@/components/ui/button';
+import { ConversationThread } from '@/components/messaging/conversation-thread';
 import { getAvailableApplicationStatuses } from '@/lib/admin/application-transitions';
 import { isApplicationPublicationStatusAllowed } from '@/lib/admin/application-publication';
 import { applicationStatusValues } from '@/lib/admin/application-utils';
@@ -11,7 +12,8 @@ import {
   BUSINESS_ACCESS_PREVIEW_COOKIE_NAME, isBusinessAccessInvitePreparationStatusAllowed
 } from '@/lib/auth/business-access';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
-import { prisma } from '@/lib/db/prisma';
+import { getConversationThread } from '@/lib/messaging/get-conversation';
+import { prisma } from '@/modules/admin/queries';
 import { ApplicationInfo } from './_components/application-info';
 import { BusinessAccessForm } from './_forms/business-access-form';
 import { PartnerPublicationForm, SupplierPublicationForm, VacancyPublicationForm } from './_forms/publication-form';
@@ -63,6 +65,10 @@ export default async function AdminApplicationDetailPage({ params, searchParams 
 
   if (!application) notFound();
 
+  const messages = await getConversationThread(applicationId);
+  const interlocutorName = application.name ?? application.businessAccount?.companyName ?? 'Заявитель';
+  const contextLabel = application.vacancy?.title ?? application.supplier?.title ?? application.type;
+
   const forwardedInfo = application.status === ApplicationStatus.FORWARDED_TO_EMPLOYER
     ? [application.forwardedAt ? dateTimeFormatter.format(application.forwardedAt) : null, application.forwardedBy?.email].filter(Boolean).join(' / ')
     : null;
@@ -103,6 +109,19 @@ export default async function AdminApplicationDetailPage({ params, searchParams 
           <Button href={ADMIN_APPLICATIONS_PATH} variant="ghost">Вернуться к списку</Button>
         </div>
       </div>
+
+      <ConversationThread
+        applicationId={applicationId}
+        composePlaceholder="Напишите ответ от имени платформы..."
+        contextLabel={contextLabel}
+        currentUserId={null}
+        currentUserRole="admin"
+        interlocutorName={interlocutorName}
+        messageCount={messages.length}
+        messages={messages}
+        senderRole={ConversationSender.ADMIN}
+        status={application.status}
+      />
     </div>
   );
 }

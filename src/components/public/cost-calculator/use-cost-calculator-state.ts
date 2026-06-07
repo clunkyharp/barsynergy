@@ -8,6 +8,14 @@ import {
 } from '@/lib/calculator/cost-calculator';
 import { money, percent } from './format';
 
+function pluralRu(n: number, one: string, few: string, many: string): string {
+  const mod10 = n % 10;
+  const mod100 = n % 100;
+  if (mod10 === 1 && mod100 !== 11) return one;
+  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 10 || mod100 >= 20)) return few;
+  return many;
+}
+
 const demoIngredients: Ingredient[] = [
   { id: 'ingredient-1', name: 'Зерно для эспрессо', packagePrice: '1450', packageAmount: '1', packageUnit: 'kg', recipeAmount: '18', recipeUnit: 'g' },
   { id: 'ingredient-2', name: 'Молоко', packagePrice: '120', packageAmount: '1', packageUnit: 'l', recipeAmount: '180', recipeUnit: 'ml' },
@@ -92,7 +100,7 @@ export function useCostCalculatorState() {
     ? 'В составе есть ошибки, итоговая цена пока не считается.'
     : hasPartialRows
       ? 'В одной из строк не хватает числа, поэтому она пока не входит в итог.'
-      : `${completedRows.toLocaleString('ru-RU')} ${completedRows === 1 ? 'строка участвует' : 'строк участвуют'} в расчёте.`;
+      : `${completedRows.toLocaleString('ru-RU')} ${pluralRu(completedRows, 'строка участвует', 'строки участвуют', 'строк участвуют')} в расчёте.`;
   const salePriceTone = hasManualSalePrice ? 'Задана вручную' : 'Рассчитана по целевой доле';
 
   function scheduleCopyReset(state: 'idle', delay: number) {

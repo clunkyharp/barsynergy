@@ -187,7 +187,7 @@ export async function updateGeneralSponsor(formData: FormData) {
 
       revalidateGeneralSponsorPaths();
       revalidatePath(`${ADMIN_GENERAL_SPONSORS_PATH}/${parsed.sponsorId}/edit`);
-      return { type: 'success', message: 'Генеральный спонсор обновлен.' };
+      return { type: 'success', message: 'Генеральный спонсор обновлён.' };
     }
   });
 }
@@ -203,7 +203,7 @@ export async function updateGeneralSponsorStatus(formData: FormData) {
       await updateContentStatus({ status: parsed.status, userId: user.id, findCurrent: (tx) => tx.generalSponsor.findUniqueOrThrow({ where: { id: parsed.sponsorId }, select: { publishedAt: true } }), update: (tx, data) => tx.generalSponsor.update({ where: { id: parsed.sponsorId }, data }) });
 
       revalidateGeneralSponsorPaths();
-      return { type: 'success', message: 'Статус генерального спонсора обновлен.' };
+      return { type: 'success', message: 'Статус генерального спонсора обновлён.' };
     }
   });
 }
@@ -221,7 +221,7 @@ export async function deleteGeneralSponsorDraft(formData: FormData) {
       await Promise.all([deleteUploadedFileIfUnused(deletedSponsor.logoImageId), deleteUploadedFileIfUnused(deletedSponsor.coverImageId)]);
 
       revalidateGeneralSponsorPaths();
-      return { type: 'success', message: 'Генеральный спонсор удален.' };
+      return { type: 'success', message: 'Генеральный спонсор удалён.' };
     }
   });
 }

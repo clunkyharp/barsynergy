@@ -1,18 +1,20 @@
 import type { Metadata } from 'next';
 import { notFound, redirect } from 'next/navigation';
+import { ApplicationType, ConversationSender, getUserApplication } from '@/modules/profile/queries';
 import { Button } from '@/components/ui/button';
 import { MetaChip } from '@/components/ui/meta-chip';
 import { PageHeader } from '@/components/ui/page-header';
 import { Panel } from '@/components/ui/panel';
 import { StatusBadge } from '@/components/ui/status-badge';
+import { ConversationThread } from '@/components/messaging/conversation-thread';
 import {
   applicationStatusBadgeVariants,
   applicationStatusLabels,
   applicationTypeLabels
-} from '@/lib/admin/application-utils';
+} from '@/modules/content/shared/labels';
 import { getApplicationPayloadDisplayEntries } from '@/lib/applications/application-payloads';
 import { getCurrentUser } from '@/lib/auth/current-user';
-import { prisma } from '@/lib/db/prisma';
+import { getConversationThread } from '@/lib/messaging/get-conversation';
 import { buildPrivatePageMetadata } from '@/lib/public/metadata';
 
 type ResponseDetailPageProps = {
@@ -33,16 +35,7 @@ export default async function ResponseDetailPage({ params }: ResponseDetailPageP
 
   const { applicationId } = await params;
 
-  const application = await prisma.application.findFirst({
-    where: {
-      id: applicationId,
-      userId: currentUser.id
-    },
-    include: {
-      vacancy: { select: { title: true } },
-      city: { select: { name: true } }
-    }
-  });
+  const application = await getUserApplication(applicationId, currentUser.id);
 
   if (!application) {
     notFound();
@@ -50,11 +43,19 @@ export default async function ResponseDetailPage({ params }: ResponseDetailPageP
 
   const payloadEntries = getApplicationPayloadDisplayEntries(application.type, application.payload);
 
+  const messages = await getConversationThread(applicationId);
+  const interlocutorName = application.vacancy?.title
+    ? application.businessAccount?.companyName ?? 'Работодатель'
+    : 'Платформа BARSYNERGY';
+  const contextLabel = application.vacancy?.title ?? applicationTypeLabels[application.type];
+  const isConversationType = application.type === ApplicationType.VACANCY_RESPONSE
+    || application.type === ApplicationType.SUPPLIER_INQUIRY;
+
   return (
     <div className="space-y-6">
       <PageHeader
         eyebrow={applicationTypeLabels[application.type]}
-        description="Детальная информация по вашему отклику или заявке."
+        description="Детальная информация по вашему отклику."
         title={application.subject ?? applicationTypeLabels[application.type]}
       />
 
@@ -113,6 +114,21 @@ export default async function ResponseDetailPage({ params }: ResponseDetailPageP
           </Button>
         </div>
       </Panel>
+
+      {isConversationType ? (
+        <ConversationThread
+          applicationId={applicationId}
+          composePlaceholder="Напишите сообщение..."
+          contextLabel={contextLabel}
+          currentUserId={currentUser.id}
+          currentUserRole="user"
+          interlocutorName={interlocutorName}
+          messageCount={messages.length}
+          messages={messages}
+          senderRole={ConversationSender.USER}
+          status={application.status}
+        />
+      ) : null}
     </div>
   );
 }

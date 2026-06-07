@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { EventApplicationForm } from '@/components/public/event-application-form';
+import { submitEventApplication } from '@/app/(public)/events/actions';
 import { PublicContentDetailPage } from '@/components/public/public-content-detail-page';
 import { PublicRelatedContentSection } from '@/components/public/public-related-content-section';
 import { JsonLd } from '@/components/seo/json-ld';
@@ -8,7 +9,7 @@ import { getApplicationCityOptions } from '@/lib/applications/form-options';
 import { arePublicApplicationFormsEnabled } from '@/lib/applications/public-forms';
 import { getPublicApplicationResult, getPublicApplicationUtm } from '@/lib/applications/public-form-helpers';
 import { getPublishedEvents } from '@/lib/public/content';
-import { getPublishedEventDetail } from '@/lib/public/content-details';
+import { getPublishedEventDetail } from '@/lib/public/content';
 import { buildMissingPublicContentMetadata, buildPublicContentMetadata } from '@/lib/public/metadata';
 import { buildBreadcrumbJsonLd, buildPublicContentJsonLd } from '@/lib/public/structured-data';
 import { getEnv } from '@/lib/validation/env';
@@ -25,7 +26,7 @@ export async function generateMetadata({ params }: EventDetailPageProps): Promis
   if (!event) {
     return buildMissingPublicContentMetadata({
       title: 'Событие не найдено',
-      description: 'Событие удалено или еще не опубликовано.'
+      description: 'Событие удалено или ещё не опубликовано.'
     });
   }
 
@@ -92,6 +93,7 @@ export default async function EventDetailPage({ params, searchParams }: EventDet
           enabled={applicationFormsEnabled}
           result={getPublicApplicationResult(query)}
           utm={getPublicApplicationUtm(query)}
+          action={submitEventApplication}
         />
       )}
       <PublicRelatedContentSection

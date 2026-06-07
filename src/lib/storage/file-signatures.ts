@@ -60,11 +60,15 @@ const PRIVATE_RESUME_SIGNATURES = {
   },
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document': {
     extensions: new Set(['.docx']),
-    matches: (buffer: Buffer) => buffer.length >= 4 && buffer[0] === 0x50 && buffer[1] === 0x4b && buffer[2] === 0x03 && buffer[3] === 0x04
+    matches: (buffer: Buffer) =>
+      buffer.length >= 4 && buffer[0] === 0x50 && buffer[1] === 0x4b && buffer[2] === 0x03 && buffer[3] === 0x04 &&
+      zipContainsEntry(buffer, 'word/document.xml')
   },
   'application/vnd.oasis.opendocument.text': {
     extensions: new Set(['.odt']),
-    matches: (buffer: Buffer) => buffer.length >= 4 && buffer[0] === 0x50 && buffer[1] === 0x4b && buffer[2] === 0x03 && buffer[3] === 0x04
+    matches: (buffer: Buffer) =>
+      buffer.length >= 4 && buffer[0] === 0x50 && buffer[1] === 0x4b && buffer[2] === 0x03 && buffer[3] === 0x04 &&
+      zipContainsEntry(buffer, 'content.xml')
   }
 } as const;
 
@@ -83,4 +87,57 @@ export function isAllowedPrivateResumeUpload(input: { mimeType: string; original
   }
 
   return input.buffer ? signature.matches(input.buffer) : true;
+}
+
+const ZIP_EOCD_SIGNATURE = 0x06054b50;
+const ZIP_CENTRAL_DIR_SIGNATURE = 0x02014b50;
+
+function zipContainsEntry(buffer: Buffer, entryName: string): boolean {
+  if (buffer.length < 22) return false;
+
+  const eocdOffset = findEocd(buffer);
+  if (eocdOffset < 0) return false;
+
+  const centralDirOffset = buffer.readUInt32LE(eocdOffset + 16);
+  const centralDirSize = buffer.readUInt32LE(eocdOffset + 12);
+  const endPos = centralDirOffset + centralDirSize;
+
+  if (endPos > buffer.length) return false;
+
+  let pos = centralDirOffset;
+  while (pos + 46 <= endPos) {
+    const sig = buffer.readUInt32LE(pos);
+    if (sig !== ZIP_CENTRAL_DIR_SIGNATURE) break;
+
+    const nameLen = buffer.readUInt16LE(pos + 28);
+    const extraLen = buffer.readUInt16LE(pos + 30);
+    const commentLen = buffer.readUInt16LE(pos + 32);
+
+    if (pos + 46 + nameLen + extraLen + commentLen > endPos) break;
+
+    const name = buffer.subarray(pos + 46, pos + 46 + nameLen).toString('utf8');
+    if (name === entryName) return true;
+
+    pos += 46 + nameLen + extraLen + commentLen;
+  }
+
+  return false;
+}
+
+function findEocd(buffer: Buffer): number {
+  const signature = Buffer.alloc(4);
+  signature.writeUInt32LE(ZIP_EOCD_SIGNATURE);
+
+  const maxSearchOffset = Math.min(buffer.length, 65557);
+  let pos = buffer.length - maxSearchOffset;
+
+  while (pos <= buffer.length - 22) {
+    if (buffer[pos] === 0x50 && buffer[pos + 1] === 0x4b &&
+        buffer[pos + 2] === 0x05 && buffer[pos + 3] === 0x06) {
+      return pos;
+    }
+    pos++;
+  }
+
+  return -1;
 }

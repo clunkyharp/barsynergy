@@ -56,7 +56,7 @@ export async function updateApplicationStatus(formData: FormData) {
 
     revalidatePath(ADMIN_APPLICATIONS_PATH);
     revalidatePath(applicationDetailPath(parsed.applicationId));
-    result = { type: 'success', message: 'Статус заявки обновлен.' };
+    result = { type: 'success', message: 'Статус заявки обновлён.' };
   } catch (error) {
     result = getApplicationActionErrorResult(error);
   }

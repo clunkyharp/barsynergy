@@ -9,13 +9,13 @@ export type {
   PublishedContentMetaGroup,
   PublicContentSearchParams
 } from './content/shared';
-export { getPublishedArticles } from './content/articles';
-export { getPublishedEvents } from './content/events';
-export { getPublishedCourses } from './content/education';
+export { getPublishedArticles, getPublishedArticleDetail } from './content/articles';
+export { getPublishedEvents, getPublishedEventDetail } from './content/events';
+export { getPublishedCourses, getPublishedCourseDetail } from './content/education';
 export {
   getPublishedVacancies,
   getVacancyApplicationFormOptions
 } from './content/vacancies';
 export type { VacancyApplicationFormOptions } from './content/vacancies';
-export { getPublishedSuppliers } from './content/suppliers';
-export { getPublishedPartners } from './content/partners';
+export { getPublishedSuppliers, getPublishedSupplierDetail } from './content/suppliers';
+export { getPublishedPartners, getPublishedPartnerDetail } from './content/partners';

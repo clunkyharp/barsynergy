@@ -1,19 +1,12 @@
 import type { ReactNode } from 'react';
-import { ApplicationStatus } from '@prisma/client';
 import { BusinessSidebar } from '@/components/layout/business-sidebar';
 import { requireBusinessAccountAccess } from '@/lib/auth/require-business-account';
-import { prisma } from '@/lib/db/prisma';
+import { getActiveRequestCount } from '@/modules/business/queries';
+import { logoutAction } from '@/app/auth/actions';
 
 export default async function BusinessLayout({ children }: { children: ReactNode }) {
   const { businessAccount } = await requireBusinessAccountAccess();
-  const activeRequestCount = await prisma.application.count({
-    where: {
-      businessAccountId: businessAccount.id,
-      status: {
-        notIn: [ApplicationStatus.DRAFT, ApplicationStatus.COMPLETED, ApplicationStatus.REJECTED, ApplicationStatus.ARCHIVED]
-      }
-    }
-  });
+  const activeRequestCount = await getActiveRequestCount(businessAccount.id);
 
   return (
     <div className="border-t border-[var(--line)] bg-[var(--surface)]">
@@ -23,6 +16,7 @@ export default async function BusinessLayout({ children }: { children: ReactNode
             activeRequestCount={activeRequestCount}
             cityName={businessAccount.city?.name}
             companyName={businessAccount.companyName}
+            logoutAction={logoutAction}
           />
         </div>
         <div className="min-w-0">{children}</div>

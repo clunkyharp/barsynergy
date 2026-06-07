@@ -2,7 +2,6 @@
 
 import { usePathname } from 'next/navigation';
 import { Building2, FileText, Users } from 'lucide-react';
-import { logoutAction } from '@/app/auth/actions';
 import { AppLink } from '@/components/ui/app-link';
 import { Panel } from '@/components/ui/panel';
 import { StatusBadge } from '@/components/ui/status-badge';
@@ -13,6 +12,7 @@ type BusinessSidebarProps = {
   activeRequestCount: number;
   cityName?: string | null;
   companyName: string;
+  logoutAction: () => Promise<void>;
 };
 
 const links = [
@@ -21,7 +21,7 @@ const links = [
   { href: '/business/cabinet/responses', label: 'Отклики', icon: Users }
 ];
 
-export function BusinessSidebar({ activeRequestCount, cityName, companyName }: BusinessSidebarProps) {
+export function BusinessSidebar({ activeRequestCount, cityName, companyName, logoutAction }: BusinessSidebarProps) {
   const pathname = usePathname();
   const companyMark = companyName.trim().charAt(0).toUpperCase() || 'B';
 

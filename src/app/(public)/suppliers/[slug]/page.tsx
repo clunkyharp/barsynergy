@@ -4,7 +4,7 @@ import { PublicContentDetailPage } from '@/components/public/public-content-deta
 import { PublicRelatedContentSection } from '@/components/public/public-related-content-section';
 import { JsonLd } from '@/components/seo/json-ld';
 import { getPublishedSuppliers } from '@/lib/public/content';
-import { getPublishedSupplierDetail } from '@/lib/public/content-details';
+import { getPublishedSupplierDetail } from '@/lib/public/content';
 import { buildMissingPublicContentMetadata, buildPublicContentMetadata } from '@/lib/public/metadata';
 import { buildBreadcrumbJsonLd, buildPublicContentJsonLd } from '@/lib/public/structured-data';
 
@@ -19,7 +19,7 @@ export async function generateMetadata({ params }: SupplierDetailPageProps): Pro
   if (!supplier) {
     return buildMissingPublicContentMetadata({
       title: 'Поставщик не найден',
-      description: 'Поставщик удален или еще не опубликован.'
+      description: 'Поставщик удалён или ещё не опубликован.'
     });
   }
 

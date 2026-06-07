@@ -137,7 +137,7 @@ export async function updateTag(formData: FormData) {
       });
 
       revalidateTagPaths();
-      return { type: 'success', message: 'Тег обновлен.' };
+      return { type: 'success', message: 'Тег обновлён.' };
     }
   });
 }

@@ -1,9 +1,10 @@
 import type { ReactNode } from 'react';
 import { redirect } from 'next/navigation';
-import { UserRole } from '@prisma/client';
+import { UserRole } from '@/modules/profile/queries';
 import { ProfileSidebar } from '@/components/layout/profile-sidebar';
 import { getCurrentUser } from '@/lib/auth/current-user';
 import { getProfileAvatarUrl } from '@/lib/profile/avatar-url';
+import { logoutAction } from '@/app/auth/actions';
 
 export const dynamic = 'force-dynamic';
 
@@ -37,7 +38,7 @@ export default async function ProfileLayout({ children }: { children: ReactNode 
       <div className="container grid gap-6 py-8 lg:grid-cols-[300px_1fr]">
         <div className="space-y-4">
           <aside aria-label="Навигация по профилю">
-            <ProfileSidebar user={sidebarUser} />
+            <ProfileSidebar logoutAction={logoutAction} user={sidebarUser} />
           </aside>
         </div>
         <div className="min-w-0">{children}</div>

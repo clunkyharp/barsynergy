@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import type { PublicContentDetail } from '@/lib/public/content-details';
+import type { PublicContentDetail } from '@/modules/content/shared/detail-helpers';
 
 const siteName = 'BARSYNERGY';
 const defaultOpenGraphImage = {

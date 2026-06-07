@@ -13,6 +13,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { ConsultingTabs } from '@/components/public/consulting-tabs';
 import { ConsultingRequestForm } from '@/components/public/consulting-request-form';
+import { submitConsultingRequest } from '@/app/(public)/consulting/actions';
 import { EditorialPublicPage } from '@/components/public/editorial-public-page';
 import { PublicBodyText, PublicDisplayTitle, PublicEyebrow } from '@/components/public/public-primitives';
 import { getApplicationCityOptions } from '@/lib/applications/form-options';
@@ -436,6 +437,7 @@ export default async function ConsultingPage({ searchParams }: ConsultingPagePro
         result={getPublicApplicationResult(params)}
         utm={getPublicApplicationUtm(params)}
         cities={cities}
+        action={submitConsultingRequest}
       />
     </>
   );

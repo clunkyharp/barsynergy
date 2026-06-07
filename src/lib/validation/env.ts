@@ -45,6 +45,8 @@ const envSchema = z
     TELEGRAM_BOT_TOKEN: optionalString,
     TELEGRAM_ADMIN_CHAT_ID: optionalString,
     YANDEX_METRIKA_ID: optionalString,
+    NEXT_PUBLIC_TURNSTILE_SITE_KEY: optionalString,
+    TURNSTILE_SECRET_KEY: optionalString,
     LEGAL_OPERATOR_TYPE: z.enum(['legal_entity', 'individual_entrepreneur']).default('legal_entity'),
     LEGAL_OPERATOR_NAME: optionalString,
     LEGAL_OPERATOR_EMAIL: optionalEmail,

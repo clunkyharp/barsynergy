@@ -1,4 +1,3 @@
-import { submitEventApplication } from '@/app/(public)/events/actions';
 import {
   ContactChannelFieldset,
   HiddenUtmFields,
@@ -16,7 +15,7 @@ import { Select } from '@/components/ui/select';
 import { SubmitButton } from '@/components/ui/submit-button';
 import { Textarea } from '@/components/ui/textarea';
 
-export function EventApplicationForm({ enabled, result, utm, cities, defaults = {} }: PublicApplicationFormProps) {
+export function EventApplicationForm({ enabled, result, utm, cities, defaults = {}, action }: PublicApplicationFormProps & { action: (formData: FormData) => void }) {
   const hasEventContext = Boolean(defaults.eventTitle);
 
   return (
@@ -33,7 +32,7 @@ export function EventApplicationForm({ enabled, result, utm, cities, defaults = 
       enabled={enabled}
       result={result}
     >
-      <form action={submitEventApplication} className="editorial-form-shell public-form-shell">
+      <form action={action} className="editorial-form-shell public-form-shell">
         <HiddenUtmFields utm={utm} />
         <HoneypotField id="event-application-website" />
         <PublicFormShellHeader

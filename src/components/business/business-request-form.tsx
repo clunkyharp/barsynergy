@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { ApplicationType } from '@prisma/client';
-import { createBusinessApplication } from '@/lib/business/actions';
 import { ActionRow } from '@/components/ui/action-row';
 import { ConsentField } from '@/components/ui/consent-field';
 import { FormField } from '@/components/ui/form-field';
@@ -12,8 +11,7 @@ import { Select } from '@/components/ui/select';
 import { SegmentedControl } from '@/components/ui/segmented-control';
 import { SubmitButton } from '@/components/ui/submit-button';
 import { Textarea } from '@/components/ui/textarea';
-import { applicationTypeLabels } from '@/lib/admin/application-utils';
-import { vacancyEmploymentTypeOptions } from '@/lib/admin/content-labels';
+import { applicationTypeLabels, vacancyEmploymentTypeOptions } from '@/modules/content/shared/labels';
 import { vacancyPositionValues } from '@/lib/vacancies/positions';
 
 type CityOption = {
@@ -24,6 +22,7 @@ type CityOption = {
 type BusinessRequestFormProps = {
   cities: CityOption[];
   defaultCityId?: string | null;
+  action: (formData: FormData) => void | Promise<void>;
 };
 
 const requestCards = [
@@ -64,7 +63,7 @@ const requestRequirements: Record<BusinessRequestCardType, string[]> = {
   [ApplicationType.CERTIFICATE_ORDER]: ['сумма или формат сертификата', 'получатель', 'пожелания по использованию']
 };
 
-export function BusinessRequestForm({ cities, defaultCityId }: BusinessRequestFormProps) {
+export function BusinessRequestForm({ cities, defaultCityId, action }: BusinessRequestFormProps) {
   const [selectedType, setSelectedType] = useState<BusinessRequestCardType>(ApplicationType.VACANCY_SUBMISSION);
   const selectedRequest = requestCards.find((card) => card.type === selectedType) ?? requestCards[0];
 
@@ -74,7 +73,7 @@ export function BusinessRequestForm({ cities, defaultCityId }: BusinessRequestFo
         <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Новая заявка</p>
         <h2 className="mt-3 text-[1.65rem] font-semibold leading-tight tracking-normal">Выберите тип заявки</h2>
       </div>
-      <form action={createBusinessApplication} className="grid gap-6 p-5 md:p-6">
+      <form action={action} className="grid gap-6 p-5 md:p-6">
         <input name="type" type="hidden" value={selectedType} />
 
         <SegmentedControl

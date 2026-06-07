@@ -2,10 +2,12 @@
 
 import { redirect } from 'next/navigation';
 import { createHash, randomBytes } from 'node:crypto';
+import { UserStatus } from '@prisma/client';
 import { prisma } from '@/lib/db/prisma';
 import { getString } from '@/lib/admin/content-utils';
 import { assertAuthAttemptAllowed } from '@/lib/auth/auth-rate-limit';
 import { assertSameOriginServerAction } from '@/lib/security/server-action-origin';
+import { getEnv } from '@/lib/validation/env';
 
 function authResultPath(path: string, result: { type: 'success' | 'error'; code: string }) {
   const url = new URL(path, 'http://localhost');
@@ -29,15 +31,31 @@ export async function verifyUserEmailAction(formData: FormData) {
   try {
     const tokenHash = createHash('sha256').update(token).digest('hex');
 
-    const record = await prisma.$executeRaw`
-      DELETE FROM "UserEmailVerificationToken"
-      WHERE "tokenHash" = ${tokenHash}
-        AND "expiresAt" > NOW()
-        AND "usedAt" IS NULL
-      RETURNING "userId"
+    const result = await prisma.$queryRaw<{ id: string }[]>`
+      WITH deleted AS (
+        DELETE FROM "UserEmailVerificationToken"
+        WHERE "tokenHash" = ${tokenHash}
+          AND "expiresAt" > NOW()
+          AND "usedAt" IS NULL
+        RETURNING "userId"
+      ),
+      activated AS (
+        UPDATE "User"
+        SET "emailVerifiedAt" = NOW(), "status" = ${UserStatus.ACTIVE}, "updatedAt" = NOW()
+        FROM deleted
+        WHERE "User"."id" = deleted."userId"
+          AND "User"."status" = ${UserStatus.PENDING}
+        RETURNING "User"."id"
+      ),
+      cleaned AS (
+        DELETE FROM "UserEmailVerificationToken"
+        WHERE "userId" IN (SELECT "id" FROM activated)
+          AND "usedAt" IS NULL
+      )
+      SELECT "id" FROM activated
     `;
 
-    if (!record) {
+    if (!result || result.length === 0) {
       redirectWithAuthResult('/auth/verify-email', { type: 'error', code: 'invalid' });
     }
 
@@ -71,10 +89,25 @@ export async function resendUserVerificationAction(formData: FormData) {
     const rawToken = randomBytes(32).toString('hex');
     const tokenHash = createHash('sha256').update(rawToken).digest('hex');
 
-    await prisma.$executeRaw`
-      INSERT INTO "UserEmailVerificationToken" ("userId", "tokenHash", "expiresAt", "createdAt")
-      VALUES (${user.id}, ${tokenHash}, NOW() + INTERVAL '24 hours', NOW())
-    `;
+    await prisma.$transaction(async (tx) => {
+      await tx.$executeRaw`
+        UPDATE "UserEmailVerificationToken"
+        SET "usedAt" = NOW(), "updatedAt" = NOW()
+        WHERE "userId" = ${user.id}
+          AND "usedAt" IS NULL
+          AND "expiresAt" > NOW()
+      `;
+
+      await tx.$executeRaw`
+        INSERT INTO "UserEmailVerificationToken" ("userId", "tokenHash", "expiresAt", "createdAt")
+        VALUES (${user.id}, ${tokenHash}, NOW() + INTERVAL '24 hours', NOW())
+      `;
+    });
+
+    const env = getEnv();
+    const verificationUrl = `${env.APP_URL}/auth/verify-email?token=${rawToken}`;
+    const { sendVerificationEmail } = await import('@/lib/notifications/auth-email');
+    sendVerificationEmail({ to: email, verificationUrl }).catch(() => {});
 
     redirectWithAuthResult('/auth/verify-email', { type: 'success', code: 'verification-resent' });
   } catch {

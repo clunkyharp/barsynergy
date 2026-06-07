@@ -1,25 +1,29 @@
 import type { Metadata } from 'next';
+import { cookies } from 'next/headers';
 import Image from 'next/image';
-import { ArrowLeft } from 'lucide-react';
 import { AppLink } from '@/components/ui/app-link';
+import { AuthBackLink } from '@/components/layout/auth-back-link';
 import { InlineAlert } from '@/components/ui/inline-alert';
 import { RegisterUserForm } from '@/components/public/register-user-form';
+import { registerUserAction } from '@/app/auth/actions';
 import { buildPrivatePageMetadata } from '@/lib/public/metadata';
 
 const errorMessages: Record<string, string> = {
-  invalid: 'Проверьте обязательные поля.',
-  'email-used': 'Этот email уже зарегистрирован. Попробуйте войти или восстановить пароль.',
+  invalid: 'Не удалось завершить регистрацию. Проверьте поля формы. Если вы уже регистрировались с этим email, попробуйте войти или восстановить доступ.',
+  'account-check': 'Если регистрация уже начиналась, проверьте почту: письмо для подтверждения отправлено повторно, когда аккаунт ждёт подтверждения. Иначе попробуйте войти или восстановить доступ.',
   'rate-limited': 'Слишком много попыток за короткое время. Повторите позже.',
   failed: 'Не удалось выполнить действие прямо сейчас. Повторите попытку позже.'
 };
 
 const successMessages: Record<string, string> = {
-  registered: 'Регистрация прошла успешно.'
+  registered: 'Почти готово! Проверьте почту и подтвердите email, чтобы войти.'
 };
 
 type RegisterUserPageProps = {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 };
+
+const REGISTER_USER_FLASH_COOKIE = 'barsynergy-register-user-flash';
 
 export const metadata: Metadata = buildPrivatePageMetadata({
   title: 'Регистрация участника',
@@ -32,20 +36,28 @@ function firstParam(value: string | string[] | undefined) {
 
 export default async function RegisterUserPage({ searchParams }: RegisterUserPageProps) {
   const params = (await searchParams) ?? {};
+  const cookieStore = await cookies();
   const error = firstParam(params.error);
   const success = firstParam(params.success);
   const formError = error && errorMessages[error] ? errorMessages[error] : null;
   const formSuccess = success && successMessages[success] ? successMessages[success] : null;
+  const storedDefaults = (() => {
+    const raw = cookieStore.get(REGISTER_USER_FLASH_COOKIE)?.value;
+
+    if (!raw || !error) {
+      return null;
+    }
+
+    try {
+      return JSON.parse(decodeURIComponent(raw)) as { email?: string; fullName?: string };
+    } catch {
+      return null;
+    }
+  })();
 
   return (
     <div className="auth-register-user-screen min-h-screen bg-[var(--background)] relative overflow-hidden">
-      <AppLink
-        className="absolute top-4 left-4 sm:top-5 sm:left-6 inline-flex items-center gap-1.5 text-sm text-[var(--muted)] transition-colors hover:text-[var(--text)]"
-        href="/"
-      >
-        <ArrowLeft size={14} strokeWidth={1.8} />
-        Вернуться на сайт
-      </AppLink>
+      <AuthBackLink />
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(150,112,30,0.08),transparent)]" />
       <div className="auth-register-user-container relative container max-w-[1440px] py-5 md:py-6">
         <header className="auth-register-user-header mx-auto mb-5 flex max-w-[440px] flex-col items-center gap-3 text-center">
@@ -74,12 +86,39 @@ export default async function RegisterUserPage({ searchParams }: RegisterUserPag
                   {formError}
                 </InlineAlert>
               ) : null}
-              {formSuccess ? (
-                <InlineAlert className="mb-4" tone="success">
-                  {formSuccess}
-                </InlineAlert>
+              {error === 'account-check' ? (
+                <div className="mb-5 flex flex-wrap gap-3 text-sm">
+                  <AppLink className="font-semibold text-[var(--accent)] transition-colors hover:text-[var(--accent-strong)]" href="/auth/login">
+                    Попробовать вход
+                  </AppLink>
+                  <AppLink className="font-semibold text-[var(--accent)] transition-colors hover:text-[var(--accent-strong)]" href="/auth/password-reset">
+                    Восстановить доступ
+                  </AppLink>
+                </div>
               ) : null}
-              <RegisterUserForm />
+              {formSuccess ? (
+                <div className="flex flex-col items-center gap-5 py-4 text-center">
+                  <InlineAlert tone="success">
+                    {formSuccess}
+                  </InlineAlert>
+                  <AppLink
+                    className="inline-flex min-h-11 items-center justify-center rounded-[var(--radius-sm)] bg-[var(--accent)] px-8 text-[13px] font-bold uppercase tracking-[0.1em] text-[var(--accent-contrast)] transition-colors hover:bg-[var(--accent-strong)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
+                    href="/auth/login"
+                  >
+                    Войти в аккаунт
+                  </AppLink>
+                </div>
+              ) : (
+                <>
+                  <RegisterUserForm action={registerUserAction} defaults={storedDefaults ?? undefined} />
+                  <p className="mt-5 text-center text-sm text-[var(--muted)]">
+                    Уже есть аккаунт?{' '}
+                    <AppLink className="font-semibold text-[var(--accent)] transition-colors hover:text-[var(--accent-strong)]" href="/auth/login">
+                      Войти
+                    </AppLink>
+                  </p>
+                </>
+              )}
             </div>
           </section>
         </main>

@@ -1,4 +1,4 @@
-import { CategoryType } from '@prisma/client';
+import { CategoryType } from '@/modules/admin/queries';
 import { createTag, updateTag } from '@/app/admin/tags/actions';
 import {
   AdminCmsAdvancedSection,
@@ -17,7 +17,7 @@ import { AdminStatusChip } from '@/components/ui/status-badge';
 import { Textarea } from '@/components/ui/textarea';
 import type { AdminContentSearchParams } from '@/lib/admin/content-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
-import { prisma } from '@/lib/db/prisma';
+import { prisma } from '@/modules/admin/queries';
 
 export const dynamic = 'force-dynamic';
 

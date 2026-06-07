@@ -1,5 +1,5 @@
 import type { JsonLdValue } from '@/components/seo/json-ld';
-import type { PublicContentDetail } from '@/lib/public/content-details';
+import type { PublicContentDetail } from '@/modules/content/shared/detail-helpers';
 import { getEnv } from '@/lib/validation/env';
 
 const siteName = 'BARSYNERGY';

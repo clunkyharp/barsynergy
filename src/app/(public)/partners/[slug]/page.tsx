@@ -4,7 +4,7 @@ import { PublicContentDetailPage } from '@/components/public/public-content-deta
 import { PublicRelatedContentSection } from '@/components/public/public-related-content-section';
 import { JsonLd } from '@/components/seo/json-ld';
 import { getPublishedPartners } from '@/lib/public/content';
-import { getPublishedPartnerDetail } from '@/lib/public/content-details';
+import { getPublishedPartnerDetail } from '@/lib/public/content';
 import { buildMissingPublicContentMetadata, buildPublicContentMetadata } from '@/lib/public/metadata';
 import { buildBreadcrumbJsonLd, buildPublicContentJsonLd } from '@/lib/public/structured-data';
 
@@ -18,8 +18,8 @@ export async function generateMetadata({ params }: PartnerDetailPageProps): Prom
 
   if (!partner) {
     return buildMissingPublicContentMetadata({
-      title: 'Партнер не найден',
-      description: 'Партнер удален или еще не опубликован.'
+      title: 'Партнёр не найден',
+      description: 'Партнёр удалён или ещё не опубликован.'
     });
   }
 

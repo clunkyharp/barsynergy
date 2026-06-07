@@ -1,4 +1,4 @@
-import { CategoryType, type Prisma } from '@prisma/client';
+import { CategoryType, type Prisma } from '@/modules/admin/queries';
 import { deleteEventDraft, updateEventStatus } from '@/app/admin/events/actions';
 import {
   AdminActionAlert,
@@ -37,7 +37,7 @@ import {
   type AdminContentSearchParams
 } from '@/lib/admin/content-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
-import { prisma } from '@/lib/db/prisma';
+import { prisma } from '@/modules/admin/queries';
 
 export const dynamic = 'force-dynamic';
 

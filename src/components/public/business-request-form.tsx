@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { createBusinessAccountRequestAction } from '@/app/auth/actions';
 import { ActionRow } from '@/components/ui/action-row';
 import { Button } from '@/components/ui/button';
 import { ConsentField } from '@/components/ui/consent-field';
@@ -11,19 +10,22 @@ import { InlineLink } from '@/components/ui/inline-link';
 import { Select } from '@/components/ui/select';
 import { SubmitButton } from '@/components/ui/submit-button';
 import { Textarea } from '@/components/ui/textarea';
+import { Turnstile } from '@/components/ui/turnstile';
 import { PublicFormValidation } from '@/components/public/public-form-validation';
 
 type BusinessRequestFormProps = {
   cities: Array<{ id: string; name: string }>;
+  action: (formData: FormData) => void;
 };
 
-export function BusinessRequestForm({ cities }: BusinessRequestFormProps) {
+export function BusinessRequestForm({ cities, action }: BusinessRequestFormProps) {
   const [step, setStep] = useState<1 | 2>(1);
   const [email, setEmail] = useState('');
   const [contactPerson, setContactPerson] = useState('');
+  const [turnstileToken, setTurnstileToken] = useState('');
 
   return (
-    <form action={createBusinessAccountRequestAction} className="auth-business-request-form public-form-shell grid gap-6" noValidate>
+    <form action={action} className="auth-business-request-form public-form-shell grid gap-6" noValidate>
       <PublicFormValidation />
       <div className="flex flex-wrap gap-2 border-b border-[var(--line)] pb-4">
         {[
@@ -130,6 +132,8 @@ export function BusinessRequestForm({ cities }: BusinessRequestFormProps) {
               <InlineLink href="/legal/personal-data-consent">согласие на обработку персональных данных</InlineLink> для рассмотрения заявки на бизнес-доступ.
             </span>
           </ConsentField>
+          <input name="turnstileToken" type="hidden" value={turnstileToken} />
+          <Turnstile onVerify={setTurnstileToken} />
           <ActionRow align="between">
             <Button className="rounded-[var(--radius-md)]" onClick={() => setStep(1)} size="lg" type="button" variant="secondary">
               Назад

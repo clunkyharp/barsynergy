@@ -8,6 +8,7 @@ import { PageHeader } from '@/components/ui/page-header';
 import { Panel } from '@/components/ui/panel';
 import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
+import { PasswordPairValidation } from '@/components/ui/password-pair-validation';
 import { SalaryInput } from '@/components/ui/salary-input';
 import { Select } from '@/components/ui/select';
 import { SubmitButton } from '@/components/ui/submit-button';
@@ -16,10 +17,9 @@ import { CheckboxField } from '@/components/ui/checkbox-field';
 import { FileUpload } from '@/components/ui/file-upload';
 import { getCurrentUser } from '@/lib/auth/current-user';
 import { getProfileAvatarUrl } from '@/lib/profile/avatar-url';
-import { prisma } from '@/lib/db/prisma';
 import { buildPrivatePageMetadata } from '@/lib/public/metadata';
 import { firstParam } from '@/lib/admin/content-utils';
-import { EmploymentType, JobSearchStatus } from '@prisma/client';
+import { getProfileSettingsData, EmploymentType, JobSearchStatus } from '@/modules/profile/queries';
 
 type ProfileSettingsPageProps = {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
@@ -41,31 +41,7 @@ export default async function ProfileSettingsPage({ searchParams }: ProfileSetti
   const success = firstParam(params.success);
   const error = firstParam(params.error);
 
-  const [user, cities, allSkills] = await Promise.all([
-    prisma.user.findUnique({
-      where: { id: currentUser.id },
-      include: {
-        profile: {
-          include: {
-            city: true,
-            avatarFile: { select: { fileKey: true, bucket: true } },
-            workExperiences: { orderBy: { sortOrder: 'asc' } },
-            profileSkills: { include: { skill: true } }
-          }
-        }
-      }
-    }),
-    prisma.city.findMany({
-      where: { isActive: true },
-      orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
-      select: { id: true, name: true }
-    }),
-    prisma.skill.findMany({
-      where: { isActive: true },
-      orderBy: { name: 'asc' },
-      select: { id: true, name: true }
-    })
-  ]);
+  const [user, cities, allSkills] = await getProfileSettingsData(currentUser.id);
 
   if (!user) {
     redirect('/auth/login?returnTo=/profile/settings');
@@ -264,15 +240,16 @@ export default async function ProfileSettingsPage({ searchParams }: ProfileSetti
       <Panel className="max-w-2xl scroll-mt-6" id="password" padding="lg" tone="elevated">
         <h2 className="text-lg font-semibold tracking-normal">Смена пароля</h2>
         <form action={changePassword} className="mt-5 grid gap-5">
+          <PasswordPairValidation passwordName="newPassword" />
           <div className="grid gap-5 md:grid-cols-2">
-            <FormField htmlFor="currentPassword" label="Текущий пароль">
-              <Input id="currentPassword" name="currentPassword" required type="password" placeholder="Введите текущий пароль" maxLength={200} />
+            <FormField htmlFor="current-password" label="Текущий пароль">
+              <Input id="current-password" name="currentPassword" required type="password" autoComplete="current-password" placeholder="Введите текущий пароль" maxLength={200} />
             </FormField>
-            <FormField htmlFor="newPassword" label="Новый пароль">
-              <Input id="newPassword" name="newPassword" required type="password" placeholder="Минимум 6 символов" minLength={6} maxLength={200} />
+            <FormField htmlFor="new-password" label="Новый пароль">
+              <Input id="new-password" name="newPassword" required type="password" autoComplete="new-password" placeholder="Минимум 6 символов" minLength={6} maxLength={200} />
             </FormField>
-            <FormField htmlFor="confirmPassword" label="Подтвердите пароль">
-              <Input id="confirmPassword" name="confirmPassword" required type="password" placeholder="Повторите новый пароль" minLength={6} maxLength={200} />
+            <FormField htmlFor="confirm-password" label="Подтвердите пароль">
+              <Input id="confirm-password" name="confirmPassword" required type="password" autoComplete="new-password" placeholder="Повторите новый пароль" minLength={6} maxLength={200} />
             </FormField>
           </div>
           <div className="flex items-center justify-between gap-3 border-t border-[var(--line)] pt-5">

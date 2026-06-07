@@ -2,7 +2,7 @@ import { getCurrentUser } from '@/lib/auth/current-user';
 import { SiteHeader } from '@/components/layout/site-header';
 import { getProfileAvatarUrl } from '@/lib/profile/avatar-url';
 
-export async function SiteHeaderServer() {
+export async function SiteHeaderServer({ logoutAction }: { logoutAction?: () => Promise<void> }) {
   const user = await getCurrentUser();
 
   const headerUser = user
@@ -15,5 +15,5 @@ export async function SiteHeaderServer() {
         }
       : null;
 
-  return <SiteHeader user={headerUser} />;
+  return <SiteHeader logoutAction={logoutAction} user={headerUser} />;
 }

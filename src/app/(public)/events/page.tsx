@@ -1,12 +1,12 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import { CalendarDays } from 'lucide-react';
-import { CategoryType } from '@prisma/client';
+import { CategoryType } from '@/modules/content/shared/types';
 import { EditorialPublicPage } from '@/components/public/editorial-public-page';
 import { EventAgendaSection } from '@/components/public/platform-ui';
 import { PublicFilters } from '@/components/public/public-filters';
 import { stripPublicApplicationResultParams } from '@/lib/applications/public-form-helpers';
-import { getPublishedEvents, type PublicContentSearchParams } from '@/lib/public/content';
+import { getPublishedEvents, hasActivePublicContentParams, type PublicContentSearchParams } from '@/lib/public/content';
 import { getEventFilterOptions, getPublicCategoryOptions, getPublicCityFilterOptions } from '@/lib/public/filter-options';
 import { Button } from '@/components/ui/button';
 import { buildPublicPageMetadata } from '@/lib/public/metadata';
@@ -39,9 +39,7 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
     getEventFilterOptions()
   ]);
 
-  const hasActiveSearch = Boolean(
-    contentParams.q || contentParams.category || contentParams.city || contentParams.format || (contentParams.period && contentParams.period !== 'upcoming')
-  );
+  const hasActiveSearch = hasActivePublicContentParams(contentParams, ['q', 'category', 'city', 'format', 'period']);
   const showFilters = content.total > 0 || hasActiveSearch;
   const isEmpty = content.total === 0;
   const isPrelaunchEmpty = isEmpty && !hasActiveSearch;

@@ -7,9 +7,10 @@ import { Button } from '@/components/ui/button';
 import { InlineAlert } from '@/components/ui/inline-alert';
 import { Panel } from '@/components/ui/panel';
 import { BusinessRequestForm } from '@/components/public/business-request-form';
+import { createBusinessAccountRequestAction } from '@/app/auth/actions';
 import { arePublicApplicationFormsEnabled } from '@/lib/applications/public-forms';
-import { prisma } from '@/lib/db/prisma';
 import { buildPrivatePageMetadata } from '@/lib/public/metadata';
+import { getActiveCities } from '@/modules/auth/shared/queries';
 import { SUPPORT_EMAIL } from '@/lib/contact-info';
 import { getEnv } from '@/lib/validation/env';
 
@@ -41,11 +42,7 @@ export default async function RegisterPage({ searchParams }: RegisterPageProps) 
   const params = (await searchParams) ?? {};
   const error = firstParam(params.error);
   const cities = formsEnabled
-    ? await prisma.city.findMany({
-        where: { isActive: true },
-        orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
-        select: { id: true, name: true }
-      })
+    ? await getActiveCities()
     : [];
 
   return (
@@ -135,7 +132,7 @@ export default async function RegisterPage({ searchParams }: RegisterPageProps) 
                     {errorMessages[error]}
                   </InlineAlert>
                 ) : null}
-                <BusinessRequestForm cities={cities} />
+                <BusinessRequestForm action={createBusinessAccountRequestAction} cities={cities} />
               </div>
             </>
           )}

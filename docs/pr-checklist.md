@@ -36,6 +36,13 @@ Use this checklist before merging any branch into `dev`, and before merging `dev
 - [ ] New file upload paths validate MIME type, extension, and file signature
 - [ ] Rate limiting applied to new high-frequency public endpoints (forms, auth)
 - [ ] No secrets, passwords, or env values added to source files
+- [ ] No unauthenticated flow reveals whether an email, account, or pending request exists
+- [ ] Password rules are identical across register / change / reset / activation flows
+- [ ] Password change and password reset revoke existing sessions
+- [ ] User/profile/business mutations do not write by naked primary key from `FormData` or params; ownership is enforced in the write query
+- [ ] User-facing actions that accept content ids re-check published/active visibility server-side
+- [ ] `.docx` / `.odt` validation checks real container structure, not just ZIP magic bytes
+- [ ] No personal data is sent to Telegram or other non-approved channels beyond the approved minimum
 
 ### Database
 

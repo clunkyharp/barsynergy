@@ -154,7 +154,7 @@ export async function updateEventStatus(formData: FormData) {
       await updateContentStatus({ status: parsed.status, userId: user.id, findCurrent: (tx) => tx.event.findUniqueOrThrow({ where: { id: parsed.eventId }, select: { publishedAt: true } }), update: (tx, data) => tx.event.update({ where: { id: parsed.eventId }, data }) });
 
       revalidatePath(ADMIN_EVENTS_PATH);
-      return { type: 'success', message: 'Статус события обновлен.' };
+      return { type: 'success', message: 'Статус события обновлён.' };
     }
   });
 }

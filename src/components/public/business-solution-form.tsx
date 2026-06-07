@@ -1,4 +1,3 @@
-import { submitBusinessSolutionRequest } from '@/app/(public)/business/actions';
 import {
   ContactChannelFieldset,
   HiddenUtmFields,
@@ -21,9 +20,10 @@ import { businessVenueTypeOptions } from '@/lib/applications/b2b-request-options
 
 type BusinessSolutionFormProps = PublicApplicationFormProps & {
   direct?: boolean;
+  action: (formData: FormData) => void;
 };
 
-export function BusinessSolutionForm({ enabled, result, utm, cities, defaults = {}, direct = false }: BusinessSolutionFormProps) {
+export function BusinessSolutionForm({ enabled, result, utm, cities, defaults = {}, direct = false, action }: BusinessSolutionFormProps) {
   return (
     <PublicApplicationSection
       eyebrow="Каталог / Заявка"
@@ -40,7 +40,7 @@ export function BusinessSolutionForm({ enabled, result, utm, cities, defaults = 
       result={result}
       sectionId="business-request"
     >
-      <form action={submitBusinessSolutionRequest} className="editorial-form-shell public-form-shell" noValidate>
+      <form action={action} className="editorial-form-shell public-form-shell" noValidate>
         <PublicFormValidation />
         <HiddenUtmFields utm={utm} />
         <HoneypotField id="business-solution-website" />

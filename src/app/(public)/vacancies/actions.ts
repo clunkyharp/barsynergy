@@ -27,6 +27,7 @@ import {
 } from '@/lib/applications/public-submission-guards';
 import { prisma } from '@/lib/db/prisma';
 import { assertSameOriginServerAction } from '@/lib/security/server-action-origin';
+import { assertTurnstilePassed } from '@/lib/security/turnstile';
 import { vacancyPositionValues } from '@/lib/vacancies/positions';
 import { getCurrentUser } from '@/lib/auth/current-user';
 
@@ -141,6 +142,8 @@ export async function submitVacancyResponseApplication(
     if (hasHoneypotValue(getString(formData, 'website'))) {
       return { type: 'success', message: 'Отклик отправлен.' };
     }
+
+    await assertTurnstilePassed(getString(formData, 'turnstileToken'));
 
     const parsed = vacancyResponseSchema.parse({
       vacancyId: getString(formData, 'vacancyId'),

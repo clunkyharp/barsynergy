@@ -2,9 +2,8 @@
 
 import { useEffect, useId, useRef, useState, type RefObject } from 'react';
 import { createPortal } from 'react-dom';
-import { Menu, X } from 'lucide-react';
+import { ArrowUpRight, LogIn, Menu, X } from 'lucide-react';
 import { usePathname } from 'next/navigation';
-import { logoutAction } from '@/app/auth/login/actions';
 import { AppLink } from '@/components/ui/app-link';
 import { focusFirstElement, trapFocusInContainer } from '@/components/ui/focus-trap';
 import { displayFont } from '@/lib/fonts';
@@ -61,6 +60,16 @@ function isActiveMobileItem(pathname: string | null, href: string) {
   const [pathOnly] = href.split('?');
 
   return pathname === pathOnly || pathname.startsWith(`${pathOnly}/`);
+}
+
+function userInitials(user: NonNullable<MobileSiteMenuProps['user']>) {
+  return (user.displayName ?? user.email).slice(0, 2).toUpperCase();
+}
+
+function profileHref(role: string) {
+  if (role === 'BUSINESS') return '/business/cabinet';
+  if (role === 'ADMIN' || role === 'MODERATOR') return '/admin';
+  return '/profile';
 }
 
 export function MobileSiteMenu({ isOpen, navItems, onOpenChange, user }: MobileSiteMenuProps) {
@@ -214,7 +223,30 @@ export function MobileSiteMenu({ isOpen, navItems, onOpenChange, user }: MobileS
                   Мобильная навигация
                 </h2>
 
-                <nav aria-label="Мобильная навигация" className="mt-6">
+                {user ? (
+                  <AppLink
+                    className="mb-5 mt-6 flex items-center gap-4 rounded-[var(--radius-lg)] border border-[var(--editorial-dark-border)] bg-[rgba(255,255,255,0.04)] p-4 transition-colors hover:bg-[rgba(255,255,255,0.08)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
+                    href={profileHref(user.role)}
+                    onClick={() => onOpenChange(false)}
+                  >
+                    <span className="grid size-10 shrink-0 place-items-center rounded-full bg-[var(--accent-soft)] text-sm font-bold text-[var(--accent)]">
+                      {userInitials(user)}
+                    </span>
+                    <span className="min-w-0">
+                      <span className="block text-sm font-semibold text-[var(--editorial-dark-text)] truncate">
+                        {user.displayName ?? user.email}
+                      </span>
+                      <span className="block text-xs text-[var(--editorial-dark-muted)]">
+                        {user.displayName ? user.email : null}
+                        <span className="inline-flex items-center gap-1 text-[var(--accent)] ml-auto">
+                          Кабинет <ArrowUpRight size={12} strokeWidth={1.8} />
+                        </span>
+                      </span>
+                    </span>
+                  </AppLink>
+                ) : null}
+
+                <nav aria-label="Мобильная навигация">
                   <div className="grid gap-6">
                     {groups.map((group) => (
                       <div key={group.label}>
@@ -248,24 +280,17 @@ export function MobileSiteMenu({ isOpen, navItems, onOpenChange, user }: MobileS
                 </nav>
 
                 <div className="mt-auto border-t border-[var(--editorial-dark-border)] pt-5 text-[13px] text-[var(--editorial-dark-muted)]">
-                  {loginItem ? (
-                    <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between">
+                    {user ? null : loginItem ? (
                       <AppLink
-                        className="transition-colors duration-[var(--motion-duration-fast)] hover:text-[var(--editorial-dark-text)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] motion-reduce:transition-none"
+                        className="inline-flex items-center gap-2 rounded-[var(--radius-md)] bg-[var(--accent)] px-4 py-2.5 text-sm font-semibold text-[var(--accent-contrast)] transition-colors hover:bg-[var(--accent-strong)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
                         href="/auth/login"
                         onClick={() => onOpenChange(false)}
                       >
+                        <LogIn size={15} strokeWidth={1.8} />
                         {loginItem.label}
                       </AppLink>
-                      <AppLink
-                        className="transition-colors duration-[var(--motion-duration-fast)] hover:text-[var(--editorial-dark-text)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] motion-reduce:transition-none"
-                        href="https://t.me/barsynergy"
-                        onClick={() => onOpenChange(false)}
-                      >
-                        Telegram
-                      </AppLink>
-                    </div>
-                  ) : (
+                    ) : null}
                     <AppLink
                       className="transition-colors duration-[var(--motion-duration-fast)] hover:text-[var(--editorial-dark-text)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] motion-reduce:transition-none"
                       href="https://t.me/barsynergy"
@@ -273,7 +298,7 @@ export function MobileSiteMenu({ isOpen, navItems, onOpenChange, user }: MobileS
                     >
                       Telegram
                     </AppLink>
-                  )}
+                  </div>
                 </div>
               </div>
             </div>,

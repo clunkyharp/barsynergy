@@ -269,7 +269,7 @@ export async function updateVacancyStatus(formData: FormData) {
       });
 
       revalidatePath(ADMIN_VACANCIES_PATH);
-      return { type: 'success', message: 'Статус вакансии обновлен.' };
+      return { type: 'success', message: 'Статус вакансии обновлён.' };
     }
   });
 }

@@ -14,6 +14,7 @@ import {
   hasHoneypotValue
 } from '@/lib/applications/public-submission-guards';
 import { assertSameOriginServerAction } from '@/lib/security/server-action-origin';
+import { assertTurnstilePassed, TurnstileError } from '@/lib/security/turnstile';
 
 type SubmitPublicApplicationActionInput<TParsed> = {
   actionName: string;
@@ -44,6 +45,8 @@ export async function submitPublicApplicationAction<TParsed>({
       result = { type: 'success', message: successMessage };
       redirectWithResult(result);
     }
+
+    await assertTurnstilePassed(getString(formData, 'turnstileToken'));
 
     const parsed = await parse(formData);
     await assertPublicApplicationSubmissionAllowed(applicationType);

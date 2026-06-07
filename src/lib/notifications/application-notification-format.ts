@@ -43,7 +43,12 @@ function buildAdminApplicationNotificationLines(input: ApplicationNotificationIn
 }
 
 export function buildAdminApplicationTelegramMessage(input: ApplicationNotificationInput, appUrl: string) {
-  const lines = buildAdminApplicationNotificationLines(input, appUrl);
+  const lines = [
+    'Новая заявка BARSYNERGY',
+    `Тип: ${input.applicationTypeLabel}`,
+    `Тема: ${input.subject}`,
+    `Карточка: ${appUrl}/admin/applications/${input.applicationId}`
+  ];
 
   return lines.join('\n');
 }

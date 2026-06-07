@@ -177,6 +177,8 @@ Full standards are in `docs/engineering-standards.md`. Key rules enforced inline
 - New content types follow the 7-phase checklist in `docs/architecture.md`.
 - `getCurrentUser()` must be wrapped in React `cache()` — see `docs/engineering-standards.md` §2.
 - `src/middleware.ts` is the edge-safe route guard + CSP injector. Keep auth cookie constants in `src/lib/auth/session-constants.ts` and do not import `src/lib/auth/session.ts` into middleware.
+- Any user-, profile-, or business-scoped mutation that accepts an object id from params or `FormData` must enforce ownership in the write query itself. Never update or delete by a naked `id` after a separate ownership read.
+- User-facing lists, detail pages and actions must re-check content visibility server-side. Do not expose unpublished, archived, blocked or private related records just because the caller knows an internal id.
 
 **Components:**
 - Prefer existing components in `src/components/ui`, `src/components/layout`, and `src/components/public`.
@@ -188,6 +190,9 @@ Full standards are in `docs/engineering-standards.md`. Key rules enforced inline
 - `required` fields must not be inside `<details>` blocks marked «по желанию».
 - All consent checkboxes use `<ConsentField>`, never a bare `<input type="checkbox">`.
 - New public forms follow the checklist in `docs/pr-checklist.md` → "New Public Form".
+- Public auth, registration, activation and recovery flows must not reveal whether an email, account, or pending request exists unless the actor is already authenticated and authorized to know it.
+- Password policy must stay consistent across register, change, reset and activation flows. Password change and password reset must revoke existing sessions.
+- Office-document uploads (`.docx`, `.odt`) need container-aware validation, not just extension plus ZIP magic bytes.
 
 **CSS:**
 - No new CSS files. Add rules to the most specific existing file.
@@ -207,6 +212,7 @@ Full standards are in `docs/engineering-standards.md`. Key rules enforced inline
 - For small visible UI fixes, prefer concrete browser diff evidence, screenshot notes, page URL, and target element over a generic `поправь дизайн` prompt.
 - For visual QA, state which tool actually verified the screen: built-in browser, Playwright screenshot, HTML/source smoke, or an explicit unverified visual gap.
 - After visual QA, delete generated screenshots, browser dumps, JSON result files and other temporary QA artifacts from the project before closeout unless the owner explicitly asks to preserve them.
+- For auth, file-upload, profile, business-cabinet, or admin-access changes, run a dedicated security pass: IDOR/object ownership, enumeration, rate limiting, unpublished/private data exposure, session revocation, and token lifecycle.
 
 **Schema:**
 - Use Prisma migrations for schema changes. Do not edit generated Prisma client files.

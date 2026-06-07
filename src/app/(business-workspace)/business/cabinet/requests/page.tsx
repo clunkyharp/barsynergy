@@ -2,12 +2,13 @@ import type { Metadata } from 'next';
 import { AdminActionAlert } from '@/components/admin/content-admin-controls';
 import { RequestLedger } from '@/components/business/business-cabinet';
 import { BusinessRequestForm } from '@/components/business/business-request-form';
+import { createBusinessApplication } from '@/lib/business/actions';
 import { PageHeader } from '@/components/ui/page-header';
 import { firstParam } from '@/lib/admin/content-utils';
 import type { AdminContentSearchParams } from '@/lib/admin/content-utils';
 import { requireBusinessAccountAccess } from '@/lib/auth/require-business-account';
-import { prisma } from '@/lib/db/prisma';
 import { buildPrivatePageMetadata } from '@/lib/public/metadata';
+import { getBusinessRequestsPage } from '@/modules/business/queries';
 
 const PAGE_SIZE = 10;
 
@@ -26,30 +27,7 @@ export default async function BusinessRequestsPage({ searchParams }: BusinessReq
   const page = Math.max(1, Number(firstParam(params.page) ?? '1'));
   const skip = (page - 1) * PAGE_SIZE;
 
-  const [cities, totalCount, applications] = await Promise.all([
-    prisma.city.findMany({
-      where: { isActive: true },
-      orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
-      select: { id: true, name: true }
-    }),
-    prisma.application.count({
-      where: { businessAccountId: businessAccount.id }
-    }),
-    prisma.application.findMany({
-      where: { businessAccountId: businessAccount.id },
-      orderBy: [{ createdAt: 'desc' }],
-      skip,
-      take: PAGE_SIZE,
-      select: {
-        id: true,
-        type: true,
-        status: true,
-        subject: true,
-        businessNotes: true,
-        createdAt: true
-      }
-    })
-  ]);
+  const { cities, totalCount, applications } = await getBusinessRequestsPage(businessAccount.id, skip, PAGE_SIZE);
 
   const totalPages = Math.ceil(totalCount / PAGE_SIZE);
 
@@ -58,7 +36,7 @@ export default async function BusinessRequestsPage({ searchParams }: BusinessReq
       <PageHeader eyebrow="Бизнес-заявки" title="Заявки компании" />
       <AdminActionAlert params={params} />
       <section className="grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
-        <BusinessRequestForm cities={cities} defaultCityId={businessAccount.cityId} />
+        <BusinessRequestForm cities={cities} defaultCityId={businessAccount.cityId} action={createBusinessApplication} />
         <div className="space-y-4">
           <RequestLedger
             applications={applications}

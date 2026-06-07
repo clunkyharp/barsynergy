@@ -128,7 +128,7 @@ export async function updateSupplier(formData: FormData) {
       if (previousCoverImageId !== coverImageId) await deleteUploadedFileIfUnused(previousCoverImageId);
 
       revalidatePath(ADMIN_SUPPLIERS_PATH);
-      return { type: 'success', message: 'Поставщик обновлен.' };
+      return { type: 'success', message: 'Поставщик обновлён.' };
     }
   });
 }
@@ -144,7 +144,7 @@ export async function updateSupplierStatus(formData: FormData) {
       await updateContentStatus({ status: parsed.status, userId: user.id, findCurrent: (tx) => tx.supplier.findUniqueOrThrow({ where: { id: parsed.supplierId }, select: { publishedAt: true } }), update: (tx, data) => tx.supplier.update({ where: { id: parsed.supplierId }, data }) });
 
       revalidatePath(ADMIN_SUPPLIERS_PATH);
-      return { type: 'success', message: 'Статус поставщика обновлен.' };
+      return { type: 'success', message: 'Статус поставщика обновлён.' };
     }
   });
 }
@@ -162,7 +162,7 @@ export async function deleteSupplierDraft(formData: FormData) {
       await deleteUploadedFileIfUnused(deletedSupplier.coverImageId);
 
       revalidatePath(ADMIN_SUPPLIERS_PATH);
-      return { type: 'success', message: 'Поставщик удален.' };
+      return { type: 'success', message: 'Поставщик удалён.' };
     }
   });
 }

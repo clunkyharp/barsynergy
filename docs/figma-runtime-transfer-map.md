@@ -124,7 +124,7 @@
 ## Изменения одиннадцатого среза
 
 - `src/components/public/public-content-detail-page.tsx`: shared detail shell now exposes `data-detail-kind`, type-specific body labels and type-specific fallback copy for article/event/course/vacancy/supplier/partner pages.
-- `src/lib/public/content-details.ts`: article, course, vacancy, supplier and partner detail builders now return type-specific section blocks from existing fields. Event sections were already present.
+- `src/lib/public/content/{articles,education,suppliers,partners}.ts` and `src/lib/public/content/events.ts`: article, course, supplier, partner, event detail builders now return type-specific section blocks from existing fields. Vacancy detail moved to `src/modules/content/vacancies/queries.ts`. The old `src/lib/public/content-details.ts` was removed.
 - `src/app/(public)/{articles,education,vacancies,suppliers,partners}/[slug]/page.tsx`: detail routes now pass `sections` into the shared detail template; queries, slugs, data fetching and CTA targets were not changed.
 - `src/app/globals.css`: added scoped `.public-detail-*` CSS for stable section cards, type hooks and 320px overflow hardening.
 - `tests/public-detail-hardening.test.mjs`: static regression covers type-specific labels, section blocks and route-to-template section wiring.

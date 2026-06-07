@@ -1,4 +1,4 @@
-import { ApplicationStatus, ApplicationType, BusinessAccountStatus, ContentStatus, UserRole } from '@prisma/client';
+import { ApplicationStatus, ApplicationType, BusinessAccountStatus, ContentStatus, UserRole } from '@/modules/admin/queries';
 import { AppLink } from '@/components/ui/app-link';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -13,7 +13,7 @@ import {
 import { contentStatusBadgeVariants, contentStatusLabels } from '@/lib/admin/content-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
 import { canAccessAdminSection } from '@/lib/auth/permissions';
-import { prisma } from '@/lib/db/prisma';
+import { prisma } from '@/modules/admin/queries';
 import { cn } from '@/lib/utils';
 
 export const dynamic = 'force-dynamic';
@@ -279,21 +279,21 @@ export default async function AdminPage() {
 
       <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard
-          delta={`${newApplications} новых`}
+          delta={`Новых: ${newApplications}`}
           description="Активная очередь входящих форм"
           label="Заявки в работе"
           status="модерация"
           value={activeApplicationTotal}
         />
         <StatCard
-          delta={`${pendingBusinessAccounts} ждут`}
+          delta={`Ожидают: ${pendingBusinessAccounts}`}
           description="Подключение и проверка бизнес-кабинетов"
           label="Бизнес-доступы"
           status={canManageUsers ? 'админ' : 'просмотр'}
           value={pendingBusinessAccounts}
         />
         <StatCard
-          delta={`${draftArticles + draftEvents + draftVacancies} материалов`}
+          delta={`Черновиков: ${draftArticles + draftEvents + draftVacancies}`}
           description="Черновики перед публикацией"
           label="Черновики"
           status="публикация"

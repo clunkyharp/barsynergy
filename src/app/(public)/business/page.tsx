@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { ArrowUpRight, BadgeCheck, MapPinned, SearchCheck, Store } from 'lucide-react';
 import { BusinessSolutionForm } from '@/components/public/business-solution-form';
+import { submitBusinessSolutionRequest } from '@/app/(public)/business/actions';
 import { EditorialPublicPage } from '@/components/public/editorial-public-page';
 import { RoleTaskCard } from '@/components/public/public-card-patterns';
 import { PublicBodyText, PublicDisplayTitle, PublicEyebrow } from '@/components/public/public-primitives';
@@ -167,6 +168,7 @@ export default async function BusinessPage({ searchParams }: BusinessPageProps) 
         result={getPublicApplicationResult(params)}
         utm={getPublicApplicationUtm(params)}
         cities={cities}
+        action={submitBusinessSolutionRequest}
       />
     </>
   );

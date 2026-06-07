@@ -178,7 +178,7 @@ export default function AboutPage() {
 
       <section className="background-zone background-zone-cta py-14 md:py-20">
         <div className="mx-auto max-w-[1240px] px-5 md:px-12">
-          <div className="rounded-[var(--radius-xl)] border border-[var(--editorial-dark-border)] bg-[var(--editorial-dark-surface)] p-6 text-white md:p-10 xl:p-12">
+          <div className="rounded-[var(--radius-xl)] border border-[var(--editorial-dark-border)] bg-[var(--editorial-dark-surface)] p-6 text-white md:p-10 xl:p-12" data-theme="dark">
             <div className="grid gap-8 xl:grid-cols-[minmax(0,0.55fr)_minmax(16rem,0.38fr)] xl:items-start">
               <div>
                 <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--editorial-dark-label)]">Следующий шаг</p>

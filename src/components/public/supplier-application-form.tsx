@@ -1,4 +1,3 @@
-import { submitSupplierApplication } from '@/app/(public)/suppliers/actions';
 import {
   ContactChannelFieldset,
   HiddenUtmFields,
@@ -16,7 +15,7 @@ import { Select } from '@/components/ui/select';
 import { SubmitButton } from '@/components/ui/submit-button';
 import { Textarea } from '@/components/ui/textarea';
 
-export function SupplierApplicationForm({ enabled, result, utm, cities }: PublicApplicationFormProps) {
+export function SupplierApplicationForm({ enabled, result, utm, cities, action }: PublicApplicationFormProps & { action?: (formData: FormData) => void }) {
   return (
     <PublicApplicationSection
       eyebrow="Поставщики / Заявка"
@@ -32,7 +31,7 @@ export function SupplierApplicationForm({ enabled, result, utm, cities }: Public
       introVariant="compact"
       result={result}
     >
-      <form action={submitSupplierApplication} className="editorial-form-shell public-form-shell">
+      <form action={action} className="editorial-form-shell public-form-shell">
         <HiddenUtmFields utm={utm} />
         <HoneypotField id="supplier-application-website" />
         <PublicFormShellHeader

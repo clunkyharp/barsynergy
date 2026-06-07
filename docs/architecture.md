@@ -283,7 +283,7 @@ These items are documented but not yet implemented:
 |------|--------|---------------------|
 | `middleware.ts` route guard | Done | — |
 | `withPublicAction` wrapper | Not done | 28 action files each implement error handling differently |
-| `getCurrentUser` + `cache()` | Not done | N DB queries per SSR render in nested layouts |
-| Notification retry (max_attempts) | Not done | Notification failures are silent and unrecoverable |
+| `getCurrentUser` + `cache()` | Done | — |
+| Notification retry (max_attempts + process-queue) | Done | — |
 
 When implementing any of these, update this document to mark the item as done.

@@ -1,17 +1,21 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { ApplicationStatus, ApplicationType } from '@prisma/client';
+import { ConversationSender } from '@/modules/business/queries';
 import { Button } from '@/components/ui/button';
 import { PageHeader } from '@/components/ui/page-header';
 import { Panel } from '@/components/ui/panel';
 import { StatusBadge } from '@/components/ui/status-badge';
+import { ConversationThread } from '@/components/messaging/conversation-thread';
 import { requireBusinessAccountAccess } from '@/lib/auth/require-business-account';
-import { prisma } from '@/lib/db/prisma';
 import { buildPrivatePageMetadata } from '@/lib/public/metadata';
 import {
   applicationStatusBadgeVariants,
   applicationStatusLabels
 } from '@/lib/admin/application-utils';
+import {
+  getBusinessResponseDetail
+} from '@/modules/business/queries';
+import { getConversationThread } from '@/lib/messaging/get-conversation';
 
 type BusinessResponseDetailPageProps = {
   params: Promise<{ applicationId: string }>;
@@ -30,33 +34,15 @@ export default async function BusinessResponseDetailPage({ params }: BusinessRes
   const { user } = await requireBusinessAccountAccess();
   const { applicationId } = await params;
 
-  const application = await prisma.application.findFirst({
-    where: {
-      id: applicationId,
-      type: ApplicationType.VACANCY_RESPONSE,
-      status: { not: ApplicationStatus.DRAFT },
-      vacancy: { createdById: user.id }
-    },
-    select: {
-      id: true,
-      status: true,
-      type: true,
-      createdAt: true,
-      name: true,
-      email: true,
-      phone: true,
-      telegram: true,
-      message: true,
-      city: { select: { name: true } },
-      vacancy: {
-        select: { id: true, title: true, slug: true, companyName: true }
-      }
-    }
-  });
+  const application = await getBusinessResponseDetail(applicationId, user.id);
 
   if (!application) {
     notFound();
   }
+
+  const messages = await getConversationThread(applicationId);
+  const interlocutorName = application.name ?? 'Кандидат';
+  const contextLabel = application.vacancy?.title ?? 'Отклик на вакансию';
 
   return (
     <div className="space-y-6">
@@ -126,6 +112,19 @@ export default async function BusinessResponseDetailPage({ params }: BusinessRes
           <p className="mt-2 text-sm text-[var(--muted)]">Вакансия не найдена.</p>
         )}
       </Panel>
+
+      <ConversationThread
+        applicationId={applicationId}
+        composePlaceholder="Ответьте кандидату..."
+        contextLabel={contextLabel}
+        currentUserId={user.id}
+        currentUserRole="business"
+        interlocutorName={interlocutorName}
+        messageCount={messages.length}
+        messages={messages}
+        senderRole={ConversationSender.BUSINESS}
+        status={application.status}
+      />
 
       <Button href="/business/cabinet/responses" variant="ghost">
         Вернуться к откликам

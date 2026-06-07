@@ -1,4 +1,3 @@
-import { submitPartnerApplication } from '@/app/(public)/partners/actions';
 import {
   ContactChannelFieldset,
   HiddenUtmFields,
@@ -17,7 +16,7 @@ import { Select } from '@/components/ui/select';
 import { SubmitButton } from '@/components/ui/submit-button';
 import { Textarea } from '@/components/ui/textarea';
 
-export function PartnerApplicationForm({ enabled, result, utm, cities, defaults = {} }: PublicApplicationFormProps) {
+export function PartnerApplicationForm({ enabled, result, utm, cities, defaults = {}, action }: PublicApplicationFormProps & { action?: (formData: FormData) => void }) {
   const highlights = [
     'Образовательные проекты',
     'События для заведений',
@@ -46,7 +45,7 @@ export function PartnerApplicationForm({ enabled, result, utm, cities, defaults 
       enabled={enabled}
       result={result}
     >
-      <form action={submitPartnerApplication} className="editorial-form-shell public-form-shell">
+      <form action={action} className="editorial-form-shell public-form-shell">
         <HiddenUtmFields utm={utm} />
         <HoneypotField id="partner-application-website" />
         <div className="relative grid lg:grid-cols-[0.42fr_0.58fr]">

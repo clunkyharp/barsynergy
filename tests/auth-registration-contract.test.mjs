@@ -41,7 +41,10 @@ test('register user form has fullName, email, password and consent', () => {
   assert.match(formSource, /email/);
   assert.match(formSource, /password/);
   assert.match(formSource, /ConsentField/);
-  assert.match(formSource, /registerUserAction/);
+  assert.match(formSource, /PasswordPairValidation/);
+  assert.match(formSource, /id="new-password"/);
+  assert.match(formSource, /id="confirm-password"/);
+  assert.match(formSource, /action: \(formData: FormData\) => void/);
   assert.match(formSource, /Зарегистрироваться/);
   assert.match(formSource, /data-public-validation="true"/);
   assert.match(formSource, /noValidate/);
@@ -118,9 +121,26 @@ test('activate page guards with invalid-invite, blocked-user and mismatch error 
   assert.match(pageSource, /blocked: 'Доступ временно заблокирован/);
   assert.match(pageSource, /failed: 'Не удалось завершить активацию/);
   assert.match(pageSource, /activateBusinessAccessAction/);
+  assert.match(pageSource, /PasswordPairValidation/);
+  assert.match(pageSource, /id="new-password"/);
+  assert.match(pageSource, /id="confirm-password"/);
   assert.match(pageSource, /findActiveBusinessAccessInvite/);
   assert.match(pageSource, /BUSINESS_ACCESS_ACTIVATION_COOKIE_NAME/);
   assert.match(pageSource, /parseBusinessAccessRequestPayload/);
+});
+
+test('all new-password forms share password pair validation helper', () => {
+  const resetSource = readProjectFile('src/app/auth/password-reset/confirm/page.tsx');
+  const profileSource = readProjectFile('src/app/profile/settings/page.tsx');
+  const helperSource = readProjectFile('src/components/ui/password-pair-validation.tsx');
+
+  assert.match(helperSource, /confirmTouched = false/);
+  assert.match(helperSource, /addEventListener\('blur', onConfirmBlur\)/);
+  assert.match(helperSource, /addEventListener\('submit', checkMatch, true\)/);
+  assert.match(resetSource, /PasswordPairValidation/);
+  assert.match(profileSource, /PasswordPairValidation passwordName="newPassword"/);
+  assert.match(profileSource, /autoComplete="current-password"/);
+  assert.match(profileSource, /autoComplete="new-password"/);
 });
 
 test('activate consume route validates token and sets or clears cookie', () => {

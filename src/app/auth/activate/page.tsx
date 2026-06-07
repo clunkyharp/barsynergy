@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { FormField } from '@/components/ui/form-field';
 import { InlineAlert } from '@/components/ui/inline-alert';
 import { Input } from '@/components/ui/input';
+import { PasswordPairValidation } from '@/components/ui/password-pair-validation';
 import { Panel } from '@/components/ui/panel';
 import { SubmitButton } from '@/components/ui/submit-button';
 import { PublicFormValidation } from '@/components/public/public-form-validation';
@@ -112,12 +113,13 @@ export default async function ActivateBusinessAccessPage({ searchParams }: Activ
             ) : (
               <form action={activateBusinessAccessAction} className="grid gap-4" data-public-validation="true" noValidate>
                 <PublicFormValidation />
+                <PasswordPairValidation />
                 <input name="token" type="hidden" value={token} />
-                <FormField htmlFor="password" label="Пароль" hint="Минимум 8 символов. Лучше взять отдельный пароль для кабинета.">
-                  <Input id="password" name="password" type="password" minLength={8} autoComplete="new-password" placeholder="Минимум 8 символов" required />
+                <FormField htmlFor="new-password" label="Пароль" hint="Минимум 8 символов. Лучше взять отдельный пароль для кабинета.">
+                  <Input id="new-password" name="password" type="password" minLength={8} autoComplete="new-password" placeholder="Минимум 8 символов" required />
                 </FormField>
-                <FormField htmlFor="confirmPassword" label="Повторите пароль">
-                  <Input id="confirmPassword" name="confirmPassword" type="password" minLength={8} autoComplete="new-password" placeholder="Повторите пароль" required />
+                <FormField htmlFor="confirm-password" label="Повторите пароль">
+                  <Input id="confirm-password" name="confirmPassword" type="password" minLength={8} autoComplete="new-password" placeholder="Повторите пароль" required />
                 </FormField>
                 <ActionRow>
                   <SubmitButton className="rounded-[var(--radius-md)]" size="lg">

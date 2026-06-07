@@ -2,11 +2,12 @@ import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { Bookmark, BookmarkX, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { EmptyState } from '@/components/ui/empty-state';
 import { MetaChip } from '@/components/ui/meta-chip';
 import { PageHeader } from '@/components/ui/page-header';
 import { Panel } from '@/components/ui/panel';
 import { getCurrentUser } from '@/lib/auth/current-user';
-import { prisma } from '@/lib/db/prisma';
+import { getSavedVacancies } from '@/modules/profile/queries';
 import { buildPrivatePageMetadata } from '@/lib/public/metadata';
 import { AppLink } from '@/components/ui/app-link';
 import { getAdminOptionLabel, vacancyEmploymentTypeOptions } from '@/lib/admin/content-labels';
@@ -24,24 +25,7 @@ export default async function SavedVacanciesPage() {
     redirect('/auth/login?returnTo=/profile/saved-vacancies');
   }
 
-  const savedVacancies = await prisma.savedVacancy.findMany({
-    where: { userId: currentUser.id },
-    include: {
-      vacancy: {
-        select: {
-          id: true,
-          title: true,
-          slug: true,
-          companyName: true,
-          city: { select: { name: true } },
-          salaryLabel: true,
-          employmentType: true,
-          publishedAt: true
-        }
-      }
-    },
-    orderBy: { createdAt: 'desc' }
-  });
+  const savedVacancies = await getSavedVacancies(currentUser.id);
 
   return (
     <div className="space-y-6">
@@ -53,23 +37,12 @@ export default async function SavedVacanciesPage() {
 
       <div className="space-y-4">
         {savedVacancies.length === 0 ? (
-          <Panel className="max-w-xl" padding="lg">
-            <div className="flex flex-col items-start gap-4">
-              <span className="inline-flex h-11 w-11 items-center justify-center rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--accent-soft)] text-[var(--accent)]">
-                <Bookmark aria-hidden="true" size={20} strokeWidth={1.8} />
-              </span>
-              <div>
-                <h2 className="text-xl font-semibold leading-7 text-[var(--text)]">Сохранённых вакансий нет</h2>
-                <p className="mt-2 max-w-md text-sm leading-6 text-[var(--muted)]">
-                  Нажмите на значок закладки на странице вакансии — она появится здесь.
-                </p>
-              </div>
-              <Button href="/vacancies">
-                <Search size={15} strokeWidth={1.8} />
-                Смотреть вакансии
-              </Button>
-            </div>
-          </Panel>
+          <EmptyState
+            icon={Bookmark}
+            title="Сохранённых вакансий нет"
+            description="Нажмите на значок закладки на странице вакансии — она появится здесь."
+            actions={[{ label: 'Смотреть вакансии', href: '/vacancies', icon: Search }]}
+          />
         ) : (
           savedVacancies.map((sv) => {
             const v = sv.vacancy;

@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
-import { CategoryType } from '@prisma/client';
+import { CategoryType } from '@/modules/content/shared/types';
 import { Briefcase } from 'lucide-react';
 import { EditorialPublicPage } from '@/components/public/editorial-public-page';
-import { PublishedContentSection } from '@/components/public/published-content-section';
+import { PublishedContentSectionOpportunity } from '@/components/public/published-content-section';
 import { PublicFilters } from '@/components/public/public-filters';
 import {
   stripPublicApplicationResultParams
@@ -33,7 +33,7 @@ export default async function VacanciesPage({ searchParams }: VacanciesPageProps
     getPublicCityFilterOptions(),
     getVacancyFilterOptions()
   ]);
-  const vacancyContactHref = '/vacancies#submit-vacancy';
+  const vacancyContactHref = '/contacts?topic=vacancy#contact-form';
 
   return (
     <>
@@ -51,12 +51,13 @@ export default async function VacanciesPage({ searchParams }: VacanciesPageProps
         accentGradient="radial-gradient(ellipse 90% 60% at 20% 30%, rgba(210,150,50,0.14), transparent)"
         accentIcon={Briefcase}
       />
-      <PublishedContentSection
+      <PublishedContentSectionOpportunity
         basePath="/vacancies"
         content={content}
         emptyActions={[]}
         emptyDescription="Открытых вакансий сейчас нет. Работодатели могут отправить вакансию для публикации или написать команде."
         emptyTitle="Вакансий пока нет"
+        title="Вакансии"
         filters={
           <PublicFilters
             categories={categories}
@@ -70,11 +71,7 @@ export default async function VacanciesPage({ searchParams }: VacanciesPageProps
         }
         sectionId="vacancy-list"
         listLabel="Вакансии индустрии"
-        rowVariant="opportunity"
-        rowActionLabel="Смотреть вакансию"
-        showSidebarTitle={false}
-        sortLabel="Сначала новые"
-        title="Открытые вакансии"
+        rowActionLabel="Открыть вакансию"
       />
     </>
   );

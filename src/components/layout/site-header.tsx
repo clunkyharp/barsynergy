@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { ChevronDown, UserRound } from 'lucide-react';
+import { ChevronDown, Search, UserRound } from 'lucide-react';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { AccountMenu } from '@/components/layout/account-menu';
@@ -19,6 +19,7 @@ type HeaderUser = {
 
 type SiteHeaderProps = {
   user?: HeaderUser | null;
+  logoutAction?: () => Promise<void>;
 };
 
 const guestNavItems = [
@@ -61,7 +62,7 @@ function isActiveItem(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-export function SiteHeader({ user }: SiteHeaderProps) {
+export function SiteHeader({ user, logoutAction }: SiteHeaderProps) {
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMoreNavOpen, setIsMoreNavOpen] = useState(false);
@@ -117,6 +118,14 @@ export function SiteHeader({ user }: SiteHeaderProps) {
     return null;
   }
 
+  const businessHref = user?.role === 'BUSINESS' ? '/business/cabinet' : '/business';
+  const effectiveDesktopPrimaryNavItems = desktopPrimaryNavItems.map((item) =>
+    item.href === '/business' ? { ...item, href: businessHref } : item
+  );
+  const effectiveGuestNavItems = guestNavItems.map((item) =>
+    item.href === '/business' ? { ...item, href: businessHref } : item
+  );
+
   return (
     <header
       className={cn(
@@ -167,7 +176,7 @@ export function SiteHeader({ user }: SiteHeaderProps) {
             />
           </AppLink>
           <nav className="hidden min-w-0 items-center justify-center gap-1 px-0 text-[11px] font-semibold uppercase tracking-[0.06em] text-inherit xl:flex xl:justify-self-start 2xl:gap-2 2xl:text-[12px] 2xl:tracking-[0.08em]">
-            {desktopPrimaryNavItems.map((item) => {
+            {effectiveDesktopPrimaryNavItems.map((item) => {
               const isActive = pathname ? isActiveItem(pathname, item.href) : false;
 
               return (
@@ -237,13 +246,23 @@ export function SiteHeader({ user }: SiteHeaderProps) {
             ) : null}
           </nav>
           <div className="hidden shrink-0 items-center justify-end gap-2 xl:flex xl:w-full">
+            <AppLink
+              aria-label="Поиск"
+              className={cn(
+                'inline-flex min-h-10 w-10 shrink-0 items-center justify-center rounded-[var(--radius-md)] text-inherit transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] hover:bg-[rgba(255,253,249,0.12)] motion-reduce:transition-none',
+                focusClassName
+              )}
+              href="/search"
+            >
+              <Search aria-hidden="true" size={17} strokeWidth={1.8} />
+            </AppLink>
             {user?.role === 'BUSINESS' ? (
               <AppLink
                 className={cn(
                   'hidden min-h-10 shrink-0 items-center justify-center whitespace-nowrap rounded-[var(--radius-sm)] border-[1.5px] border-[var(--accent)] bg-[var(--accent-soft)] px-3 text-[11px] font-bold uppercase tracking-[0.1em] text-[var(--accent)] transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] hover:bg-[var(--accent)] hover:text-[var(--accent-contrast)] motion-reduce:transition-none xl:inline-flex xl:px-4',
                   focusClassName
                 )}
-                href="/vacancies#submit-vacancy"
+                href="/contacts?topic=vacancy#contact-form"
               >
                 Разместить вакансию
               </AppLink>
@@ -262,15 +281,15 @@ export function SiteHeader({ user }: SiteHeaderProps) {
               </AppLink>
             ) : null}
             {user ? (
-              <AccountMenu user={user} />
+              <AccountMenu logoutAction={logoutAction!} user={user} />
             ) : (
               <AppLink
+                aria-label="Войти в кабинет"
                 className={cn(
                   'inline-flex min-h-10 shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-[var(--radius-md)] px-3 text-[12px] font-semibold text-inherit transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] hover:bg-[rgba(255,253,249,0.12)] motion-reduce:transition-none',
                   focusClassName
                 )}
                 href="/auth/login"
-                aria-label="Войти в кабинет"
               >
                 <UserRound size={16} strokeWidth={1.8} />
                 <span>Войти</span>
@@ -278,8 +297,18 @@ export function SiteHeader({ user }: SiteHeaderProps) {
             )}
           </div>
           <div className="flex shrink-0 items-center gap-2 xl:hidden">
-            {user ? <AccountMenu user={user} /> : null}
-            <MobileSiteMenu isOpen={isMobileMenuOpen} navItems={guestNavItems} user={user} onOpenChange={setIsMobileMenuOpen} />
+            {user ? <AccountMenu logoutAction={logoutAction!} user={user} /> : null}
+            <AppLink
+              aria-label="Поиск"
+              className={cn(
+                'inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-[var(--radius-sm)] border border-[var(--border-default)] bg-[var(--surface-elevated)] text-[var(--text)] shadow-[var(--shadow-card)] backdrop-blur-[12px] transition-[background-color,border-color,color] duration-[var(--motion-duration-base)] ease-[var(--motion-ease-standard)] hover:border-[var(--accent)]/30 hover:bg-[var(--surface)] motion-reduce:transition-none',
+                focusClassName
+              )}
+              href="/search"
+            >
+              <Search aria-hidden="true" size={17} strokeWidth={1.8} />
+            </AppLink>
+            <MobileSiteMenu isOpen={isMobileMenuOpen} navItems={effectiveGuestNavItems} user={user} onOpenChange={setIsMobileMenuOpen} />
           </div>
         </div>
       </div>

@@ -3,14 +3,14 @@
 import { useRouter } from 'next/navigation';
 import { Bookmark } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { toggleSavedVacancy } from '@/lib/profile/saved-vacancies-actions';
 
 type ToggleSavedVacancyButtonProps = {
   vacancyId: string;
   initialSaved?: boolean;
+  toggleAction: (vacancyId: string) => Promise<{ saved: boolean; error?: string }>;
 };
 
-export function ToggleSavedVacancyButton({ vacancyId, initialSaved = false }: ToggleSavedVacancyButtonProps) {
+export function ToggleSavedVacancyButton({ vacancyId, initialSaved = false, toggleAction }: ToggleSavedVacancyButtonProps) {
   const router = useRouter();
 
   return (
@@ -20,7 +20,7 @@ export function ToggleSavedVacancyButton({ vacancyId, initialSaved = false }: To
         initialSaved && 'text-[var(--accent)] border-[var(--accent)]'
       )}
       onClick={async () => {
-        await toggleSavedVacancy(vacancyId);
+        await toggleAction(vacancyId);
         router.refresh();
       }}
       type="button"

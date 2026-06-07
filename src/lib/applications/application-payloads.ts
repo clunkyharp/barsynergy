@@ -107,6 +107,16 @@ const certificateOrderPayloadSchema = z.object({
   amountLabel: z.string().trim().min(1)
 });
 
+const supplierInquiryPayloadSchema = z.object({
+  source: payloadSource,
+  supplierTitle: optionalString,
+  productCategory: optionalString,
+  volumeDetails: optionalString,
+  contactName: optionalString,
+  contactPhone: optionalString,
+  contactEmail: optionalString
+});
+
 export const applicationPayloadSchemas = {
   [ApplicationType.BUSINESS_ACCOUNT_REQUEST]: businessAccountRequestPayloadSchema,
   [ApplicationType.COURSE_APPLICATION]: courseApplicationPayloadSchema,
@@ -119,7 +129,8 @@ export const applicationPayloadSchemas = {
   [ApplicationType.CONSULTING_REQUEST]: consultingRequestPayloadSchema,
   [ApplicationType.CONTACT_MESSAGE]: contactMessagePayloadSchema,
   [ApplicationType.CORPORATE_TRAINING_APPLICATION]: corporateTrainingPayloadSchema,
-  [ApplicationType.CERTIFICATE_ORDER]: certificateOrderPayloadSchema
+  [ApplicationType.CERTIFICATE_ORDER]: certificateOrderPayloadSchema,
+  [ApplicationType.SUPPLIER_INQUIRY]: supplierInquiryPayloadSchema
 } satisfies Record<ApplicationType, z.ZodType>;
 
 export type ApplicationPayloadByType = {
@@ -135,6 +146,7 @@ export type ApplicationPayloadByType = {
   [ApplicationType.CONTACT_MESSAGE]: z.infer<typeof contactMessagePayloadSchema>;
   [ApplicationType.CORPORATE_TRAINING_APPLICATION]: z.infer<typeof corporateTrainingPayloadSchema>;
   [ApplicationType.CERTIFICATE_ORDER]: z.infer<typeof certificateOrderPayloadSchema>;
+  [ApplicationType.SUPPLIER_INQUIRY]: z.infer<typeof supplierInquiryPayloadSchema>;
 };
 
 export function parseApplicationPayload<TType extends ApplicationType>(

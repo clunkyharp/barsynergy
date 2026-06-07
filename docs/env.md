@@ -100,6 +100,7 @@ Public application notifications are optional and env-driven.
 - Admin email notifications for new public applications are sent to `ADMIN_NOTIFICATION_EMAIL` only when SMTP is configured.
 - Short Telegram admin notifications are sent only when both `TELEGRAM_BOT_TOKEN` and `TELEGRAM_ADMIN_CHAT_ID` are configured.
 - Missing notification env must not block public form submission.
+- Cloudflare Turnstile (`NEXT_PUBLIC_TURNSTILE_SITE_KEY` + `TURNSTILE_SECRET_KEY`) is optional. When both are set, the Turnstile challenge is rendered on sensitive public forms (business registration, participant registration, vacancy response, vacancy submission) and verified server-side. When absent, the forms work without the challenge layer.
 
 ## Secret Hygiene
 

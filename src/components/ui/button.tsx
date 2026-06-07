@@ -2,7 +2,7 @@ import type { AnchorHTMLAttributes, ButtonHTMLAttributes, ReactNode } from 'reac
 import { AppLink } from '@/components/ui/app-link';
 import { cn } from '@/lib/utils';
 
-export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'link' | 'destructive' | 'inverse';
+export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'link' | 'destructive' | 'inverse' | 'on-dark';
 export type ButtonSize = 'sm' | 'md' | 'lg';
 
 const variants: Record<ButtonVariant, string> = {
@@ -14,7 +14,8 @@ const variants: Record<ButtonVariant, string> = {
     'border-[var(--border-default)] bg-transparent text-[var(--text)] shadow-none hover:border-[var(--border-strong)] hover:bg-[var(--surface-wash)] hover:text-[var(--text)]',
   link: 'border-transparent bg-transparent px-0 text-[var(--accent)] shadow-none hover:text-[var(--accent-strong)]',
   destructive: 'border-[var(--danger-action-bg)] bg-[var(--danger-action-bg)] text-[var(--danger-action-text)] hover:bg-[var(--danger-action-bg-hover)]',
-  inverse: 'border-[var(--border-inverse)] bg-[var(--surface-inverse)] text-[var(--background)] hover:bg-[var(--accent)] hover:text-[var(--accent-contrast)]'
+  inverse: 'border-[var(--border-inverse)] bg-[var(--surface-inverse)] text-[var(--background)] hover:bg-[var(--accent)] hover:text-[var(--accent-contrast)]',
+  'on-dark': 'border-transparent bg-transparent px-0 text-[var(--editorial-dark-muted)] shadow-none hover:text-[var(--accent)] focus-visible:ring-offset-[var(--editorial-dark-surface)]'
 };
 
 const sizes: Record<ButtonSize, string> = {

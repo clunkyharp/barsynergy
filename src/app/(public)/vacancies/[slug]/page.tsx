@@ -3,15 +3,19 @@ import { notFound } from 'next/navigation';
 import { PublicContentDetailPage } from '@/components/public/public-content-detail-page';
 import { PublicRelatedContentSection } from '@/components/public/public-related-content-section';
 import { ToggleSavedVacancyButton } from '@/components/public/toggle-saved-vacancy-button';
+import { getPublishedVacancyDetail } from '@/modules/content/vacancies/queries';
+import { toggleSavedVacancy } from '@/lib/profile/saved-vacancies-actions';
 import { VacancyResponseDialog } from '@/components/public/vacancy-application-forms';
+import { submitVacancyResponseApplication } from '@/app/(public)/vacancies/actions';
 import { JsonLd } from '@/components/seo/json-ld';
 import { arePublicApplicationFormsEnabled } from '@/lib/applications/public-forms';
 import { getPublicApplicationUtm } from '@/lib/applications/public-form-helpers';
 import { getCurrentUser } from '@/lib/auth/current-user';
-import { prisma } from '@/lib/db/prisma';
 import { getPublishedVacancies } from '@/lib/public/content';
-import { getPublishedVacancyDetail } from '@/lib/public/content-details';
-import { getVacancyApplicationFormOptions } from '@/lib/public/content/vacancies';
+import {
+  getVacancyApplicationFormOptions,
+  getVacancyUserPrefill
+} from '@/modules/content/vacancies/queries';
 import { buildMissingPublicContentMetadata, buildPublicContentMetadata } from '@/lib/public/metadata';
 import { buildBreadcrumbJsonLd, buildPublicContentJsonLd } from '@/lib/public/structured-data';
 import { getEnv } from '@/lib/validation/env';
@@ -72,33 +76,9 @@ export default async function VacancyDetailPage({ params, searchParams }: Vacanc
   let isSaved = false;
 
   if (currentUser) {
-    const [userWithProfile, savedVacancy] = await Promise.all([
-      prisma.user.findUnique({
-        where: { id: currentUser.id },
-        select: {
-          email: true,
-          profile: {
-            select: { fullName: true, cityId: true, phone: true, telegram: true }
-          }
-        }
-      }),
-      prisma.savedVacancy.findUnique({
-        where: { userId_vacancyId: { userId: currentUser.id, vacancyId: vacancy.id } },
-        select: { id: true }
-      })
-    ]);
-
-    if (userWithProfile) {
-      profilePrefill = {
-        fullName: userWithProfile.profile?.fullName ?? undefined,
-        cityId: userWithProfile.profile?.cityId ?? undefined,
-        email: userWithProfile.email,
-        phone: userWithProfile.profile?.phone ?? undefined,
-        telegram: userWithProfile.profile?.telegram ?? undefined
-      };
-    }
-
-    isSaved = Boolean(savedVacancy);
+    const result = await getVacancyUserPrefill(currentUser.id, vacancy.id);
+    profilePrefill = result.profilePrefill;
+    isSaved = result.isSaved;
   }
 
   return (
@@ -138,11 +118,12 @@ export default async function VacancyDetailPage({ params, searchParams }: Vacanc
               cityName: vacancy.cityName
             }}
             utm={getPublicApplicationUtm(sp)}
+            submitVacancyResponseApplication={submitVacancyResponseApplication}
           />
         }
         actionsBottomSlot={
           currentUser && (
-            <ToggleSavedVacancyButton vacancyId={vacancy.id} initialSaved={isSaved} />
+            <ToggleSavedVacancyButton vacancyId={vacancy.id} initialSaved={isSaved} toggleAction={toggleSavedVacancy} />
           )
         }
       />

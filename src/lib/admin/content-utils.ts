@@ -2,9 +2,15 @@ import { redirect } from 'next/navigation';
 import { CategoryType, ContentStatus, FileVisibility, Prisma, StorageDriver } from '@prisma/client';
 import { hasErrorMessage, resolveServerActionError } from '../actions/server-action-errors';
 import { prisma } from '@/lib/db/prisma';
+import { PUBLICATION_STATUS_HINT, contentStatusLabels, firstParam } from '@/lib/admin/content-ui';
 import { isAllowedPublicImageUpload } from '@/lib/storage/file-signatures';
 import { MAX_UPLOAD_FILE_SIZE_BYTES } from '@/lib/storage/storage.types';
 
+export {
+  firstParam,
+  PUBLICATION_STATUS_HINT,
+  contentStatusLabels
+} from '@/lib/admin/content-ui';
 export {
   courseFormatOptions,
   courseLevelOptions,
@@ -27,25 +33,12 @@ export const contentStatusValues = [
   ContentStatus.ARCHIVED
 ] as const;
 
-export const contentStatusLabels: Record<ContentStatus, string> = {
-  [ContentStatus.DRAFT]: 'Черновик',
-  [ContentStatus.REVIEW]: 'На проверке',
-  [ContentStatus.PUBLISHED]: 'Опубликовано',
-  [ContentStatus.ARCHIVED]: 'Архив'
-};
-
-export const PUBLICATION_STATUS_HINT = 'Опубликовано видно на сайте. Черновик, на проверке и архив скрыты.';
-
 export const contentStatusBadgeVariants: Record<ContentStatus, 'neutral' | 'success' | 'warning' | 'danger' | 'pending'> = {
   [ContentStatus.DRAFT]: 'neutral',
   [ContentStatus.REVIEW]: 'warning',
   [ContentStatus.PUBLISHED]: 'success',
   [ContentStatus.ARCHIVED]: 'neutral'
 };
-
-export function firstParam(value: string | string[] | undefined) {
-  return Array.isArray(value) ? value[0] : value;
-}
 
 export function getAdminPage(params: AdminContentSearchParams) {
   const value = Number.parseInt(firstParam(params.page) ?? '1', 10);

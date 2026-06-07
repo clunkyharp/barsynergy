@@ -3,7 +3,6 @@
 import Image from 'next/image';
 import { LogOut, UserRound } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { logoutAction } from '@/app/auth/login/actions';
 import { ThemeSegmentedToggle } from '@/components/layout/theme-toggle';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, useDropdownMenu } from '@/components/ui/dropdown-menu';
 import { AppLink } from '@/components/ui/app-link';
@@ -17,11 +16,12 @@ type AccountMenuProps = {
     displayName: string | null;
     avatarUrl: string | null;
   };
+  logoutAction: () => Promise<void>;
 };
 
 const focusClassName = 'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]';
 
-function LogoutForm() {
+function LogoutForm({ logoutAction }: { logoutAction: () => Promise<void> }) {
   const { closeMenu } = useDropdownMenu();
 
   return (
@@ -67,7 +67,7 @@ function getMenuItems(role: string) {
   return [] as const;
 }
 
-export function AccountMenu({ user }: AccountMenuProps) {
+export function AccountMenu({ user, logoutAction }: AccountMenuProps) {
   const router = useRouter();
   const items = getMenuItems(user.role);
   const initials = user.displayName
@@ -124,7 +124,7 @@ export function AccountMenu({ user }: AccountMenuProps) {
           <ThemeSegmentedToggle />
         </div>
         <div className="border-t border-[var(--line)] pt-1 mt-1">
-          <LogoutForm />
+          <LogoutForm logoutAction={logoutAction} />
         </div>
       </DropdownMenuContent>
     </DropdownMenu>

@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import { ApplicationStatus, ApplicationType } from '@prisma/client';
 import { Mail, Search } from 'lucide-react';
 import { redirect } from 'next/navigation';
 import { AppLink } from '@/components/ui/app-link';
@@ -10,17 +9,22 @@ import { PageHeader } from '@/components/ui/page-header';
 import { Panel } from '@/components/ui/panel';
 import { Select } from '@/components/ui/select';
 import { StatusBadge } from '@/components/ui/status-badge';
+import { UnreadBadge } from '@/components/messaging/unread-badge';
 import {
   applicationStatusBadgeVariants,
   applicationStatusLabels,
-  applicationStatusValues,
-  applicationTypeLabels,
-  applicationTypeValues
-} from '@/lib/admin/application-utils';
+  applicationTypeLabels
+} from '@/modules/content/shared/labels';
 import { firstParam } from '@/lib/admin/content-utils';
 import { getCurrentUser } from '@/lib/auth/current-user';
-import { prisma } from '@/lib/db/prisma';
+import { getUnreadMessageCounts } from '@/lib/messaging/get-conversation';
 import { buildPrivatePageMetadata } from '@/lib/public/metadata';
+import {
+  getUserResponses,
+  ApplicationStatus,
+  profileResponseStatusValues,
+  profileResponseType
+} from '@/modules/profile/queries';
 
 const PAGE_SIZE = 20;
 
@@ -28,19 +32,9 @@ type ProfileResponsesPageProps = {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 };
 
-type ResponseRow = {
-  id: string;
-  type: ApplicationType;
-  status: ApplicationStatus;
-  createdAt: Date;
-  subject: string | null;
-  message: string | null;
-  vacancy: { title: string; slug: string } | null;
-};
-
 export const metadata: Metadata = buildPrivatePageMetadata({
   title: 'Мои отклики',
-  description: 'История откликов и заявок BARSYNERGY.'
+  description: 'История откликов на вакансии BARSYNERGY.'
 });
 
 export default async function ProfileResponsesPage({ searchParams }: ProfileResponsesPageProps) {
@@ -52,17 +46,18 @@ export default async function ProfileResponsesPage({ searchParams }: ProfileResp
 
   const params = (await searchParams) ?? {};
   const statusFilter = firstParam(params.status);
-  const typeFilter = firstParam(params.type);
   const q = firstParam(params.q);
   const sort = firstParam(params.sort) ?? 'desc';
   const page = Math.max(1, Number(firstParam(params.page)) || 1);
 
-  const where: Record<string, unknown> = { userId: user.id };
-  if (statusFilter && applicationStatusValues.includes(statusFilter as ApplicationStatus)) {
+  const where: Record<string, unknown> = {
+    userId: user.id,
+    type: profileResponseType,
+    status: { not: ApplicationStatus.DRAFT }
+  };
+
+  if (statusFilter && profileResponseStatusValues.includes(statusFilter as ApplicationStatus)) {
     where.status = statusFilter;
-  }
-  if (typeFilter && applicationTypeValues.includes(typeFilter as ApplicationType)) {
-    where.type = typeFilter;
   }
   if (q) {
     where.OR = [
@@ -71,26 +66,10 @@ export default async function ProfileResponsesPage({ searchParams }: ProfileResp
     ];
   }
 
-  const [responses, totalCount] = await Promise.all([
-    prisma.application.findMany({
-      where: where as never,
-      select: {
-        id: true,
-        type: true,
-        status: true,
-        createdAt: true,
-        subject: true,
-        message: true,
-        vacancy: {
-          select: { title: true, slug: true }
-        }
-      },
-      orderBy: { createdAt: sort === 'asc' ? 'asc' : 'desc' },
-      skip: (page - 1) * PAGE_SIZE,
-      take: PAGE_SIZE
-    }) as Promise<ResponseRow[]>,
-    prisma.application.count({ where: where as never })
-  ]);
+  const [responses, totalCount] = await getUserResponses(where, sort, page, PAGE_SIZE);
+
+  const responseIds = responses.map((r) => r.id);
+  const unreadCounts = await getUnreadMessageCounts(responseIds, 'user');
 
   const totalPages = Math.ceil(totalCount / PAGE_SIZE);
 
@@ -98,7 +77,6 @@ export default async function ProfileResponsesPage({ searchParams }: ProfileResp
     const url = new URL('/profile/responses', 'http://localhost');
     const merged: Record<string, string | undefined> = {};
     if (statusFilter) merged.status = statusFilter;
-    if (typeFilter) merged.type = typeFilter;
     if (q) merged.q = q;
     merged.sort = sort;
     Object.assign(merged, overrides);
@@ -114,7 +92,7 @@ export default async function ProfileResponsesPage({ searchParams }: ProfileResp
     <div className="space-y-6">
       <PageHeader
         eyebrow="История активности"
-        description="История ваших откликов на вакансии и других заявок."
+        description="История ваших откликов на вакансии."
         title="Мои отклики"
       />
 
@@ -126,17 +104,9 @@ export default async function ProfileResponsesPage({ searchParams }: ProfileResp
         <div className="flex flex-wrap gap-2">
           <Select className="min-w-[140px]" defaultValue={statusFilter ?? ''} name="status">
             <option value="">Все статусы</option>
-            {applicationStatusValues.map((s) => (
+            {profileResponseStatusValues.map((s) => (
               <option key={s} value={s}>
                 {applicationStatusLabels[s]}
-              </option>
-            ))}
-          </Select>
-          <Select className="min-w-[140px]" defaultValue={typeFilter ?? ''} name="type">
-            <option value="">Все типы</option>
-            {applicationTypeValues.map((t) => (
-              <option key={t} value={t}>
-                {applicationTypeLabels[t]}
               </option>
             ))}
           </Select>
@@ -157,15 +127,15 @@ export default async function ProfileResponsesPage({ searchParams }: ProfileResp
               </span>
               <div>
                 <h2 className="text-xl font-semibold leading-7 text-[var(--text)]">
-                  {q || statusFilter || typeFilter ? 'Ничего не найдено' : 'Откликов пока нет'}
+                  {q || statusFilter ? 'Ничего не найдено' : 'Откликов пока нет'}
                 </h2>
                 <p className="mt-2 max-w-md text-sm leading-6 text-[var(--muted)]">
-                  {q || statusFilter || typeFilter
+                  {q || statusFilter
                     ? 'Попробуйте изменить параметры поиска.'
                     : 'Найдите вакансию, войдите в аккаунт и откликнитесь — отклики появятся здесь. Отклики, отправленные без входа, могут не отображаться в истории.'}
                 </p>
               </div>
-              {q || statusFilter || typeFilter ? (
+              {q || statusFilter ? (
                 <Button href="/profile/responses" variant="secondary">Сбросить фильтры</Button>
               ) : (
                 <Button href="/vacancies">Смотреть вакансии →</Button>
@@ -203,6 +173,7 @@ export default async function ProfileResponsesPage({ searchParams }: ProfileResp
                   )}
                 </div>
                 <div className="flex items-center gap-4">
+                  <UnreadBadge count={unreadCounts.get(response.id) ?? 0} />
                   <StatusBadge variant={applicationStatusBadgeVariants[response.status]}>
                     {applicationStatusLabels[response.status]}
                   </StatusBadge>

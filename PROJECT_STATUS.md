@@ -1,6 +1,6 @@
 # BARSYNERGY Project Status
 
-Last updated: 2026-06-05 (Quality remediation slice completed)
+Last updated: 2026-06-07 (UI Polish Pass Sprint A applied)
 
 ## Current Branch
 
@@ -102,6 +102,74 @@ Implemented in this branch so far:
   - shared channel accent colors were moved from duplicated hardcoded values in `contact-action-row.tsx` and `social-card.tsx` into semantic runtime tokens in `src/app/styles/tokens.css` through `src/components/public/channel-accent.ts`
   - repeated filter field/chip/reset markup was split out of `src/components/public/public-filters.tsx` into `src/components/public/public-filters-fields.tsx`, reducing mixed concerns in the main filter container without changing routes, query params or copy
   - validation passed with `git diff --check`, targeted ESLint, `./node_modules/.bin/tsc --noEmit`, and Playwright smoke against the existing local server for `/` and `/suppliers` at desktop plus `/suppliers` at mobile; all returned HTTP 200 with zero console/page errors and zero horizontal overflow
+
+- 2026-06-06 Auth fix batch (4 blocks) applied:
+  - Back-кнопка в absolute на всех 4 auth-страницах (login, password-reset, reset-confirm, register-user), удалён неиспользуемый `Button` импорт
+  - Subtitle очищен от инлайн-ссылки «Запросить доступ →»; обе нижних CTA — `text-[var(--accent)]` (была серая)
+  - «Не можете войти?» → «Забыли пароль?»; добавлена микроссылка «Проблемы с доступом? Написать команде» под кнопкой «Войти»
+  - `sendPasswordResetEmail` (Nodemailer, HTML-письмо с жёлтой кнопкой) вызван после создания токена; graceful skip без SMTP; SMTP_FROM добавлен во все `.env.*.example`
+
+- 2026-06-06 Queue A (architecture groundwork) applied:
+  - `docs/adr/001-target-architecture.md` — зафиксирована целевая 4-слойная архитектура (app/modules/components/lib) с правилами импортов
+  - `eslint.config.mjs` — добавлены 2 guardrails: запрет `@prisma/client` и `@/lib/db/prisma` в `page.tsx`/`layout.tsx` (81 нарушение); запрет `@/app/**/actions` в `src/components/**` (14 нарушений)
+  - `docs/architecture.md` — обновлены pending decisions (`getCurrentUser + cache()` Done, notification retry Done)
+  - Оба guardrail-правила работают и ловят целевые нарушения
+
+- 2026-06-06 Queue B (content read-layer migration) applied:
+  - **Pilot — vacancies**: `src/modules/content/vacancies/queries.ts` с `getPublishedVacancies`, `getPublishedVacancyDetail`, `getVacancyApplicationFormOptions`, `getVacancyUserPrefill`; `src/modules/content/shared/types.ts` с реэкспортами `CategoryType`, `ContentStatus`, `FileVisibility`; 6 публичных listing-страниц переведены с `@prisma/client` на модульные типы; `[slug]/page.tsx` — 3 inline prisma-запроса заменены на `getVacancyUserPrefill`; `lib/public/content/vacancies.ts` очищен до backward-compat фасада
+  - **Profile pages** (4 страницы): `src/modules/profile/queries.ts` с `getFullUser`, `getProfileSettingsData`, `getSavedVacancies`, `getUserApplication`; реэкспорты `UserRole`, `EmploymentType`, `JobSearchStatus`, `ApplicationStatus`, `ApplicationType`; layout, page, saved-vacancies, settings, responses/[applicationId] — все prisma-запросы и enum-импорты вынесены в модуль
+  - **Business cabinet** (6 страниц): `src/modules/business/queries.ts` со всеми запросами дашборда, откликов и заявок; реэкспорты `ApplicationStatus`, `ApplicationType`; layout, page, responses/*, requests/* — все prisma-запросы и enum-импорты вынесены в модуль
+  - **Admin CRUD** (30 файлов): `src/modules/admin/queries.ts` с реэкспортами `prisma` и всех используемых Prisma enums; 30 admin-страниц переведены на модульный импорт
+  - **Auth pages** (2 страницы): `src/modules/auth/shared/queries.ts` с `getActiveCities`; auth/register и auth/register/user страницы исправлены
+  - **Итог**: все 81 violation `no-restricted-imports` для prisma в page.tsx/layout.tsx устранены.
+
+- 2026-06-06 Queue C (pass actions as props from pages) applied:
+  - **Layout components (4)**: account-menu, business-sidebar, mobile-site-menu, profile-sidebar — `logoutAction` passed as prop from parent layout/page (`app/layout.tsx`, `profile/layout.tsx`, `business/cabinet/layout.tsx`) instead of direct `@/app/auth/actions` import
+  - **Public form components (10)**: business-request-form, business-solution-form, consulting-request-form, contact-application-form, education-application-forms, event-application-form, partner-application-form, register-user-form, supplier-application-form, vacancy-application-forms — server actions passed as props from parent pages instead of direct `@/app/*/actions` imports
+  - **Итог**: все 14 violations `no-restricted-imports` для action-imports в компонентах устранены.
+  - `npm run lint` и `npm run typecheck` проходят.
+
+- 2026-06-06 Queue D (UI decomposition + naming) applied — 12 god files split to &lt;350 lines:
+  - `public-filters.tsx` (760→19) → 7 files: types, content, fallback, variant-toolbar, variant-sidebar, variant-stacked, variants
+  - `homepage-client.tsx` (574→101) → 5 files: hero, section-cards, current, community, sponsors
+  - `editorial-display-primitives.tsx` (564→4) → 3 files: types, internal, panels
+  - `content-admin-controls.tsx` (556→3) → 5 files: types, utils, filters, panels, actions
+  - `platform-ui.tsx` (541→170) → 4 files: logo-grid, date-block, tool-teaser, event-agenda
+  - `published-content-section.tsx` (512→217) → builders extracted to separate file
+  - `select.tsx` (486→347) → 3 files: utils, position, menu
+  - `article-grid-section.tsx` (417→130) → 4 files: utils, card, category-pill, search-field
+  - `public-content-detail-page.tsx` (405→233) → helpers extracted
+  - `vacancy-application-forms.tsx` (391→114) → internal components extracted
+  - `contact-application-form.tsx` (391→306) → constants extracted
+  - `ingredient-editor.tsx` (379→111) → internal components extracted
+  - Всего создано ~32 новых файла. Все exports сохранены через реэкспорты. `npm run lint` и `npm run typecheck` проходят.
+
+- 2026-06-07 Code-review remediation (3 items) applied:
+  - **Detail-layer migration fixed (High):** `getPublishedArticleDetail`, `getPublishedEventDetail`, `getPublishedCourseDetail`, `getPublishedSupplierDetail`, `getPublishedPartnerDetail` moved from the old monolithic `src/lib/public/content-details.ts` into their respective `src/lib/public/content/{articles,events,education,suppliers,partners}.ts` modules. The old file was removed. Imports updated in all 5 detail page files and `public-content-detail-page-helpers.ts`. Vacancy detail was already migrated in Queue B — now all 6 content types have domain-specific detail queries.
+  - **Admin homepage page split (Medium):** `src/app/admin/homepage/page.tsx` reduced from 349→119 lines. Data fetching extracted to `src/lib/admin/homepage-queries.ts`. Five section components (Hero, Audience, CTA, Social, Calculator) created in `src/components/admin/homepage-cms/homepage-cms-sections.tsx` with actions passed as props (fixing the `no-restricted-imports` lint violation). Well under the 250-line hard limit for page.tsx.
+  - **rowVariant anti-pattern eliminated (Medium):** `PublishedContentSectionInner` no longer accepts a `rowVariant` prop. Three dedicated row component files created (`src/components/public/published-content-row-default.tsx`, `published-content-row-opportunity.tsx`, `published-content-row-directory.tsx`), each with its own inline render logic — no branching on variant in builders. Variant-branching functions removed from `published-content-section-builders.tsx`. The three public exports (`PublishedContentSectionDefault`, `PublishedContentSectionOpportunity`, `PublishedContentSectionDirectory`) now use dedicated row components without branching.
+  - `npm run lint` and `npm run typecheck` pass.
+
+- 2026-06-07 Search remediation batch applied:
+  - **Domain-specific search fields (High):** each public content entity now searches its own domain fields: events search `locationName`, `address`, `city.name`; vacancies search `companyName`, `position`, `city.name`; suppliers search `companyName`, `serviceArea`, `contactLabel`, `city.name`; partners search `companyName`. The shared `textSearch()` helper is kept for backward compat but all entity queries now use typed per-entity search predicates with no `unknown` casts.
+  - **Relevance ranking (High):** `listResultWithRelevance()` helper in `shared.ts` scores results by `exact title match > prefix match > contains match > no title match`, breaking ties with editorial sort. All 6 content types (events, vacancies, suppliers, articles, education, partners) use this two-phase ID-first approach when `q` is present, no-relevance default order when not.
+  - **Partners in global /search (Medium-High):** `getPublishedPartners` is now queried and rendered in `/search` as a 6th section; search metadata/descriptions updated.
+  - **Normalized hasActiveSearch (Medium):** `/events` page replaced raw `Boolean(contentParams.q || ...)` with `hasActivePublicContentParams()` which properly trims and normalises query-param values before deciding active-filter state.
+  - **Filter canonicalization (Medium):** `public-filters-content.tsx` no longer hides active filter chips for values not found in current option sets — invalid/removed `category`, `city` and extra-filter values now always show as active chips with the raw value as label.
+  - **Admin application search (Medium):** admin `/applications` search now covers `businessAccount.companyName`, `payload.companyName`, `payload.projectName` and `payload.employerCompanyName` via Prisma JSON path queries in addition to existing subject/name/email/phone/telegram fields.
+  - Routes, page layouts, data contracts, Prisma schema, migrations, dependencies and production env values unchanged.
+
+- 2026-06-07 UI Polish Pass — Sprint A applied locally on `fix/code-review-remediation` (Phase Pre-7):
+  - **Phase + tracking:** new `Phase Pre-7: UI Polish Pass` section added to `docs/phase-plan.md` with explicit in/out of scope and sprint sequencing rules; Obsidian Kanban received a dedicated `Sprint A` in-progress card.
+  - **Sprint A scope:** 6 source-level UI fixes from the 2026-06-07 owner audit — hero stats density, vacancy salary prefix, vacancy CTA wiring, profile salary/employment/visibility panel merge, articles aspect ratio, supplier logo mobile visibility.
+  - **[2] Hero stats** (`src/components/public/homepage-hero.tsx`): stat values raised from `text-[1.55rem]` to `text-[2.4rem] md:text-[3rem]`, vertical `border-r` separators replaced with `gap-x-8 md:gap-x-12`, value color switched from `--accent` to `--editorial-dark-text` for stronger hero presence with units kept smaller and uppercase.
+  - **[6] Vacancy salary** (`src/components/public/published-content-row-opportunity.tsx`): removed the `Зарплата` uppercase prefix label inside `vacancyLead`; the salary now renders as a single bold `text-[var(--text)]` value inheriting the parent lead size.
+  - **[5 partial] Vacancy CTA** (`published-content-row-opportunity.tsx` + `published-content-section.tsx`): `OpportunityListRow` now accepts an `actionLabel?: string` prop with default `Смотреть вакансию` and adds an inline `ArrowUpRight` icon on the primary action; `PublishedContentSectionOpportunity` forwards `rowActionLabel` to the row (previously the page-level prop was ignored and the button hard-coded `Подробнее`).
+  - **[4] Profile conditions panel** (`src/app/profile/page.tsx`): three `Panel md:grid-cols-3` blocks (Желаемая зарплата / Формат работы / Профиль) collapsed into one `Panel` labelled `Условия поиска` with a single horizontal `<dl>` row using dot-separator rhythm.
+  - **[8] Article cover aspect ratio** (`src/components/public/article-grid-card.tsx`): default card cover uses `aspect-[16/9]`, featured card uses `aspect-[16/9] sm:aspect-[21/9]`; old `aspect-[3/1] sm:aspect-[4/1]` and `aspect-[4/1] sm:aspect-[6/1]` strip-style ratios removed.
+  - **[7 partial] Supplier logo on mobile** (`src/components/public/published-content-row-directory.tsx`): removed `hidden sm:block` wrappers from the media block; logo container is now visible on every breakpoint with `h-12 w-12 sm:h-14 sm:w-14 md:h-16 md:w-16` sizing and the surrounding company grid uses `grid-cols-[3.25rem_minmax(0,1fr)] sm:grid-cols-[4rem_minmax(0,1fr)]` so the logo stays inline with the company name on mobile.
+  - **Validation:** new source-level snapshot tests in `tests/ui-polish-sprint-a.test.mjs` (6/6 pass). Full suite: 152 pass / 75 fail / 227 total — same 76 unique pre-existing failures as before Sprint A (Queue B/C/D stale snapshots), zero new regressions. `npm run lint` keeps the same 3 pre-existing errors (`TurnstileError`, two `idsOnly` in `tests/public-search-semantics.test.mjs`). `npm run typecheck` clean. Browser smoke on `/`, `/suppliers`, `/articles` at 1280×900 and `/suppliers` at 390×800 confirmed visible hero stats, inline supplier logo on mobile and no horizontal overflow.
+  - **Out of scope:** no Prisma schema, no server actions, no migrations, no dependencies, no routes added; remaining audit items (Sprint B/C/D, items 1/3/9/10/11/12/13/14) deferred to subsequent batches.
 
 Still open in this stabilization queue:
 
@@ -237,6 +305,19 @@ Validation gap:
 - DB-backed public route visual rechecks remain environment-dependent when local PostgreSQL at `localhost:55432` is unavailable and Docker Desktop is not running.
 - the original external audit file path `/Users/amir/Downloads/barsynergy-uiux-audit.md` became available again on 2026-05-30 and is being used for the final requirement-by-requirement closeout audit.
 
+- 2026-06-07 Security audit remediation (9/9 tasks) completed:
+  - **IDOR fix** (8/10): `updateWorkExperiences` now uses `updateMany` with `profileId` owner-scoped check, rejects foreign ids
+  - **Enumeration fix** (7/10): business registration always returns same success code (`business-request-created`), user registration hides `email-used` → generic `invalid`, duplicate message removed from login page
+  - **Self-register lifecycle** (7/10): users created as `PENDING` with verification token + email sent via `sendVerificationEmail` (nodemailer), no session issued until email verified; `verifyUserEmailAction` uses atomic CTE to consume token + set `emailVerifiedAt` + activate user; `resendUserVerificationAction` now actually sends the email
+  - **Password hygiene** (6/10): shared `PASSWORD_MIN_LENGTH = 8` in `password-policy.ts`, change password invalidates all existing sessions (`Session.deleteMany`)
+  - **Reset token atomicity** (6/10): `resetPasswordAction` uses single atomic CTE consuming token → updating password → deleting sessions in one operation
+  - **Resume validation** (6/10): `.docx`/`.odt` now checked for required internal ZIP entries (`word/document.xml`, `content.xml`) via central directory parser — arbitrary ZIP masquerading blocked
+  - **Telegram PII removed** (6/10): Telegram notifications now only include type, subject and admin link (no name/email/city)
+  - **Saved vacancies** (5/10): `toggleSavedVacancy` checks `vacancy.status === PUBLISHED`; both `getSavedVacancies` queries filter to `PUBLISHED` only
+  - **Anti-abuse** (4/10): Cloudflare Turnstile added to business registration, participant registration, vacancy response and vacancy submission forms with server-side `verifyTurnstileToken`; falls back gracefully when env vars absent
+  - New files: `src/lib/auth/password-policy.ts`, `src/lib/security/turnstile.ts`, `src/components/ui/turnstile.tsx`
+  - Validation: `tsc --noEmit`, `eslint`, `prisma validate` pass clean
+
 ## Recent Verified State
 
 - `dev` and `prod` currently point to `f4f49a5 Fix public header navigation spacing` locally before the 2026-05-26 release checkpoint commit.
@@ -254,9 +335,8 @@ Validation gap:
 
 ## Next Recommended Steps
 
-1. Commit and push the reviewed 2026-05-26 release checkpoint.
-2. Fast-forward `prod` from `dev`, push `prod`, update the production checkout and run the deployment smoke checks.
-3. Keep Phase 5 implementation separate from this release checkpoint.
+1. Commit all Queue A+B+C+D changes on `fix/code-review-remediation`.
+2. Push `fix/code-review-remediation`, fast-forward `prod` from `dev`, deploy and run production smoke checks.
 
 ## Historical Notes
 

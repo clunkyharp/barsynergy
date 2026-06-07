@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { EditorialPublicPage } from '@/components/public/editorial-public-page';
 import { ContactApplicationForm } from '@/components/public/contact-application-form';
+import { submitContactMessage } from '@/app/(public)/contacts/actions';
 import { arePublicApplicationFormsEnabled } from '@/lib/applications/public-forms';
 import { getApplicationCityOptions } from '@/lib/applications/form-options';
 import { getPublicApplicationResult, getPublicApplicationUtm } from '@/lib/applications/public-form-helpers';
@@ -91,6 +92,7 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
         utm={getPublicApplicationUtm(params)}
         defaults={defaults}
         cities={cities}
+        action={submitContactMessage}
       />
     </>
   );

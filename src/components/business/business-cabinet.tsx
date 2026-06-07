@@ -12,7 +12,7 @@ import {
   applicationStatusBadgeVariants,
   applicationStatusLabels,
   applicationTypeLabels
-} from '@/lib/admin/application-utils';
+} from '@/modules/content/shared/labels';
 import { cn } from '@/lib/utils';
 
 type BusinessFormAction = (formData: FormData) => void | Promise<void>;
@@ -251,7 +251,7 @@ export function RequestLedger({
                 )}
               </div>
               <div className="flex flex-wrap items-center gap-2 lg:justify-end">
-                <StatusBadge variant={applicationStatusBadgeVariants[application.status]}>
+                <StatusBadge variant={applicationStatusBadgeVariants[application.status] as StatusBadgeVariant}>
                   {applicationStatusLabels[application.status]}
                 </StatusBadge>
                 <Button href={`/business/cabinet/requests/${application.id}`} size="sm" variant="secondary">

@@ -165,6 +165,10 @@ export function resolvePublicApplicationActionError(action: string, error: unkno
       {
         matches: (candidate) => hasErrorMessage(candidate, 'private resume file is too large'),
         message: 'Файл резюме превышает допустимый размер.'
+      },
+      {
+        matches: (candidate) => hasErrorMessage(candidate, 'captcha failed'),
+        message: 'Проверка не пройдена. Попробуйте ещё раз.'
       }
     ],
     fallbackMessage: 'Не получилось отправить заявку. Проверьте поля и попробуйте ещё раз.'

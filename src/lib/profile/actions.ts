@@ -8,6 +8,7 @@ import { getString, getArray, nullableString, optionalString } from '@/lib/admin
 import { resolveServerActionError } from '@/lib/actions/server-action-errors';
 import { getCurrentUser } from '@/lib/auth/current-user';
 import { hashPassword, verifyPassword } from '@/lib/auth/password';
+import { PASSWORD_MIN_LENGTH } from '@/lib/auth/password-policy';
 import { prisma } from '@/lib/db/prisma';
 import { assertSameOriginServerAction } from '@/lib/security/server-action-origin';
 import { getStorageService } from '@/lib/storage/storage.service';
@@ -37,7 +38,7 @@ const jobSearchSchema = z.object({
 
 const changePasswordSchema = z.object({
   currentPassword: z.string().min(1).max(200),
-  newPassword: z.string().min(6).max(200),
+  newPassword: z.string().min(PASSWORD_MIN_LENGTH).max(200),
   confirmPassword: z.string().min(1).max(200)
 }).refine((data) => data.newPassword === data.confirmPassword, {
   message: 'Пароли не совпадают',
@@ -256,13 +257,13 @@ export async function updateWorkExperiences(formData: FormData) {
 
     await prisma.$transaction(async (tx) => {
       if (toDelete.length > 0) {
-        await tx.workExperience.deleteMany({ where: { id: { in: toDelete } } });
+        await tx.workExperience.deleteMany({ where: { id: { in: toDelete }, profileId: profile.id } });
       }
 
       for (const exp of parsed) {
         if (exp.id) {
-          await tx.workExperience.update({
-            where: { id: exp.id },
+          const updated = await tx.workExperience.updateMany({
+            where: { id: exp.id, profileId: profile.id },
             data: {
               companyName: exp.companyName,
               position: exp.position,
@@ -272,6 +273,9 @@ export async function updateWorkExperiences(formData: FormData) {
               sortOrder: exp.sortOrder
             }
           });
+          if (updated.count === 0) {
+            throw new Error('work experience not found');
+          }
         } else {
           await tx.workExperience.create({
             data: {
@@ -530,13 +534,16 @@ export async function changePassword(formData: FormData) {
 
     const newPasswordHash = await hashPassword(parsed.newPassword);
 
-    await prisma.user.update({
-      where: { id: user.id },
-      data: { passwordHash: newPasswordHash }
+    await prisma.$transaction(async (tx) => {
+      await tx.user.update({
+        where: { id: user.id },
+        data: { passwordHash: newPasswordHash }
+      });
+      await tx.session.deleteMany({ where: { userId: user.id } });
     });
 
     revalidatePath(SETTINGS_PATH);
-    result = { type: 'success', message: 'Пароль изменён.' };
+    result = { type: 'success', message: 'Пароль изменён. Перезайдите с новым паролем.' };
   } catch (error) {
     result = {
       type: 'error',

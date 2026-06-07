@@ -382,6 +382,48 @@ Done when:
 - potentially paid applications are clear;
 - MVP remains simple.
 
+## Phase Pre-7: UI Polish Pass
+
+Goal:
+
+Apply the 14-point UX/UI improvement plan recorded in owner audit 2026-06-07 across 10 screens. Stay strictly within the existing data model, routes, server actions and dependencies. No new content types, no schema changes, no new libraries.
+
+Source plan: owner audit 2026-06-07 — homepage, navigation, vacancies, profile, articles, suppliers, education, auth, events, business cabinet.
+
+In scope:
+
+- Sprint A — quick wins (XS/S complexity): hero stats resize, vacancy salary prefix removal, vacancy CTA label wiring, profile salary/employment/visibility panel merge, articles aspect ratio fix, supplier logo always visible on mobile.
+- Sprint B — cards and rows (S/M): vacancy «Новая» badges, supplier directory contact actions in listing, event date block, course duration/level row, featured article horizontal layout.
+- Sprint C — structural (M): profile hero card with avatar, auth two-column desktop layout, homepage restructure (remove HomeSectionCards, fix events fallbacks), mobile nav auth strip + grouping.
+- Sprint D — cabinet (M): business cabinet card-list instead of DataTable, cabinet overview dashboard.
+
+Out of scope:
+
+- new Prisma models or migrations;
+- new public routes;
+- new server actions or action wrappers;
+- new third-party libraries;
+- copy rewrites outside the listed elements;
+- mobile admin redesign;
+- dark-mode refactor;
+- pre-Phase-5 stabilization items still tracked in `docs/remediation-plan.md`.
+
+Done when:
+
+- each sprint closes with `npm run lint`, `npm run typecheck`, `npm test` no worse than the recorded pre-sprint baseline;
+- public visual smoke confirms each changed surface renders without horizontal overflow at desktop 1280px and mobile 390px;
+- `PROJECT_STATUS.md` and Obsidian Kanban reflect sprint completion;
+- no out-of-scope file (server actions, Prisma schema, migrations, dependencies, production env values) is modified.
+
+Sprint sequencing:
+
+1. Sprint A → recorded baseline (lint, typecheck, test counts) → implementation → re-validation → closeout.
+2. Sprint B/C/D only start after the previous sprint has closeout and owner sign-off.
+
+Current status:
+
+- 2026-06-07 Sprint A in progress on `fix/code-review-remediation`: hero stats, vacancy salary prefix, vacancy CTA label wiring, profile salary panels merge, articles aspect ratio, supplier logo visibility.
+
 ## Phase 7: Stabilization And Release 1.0
 
 Goal:

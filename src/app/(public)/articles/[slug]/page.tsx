@@ -4,7 +4,7 @@ import { PublicContentDetailPage } from '@/components/public/public-content-deta
 import { PublicRelatedContentSection } from '@/components/public/public-related-content-section';
 import { JsonLd } from '@/components/seo/json-ld';
 import { getPublishedArticles } from '@/lib/public/content';
-import { getPublishedArticleDetail } from '@/lib/public/content-details';
+import { getPublishedArticleDetail } from '@/lib/public/content';
 import { buildMissingPublicContentMetadata, buildPublicContentMetadata } from '@/lib/public/metadata';
 import { buildBreadcrumbJsonLd, buildPublicContentJsonLd } from '@/lib/public/structured-data';
 
@@ -19,7 +19,7 @@ export async function generateMetadata({ params }: ArticleDetailPageProps): Prom
   if (!article) {
     return buildMissingPublicContentMetadata({
       title: 'Материал не найден',
-      description: 'Материал удален или еще не опубликован.'
+      description: 'Материал удалён или ещё не опубликован.'
     });
   }
 

@@ -9,6 +9,7 @@ import {
   getPublishedArticles,
   getPublishedCourses,
   getPublishedEvents,
+  getPublishedPartners,
   getPublishedSuppliers,
   getPublishedVacancies,
   type PublishedContentItem,
@@ -33,7 +34,7 @@ type SearchResultsSectionProps = {
 
 export const metadata: Metadata = {
   title: 'Поиск',
-  description: 'Поиск по вакансиям, поставщикам, материалам, обучению и событиям BARSYNERGY.',
+  description: 'Поиск по вакансиям, поставщикам, материалам, обучению, событиям и партнёрам BARSYNERGY.',
   robots: {
     index: false,
     follow: true
@@ -149,16 +150,17 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   const q = searchQuery(params);
   const searchParamsForLists = { q, pageSize: '4' };
   const hasQuery = q.length > 0;
-  const [vacancies, suppliers, articles, courses, events] = hasQuery
+  const [vacancies, suppliers, articles, courses, events, partners] = hasQuery
     ? await Promise.all([
         getPublishedVacancies(searchParamsForLists),
         getPublishedSuppliers(searchParamsForLists),
         getPublishedArticles(searchParamsForLists),
         getPublishedCourses(searchParamsForLists),
-        getPublishedEvents({ ...searchParamsForLists, period: 'all' })
+        getPublishedEvents({ ...searchParamsForLists, period: 'all' }),
+        getPublishedPartners(searchParamsForLists)
       ])
     : [];
-  const totalResults = [vacancies, suppliers, articles, courses, events]
+  const totalResults = [vacancies, suppliers, articles, courses, events, partners]
     .filter(isPublishedContentList)
     .reduce((sum, content) => sum + content.total, 0);
   const resultSections = [
@@ -206,6 +208,15 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
           description: 'Афиша встреч, лекций, дегустаций и гостевых смен.',
           title: 'События'
         }
+      : null,
+    partners
+      ? {
+          actionLabel: 'Смотреть профиль',
+          basePath: '/partners',
+          content: partners,
+          description: 'Партнёрские форматы для брендов, школ и заведений.',
+          title: 'Партнёры'
+        }
       : null
   ].filter((section): section is NonNullable<typeof section> => Boolean(section && section.content.total > 0));
 
@@ -216,7 +227,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         eyebrow="Поиск"
         path="/search"
         title="Поиск по платформе"
-        description="Ищите вакансии, поставщиков, материалы, обучение и события одним запросом."
+        description="Ищите вакансии, поставщиков, материалы, обучение, события и партнёров одним запросом."
         summary="Введите запрос и перейдите в нужный раздел, если нужны дополнительные фильтры."
         density="compact"
         metrics={hasQuery ? [{ value: String(totalResults), label: 'результатов' }] : []}

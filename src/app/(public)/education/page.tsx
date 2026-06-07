@@ -1,11 +1,11 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import { BookOpen } from 'lucide-react';
-import { CategoryType } from '@prisma/client';
+import { CategoryType } from '@/modules/content/shared/types';
 import { ProgramFormatMatrix } from '@/components/public/editorial-display-primitives';
 import { EditorialPublicPage } from '@/components/public/editorial-public-page';
 import { Button } from '@/components/ui/button';
-import { PublishedContentSection } from '@/components/public/published-content-section';
+import { PublishedContentSectionCourse } from '@/components/public/published-content-section';
 import { PublicFeaturedContent } from '@/components/public/public-featured-content';
 import { PublicFilters } from '@/components/public/public-filters';
 import { stripPublicApplicationResultParams } from '@/lib/applications/public-form-helpers';
@@ -223,10 +223,10 @@ export default async function EducationPage({ searchParams }: EducationPageProps
             item={featuredItem}
             title="Программа в фокусе"
           />
-          <PublishedContentSection
+          <PublishedContentSectionCourse
             basePath="/education"
             content={content}
-            countLabel="Программ в списке"
+            countLabel="Все программы"
             emptyDescription="Список пока пуст. Можно сразу написать, какое обучение вам нужно."
             emptyActions={[
               { href: '/contacts?topic=education-program#contact-form', label: 'Предложить программу' },
@@ -235,7 +235,7 @@ export default async function EducationPage({ searchParams }: EducationPageProps
             ]}
             emptyTitle="Программ пока нет"
             excludedItemIds={featuredItem ? [featuredItem.id] : []}
-            rowActionLabel="Смотреть программу"
+            rowActionLabel="Записаться"
             sectionId="education-list"
             secondaryEmptyActions={[
               { href: '/contacts?topic=education-program#contact-form', label: 'Написать' }

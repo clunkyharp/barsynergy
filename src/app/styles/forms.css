@@ -51,6 +51,15 @@
   text-transform: uppercase;
 }
 
+.field-label.field-label-compact {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: normal;
+  line-height: 1.125rem;
+  text-transform: none;
+  color: var(--text);
+}
+
 .field-hint,
 .field-error,
 .field-success {
@@ -614,9 +623,7 @@
   word-break: normal;
 }
 
-.render-deferred-section {
-  contain: layout style paint;
-}
+
 
 @media (pointer: coarse) {
   .field-base,

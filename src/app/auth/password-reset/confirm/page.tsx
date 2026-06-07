@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { FormField } from '@/components/ui/form-field';
 import { InlineAlert } from '@/components/ui/inline-alert';
 import { Input } from '@/components/ui/input';
+import { PasswordPairValidation } from '@/components/ui/password-pair-validation';
 import { SubmitButton } from '@/components/ui/submit-button';
 import { PublicFormValidation } from '@/components/public/public-form-validation';
 import { buildPrivatePageMetadata } from '@/lib/public/metadata';
@@ -97,6 +98,7 @@ export default async function PasswordResetConfirmPage({ searchParams }: Passwor
               )}
               <form action={resetPasswordAction} className="auth-password-reset-confirm-form grid gap-3.5" data-public-validation="true" noValidate>
                 <PublicFormValidation />
+                <PasswordPairValidation />
                 <input name="token" type="hidden" value={token} />
                 <FormField htmlFor="new-password" label="Новый пароль" required={false}>
                   <Input

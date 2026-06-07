@@ -1,4 +1,3 @@
-import { submitConsultingRequest } from '@/app/(public)/consulting/actions';
 import {
   ContactChannelFieldset,
   HiddenUtmFields,
@@ -26,9 +25,10 @@ import {
 
 type ConsultingRequestFormProps = PublicApplicationFormProps & {
   direct?: boolean;
+  action: (formData: FormData) => void;
 };
 
-export function ConsultingRequestForm({ enabled, result, utm, cities, defaults = {}, direct = false }: ConsultingRequestFormProps) {
+export function ConsultingRequestForm({ enabled, result, utm, cities, defaults = {}, direct = false, action }: ConsultingRequestFormProps) {
   return (
     <PublicApplicationSection
       eyebrow="Консалтинг / Заявка"
@@ -45,7 +45,7 @@ export function ConsultingRequestForm({ enabled, result, utm, cities, defaults =
       result={result}
       sectionId="consulting-request"
     >
-      <form action={submitConsultingRequest} className="editorial-form-shell public-form-shell" noValidate>
+      <form action={action} className="editorial-form-shell public-form-shell" noValidate>
         <PublicFormValidation />
         <HiddenUtmFields utm={utm} />
         <HoneypotField id="consulting-request-website" />

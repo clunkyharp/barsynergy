@@ -4,6 +4,7 @@ import './globals.css';
 import { SiteFooter } from '@/components/layout/site-footer';
 import { SiteHeaderServer } from '@/components/layout/site-header-server';
 import { CookieNotice } from '@/components/public/cookie-notice';
+import { logoutAction } from '@/app/auth/login/actions';
 import { ViewportReveal } from '@/components/public/viewport-reveal';
 import { ScrollToTopButton } from '@/components/layout/scroll-to-top-button';
 import { JsonLd } from '@/components/seo/json-ld';
@@ -62,8 +63,8 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
         <JsonLd data={buildSiteJsonLd()} />
         <ToastProvider>
           <div className="site-shell overflow-x-clip">
-            <SiteHeaderServer />
-            <main className="site-main overflow-x-hidden w-full max-w-full">{children}</main>
+            <SiteHeaderServer logoutAction={logoutAction} />
+            <main className="site-main flex-1 overflow-x-hidden w-full max-w-full">{children}</main>
             <SiteFooter />
             <ViewportReveal />
             <ScrollToTopButton />

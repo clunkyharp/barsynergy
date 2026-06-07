@@ -2,8 +2,7 @@
 
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { Bookmark, LayoutDashboard, Mail, Settings } from 'lucide-react';
-import { logoutAction } from '@/app/auth/actions';
+import { Bookmark, LayoutDashboard, Mail, MessageSquare, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { NavLink } from '@/components/ui/nav-link';
 import { Panel } from '@/components/ui/panel';
@@ -16,16 +15,18 @@ type SidebarUser = {
 
 type ProfileSidebarProps = {
   user?: SidebarUser | null;
+  logoutAction: () => Promise<void>;
 };
 
 const links = [
   { href: '/profile', label: 'Обзор', icon: LayoutDashboard },
   { href: '/profile/responses', label: 'Мои отклики', icon: Mail },
+  { href: '/profile/inquiries', label: 'Запросы поставщикам', icon: MessageSquare },
   { href: '/profile/saved-vacancies', label: 'Избранное', icon: Bookmark },
   { href: '/profile/settings', label: 'Настройки', icon: Settings }
 ];
 
-export function ProfileSidebar({ user }: ProfileSidebarProps) {
+export function ProfileSidebar({ user, logoutAction }: ProfileSidebarProps) {
   const pathname = usePathname();
 
   return (

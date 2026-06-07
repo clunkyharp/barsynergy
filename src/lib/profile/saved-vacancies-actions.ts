@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
+import { ContentStatus } from '@prisma/client';
 import { prisma } from '@/lib/db/prisma';
 import { getCurrentUser } from '@/lib/auth/current-user';
 import { assertSameOriginServerAction } from '@/lib/security/server-action-origin';
@@ -41,6 +42,15 @@ export async function toggleSavedVacancy(vacancyId: string) {
       redirect('/auth/login');
     }
 
+    const vacancy = await prisma.vacancy.findUnique({
+      where: { id: vacancyId },
+      select: { status: true }
+    });
+
+    if (!vacancy || vacancy.status !== ContentStatus.PUBLISHED) {
+      return { saved: false, error: 'Вакансия недоступна.' };
+    }
+
     const existing = await prisma.savedVacancy.findUnique({
       where: { userId_vacancyId: { userId: user.id, vacancyId } }
     });
@@ -78,7 +88,10 @@ export async function getSavedVacancies() {
   }
 
   return prisma.savedVacancy.findMany({
-    where: { userId: user.id },
+    where: {
+      userId: user.id,
+      vacancy: { status: ContentStatus.PUBLISHED }
+    },
     include: {
       vacancy: {
         select: {

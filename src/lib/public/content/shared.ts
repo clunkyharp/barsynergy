@@ -26,6 +26,8 @@ export type PublishedContentItem = {
   metaGroups?: PublishedContentMetaGroup[];
   statusLabel?: string;
   updatedLabel?: string;
+  websiteUrl?: string;
+  isNew?: boolean;
 };
 
 export type PublishedContentList = {
@@ -131,6 +133,66 @@ export function textSearch(query?: string) {
         ]
       }
     : {};
+}
+
+export function scoredTextSearch(
+  query: string | undefined,
+  extraFields: Record<string, string>[] = []
+) {
+  if (!query) return {};
+  return {
+    OR: [
+      { title: { contains: query, mode: 'insensitive' as const } },
+      { summary: { contains: query, mode: 'insensitive' as const } },
+      ...extraFields
+    ]
+  };
+}
+
+export function scoreRelevance(title: string, query: string): number {
+  const lower = title.toLowerCase();
+  const qLower = query.toLowerCase();
+  if (lower === qLower) return 0;
+  if (lower.startsWith(qLower)) return 1;
+  if (lower.includes(qLower)) return 2;
+  return 10;
+}
+
+export async function listResultWithRelevance<
+  TId extends { id: string; title: string },
+  TFull extends { id: string }
+>(
+  query: string | undefined,
+  page: number,
+  pageSize: number,
+  getIdQuery: (opts: { idsOnly: boolean }) => Promise<{ ids: TId[]; total: number }>,
+  fetchRecords: (ids: string[]) => Promise<TFull[]>
+): Promise<{ items: TFull[]; total: number }> {
+  if (!query) {
+    const { ids, total } = await getIdQuery({ idsOnly: false });
+    const paginatedIds = ids.slice((page - 1) * pageSize, page * pageSize).map((item) => item.id);
+    const items = paginatedIds.length > 0 ? await fetchRecords(paginatedIds) : [];
+    const order = new Map(paginatedIds.map((id, i) => [id, i]));
+    items.sort((a, b) => (order.get(a.id) ?? 0) - (order.get(b.id) ?? 0));
+    return { items, total };
+  }
+
+  const { ids, total } = await getIdQuery({ idsOnly: true });
+  const qLower = query.toLowerCase();
+
+  const scored = ids
+    .map((item) => ({ id: item.id, score: scoreRelevance(item.title, qLower) }))
+    .sort((a, b) => a.score - b.score);
+
+  const paginatedIds = scored
+    .slice((page - 1) * pageSize, page * pageSize)
+    .map((s) => s.id);
+
+  const items = paginatedIds.length > 0 ? await fetchRecords(paginatedIds) : [];
+  const order = new Map(paginatedIds.map((id, i) => [id, i]));
+  items.sort((a, b) => (order.get(a.id) ?? 0) - (order.get(b.id) ?? 0));
+
+  return { items, total };
 }
 
 const relativeTimeFormatter = new Intl.RelativeTimeFormat('ru-RU', { numeric: 'auto' });

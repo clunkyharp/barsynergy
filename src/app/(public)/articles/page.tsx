@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { CategoryType } from '@prisma/client';
+import { CategoryType } from '@/modules/content/shared/types';
 import { ArticleGridSection } from '@/components/public/article-grid-section';
 import { FileText } from 'lucide-react';
 import { EditorialPublicPage } from '@/components/public/editorial-public-page';
@@ -40,7 +40,7 @@ export default async function ArticlesPage({ searchParams }: ArticlesPageProps) 
         density="compact"
         metrics={[]}
         rows={[]}
-        primaryLink={{ label: 'Предложить тему', href: '/contacts?topic=article-topic#contact-form' }}
+        primaryLink={isPrelaunchEmpty ? undefined : { label: 'Предложить тему', href: '/contacts?topic=article-topic#contact-form' }}
         accentGradient="radial-gradient(ellipse 90% 60% at 30% 40%, rgba(160,80,200,0.14), transparent)"
         accentIcon={FileText}
       />

@@ -214,7 +214,7 @@ export async function updateCity(formData: FormData) {
       });
 
       revalidateTaxonomyPaths();
-      return { type: 'success', message: 'Город обновлен.' };
+      return { type: 'success', message: 'Город обновлён.' };
     }
   });
 }

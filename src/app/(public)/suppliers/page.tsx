@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
-import { CategoryType } from '@prisma/client';
+import { CategoryType } from '@/modules/content/shared/types';
 import { PackageCheck } from 'lucide-react';
 import { EditorialPublicPage } from '@/components/public/editorial-public-page';
-import { PublishedContentSection } from '@/components/public/published-content-section';
+import { PublishedContentSectionDirectory } from '@/components/public/published-content-section';
 import { PublicFilters } from '@/components/public/public-filters';
 import { PublicPrelaunchSection } from '@/components/public/public-prelaunch-section';
 import { stripPublicApplicationResultParams } from '@/lib/applications/public-form-helpers';
@@ -76,7 +76,7 @@ export default async function SuppliersPage({ searchParams }: SuppliersPageProps
           title="Какие компании можно добавить"
         />
       ) : (
-        <PublishedContentSection
+        <PublishedContentSectionDirectory
           basePath="/suppliers"
           content={content}
           emptyDescription="Каталог пополняется. Добавьте компанию, если она работает с кофейными барами, зерном, оборудованием или сервисом в регионе."
@@ -108,7 +108,6 @@ export default async function SuppliersPage({ searchParams }: SuppliersPageProps
           listLabel="Поставщики"
           countLabel="В базе"
           rowActionLabel="Смотреть профиль"
-          rowVariant="directory"
           sectionId="suppliers-list"
           showSidebarTitle={false}
           title="Каталог"

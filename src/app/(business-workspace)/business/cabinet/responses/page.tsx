@@ -1,18 +1,22 @@
 import type { Metadata } from 'next';
 import { Mail } from 'lucide-react';
-import { ApplicationStatus, ApplicationType } from '@prisma/client';
 import { Button } from '@/components/ui/button';
 import { PageHeader } from '@/components/ui/page-header';
 import { Panel } from '@/components/ui/panel';
 import { StatusBadge } from '@/components/ui/status-badge';
+import { UnreadBadge } from '@/components/messaging/unread-badge';
 import { AppLink } from '@/components/ui/app-link';
 import { requireBusinessAccountAccess } from '@/lib/auth/require-business-account';
-import { prisma } from '@/lib/db/prisma';
+import { getUnreadMessageCounts } from '@/lib/messaging/get-conversation';
 import { buildPrivatePageMetadata } from '@/lib/public/metadata';
 import {
   applicationStatusBadgeVariants,
   applicationStatusLabels
 } from '@/lib/admin/application-utils';
+import {
+  getBusinessVacancySlugs,
+  getBusinessResponses
+} from '@/modules/business/queries';
 
 export const metadata: Metadata = buildPrivatePageMetadata({
   title: 'Отклики на вакансии',
@@ -22,31 +26,12 @@ export const metadata: Metadata = buildPrivatePageMetadata({
 export default async function BusinessResponsesPage() {
   const { businessAccount } = await requireBusinessAccountAccess();
 
-  const vacancies = await prisma.vacancy.findMany({
-    where: { businessAccountId: businessAccount.id },
-    select: { id: true, title: true, slug: true }
-  });
-
+  const vacancies = await getBusinessVacancySlugs(businessAccount.id);
   const vacancyIds = vacancies.map((v) => v.id);
+  const responses = await getBusinessResponses(vacancyIds);
 
-  const responses = vacancyIds.length > 0
-    ? await prisma.application.findMany({
-        where: {
-          vacancyId: { in: vacancyIds },
-          type: ApplicationType.VACANCY_RESPONSE,
-          status: { not: ApplicationStatus.DRAFT }
-        },
-        select: {
-          id: true,
-          status: true,
-          createdAt: true,
-          name: true,
-          message: true,
-          vacancy: { select: { title: true, slug: true } }
-        },
-        orderBy: { createdAt: 'desc' }
-      })
-    : [];
+  const responseIds = responses.map((r) => r.id);
+  const unreadCounts = await getUnreadMessageCounts(responseIds, 'business');
 
   return (
     <div className="space-y-6">
@@ -100,9 +85,12 @@ export default async function BusinessResponsesPage() {
                   <p className="mt-1 text-sm text-[var(--muted)] line-clamp-2">{response.message}</p>
                 )}
               </div>
-              <Button href={`/business/cabinet/responses/${response.id}`} size="sm" variant="secondary">
-                Подробнее
-              </Button>
+              <div className="flex items-center gap-3">
+                <UnreadBadge count={unreadCounts.get(response.id) ?? 0} />
+                <Button href={`/business/cabinet/responses/${response.id}`} size="sm" variant="secondary">
+                  Подробнее
+                </Button>
+              </div>
             </Panel>
           ))}
         </div>

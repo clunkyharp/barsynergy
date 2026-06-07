@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { ApplicationStatus } from '@prisma/client';
+import { ArrowRight } from 'lucide-react';
 import { updateBusinessProfile } from '@/lib/business/actions';
 import { AdminActionAlert } from '@/components/admin/content-admin-controls';
 import {
@@ -8,11 +8,15 @@ import {
   RequestLedger,
   RequestStatusRail
 } from '@/components/business/business-cabinet';
+import { Button } from '@/components/ui/button';
 import { PageHeader } from '@/components/ui/page-header';
 import type { AdminContentSearchParams } from '@/lib/admin/content-utils';
 import { requireBusinessAccountAccess } from '@/lib/auth/require-business-account';
-import { prisma } from '@/lib/db/prisma';
 import { buildPrivatePageMetadata } from '@/lib/public/metadata';
+import {
+  getBusinessDashboardData,
+  getActiveCities
+} from '@/modules/business/queries';
 
 type BusinessDashboardPageProps = {
   searchParams?: Promise<AdminContentSearchParams>;
@@ -26,42 +30,12 @@ export const metadata: Metadata = buildPrivatePageMetadata({
 export default async function BusinessDashboardPage({ searchParams }: BusinessDashboardPageProps) {
   const { businessAccount } = await requireBusinessAccountAccess();
   const params = (await searchParams) ?? {};
-  const [cities, requestCount, activeRequestCount, draftRequestCount, closedRequestCount, latestApplications] = await Promise.all([
-    prisma.city.findMany({
-      where: { isActive: true },
-      orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
-      select: { id: true, name: true }
-    }),
-    prisma.application.count({ where: { businessAccountId: businessAccount.id } }),
-    prisma.application.count({
-      where: {
-        businessAccountId: businessAccount.id,
-        status: {
-          notIn: [ApplicationStatus.DRAFT, ApplicationStatus.ARCHIVED]
-        }
-      }
-    }),
-    prisma.application.count({
-      where: {
-        businessAccountId: businessAccount.id,
-        status: ApplicationStatus.DRAFT
-      }
-    }),
-    prisma.application.count({
-      where: {
-        businessAccountId: businessAccount.id,
-        status: {
-          in: [ApplicationStatus.COMPLETED, ApplicationStatus.REJECTED, ApplicationStatus.ARCHIVED]
-        }
-      }
-    }),
-    prisma.application.findMany({
-      where: { businessAccountId: businessAccount.id },
-      orderBy: [{ updatedAt: 'desc' }],
-      take: 5,
-      select: { id: true, type: true, subject: true, status: true, businessNotes: true, createdAt: true, updatedAt: true }
-    })
-  ]);
+  const cities = await getActiveCities();
+  const {
+    requestCount, activeRequestCount, draftRequestCount,
+    closedRequestCount, latestApplications,
+    newResponseCount
+  } = await getBusinessDashboardData(businessAccount.id);
 
   const missingProfileFields = [
     businessAccount.contactPerson ? null : 'контактное лицо',
@@ -74,6 +48,18 @@ export default async function BusinessDashboardPage({ searchParams }: BusinessDa
     <div className="space-y-8">
       <PageHeader eyebrow="Компания" title={businessAccount.companyName} />
       <AdminActionAlert params={params} />
+
+      <div className="flex flex-wrap items-center gap-4 rounded-[var(--radius-lg)] border border-[var(--line)] bg-[var(--surface-elevated)] px-5 py-4">
+        <div className="flex items-center gap-4 text-sm">
+          <span className="font-semibold text-[var(--text)]">Активных заявок: <span className="text-[var(--accent)]">{activeRequestCount}</span></span>
+          <span className="h-4 w-px bg-[var(--line)]" aria-hidden="true" />
+          <span className="font-semibold text-[var(--text)]">Новых откликов: <span className="text-[var(--accent)]">{newResponseCount}</span></span>
+        </div>
+        <Button className="ml-auto shrink-0 rounded-[var(--radius-md)]" href="/business/cabinet/requests" size="sm" variant="primary">
+          Создать заявку
+          <ArrowRight size={15} strokeWidth={1.8} />
+        </Button>
+      </div>
 
       <section className="grid gap-5 xl:grid-cols-[minmax(0,1.1fr)_minmax(300px,0.45fr)]">
         <BusinessProfileSheet account={businessAccount} action={updateBusinessProfile} cities={cities} />

@@ -21,8 +21,8 @@ export function SiteFooter() {
   }
 
   return (
-    <footer className="mt-auto">
-      <section className="border-t border-[var(--editorial-dark-border)] bg-[var(--editorial-dark-surface)] py-9 text-[var(--editorial-dark-text)]">
+    <footer>
+      <section className="bg-[var(--editorial-dark-surface)] py-9 text-[var(--editorial-dark-text)]" data-theme="dark">
         <div className="container grid gap-8 lg:grid-cols-[minmax(18rem,1.08fr)_minmax(0,1.6fr)] lg:items-start">
           <div>
             <AppLink className="inline-flex min-h-10 w-fit items-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]" href="/">
@@ -91,8 +91,7 @@ export function SiteFooter() {
                 Регистрация
               </AppLink>
             </nav>
-            <div className="col-span-full mt-4 flex items-center justify-between border-t border-[var(--editorial-dark-border)] pt-4">
-              <span className="text-xs text-[var(--editorial-dark-muted)]">Тема</span>
+            <div className="col-span-full mt-4 flex justify-end border-t border-[var(--editorial-dark-border)] pt-4">
               <ThemeToggle compact />
             </div>
           </div>

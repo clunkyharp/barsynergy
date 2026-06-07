@@ -79,7 +79,7 @@ export async function updateApplicationBusinessNotes(formData: FormData) {
     revalidatePath(applicationDetailPath(parsed.applicationId));
     revalidatePath('/business/cabinet');
     revalidatePath('/business/cabinet/requests');
-    result = { type: 'success', message: 'Комментарий для бизнеса сохранен.' };
+    result = { type: 'success', message: 'Комментарий для бизнеса сохранён.' };
   } catch (error) {
     result = getApplicationActionErrorResult(error);
   }

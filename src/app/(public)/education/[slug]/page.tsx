@@ -4,7 +4,7 @@ import { PublicContentDetailPage } from '@/components/public/public-content-deta
 import { PublicRelatedContentSection } from '@/components/public/public-related-content-section';
 import { JsonLd } from '@/components/seo/json-ld';
 import { getPublishedCourses } from '@/lib/public/content';
-import { getPublishedCourseDetail } from '@/lib/public/content-details';
+import { getPublishedCourseDetail } from '@/lib/public/content';
 import { buildMissingPublicContentMetadata, buildPublicContentMetadata } from '@/lib/public/metadata';
 import { buildBreadcrumbJsonLd, buildPublicContentJsonLd } from '@/lib/public/structured-data';
 
@@ -19,7 +19,7 @@ export async function generateMetadata({ params }: CourseDetailPageProps): Promi
   if (!course) {
     return buildMissingPublicContentMetadata({
       title: 'Программа не найдена',
-      description: 'Программа удалена или еще не опубликована.'
+      description: 'Программа удалена или ещё не опубликована.'
     });
   }
 

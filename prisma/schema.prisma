@@ -81,6 +81,7 @@ enum ApplicationType {
   CONTACT_MESSAGE                @map("contact_message")
   CORPORATE_TRAINING_APPLICATION @map("corporate_training_application")
   CERTIFICATE_ORDER              @map("certificate_order")
+  SUPPLIER_INQUIRY               @map("supplier_inquiry")
 }
 
 enum ApplicationStatus {
@@ -98,9 +99,19 @@ enum ApplicationStatus {
 }
 
 enum ApplicationNotificationChannel {
-  ADMIN_EMAIL    @map("admin_email")
-  ADMIN_TELEGRAM @map("admin_telegram")
-  USER_EMAIL     @map("user_email")
+  ADMIN_EMAIL              @map("admin_email")
+  ADMIN_TELEGRAM           @map("admin_telegram")
+  USER_EMAIL               @map("user_email")
+  BUSINESS_MESSAGE_EMAIL   @map("business_message_email")
+  USER_MESSAGE_EMAIL       @map("user_message_email")
+}
+
+enum ConversationSender {
+  USER     @map("user")
+  BUSINESS @map("business")
+  ADMIN    @map("admin")
+
+  @@map("ConversationSender")
 }
 
 enum ApplicationNotificationStatus {
@@ -162,6 +173,7 @@ model User {
   applications            Application[]                @relation("ApplicationUser")
   forwardedApplications   Application[]                @relation("ApplicationForwardedBy")
   businessAccessInvites   BusinessAccessInvite[]
+  conversationMessages    ConversationMessage[]
 
   @@index([role])
   @@index([status])
@@ -798,6 +810,9 @@ model Application {
   forwardedById     String?
   internalNotes     String?
   businessNotes     String?
+  hasUnreadForUser     Boolean   @default(false)
+  hasUnreadForBusiness Boolean   @default(false)
+  lastMessageAt     DateTime?
   createdAt         DateTime          @default(now())
   updatedAt         DateTime          @updatedAt
 
@@ -811,6 +826,7 @@ model Application {
   forwardedBy           User?                     @relation("ApplicationForwardedBy", fields: [forwardedById], references: [id], onDelete: SetNull)
   businessAccessInvites BusinessAccessInvite[]
   notifications         ApplicationNotification[]
+  conversationMessages  ConversationMessage[]
 
   @@index([type, status])
   @@index([status, createdAt])
@@ -842,6 +858,25 @@ model ApplicationNotification {
 
   @@index([status, nextAttemptAt])
   @@index([applicationId, channel])
+}
+
+model ConversationMessage {
+  id                 String             @id @default(cuid())
+  applicationId      String
+  authorId           String?
+  senderRole         ConversationSender
+  body               String             @db.Text
+  isReadByUser       Boolean            @default(false)
+  isReadByBusiness   Boolean            @default(false)
+  createdAt          DateTime           @default(now())
+
+  application Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  author      User?       @relation(fields: [authorId], references: [id], onDelete: SetNull)
+
+  @@index([applicationId, createdAt])
+  @@index([authorId])
+  @@index([applicationId, isReadByUser])
+  @@index([applicationId, isReadByBusiness])
 }
 
 model UserEmailVerificationToken {

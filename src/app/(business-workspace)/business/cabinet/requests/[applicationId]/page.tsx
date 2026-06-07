@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { ApplicationStatus, ApplicationType } from '@prisma/client';
 import {
   archiveBusinessDraftApplication,
   submitBusinessDraftApplication,
@@ -27,8 +26,12 @@ import {
 import { vacancyEmploymentTypeOptions, withCurrentValueOption, type AdminContentSearchParams } from '@/lib/admin/content-utils';
 import { getApplicationPayloadText } from '@/lib/applications/application-payloads';
 import { requireBusinessAccountAccess } from '@/lib/auth/require-business-account';
-import { prisma } from '@/lib/db/prisma';
 import { buildPrivatePageMetadata } from '@/lib/public/metadata';
+import {
+  getBusinessRequestDetail,
+  ApplicationStatus,
+  ApplicationType
+} from '@/modules/business/queries';
 import { isVacancyPosition, vacancyPositionValues } from '@/lib/vacancies/positions';
 
 type BusinessRequestDetailPageProps = {
@@ -145,22 +148,7 @@ export default async function BusinessRequestDetailPage({ params, searchParams }
   const { businessAccount } = await requireBusinessAccountAccess();
   const { applicationId } = await params;
   const query = (await searchParams) ?? {};
-  const [cities, application] = await Promise.all([
-    prisma.city.findMany({
-      where: { isActive: true },
-      orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
-      select: { id: true, name: true }
-    }),
-    prisma.application.findFirst({
-      where: {
-        id: applicationId,
-        businessAccountId: businessAccount.id
-      },
-      include: {
-        city: { select: { name: true } }
-      }
-    })
-  ]);
+  const { cities, application } = await getBusinessRequestDetail(businessAccount.id, applicationId);
 
   if (!application) {
     notFound();

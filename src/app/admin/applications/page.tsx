@@ -1,4 +1,4 @@
-import { ApplicationStatus, ApplicationType, type Prisma } from '@prisma/client';
+import { ApplicationStatus, ApplicationType, type Prisma } from '@/modules/admin/queries';
 import { publishContentFromApplication } from '@/app/admin/applications/actions';
 import { AdminFilterBar, AdminPagination, AdminStatusTabs, HiddenRedirect } from '@/components/admin/content-admin-controls';
 import { AdminPageIntro } from '@/components/admin/admin-page-intro';
@@ -38,7 +38,7 @@ import {
 } from '@/lib/admin/content-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
 import { getApplicationPayloadText } from '@/lib/applications/application-payloads';
-import { prisma } from '@/lib/db/prisma';
+import { prisma } from '@/modules/admin/queries';
 
 export const dynamic = 'force-dynamic';
 
@@ -176,7 +176,11 @@ export default async function AdminApplicationsPage({ searchParams }: AdminAppli
           { name: { contains: search, mode: 'insensitive' } },
           { email: { contains: search, mode: 'insensitive' } },
           { phone: { contains: search, mode: 'insensitive' } },
-          { telegram: { contains: search, mode: 'insensitive' } }
+          { telegram: { contains: search, mode: 'insensitive' } },
+          { businessAccount: { companyName: { contains: search, mode: 'insensitive' } } },
+          { payload: { path: ['companyName'], string_contains: search } },
+          { payload: { path: ['projectName'], string_contains: search } },
+          { payload: { path: ['employerCompanyName'], string_contains: search } }
         ]
       }
     : {};

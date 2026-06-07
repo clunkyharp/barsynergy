@@ -4,6 +4,25 @@ Rules derived from the BARSYNERGY code review (June 2026). Every rule has a reas
 
 ---
 
+## 0. Import Boundaries (Enforced by ESLint)
+
+Two `no-restricted-imports` rules guard layer separation:
+
+| Rule | Files targeted | Restricted imports | Violations found |
+|------|---------------|-------------------|------------------|
+| Prisma in pages | `src/**/page.tsx`, `src/**/layout.tsx` | `@prisma/client`, `@/lib/db/prisma` | 81 |
+| Actions in components | `src/components/**` | `@/app/**/actions` | 14 |
+
+These are hard errors. `npm run lint` must pass before commit.
+
+The target architecture is documented in `docs/adr/001-target-architecture.md`:
+- `app/` — composition layer (entry points, thin action wrappers)
+- `modules/` — domain layer (queries, commands, schemas, policies)
+- `components/` — UI layer (no data fetching, no server action imports)
+- `lib/` — infra shared (db, storage, security, validation, utils)
+
+Migration is done in 4 queues (A guardrails+ADR → B content read → C actions/commands → D UI decomposition).
+
 ## 1. Component Design
 
 ### Size Limits
@@ -88,6 +107,49 @@ Reason: direct Prisma in pages couples pages to schema, makes queries untestable
 
 Exception: joining multiple queries in `Promise.all` for performance is acceptable in pages if each individual query is already a lib function.
 
+### Object-Level Authorization Is Enforced In The Write Query
+
+If an action receives an object id from route params or `FormData`, the final write must still encode ownership or role scope.
+
+```typescript
+// Good
+await prisma.workExperience.updateMany({
+  where: { id: exp.id, profileId: profile.id },
+  data: { ... }
+});
+
+// Bad
+const ownRecord = await prisma.workExperience.findFirst({ where: { profileId: profile.id } });
+await prisma.workExperience.update({
+  where: { id: exp.id },
+  data: { ... }
+});
+```
+
+Reason: a prior ownership read does not protect a later naked `update({ where: { id } })`. If the caller injects another valid id, this becomes an IDOR bug.
+
+Rule:
+- profile/business/user actions must use `updateMany` / `deleteMany` with owner scope, or a unique composite key that already includes owner scope;
+- if a naked primary-key write is unavoidable, the action must first prove that the id came from a server-owned source, not from user-controlled form data.
+
+### Visibility Checks Must Be Reapplied Server-Side
+
+User-facing pages and actions must not trust that a client only submits ids of published or visible content.
+
+```typescript
+// Good
+const vacancy = await prisma.vacancy.findFirst({
+  where: { id: vacancyId, status: ContentStatus.PUBLISHED }
+});
+
+// Bad
+await prisma.savedVacancy.create({ data: { userId, vacancyId } });
+```
+
+Rule:
+- public actions that accept content ids re-check `PUBLISHED`/active visibility server-side;
+- profile and business lists must not expose unpublished or private related records through saved items, history or detail pages.
+
 ### Server Actions — Use the Wrapper
 
 All public-facing server actions must go through `withPublicAction`. All admin actions through `withAdminAction`. These wrappers (to be created — see architecture.md) provide:
@@ -133,6 +195,24 @@ Adding a new topic means creating a new file, not extending an existing 400-line
 - `ConsentField` is a wrapper around `CheckboxField`. Never inline a bare `<input type="checkbox">` for consent.
 - `color-scheme: light` is set on `.checkbox-control` to prevent Safari dark-mode hit-test bugs. Do not remove it.
 - All consent fields must have `required` and a matching consent text key from `lib/legal/`.
+
+### Enumeration-Safe Auth And Registration Copy
+
+Public auth and recovery surfaces must not reveal whether an email, account, or pending request exists.
+
+Good:
+- `Если этот email зарегистрирован, мы отправили письмо.`
+- `Если данные корректны, заявка принята в обработку.`
+
+Bad:
+- `Этот email уже зарегистрирован.`
+- `Заявка по этому email уже получена.`
+
+Reason: explicit duplicate messages create account and workflow enumeration endpoints.
+
+Rule:
+- unauthenticated register, business-access request, password reset and verification resend flows return generic success messages;
+- duplicate detection still happens server-side, but the user-facing response remains indistinguishable.
 
 ---
 
@@ -226,6 +306,33 @@ type ActionResult<T = void> =
 ```
 
 Until `ActionResult` is formally defined: actions must return objects with a `type` discriminant. Never return raw `undefined` or throw from an action without catching.
+
+### Password And Session Invariants
+
+Password rules must stay aligned across all auth flows:
+- register;
+- change password;
+- password reset;
+- first-time activation.
+
+Minimum length and complexity requirements are defined once and reused. Do not let one flow accept a weaker password than the others.
+
+When a password changes successfully:
+- revoke all existing sessions for that user inside the same security flow;
+- consume reset/activation tokens atomically so the token becomes single-use under concurrent requests.
+
+Reason: inconsistent password policies silently weaken the account surface, and non-revoked sessions keep an attacker logged in after credential rotation.
+
+### Container-Aware Validation For Office Files
+
+ZIP-based office formats such as `.docx` and `.odt` are not validated by checking only the first `PK` bytes.
+
+Rule:
+- validate extension, claimed MIME type, size and container structure;
+- for `.docx`, require expected Word entries such as `[Content_Types].xml` and `word/document.xml`;
+- for `.odt`, require the expected ODF manifest/mimetype entries.
+
+Reason: plain ZIP archives can masquerade as office documents if validation checks only the container signature.
 
 ---
 
