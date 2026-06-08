@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { notFound } from 'next/navigation';
+import { Button } from '@/components/ui/button';
 import { PublicContentDetailPage } from '@/components/public/public-content-detail-page';
 import { PublicRelatedContentSection } from '@/components/public/public-related-content-section';
 import { JsonLd } from '@/components/seo/json-ld';
@@ -19,7 +19,8 @@ type SupplierDetailPageProps = {
 };
 
 export async function generateMetadata({ params }: SupplierDetailPageProps): Promise<Metadata> {
-  const { slug } = await params;
+  const { slug: rawSlug } = await params;
+  const slug = decodeURIComponent(rawSlug);
   const supplier = await getPublishedSupplierDetail(slug);
 
   if (!supplier) {
@@ -36,11 +37,24 @@ export async function generateMetadata({ params }: SupplierDetailPageProps): Pro
 }
 
 export default async function SupplierDetailPage({ params, searchParams }: SupplierDetailPageProps) {
-  const { slug } = await params;
+  const { slug: rawSlug } = await params;
+  const slug = decodeURIComponent(rawSlug);
   const [supplier, related] = await Promise.all([getPublishedSupplierDetail(slug), getPublishedSuppliers({ pageSize: '4' })]);
 
   if (!supplier) {
-    notFound();
+    return (
+      <div className="container py-10 md:py-14">
+        <div className="mx-auto max-w-md text-center">
+          <h1 className="text-3xl font-bold leading-tight text-[var(--text)]">Поставщик не найден</h1>
+          <p className="mt-3 text-sm leading-6 text-[var(--muted)]">
+            Поставщик удалён, ещё не опубликован или ссылка неправильная.
+          </p>
+          <Button className="mt-6 rounded-[var(--radius-md)]" href="/suppliers" size="lg">
+            Вернуться в каталог поставщиков
+          </Button>
+        </div>
+      </div>
+    );
   }
 
   const sp = (await searchParams) ?? {};

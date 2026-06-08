@@ -20,7 +20,8 @@ type EventDetailPageProps = {
 };
 
 export async function generateMetadata({ params }: EventDetailPageProps): Promise<Metadata> {
-  const { slug } = await params;
+  const { slug: rawSlug } = await params;
+  const slug = decodeURIComponent(rawSlug);
   const event = await getPublishedEventDetail(slug);
 
   if (!event) {
@@ -37,7 +38,8 @@ export async function generateMetadata({ params }: EventDetailPageProps): Promis
 }
 
 export default async function EventDetailPage({ params, searchParams }: EventDetailPageProps) {
-  const { slug } = await params;
+  const { slug: rawSlug } = await params;
+  const slug = decodeURIComponent(rawSlug);
   const query = (await searchParams) ?? {};
   const [event, related, cities] = await Promise.all([
     getPublishedEventDetail(slug),

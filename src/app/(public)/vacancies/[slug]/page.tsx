@@ -26,7 +26,8 @@ type VacancyDetailPageProps = {
 };
 
 export async function generateMetadata({ params }: VacancyDetailPageProps): Promise<Metadata> {
-  const { slug } = await params;
+  const { slug: rawSlug } = await params;
+  const slug = decodeURIComponent(rawSlug);
   const vacancy = await getPublishedVacancyDetail(slug);
 
   if (!vacancy) {
@@ -43,7 +44,8 @@ export async function generateMetadata({ params }: VacancyDetailPageProps): Prom
 }
 
 export default async function VacancyDetailPage({ params, searchParams }: VacancyDetailPageProps) {
-  const { slug } = await params;
+  const { slug: rawSlug } = await params;
+  const slug = decodeURIComponent(rawSlug);
 
   const [vacancy, related] = await Promise.all([
     getPublishedVacancyDetail(slug),

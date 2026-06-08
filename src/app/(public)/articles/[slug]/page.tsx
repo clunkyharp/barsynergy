@@ -13,7 +13,8 @@ type ArticleDetailPageProps = {
 };
 
 export async function generateMetadata({ params }: ArticleDetailPageProps): Promise<Metadata> {
-  const { slug } = await params;
+  const { slug: rawSlug } = await params;
+  const slug = decodeURIComponent(rawSlug);
   const article = await getPublishedArticleDetail(slug);
 
   if (!article) {
@@ -30,7 +31,8 @@ export async function generateMetadata({ params }: ArticleDetailPageProps): Prom
 }
 
 export default async function ArticleDetailPage({ params }: ArticleDetailPageProps) {
-  const { slug } = await params;
+  const { slug: rawSlug } = await params;
+  const slug = decodeURIComponent(rawSlug);
   const [article, related] = await Promise.all([getPublishedArticleDetail(slug), getPublishedArticles({ pageSize: '4' })]);
 
   if (!article) {

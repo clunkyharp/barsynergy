@@ -13,7 +13,8 @@ type CourseDetailPageProps = {
 };
 
 export async function generateMetadata({ params }: CourseDetailPageProps): Promise<Metadata> {
-  const { slug } = await params;
+  const { slug: rawSlug } = await params;
+  const slug = decodeURIComponent(rawSlug);
   const course = await getPublishedCourseDetail(slug);
 
   if (!course) {
@@ -30,7 +31,8 @@ export async function generateMetadata({ params }: CourseDetailPageProps): Promi
 }
 
 export default async function CourseDetailPage({ params }: CourseDetailPageProps) {
-  const { slug } = await params;
+  const { slug: rawSlug } = await params;
+  const slug = decodeURIComponent(rawSlug);
   const [course, related] = await Promise.all([getPublishedCourseDetail(slug), getPublishedCourses({ pageSize: '4' })]);
 
   if (!course) {

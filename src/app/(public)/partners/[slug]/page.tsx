@@ -13,7 +13,8 @@ type PartnerDetailPageProps = {
 };
 
 export async function generateMetadata({ params }: PartnerDetailPageProps): Promise<Metadata> {
-  const { slug } = await params;
+  const { slug: rawSlug } = await params;
+  const slug = decodeURIComponent(rawSlug);
   const partner = await getPublishedPartnerDetail(slug);
 
   if (!partner) {
@@ -47,7 +48,8 @@ function partnerContactHref(input: { title: string; companyName?: string; label?
 }
 
 export default async function PartnerDetailPage({ params }: PartnerDetailPageProps) {
-  const { slug } = await params;
+  const { slug: rawSlug } = await params;
+  const slug = decodeURIComponent(rawSlug);
   const [partner, related] = await Promise.all([getPublishedPartnerDetail(slug), getPublishedPartners({ pageSize: '4' })]);
 
   if (!partner) {
