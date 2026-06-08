@@ -248,7 +248,7 @@ export default async function EducationPage({ searchParams }: EducationPageProps
       ) : (
         <section className="background-zone background-zone-ivory border-b border-[var(--line)] py-16">
           <div className="container text-center">
-            <p className="text-[var(--muted)]">Первые программы готовятся к публикации.</p>
+            <p className="text-[var(--muted)]">Конкретные программы с датами и записью скоро появятся. Напишите нам, если хотите попасть на ближайший запуск.</p>
             <Button className="mt-6" href="/contacts?topic=education-program#contact-form">
               Предложить программу
             </Button>

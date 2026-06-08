@@ -101,31 +101,7 @@ export function FeaturedNowCard({ card }: { card: HomepageLiveCard }) {
 
 export function HomeEventsStrip({ event }: { event: HomepageLiveCard }) {
   if (event.isFallback) {
-    return (
-      <section className="background-zone background-zone-ivory border-b border-[var(--line)] py-10 md:py-14" id="home-events">
-        <div className="container">
-          <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
-            <h2 className={`${displayFont.className} text-[2.35rem] font-semibold leading-none text-[var(--text)] md:text-[3.2rem]`}>
-              Ближайшее событие
-            </h2>
-            <Button className="px-0 text-sm tracking-normal" href="/events" variant="link">
-              Вся афиша
-              <ArrowUpRight size={16} />
-            </Button>
-          </div>
-          <div className="md:max-w-md">
-            <div
-              className="home-event-card block rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--surface-card)] p-5 text-[var(--text)]"
-            >
-              <span className="block text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--accent)]">Скоро</span>
-              <p className="mt-4 text-sm leading-6 text-[var(--muted)]">
-                Следите за анонсами — скоро появится ближайшая встреча, каппинг или тренинг.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-    );
+    return null;
   }
 
   return (

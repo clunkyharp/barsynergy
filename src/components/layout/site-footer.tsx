@@ -6,11 +6,16 @@ import { Send } from 'lucide-react';
 import { AppLink } from '@/components/ui/app-link';
 import { ThemeToggle } from '@/components/layout/theme-toggle';
 
-export function SiteFooter() {
+type SiteFooterProps = {
+  userRole?: string | null;
+};
+
+export function SiteFooter({ userRole }: SiteFooterProps = {}) {
   const pathname = usePathname();
   const isWorkspacePath =
     pathname?.startsWith('/admin') || pathname?.startsWith('/business/cabinet') || pathname?.startsWith('/auth') || pathname?.startsWith('/profile');
   const aboutHref = '/about';
+  const businessHref = userRole === 'BUSINESS' ? '/business/cabinet' : '/business';
   const footerNavClassName = 'grid content-start gap-1 text-sm leading-5 text-[var(--editorial-dark-muted)] md:justify-items-start';
   const footerHeadingClassName =
     'mb-3 flex min-h-4 items-center text-xs font-semibold uppercase leading-none tracking-[0.14em] text-[var(--editorial-dark-text)]';
@@ -36,7 +41,7 @@ export function SiteFooter() {
           </div>
           <div className="grid gap-8 sm:grid-cols-2 xl:grid-cols-4">
             <nav className={footerNavClassName}>
-              <p className={footerHeadingClassName}>Платформа</p>
+              <h3 className={footerHeadingClassName}>Платформа</h3>
               <AppLink className={footerLinkClassName} href={aboutHref}>
                 О проекте
               </AppLink>
@@ -49,7 +54,7 @@ export function SiteFooter() {
               <AppLink className={footerLinkClassName} href="/vacancies">
                 Вакансии
               </AppLink>
-              <AppLink className={footerLinkClassName} href="/business">
+              <AppLink className={footerLinkClassName} href={businessHref}>
                 Для бизнеса
               </AppLink>
               <AppLink className={footerLinkClassName} href="/consulting">
@@ -60,7 +65,7 @@ export function SiteFooter() {
               </AppLink>
             </nav>
             <nav className={footerNavClassName}>
-              <p className={footerHeadingClassName}>Сообщество</p>
+              <h3 className={footerHeadingClassName}>Сообщество</h3>
               <AppLink className={footerLinkClassName} href="/partners">
                 Партнёры
               </AppLink>
@@ -79,7 +84,7 @@ export function SiteFooter() {
               </AppLink>
             </nav>
             <nav className={footerNavClassName}>
-              <p className={footerHeadingClassName}>Контакты</p>
+              <h3 className={footerHeadingClassName}>Контакты</h3>
               <AppLink className={footerLinkClassName} href="/contacts">
                 Написать команде
               </AppLink>
@@ -89,9 +94,12 @@ export function SiteFooter() {
               <AppLink className={footerLinkClassName} href="/legal/privacy">
                 Политика конфиденциальности
               </AppLink>
+              <AppLink className={footerLinkClassName} href="/legal/cookies">
+                Куки
+              </AppLink>
             </nav>
             <nav className={footerNavClassName}>
-              <p className={footerHeadingClassName}>Кабинет</p>
+              <h3 className={footerHeadingClassName}>Кабинет</h3>
               <AppLink className={footerLinkClassName} href="/auth/login">
                 Войти
               </AppLink>

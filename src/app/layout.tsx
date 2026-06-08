@@ -1,9 +1,8 @@
 import type { Metadata } from 'next';
 import { headers } from 'next/headers';
 import './globals.css';
-import { SiteFooter } from '@/components/layout/site-footer';
+import { SiteFooterServer } from '@/components/layout/site-footer-server';
 import { SiteHeaderServer } from '@/components/layout/site-header-server';
-import { CookieNotice } from '@/components/public/cookie-notice';
 import { logoutAction } from '@/app/auth/login/actions';
 import { ViewportReveal } from '@/components/public/viewport-reveal';
 import { ScrollToTopButton } from '@/components/layout/scroll-to-top-button';
@@ -65,10 +64,9 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
           <div className="site-shell overflow-x-clip">
             <SiteHeaderServer logoutAction={logoutAction} />
             <main className="site-main flex-1 overflow-x-hidden w-full max-w-full">{children}</main>
-            <SiteFooter />
+            <SiteFooterServer />
             <ViewportReveal />
             <ScrollToTopButton />
-            <CookieNotice />
           </div>
         </ToastProvider>
       </body>

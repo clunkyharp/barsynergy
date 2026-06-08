@@ -47,7 +47,7 @@ export async function submitBusinessSolutionRequest(formData: FormData) {
     actionName: 'public:business-solution',
     applicationType: ApplicationType.BUSINESS_SOLUTION,
     formData,
-    successMessage: 'Заявку на размещение получили. Если понадобится уточнение, мы свяжемся с вами.',
+    successMessage: 'Заявку на размещение получили. Проверим данные и ответим в течение 2 рабочих дней.',
     redirectWithResult: redirectWithBusinessResult,
     parse: async (data) => {
       const parsed = businessSolutionSchema.parse({

@@ -163,7 +163,7 @@ export function BusinessSolutionForm({ enabled, result, utm, cities, defaults = 
                   <InlineLink href="/legal/personal-data-consent">согласие на обработку персональных данных</InlineLink> для этой заявки.
                 </ConsentField>
               </div>
-              <PublicFormShellFooter note="После отправки свяжемся по указанному способу связи.">
+              <PublicFormShellFooter note="После отправки свяжемся в течение 2 рабочих дней по указанному способу связи.">
                 <SubmitButton>Отправить заявку</SubmitButton>
               </PublicFormShellFooter>
           </div>

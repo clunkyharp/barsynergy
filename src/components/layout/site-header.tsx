@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { ChevronDown, Search, UserRound } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { AccountMenu } from '@/components/layout/account-menu';
 import { MobileSiteMenu } from '@/components/layout/mobile-site-menu';
@@ -49,6 +50,41 @@ const desktopMoreNavItems = getNavItems(['/articles', '/tools/cost-calculator', 
 
 function isWorkspacePath(pathname: string | null) {
   return Boolean(pathname?.startsWith('/admin') || pathname?.startsWith('/business/cabinet') || pathname?.startsWith('/auth'));
+}
+
+const quickLinkItems = [
+  { label: 'Вакансии', href: '/vacancies' },
+  { label: 'Поставщики', href: '/suppliers' },
+  { label: 'Обучение', href: '/education' }
+];
+
+function MobileQuickLinks({ pathname, isHomePath }: { pathname: string | null; isHomePath: boolean }) {
+  if (pathname?.startsWith('/admin') || pathname?.startsWith('/business/cabinet') || pathname?.startsWith('/auth') || pathname?.startsWith('/profile')) {
+    return null;
+  }
+
+  return (
+    <div className={cn('flex items-center gap-2 overflow-x-auto border-b border-[var(--line)] bg-[var(--surface-wash)] px-4 py-2.5 xl:hidden', isHomePath && 'mt-14')}>
+      {quickLinkItems.map((item) => {
+        const isActive = pathname === item.href || pathname?.startsWith(`${item.href}/`);
+
+        return (
+          <Link
+            className={cn(
+              'shrink-0 rounded-[var(--radius-pill)] border px-3 py-1.5 text-[12px] font-semibold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]',
+              isActive
+                ? 'border-[var(--accent)]/35 bg-[var(--accent-soft)] text-[var(--accent)]'
+                : 'border-[var(--line)] bg-[var(--surface)] text-[var(--muted)] hover:border-[var(--accent)] hover:text-[var(--accent)]'
+            )}
+            href={item.href}
+            key={item.href}
+          >
+            {item.label}
+          </Link>
+        );
+      })}
+    </div>
+  );
 }
 
 function isActiveItem(pathname: string, href: string) {
@@ -128,6 +164,7 @@ export function SiteHeader({ user, logoutAction }: SiteHeaderProps) {
   );
 
   return (
+    <div className="contents">
     <header
       className={cn(
         'site-header border-b transition-[background-color,border-color,backdrop-filter] duration-[var(--motion-duration-base)] ease-[var(--motion-ease-standard)]',
@@ -315,5 +352,7 @@ export function SiteHeader({ user, logoutAction }: SiteHeaderProps) {
         </div>
       </div>
     </header>
+    <MobileQuickLinks isHomePath={isHomePath} pathname={pathname} />
+    </div>
   );
 }
