@@ -5,20 +5,25 @@ import { useCallback, useEffect, useState } from 'react';
 import type { UserRole } from '@prisma/client';
 import { AdminHeader } from '@/components/layout/admin-header';
 import { AdminSidebar } from '@/components/layout/admin-sidebar';
+import { UnsavedChangesProvider } from '@/components/admin/unsaved-changes-guard';
 
 const sidebarStorageKey = 'barsynergy-admin-sidebar-collapsed';
 
 type AdminShellFrameProps = {
   children: ReactNode;
   email: string;
+  logoutAction: (formData: FormData) => Promise<void>;
   role: UserRole;
 };
 
-export function AdminShellFrame({ children, email, role }: AdminShellFrameProps) {
+export function AdminShellFrame({ children, email, logoutAction, role }: AdminShellFrameProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   useEffect(() => {
-    setIsCollapsed(window.localStorage.getItem(sidebarStorageKey) === 'true');
+    const stored = window.localStorage.getItem(sidebarStorageKey);
+    if (stored === 'true') {
+      setIsCollapsed(true);
+    }
   }, []);
 
   const handleCollapsedChange = useCallback((nextValue: boolean) => {
@@ -30,8 +35,10 @@ export function AdminShellFrame({ children, email, role }: AdminShellFrameProps)
     <div className="admin-layout-grid hidden min-h-screen lg:grid" data-sidebar-state={isCollapsed ? 'collapsed' : 'expanded'}>
       <AdminSidebar collapsed={isCollapsed} onCollapsedChange={handleCollapsedChange} role={role} />
       <div className="admin-main-shell min-w-0">
-        <AdminHeader email={email} role={role} />
-        <div className="admin-content-area">{children}</div>
+        <AdminHeader email={email} logoutAction={logoutAction} role={role} />
+        <div className="admin-content-area">
+          <UnsavedChangesProvider>{children}</UnsavedChangesProvider>
+        </div>
       </div>
     </div>
   );

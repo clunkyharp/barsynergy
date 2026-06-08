@@ -281,6 +281,7 @@ export default async function AdminPage() {
         <StatCard
           delta={`Новых: ${newApplications}`}
           description="Активная очередь входящих форм"
+          href="/admin/applications"
           label="Заявки в работе"
           status="модерация"
           value={activeApplicationTotal}
@@ -288,6 +289,7 @@ export default async function AdminPage() {
         <StatCard
           delta={`Ожидают: ${pendingBusinessAccounts}`}
           description="Подключение и проверка бизнес-кабинетов"
+          href={businessAccessHref}
           label="Бизнес-доступы"
           status={canManageUsers ? 'админ' : 'просмотр'}
           value={pendingBusinessAccounts}
@@ -295,13 +297,15 @@ export default async function AdminPage() {
         <StatCard
           delta={`Черновиков: ${draftArticles + draftEvents + draftVacancies}`}
           description="Черновики перед публикацией"
+          href={draftArticles > 0 ? '/admin/articles?status=DRAFT' : draftEvents > 0 ? '/admin/events?status=DRAFT' : '/admin/vacancies?status=DRAFT'}
           label="Черновики"
           status="публикация"
           value={draftContentTotal}
         />
         <StatCard
-          delta={contentWarningCount > 0 ? 'проверить' : 'чисто'}
+          delta={contentWarningCount > 0 ? `замечаний: ${contentWarningCount}` : 'всё в норме'}
           description="Разделы с незакрытыми замечаниями"
+          href={contentWarningCount > 0 ? contentHealthRows.find((r) => r.variant !== 'success')?.href ?? '/admin/categories' : '/admin/categories'}
           label="Проверки контента"
           status="контроль"
           value={contentWarningCount}
@@ -328,18 +332,18 @@ function AdminWorkQueue({ className, items }: { className?: string; items: Queue
         title="Очередь действий"
       />
       <div className="border-t border-[var(--line)]">
-        <div className="hidden grid-cols-[minmax(7rem,1fr)_3.5rem_6rem_minmax(8rem,1fr)_5rem] gap-4 border-b border-[var(--line)] bg-[var(--surface-muted)] px-4 py-3 text-xs font-semibold uppercase tracking-[0.08em] text-[var(--muted)] md:grid">
-          <span>Участок</span>
-          <span>Кол-во</span>
-          <span>Ведёт</span>
-          <span>Следующий шаг</span>
-          <span className="text-right">Действие</span>
+        <div className="hidden grid-cols-[minmax(7rem,1fr)_4.75rem_6rem_minmax(8rem,1fr)_5rem] gap-4 border-b border-[var(--line)] bg-[var(--surface-muted)] px-4 py-3 text-xs font-semibold uppercase tracking-[0.08em] text-[var(--muted)] md:grid">
+          <span className="whitespace-nowrap">Участок</span>
+          <span className="whitespace-nowrap">Кол-во</span>
+          <span className="whitespace-nowrap">Ведёт</span>
+          <span className="whitespace-nowrap">Следующий шаг</span>
+          <span className="whitespace-nowrap text-right">Действие</span>
         </div>
         <div className="divide-y divide-[var(--line)]">
           {items.map((item) => (
             <div
               className={cn(
-                'grid gap-3 px-4 py-4 md:grid-cols-[minmax(7rem,1fr)_3.5rem_6rem_minmax(8rem,1fr)_5rem] md:items-center md:gap-4',
+                'grid gap-3 px-4 py-4 md:grid-cols-[minmax(7rem,1fr)_4.75rem_6rem_minmax(8rem,1fr)_5rem] md:items-center md:gap-4',
                 item.count === 0 && 'opacity-50'
               )}
               key={item.label}
@@ -383,20 +387,22 @@ function ContentHealthTable({ className, rows }: { className?: string; rows: Hea
           {rows.some((row) => row.variant !== 'success') ? 'нужна проверка' : 'в норме'}
         </StatusBadge>
       </div>
-      <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-5">
+      <div className="mt-4 grid gap-3 [grid-template-columns:repeat(auto-fit,minmax(23rem,1fr))]">
         {rows.map((row) => (
-          <div className="rounded-[var(--radius-md)] border border-[var(--line)] bg-[var(--surface-muted)] p-4" key={row.area}>
-            <div className="flex items-start justify-between gap-3">
+          <div className="flex h-full flex-col rounded-[var(--radius-md)] border border-[var(--line)] bg-[var(--surface-muted)] p-4" key={row.area}>
+            <div className="flex flex-col gap-2">
               <p className="font-semibold">{row.area}</p>
-              <StatusBadge variant={row.variant}>{row.status}</StatusBadge>
+              <StatusBadge className="max-w-full self-start whitespace-normal break-words text-left leading-5" variant={row.variant}>
+                {row.status}
+              </StatusBadge>
             </div>
             <p className="mt-3 text-sm leading-6 text-[var(--muted)]">{row.note}</p>
             {row.href ? (
-              <Button className="mt-4 min-h-9 w-full px-3 py-1.5 text-xs" href={row.href} variant="secondary">
+              <Button className="mt-auto min-h-9 w-full px-3 py-1.5 pt-4 text-xs" href={row.href} variant="secondary">
                 Перейти
               </Button>
             ) : (
-              <span className="mt-4 inline-flex text-xs font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">нет доступа</span>
+              <span className="mt-auto inline-flex pt-4 text-xs font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">нет доступа</span>
             )}
           </div>
         ))}

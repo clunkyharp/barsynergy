@@ -48,48 +48,50 @@ export function FeaturedNowCard({ card }: { card: HomepageLiveCard }) {
 
   return (
     <Link
-      className="public-card-shell featured-now-card group grid overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] md:rounded-[var(--radius-xl)] lg:grid-cols-[minmax(0,0.82fr)_minmax(0,1fr)]"
+      aria-label={`${card.eyebrow}: ${card.title}`}
+      className="public-card-shell featured-now-card group relative block aspect-[3/2] min-h-[220px] overflow-hidden md:aspect-[21/9] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] md:rounded-[var(--radius-xl)]"
       href={card.href}
     >
       <span
         aria-hidden="true"
-        className="featured-now-media min-h-[118px] bg-[linear-gradient(135deg,rgba(153,44,38,0.13),rgba(20,20,18,0.08))] bg-cover bg-center grayscale-[0.08] transition-transform duration-[var(--motion-duration-media)] ease-[var(--motion-ease-move)] group-hover:scale-[1.02] motion-reduce:transition-none sm:min-h-[150px] lg:min-h-full lg:max-h-[480px]"
+        className="absolute inset-0 bg-[linear-gradient(135deg,rgba(153,44,38,0.13),rgba(20,20,18,0.08))] bg-cover bg-center grayscale-[0.08] transition-transform duration-[var(--motion-duration-media)] ease-[var(--motion-ease-move)] group-hover:scale-[1.02] motion-reduce:transition-none"
         style={card.imageUrl ? { backgroundImage: `url("${card.imageUrl}")` } : undefined}
       />
-      <span className="featured-now-content flex min-w-0 flex-col p-4 md:p-6">
-        <span className="featured-now-meta-row flex flex-wrap gap-2">
-          <span className="public-card-label w-fit">
-            {card.eyebrow}
-          </span>
-          {visibleMeta.map((entry) => (
-            <span
-              className="public-card-meta w-fit text-[var(--muted)]"
-              key={entry}
-            >
-              {entry}
+      <span aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
+      <span aria-hidden="true" className="absolute bottom-0 left-0 right-0 flex flex-col gap-3 p-6 text-white md:flex-row md:items-end md:justify-between md:gap-6 md:p-8">
+        <span className="min-w-0">
+          <span className="featured-now-meta-row flex flex-wrap gap-2">
+            <span className="public-card-label w-fit">
+              {card.eyebrow}
             </span>
-          ))}
+            {visibleMeta.map((entry) => (
+              <span
+                className="public-card-meta w-fit text-white/65"
+                key={entry}
+              >
+                {entry}
+              </span>
+            ))}
+          </span>
+          <h3 className={`${displayFont.className} featured-now-title mt-2 block text-[1.35rem] font-semibold leading-[1.12] text-white md:mt-3 md:text-[1.8rem] lg:text-[2.45rem]`}>
+            {card.title}
+          </h3>
+          <span className="featured-now-summary mt-2 hidden max-h-[4.5rem] max-w-2xl overflow-hidden text-sm leading-6 text-white/75 sm:block md:mt-3 md:max-h-[5.2rem] md:leading-7 md:text-[15px]">{card.summary}</span>
         </span>
-        <span className={`${displayFont.className} featured-now-title mt-3 block text-[1.8rem] font-semibold leading-none text-[var(--text)] md:mt-4 md:text-[2.45rem]`}>
-          {card.title}
-        </span>
-        <span className="featured-now-summary mt-3 block max-h-[4.5rem] max-w-2xl overflow-hidden text-sm leading-6 text-[var(--muted)] md:mt-4 md:max-h-[5.2rem] md:leading-7 md:text-[15px]">{card.summary}</span>
-        <span className="mt-auto flex flex-col gap-4">
-          <span className="featured-now-support inline-flex items-center gap-2.5 rounded-[var(--radius-sm)] bg-[var(--surface-card-muted)] px-3 py-2.5 text-xs">
-            <KindIcon size={16} strokeWidth={1.5} className="shrink-0 text-[var(--accent)]" />
-            <span className="font-semibold text-[var(--text)]">{kindInfo.label}</span>
+        <span className="flex shrink-0 flex-col items-end gap-3">
+          <span className="featured-now-action inline-flex items-center gap-2 text-sm font-semibold text-white">
+            {card.actionLabel}
+            <ArrowUpRight className="transition-transform duration-[var(--motion-duration-base)] ease-[var(--motion-ease-move)] group-hover:translate-x-1 motion-reduce:transition-none" size={16} strokeWidth={1.8} />
+          </span>
+          <span className="featured-now-support hidden items-center gap-2.5 rounded-[var(--radius-sm)] bg-white/12 px-3 py-1.5 text-xs text-white/85 md:inline-flex">
+            <KindIcon size={16} strokeWidth={1.5} className="shrink-0" />
+            <span className="font-semibold">{kindInfo.label}</span>
             {supportMeta.length > 0 && (
               <>
-                <span className="h-3 w-px bg-[var(--line)]" aria-hidden="true" />
-                <span className="text-[var(--muted)]">{supportMeta.join(' · ')}</span>
+                <span className="h-3 w-px bg-white/25" aria-hidden="true" />
+                <span className="text-white/70">{supportMeta.join(' · ')}</span>
               </>
             )}
-          </span>
-          <span className="featured-now-footer flex flex-wrap items-center gap-3 border-t border-[var(--line)] pt-4 md:pt-5">
-            <span className="featured-now-action inline-flex items-center gap-2 text-sm font-semibold text-[var(--accent)]">
-              {card.actionLabel}
-              <ArrowUpRight className="transition-transform duration-[var(--motion-duration-base)] ease-[var(--motion-ease-move)] group-hover:translate-x-1 motion-reduce:transition-none" size={16} strokeWidth={1.8} />
-            </span>
           </span>
         </span>
       </span>
@@ -99,7 +101,31 @@ export function FeaturedNowCard({ card }: { card: HomepageLiveCard }) {
 
 export function HomeEventsStrip({ event }: { event: HomepageLiveCard }) {
   if (event.isFallback) {
-    return null;
+    return (
+      <section className="background-zone background-zone-ivory border-b border-[var(--line)] py-10 md:py-14" id="home-events">
+        <div className="container">
+          <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
+            <h2 className={`${displayFont.className} text-[2.35rem] font-semibold leading-none text-[var(--text)] md:text-[3.2rem]`}>
+              Ближайшее событие
+            </h2>
+            <Button className="px-0 text-sm tracking-normal" href="/events" variant="link">
+              Вся афиша
+              <ArrowUpRight size={16} />
+            </Button>
+          </div>
+          <div className="md:max-w-md">
+            <div
+              className="home-event-card block rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--surface-card)] p-5 text-[var(--text)]"
+            >
+              <span className="block text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--accent)]">Скоро</span>
+              <p className="mt-4 text-sm leading-6 text-[var(--muted)]">
+                Следите за анонсами — скоро появится ближайшая встреча, каппинг или тренинг.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
   }
 
   return (
@@ -150,7 +176,7 @@ export function NowCard({
 }) {
   return (
     <Link
-      className="group grid grid-cols-[2.75rem_minmax(0,1fr)] gap-x-3 border-b border-[var(--line)] py-3 transition-[background-color,border-color,color,box-shadow] duration-[var(--motion-duration-base)] ease-[var(--motion-ease-standard)] hover:border-[var(--accent)]/34 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] motion-reduce:transition-none sm:flex sm:h-full sm:min-h-[11.5rem] sm:flex-col sm:rounded-[var(--radius-lg)] sm:border sm:border-[var(--card-border)] sm:bg-[var(--surface-card)] sm:p-4 sm:shadow-[var(--shadow-card)] sm:hover:border-[var(--card-border-hover)] sm:hover:bg-[var(--surface-card-hover)]"
+      className="group grid grid-cols-[2.75rem_minmax(0,1fr)] gap-x-3 border-b border-[var(--line)] py-3 transition-[background-color,border-color,color,box-shadow] duration-[var(--motion-duration-base)] ease-[var(--motion-ease-standard)] hover:border-[var(--accent)]/34 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] motion-reduce:transition-none sm:flex sm:h-full sm:min-h-0 sm:flex-col sm:rounded-[var(--radius-lg)] sm:border sm:border-[var(--card-border)] sm:bg-[var(--surface-card)] sm:p-4 sm:shadow-[var(--shadow-card)] sm:hover:border-[var(--card-border-hover)] sm:hover:bg-[var(--surface-card-hover)]"
       href={card?.href ?? href}
     >
       <span className="row-span-4 sm:flex sm:items-start sm:justify-between sm:gap-3">

@@ -4,7 +4,6 @@ import { AppLink } from '@/components/ui/app-link';
 import {
   BadgeCheck,
   PanelsTopLeft,
-  Store,
   type LucideIcon
 } from 'lucide-react';
 import { PublicBreadcrumbs } from '@/components/public/public-primitives';
@@ -179,8 +178,7 @@ export default function AboutPage() {
       <section className="background-zone background-zone-cta py-14 md:py-20">
         <div className="mx-auto max-w-[1240px] px-5 md:px-12">
           <div className="rounded-[var(--radius-xl)] border border-[var(--editorial-dark-border)] bg-[var(--editorial-dark-surface)] p-6 text-white md:p-10 xl:p-12" data-theme="dark">
-            <div className="grid gap-8 xl:grid-cols-[minmax(0,0.55fr)_minmax(16rem,0.38fr)] xl:items-start">
-              <div>
+            <div>
                 <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--editorial-dark-label)]">Следующий шаг</p>
                 <h2 className={`${displayFont.className} mt-4 max-w-4xl text-[clamp(2.55rem,5vw,4rem)] font-semibold leading-none text-white`}>
                   Хотите добавить событие, компанию, вакансию или партнёрскую идею?
@@ -188,25 +186,19 @@ export default function AboutPage() {
                 <p className="mt-6 max-w-3xl text-base leading-8 text-[var(--editorial-dark-muted)] md:text-lg md:leading-9">
                   Напишите команде. Мы уточним задачу и подскажем, какой раздел или формат подходит для первого шага.
                 </p>
-              </div>
-              <div className="flex flex-col gap-3 items-start xl:items-stretch">
-                <Button className="h-12 w-full rounded-[var(--radius-md)] px-7 self-stretch" href="/contacts?topic=other#contact-form" size="lg">
-                  Связаться с командой
-                </Button>
-                <div className="mt-3 flex gap-4 text-sm text-white/60">
-                  <AppLink className="hover:text-white transition-colors" href="/contacts?topic=event#contact-form">
+                <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
+                  <Button className="h-12 rounded-[var(--radius-md)] px-7" href="/contacts?topic=other#contact-form" size="lg">
+                    Связаться с командой
+                  </Button>
+                  <AppLink className="font-medium text-white/70 hover:text-white transition-colors" href="/contacts?topic=event#contact-form">
                     Предложить событие
                   </AppLink>
-                  <AppLink className="hover:text-white transition-colors" href="/contacts?topic=partnership#contact-form">
+                  <span className="text-white/30" aria-hidden="true">·</span>
+                  <AppLink className="font-medium text-white/70 hover:text-white transition-colors" href="/contacts?topic=partnership#contact-form">
                     Стать партнёром
                   </AppLink>
                 </div>
               </div>
-            </div>
-            <div className="mt-8 flex items-center gap-3 border-t border-white/15 pt-5 text-sm leading-6 text-white/68">
-              <Store className="shrink-0" size={18} strokeWidth={1.8} />
-              <p>Платформа развивается: добавляем разделы и функции по запросам пользователей и партнёров.</p>
-            </div>
           </div>
         </div>
       </section>

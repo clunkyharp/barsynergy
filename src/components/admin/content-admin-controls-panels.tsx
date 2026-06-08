@@ -25,25 +25,35 @@ export function AdminActionAlert({ params }: AdminActionAlertProps) {
 }
 
 export function AdminPagination({ basePath, params, page, totalPages, total, pageSize }: AdminPaginationProps) {
-  if (totalPages <= 1) {
+  if (totalPages <= 1 && total <= pageSize) {
     return (
       <p className="rounded-[var(--radius-sm)] border border-[var(--line)] bg-[var(--surface)] px-3 py-2 text-sm text-[var(--muted)]">
-        Записей: {total}. Размер страницы: {pageSize}.
+        Записей: {total}.
       </p>
+    );
+  }
+
+  if (totalPages <= 1) {
+    return (
+      <div className="flex flex-col gap-3 rounded-[var(--radius-sm)] border border-[var(--line)] bg-[var(--surface)] px-3 py-3 sm:flex-row sm:items-center sm:justify-between">
+        <p className="text-sm text-[var(--muted)]">
+          Записей: {total}. Страница {page} из {totalPages}.
+        </p>
+      </div>
     );
   }
 
   return (
     <div className="flex flex-col gap-3 rounded-[var(--radius-sm)] border border-[var(--line)] bg-[var(--surface)] px-3 py-3 sm:flex-row sm:items-center sm:justify-between">
       <p className="text-sm text-[var(--muted)]">
-        Записей: {total}. Страница {page} из {totalPages}. На странице до {pageSize}.
+        Записей: {total}. Страница {page} из {totalPages}.
       </p>
       <AdminActionRow className="justify-start sm:justify-end">
         <Button disabled={page <= 1} href={adminPageHref(basePath, params, page - 1)} variant="secondary">
-          Назад
+          ← Назад
         </Button>
         <Button disabled={page >= totalPages} href={adminPageHref(basePath, params, page + 1)} variant="secondary">
-          Вперед
+          Вперёд →
         </Button>
       </AdminActionRow>
     </div>
@@ -77,13 +87,12 @@ export function CoverImageField({
         </CheckboxField>
       ) : null}
       <FieldHint>JPEG, PNG, WebP или AVIF до 8 МБ.</FieldHint>
-      <FormField htmlFor={`${id}-alt`} label={altLabel}>
+      <FormField htmlFor={`${id}-alt`} label={altLabel} hint="Для скринридеров и SEO. Например: «Бариста готовит эспрессо в кофейне»">
         <Input
           id={`${id}-alt`}
           name={altName}
           maxLength={180}
           defaultValue={currentAlt ?? ''}
-          placeholder="Короткое описание изображения"
         />
       </FormField>
     </div>

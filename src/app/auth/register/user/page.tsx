@@ -1,8 +1,9 @@
 import type { Metadata } from 'next';
 import { cookies } from 'next/headers';
 import Image from 'next/image';
+import { ArrowLeft } from 'lucide-react';
 import { AppLink } from '@/components/ui/app-link';
-import { AuthBackLink } from '@/components/layout/auth-back-link';
+import { Button } from '@/components/ui/button';
 import { InlineAlert } from '@/components/ui/inline-alert';
 import { RegisterUserForm } from '@/components/public/register-user-form';
 import { registerUserAction } from '@/app/auth/actions';
@@ -57,10 +58,9 @@ export default async function RegisterUserPage({ searchParams }: RegisterUserPag
 
   return (
     <div className="auth-register-user-screen min-h-screen bg-[var(--background)] relative overflow-hidden">
-      <AuthBackLink />
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(150,112,30,0.08),transparent)]" />
-      <div className="auth-register-user-container relative container max-w-[1440px] py-5 md:py-6">
-        <header className="auth-register-user-header mx-auto mb-5 flex max-w-[440px] flex-col items-center gap-3 text-center">
+      <div className="auth-register-user-container relative container max-w-[1440px] py-6 md:py-8">
+        <header className="auth-register-user-header mx-auto mb-6 flex max-w-[440px] flex-wrap items-center gap-4">
           <AppLink
             aria-label="BARSYNERGY"
             className="inline-flex min-h-12 w-fit shrink-0 items-center rounded-[var(--radius-md)] pr-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
@@ -69,6 +69,11 @@ export default async function RegisterUserPage({ searchParams }: RegisterUserPag
             <Image alt="BARSYNERGY" className="theme-logo-light h-auto w-[176px] md:w-[198px]" height={70} priority src="/brand/barsynergy-lockup.svg" width={360} />
             <Image alt="BARSYNERGY" className="theme-logo-dark h-auto w-[176px] md:w-[198px]" height={70} priority src="/brand/barsynergy-lockup-light.svg" width={360} />
           </AppLink>
+          <span aria-hidden="true" className="hidden h-9 w-px bg-[var(--line)] sm:block" />
+          <Button className="px-3" href="/" size="sm" variant="link">
+            <ArrowLeft aria-hidden size={14} strokeWidth={1.8} />
+            Вернуться на сайт
+          </Button>
         </header>
 
         <main className="auth-register-user-layout mx-auto max-w-[440px]">

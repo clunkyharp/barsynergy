@@ -22,13 +22,12 @@ const contactTopicValues = [
   'education-launch',
   'event',
   'vacancy-placement',
-  'supplier-contact',
-  'supplier',
   'partnership',
   'sponsorship',
   'consulting',
   'article-topic',
   'bug-report',
+  'supplier',
   'other'
 ] as const;
 
@@ -44,10 +43,6 @@ function getContactTopicLabel(topic: ContactTopic) {
       return 'Событие';
     case 'vacancy-placement':
       return 'Вакансия';
-    case 'supplier-contact':
-      return 'Контакт с поставщиком';
-    case 'supplier':
-      return 'Поставщик';
     case 'partnership':
       return 'Партнёрство';
     case 'sponsorship':
@@ -58,6 +53,8 @@ function getContactTopicLabel(topic: ContactTopic) {
       return 'Материал или интервью';
     case 'bug-report':
       return 'Что-то сломалось';
+    case 'supplier':
+      return 'Поставщик';
     case 'other':
       return 'Другое';
   }
@@ -77,8 +74,6 @@ const contactMessageSchema = baseContactSchema
     position: z.string().trim().max(160).optional(),
     employmentType: z.string().trim().max(120).optional(),
     salaryLabel: z.string().trim().max(120).optional(),
-    supplierCategory: z.string().trim().max(160).optional(),
-    serviceArea: z.string().trim().max(160).optional(),
     websiteUrl: z.string().trim().url().max(500).optional(),
     eventTitle: z.string().trim().max(180).optional(),
     eventDate: z.string().trim().max(40).optional(),
@@ -146,8 +141,6 @@ export async function submitContactMessage(formData: FormData) {
         position: optionalString(getString(data, 'position')),
         employmentType: optionalString(getString(data, 'employmentType')),
         salaryLabel: optionalString(getString(data, 'salaryLabel')),
-        supplierCategory: optionalString(getString(data, 'supplierCategory')),
-        serviceArea: optionalString(getString(data, 'serviceArea')),
         websiteUrl: optionalString(getString(data, 'websiteUrl')),
         eventTitle: optionalString(getString(data, 'eventTitle')),
         eventDate: optionalString(getString(data, 'eventDate')),
@@ -190,8 +183,6 @@ export async function submitContactMessage(formData: FormData) {
         position: parsed.position ?? null,
         employmentType: parsed.employmentType ?? null,
         salaryLabel: parsed.salaryLabel ?? null,
-        supplierCategory: parsed.supplierCategory ?? null,
-        serviceArea: parsed.serviceArea ?? null,
         websiteUrl: parsed.websiteUrl ?? null,
         eventTitle: parsed.eventTitle ?? null,
         eventDate: parsed.eventDate ?? null,

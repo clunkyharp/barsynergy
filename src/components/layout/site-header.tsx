@@ -29,6 +29,7 @@ const guestNavItems = [
   { label: 'Материалы', href: '/articles' },
   { label: 'Вакансии', href: '/vacancies' },
   { label: 'Поставщики', href: '/suppliers' },
+  { label: 'Калькулятор', href: '/tools/cost-calculator' },
   { label: 'Для бизнеса', href: '/business' },
   { label: 'Консалтинг', href: '/consulting' },
   { label: 'Партнёры', href: '/partners' },
@@ -43,8 +44,8 @@ function getNavItems(hrefs: string[]) {
     .filter((item): item is (typeof guestNavItems)[number] => Boolean(item));
 }
 
-const desktopPrimaryNavItems = getNavItems(['/education', '/events', '/articles', '/vacancies', '/suppliers', '/business']);
-const desktopMoreNavItems = getNavItems(['/about', '/consulting', '/partners', '/general-sponsors', '/contacts']);
+const desktopPrimaryNavItems = getNavItems(['/education', '/events', '/vacancies', '/suppliers', '/business', '/about']);
+const desktopMoreNavItems = getNavItems(['/articles', '/tools/cost-calculator', '/consulting', '/partners', '/general-sponsors', '/contacts']);
 
 function isWorkspacePath(pathname: string | null) {
   return Boolean(pathname?.startsWith('/admin') || pathname?.startsWith('/business/cabinet') || pathname?.startsWith('/auth'));
@@ -214,6 +215,7 @@ export function SiteHeader({ user, logoutAction }: SiteHeaderProps) {
                 open={isMoreNavOpen}
               >
                 <summary
+                  aria-expanded={isMoreNavOpen}
                   className={cn(
                     'relative inline-flex min-h-11 shrink-0 cursor-pointer list-none items-center gap-1.5 whitespace-nowrap rounded-[var(--radius-sm)] px-1 opacity-85 transition-[color,opacity] duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] after:absolute after:inset-x-1 after:bottom-1 after:h-px after:origin-left after:scale-x-0 after:bg-[var(--accent)] after:transition-transform after:duration-[var(--motion-duration-base)] after:ease-[var(--motion-ease-move)] hover:opacity-100 hover:after:scale-x-100 group-open:after:scale-x-0 motion-reduce:transition-none motion-reduce:after:transition-none [&::-webkit-details-marker]:hidden 2xl:px-2 2xl:after:inset-x-1.5',
                     desktopMoreNavItems.some((item) => pathname && isActiveItem(pathname, item.href)) && 'text-[var(--accent)] opacity-100 after:scale-x-100',
@@ -221,7 +223,7 @@ export function SiteHeader({ user, logoutAction }: SiteHeaderProps) {
                   )}
                 >
                   {moreLabel}
-                  <ChevronDown className="transition-transform duration-[var(--motion-duration-base)] ease-[var(--motion-ease-standard)] group-open:rotate-180 motion-reduce:transition-none" size={14} strokeWidth={1.8} />
+                  <ChevronDown aria-hidden="true" className="transition-transform duration-[var(--motion-duration-base)] ease-[var(--motion-ease-standard)] group-open:rotate-180 motion-reduce:transition-none" size={14} strokeWidth={1.8} />
                 </summary>
                 <div className="absolute right-0 top-[calc(100%+0.35rem)] z-20 grid min-w-[12rem] gap-1 rounded-[var(--radius-md)] border border-[var(--card-border)] bg-[var(--surface-elevated)] p-2 shadow-[var(--shadow-panel)]">
                   {desktopMoreNavItems.map((item) => {

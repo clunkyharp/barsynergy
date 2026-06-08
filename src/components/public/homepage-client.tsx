@@ -36,14 +36,14 @@ export function HomepageClient({ data }: HomepageClientProps) {
               </h2>
             </div>
             <Button className="px-0 text-sm tracking-normal" href="/articles" variant="link">
-              Все материалы
+              Смотреть всё
               <ArrowUpRight size={16} />
             </Button>
           </div>
-          <div className="home-current-layout grid gap-4 lg:grid-cols-[minmax(0,0.62fr)_minmax(0,0.38fr)]">
+          <div className="home-current-layout flex flex-col gap-4">
             <FeaturedNowCard card={data.article} />
-            <div className="home-current-support-grid sm:grid sm:grid-cols-2 sm:gap-3 lg:grid-cols-1 [&>a:last-child]:border-b-0">
-              <NowCard actionLabel="Откликнуться" card={data.vacancy} href="/vacancies" icon={BriefcaseBusiness} label="Вакансии" />
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 [&>a:last-child]:border-b-0 sm:[&>a:last-child]:border-b">
+              <NowCard actionLabel={data.vacancy ? 'Откликнуться' : 'Все вакансии'} card={data.vacancy} href="/vacancies" icon={BriefcaseBusiness} label="Вакансии" />
               <NowCard actionLabel="Читать" card={data.secondaryArticle} fallbackMeta="Другие материалы" href="/articles" icon={BookOpen} label="Материалы" />
               <NowCard actionLabel={data.supplier ? 'Открыть' : 'Смотреть поставщиков'} card={data.supplier} href="/suppliers" icon={PackageCheck} label="Поставщики" />
             </div>

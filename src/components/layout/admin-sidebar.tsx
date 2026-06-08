@@ -76,7 +76,7 @@ export function AdminSidebar({ collapsed, onCollapsedChange, role }: AdminSideba
   const toggleLabel = collapsed ? 'Развернуть боковую навигацию' : 'Свернуть боковую навигацию';
 
   return (
-    <aside aria-label="Навигация админки" className="admin-sidebar-shell" data-sidebar-state={collapsed ? 'collapsed' : 'expanded'}>
+    <aside aria-label="Навигация админки" className="admin-sidebar-shell" data-sidebar-state={collapsed ? 'collapsed' : 'expanded'} data-theme="dark">
       <button
         aria-controls="admin-sidebar-nav"
         aria-expanded={!collapsed}
@@ -93,10 +93,12 @@ export function AdminSidebar({ collapsed, onCollapsedChange, role }: AdminSideba
             <span aria-hidden="true" className="admin-sidebar-brand-mark">
               B
             </span>
-            <span className="admin-sidebar-brand-wordmark">BARSYNERGY</span>
-            <span className="admin-sidebar-role-badge">
-              <span className="admin-sidebar-role-badge-dot" aria-hidden="true" />
-              {roleLabel}
+            <span className="admin-sidebar-brand-copy">
+              <span className="admin-sidebar-brand-wordmark">BARSYNERGY</span>
+              <span className="admin-sidebar-role-badge">
+                <span className="admin-sidebar-role-badge-dot" aria-hidden="true" />
+                {roleLabel}
+              </span>
             </span>
           </AppLink>
         </div>

@@ -3,13 +3,19 @@ import { notFound } from 'next/navigation';
 import { PublicContentDetailPage } from '@/components/public/public-content-detail-page';
 import { PublicRelatedContentSection } from '@/components/public/public-related-content-section';
 import { JsonLd } from '@/components/seo/json-ld';
+import { SupplierInquiryForm } from '@/components/messaging/supplier-inquiry-form';
 import { getPublishedSuppliers } from '@/lib/public/content';
 import { getPublishedSupplierDetail } from '@/lib/public/content';
 import { buildMissingPublicContentMetadata, buildPublicContentMetadata } from '@/lib/public/metadata';
 import { buildBreadcrumbJsonLd, buildPublicContentJsonLd } from '@/lib/public/structured-data';
+import { arePublicApplicationFormsEnabled } from '@/lib/applications/public-forms';
+import { getPublicApplicationResult, getPublicApplicationUtm } from '@/lib/applications/public-form-helpers';
+import { getCurrentUser } from '@/lib/auth/current-user';
+import { getEnv } from '@/lib/validation/env';
 
 type SupplierDetailPageProps = {
   params: Promise<{ slug: string }>;
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
 };
 
 export async function generateMetadata({ params }: SupplierDetailPageProps): Promise<Metadata> {
@@ -29,32 +35,26 @@ export async function generateMetadata({ params }: SupplierDetailPageProps): Pro
   });
 }
 
-function supplierContactHref(input: { title: string; companyName?: string; label?: string; externalUrl?: string }) {
-  const params = new URLSearchParams({
-    topic: 'supplier-contact',
-    companyName: input.companyName ?? input.title
-  });
-
-  if (input.label) {
-    params.set('supplierCategory', input.label);
-  }
-
-  if (input.externalUrl) {
-    params.set('websiteUrl', input.externalUrl);
-  }
-
-  return `/contacts?${params.toString()}#contact-form`;
-}
-
-export default async function SupplierDetailPage({ params }: SupplierDetailPageProps) {
+export default async function SupplierDetailPage({ params, searchParams }: SupplierDetailPageProps) {
   const { slug } = await params;
   const [supplier, related] = await Promise.all([getPublishedSupplierDetail(slug), getPublishedSuppliers({ pageSize: '4' })]);
 
   if (!supplier) {
     notFound();
   }
+
+  const sp = (await searchParams) ?? {};
   const detailPath = `/suppliers/${supplier.slug}`;
   const relatedItems = related.items.filter((item) => item.slug !== slug).slice(0, 3);
+  const env = getEnv();
+  const formsEnabled = arePublicApplicationFormsEnabled(env);
+
+  const currentUser = await getCurrentUser();
+  const isAuthenticated = currentUser?.role === 'USER';
+  const profile = currentUser ? {
+    fullName: currentUser.profile?.fullName ?? undefined,
+    email: currentUser.email ?? undefined
+  } : undefined;
 
   return (
     <>
@@ -77,7 +77,6 @@ export default async function SupplierDetailPage({ params }: SupplierDetailPageP
         imageUrl={supplier.imageUrl}
         label={supplier.label}
         meta={supplier.meta}
-        primaryLink={{ href: supplierContactHref(supplier), label: 'Написать поставщику' }}
         secondaryLink={
           supplier.externalUrl && supplier.externalUrlLabel
             ? { href: supplier.externalUrl, label: supplier.externalUrlLabel, external: true }
@@ -86,6 +85,18 @@ export default async function SupplierDetailPage({ params }: SupplierDetailPageP
         sections={supplier.sections}
         summary={supplier.summary}
         title={supplier.title}
+        actionsSlot={
+          <SupplierInquiryForm
+            enabled={formsEnabled}
+            isAuthenticated={isAuthenticated}
+            profile={profile}
+            supplierId={supplier.id}
+            supplierTitle={supplier.title}
+            supplierSlug={supplier.slug}
+            utm={getPublicApplicationUtm(sp)}
+            result={getPublicApplicationResult(sp)}
+          />
+        }
       />
       <PublicRelatedContentSection
         basePath="/suppliers"

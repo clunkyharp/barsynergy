@@ -12,6 +12,7 @@ import { buildPrivatePageMetadata } from '@/lib/public/metadata';
 
 const errorMessages: Record<string, string> = {
   invalid: 'Введите корректный email.',
+  'rate-limited': 'Слишком много попыток за короткое время. Повторите позже.',
   failed: 'Не удалось выполнить действие прямо сейчас. Повторите попытку позже.'
 };
 

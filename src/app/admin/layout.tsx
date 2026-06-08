@@ -5,6 +5,7 @@ import { AppLink } from '@/components/ui/app-link';
 import { Panel } from '@/components/ui/panel';
 import { getCurrentUser } from '@/lib/auth/current-user';
 import { canAccessAdmin } from '@/lib/auth/permissions';
+import { logoutAction } from '@/app/auth/login/actions';
 
 function AdminMobileUnsupportedState() {
   return (
@@ -44,7 +45,7 @@ export default async function AdminLayout({ children }: { children: ReactNode })
   return (
     <div className="admin-shell min-h-screen">
       <AdminMobileUnsupportedState />
-      <AdminShellFrame email={user.email} role={user.role}>{children}</AdminShellFrame>
+      <AdminShellFrame email={user.email} logoutAction={logoutAction} role={user.role}>{children}</AdminShellFrame>
     </div>
   );
 }

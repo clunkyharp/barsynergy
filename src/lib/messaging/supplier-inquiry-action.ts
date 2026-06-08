@@ -21,8 +21,17 @@ import { prisma } from '@/lib/db/prisma';
 import { assertSameOriginServerAction } from '@/lib/security/server-action-origin';
 import { assertTurnstilePassed } from '@/lib/security/turnstile';
 import { getCurrentUser } from '@/lib/auth/current-user';
+import { isRedirectError } from '@/lib/actions/server-action-errors';
 
-const INQUIRY_REDIRECT = '/profile/inquiries';
+const PROTECTED_INQUIRY_PATH = '/profile/inquiries';
+
+function supplierSuccessPath(slug: string) {
+  return `/suppliers/${slug}?applicationSuccess=${encodeURIComponent('Запрос отправлен. Команда BARSYNERGY передаст его поставщику.')}`;
+}
+
+function supplierErrorPath(slug: string, error: string) {
+  return `/suppliers/${slug}?applicationError=${encodeURIComponent(error)}`;
+}
 
 const supplierInquirySchema = baseContactSchema
   .extend({
@@ -35,12 +44,17 @@ const supplierInquirySchema = baseContactSchema
   .refine((data) => data.email || data.phone || data.telegram, { message: 'contact is required' });
 
 export async function submitSupplierInquiryAction(formData: FormData) {
+  let supplierSlug = optionalString(getString(formData, 'supplierSlug'));
+
   try {
     await assertSameOriginServerAction();
     assertPublicApplicationFormsEnabled();
 
     if (hasHoneypotValue(getString(formData, 'website'))) {
-      redirect(`${INQUIRY_REDIRECT}?success=supplier-inquiry`);
+      if (supplierSlug) {
+        redirect(supplierSuccessPath(supplierSlug));
+      }
+      redirect(`${PROTECTED_INQUIRY_PATH}?applicationSuccess=${encodeURIComponent('Запрос отправлен.')}`);
     }
 
     await assertTurnstilePassed(getString(formData, 'turnstileToken'));
@@ -58,20 +72,26 @@ export async function submitSupplierInquiryAction(formData: FormData) {
 
     const supplier = await prisma.supplier.findFirst({
       where: { id: parsed.supplierId, status: ContentStatus.PUBLISHED },
-      select: { id: true, title: true }
+      select: { id: true, title: true, slug: true }
     });
 
     if (!supplier) {
-      redirect(`${INQUIRY_REDIRECT}?error=supplier-inquiry-invalid`);
+      if (supplierSlug) {
+        redirect(supplierErrorPath(supplierSlug, 'Поставщик не найден или больше не публикуется.'));
+      }
+      redirect(`${PROTECTED_INQUIRY_PATH}?error=${encodeURIComponent('Поставщик не найден.')}`);
     }
+
+    supplierSlug = supplier.slug;
 
     await assertPublicApplicationSubmissionAllowed(ApplicationType.SUPPLIER_INQUIRY);
 
     const currentUser = await getCurrentUser();
+    const isAuthenticatedUser = currentUser?.role === UserRole.USER;
 
     const application = await createPublicApplication({
       type: ApplicationType.SUPPLIER_INQUIRY,
-      userId: currentUser?.role === UserRole.USER ? currentUser.id : null,
+      userId: isAuthenticatedUser ? currentUser.id : null,
       subject: `Запрос поставщику: ${supplier.title}`,
       message: parsed.volumeDetails,
       name: parsed.contactName,
@@ -93,16 +113,23 @@ export async function submitSupplierInquiryAction(formData: FormData) {
     await prisma.conversationMessage.create({
       data: {
         applicationId: application.id,
-        authorId: currentUser?.role === UserRole.USER ? currentUser.id : null,
+        authorId: isAuthenticatedUser ? currentUser.id : null,
         senderRole: ConversationSender.USER,
         body: parsed.volumeDetails
       }
     });
 
-    redirect(`${INQUIRY_REDIRECT}/${application.id}?success=supplier-inquiry`);
+    if (isAuthenticatedUser) {
+      redirect(`${PROTECTED_INQUIRY_PATH}/${application.id}?success=supplier-inquiry`);
+    }
+
+    redirect(supplierSuccessPath(supplier.slug));
   } catch (error) {
-    if (error instanceof Error && error.message.startsWith('NEXT_REDIRECT')) throw error;
+    if (isRedirectError(error)) throw error;
     console.error('[submit-supplier-inquiry]', error);
-    redirect(`${INQUIRY_REDIRECT}?error=supplier-inquiry-failed`);
+    if (supplierSlug) {
+      redirect(supplierErrorPath(supplierSlug, 'Не удалось отправить запрос. Попробуйте позже.'));
+    }
+    redirect(`${PROTECTED_INQUIRY_PATH}?error=${encodeURIComponent('Не удалось отправить запрос.')}`);
   }
 }

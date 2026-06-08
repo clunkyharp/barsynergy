@@ -31,10 +31,10 @@ const dateTimeFormatter = new Intl.DateTimeFormat('ru-RU', {
 });
 
 export default async function BusinessResponseDetailPage({ params }: BusinessResponseDetailPageProps) {
-  const { user } = await requireBusinessAccountAccess();
+  const { businessAccount, user } = await requireBusinessAccountAccess();
   const { applicationId } = await params;
 
-  const application = await getBusinessResponseDetail(applicationId, user.id);
+  const application = await getBusinessResponseDetail(applicationId, businessAccount.id);
 
   if (!application) {
     notFound();

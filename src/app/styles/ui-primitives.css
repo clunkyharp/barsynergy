@@ -487,11 +487,30 @@
 
 .search-input-icon {
   position: absolute;
-  left: 0.9rem;
+  left: 1rem;
   top: 50%;
   z-index: 1;
   color: var(--muted);
+  pointer-events: none;
   transform: translateY(-50%);
+}
+
+.search-input-control[type="search"] {
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.search-input-control[type="search"]::-webkit-search-decoration,
+.search-input-control[type="search"]::-webkit-search-cancel-button,
+.search-input-control[type="search"]::-webkit-search-results-button,
+.search-input-control[type="search"]::-webkit-search-results-decoration {
+  appearance: none;
+  -webkit-appearance: none;
+  display: none;
+}
+
+.search-input .field-base.search-input-control {
+  padding-left: 2.75rem;
 }
 
 .form-section {

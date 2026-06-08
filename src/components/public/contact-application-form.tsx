@@ -34,27 +34,23 @@ export function ContactApplicationForm({ enabled, result, utm, cities, defaultTo
   const messageLabel =
     topic === 'vacancy-placement'
       ? 'Описание вакансии'
-      : topic === 'supplier'
-        ? 'Что поставляете и как работаете'
-        : topic === 'supplier-contact'
-          ? 'Что хотите уточнить'
-        : topic === 'event'
-          ? 'Расскажите о событии'
-          : topic === 'partnership'
-            ? 'Какой формат партнёрства хотите обсудить'
-            : topic === 'sponsorship'
-              ? 'Какие условия спонсорства нужны'
-              : topic === 'consulting'
-                ? 'Опишите задачу для консультации'
-                : topic === 'bug-report'
-                  ? 'Что сломалось'
-              : topic === 'article-topic'
-                ? 'О чём должен быть материал'
-                : topic === 'education-program'
-                  ? 'Что нужно по обучению'
-                  : topic === 'education-launch'
-                    ? 'Расскажите о программе обучения'
-                    : 'Сообщение';
+      : topic === 'event'
+        ? 'Расскажите о событии'
+        : topic === 'partnership'
+          ? 'Какой формат партнёрства хотите обсудить'
+          : topic === 'sponsorship'
+            ? 'Какие условия спонсорства нужны'
+            : topic === 'consulting'
+              ? 'Опишите задачу для консультации'
+              : topic === 'bug-report'
+                ? 'Что сломалось'
+            : topic === 'article-topic'
+              ? 'О чём должен быть материал'
+              : topic === 'education-program'
+                ? 'Что нужно по обучению'
+                : topic === 'education-launch'
+                  ? 'Расскажите о программе обучения'
+                  : 'Сообщение';
 
   const form = enabled ? (
     <form action={action} className="editorial-form-shell public-form-shell">
@@ -109,8 +105,6 @@ export function ContactApplicationForm({ enabled, result, utm, cities, defaultTo
               {(topic === 'education-program' ||
                 topic === 'education-launch' ||
                 topic === 'vacancy-placement' ||
-                topic === 'supplier' ||
-                topic === 'supplier-contact' ||
                 topic === 'partnership' ||
                 topic === 'sponsorship' ||
                 topic === 'consulting') ? (
@@ -153,29 +147,6 @@ export function ContactApplicationForm({ enabled, result, utm, cities, defaultTo
                   </FormField>
                   <FormField htmlFor="contactSalaryLabel" label="Оплата">
                     <Input autoComplete="off" id="contactSalaryLabel" name="salaryLabel" defaultValue={defaults.salaryLabel} placeholder="Например, 80 000 + бонусы" maxLength={120} />
-                  </FormField>
-                </>
-              ) : null}
-              {topic === 'supplier' ? (
-                <>
-                  <FormField htmlFor="contactSupplierCategory" label="Категория">
-                    <Input autoComplete="off" id="contactSupplierCategory" name="supplierCategory" defaultValue={defaults.supplierCategory} placeholder="Например, кофе и расходники" maxLength={160} />
-                  </FormField>
-                  <FormField htmlFor="contactServiceArea" label="Что поставляете">
-                    <Input autoComplete="off" id="contactServiceArea" name="serviceArea" defaultValue={defaults.serviceArea} placeholder="Например, зерно, молоко и сиропы" maxLength={160} />
-                  </FormField>
-                  <FormField htmlFor="contactWebsiteUrl" label="Сайт или соцсеть">
-                    <Input autoComplete="url" id="contactWebsiteUrl" name="websiteUrl" defaultValue={defaults.websiteUrl} placeholder="https://example.ru" maxLength={500} type="url" />
-                  </FormField>
-                </>
-              ) : null}
-              {topic === 'supplier-contact' ? (
-                <>
-                  <FormField htmlFor="contactSupplierCategory" label="Категория поставщика">
-                    <Input autoComplete="off" id="contactSupplierCategory" name="supplierCategory" defaultValue={defaults.supplierCategory} placeholder="Например, кофе и барный инвентарь" maxLength={160} />
-                  </FormField>
-                  <FormField htmlFor="contactCompanyName" label="Название поставщика">
-                    <Input autoComplete="off" id="contactCompanyName" name="companyName" defaultValue={defaults.companyName} placeholder="Например, Roaster Lab" maxLength={180} />
                   </FormField>
                 </>
               ) : null}

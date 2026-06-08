@@ -34,7 +34,8 @@ export async function createVacancyDraftFromApplicationId({
         telegram: true,
         consentAcceptedAt: true,
         payload: true,
-        internalNotes: true
+        internalNotes: true,
+        businessAccountId: true
       }
     });
     const draftFields = getVacancyDraftFieldsFromApplication(application);
@@ -59,7 +60,8 @@ export async function createVacancyDraftFromApplicationId({
             ...draftFields,
             slug: uniqueSlug,
             createdById: userId,
-            updatedById: userId
+            updatedById: userId,
+            businessAccountId: application.businessAccountId
           },
           select: { id: true, title: true, slug: true }
         })
@@ -107,7 +109,8 @@ export async function publishContentFromApplicationId({
         telegram: true,
         consentAcceptedAt: true,
         payload: true,
-        internalNotes: true
+        internalNotes: true,
+        businessAccountId: true
       }
     });
 
@@ -136,7 +139,8 @@ export async function publishContentFromApplicationId({
               publishedAt: now,
               archivedAt: null,
               createdById: userId,
-              updatedById: userId
+              updatedById: userId,
+              businessAccountId: application.businessAccountId
             },
             select: { id: true, title: true, slug: true }
           })

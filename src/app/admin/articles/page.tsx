@@ -185,7 +185,7 @@ export default async function AdminArticlesPage({ searchParams }: AdminArticlesP
                       ) : null}
                     </AdminTableCell>
                     <AdminTableCell className="text-[var(--muted)]" label="Категория">{article.category?.name ?? '-'}</AdminTableCell>
-                    <AdminTableCell className="text-[var(--muted)]" label="Город">{article.city?.name ?? '-'}</AdminTableCell>
+                    <AdminTableCell className="text-[var(--muted)]" label="Город">{article.city?.name ?? <span className="text-[var(--muted)]">Без города</span>}</AdminTableCell>
                     <AdminTableCell label="Статус">
                       <StatusBadge variant={contentStatusBadgeVariants[article.status]}>{contentStatusLabels[article.status]}</StatusBadge>
                     </AdminTableCell>

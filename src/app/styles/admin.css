@@ -42,9 +42,12 @@
 }
 
 .admin-layout-grid {
-  align-items: stretch;
+  height: 100dvh;
+  overflow-x: visible;
+  overflow-y: hidden;
   background: #f7f8fa;
   grid-template-columns: 272px minmax(0, 1fr);
+  align-items: stretch;
 }
 
 .admin-layout-grid[data-sidebar-state="collapsed"] {
@@ -52,7 +55,10 @@
 }
 
 .admin-main-shell {
-  min-height: 100vh;
+  height: 100dvh;
+  position: relative;
+  z-index: 0;
+  overflow-y: auto;
   background: #f7f8fa;
 }
 
@@ -108,12 +114,13 @@
   --admin-sidebar-badge-bg: var(--accent-soft);
   --admin-sidebar-badge-border: color-mix(in oklab, var(--accent) 32%, var(--border-default));
   --admin-sidebar-toggle-size: 30px;
-  min-height: 100vh;
-  max-height: 100vh;
+  height: 100dvh;
   display: flex;
   flex-direction: column;
   position: sticky;
   top: 0;
+  z-index: 30;
+  align-self: start;
   overflow: visible;
   padding: 0;
   border-right: 1px solid color-mix(in oklab, var(--editorial-dark-text) 12%, transparent);
@@ -123,8 +130,8 @@
 
 .admin-sidebar-body {
   min-width: 0;
-  min-height: 100vh;
-  max-height: 100vh;
+  flex: 1 1 0;
+  min-height: 0;
   overflow-y: auto;
   overflow-x: hidden;
   padding: 18px 18px 22px;
@@ -140,12 +147,12 @@
 }
 
 .admin-sidebar-brand {
-  display: inline-flex;
+  display: flex;
   min-width: 0;
   min-height: 40px;
   flex: 1 1 auto;
   align-items: center;
-  gap: 9px;
+  gap: 10px;
   border-radius: var(--radius-md);
   color: var(--admin-sidebar-text);
   font-size: 17px;
@@ -181,16 +188,28 @@
   line-height: 1;
 }
 
+.admin-sidebar-brand-copy {
+  display: flex;
+  min-width: 0;
+  flex: 1 1 auto;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.55rem 0.7rem;
+}
+
 .admin-sidebar-brand-wordmark {
   min-width: 0;
-  overflow: hidden;
   color: var(--admin-sidebar-text);
   font-size: 17px;
   font-weight: 850;
   line-height: 20px;
   letter-spacing: 0.02em;
-  text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.admin-sidebar-shell:not([data-sidebar-state="collapsed"]) .admin-sidebar-brand-wordmark {
+  overflow: visible;
+  text-overflow: clip;
 }
 
 .admin-sidebar-role-badge {
@@ -198,6 +217,7 @@
   min-width: 0;
   min-height: 28px;
   flex: 0 0 auto;
+  max-width: 100%;
   align-items: center;
   gap: 6px;
   overflow: hidden;
@@ -336,11 +356,13 @@
 }
 
 .admin-sidebar-shell[data-sidebar-state="collapsed"] .admin-sidebar-brand {
+  display: inline-flex;
   width: 40px;
   flex: 0 0 auto;
   justify-content: center;
 }
 
+.admin-sidebar-shell[data-sidebar-state="collapsed"] .admin-sidebar-brand-copy,
 .admin-sidebar-shell[data-sidebar-state="collapsed"] .admin-sidebar-brand-wordmark,
 .admin-sidebar-shell[data-sidebar-state="collapsed"] .admin-sidebar-role-badge,
 .admin-sidebar-shell[data-sidebar-state="collapsed"] .admin-sidebar-group-title,
@@ -388,6 +410,9 @@
   border-bottom: 1px solid var(--line);
   background: var(--admin-surface);
   padding: 18px 24px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
 .admin-topbar-kicker {
@@ -480,6 +505,11 @@
 .admin-cms-panel.editorial-form-shell {
   overflow: visible;
   padding: 20px;
+}
+
+.admin-cms-form:has(.admin-sticky-form-actions),
+.admin-cms-panel:has(.admin-sticky-form-actions) {
+  padding-bottom: 100px;
 }
 
 .admin-cms-form.editorial-form-shell::before,
@@ -583,6 +613,22 @@
 :root[data-theme="dark"] .admin-record-form,
 :root[data-theme="dark"] .admin-sticky-form-actions.form-actions.admin-surface-shell {
   background: var(--admin-surface);
+}
+
+:root[data-theme="dark"] .admin-sidebar-shell {
+  --admin-sidebar-text: #f5f7fb;
+  --admin-sidebar-text-muted: rgba(245, 247, 251, 0.68);
+  --admin-sidebar-text-soft: rgba(188, 193, 207, 0.80);
+  --admin-sidebar-panel: #1b1e25;
+  --admin-sidebar-item-bg: rgba(35, 39, 49, 0.80);
+  --admin-sidebar-item-bg-hover: rgba(42, 48, 58, 0.80);
+  --admin-sidebar-item-border: rgba(255, 255, 255, 0.10);
+  --admin-sidebar-item-active-bg: color-mix(in oklab, var(--accent) 18%, #252833);
+  --admin-sidebar-item-active-border: color-mix(in oklab, var(--accent) 40%, rgba(255, 255, 255, 0.18));
+  --admin-sidebar-badge-bg: color-mix(in oklab, var(--accent) 18%, #252833);
+  --admin-sidebar-badge-border: color-mix(in oklab, var(--accent) 30%, rgba(255, 255, 255, 0.10));
+  background: #1b1e25;
+  border-right-color: rgba(224, 226, 232, 0.10);
 }
 
 [data-button-variant] {

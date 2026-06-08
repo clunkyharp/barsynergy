@@ -38,7 +38,7 @@ export function ArticleGridSection({
     >
       <div className="container">
         {/* Filter bar */}
-        <div className="flex items-center justify-between gap-3">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
           <div className="flex min-w-0 flex-1 items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
             <CategoryPill
               href={listingHref(content, basePath, { category: null })}
@@ -84,7 +84,7 @@ export function ArticleGridSection({
         ) : (
           <>
             {/* Count */}
-            <MetaChip className="mt-5 border-[var(--border-default)] bg-[var(--accent-soft)] text-[var(--accent)]" variant="filter">
+            <MetaChip aria-live="polite" aria-atomic="true" className="mt-5 border-[var(--border-default)] bg-[var(--accent-soft)] text-[var(--accent)]" variant="filter">
               Материалов: {content.total}
             </MetaChip>
 

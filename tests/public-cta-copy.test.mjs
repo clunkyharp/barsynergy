@@ -557,12 +557,11 @@ test('public contact CTAs map to form topics and defaults', () => {
   assert.match(contactFormSource, /label: 'Откликнуться на вакансию'/);
   assert.match(contactFormSource, /value: 'event-news'/);
   assert.match(contactFormSource, /label: 'Подписаться на анонсы'/);
-  assert.match(contactFormSource, /value: 'supplier-contact'/);
-  assert.match(contactFormSource, /label: 'Связаться с поставщиком'/);
+  assert.doesNotMatch(contactFormSource, /value: 'supplier-contact'/);
+  assert.doesNotMatch(contactFormSource, /label: 'Связаться с поставщиком'/);
   assert.match(contactActionsSource, /'vacancy-response'/);
   assert.match(contactActionsSource, /'event-news'/);
-  assert.match(contactActionsSource, /'supplier-contact'/);
-  assert.match(sectionSource, /encodedContactHref\('supplier-contact'/);
+  assert.doesNotMatch(contactActionsSource, /'supplier-contact'/);
   assert.doesNotMatch(sectionSource, /encodedContactHref\('vacancy-response'/);
   assert.doesNotMatch(sectionSource, /position: item\.title/);
   assert.doesNotMatch(sectionSource, /vacancyTitle: item\.title/);

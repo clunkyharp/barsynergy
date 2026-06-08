@@ -205,7 +205,7 @@ test('listResultWithRelevance returns items in relevance order with pagination',
     { id: '4', title: 'кофейня' },
   ];
 
-  const getIdQuery = async ({ idsOnly }) => ({ ids: items, total: 4 });
+  const getIdQuery = async () => ({ ids: items, total: 4 });
   const fetchRecords = async (ids) => items.filter((item) => ids.includes(item.id));
 
   const result = await listResultWithRelevance('кофейня', 1, 10, getIdQuery, fetchRecords);
@@ -225,7 +225,7 @@ test('listResultWithRelevance paginates correctly', async () => {
     { id: '4', title: 'кофейня Г' },
   ];
 
-  const getIdQuery = async ({ idsOnly }) => ({ ids: items, total: 4 });
+  const getIdQuery = async () => ({ ids: items, total: 4 });
   const fetchRecords = async (ids) => items.filter((item) => ids.includes(item.id));
 
   const page1 = await listResultWithRelevance('кофейня', 1, 2, getIdQuery, fetchRecords);

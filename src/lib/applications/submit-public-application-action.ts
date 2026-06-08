@@ -14,7 +14,7 @@ import {
   hasHoneypotValue
 } from '@/lib/applications/public-submission-guards';
 import { assertSameOriginServerAction } from '@/lib/security/server-action-origin';
-import { assertTurnstilePassed, TurnstileError } from '@/lib/security/turnstile';
+import { assertTurnstilePassed } from '@/lib/security/turnstile';
 
 type SubmitPublicApplicationActionInput<TParsed> = {
   actionName: string;

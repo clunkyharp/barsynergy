@@ -8,9 +8,19 @@ import {
   shouldApplyCsp
 } from '@/lib/security/csp';
 
+function generateRequestId() {
+  const bytes = new Uint8Array(12);
+  crypto.getRandomValues(bytes);
+  return 'req_' + Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('');
+}
+
 export function proxy(request: NextRequest) {
+  const requestId = generateRequestId();
+
   if (!shouldApplyCsp(request.nextUrl.pathname)) {
-    return NextResponse.next();
+    const response = NextResponse.next();
+    response.headers.set('X-Request-Id', requestId);
+    return response;
   }
 
   const nonce = createCspNonce();
@@ -20,10 +30,12 @@ export function proxy(request: NextRequest) {
   });
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set('x-nonce', nonce);
+  requestHeaders.set('x-request-id', requestId);
   requestHeaders.set('Content-Security-Policy', contentSecurityPolicy);
 
   const withSecurityHeaders = (response: NextResponse) => {
     response.headers.set('Content-Security-Policy', contentSecurityPolicy);
+    response.headers.set('X-Request-Id', requestId);
     return response;
   };
 

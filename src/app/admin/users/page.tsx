@@ -13,7 +13,10 @@ import {
   AdminActionRow
 } from '@/components/ui/admin-table';
 import { ContextualEmptyState } from '@/components/ui/empty-state';
+import { FormField } from '@/components/ui/form-field';
+import { Input } from '@/components/ui/input';
 import { AdminStatusChip, type StatusBadgeVariant } from '@/components/ui/status-badge';
+import { AdminFilterBar } from '@/components/admin/content-admin-controls';
 import { applicationStatusLabels } from '@/lib/admin/application-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
 import { prisma } from '@/modules/admin/queries';
@@ -145,9 +148,22 @@ export default async function AdminUsersPage({ searchParams }: AdminUsersPagePro
 
   const params = (await searchParams) ?? {};
   const accessFilter = getAccessFilter(params);
+  const searchQuery = firstParam(params.q)?.trim() ?? '';
   const currentPath = getAdminCurrentPath(ADMIN_USERS_PATH, params);
+  const searchWhere: Prisma.UserWhereInput = searchQuery
+    ? {
+        OR: [
+          { email: { contains: searchQuery, mode: 'insensitive' } },
+          { businessAccount: { companyName: { contains: searchQuery, mode: 'insensitive' } } }
+        ]
+      }
+    : {};
+  const where: Prisma.UserWhereInput = {
+    ...getBusinessAccessWhere(accessFilter),
+    ...searchWhere
+  };
   const users = await prisma.user.findMany({
-    where: getBusinessAccessWhere(accessFilter),
+    where,
     orderBy: [{ createdAt: 'desc' }],
     take: 50,
     select: {
@@ -182,6 +198,15 @@ export default async function AdminUsersPage({ searchParams }: AdminUsersPagePro
         title="Бизнес-доступы"
       />
       <AdminActionAlert params={params} />
+      <AdminFilterBar action={ADMIN_USERS_PATH}>
+        <FormField htmlFor="admin-users-search" label="Поиск">
+          <Input id="admin-users-search" name="q" defaultValue={searchQuery} placeholder="Поиск по email или названию компании" />
+        </FormField>
+        <AdminActionRow className="justify-start">
+          <Button type="submit" variant="secondary">Найти</Button>
+          <Button href={ADMIN_USERS_PATH} variant="ghost">Сбросить</Button>
+        </AdminActionRow>
+      </AdminFilterBar>
       <section className="rounded-[var(--radius-md)] border border-[var(--line)] border-l-[3px] border-l-[var(--admin-structure-accent)] bg-[var(--surface)] p-4">
         <div className="grid gap-1 border-b border-[var(--line)] pb-3">
           <h2 className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--admin-label)]">Фильтр доступов</h2>

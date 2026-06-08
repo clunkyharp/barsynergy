@@ -13,7 +13,7 @@ type ResolveServerActionErrorInput = {
   fallbackMessage: string;
 };
 
-function isRedirectError(error: unknown) {
+export function isRedirectError(error: unknown) {
   if (typeof error !== 'object' || error === null || !('digest' in error) || typeof error.digest !== 'string') {
     return false;
   }

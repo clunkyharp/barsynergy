@@ -179,7 +179,7 @@ export default async function AdminEventsPage({ searchParams }: AdminEventsPageP
                       <div>{dateFormatter.format(event.startsAt)}</div>
                       {event.endsAt ? <div className="mt-1 text-xs">до {dateFormatter.format(event.endsAt)}</div> : null}
                     </AdminTableCell>
-                    <AdminTableCell className="text-[var(--muted)]" label="Город">{event.city?.name ?? '-'}</AdminTableCell>
+                    <AdminTableCell className="text-[var(--muted)]" label="Город">{event.city?.name ?? <span className="text-[var(--muted)]">Без города</span>}</AdminTableCell>
                     <AdminTableCell label="Статус">
                       <StatusBadge variant={contentStatusBadgeVariants[event.status]}>{contentStatusLabels[event.status]}</StatusBadge>
                     </AdminTableCell>

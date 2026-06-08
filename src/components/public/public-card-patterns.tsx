@@ -226,7 +226,7 @@ export function FeatureCard({
     return (
       <article
         className={cn(
-          'group grid gap-3 border-b border-[var(--line)] py-4 transition-colors duration-[var(--motion-duration-base)] ease-[var(--motion-ease-standard)] hover:bg-[var(--surface-wash)] focus-within:bg-[var(--surface-wash)] motion-reduce:transition-none md:grid-cols-[minmax(7rem,0.28fr)_minmax(0,1fr)_minmax(12rem,0.46fr)] md:items-start md:gap-5 md:px-3 md:py-5',
+          'group grid grid-cols-1 gap-3 border-b border-[var(--line)] py-4 transition-colors duration-[var(--motion-duration-base)] ease-[var(--motion-ease-standard)] hover:bg-[var(--surface-wash)] focus-within:bg-[var(--surface-wash)] motion-reduce:transition-none md:grid-cols-[minmax(7rem,0.28fr)_minmax(0,1fr)_minmax(12rem,0.46fr)] md:items-start md:gap-5 md:px-3 md:py-5',
           className
         )}
       >

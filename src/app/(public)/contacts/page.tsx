@@ -23,14 +23,13 @@ const contactTopicAliases: Record<string, string> = {
   'sponsorship-presentation': 'sponsorship',
   consulting: 'consulting',
   'consulting-request': 'consulting',
-  'supplier-contact': 'supplier-contact',
-  supplier: 'supplier',
   event: 'event',
   bug: 'bug-report',
   'bug-report': 'bug-report',
   'article-topic': 'article-topic',
   'article-interview': 'article-topic',
-  'article-launch': 'article-topic'
+  'article-launch': 'article-topic',
+  supplier: 'other'
 };
 
 const contextParamKeys = [
@@ -40,8 +39,6 @@ const contextParamKeys = [
   'position',
   'employmentType',
   'salaryLabel',
-  'supplierCategory',
-  'serviceArea',
   'websiteUrl',
   'eventTitle',
   'eventDate',

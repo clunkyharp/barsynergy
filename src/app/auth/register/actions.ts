@@ -32,7 +32,11 @@ const registerUserSchema = z.object({
   fullName: z.string().trim().min(1).max(200),
   email: z.string().trim().email().max(255).transform((value) => value.toLowerCase()),
   password: z.string().min(8).max(200),
+  confirmPassword: z.string().min(8).max(200),
   consent: z.literal('on')
+}).refine((data) => data.password === data.confirmPassword, {
+  message: 'passwords do not match',
+  path: ['confirmPassword']
 });
 
 const REGISTER_USER_FLASH_COOKIE = 'barsynergy-register-user-flash';
@@ -82,20 +86,25 @@ function getRegisterUserFlash(formData: FormData): RegisterUserFlash {
 async function sendUserVerificationEmail(input: { email: string; userId: string }) {
   const rawToken = randomBytes(32).toString('hex');
   const tokenHash = createHash('sha256').update(rawToken).digest('hex');
+  const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
   await prisma.$transaction(async (tx) => {
-    await tx.$executeRaw`
-      UPDATE "UserEmailVerificationToken"
-      SET "usedAt" = NOW(), "updatedAt" = NOW()
-      WHERE "userId" = ${input.userId}
-        AND "usedAt" IS NULL
-        AND "expiresAt" > NOW()
-    `;
+    await tx.userEmailVerificationToken.updateMany({
+      where: {
+        userId: input.userId,
+        usedAt: null,
+        expiresAt: { gt: new Date() }
+      },
+      data: { usedAt: new Date() }
+    });
 
-    await tx.$executeRaw`
-      INSERT INTO "UserEmailVerificationToken" ("userId", "tokenHash", "expiresAt", "createdAt")
-      VALUES (${input.userId}, ${tokenHash}, NOW() + INTERVAL '24 hours', NOW())
-    `;
+    await tx.userEmailVerificationToken.create({
+      data: {
+        userId: input.userId,
+        tokenHash,
+        expiresAt
+      }
+    });
   });
 
   const env = getEnv();
@@ -207,7 +216,8 @@ export async function registerUserAction(formData: FormData) {
 
   const parsed = registerUserSchema.safeParse({
     fullName: getString(formData, 'fullName'), email: getString(formData, 'email'),
-    password: getString(formData, 'password'), consent: getString(formData, 'consent')
+    password: getString(formData, 'password'), confirmPassword: getString(formData, 'confirmPassword'),
+    consent: getString(formData, 'consent')
   });
 
   if (!parsed.success) {

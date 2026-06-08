@@ -107,6 +107,9 @@ export default async function AdminSupplierEditPage({ params }: AdminSupplierEdi
                 ))}
               </Select>
             </FormField>
+            <p className="text-xs leading-5 text-[var(--muted)] lg:col-span-2">
+              Статус через панель «Видимость на сайте» использует подтверждение. Изменение через этот Select сохраняется без подтверждения.
+            </p>
           </AdminCmsGrid>
         </AdminCmsSection>
 
@@ -122,7 +125,7 @@ export default async function AdminSupplierEditPage({ params }: AdminSupplierEdi
                 defaultValue={supplier.companyName}
               />
             </FormField>
-            <FormField htmlFor="supplier-websiteUrl" label="Сайт">
+            <FormField htmlFor="supplier-websiteUrl" label="Сайт" hint="Необязательно. Если не заполнен, ссылка не покажется на публичной странице.">
               <Input id="supplier-websiteUrl" name="websiteUrl" maxLength={240} type="url" defaultValue={supplier.websiteUrl ?? ''} />
             </FormField>
             <FormField htmlFor="supplier-contactLabel" label="Контакт" hint="Коротко: имя, телефон, Telegram или email. Если контактов несколько, разделяйте точкой с запятой.">
@@ -143,7 +146,7 @@ export default async function AdminSupplierEditPage({ params }: AdminSupplierEdi
                 ))}
               </Select>
             </FormField>
-            <FormField htmlFor="supplier-serviceArea" label="Зона работы">
+            <FormField htmlFor="supplier-serviceArea" label="Зона работы" hint="Например: СКФО, Краснодарский край, вся Россия">
               <Input id="supplier-serviceArea" name="serviceArea" maxLength={180} defaultValue={supplier.serviceArea ?? ''} />
             </FormField>
           </AdminCmsGrid>

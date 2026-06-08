@@ -41,8 +41,10 @@ export function AdminTableFrame({ className, ...props }: HTMLAttributes<HTMLDivE
 export function AdminDataTable({ className, minWidth = '1040px', mobileLayout = 'cards', style, ...props }: AdminTableProps) {
   return (
     <table
+      aria-label="Таблица данных"
       className={cn('admin-data-table w-full border-collapse text-left text-[13px] leading-[18px]', className)}
       data-mobile-layout={mobileLayout}
+      role="grid"
       style={
         {
           '--admin-table-min-width': typeof minWidth === 'number' ? `${minWidth}px` : minWidth,

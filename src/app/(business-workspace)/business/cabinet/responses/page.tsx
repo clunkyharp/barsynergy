@@ -14,7 +14,6 @@ import {
   applicationStatusLabels
 } from '@/lib/admin/application-utils';
 import {
-  getBusinessVacancySlugs,
   getBusinessResponses
 } from '@/modules/business/queries';
 
@@ -26,9 +25,7 @@ export const metadata: Metadata = buildPrivatePageMetadata({
 export default async function BusinessResponsesPage() {
   const { businessAccount } = await requireBusinessAccountAccess();
 
-  const vacancies = await getBusinessVacancySlugs(businessAccount.id);
-  const vacancyIds = vacancies.map((v) => v.id);
-  const responses = await getBusinessResponses(vacancyIds);
+  const responses = await getBusinessResponses(businessAccount.id);
 
   const responseIds = responses.map((r) => r.id);
   const unreadCounts = await getUnreadMessageCounts(responseIds, 'business');

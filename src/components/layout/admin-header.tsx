@@ -25,15 +25,17 @@ const adminHeaderSections = [
   { title: 'Бизнес-доступы', test: (pathname: string) => pathname.startsWith('/admin/users') },
   { title: 'Категории', test: (pathname: string) => pathname.startsWith('/admin/categories') },
   { title: 'Города', test: (pathname: string) => pathname.startsWith('/admin/cities') },
-  { title: 'Теги', test: (pathname: string) => pathname.startsWith('/admin/tags') }
+  { title: 'Теги', test: (pathname: string) => pathname.startsWith('/admin/tags') },
+  { title: 'Навыки', test: (pathname: string) => pathname.startsWith('/admin/skills') }
 ] as const;
 
 type AdminHeaderProps = {
   email: string;
+  logoutAction: (formData: FormData) => Promise<void>;
   role: UserRole;
 };
 
-export function AdminHeader({ email, role }: AdminHeaderProps) {
+export function AdminHeader({ email, logoutAction, role }: AdminHeaderProps) {
   const pathname = usePathname();
   const currentSection = adminHeaderSections.find((section) => section.test(pathname))?.title ?? 'Админка';
 
@@ -51,6 +53,11 @@ export function AdminHeader({ email, role }: AdminHeaderProps) {
         <Button href="/" size="sm" variant="ghost">
           На сайт
         </Button>
+        <form action={logoutAction}>
+          <Button className="min-h-9 px-3 py-1.5 text-xs" size="sm" type="submit" variant="ghost">
+            Выйти
+          </Button>
+        </form>
       </div>
     </header>
   );

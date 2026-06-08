@@ -38,7 +38,7 @@ export function AdminStatusChip({ children, className, variant = 'neutral', show
   return (
     <span
       className={cn(
-        'inline-flex min-h-8 items-center gap-1.5 rounded-[var(--radius-pill)] border px-2.5 py-1.5 text-[11px] font-semibold leading-[14px] tracking-[0]',
+        'inline-flex min-h-8 items-center gap-1.5 whitespace-nowrap rounded-[var(--radius-pill)] border px-2.5 py-1.5 text-[11px] font-semibold leading-[14px] tracking-[0]',
         isSolidVariant && 'shadow-none',
         styles.chip,
         className

@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation';
 import { CategoryType, ContentStatus, FileVisibility, Prisma, StorageDriver } from '@prisma/client';
 import { hasErrorMessage, resolveServerActionError } from '../actions/server-action-errors';
 import { prisma } from '@/lib/db/prisma';
-import { PUBLICATION_STATUS_HINT, contentStatusLabels, firstParam } from '@/lib/admin/content-ui';
+import { firstParam } from '@/lib/admin/content-ui';
 import { isAllowedPublicImageUpload } from '@/lib/storage/file-signatures';
 import { MAX_UPLOAD_FILE_SIZE_BYTES } from '@/lib/storage/storage.types';
 

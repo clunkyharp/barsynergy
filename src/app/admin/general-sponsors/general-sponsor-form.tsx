@@ -184,10 +184,10 @@ export function GeneralSponsorForm({ action, cities, redirectTo, submitLabel, sp
           <FormField htmlFor="sponsor-telegramUrl" label="Telegram">
             <Input id="sponsor-telegramUrl" name="telegramUrl" maxLength={500} defaultValue={sponsor?.telegramUrl ?? ''} />
           </FormField>
-          <FormField htmlFor="sponsor-contactName" label="Имена контактов" hint="Если контактов несколько, пишите их в том же порядке, что телефоны: Загир / Офис или с новой строки.">
+          <FormField htmlFor="sponsor-contactName" label="Имена контактов" hint="Несколько контактов — через / или с новой строки. Порядок должен совпадать с Телефонами.">
             <Textarea id="sponsor-contactName" name="contactName" maxLength={240} className="min-h-24" defaultValue={sponsor?.contactName ?? ''} />
           </FormField>
-          <FormField htmlFor="sponsor-contactPhone" label="Телефоны" hint="Порядок должен совпадать с именами: 8 928 057 77 13 / 8 967 936 05 50 или с новой строки.">
+          <FormField htmlFor="sponsor-contactPhone" label="Телефоны" hint="В том же порядке, что Имена: +7 928 ... / +7 967 ... или с новой строки.">
             <Textarea id="sponsor-contactPhone" name="contactPhone" maxLength={240} className="min-h-24" defaultValue={sponsor?.contactPhone ?? ''} />
           </FormField>
           <FormField htmlFor="sponsor-contactEmail" label="Email">

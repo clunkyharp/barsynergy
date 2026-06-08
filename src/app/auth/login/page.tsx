@@ -23,7 +23,7 @@ const errorMessages: Record<string, string> = {
 };
 
 const successMessages: Record<string, string> = {
-  'business-request-created': 'Заявку получили. После проверки напишем, как открыть доступ.',
+  'business-request-created': 'Заявку получили. Обычно отвечаем за 1–2 рабочих дня. После проверки напишем, как открыть доступ.',
   'logged-out': 'Вы вышли из аккаунта.',
   'password-reset': 'Пароль успешно изменён. Войдите с новым паролем.'
 };

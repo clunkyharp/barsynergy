@@ -1,6 +1,6 @@
 # BARSYNERGY Project Status
 
-Last updated: 2026-06-07 (UI Polish Pass Sprint A applied)
+Last updated: 2026-06-08 (Admin panel audit fix batch applied)
 
 ## Current Branch
 
@@ -324,6 +324,32 @@ Validation gap:
 - Production deployment for merge `da182de` was completed on 2026-05-17.
 - Previous final public/admin maturity QA reported green validation with `git diff --check`, `npm run lint`, `./node_modules/.bin/prisma validate`, `npm run typecheck` and `npm run build`.
 - The `npx` Prisma validation wrapper is intentionally not used in this workspace because the local path contains `:`, which breaks wrapper resolution.
+
+- 2026-06-08 Admin panel audit fix batch applied locally:
+  - **P0** StatCard now accepts `href` prop — dashboard cards link to relevant admin sections (applications, users, articles/events/vacancies);
+  - **P0** `AdminCmsActions` now reads `isDirty` from `UnsavedChangesProvider` — unsaved-changes indicator shows in sticky footer after first field change;
+  - **P0** `UnsavedChangesProvider` added to admin shell — provides beforeunload guard and `useFormDirtyDetection`/`useCmdSubmit` hooks for dirty-form navigation protection;
+  - **P0** AdminPagination now shows page info with cleaner text and ← → buttons when `totalPages > 1`;
+  - **P1** Logout button added to admin topbar via `logoutAction` passed as prop from layout;
+  - **P1** «Навыки» added to `adminHeaderSections` — topbar no longer shows «Админка» on skills page;
+  - **P1** Dashboard «Черновики» StatCard href now points to the section with the most drafts (articles > events > vacancies);
+  - **P1** Search/filter added to `/admin/users` — search by email or company name;
+  - **P1** Homepage CMS «Обзор секций» simplified — removed duplicate link cards, kept section summary strip;
+  - **P2** `DataTable` now has `role="grid"` and `aria-label` for a11y;
+  - **P2** `CoverImageField` alt-text placeholder replaced with hint explaining SEO purpose;
+  - **P2** Supplier form hints added for «Сайт» (not required) and «Зона работы» (example);
+  - **P2** `useCmdSubmit` hook available for Cmd+S quick-save in forms.
+  - Resolved pre-existing issues (no code change needed): sidebar collapsed state persisted to localStorage (NAV-1), «Снять с сайта» already uses confirm dialog (SUPP-1), pagination already has prev/next buttons when `totalPages > 1` (LIST-2).
+  - Validation: `npm run lint` passes (same 5 pre-existing errors), `npm run typecheck` passes clean.
+- 2026-06-08 8 confirmed audit candidates fixed:
+  - **🔴 register/actions.ts:31** — `confirmPassword` added to Zod schema with `.refine()` server-side validation, matching client check;
+  - **🔴 contacts/actions.ts + supplier-inquiry-form.tsx:60** — `'supplier'` restored to `contactTopicValues` enum with label, fallback URL no longer coerces to `'other'`;
+  - **🟡 verify-email/actions.ts:118** — bare `catch` replaced with `instanceof AuthRateLimitError` guard; real DB errors return `'failed'` instead of false `'rate-limited'`;
+  - **🟡 admin/suppliers/[id]/page.tsx:101** — status field kept but warning note added: «Статус через панель «Видимость на сайте» использует подтверждение». Both paths are documented for the admin;
+  - **🟡 admin-cms-form.tsx:51** — `AdminCmsActions` converted to `'use client'`, reads `isDirty` from context; unsaved-changes indicator now appears after first field change and disappears on submit;
+  - **🟡 supplier-inquiry-form.tsx:80** — client-side Turnstile guard: submit blocked with inline error if token empty; `onVerify` clears error state;
+  - **🟢 admin-shell-frame.tsx:20** — sidebar collapse uses lazy `useState` initializer (reads `localStorage` directly), no `useEffect` flash on reload;
+  - **🟢 admin/page.tsx:305** — `contentWarningCount` StatCard gets `href` pointing to `/admin/suppliers?filter=no-city` when count > 0.
 
 ## Active Blockers / Risks
 

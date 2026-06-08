@@ -227,7 +227,7 @@ export default async function AdminSuppliersPage({ searchParams }: AdminSupplier
                       </div>
                       {supplier.serviceArea ? <div className="mt-1 text-xs">{supplier.serviceArea}</div> : null}
                     </AdminTableCell>
-                    <AdminTableCell className="text-[var(--muted)]" label="Город">{supplier.city?.name ?? '-'}</AdminTableCell>
+                    <AdminTableCell className="text-[var(--muted)]" label="Город">{supplier.city?.name ?? <span className="text-[var(--muted)]">Без города</span>}</AdminTableCell>
                     <AdminTableCell label="Статус">
                       <StatusBadge variant={contentStatusBadgeVariants[supplier.status]}>{contentStatusLabels[supplier.status]}</StatusBadge>
                     </AdminTableCell>

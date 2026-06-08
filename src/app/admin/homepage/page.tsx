@@ -3,7 +3,7 @@ import { AdminPageIntro } from '@/components/admin/admin-page-intro';
 import { AdminCmsPanel } from '@/components/admin/admin-cms-form';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
 import { ADMIN_GENERAL_SPONSORS_PATH, sectionMeta } from '@/components/admin/homepage-cms/homepage-cms-types';
-import { RecordStatus, formatDate, getActiveHomepageSection, HomepageOverviewCard } from '@/components/admin/homepage-cms/homepage-cms-utils';
+import { RecordStatus, formatDate, getActiveHomepageSection } from '@/components/admin/homepage-cms/homepage-cms-utils';
 import { HomepageSectionEditor, ExternalSectionPanel } from '@/components/admin/homepage-cms/homepage-cms-section-layout';
 import { AdminCmsCompactRecordSummary } from '@/components/admin/admin-cms-form';
 import {
@@ -38,16 +38,18 @@ export default async function AdminHomepagePage({ searchParams }: { searchParams
 
       <AdminActionAlert params={params} />
 
-      <AdminCmsPanel title="Обзор секций" description="Откройте только ту секцию, которую нужно изменить. Каждая секция сохраняется отдельно.">
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+      <AdminCmsPanel title="Секции главной" description="Каждая секция редактируется отдельно. На сайте видны только опубликованные записи.">
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
           {sectionMeta.map((section) => (
-            <HomepageOverviewCard
-              description={section.description}
-              id={section.id}
-              key={section.id}
-              status={section.externalStatus}
-              title={section.title}
-            />
+            <div className="rounded-[var(--radius-md)] border border-[var(--line)] bg-[var(--surface)] px-4 py-3" key={section.id}>
+              <p className="text-sm font-semibold">{section.title}</p>
+              <p className="mt-1 text-xs leading-5 text-[var(--muted)]">{section.description}</p>
+              {section.externalStatus ? (
+                <p className="mt-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">
+                  {section.externalStatus.label}
+                </p>
+              ) : null}
+            </div>
           ))}
         </div>
       </AdminCmsPanel>

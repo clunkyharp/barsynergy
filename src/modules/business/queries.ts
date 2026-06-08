@@ -53,13 +53,14 @@ export async function getBusinessDashboardData(businessAccountId: string) {
     prisma.application.count({
       where: {
         type: ApplicationType.VACANCY_RESPONSE,
+        status: { notIn: [ApplicationStatus.DRAFT, ApplicationStatus.ARCHIVED] },
         vacancy: { businessAccountId }
       }
     }),
     prisma.application.count({
       where: {
         type: ApplicationType.VACANCY_RESPONSE,
-        status: { not: ApplicationStatus.DRAFT },
+        status: { notIn: [ApplicationStatus.DRAFT, ApplicationStatus.ARCHIVED] },
         vacancy: { businessAccountId },
         createdAt: { gte: sevenDaysAgo }
       }
@@ -69,20 +70,12 @@ export async function getBusinessDashboardData(businessAccountId: string) {
   return { cities, requestCount, activeRequestCount, draftRequestCount, closedRequestCount, latestApplications, responseCount, newResponseCount };
 }
 
-export async function getBusinessVacancySlugs(businessAccountId: string) {
-  return prisma.vacancy.findMany({
-    where: { businessAccountId },
-    select: { id: true, title: true, slug: true }
-  });
-}
-
-export async function getBusinessResponses(vacancyIds: string[]) {
-  if (vacancyIds.length === 0) return [];
+export async function getBusinessResponses(businessAccountId: string) {
   return prisma.application.findMany({
     where: {
-      vacancyId: { in: vacancyIds },
       type: ApplicationType.VACANCY_RESPONSE,
-      status: { not: ApplicationStatus.DRAFT }
+      status: { notIn: [ApplicationStatus.DRAFT, ApplicationStatus.ARCHIVED] },
+      vacancy: { businessAccountId }
     },
     select: {
       id: true,
@@ -96,13 +89,13 @@ export async function getBusinessResponses(vacancyIds: string[]) {
   });
 }
 
-export async function getBusinessResponseDetail(applicationId: string, userId: string) {
+export async function getBusinessResponseDetail(applicationId: string, businessAccountId: string) {
   return prisma.application.findFirst({
     where: {
       id: applicationId,
       type: ApplicationType.VACANCY_RESPONSE,
-      status: { not: ApplicationStatus.DRAFT },
-      vacancy: { createdById: userId }
+      status: { notIn: [ApplicationStatus.DRAFT, ApplicationStatus.ARCHIVED] },
+      vacancy: { businessAccountId }
     },
     select: {
       id: true,

@@ -52,10 +52,10 @@ export function CalculatorResultRail({
   const marginValue = canShowSalePrice ? percent(grossMargin) : '—';
 
   return (
-    <aside className="order-last xl:order-none">
+    <aside className="order-first xl:order-none">
       <div
         aria-invalid={resultState === 'error' ? true : undefined}
-        className="calculator-result-card cost-sheet xl:sticky xl:top-24"
+        className="calculator-result-card cost-sheet lg:sticky lg:top-24"
         data-calculator-result-state={resultState}
       >
         <div className="calculator-result-badge">

@@ -154,6 +154,7 @@ function PricingModeFields({
             error={salePriceError ?? undefined}
             htmlFor="calculatorSalePrice"
             label="Своя цена продажи"
+            hint={isManualMode ? undefined : 'Переключитесь в режим «Проверить цену», чтобы ввести свою цену.'}
           >
             <Input
               aria-invalid={salePriceError ? true : undefined}
@@ -187,7 +188,7 @@ function CalculatorMobileResultStrip({ summary }: { summary: CalculatorSummary }
   }
 
   return (
-    <div aria-live="polite" className="calculator-mobile-result-strip xl:hidden" data-calculator-mobile-result-state={state}>
+    <div aria-live="polite" role="status" className="calculator-mobile-result-strip sticky top-16 z-10 xl:hidden" data-calculator-mobile-result-state={state}>
       <span className="sr-only">Итог: </span>
       <strong className="calculator-mobile-result-strip-value">{line}</strong>
     </div>

@@ -59,14 +59,14 @@ const homeSectionCards = [
 
 export function HomeSectionCards() {
   return (
-    <section className="background-zone background-zone-ivory scroll-mt-28 border-b border-[var(--line)] py-10 md:py-14" id="home-sections" style={{ '--zone-surface': 'var(--background-band)' } as CSSProperties}>
+    <section aria-labelledby="home-sections-title" className="background-zone background-zone-ivory scroll-mt-28 border-b border-[var(--line)] py-10 md:py-14" id="home-sections" style={{ '--zone-surface': 'var(--background-band)' } as CSSProperties}>
       <div className="container">
         <div className="grid gap-8 xl:grid-cols-[minmax(0,0.48fr)_minmax(0,1.52fr)]">
           <div className="xl:pr-4">
             <PublicEyebrow>Платформа</PublicEyebrow>
-            <PublicDisplayTitle className="mt-4 md:text-[44px]">Разделы платформы</PublicDisplayTitle>
+            <PublicDisplayTitle className="mt-4 md:text-[44px]" id="home-sections-title">Разделы платформы</PublicDisplayTitle>
           </div>
-          <div className="grid gap-5 md:grid-cols-2 md:gap-4 xl:grid-cols-3">
+          <div className="grid gap-5 sm:grid-cols-2 md:gap-4 lg:grid-cols-3">
             {homeSectionCards.map((card) => {
               const Icon = card.icon;
 

@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
+import { Send } from 'lucide-react';
 import { AppLink } from '@/components/ui/app-link';
 import { ThemeToggle } from '@/components/layout/theme-toggle';
 
@@ -9,7 +10,7 @@ export function SiteFooter() {
   const pathname = usePathname();
   const isWorkspacePath =
     pathname?.startsWith('/admin') || pathname?.startsWith('/business/cabinet') || pathname?.startsWith('/auth') || pathname?.startsWith('/profile');
-  const aboutHref = pathname === '/' ? '#home-about' : '/#home-about';
+  const aboutHref = '/about';
   const footerNavClassName = 'grid content-start gap-1 text-sm leading-5 text-[var(--editorial-dark-muted)] md:justify-items-start';
   const footerHeadingClassName =
     'mb-3 flex min-h-4 items-center text-xs font-semibold uppercase leading-none tracking-[0.14em] text-[var(--editorial-dark-text)]';
@@ -54,6 +55,9 @@ export function SiteFooter() {
               <AppLink className={footerLinkClassName} href="/consulting">
                 Консалтинг
               </AppLink>
+              <AppLink className={footerLinkClassName} href="/tools/cost-calculator">
+                Калькулятор
+              </AppLink>
             </nav>
             <nav className={footerNavClassName}>
               <p className={footerHeadingClassName}>Сообщество</p>
@@ -68,6 +72,10 @@ export function SiteFooter() {
               </AppLink>
               <AppLink className={footerLinkClassName} href="/contacts">
                 Контакты
+              </AppLink>
+              <AppLink className={footerLinkClassName} href="https://t.me/barsynergy">
+                <Send size={14} strokeWidth={1.8} className="mr-1.5 inline-block shrink-0" />
+                Telegram
               </AppLink>
             </nav>
             <nav className={footerNavClassName}>
@@ -91,7 +99,7 @@ export function SiteFooter() {
                 Регистрация
               </AppLink>
             </nav>
-            <div className="col-span-full mt-4 flex justify-end border-t border-[var(--editorial-dark-border)] pt-4">
+            <div className="col-span-full mt-4 flex justify-start border-t border-[var(--editorial-dark-border)] pt-4 sm:justify-end">
               <ThemeToggle compact />
             </div>
           </div>

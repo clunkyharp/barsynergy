@@ -3,7 +3,6 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import type { PublishedContentItem } from '@/lib/public/content';
 import {
-  encodedContactHref,
   metaGroupValue,
   renderCompactChips,
   titleInitials,
@@ -54,13 +53,7 @@ function directoryDescription(item: PublishedContentItem) {
 
 function directoryActions(item: PublishedContentItem, basePath: string) {
   return [
-    {
-      href: encodedContactHref('supplier-contact', {
-        companyName: item.title,
-        supplierCategory: item.label ?? undefined
-      }),
-      label: 'Связаться'
-    },
+    { href: `${basePath}/${item.slug}`, label: 'Связаться' },
     { href: `${basePath}/${item.slug}`, label: 'Профиль', variant: 'secondary' as const }
   ];
 }

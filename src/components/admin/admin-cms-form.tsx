@@ -1,6 +1,9 @@
+'use client';
+
 import type { ComponentPropsWithoutRef, ReactNode } from 'react';
 import { FormActions } from '@/components/ui/form-field';
 import { cn } from '@/lib/utils';
+import { useUnsavedChanges } from '@/components/admin/unsaved-changes-guard';
 
 type AdminCmsFormProps = ComponentPropsWithoutRef<'form'>;
 
@@ -187,7 +190,10 @@ export function AdminCmsInlineEditRecord({
   );
 }
 
-export function AdminCmsActions({ children, className, stateText = 'Есть несохранённые изменения', ...props }: AdminCmsActionsProps) {
+export function AdminCmsActions({ children, className, stateText, ...props }: AdminCmsActionsProps) {
+  const { isDirty } = useUnsavedChanges();
+  const resolved = stateText !== undefined ? stateText : isDirty ? 'Есть несохранённые изменения' : null;
+
   return (
     <FormActions
       className={cn(
@@ -196,7 +202,7 @@ export function AdminCmsActions({ children, className, stateText = 'Есть н�
       )}
       {...props}
     >
-      {stateText ? <p className="admin-sticky-form-actions-state">{stateText}</p> : null}
+      {resolved ? <p className="admin-sticky-form-actions-state">{resolved}</p> : null}
       <div className="admin-sticky-form-actions-controls">{children}</div>
     </FormActions>
   );

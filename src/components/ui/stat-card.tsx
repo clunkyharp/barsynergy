@@ -1,8 +1,10 @@
 import type { HTMLAttributes, ReactNode } from 'react';
+import { AppLink } from '@/components/ui/app-link';
 import { Panel } from '@/components/ui/panel';
 import { cn } from '@/lib/utils';
 
 type StatCardProps = HTMLAttributes<HTMLDivElement> & {
+  href?: string;
   label: string;
   value: ReactNode;
   description?: ReactNode;
@@ -16,7 +18,7 @@ type StatCardProps = HTMLAttributes<HTMLDivElement> & {
   deltaClassName?: string;
 };
 
-export function StatCard({
+function StatCardInner({
   className,
   label,
   value,
@@ -29,26 +31,24 @@ export function StatCard({
   descriptionClassName,
   statusClassName,
   deltaClassName,
-  ...props
 }: StatCardProps) {
   const isInverse = tone === 'inverse';
 
   return (
     <Panel
       className={cn(
-        'space-y-3 border-[var(--border-default)] shadow-none',
+        'flex h-full flex-col justify-between space-y-3 border-[var(--border-default)] shadow-none',
         isInverse ? 'bg-[var(--surface-inverse)]' : 'bg-[var(--surface)]',
         className
       )}
       padding="md"
       tone={isInverse ? 'inverse' : 'default'}
-      {...props}
     >
       <div className="flex min-w-0 items-start justify-between gap-3">
         <div className="min-w-0">
           <p
             className={cn(
-              'text-[11px] font-semibold uppercase tracking-[0.16em]',
+              'overflow-hidden text-ellipsis whitespace-nowrap text-[11px] font-semibold uppercase tracking-[0.16em]',
               isInverse ? 'text-[var(--editorial-dark-label)]' : 'text-[var(--muted)]',
               labelClassName
             )}
@@ -94,4 +94,19 @@ export function StatCard({
       ) : null}
     </Panel>
   );
+}
+
+export function StatCard({ href, ...props }: StatCardProps) {
+  if (href) {
+      return (
+      <AppLink
+        className="block h-full rounded-[var(--radius-md)] transition hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)]"
+        href={href}
+      >
+        <StatCardInner {...props} />
+      </AppLink>
+    );
+  }
+
+  return <StatCardInner {...props} />;
 }

@@ -44,7 +44,7 @@ function getValidationMessage(control: ValidatableControl) {
   }
 
   if (validity.valueMissing) {
-    return `${label} нужно заполнить.`;
+    return `Заполните поле «${label}».`;
   }
 
   if (validity.typeMismatch) {
@@ -58,26 +58,34 @@ function getValidationMessage(control: ValidatableControl) {
   }
 
   if (validity.tooShort && 'minLength' in control && control.minLength > 0) {
-    return `Минимум ${control.minLength} символов.`;
+    return `В поле «${label}» нужно минимум ${control.minLength} символов.`;
   }
 
   if (validity.tooLong && 'maxLength' in control && control.maxLength > 0) {
-    return `Максимум ${control.maxLength} символов.`;
+    return `В поле «${label}» можно использовать максимум ${control.maxLength} символов.`;
   }
 
   if (validity.rangeUnderflow && control instanceof HTMLInputElement && control.min) {
-    return `Значение должно быть не меньше ${control.min}.`;
+    return `В поле «${label}» значение должно быть не меньше ${control.min}.`;
   }
 
   if (validity.rangeOverflow && control instanceof HTMLInputElement && control.max) {
-    return `Значение должно быть не больше ${control.max}.`;
+    return `В поле «${label}» значение должно быть не больше ${control.max}.`;
   }
 
   if (validity.patternMismatch) {
-    return 'Проверьте формат поля.';
+    return `Проверьте формат поля «${label}».`;
   }
 
-  return 'Проверьте значение поля.';
+  if (validity.customError) {
+    const customMessage = control.validationMessage.trim();
+
+    if (customMessage) {
+      return customMessage;
+    }
+  }
+
+  return `Проверьте значение поля «${label}».`;
 }
 
 function updateDescribedBy(control: ValidatableControl, errorId: string, hasError: boolean) {
@@ -145,6 +153,20 @@ function getFormControls(form: HTMLFormElement) {
   return Array.from(form.querySelectorAll<ValidatableControl>(CONTROL_SELECTOR)).filter((control) => control.willValidate);
 }
 
+export function validatePublicForm(form: HTMLFormElement, controls: ValidatableControl[] = getFormControls(form)) {
+  form.dataset.publicValidationSubmitted = 'true';
+  const invalidControls = controls.filter((control) => !control.validity.valid);
+
+  if (invalidControls.length === 0) {
+    return true;
+  }
+
+  invalidControls.forEach((control) => setControlError(control, true));
+  getVisualControl(invalidControls[0])?.focus();
+
+  return false;
+}
+
 export function PublicFormValidation() {
   const markerRef = useRef<HTMLSpanElement>(null);
 
@@ -156,14 +178,9 @@ export function PublicFormValidation() {
     }
 
     const formElement = form;
-    const submittedFlag = 'publicValidationSubmitted';
 
     function hasSubmittedAttempt() {
-      return formElement.dataset[submittedFlag] === 'true';
-    }
-
-    function markSubmittedAttempt() {
-      formElement.dataset[submittedFlag] = 'true';
+      return formElement.dataset.publicValidationSubmitted === 'true';
     }
 
     function handleBlur(event: FocusEvent) {
@@ -187,18 +204,7 @@ export function PublicFormValidation() {
     }
 
     function validateForm() {
-      markSubmittedAttempt();
-      const controls = getFormControls(formElement);
-      const invalidControls = controls.filter((control) => !control.validity.valid);
-
-      if (invalidControls.length === 0) {
-        return true;
-      }
-
-      invalidControls.forEach((control) => setControlError(control, true));
-      getVisualControl(invalidControls[0])?.focus();
-
-      return false;
+      return validatePublicForm(formElement);
     }
 
     function handleInvalid(event: Event) {

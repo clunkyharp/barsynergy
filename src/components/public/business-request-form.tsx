@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { ActionRow } from '@/components/ui/action-row';
 import { Button } from '@/components/ui/button';
 import { ConsentField } from '@/components/ui/consent-field';
@@ -11,7 +11,7 @@ import { Select } from '@/components/ui/select';
 import { SubmitButton } from '@/components/ui/submit-button';
 import { Textarea } from '@/components/ui/textarea';
 import { Turnstile } from '@/components/ui/turnstile';
-import { PublicFormValidation } from '@/components/public/public-form-validation';
+import { PublicFormValidation, validatePublicForm } from '@/components/public/public-form-validation';
 
 type BusinessRequestFormProps = {
   cities: Array<{ id: string; name: string }>;
@@ -19,13 +19,30 @@ type BusinessRequestFormProps = {
 };
 
 export function BusinessRequestForm({ cities, action }: BusinessRequestFormProps) {
+  const formRef = useRef<HTMLFormElement>(null);
   const [step, setStep] = useState<1 | 2>(1);
   const [email, setEmail] = useState('');
   const [contactPerson, setContactPerson] = useState('');
   const [turnstileToken, setTurnstileToken] = useState('');
 
+  function handleContinue() {
+    const form = formRef.current;
+
+    if (!(form instanceof HTMLFormElement)) {
+      return;
+    }
+
+    const stepOneControls = ['registerEmail', 'registerContactPerson']
+      .map((id) => form.querySelector<HTMLInputElement>(`#${id}`))
+      .filter((control): control is HTMLInputElement => control instanceof HTMLInputElement);
+
+    if (validatePublicForm(form, stepOneControls)) {
+      setStep(2);
+    }
+  }
+
   return (
-    <form action={action} className="auth-business-request-form public-form-shell grid gap-6" noValidate>
+    <form action={action} className="auth-business-request-form public-form-shell grid gap-6" noValidate ref={formRef}>
       <PublicFormValidation />
       <div className="flex flex-wrap gap-2 border-b border-[var(--line)] pb-4">
         {[
@@ -75,8 +92,7 @@ export function BusinessRequestForm({ cities, action }: BusinessRequestFormProps
             </p>
             <Button
               className="rounded-[var(--radius-md)]"
-              disabled={!email.trim() || !contactPerson.trim()}
-              onClick={() => setStep(2)}
+              onClick={handleContinue}
               size="lg"
               type="button"
             >
@@ -93,7 +109,7 @@ export function BusinessRequestForm({ cities, action }: BusinessRequestFormProps
               <FormField htmlFor="companyName" label="Компания">
                 <Input id="companyName" name="companyName" required maxLength={160} placeholder="Например, Coffee Point" />
               </FormField>
-              <FormField htmlFor="cityId" label="Город">
+              <FormField htmlFor="cityId" hint="необязательно" label="Город">
                 <Select id="cityId" name="cityId">
                   <option value="">Не выбран</option>
                   {cities.map((city) => (

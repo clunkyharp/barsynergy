@@ -1,6 +1,6 @@
 import { ApplicationStatus, ApplicationType, type Prisma } from '@/modules/admin/queries';
 import { publishContentFromApplication } from '@/app/admin/applications/actions';
-import { AdminFilterBar, AdminPagination, AdminStatusTabs, HiddenRedirect } from '@/components/admin/content-admin-controls';
+import { AdminActionAlert, AdminFilterBar, AdminPagination, AdminStatusTabs, HiddenRedirect } from '@/components/admin/content-admin-controls';
 import { AdminPageIntro } from '@/components/admin/admin-page-intro';
 import { Button } from '@/components/ui/button';
 import {
@@ -247,6 +247,7 @@ export default async function AdminApplicationsPage({ searchParams }: AdminAppli
         eyebrow="Админка / Заявки"
         title="Заявки"
       />
+      <AdminActionAlert params={params} />
 
       <AdminStatusTabs
         items={[
@@ -293,7 +294,7 @@ export default async function AdminApplicationsPage({ searchParams }: AdminAppli
         </div>
 
         <DataTableFrame>
-          <DataTable minWidth={1320}>
+          <DataTable minWidth={1040}>
             <DataTableHead>
               <tr>
                 <DataTableHeaderCell>Тип заявки</DataTableHeaderCell>

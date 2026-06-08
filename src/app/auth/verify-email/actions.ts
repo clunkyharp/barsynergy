@@ -5,7 +5,7 @@ import { createHash, randomBytes } from 'node:crypto';
 import { UserStatus } from '@prisma/client';
 import { prisma } from '@/lib/db/prisma';
 import { getString } from '@/lib/admin/content-utils';
-import { assertAuthAttemptAllowed } from '@/lib/auth/auth-rate-limit';
+import { AuthRateLimitError, assertAuthAttemptAllowed } from '@/lib/auth/auth-rate-limit';
 import { assertSameOriginServerAction } from '@/lib/security/server-action-origin';
 import { getEnv } from '@/lib/validation/env';
 
@@ -88,20 +88,25 @@ export async function resendUserVerificationAction(formData: FormData) {
 
     const rawToken = randomBytes(32).toString('hex');
     const tokenHash = createHash('sha256').update(rawToken).digest('hex');
+    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
     await prisma.$transaction(async (tx) => {
-      await tx.$executeRaw`
-        UPDATE "UserEmailVerificationToken"
-        SET "usedAt" = NOW(), "updatedAt" = NOW()
-        WHERE "userId" = ${user.id}
-          AND "usedAt" IS NULL
-          AND "expiresAt" > NOW()
-      `;
+      await tx.userEmailVerificationToken.updateMany({
+        where: {
+          userId: user.id,
+          usedAt: null,
+          expiresAt: { gt: new Date() }
+        },
+        data: { usedAt: new Date() }
+      });
 
-      await tx.$executeRaw`
-        INSERT INTO "UserEmailVerificationToken" ("userId", "tokenHash", "expiresAt", "createdAt")
-        VALUES (${user.id}, ${tokenHash}, NOW() + INTERVAL '24 hours', NOW())
-      `;
+      await tx.userEmailVerificationToken.create({
+        data: {
+          userId: user.id,
+          tokenHash,
+          expiresAt
+        }
+      });
     });
 
     const env = getEnv();
@@ -110,7 +115,10 @@ export async function resendUserVerificationAction(formData: FormData) {
     sendVerificationEmail({ to: email, verificationUrl }).catch(() => {});
 
     redirectWithAuthResult('/auth/verify-email', { type: 'success', code: 'verification-resent' });
-  } catch {
-    redirectWithAuthResult('/auth/verify-email', { type: 'error', code: 'rate-limited' });
+  } catch (error) {
+    if (error instanceof AuthRateLimitError) {
+      redirectWithAuthResult('/auth/verify-email', { type: 'error', code: 'rate-limited' });
+    }
+    redirectWithAuthResult('/auth/verify-email', { type: 'error', code: 'failed' });
   }
 }

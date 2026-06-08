@@ -196,7 +196,7 @@ export default async function AdminVacanciesPage({ searchParams }: AdminVacancie
                       <div className="mt-1 text-xs">{vacancy.position}</div>
                       {vacancy.salaryLabel ? <div className="mt-1 text-xs">{vacancy.salaryLabel}</div> : null}
                     </AdminTableCell>
-                    <AdminTableCell className="text-[var(--muted)]" label="Город">{vacancy.city?.name ?? '-'}</AdminTableCell>
+                    <AdminTableCell className="text-[var(--muted)]" label="Город">{vacancy.city?.name ?? <span className="text-[var(--muted)]">Без города</span>}</AdminTableCell>
                     <AdminTableCell label="Статус">
                       <StatusBadge variant={contentStatusBadgeVariants[vacancy.status]}>{contentStatusLabels[vacancy.status]}</StatusBadge>
                     </AdminTableCell>

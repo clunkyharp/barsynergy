@@ -1,0 +1,78 @@
+name: CI
+
+on:
+  push:
+    branches: [dev, prod]
+  pull_request:
+    branches: [dev, prod]
+
+jobs:
+  validate:
+    name: Lint, Typecheck, Prisma Validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.12'
+          cache: 'npm'
+
+      - run: npm ci
+
+      - run: npm run prisma:generate
+
+      - run: npm run lint
+
+      - run: npm run typecheck
+
+      - run: ./node_modules/.bin/prisma validate
+
+  test:
+    name: Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: barsynergy
+          POSTGRES_PASSWORD: barsynergy
+          POSTGRES_DB: barsynergy
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.12'
+          cache: 'npm'
+
+      - run: npm ci
+
+      - run: cp .env.example .env
+
+      - run: npm run prisma:generate
+
+      - run: npx prisma migrate deploy
+        env:
+          DATABASE_URL: postgresql://barsynergy:barsynergy@localhost:5432/barsynergy
+
+      - run: npm test
+        env:
+          DATABASE_URL: postgresql://barsynergy:barsynergy@localhost:5432/barsynergy
+          SESSION_SECRET: ci-test-session-secret
+          THROTTLE_SECRET: ci-test-throttle-secret
+          APPLICATION_FORMS_ENABLED: 'true'
+          STORAGE_DRIVER: local
+          LOCAL_UPLOAD_DIR: ./uploads

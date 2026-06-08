@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { displayFont } from '@/lib/fonts';
 
 const homepageFaqItems = [
@@ -41,6 +42,7 @@ export function HomeCtaFaqSection() {
 
   return (
     <section
+      aria-labelledby="home-cta-title"
       className="background-zone background-zone-ivory render-deferred-section border-b border-[var(--line)] py-16 text-[var(--text)] max-[900px]:py-[60px]"
       id="home-platform-help"
     >
@@ -51,6 +53,7 @@ export function HomeCtaFaqSection() {
             style={{ boxShadow: 'var(--shadow-panel)' }}
           >
             <h2
+              id="home-cta-title"
               className={`${displayFont.className} mb-[15px] text-[3.35rem] font-semibold leading-[1.04] max-[640px]:text-[2.45rem]`}
             >
               Напишите команде
@@ -60,6 +63,12 @@ export function HomeCtaFaqSection() {
             <p className="mb-[30px] max-w-[34rem] text-[0.95rem] font-medium leading-7 text-[var(--editorial-dark-muted)]">
               Ответим на вопрос, примем идею события или поможем выбрать нужный раздел.
             </p>
+            <Button
+              className="w-full rounded-[var(--radius-md)] border-[var(--accent)] bg-[var(--accent)] text-[var(--accent-contrast)] shadow-none hover:border-[var(--accent-strong)] hover:bg-[var(--accent-strong)] md:w-auto"
+              href="/contacts#contact-form"
+            >
+              Написать команде
+            </Button>
           </div>
 
           <div className="home-help-faq-list flex flex-col gap-3">

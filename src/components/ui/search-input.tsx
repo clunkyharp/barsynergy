@@ -12,7 +12,7 @@ export const SearchInput = forwardRef<HTMLInputElement, InputHTMLAttributes<HTML
   return (
     <span className="search-input">
       <Search aria-hidden className="search-input-icon" size={17} strokeWidth={1.8} />
-      <Input className={cn('pl-10', className)} ref={ref} type={type} {...props} />
+      <Input className={cn('search-input-control pl-11', className)} ref={ref} type={type} {...props} />
     </span>
   );
 });

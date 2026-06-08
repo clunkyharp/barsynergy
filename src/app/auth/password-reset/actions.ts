@@ -5,7 +5,7 @@ import { createHash, randomBytes } from 'node:crypto';
 import { z } from 'zod';
 import { prisma } from '@/lib/db/prisma';
 import { getString } from '@/lib/admin/content-utils';
-import { assertAuthAttemptAllowed } from '@/lib/auth/auth-rate-limit';
+import { AuthRateLimitError, assertAuthAttemptAllowed } from '@/lib/auth/auth-rate-limit';
 import { hashPassword } from '@/lib/auth/password';
 import { PASSWORD_MIN_LENGTH } from '@/lib/auth/password-policy';
 import { assertSameOriginServerAction } from '@/lib/security/server-action-origin';
@@ -33,6 +33,17 @@ function redirectWithAuthResult(path: string, result: { type: 'success' | 'error
   redirect(authResultPath(path, result));
 }
 
+function redirectWithPasswordResetConfirmResult(token: string, result: { type: 'success' | 'error'; code: string }): never {
+  const url = new URL('/auth/password-reset/confirm', 'http://localhost');
+
+  if (token) {
+    url.searchParams.set('token', token);
+  }
+
+  url.searchParams.set(result.type, result.code);
+  redirect(`${url.pathname}${url.search}`);
+}
+
 export async function requestPasswordResetAction(formData: FormData) {
   await assertSameOriginServerAction();
 
@@ -41,6 +52,8 @@ export async function requestPasswordResetAction(formData: FormData) {
   if (!email) {
     redirectWithAuthResult('/auth/password-reset', { type: 'error', code: 'invalid' });
   }
+
+  let requestAccepted = false;
 
   try {
     await assertAuthAttemptAllowed({ action: 'password-reset', email });
@@ -53,11 +66,15 @@ export async function requestPasswordResetAction(formData: FormData) {
     if (user) {
       const rawToken = randomBytes(32).toString('hex');
       const tokenHash = createHash('sha256').update(rawToken).digest('hex');
+      const expiresAt = new Date(Date.now() + 60 * 60 * 1000);
 
-      await prisma.$executeRaw`
-        INSERT INTO "PasswordResetToken" ("userId", "tokenHash", "expiresAt", "createdAt")
-        VALUES (${user.id}, ${tokenHash}, NOW() + INTERVAL '1 hour', NOW())
-      `;
+      await prisma.userPasswordResetToken.create({
+        data: {
+          userId: user.id,
+          tokenHash,
+          expiresAt
+        }
+      });
 
       const env = getEnv();
       const resetUrl = `${env.APP_URL}/auth/password-reset/confirm?token=${rawToken}`;
@@ -66,24 +83,35 @@ export async function requestPasswordResetAction(formData: FormData) {
       });
     }
 
-    redirectWithAuthResult('/auth/password-reset', { type: 'success', code: 'reset-sent' });
-  } catch {
+    requestAccepted = true;
+  } catch (error) {
+    if (error instanceof AuthRateLimitError) {
+      redirectWithAuthResult('/auth/password-reset', { type: 'error', code: 'rate-limited' });
+    }
+
     redirectWithAuthResult('/auth/password-reset', { type: 'error', code: 'failed' });
+  }
+
+  if (requestAccepted) {
+    redirectWithAuthResult('/auth/password-reset', { type: 'success', code: 'reset-sent' });
   }
 }
 
 export async function resetPasswordAction(formData: FormData) {
   await assertSameOriginServerAction();
+  const token = getString(formData, 'token');
 
   const parsed = resetPasswordSchema.safeParse({
-    token: getString(formData, 'token'),
+    token,
     password: getString(formData, 'password'),
     confirmPassword: getString(formData, 'confirmPassword')
   });
 
   if (!parsed.success) {
-    redirectWithAuthResult('/auth/password-reset/confirm', { type: 'error', code: 'invalid' });
+    redirectWithPasswordResetConfirmResult(token, { type: 'error', code: 'invalid' });
   }
+
+  let resetSucceeded = false;
 
   try {
     const tokenHash = createHash('sha256').update(parsed.data.token).digest('hex');
@@ -91,7 +119,7 @@ export async function resetPasswordAction(formData: FormData) {
 
     const result = await prisma.$queryRaw<{ userId: string }[]>`
       WITH consumed_token AS (
-        UPDATE "PasswordResetToken"
+        UPDATE "UserPasswordResetToken"
         SET "usedAt" = NOW(), "updatedAt" = NOW()
         WHERE "tokenHash" = ${tokenHash}
           AND "expiresAt" > NOW()
@@ -104,19 +132,23 @@ export async function resetPasswordAction(formData: FormData) {
         FROM consumed_token
         WHERE "User"."id" = consumed_token."userId"
         RETURNING "User"."id" AS "userId"
+      ),
+      deleted_sessions AS (
+        DELETE FROM "Session"
+        USING updated_password
+        WHERE "Session"."userId" = updated_password."userId"
       )
-      DELETE FROM "Session"
-      USING updated_password
-      WHERE "Session"."userId" = updated_password."userId"
-      RETURNING updated_password."userId" AS "userId"
+      SELECT "userId" FROM updated_password
     `;
 
-    if (!result || result.length === 0) {
-      redirectWithAuthResult('/auth/password-reset/confirm', { type: 'error', code: 'invalid' });
-    }
-
-    redirectWithAuthResult('/auth/login', { type: 'success', code: 'password-reset' });
+    resetSucceeded = Boolean(result && result.length > 0);
   } catch {
-    redirectWithAuthResult('/auth/password-reset/confirm', { type: 'error', code: 'failed' });
+    redirectWithPasswordResetConfirmResult(parsed.data.token, { type: 'error', code: 'failed' });
   }
+
+  if (!resetSucceeded) {
+    redirectWithPasswordResetConfirmResult(parsed.data.token, { type: 'error', code: 'invalid' });
+  }
+
+  redirectWithAuthResult('/auth/login', { type: 'success', code: 'password-reset' });
 }
