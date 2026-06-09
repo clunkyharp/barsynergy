@@ -163,8 +163,27 @@ test('saving the current status does not re-run transition requirements', () => 
 });
 
 test('business notes are editable only for applications linked to a business account', () => {
-  assert.equal(canUpdateApplicationBusinessNotes({ businessAccountId: 'business-1' }), true);
-  assert.equal(canUpdateApplicationBusinessNotes({ businessAccountId: null }), false);
+  assert.equal(
+    canUpdateApplicationBusinessNotes({
+      businessAccountId: 'business-1',
+      status: ApplicationStatus.IN_REVIEW
+    }),
+    true
+  );
+  assert.equal(
+    canUpdateApplicationBusinessNotes({
+      businessAccountId: 'business-1',
+      status: ApplicationStatus.ARCHIVED
+    }),
+    false
+  );
+  assert.equal(
+    canUpdateApplicationBusinessNotes({
+      businessAccountId: null,
+      status: ApplicationStatus.IN_REVIEW
+    }),
+    false
+  );
 });
 
 test('forwarding metadata is cleared when status moves back', () => {

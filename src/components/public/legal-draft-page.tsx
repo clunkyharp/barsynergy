@@ -1,4 +1,4 @@
-import { PublicBodyText, PublicDisplayTitle, PublicEyebrow } from '@/components/public/public-primitives';
+import { PublicBodyText, PublicBreadcrumbs, PublicDisplayTitle, PublicEyebrow } from '@/components/public/public-primitives';
 import { InlineLink } from '@/components/ui/inline-link';
 import { getLegalOperatorProfile } from '@/lib/legal/legal-operator';
 import type { LegalDocument } from '@/lib/legal/legal-documents';
@@ -19,10 +19,11 @@ export function LegalDraftPage({ document }: LegalDraftPageProps) {
 
   return (
     <article>
-      <section className="editorial-grid border-b border-[var(--line)] py-10 md:py-14">
+      <section className="editorial-grid border-b border-[var(--line)] pt-3 pb-10 md:pb-14">
         <div className="container grid gap-8 xl:grid-cols-[0.72fr_0.72fr_0.56fr]">
           <div className="min-w-0">
-            <PublicEyebrow>Юридический раздел</PublicEyebrow>
+            <PublicBreadcrumbs current={title} />
+            <PublicEyebrow className="mt-4">Юридический раздел</PublicEyebrow>
             <PublicDisplayTitle as="h1" className="mt-3" size="legal">
               {title}
             </PublicDisplayTitle>

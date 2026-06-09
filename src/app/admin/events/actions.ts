@@ -17,6 +17,7 @@ import {
   statusTransitionDates
 } from '@/lib/admin/content-utils';
 import { deleteContentDraft, updateContentStatus } from '@/lib/admin/content-lifecycle';
+import { revalidateEventPublicPaths } from '@/lib/admin/public-content-revalidation';
 import { prisma } from '@/lib/db/prisma';
 import { withAdminAction } from '@/lib/server-action-wrappers';
 
@@ -84,14 +85,16 @@ export async function createEvent(formData: FormData) {
 
       const coverImageId = await resolveCoverImageId({ formData, userId: user.id, onUploadedImageId: (fileId) => { uploadedCoverImageId = fileId; } });
 
-      await persistWithUniqueSlugRetry({
+      const createdEvent = await persistWithUniqueSlugRetry({
         baseSlug: slug, exists: async (candidate) => Boolean(await prisma.event.findFirst({ where: { slug: candidate }, select: { id: true } })),
         persist: (uniqueSlug) => prisma.event.create({
-          data: { title: parsed.title, slug: uniqueSlug, summary: parsed.summary, status: parsed.status, coverImageId, coverImageAlt: nullableString(parsed.coverImageAlt), categoryId: nullableString(parsed.categoryId), cityId: nullableString(parsed.cityId), startsAt: parsed.startsAt, endsAt: parsed.endsAt ?? null, locationName: nullableString(parsed.locationName), address: nullableString(parsed.address), format: nullableString(parsed.format), capacity: parsed.capacity, registrationMode: nullableString(parsed.registrationMode), registrationUrl: nullableString(parsed.registrationUrl), createdById: user.id, updatedById: user.id, ...initialPublicationDates(parsed.status) }
+          data: { title: parsed.title, slug: uniqueSlug, summary: parsed.summary, status: parsed.status, coverImageId, coverImageAlt: nullableString(parsed.coverImageAlt), categoryId: nullableString(parsed.categoryId), cityId: nullableString(parsed.cityId), startsAt: parsed.startsAt, endsAt: parsed.endsAt ?? null, locationName: nullableString(parsed.locationName), address: nullableString(parsed.address), format: nullableString(parsed.format), capacity: parsed.capacity, registrationMode: nullableString(parsed.registrationMode), registrationUrl: nullableString(parsed.registrationUrl), createdById: user.id, updatedById: user.id, ...initialPublicationDates(parsed.status) },
+          select: { slug: true }
         })
       });
 
       revalidatePath(ADMIN_EVENTS_PATH);
+      revalidateEventPublicPaths(createdEvent.slug);
       return { type: 'success', message: 'Событие создано.' };
     }
   });
@@ -121,23 +124,25 @@ export async function updateEvent(formData: FormData) {
       if (!slug) throw new Error('Event slug is required.');
       if (parsed.endsAt && parsed.endsAt < parsed.startsAt) throw new Error('Event end date cannot be before start date.');
 
-      const existingEvent = await prisma.event.findUniqueOrThrow({ where: { id: parsed.eventId }, select: { coverImageId: true, publishedAt: true } });
+      const existingEvent = await prisma.event.findUniqueOrThrow({ where: { id: parsed.eventId }, select: { coverImageId: true, publishedAt: true, slug: true } });
       const previousCoverImageId = existingEvent.coverImageId;
 
       await assertActiveContentRelations({ entityName: 'Event', categoryId: parsed.categoryId, categoryType: CategoryType.EVENT, cityId: parsed.cityId });
 
       const coverImageId = await resolveCoverImageId({ formData, userId: user.id, currentCoverImageId: existingEvent.coverImageId, onUploadedImageId: (fileId) => { uploadedCoverImageId = fileId; } });
 
-      await persistWithUniqueSlugRetry({
+      const updatedEvent = await persistWithUniqueSlugRetry({
         baseSlug: slug, exists: async (candidate) => Boolean(await prisma.event.findFirst({ where: { slug: candidate, id: { not: parsed.eventId } }, select: { id: true } })),
         persist: (uniqueSlug) => prisma.event.update({
-          where: { id: parsed.eventId }, data: { title: parsed.title, slug: uniqueSlug, summary: parsed.summary, status: parsed.status, coverImageId, coverImageAlt: nullableString(parsed.coverImageAlt), categoryId: nullableString(parsed.categoryId), cityId: nullableString(parsed.cityId), startsAt: parsed.startsAt, endsAt: parsed.endsAt ?? null, locationName: nullableString(parsed.locationName), address: nullableString(parsed.address), format: nullableString(parsed.format), capacity: parsed.capacity, registrationMode: nullableString(parsed.registrationMode), registrationUrl: nullableString(parsed.registrationUrl), updatedById: user.id, ...statusTransitionDates(parsed.status, existingEvent.publishedAt) }
+          where: { id: parsed.eventId }, data: { title: parsed.title, slug: uniqueSlug, summary: parsed.summary, status: parsed.status, coverImageId, coverImageAlt: nullableString(parsed.coverImageAlt), categoryId: nullableString(parsed.categoryId), cityId: nullableString(parsed.cityId), startsAt: parsed.startsAt, endsAt: parsed.endsAt ?? null, locationName: nullableString(parsed.locationName), address: nullableString(parsed.address), format: nullableString(parsed.format), capacity: parsed.capacity, registrationMode: nullableString(parsed.registrationMode), registrationUrl: nullableString(parsed.registrationUrl), updatedById: user.id, ...statusTransitionDates(parsed.status, existingEvent.publishedAt) },
+          select: { slug: true }
         })
       });
 
       if (previousCoverImageId !== coverImageId) await deleteUploadedFileIfUnused(previousCoverImageId);
 
       revalidatePath(ADMIN_EVENTS_PATH);
+      revalidateEventPublicPaths(updatedEvent.slug, existingEvent.slug);
       return { type: 'success', message: 'Событие обновлено.' };
     }
   });
@@ -151,9 +156,12 @@ export async function updateEventStatus(formData: FormData) {
     handler: async ({ user }) => {
       const parsed = statusFormSchema.parse({ eventId: getString(formData, 'eventId'), status: getString(formData, 'status') });
 
+      const event = await prisma.event.findUniqueOrThrow({ where: { id: parsed.eventId }, select: { slug: true } });
+
       await updateContentStatus({ status: parsed.status, userId: user.id, findCurrent: (tx) => tx.event.findUniqueOrThrow({ where: { id: parsed.eventId }, select: { publishedAt: true } }), update: (tx, data) => tx.event.update({ where: { id: parsed.eventId }, data }) });
 
       revalidatePath(ADMIN_EVENTS_PATH);
+      revalidateEventPublicPaths(event.slug);
       return { type: 'success', message: 'Статус события обновлён.' };
     }
   });

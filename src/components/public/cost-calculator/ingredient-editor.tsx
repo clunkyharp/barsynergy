@@ -66,10 +66,10 @@ export function IngredientEditor({
           )}
         >
           <span className="truncate">Ингредиент</span>
-          <span className="truncate">Цена, ₽</span>
+          <span className="truncate text-right">Цена, ₽</span>
           <span className="truncate">Упаковка</span>
           <span className="truncate">В рецепте</span>
-          <span className="truncate">Себестоимость</span>
+          <span className="truncate text-right">Себестоимость</span>
           <span className="truncate text-center">Действия</span>
         </div>
 

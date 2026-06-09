@@ -31,8 +31,8 @@ test('about page uses narrative story, visual facts, timeline, and focused final
   assert.match(source, /Связаться с командой/);
   assert.match(source, /Предложить событие/);
   assert.match(source, /Стать партнёром/);
-  assert.match(source, /xl:grid-cols-\[minmax\(0,0\.55fr\)_minmax\(22rem,0\.45fr\)\]/);
-  assert.match(source, /xl:items-start/);
+  assert.match(source, /xl:grid-cols-\[minmax\(0,0\.58fr\)_minmax\(0,0\.42fr\)\]/);
+  assert.match(source, /xl:items-center/);
 });
 
 test('editorial public page hero does not duplicate breadcrumb as eyebrow', () => {
@@ -51,25 +51,24 @@ test('editorial public page hero does not duplicate breadcrumb as eyebrow', () =
 test('contacts page exposes concrete routing topics and direct first-screen copy', () => {
   const pageSource = readProjectFile('src/app/(public)/contacts/page.tsx');
   const formSource = readProjectFile('src/components/public/contact-application-form.tsx');
+  const constantsSource = readProjectFile('src/components/public/contact-application-form-constants.ts');
   const actionSource = readProjectFile('src/app/(public)/contacts/actions.ts');
 
-  assert.match(pageSource, /title="Контакты"/);
-  assert.match(pageSource, /Пишите по любому вопросу — отвечаем в течение рабочего дня/);
+  assert.match(pageSource, /title="Напишите нам"/);
+  assert.match(pageSource, /Отвечаем в течение рабочего дня\. Выберите тему — форма подстроится\./);
   assert.match(pageSource, /Форма — основной способ связаться с командой/);
-  assert.match(formSource, /Хочу разместить вакансию/);
-  assert.match(formSource, /Интересует обучение/);
-  assert.match(formSource, /Предлагаю сотрудничество как поставщик/);
-  assert.match(formSource, /Хочу стать партнёром/);
-  assert.match(formSource, /Вопрос по калькулятору/);
-  assert.match(formSource, /Что-то сломалось/);
-  assert.match(formSource, /Другое/);
+  assert.match(constantsSource, /Хочу разместить вакансию/);
+  assert.match(constantsSource, /Интересует обучение/);
+  assert.match(constantsSource, /Хочу стать партнёром/);
+  assert.match(constantsSource, /Что-то сломалось/);
+  assert.match(constantsSource, /Другое/);
   assert.match(formSource, /label="Контакт"/);
   assert.match(formSource, /name="contact"/);
   assert.match(formSource, /Прямой контакт/);
   assert.doesNotMatch(formSource, /contact-channels-panel/);
   assert.doesNotMatch(formSource, /<ContactChannelFieldset/);
-  assert.match(actionSource, /'calculator-question'/);
   assert.match(actionSource, /'bug-report'/);
+  assert.match(actionSource, /'supplier'/);
 });
 
 test('legal pages include short summaries, sticky toc, related links, date and 65ch text width', () => {
@@ -97,15 +96,16 @@ test('auth surfaces use minimal login, progressive register and admin dark mode'
   const activateSource = readProjectFile('src/app/auth/activate/page.tsx');
   const adminSource = readProjectFile('src/app/(admin-auth)/admin/login/page.tsx');
 
-  assert.match(loginSource, /auth-login-layout mx-auto max-w-\[440px\]/);
-  assert.match(loginSource, /auth-login-header mx-auto mb-5 flex max-w-\[440px\] flex-col/);
+  assert.match(loginSource, /auth-login-layout mx-auto w-full max-w-\[440px\] md:max-w-\[460px\]/);
+  assert.match(loginSource, /auth-login-header mb-6 flex flex-wrap items-center gap-4/);
   assert.doesNotMatch(loginSource, /auth-split-photo/);
   assert.doesNotMatch(loginSource, /Хороший эспрессо начинается с правильной экстракции/);
   assert.doesNotMatch(loginSource, /AuthRoleCard/);
   assert.doesNotMatch(loginSource, /publicLoginRoles/);
   assert.doesNotMatch(loginSource, /name="role"/);
   assert.match(loginSource, /Вход в кабинет/);
-  assert.match(loginSource, /Не можете войти\? Напишите нам/);
+  assert.match(loginSource, /Проблемы с доступом\?/);
+  assert.match(loginSource, /Написать команде/);
   assert.match(registerSource, /BusinessRequestForm/);
   assert.match(registerSource, /Шаг 1/);
   assert.match(registerSource, /Шаг 2/);

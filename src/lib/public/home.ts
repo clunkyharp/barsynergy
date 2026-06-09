@@ -168,6 +168,13 @@ const fallbackCards: Record<HomepageCardKind, Omit<HomepageLiveCard, 'kind'>> = 
   }
 };
 
+const homepageEditorialImageOverrides = {
+  featuredArticle: '/images/home/current-featured-hero.png',
+  vacancy: '/images/home/current-vacancy-card.png',
+  secondaryArticle: '/images/home/current-event-card.png',
+  supplier: '/images/home/current-supplier-card.png'
+} as const;
+
 function parseLinePairs(value?: string | null) {
   return (value ?? '')
     .split(/\r?\n/)
@@ -250,6 +257,17 @@ function toHomepageCard(
   };
 }
 
+function withHomepageImageOverride(card: HomepageLiveCard, imageUrl?: string): HomepageLiveCard {
+  if (!imageUrl) {
+    return card;
+  }
+
+  return {
+    ...card,
+    imageUrl
+  };
+}
+
 const homepageCache = new Map<string, { data: HomepageData; expiresAt: number }>();
 
 export function revalidateHomepageCache() {
@@ -311,6 +329,30 @@ export async function getHomepageData(): Promise<HomepageData> {
 
   const featuredEvent = upcomingEvents.items[0] ?? latestEvents.items[0];
   const featuredSupplier = suppliers.items[0];
+  const featuredArticle = withHomepageImageOverride(
+    toHomepageCard(
+      articles.items[0],
+      'article',
+      articles.items[0] ? `/articles/${articles.items[0].slug}` : '/articles',
+      'Читать материал',
+      'Редакция BARSYNERGY'
+    ),
+    homepageEditorialImageOverrides.featuredArticle
+  );
+  const secondaryArticle = articles.items[1]
+    ? withHomepageImageOverride(
+        toHomepageCard(articles.items[1], 'article', `/articles/${articles.items[1].slug}`, 'Читать материал', 'Материал'),
+        homepageEditorialImageOverrides.secondaryArticle
+      )
+    : undefined;
+  const featuredVacancy = withHomepageImageOverride(
+    toHomepageCard(vacancies.items[0], 'vacancy', '/vacancies', 'Найти вакансию', 'Открытая вакансия'),
+    homepageEditorialImageOverrides.vacancy
+  );
+  const supplierCard = withHomepageImageOverride(
+    toHomepageCard(featuredSupplier, 'supplier', '/suppliers', 'Смотреть поставщиков', 'Поставщик'),
+    homepageEditorialImageOverrides.supplier
+  );
   const partnerSignals =
     partners.items.length > 0
       ? partners.items.map((item) => item.title)
@@ -338,18 +380,10 @@ export async function getHomepageData(): Promise<HomepageData> {
     })),
     course: toHomepageCard(courses.items[0], 'course', '/education', 'Выбрать программу', 'Обучение'),
     event: toHomepageCard(featuredEvent, 'event', '/events', 'Выбрать событие', 'Ближайшее событие'),
-    article: toHomepageCard(
-      articles.items[0],
-      'article',
-      articles.items[0] ? `/articles/${articles.items[0].slug}` : '/articles',
-      'Читать материал',
-      'Редакция BARSYNERGY'
-    ),
-    secondaryArticle: articles.items[1]
-      ? toHomepageCard(articles.items[1], 'article', `/articles/${articles.items[1].slug}`, 'Читать материал', 'Материал')
-      : undefined,
-    vacancy: toHomepageCard(vacancies.items[0], 'vacancy', '/vacancies', 'Найти вакансию', 'Открытая вакансия'),
-    supplier: toHomepageCard(featuredSupplier, 'supplier', '/suppliers', 'Смотреть поставщиков', 'Поставщик'),
+    article: featuredArticle,
+    secondaryArticle,
+    vacancy: featuredVacancy,
+    supplier: supplierCard,
     generalSponsors,
     socialBlocks: socialBlocks.map((block) => ({
       id: block.id,

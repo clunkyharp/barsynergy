@@ -178,6 +178,9 @@ export default async function ProfileDashboardPage() {
                   Добавьте недостающие поля, чтобы повысить шансы найти работу.
                 </p>
               )}
+              <p className="mt-2 text-xs leading-5 text-[var(--muted)]">
+                Заполненный профиль помогает работодателям быстрее понять ваш опыт и принять решение.
+              </p>
               <Button className="mt-2 rounded-[var(--radius-md)]" href="/profile/settings" size="sm" variant="secondary">
                 Дозаполнить профиль
               </Button>

@@ -82,6 +82,38 @@ test.describe('public browser smoke', () => {
     });
   }
 
+  test('all header and footer navigation links return 200', async ({ page }) => {
+    const response = await page.goto('/');
+
+    expect(response?.ok(), 'homepage should respond successfully').toBe(true);
+
+    const links = await page.evaluate(() => {
+      const header = document.querySelector('header');
+      const footer = document.querySelector('footer');
+      const navElements = document.querySelectorAll('nav');
+      const allNavLinks = new Set<string>();
+
+      [header, footer, ...Array.from(navElements)].forEach((section) => {
+        if (!section) return;
+        section.querySelectorAll<HTMLAnchorElement>('a[href]').forEach((a) => {
+          const href = a.getAttribute('href');
+          if (!href || href.startsWith('#') || href.startsWith('http') || href.startsWith('tel:') || href.startsWith('mailto:')) return;
+          allNavLinks.add(href);
+        });
+      });
+
+      return Array.from(allNavLinks);
+    });
+
+    expect(links.length, 'should find navigation links to test').toBeGreaterThan(0);
+
+    for (const link of links) {
+      const linkResponse = await page.goto(link);
+
+      expect(linkResponse?.ok(), `${link} should return 200`).toBe(true);
+    }
+  });
+
   test('cost calculator keeps visible ingredient controls usable across viewport widths', async ({ page }) => {
     for (const viewport of [
       { width: 390, height: 844 },

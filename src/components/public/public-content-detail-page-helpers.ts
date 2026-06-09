@@ -33,13 +33,20 @@ function paragraphsFromBody(body?: string) {
   }
 
   return body
+    .replace(/\r\n/g, '\n')
     .split(/\n{2,}/)
     .map((part) => part.trim())
     .filter(Boolean);
 }
 
 function normalizeText(value: string) {
-  return value.replace(/\s+/g, ' ').trim().toLowerCase();
+  return value
+    .replace(/\*\*(.+?)\*\*/g, '$1')
+    .replace(/_(.+?)_/g, '$1')
+    .replace(/`(.+?)`/g, '$1')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .toLowerCase();
 }
 
 function normalizeImage(value: string | PublicContentImage | undefined, fallbackAlt: string): PublicContentImage | undefined {

@@ -103,7 +103,7 @@ export function EditorialPublicPage({
       <section
         className={cn(
           'background-zone background-zone-hero border-b border-[var(--line)]',
-          isCompact ? 'py-7 md:py-10' : 'py-10 md:py-14',
+          isCompact ? 'pt-3 pb-7 md:pt-3 md:pb-10' : 'pt-3 pb-10 md:pt-3 md:pb-14',
           isCoverHero && 'relative isolate overflow-hidden bg-[var(--editorial-dark-surface)] text-[var(--editorial-dark-text)]',
           accentGradient && !isCoverHero && 'relative overflow-hidden'
         )}

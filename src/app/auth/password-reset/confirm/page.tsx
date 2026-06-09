@@ -6,7 +6,7 @@ import { AppLink } from '@/components/ui/app-link';
 import { Button } from '@/components/ui/button';
 import { FormField } from '@/components/ui/form-field';
 import { InlineAlert } from '@/components/ui/inline-alert';
-import { Input } from '@/components/ui/input';
+import { PasswordInput } from '@/components/ui/password-input';
 import { PasswordPairValidation } from '@/components/ui/password-pair-validation';
 import { SubmitButton } from '@/components/ui/submit-button';
 import { PublicFormValidation } from '@/components/public/public-form-validation';
@@ -88,9 +88,14 @@ export default async function PasswordResetConfirmPage({ searchParams }: Passwor
 
             <div className="mt-5 w-full">
               {formError ? (
-                <InlineAlert className="mb-4" tone="error">
-                  {formError}
-                </InlineAlert>
+                <div className="space-y-4">
+                  <InlineAlert className="mb-4" tone="error">
+                    {formError}
+                  </InlineAlert>
+                  <Button className="w-full rounded-[var(--radius-md)]" href="/auth/password-reset" size="lg">
+                    Запросить восстановление заново
+                  </Button>
+                </div>
               ) : (
                 <InlineAlert className="mb-4" tone="info">
                   Минимальная длина пароля — 8 символов.
@@ -101,10 +106,9 @@ export default async function PasswordResetConfirmPage({ searchParams }: Passwor
                 <PasswordPairValidation />
                 <input name="token" type="hidden" value={token} />
                 <FormField htmlFor="new-password" label="Новый пароль" required={false}>
-                  <Input
+                  <PasswordInput
                     id="new-password"
                     name="password"
-                    type="password"
                     autoComplete="new-password"
                     placeholder="Минимум 8 символов"
                     required
@@ -113,10 +117,9 @@ export default async function PasswordResetConfirmPage({ searchParams }: Passwor
                   />
                 </FormField>
                 <FormField htmlFor="confirm-password" label="Подтвердите пароль" required={false}>
-                  <Input
+                  <PasswordInput
                     id="confirm-password"
                     name="confirmPassword"
-                    type="password"
                     autoComplete="new-password"
                     placeholder="Повторите новый пароль"
                     required

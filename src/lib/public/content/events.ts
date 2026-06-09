@@ -13,7 +13,6 @@ import {
 } from '@/modules/content/shared/detail-helpers';
 import {
   eventPlaceLabel,
-  formatDateTimeLabel,
   getPage,
   getPageSize,
   listResult,
@@ -23,6 +22,18 @@ import {
   type PublishedContentMetaGroup,
   type PublicContentSearchParams
 } from './shared';
+
+function formatTime(date: Date) {
+  return date.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Moscow' });
+}
+
+function formatDateOnlyLabel(date: Date) {
+  return date.toLocaleDateString('ru-RU', {
+    day: '2-digit',
+    month: 'short',
+    weekday: 'short'
+  });
+}
 
 export async function getPublishedEventDetail(slug: string): Promise<PublicContentDetail | null> {
   const event = await prisma.event.findFirst({
@@ -97,6 +108,26 @@ export async function getPublishedEventDetail(slug: string): Promise<PublicConte
   };
 }
 
+function buildStartsAtFilter(period: string | undefined): Prisma.DateTimeFilter | undefined {
+  if (!period) return undefined;
+  const now = new Date();
+  if (period === 'past') return { lt: now };
+  if (period === 'upcoming') return { gte: now };
+  if (period === 'today') {
+    const start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const end = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+    return { gte: start, lt: end };
+  }
+  if (period === 'this_week') {
+    const dow = now.getDay();
+    const toMonday = dow === 0 ? -6 : 1 - dow;
+    const monday = new Date(now.getFullYear(), now.getMonth(), now.getDate() + toMonday);
+    const nextMonday = new Date(now.getFullYear(), now.getMonth(), now.getDate() + toMonday + 7);
+    return { gte: monday, lt: nextMonday };
+  }
+  return undefined;
+}
+
 const eventSearchFields = (q: string): Prisma.EventWhereInput[] => [
   { title: { contains: q, mode: 'insensitive' as const } },
   { summary: { contains: q, mode: 'insensitive' as const } },
@@ -116,7 +147,7 @@ export async function getPublishedEvents(params: PublicContentSearchParams = {})
     category: optionalParam(params, 'category') ? { slug: optionalParam(params, 'category'), type: CategoryType.EVENT } : undefined,
     city: optionalParam(params, 'city') ? { slug: optionalParam(params, 'city') } : undefined,
     format: optionalParam(params, 'format') ? { equals: optionalParam(params, 'format'), mode: 'insensitive' } : undefined,
-    startsAt: period === 'past' ? { lt: new Date() } : period === 'upcoming' ? { gte: new Date() } : undefined
+    startsAt: buildStartsAtFilter(period)
   };
 
   const { items, total } = await listResultWithRelevance(
@@ -155,7 +186,7 @@ export async function getPublishedEvents(params: PublicContentSearchParams = {})
     },
     (ids) =>
       prisma.event.findMany({
-        where: { id: { in: ids } },
+        where: { id: { in: ids }, status: ContentStatus.PUBLISHED },
         include: {
           category: { select: { name: true } },
           city: { select: { name: true } },
@@ -184,12 +215,16 @@ export async function getPublishedEvents(params: PublicContentSearchParams = {})
         event.startsAt.toLocaleDateString('ru-RU')
       ].filter(Boolean) as string[],
       metaGroups: [
-        { label: 'Дата', value: formatDateTimeLabel(event.startsAt), tone: 'accent' },
+        { label: 'Дата', value: formatDateOnlyLabel(event.startsAt), tone: 'accent' },
+        event.endsAt
+          ? { label: 'Время', value: `${formatTime(event.startsAt)} – ${formatTime(event.endsAt)}` }
+          : { label: 'Время', value: formatTime(event.startsAt) },
         { label: 'Место', value: eventPlaceLabel(event.locationName, event.city?.name) },
         event.format ? { label: 'Формат', value: getAdminOptionLabel(eventFormatOptions, event.format) } : undefined,
         { label: 'Аудитория', value: 'специалисты и команды' }
       ].filter(Boolean) as PublishedContentMetaGroup[],
-      imageUrl: publicImageUrl(event.coverImage)
+      imageUrl: publicImageUrl(event.coverImage),
+      statusLabel: typeof event.capacity === 'number' ? `Мест: ${event.capacity}` : undefined
     }))
   });
 }

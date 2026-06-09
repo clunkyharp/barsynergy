@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
+import { MarkdownEditor } from '@/components/admin/markdown-editor';
 import { Textarea } from '@/components/ui/textarea';
 import { PUBLICATION_STATUS_HINT, contentStatusLabels } from '@/lib/admin/content-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
@@ -175,7 +176,7 @@ export default async function AdminSupplierEditPage({ params }: AdminSupplierEdi
               <Textarea id="supplier-summary" name="summary" required minLength={10} maxLength={500} defaultValue={supplier.summary} />
             </FormField>
             <FormField htmlFor="supplier-description" label="Описание">
-              <Textarea id="supplier-description" name="description" required minLength={20} className="min-h-64" defaultValue={supplier.description} />
+              <MarkdownEditor id="supplier-description" name="description" required minLength={20} maxLength={100_000} className="min-h-64" defaultValue={supplier.description} />
             </FormField>
           </div>
         </AdminCmsSection>

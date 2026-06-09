@@ -339,11 +339,14 @@ test('all entity queries avoid bare textSearch in where clause', () => {
 /* ───── Static analysis: /search page includes partners ───── */
 
 test('global search route now aggregates partners section', () => {
-  const source = readProjectFile('src/app/(public)/search/page.tsx');
+  const source = [
+    'src/app/(public)/search/page.tsx',
+    'src/components/public/search-results-client.tsx'
+  ].map(readProjectFile).join('\n');
 
   assert.match(source, /getPublishedPartners/);
   assert.match(source, /basePath: '\/partners'/);
-  assert.match(source, /Партнёры/);
+  assert.match(source, /label: 'Партнёры'/);
 });
 
 test('global search route still aggregates all 6 content types', () => {

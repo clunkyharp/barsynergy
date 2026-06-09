@@ -51,7 +51,7 @@ export function CookieNotice() {
     setIsVisible(!hasValidChoice);
   }, []);
 
-  if (!isVisible || pathname?.startsWith('/admin') || pathname?.startsWith('/business/cabinet') || pathname?.startsWith('/auth')) {
+  if (!isVisible || pathname?.startsWith('/admin') || pathname?.startsWith('/business/cabinet') || pathname?.startsWith('/auth') || pathname?.startsWith('/profile')) {
     return null;
   }
 

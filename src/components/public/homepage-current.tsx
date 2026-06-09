@@ -1,14 +1,12 @@
 import Link from 'next/link';
-import { ArrowUpRight, BookOpen, BriefcaseBusiness, CalendarDays, Coffee, PackageCheck } from 'lucide-react';
-import type { LucideIcon } from 'lucide-react';
+import { ArrowUpRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { displayFont } from '@/lib/fonts';
+import { bodyFont, displayFont } from '@/lib/fonts';
 import type { HomepageLiveCard } from '@/lib/public/home';
 
 function normalizedMetaKey(value: string) {
   return value.trim().toLowerCase();
 }
-
 function getVisibleFeaturedMeta(card: HomepageLiveCard) {
   const hiddenMeta = new Set(['Открытый доступ', card.eyebrow].map(normalizedMetaKey));
   const seenMeta = new Set<string>();
@@ -31,68 +29,111 @@ function getVisibleFeaturedMeta(card: HomepageLiveCard) {
     })
     .slice(0, 3);
 }
-
-const featuredKindConfig: Record<string, { icon: LucideIcon; label: string }> = {
-  article: { icon: BookOpen, label: 'Материал' },
-  course: { icon: Coffee, label: 'Курс' },
-  event: { icon: CalendarDays, label: 'Событие' },
-  vacancy: { icon: BriefcaseBusiness, label: 'Вакансия' },
-  supplier: { icon: PackageCheck, label: 'Поставщик' }
+const kindLabels: Record<string, string> = {
+  article: 'Материал',
+  course: 'Курс',
+  event: 'Событие',
+  vacancy: 'Вакансия',
+  supplier: 'Поставщик'
 };
 
-export function FeaturedNowCard({ card }: { card: HomepageLiveCard }) {
+function supportMetaText(card: HomepageLiveCard) {
+  return card.meta.filter(Boolean).slice(0, 2).join(' / ');
+}
+
+export function EditorialFeatured({ card }: { card: HomepageLiveCard }) {
   const visibleMeta = getVisibleFeaturedMeta(card);
-  const supportMeta = card.meta.filter(Boolean).slice(0, 2);
-  const kindInfo = featuredKindConfig[card.kind] ?? { icon: BookOpen, label: 'Материал' };
-  const KindIcon = kindInfo.icon;
+  const kindLabel = kindLabels[card.kind] ?? 'Материал';
+  const authorMeta = card.meta.filter(Boolean).slice(0, 2).join(' · ');
 
   return (
     <Link
       aria-label={`${card.eyebrow}: ${card.title}`}
-      className="public-card-shell featured-now-card group relative block aspect-[3/2] min-h-[220px] overflow-hidden md:aspect-[21/9] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] md:rounded-[var(--radius-xl)]"
+      className="editorial-featured group relative block aspect-[3/2] overflow-hidden rounded-[var(--radius-xl)] border border-white/8 md:aspect-[21/9] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--editorial-dark-surface)]"
       href={card.href}
     >
       <span
         aria-hidden="true"
-        className="absolute inset-0 bg-[linear-gradient(135deg,rgba(153,44,38,0.13),rgba(20,20,18,0.08))] bg-cover bg-center grayscale-[0.08] transition-transform duration-[var(--motion-duration-media)] ease-[var(--motion-ease-move)] group-hover:scale-[1.02] motion-reduce:transition-none"
+        className="editorial-featured-media absolute inset-0 bg-cover bg-center transition-transform duration-[var(--motion-duration-media)] ease-[var(--motion-ease-move)] group-hover:scale-[1.015] motion-reduce:transition-none"
         style={card.imageUrl ? { backgroundImage: `url("${card.imageUrl}")` } : undefined}
       />
-      <span aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
-      <span aria-hidden="true" className="absolute bottom-0 left-0 right-0 flex flex-col gap-3 p-6 text-white md:flex-row md:items-end md:justify-between md:gap-6 md:p-8">
-        <span className="min-w-0">
-          <span className="featured-now-meta-row flex flex-wrap gap-2">
-            <span className="public-card-label w-fit">
-              {card.eyebrow}
-            </span>
-            {visibleMeta.map((entry) => (
-              <span
-                className="public-card-meta w-fit text-white/65"
-                key={entry}
-              >
-                {entry}
-              </span>
-            ))}
-          </span>
-          <h3 className={`${displayFont.className} featured-now-title mt-2 block text-[1.35rem] font-semibold leading-[1.12] text-white md:mt-3 md:text-[1.8rem] lg:text-[2.45rem]`}>
-            {card.title}
-          </h3>
-          <span className="featured-now-summary mt-2 hidden max-h-[4.5rem] max-w-2xl overflow-hidden text-sm leading-6 text-white/75 sm:block md:mt-3 md:max-h-[5.2rem] md:leading-7 md:text-[15px]">{card.summary}</span>
+      <span aria-hidden="true" className="editorial-featured-gradient absolute inset-0" />
+
+      <span className="editorial-featured-content absolute inset-0 flex flex-col justify-end p-5 md:p-8 lg:p-10">
+        <span className="editorial-featured-chips mb-3 flex flex-wrap gap-2 md:mb-4">
+          <span className="editorial-chip--accent">{card.eyebrow}</span>
+          {visibleMeta.map((entry) => (
+            <span className="editorial-chip" key={entry}>{entry}</span>
+          ))}
         </span>
-        <span className="flex shrink-0 flex-col items-end gap-3">
-          <span className="featured-now-action inline-flex items-center gap-2 text-sm font-semibold text-white">
+
+        <h3 className={`${displayFont.className} editorial-featured-headline text-[1.6rem] font-bold leading-[1.05] tracking-[-0.01em] text-[var(--editorial-dark-text)] md:text-[2.2rem] lg:text-[3rem]`}>
+          {card.title}
+        </h3>
+
+        <p className={`${bodyFont.className} editorial-featured-summary mt-3 max-w-[38rem] text-sm leading-[1.6] text-[var(--editorial-dark-muted)] md:mt-4 md:text-[15px]`}>
+          {card.summary}
+        </p>
+
+        <span className="editorial-featured-footer mt-5 flex flex-wrap items-center gap-4 md:mt-6">
+          <span className="editorial-featured-cta inline-flex items-center gap-2 rounded-[var(--radius-pill)] border border-[var(--accent)]/50 px-4 py-2 text-sm font-semibold text-[var(--editorial-dark-text)] transition-colors duration-[var(--motion-duration-fast)] group-hover:border-[var(--accent)] group-hover:text-[var(--accent)]">
             {card.actionLabel}
-            <ArrowUpRight className="transition-transform duration-[var(--motion-duration-base)] ease-[var(--motion-ease-move)] group-hover:translate-x-1 motion-reduce:transition-none" size={16} strokeWidth={1.8} />
+            <ArrowUpRight size={15} strokeWidth={2} />
           </span>
-          <span className="featured-now-support hidden items-center gap-2.5 rounded-[var(--radius-sm)] bg-white/12 px-3 py-1.5 text-xs text-white/85 md:inline-flex">
-            <KindIcon size={16} strokeWidth={1.5} className="shrink-0" />
-            <span className="font-semibold">{kindInfo.label}</span>
-            {supportMeta.length > 0 && (
-              <>
-                <span className="h-3 w-px bg-white/25" aria-hidden="true" />
-                <span className="text-white/70">{supportMeta.join(' · ')}</span>
-              </>
-            )}
+          <span className={`${bodyFont.className} text-xs text-[var(--editorial-dark-muted)]`}>
+            {kindLabel}{authorMeta ? ` · ${authorMeta}` : ''}
           </span>
+        </span>
+      </span>
+    </Link>
+  );
+}
+
+export function EditorialSupportCard({
+  card,
+  label,
+  actionLabel,
+  fallbackMeta = 'Раздел платформы'
+}: {
+  card?: HomepageLiveCard;
+  label: string;
+  actionLabel: string;
+  fallbackMeta?: string;
+}) {
+  const title = card?.title ?? label;
+  const summary = card ? supportMetaText(card) : fallbackMeta;
+  const href = card?.href ?? '#';
+  const imageUrl = card?.imageUrl;
+
+  return (
+    <Link
+      className="editorial-support-card group flex flex-col overflow-hidden rounded-[var(--radius-lg)] border border-white/8 bg-[var(--editorial-dark-surface-muted)] transition-[border-color,box-shadow] duration-[var(--motion-duration-base)] hover:border-[var(--accent)]/40 hover:shadow-[0_4px_24px_rgba(0,0,0,0.3)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
+      href={href}
+    >
+      <span className="editorial-support-media relative block aspect-[16/10] overflow-hidden bg-[var(--editorial-dark-surface)]">
+        {imageUrl ? (
+          <span
+            aria-hidden="true"
+            className="absolute inset-0 bg-cover bg-center transition-transform duration-[var(--motion-duration-media)] ease-[var(--motion-ease-move)] group-hover:scale-[1.04] motion-reduce:transition-none"
+            style={{ backgroundImage: `url("${imageUrl}")` }}
+          />
+        ) : (
+          <span aria-hidden="true" className="absolute inset-0 bg-gradient-to-br from-[var(--editorial-dark-surface-muted)] to-[var(--editorial-dark-surface)]" />
+        )}
+        <span aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+        <span className="editorial-support-label absolute left-3 top-3 z-10">{label}</span>
+      </span>
+
+      <span className="editorial-support-body flex flex-1 flex-col gap-2 p-4 md:p-5">
+        <h3 className={`${displayFont.className} editorial-support-title text-[1.15rem] font-semibold leading-[1.2] text-[var(--editorial-dark-text)] group-hover:text-[var(--accent)] md:text-[1.35rem]`}>
+          {title}
+        </h3>
+        <p className={`${bodyFont.className} editorial-support-summary text-[13px] leading-[1.5] text-[var(--editorial-dark-muted)]`}>
+          {summary}
+        </p>
+        <span className="editorial-support-action mt-auto inline-flex items-center gap-1.5 pt-2 text-[13px] font-semibold text-[var(--accent)] transition-colors duration-[var(--motion-duration-fast)] group-hover:text-[var(--accent-strong)]">
+          {actionLabel}
+          <ArrowUpRight size={13} strokeWidth={2} />
         </span>
       </span>
     </Link>
@@ -132,54 +173,5 @@ export function HomeEventsStrip({ event }: { event: HomepageLiveCard }) {
         </div>
       </div>
     </section>
-  );
-}
-
-export function NowCard({
-  label,
-  card,
-  href,
-  actionLabel,
-  fallbackMeta = 'Раздел платформы',
-  icon
-}: {
-  label: string;
-  card?: HomepageLiveCard;
-  href: string;
-  actionLabel: string;
-  fallbackMeta?: string;
-  icon: LucideIcon;
-}) {
-  return (
-    <Link
-      className="group grid grid-cols-[2.75rem_minmax(0,1fr)] gap-x-3 border-b border-[var(--line)] py-3 transition-[background-color,border-color,color,box-shadow] duration-[var(--motion-duration-base)] ease-[var(--motion-ease-standard)] hover:border-[var(--accent)]/34 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] motion-reduce:transition-none sm:flex sm:h-full sm:min-h-0 sm:flex-col sm:rounded-[var(--radius-lg)] sm:border sm:border-[var(--card-border)] sm:bg-[var(--surface-card)] sm:p-4 sm:shadow-[var(--shadow-card)] sm:hover:border-[var(--card-border-hover)] sm:hover:bg-[var(--surface-card-hover)]"
-      href={card?.href ?? href}
-    >
-      <span className="row-span-4 sm:flex sm:items-start sm:justify-between sm:gap-3">
-        <InlineIcon icon={icon} />
-        <span className="hidden text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--accent)] sm:inline">{label}</span>
-      </span>
-      <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--accent)] sm:hidden">{label}</span>
-      <h3 className={`${displayFont.className} home-current-support-title mt-1 text-[1.22rem] font-semibold leading-[1.42] text-[var(--text)] group-hover:text-[var(--accent)] sm:mt-5 sm:text-2xl sm:leading-[1.2]`}>
-        {card?.title ?? label}
-      </h3>
-      <p className="mt-1 text-sm leading-5 text-[var(--muted)] sm:mt-3 sm:min-h-10 sm:leading-6">{card ? compactMeta(card) : fallbackMeta}</p>
-      <span className="mt-2 inline-flex items-center gap-2 text-sm font-semibold text-[var(--accent)] sm:mt-auto sm:pt-5">
-        {actionLabel}
-        <span aria-hidden="true">→</span>
-      </span>
-    </Link>
-  );
-}
-
-function compactMeta(card: HomepageLiveCard) {
-  return card.meta.filter(Boolean).slice(0, 2).join(' / ');
-}
-
-function InlineIcon({ icon: Icon }: { icon: LucideIcon }) {
-  return (
-    <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[var(--radius-sm)] bg-[var(--accent)] text-white">
-      <Icon size={20} strokeWidth={1.8} />
-    </span>
   );
 }

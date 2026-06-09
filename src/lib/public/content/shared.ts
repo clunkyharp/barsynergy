@@ -28,6 +28,7 @@ export type PublishedContentItem = {
   updatedLabel?: string;
   websiteUrl?: string;
   isNew?: boolean;
+  authorName?: string;
 };
 
 export type PublishedContentList = {

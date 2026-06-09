@@ -56,8 +56,8 @@ test('admin telegram message contains only summary fields and admin link', () =>
 
   assert.match(message, /Отклик на вакансию/);
   assert.match(message, /Отклик: Старший бармен/);
-  assert.match(message, /Махачкала/);
   assert.match(message, /\/admin\/applications\/app-1/);
+  assert.doesNotMatch(message, /Махачкала/);
   assert.doesNotMatch(message, /@/);
 });
 

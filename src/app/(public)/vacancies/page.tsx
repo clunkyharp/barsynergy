@@ -54,7 +54,7 @@ export default async function VacanciesPage({ searchParams }: VacanciesPageProps
       <PublishedContentSectionOpportunity
         basePath="/vacancies"
         content={content}
-        emptyActions={[{ href: 'https://t.me/barsynergy', label: 'Следить в Telegram', variant: 'secondary' }]}
+        emptyActions={[]}
         emptyDescription="Открытых вакансий сейчас нет. Подпишитесь на Telegram-канал — публикуем вакансии там первыми."
         emptyTitle="Вакансий пока нет"
         title="Открытые позиции"

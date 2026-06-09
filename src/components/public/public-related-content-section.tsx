@@ -74,7 +74,7 @@ export function PublicRelatedContentSection({
 
               <div className="min-w-0">
                 <div className="flex flex-wrap gap-2">
-                  <MetaChip variant="selected">{item.label ?? 'Запись'}</MetaChip>
+                  <MetaChip variant="selected">{item.label ?? 'Материал'}</MetaChip>
                   {item.meta.slice(0, 2).map((entry) => (
                     <MetaChip key={entry} variant="filter">
                       {entry}

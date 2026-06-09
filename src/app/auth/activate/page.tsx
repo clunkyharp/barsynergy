@@ -109,7 +109,20 @@ export default async function ActivateBusinessAccessPage({ searchParams }: Activ
             ) : null}
 
             {!token || !invite ? (
-              <InlineAlert tone="error">Ссылка активации недействительна или уже использована.</InlineAlert>
+              <div className="space-y-4">
+                <InlineAlert tone="error">Ссылка активации недействительна или уже использована.</InlineAlert>
+                <div className="flex flex-wrap gap-3">
+                  <Button className="rounded-[var(--radius-md)]" href="/auth/register" size="lg">
+                    Запросить новую ссылку
+                  </Button>
+                  <Button className="rounded-[var(--radius-md)]" href="/auth/login" size="lg" variant="secondary">
+                    Войти
+                  </Button>
+                  <Button className="rounded-[var(--radius-md)]" href="/contacts?topic=other" size="lg" variant="secondary">
+                    Написать команде
+                  </Button>
+                </div>
+              </div>
             ) : (
               <form action={activateBusinessAccessAction} className="grid gap-4" data-public-validation="true" noValidate>
                 <PublicFormValidation />

@@ -1,3 +1,5 @@
+'use client';
+
 import {
   ContactChannelFieldset,
   HiddenUtmFields,
@@ -14,8 +16,12 @@ import { InlineLink } from '@/components/ui/inline-link';
 import { Select } from '@/components/ui/select';
 import { SubmitButton } from '@/components/ui/submit-button';
 import { Textarea } from '@/components/ui/textarea';
+import { useRef } from 'react';
+import { useFormDraftAutoSave } from '@/lib/hooks/use-form-draft';
 
 export function SupplierApplicationForm({ enabled, result, utm, cities, action }: PublicApplicationFormProps & { action?: (formData: FormData) => void }) {
+  const formRef = useRef<HTMLFormElement>(null);
+  useFormDraftAutoSave('supplier-application', formRef);
   return (
     <PublicApplicationSection
       eyebrow="Поставщики / Заявка"
@@ -31,7 +37,7 @@ export function SupplierApplicationForm({ enabled, result, utm, cities, action }
       introVariant="compact"
       result={result}
     >
-      <form action={action} className="editorial-form-shell public-form-shell">
+      <form action={action} className="editorial-form-shell public-form-shell" ref={formRef}>
         <HiddenUtmFields utm={utm} />
         <HoneypotField id="supplier-application-website" />
         <PublicFormShellHeader

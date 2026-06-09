@@ -156,7 +156,7 @@
     linear-gradient(100deg, transparent 0%, rgba(255, 255, 255, 0.34) 45%, transparent 78%),
     var(--field-surface-hover);
   background-size: 220% 100%, auto;
-  box-shadow: inset 0 -2px 0 color-mix(in srgb, var(--accent) 55%, transparent);
+  box-shadow: inset 0 -2px 0 color-mix(in oklab, var(--accent) 55%, transparent);
   animation: field-loading-sheen 1.35s ease-in-out infinite;
 }
 
@@ -213,7 +213,7 @@
 :root[data-theme="dark"] .field-base[data-state="loading"] {
   background: var(--field-surface-hover);
   background-size: auto;
-  box-shadow: inset 0 -1px 0 color-mix(in srgb, var(--accent) 55%, transparent);
+  box-shadow: inset 0 -1px 0 color-mix(in oklab, var(--accent) 55%, transparent);
   animation: none;
 }
 

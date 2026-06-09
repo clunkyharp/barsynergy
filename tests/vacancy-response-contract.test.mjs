@@ -36,11 +36,13 @@ test('profile layout blocks non-USER roles', () => {
 
 test('profile responses detail page guards by userId ownership', () => {
   const detailSource = readProjectFile('src/app/profile/responses/[applicationId]/page.tsx');
+  const querySource = readProjectFile('src/modules/profile/queries.ts');
 
-  assert.match(detailSource, /userId: currentUser\.id/);
-  assert.match(detailSource, /where:\s*\{/);
-  assert.match(detailSource, /id: applicationId/);
-  assert.match(detailSource, /userId: currentUser\.id/);
+  assert.match(detailSource, /getUserApplication\(applicationId, currentUser\.id\)/);
+  assert.match(querySource, /export async function getUserApplication\(applicationId: string, userId: string\)/);
+  assert.match(querySource, /where:\s*\{/);
+  assert.match(querySource, /id: applicationId/);
+  assert.match(querySource, /userId,/);
 });
 
 test('profile responses list queries by userId', () => {

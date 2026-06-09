@@ -102,7 +102,7 @@ const consultingDirectionCards: {
 }[] = [
   {
     value: 'venue_opening',
-    code: '01',
+    code: '1',
     title: 'Открытие заведения',
     description: directionDescriptions.venue_opening,
     result: directionMeta.venue_opening.result,
@@ -113,7 +113,7 @@ const consultingDirectionCards: {
   },
   {
     value: 'bar_menu',
-    code: '02',
+    code: '2',
     title: 'Барная карта',
     description: directionDescriptions.bar_menu,
     result: directionMeta.bar_menu.result,
@@ -124,7 +124,7 @@ const consultingDirectionCards: {
   },
   {
     value: 'team_training',
-    code: '03',
+    code: '3',
     title: 'Обучение команды',
     description: directionDescriptions.team_training,
     result: directionMeta.team_training.result,
@@ -135,7 +135,7 @@ const consultingDirectionCards: {
   },
   {
     value: 'cost_pricing',
-    code: '04',
+    code: '4',
     title: 'Себестоимость и цены',
     description: directionDescriptions.cost_pricing,
     result: directionMeta.cost_pricing.result,
@@ -146,7 +146,7 @@ const consultingDirectionCards: {
   },
   {
     value: 'suppliers_procurement',
-    code: '05',
+    code: '5',
     title: 'Поставщики и закупки',
     description: directionDescriptions.suppliers_procurement,
     result: directionMeta.suppliers_procurement.result,
@@ -157,7 +157,7 @@ const consultingDirectionCards: {
   },
   {
     value: 'operational_audit',
-    code: '06',
+    code: '6',
     title: 'Операционный аудит',
     description: directionDescriptions.operational_audit,
     result: directionMeta.operational_audit.result,

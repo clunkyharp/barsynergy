@@ -67,7 +67,7 @@ export function HomeCtaFaqSection() {
               className="w-full rounded-[var(--radius-md)] border-[var(--accent)] bg-[var(--accent)] text-[var(--accent-contrast)] shadow-none hover:border-[var(--accent-strong)] hover:bg-[var(--accent-strong)] md:w-auto"
               href="/contacts#contact-form"
             >
-              Написать команде
+              Связаться с нами
             </Button>
           </div>
 

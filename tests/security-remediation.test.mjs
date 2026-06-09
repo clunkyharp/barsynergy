@@ -194,7 +194,7 @@ test('CSP builder emits strict script policy while preserving current asset sour
 });
 
 test('middleware keeps auth routing edge-safe and preserves login returnTo redirects', () => {
-  const source = readProjectFile('src/middleware.ts');
+  const source = readProjectFile('src/proxy.ts');
 
   assert.match(source, /from '@\/lib\/auth\/session-constants'/);
   assert.doesNotMatch(source, /from '@\/lib\/auth\/session'/);

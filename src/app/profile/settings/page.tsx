@@ -2,12 +2,14 @@ import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { changePassword, updateAvatar, updateBasicProfile, updateJobSearch, updateProfileSkills, updateWorkExperiences } from '@/lib/profile/actions';
 import { ExperienceEditor } from '@/components/profile/experience-editor';
+import { ProfileTabs } from '@/components/profile/profile-tabs';
 import { SettingsAlert } from '@/components/profile/settings-alert';
 import { SkillsSelector } from '@/components/profile/skills-selector';
 import { PageHeader } from '@/components/ui/page-header';
 import { Panel } from '@/components/ui/panel';
 import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
+import { PasswordInput } from '@/components/ui/password-input';
 import { PasswordPairValidation } from '@/components/ui/password-pair-validation';
 import { SalaryInput } from '@/components/ui/salary-input';
 import { Select } from '@/components/ui/select';
@@ -83,17 +85,7 @@ export default async function ProfileSettingsPage({ searchParams }: ProfileSetti
 
       <SettingsAlert success={success} error={error} />
 
-      <nav aria-label="Разделы настроек" className="flex flex-wrap gap-2">
-        {sections.map((s) => (
-          <a
-            className="inline-flex min-h-9 items-center rounded-[var(--radius-md)] border border-[var(--line)] bg-[var(--surface)] px-3 text-sm font-semibold text-[var(--muted)] transition-colors hover:border-[var(--border-hover)] hover:text-[var(--text)]"
-            href={`#${s.id}`}
-            key={s.id}
-          >
-            {s.label}
-          </a>
-        ))}
-      </nav>
+      <ProfileTabs sections={[...sections]} />
 
       <Panel className="max-w-2xl scroll-mt-6" id="avatar" padding="lg" tone="elevated">
         <h2 className="text-lg font-semibold tracking-normal">Аватар</h2>
@@ -243,13 +235,13 @@ export default async function ProfileSettingsPage({ searchParams }: ProfileSetti
           <PasswordPairValidation passwordName="newPassword" />
           <div className="grid gap-5 md:grid-cols-2">
             <FormField htmlFor="current-password" label="Текущий пароль">
-              <Input id="current-password" name="currentPassword" required type="password" autoComplete="current-password" placeholder="Введите текущий пароль" maxLength={200} />
+              <PasswordInput id="current-password" name="currentPassword" required autoComplete="current-password" placeholder="Введите текущий пароль" maxLength={200} />
             </FormField>
             <FormField htmlFor="new-password" label="Новый пароль">
-              <Input id="new-password" name="newPassword" required type="password" autoComplete="new-password" placeholder="Минимум 6 символов" minLength={6} maxLength={200} />
+              <PasswordInput id="new-password" name="newPassword" required autoComplete="new-password" placeholder="Минимум 6 символов" minLength={6} maxLength={200} />
             </FormField>
             <FormField htmlFor="confirm-password" label="Подтвердите пароль">
-              <Input id="confirm-password" name="confirmPassword" required type="password" autoComplete="new-password" placeholder="Повторите новый пароль" minLength={6} maxLength={200} />
+              <PasswordInput id="confirm-password" name="confirmPassword" required autoComplete="new-password" placeholder="Повторите новый пароль" minLength={6} maxLength={200} />
             </FormField>
           </div>
           <div className="flex items-center justify-between gap-3 border-t border-[var(--line)] pt-5">

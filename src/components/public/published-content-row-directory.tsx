@@ -10,7 +10,7 @@ import {
 } from './published-content-section-builders';
 
 function directoryLabel(item: PublishedContentItem) {
-  return <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">{item.label ?? 'Запись'}</p>;
+  return <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">{item.label ?? 'Поставщик'}</p>;
 }
 
 function directoryLabelMeta(item: PublishedContentItem) {

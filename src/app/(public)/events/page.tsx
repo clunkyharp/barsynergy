@@ -1,15 +1,15 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
-import { CalendarDays } from 'lucide-react';
 import { CategoryType } from '@/modules/content/shared/types';
-import { EditorialPublicPage } from '@/components/public/editorial-public-page';
 import { EventAgendaSection } from '@/components/public/platform-ui';
-import { PublicFilters } from '@/components/public/public-filters';
+import { EventsHeroSection, EventsSearchBar, EventsQuickFilters, EventsCtaBanner } from '@/components/public/events-page-header';
+import { JsonLd } from '@/components/seo/json-ld';
 import { stripPublicApplicationResultParams } from '@/lib/applications/public-form-helpers';
 import { getPublishedEvents, hasActivePublicContentParams, type PublicContentSearchParams } from '@/lib/public/content';
 import { getEventFilterOptions, getPublicCategoryOptions, getPublicCityFilterOptions } from '@/lib/public/filter-options';
-import { Button } from '@/components/ui/button';
 import { buildPublicPageMetadata } from '@/lib/public/metadata';
+import { buildStaticPageBreadcrumbJsonLd } from '@/lib/public/structured-data';
+import { Button } from '@/components/ui/button';
 
 type EventsPageProps = {
   searchParams?: Promise<PublicContentSearchParams>;
@@ -29,9 +29,15 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
   const params = (await searchParams) ?? {};
   const contentParams = stripPublicApplicationResultParams(params);
   const selectedPeriod = firstParam(contentParams.period);
+  const selectedCity = firstParam(contentParams.city);
+  const selectedFormat = firstParam(contentParams.format);
+  const selectedCategory = firstParam(contentParams.category);
+  const selectedQ = firstParam(contentParams.q);
+
   const eventListParams: PublicContentSearchParams = selectedPeriod
     ? contentParams
     : { ...contentParams, period: 'upcoming' };
+
   const [content, filterCities, categories, filterOptions] = await Promise.all([
     getPublishedEvents(eventListParams),
     getPublicCityFilterOptions(),
@@ -40,28 +46,33 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
   ]);
 
   const hasActiveSearch = hasActivePublicContentParams(contentParams, ['q', 'category', 'city', 'format', 'period']);
-  const showFilters = content.total > 0 || hasActiveSearch;
   const isEmpty = content.total === 0;
   const isPrelaunchEmpty = isEmpty && !hasActiveSearch;
 
   return (
     <>
-      <EditorialPublicPage
-        eyebrow="События"
-        path="/events"
-        title="Афиша"
-        description="Встречи, лекции, каппинги, дегустации и гостевые смены для специалистов и команд."
-        summary="Предстоящие события показываем сразу. Фильтры можно раскрыть по кнопке."
-        chips={['Встречи', 'Лекции', 'Каппинги', 'Дегустации']}
-        density="compact"
-        metrics={[]}
-        rows={[]}
-        primaryLink={{ label: 'Предложить событие', href: '/contacts?topic=event#contact-form' }}
-        accentGradient="radial-gradient(ellipse 90% 60% at 80% 20%, rgba(50,120,210,0.14), transparent)"
-        accentIcon={CalendarDays}
+      <JsonLd data={buildStaticPageBreadcrumbJsonLd('/events', 'События')} />
+
+      <EventsHeroSection />
+
+      <EventsSearchBar
+        cities={filterCities}
+        formats={filterOptions.formats}
+        selectedCity={selectedCity}
+        selectedFormat={selectedFormat}
+        selectedQ={selectedQ}
       />
+
+      <EventsQuickFilters
+        categories={categories}
+        formats={filterOptions.formats}
+        selectedCategory={selectedCategory}
+        selectedFormat={selectedFormat}
+        selectedPeriod={selectedPeriod}
+      />
+
       {isPrelaunchEmpty ? (
-        <section className="background-zone background-zone-ivory border-b border-[var(--line)] py-16">
+        <section className="background-zone background-zone-graphite border-b border-[var(--line)] py-16">
           <div className="container text-center">
             <p className="text-[var(--muted)]">Первые события готовятся к публикации.</p>
             <Button className="mt-6" href="/contacts?topic=event#contact-form">
@@ -72,49 +83,18 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
       ) : (
         <Suspense
           fallback={
-            <section className="background-zone background-zone-ivory editorial-grid border-b border-[var(--line)] py-10 md:py-14">
+            <section className="background-zone background-zone-graphite border-b border-[var(--line)] py-10 md:py-14">
               <div className="container">
                 <div aria-hidden="true" className="h-40 animate-pulse rounded-[var(--radius-xl)] bg-[var(--skeleton-fill)]" />
               </div>
             </section>
           }
         >
-          <EventAgendaSection
-            content={content}
-            filters={showFilters ? (
-              <PublicFilters
-                activeSummaryLabel="Выбрано в афише"
-                categories={categories}
-                categoryAllLabel="Все типы"
-                categoryLabel="Тип события"
-                cities={filterCities}
-                cityAllLabel="Все города"
-                cityLabel="Город"
-                description="Фильтр по городу, дате и формату события."
-                embedded
-                compact
-                contextItems={selectedPeriod ? [] : [{ label: 'Дата', value: 'Предстоящие' }]}
-                extraFilters={[
-                  { name: 'format', label: 'Формат', allLabel: 'Все форматы', options: filterOptions.formats },
-                  {
-                    name: 'period',
-                    label: 'Дата',
-                    allLabel: 'Предстоящие',
-                    options: [
-                      { value: 'upcoming', label: 'Предстоящие' },
-                      { value: 'all', label: 'Все даты' },
-                      { value: 'past', label: 'Прошедшие' }
-                    ]
-                  }
-                ]}
-                placeholder="Название, площадка или тема"
-                tone="directory"
-                variant="sidebar"
-              />
-            ) : null}
-        />
-      </Suspense>
+          <EventAgendaSection content={content} />
+        </Suspense>
       )}
+
+      <EventsCtaBanner />
     </>
   );
 }

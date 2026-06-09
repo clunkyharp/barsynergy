@@ -30,31 +30,30 @@ test('articles index does not render hardcoded starter cards', () => {
 
 test('articles index passes sidebar filters into the latest publications section', () => {
   const articlesPage = readProjectFile('src/app/(public)/articles/page.tsx');
-  const filterStart = articlesPage.indexOf('<PublicFilters');
-  const latestStart = articlesPage.indexOf('<PublishedContentSection');
-  const sectionStart = articlesPage.indexOf('filters={filters}');
+  const articleGridSection = readProjectFile('src/components/public/article-grid-section.tsx');
 
-  assert.ok(filterStart > -1);
-  assert.ok(latestStart > filterStart);
-  assert.ok(sectionStart > latestStart);
-  assert.match(articlesPage, /placeholder="Название, тема или описание\.\.\."/);
-  assert.match(articlesPage, /categoryAllLabel="Все темы"/);
-  assert.match(articlesPage, /embedded/);
-  assert.match(articlesPage, /filters=\{filters\}/);
-  assert.match(articlesPage, /rowActionLabel="Читать материал"/);
+  assert.match(articlesPage, /<ArticleGridSection/);
+  assert.match(articlesPage, /featuredItem=\{featuredItem\}/);
+  assert.match(articleGridSection, /CategoryPill/);
+  assert.match(articleGridSection, /listingHref\(content, basePath, \{ category: null \}\)/);
+  assert.match(articleGridSection, /listingHref\(content, basePath, \{ category: cat\.slug \}\)/);
+  assert.match(articleGridSection, /Предложить тему/);
   assert.doesNotMatch(articlesPage, /knowledgeTopics/);
   assert.doesNotMatch(articlesPage, /<FilterChip/);
-  assert.doesNotMatch(articlesPage, /<Suspense/);
+  assert.doesNotMatch(articleGridSection, /<PublicFilters/);
 });
 
 test('latest articles use the shared published content section', () => {
   const articlesPage = readProjectFile('src/app/(public)/articles/page.tsx');
+  const articleGridSection = readProjectFile('src/components/public/article-grid-section.tsx');
 
-  assert.match(articlesPage, /PublishedContentSection/);
-  assert.match(articlesPage, /excludedItemIds=\{featuredItem \? \[featuredItem\.id\] : \[\]\}/);
-  assert.match(articlesPage, /showSidebarTitle=\{false\}/);
-  assert.match(articlesPage, /secondaryEmptyTitle="Других материалов пока нет"/);
-  assert.doesNotMatch(articlesPage, /function ArticleGridSection/);
-  assert.doesNotMatch(articlesPage, /function ArticleEmptyResults/);
-  assert.doesNotMatch(articlesPage, /md:min-h-\[220px\]/);
+  assert.match(articlesPage, /ArticleGridSection/);
+  assert.match(articleGridSection, /const visibleItems = featuredItem/);
+  assert.match(articleGridSection, /ArticleFeaturedCard/);
+  assert.match(articleGridSection, /ArticleCard/);
+  assert.match(articleGridSection, /ArticleListItem/);
+  assert.match(articleGridSection, /Показать ещё/);
+  assert.doesNotMatch(articlesPage, /PublishedContentSection/);
+  assert.doesNotMatch(articleGridSection, /function ArticleEmptyResults/);
+  assert.doesNotMatch(articleGridSection, /md:min-h-\[220px\]/);
 });

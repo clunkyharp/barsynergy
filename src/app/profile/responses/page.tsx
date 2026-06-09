@@ -50,8 +50,7 @@ export default async function ProfileResponsesPage({ searchParams }: ProfileResp
   const sort = firstParam(params.sort) ?? 'desc';
   const page = Math.max(1, Number(firstParam(params.page)) || 1);
 
-  const where: Record<string, unknown> = {
-    userId: user.id,
+  const where: Record<string, unknown> = { userId: user.id,
     type: profileResponseType,
     status: { not: ApplicationStatus.DRAFT }
   };

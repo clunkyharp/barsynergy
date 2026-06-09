@@ -12,7 +12,10 @@ function readProjectFile(path) {
 }
 
 test('shared public detail page exposes type-specific labels and stable runtime hooks', () => {
-  const componentSource = readProjectFile('src/components/public/public-content-detail-page.tsx');
+  const componentSource = [
+    'src/components/public/public-content-detail-page.tsx',
+    'src/components/public/public-content-detail-page-helpers.ts'
+  ].map(readProjectFile).join('\n');
   const cssSource = readGlobalStyles();
 
   assert.match(componentSource, /type DetailKind = 'article' \| 'event' \| 'course' \| 'vacancy' \| 'supplier' \| 'partner'/);
@@ -29,7 +32,13 @@ test('shared public detail page exposes type-specific labels and stable runtime 
 });
 
 test('public detail data builders provide type-specific section blocks', () => {
-  const source = readProjectFile('src/lib/public/content-details.ts');
+  const source = [
+    'src/lib/public/content/articles.ts',
+    'src/lib/public/content/education.ts',
+    'src/lib/public/content/suppliers.ts',
+    'src/lib/public/content/partners.ts',
+    'src/modules/content/vacancies/queries.ts'
+  ].map(readProjectFile).join('\n');
 
   for (const title of [
     'В материале',
@@ -61,7 +70,7 @@ test('public detail routes pass type-specific sections into the shared template'
 });
 
 test('nested muted public rows keep visible separation in dark zones', () => {
-  const primitiveSource = readProjectFile('src/components/public/editorial-display-primitives.tsx');
+  const primitiveSource = readProjectFile('src/components/public/editorial-display-primitives-internal.tsx');
   const cardSource = readProjectFile('src/components/public/public-card-patterns.tsx');
 
   assert.match(primitiveSource, /border border-\[var\(--border-subtle\)\].*bg-\[var\(--surface-card-muted\)\]/);

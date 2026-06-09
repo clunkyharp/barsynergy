@@ -11,6 +11,7 @@ export {
   PUBLICATION_STATUS_HINT,
   contentStatusLabels
 } from '@/lib/admin/content-ui';
+export { slugify } from '@/lib/utils/slugify';
 export {
   courseFormatOptions,
   courseLevelOptions,
@@ -134,15 +135,6 @@ export function getArray(formData: FormData, key: string): string[] {
 
 export function nullableString(value?: string) {
   return value && value.length > 0 ? value : null;
-}
-
-export function slugify(value: string) {
-  return value
-    .trim()
-    .toLowerCase()
-    .normalize('NFKD')
-    .replace(/[^\p{L}\p{N}]+/gu, '-')
-    .replace(/^-+|-+$/g, '');
 }
 
 export async function findUniqueSlug(baseSlug: string, exists: (candidate: string) => Promise<boolean>) {

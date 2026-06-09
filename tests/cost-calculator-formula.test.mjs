@@ -20,6 +20,7 @@ async function readCalculatorComponentSources() {
   const files = [
     '../src/components/public/cost-calculator-client.tsx',
     '../src/components/public/cost-calculator/ingredient-editor.tsx',
+    '../src/components/public/cost-calculator/ingredient-editor-internal.tsx',
     '../src/components/public/cost-calculator/result-rail.tsx',
     '../src/components/public/cost-calculator/use-cost-calculator-state.ts',
     '../src/components/public/cost-calculator/format.ts'
@@ -125,8 +126,8 @@ test('calculator pricing mode control uses explicit separated options', async ()
   assert.doesNotMatch(componentSource, /label: 'Авто'/);
   assert.doesNotMatch(componentSource, /label: 'Вручную'/);
   assert.match(stylesSource, /\.cost-sheet \.calculator-mode-control \{\n\s+display: grid;\n\s+grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);/);
-  assert.match(stylesSource, /\.cost-sheet \.calculator-mode-control \.choice-card\[data-selected="true"\]::after \{\n\s+content: "Активно";/);
   assert.match(stylesSource, /\.cost-sheet \.calculator-mode-control \.choice-card\[data-selected="true"\] \{\n\s+border-color: var\(--accent\);\n\s+background: var\(--surface\);\n\s+color: var\(--text\);/);
+  assert.match(stylesSource, /@media \(max-width: 520px\) \{\n\s+\.cost-sheet \.calculator-mode-control \{\n\s+grid-template-columns: 1fr;/);
 });
 
 test('calculator ingredient actions keep breathing room inside the table', async () => {
@@ -136,9 +137,9 @@ test('calculator ingredient actions keep breathing room inside the table', async
   assert.match(componentSource, /lg:grid-cols-\[minmax\(60px,1fr\)_64px\]/);
   assert.doesNotMatch(componentSource, /grid-cols-\[minmax\(130px,1fr\)_72px_minmax\(132px,0\.85fr\)_minmax\(132px,0\.85fr\)_88px_96px\]/);
   assert.match(componentSource, /lg:flex lg:justify-center/);
-  assert.match(componentSource, /className="text-center">Действия/);
-  assert.match(componentSource, /className="text-right">Цена, ₽/);
-  assert.match(componentSource, /className="text-right">Себестоимость/);
+  assert.match(componentSource, /className="truncate text-center">Действия/);
+  assert.match(componentSource, /className="truncate text-right">Цена, ₽/);
+  assert.match(componentSource, /className="truncate text-right">Себестоимость/);
   assert.match(componentSource, /const duplicateLabel = `Дублировать ингредиент: \$\{ingredient\.name \|\| `строка \$\{index \+ 1\}`\}`;/);
   assert.match(componentSource, /const removeLabel = `Удалить ингредиент: \$\{ingredient\.name \|\| `строка \$\{index \+ 1\}`\}`;/);
   assert.match(componentSource, /aria-label=\{duplicateLabel\}/);
@@ -187,7 +188,7 @@ test('calculator formula help is collapsed across breakpoints', async () => {
 
   assert.match(componentSource, /<details className="calculator-formula-help border-b border-\[var\(--line\)\]/);
   assert.match(componentSource, /<summary className="calculator-formula-help-summary/);
-  assert.match(componentSource, /<FormulaHelpGrid className="calculator-formula-help-grid grid gap-3 border-t border-\[var\(--line\)\] px-4 py-3 md:grid-cols-3 md:px-5" \/>/);
+  assert.match(componentSource, /<FormulaHelpGrid className="calculator-formula-help-grid grid gap-4 border-t border-\[var\(--line\)\] px-4 py-4 md:grid-cols-3 md:px-5" \/>/);
   assert.doesNotMatch(componentSource, /<FormulaHelpGrid className="hidden gap-3 border-b border-\[var\(--line\)\]/);
   assert.doesNotMatch(componentSource, /text-\[var\(--muted\)\] md:hidden/);
   assert.match(stylesSource, /\.calculator-formula-help\[open\] \.calculator-formula-help-icon \{\n\s+transform: rotate\(45deg\);/);

@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
+import { MarkdownEditor } from '@/components/admin/markdown-editor';
 import { Textarea } from '@/components/ui/textarea';
 import {
   contentStatusLabels,
@@ -221,7 +222,7 @@ export default async function AdminVacancyEditPage({ params }: AdminVacancyEditP
               <Textarea id="vacancy-summary" name="summary" required minLength={10} maxLength={500} defaultValue={vacancy.summary} />
             </FormField>
             <FormField htmlFor="vacancy-description" label="Описание">
-              <Textarea id="vacancy-description" name="description" required minLength={20} className="min-h-64" defaultValue={vacancy.description} />
+              <MarkdownEditor id="vacancy-description" name="description" required minLength={20} maxLength={100_000} className="min-h-64" defaultValue={vacancy.description} />
             </FormField>
           </div>
         </AdminCmsSection>

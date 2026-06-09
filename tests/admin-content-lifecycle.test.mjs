@@ -41,3 +41,28 @@ test('admin content actions use the shared lifecycle helper for repeated mutatio
     assert.match(source, /deleteDraft: \(tx\) =>[\s\S]*deleteMany\(\{[\s\S]*status: ContentStatus\.DRAFT/, `${file} should keep draft-only delete filter`);
   }
 });
+
+test('admin content actions revalidate public listing and detail routes after content mutations', () => {
+  const publicRevalidationSource = readProjectFile('src/lib/admin/public-content-revalidation.ts');
+
+  assert.match(publicRevalidationSource, /revalidatePath\('\/search'\)/);
+  assert.match(publicRevalidationSource, /revalidatePath\('\/'\)/);
+  assert.match(publicRevalidationSource, /revalidatePath\(`\$\{detailBasePath\}\/\$\{previousSlug\}`\)/);
+  assert.match(publicRevalidationSource, /revalidatePath\(`\$\{detailBasePath\}\/\$\{currentSlug\}`\)/);
+
+  const expectedHelpersByFile = new Map([
+    ['src/app/admin/articles/actions.ts', 'revalidateArticlePublicPaths'],
+    ['src/app/admin/courses/actions.ts', 'revalidateCoursePublicPaths'],
+    ['src/app/admin/events/actions.ts', 'revalidateEventPublicPaths'],
+    ['src/app/admin/vacancies/actions.ts', 'revalidateVacancyPublicPaths'],
+    ['src/app/admin/suppliers/actions.ts', 'revalidateSupplierPublicPaths'],
+    ['src/app/admin/partners/actions.ts', 'revalidatePartnerPublicPaths'],
+    ['src/app/admin/general-sponsors/actions.ts', 'revalidateGeneralSponsorPublicPaths']
+  ]);
+
+  for (const [file, helperName] of expectedHelpersByFile) {
+    const source = readProjectFile(file);
+
+    assert.match(source, new RegExp(helperName), `${file} should use ${helperName}`);
+  }
+});

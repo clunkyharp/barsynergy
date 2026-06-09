@@ -17,11 +17,12 @@ import {
   statusTransitionDates
 } from '@/lib/admin/content-utils';
 import { deleteContentDraft, updateContentStatus } from '@/lib/admin/content-lifecycle';
+import { revalidateArticlePublicPaths } from '@/lib/admin/public-content-revalidation';
 import { prisma } from '@/lib/db/prisma';
 import { withAdminAction } from '@/lib/server-action-wrappers';
 
 const ADMIN_ARTICLES_PATH = '/admin/articles';
-const ARTICLE_BODY_MAX_LENGTH = 20_000;
+const ARTICLE_BODY_MAX_LENGTH = 100_000;
 
 const articleFormSchema = z.object({
   title: z.string().trim().min(2).max(160),
@@ -104,12 +105,12 @@ export async function createArticle(formData: FormData) {
 
       const coverImageId = await resolveCoverImageId({ formData, userId: user.id, onUploadedImageId: (fileId) => { uploadedCoverImageId = fileId; } });
 
-      await persistWithUniqueSlugRetry({
+      const createdArticle = await persistWithUniqueSlugRetry({
         baseSlug: slug, exists: async (candidate) => Boolean(await prisma.article.findFirst({ where: { slug: candidate }, select: { id: true } })),
         persist: (uniqueSlug) => prisma.$transaction(async (tx) => {
           const article = await tx.article.create({
             data: { title: parsed.title, slug: uniqueSlug, summary: parsed.summary, body: parsed.body, status: parsed.status, coverImageId, coverImageAlt: nullableString(parsed.coverImageAlt), categoryId: nullableString(parsed.categoryId), cityId: nullableString(parsed.cityId), authorName: nullableString(parsed.authorName), sourceLabel: nullableString(parsed.sourceLabel), readingTimeMinutes: parsed.readingTimeMinutes, createdById: user.id, updatedById: user.id, ...initialPublicationDates(parsed.status) },
-            select: { id: true }
+            select: { id: true, slug: true }
           });
 
           if (tagIds.length > 0) await tx.articleTag.createMany({ data: tagIds.map((tagId) => ({ articleId: article.id, tagId })), skipDuplicates: true });
@@ -119,6 +120,7 @@ export async function createArticle(formData: FormData) {
       });
 
       revalidatePath(ADMIN_ARTICLES_PATH);
+      revalidateArticlePublicPaths(createdArticle.slug);
       return { type: 'success', message: 'Статья создана.' };
     }
   });
@@ -148,18 +150,17 @@ export async function updateArticle(formData: FormData) {
 
       if (!slug) throw new Error('Article slug is required.');
 
-      const existingArticle = await prisma.article.findUniqueOrThrow({ where: { id: parsed.articleId }, select: { coverImageId: true, publishedAt: true } });
+      const existingArticle = await prisma.article.findUniqueOrThrow({ where: { id: parsed.articleId }, select: { coverImageId: true, publishedAt: true, slug: true } });
       const previousCoverImageId = existingArticle.coverImageId;
 
       await Promise.all([assertActiveContentRelations({ entityName: 'Article', categoryId: parsed.categoryId, categoryType: CategoryType.ARTICLE, cityId: parsed.cityId }), assertActiveArticleTags(tagIds)]);
 
       const coverImageId = await resolveCoverImageId({ formData, userId: user.id, currentCoverImageId: existingArticle.coverImageId, onUploadedImageId: (fileId) => { uploadedCoverImageId = fileId; } });
 
-      await persistWithUniqueSlugRetry({
+      const updatedArticle = await persistWithUniqueSlugRetry({
         baseSlug: slug, exists: async (candidate) => Boolean(await prisma.article.findFirst({ where: { slug: candidate, id: { not: parsed.articleId } }, select: { id: true } })),
         persist: (uniqueSlug) => prisma.$transaction(async (tx) => {
-          const article = await tx.article.update({ where: { id: parsed.articleId }, data: { title: parsed.title, slug: uniqueSlug, summary: parsed.summary, body: parsed.body, status: parsed.status, coverImageId, coverImageAlt: nullableString(parsed.coverImageAlt), categoryId: nullableString(parsed.categoryId), cityId: nullableString(parsed.cityId), authorName: nullableString(parsed.authorName), sourceLabel: nullableString(parsed.sourceLabel), readingTimeMinutes: parsed.readingTimeMinutes, updatedById: user.id, ...statusTransitionDates(parsed.status, existingArticle.publishedAt) }, select: { id: true } });
-
+          const article = await tx.article.update({ where: { id: parsed.articleId }, data: { title: parsed.title, slug: uniqueSlug, summary: parsed.summary, body: parsed.body, status: parsed.status, coverImageId, coverImageAlt: nullableString(parsed.coverImageAlt), categoryId: nullableString(parsed.categoryId), cityId: nullableString(parsed.cityId), authorName: nullableString(parsed.authorName), sourceLabel: nullableString(parsed.sourceLabel), readingTimeMinutes: parsed.readingTimeMinutes, updatedById: user.id, ...statusTransitionDates(parsed.status, existingArticle.publishedAt) }, select: { id: true, slug: true } });
           await tx.articleTag.deleteMany({ where: { articleId: article.id } });
 
           if (tagIds.length > 0) await tx.articleTag.createMany({ data: tagIds.map((tagId) => ({ articleId: article.id, tagId })), skipDuplicates: true });
@@ -172,6 +173,7 @@ export async function updateArticle(formData: FormData) {
 
       revalidatePath(ADMIN_ARTICLES_PATH);
       revalidatePath(`${ADMIN_ARTICLES_PATH}/${parsed.articleId}`);
+      revalidateArticlePublicPaths(updatedArticle.slug, existingArticle.slug);
       return { type: 'success', message: 'Статья обновлена.' };
     }
   });
@@ -185,9 +187,12 @@ export async function updateArticleStatus(formData: FormData) {
     handler: async ({ user }) => {
       const parsed = statusFormSchema.parse({ articleId: getString(formData, 'articleId'), status: getString(formData, 'status') });
 
+      const article = await prisma.article.findUniqueOrThrow({ where: { id: parsed.articleId }, select: { slug: true } });
+
       await updateContentStatus({ status: parsed.status, userId: user.id, findCurrent: (tx) => tx.article.findUniqueOrThrow({ where: { id: parsed.articleId }, select: { publishedAt: true } }), update: (tx, data) => tx.article.update({ where: { id: parsed.articleId }, data }) });
 
       revalidatePath(ADMIN_ARTICLES_PATH);
+      revalidateArticlePublicPaths(article.slug);
       return { type: 'success', message: 'Статус статьи обновлён.' };
     }
   });

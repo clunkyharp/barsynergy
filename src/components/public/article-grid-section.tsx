@@ -1,68 +1,117 @@
+'use client';
+
+import { LayoutGrid, List, Pencil } from 'lucide-react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useCallback, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { MetaChip } from '@/components/ui/meta-chip';
 import { Panel } from '@/components/ui/panel';
+import { Select } from '@/components/ui/select';
+import { displayFont } from '@/lib/fonts';
 import type { PublishedContentItem, PublishedContentList } from '@/lib/public/content';
 import type { PublicTaxonomyOption } from '@/lib/public/filter-options';
-import { ArticleCard } from './article-grid-card';
+import { cn } from '@/lib/utils';
+import { PublicBreadcrumbs } from './public-primitives';
+import { ArticleCard, ArticleFeaturedCard, ArticleListItem } from './article-grid-card';
 import { CategoryPill } from './article-grid-category-pill';
-import { ArticleSearchField } from './article-grid-search-field';
-import { pageHref, listingHref } from './article-grid-utils';
+import { listingHref, pageHref } from './article-grid-utils';
 
 type ArticleGridSectionProps = {
   content: PublishedContentList;
   basePath: string;
   categories: PublicTaxonomyOption[];
   featuredItem?: PublishedContentItem;
-  title: string;
 };
+
+const SUBMIT_TOPIC_HREF = '/contacts?topic=article-topic#contact-form';
+
+const SORT_OPTIONS = [
+  { value: 'newest', label: 'Сначала новые' },
+  { value: 'oldest', label: 'Сначала старые' }
+] as const;
 
 export function ArticleGridSection({
   content,
   basePath,
   categories,
-  featuredItem,
-  title
+  featuredItem
 }: ArticleGridSectionProps) {
+  const [view, setView] = useState<'grid' | 'list'>('grid');
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const currentSort = (searchParams?.get('sort') ?? 'newest') as 'newest' | 'oldest';
+
+  const handleSortChange = useCallback(
+    (value: string) => {
+      const params = new URLSearchParams(searchParams?.toString() ?? '');
+      params.delete('page');
+      if (value === 'newest') {
+        params.delete('sort');
+      } else {
+        params.set('sort', value);
+      }
+      const query = params.toString();
+      router.push(query ? `${pathname}?${query}` : pathname, { scroll: false });
+    },
+    [pathname, router, searchParams]
+  );
+
   const visibleItems = featuredItem
     ? content.items.filter((item) => item.id !== featuredItem.id)
     : content.items;
-  const currentCategory = typeof content.params.category === 'string'
-    ? content.params.category
-    : undefined;
+  const currentCategory =
+    typeof content.params.category === 'string' ? content.params.category : undefined;
 
   return (
-    <section
-      aria-label={title}
-      className="public-catalog-section background-zone background-zone-ivory editorial-grid border-b border-[var(--line)] py-8 md:py-14"
-      id="articles-list"
-    >
+    <section aria-label="Материалы" className="border-b border-[var(--line)] pt-3 pb-10 sm:pb-14" id="articles-list">
       <div className="container">
-        {/* Filter bar */}
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
-          <div className="flex min-w-0 flex-1 items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
-            <CategoryPill
-              href={listingHref(content, basePath, { category: null })}
-              active={!currentCategory}
+        <PublicBreadcrumbs current="Материалы" />
+        {/* Page header */}
+        <div className="mt-4 flex flex-wrap items-start justify-between gap-x-6 gap-y-4">
+          <div>
+            <h1
+              className={cn(
+                displayFont.className,
+                'text-[2.5rem] font-semibold leading-[1.05] text-[var(--text)] sm:text-[3.25rem]'
+              )}
             >
-              Все
+              Материалы
+            </h1>
+            <p className="mt-3 max-w-[440px] text-[15px] leading-6 text-[var(--muted)]">
+              Редакционные материалы, интервью, обзоры и практические разборы для кофейной индустрии.
+            </p>
+          </div>
+          <Button className="mt-1 w-full gap-2 sm:w-auto sm:shrink-0" href={SUBMIT_TOPIC_HREF} variant="primary">
+            <Pencil size={14} />
+            Предложить тему
+          </Button>
+        </div>
+
+        {/* Category pills */}
+        <div className="mt-6 flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+          <CategoryPill
+            active={!currentCategory}
+            href={listingHref(content, basePath, { category: null })}
+          >
+            Все
+          </CategoryPill>
+          {categories.map((cat) => (
+            <CategoryPill
+              active={currentCategory === cat.slug}
+              href={listingHref(content, basePath, { category: cat.slug })}
+              key={cat.slug}
+            >
+              {cat.name}
             </CategoryPill>
-            {categories.map((cat) => (
-              <CategoryPill
-                key={cat.slug}
-                href={listingHref(content, basePath, { category: cat.slug })}
-                active={currentCategory === cat.slug}
-              >
-                {cat.name}
-              </CategoryPill>
-            ))}
-          </div>
-          <div className="shrink-0">
-            <ArticleSearchField currentQuery={content.searchQuery} />
-          </div>
+          ))}
         </div>
 
         {content.items.length === 0 ? (
-          <Panel className="public-missing-state mt-6 space-y-4 border-[var(--border-default)] bg-[var(--surface-wash)]" padding="lg">
+          <Panel
+            className="public-missing-state mt-8 space-y-4 border-[var(--border-default)] bg-[var(--surface-wash)]"
+            padding="lg"
+          >
             <h3 className="text-xl font-semibold leading-7">
               {currentCategory || content.searchQuery
                 ? 'По этим параметрам материалов нет'
@@ -74,8 +123,8 @@ export function ArticleGridSection({
                 : 'Первые материалы появятся после публикации.'}
             </p>
             <Button
-              className="min-h-12 rounded-[var(--radius-md)] px-6 tracking-normal"
-              href="/contacts?topic=article-topic#contact-form"
+              className="min-h-12 rounded-[var(--radius-md)] px-6"
+              href={SUBMIT_TOPIC_HREF}
               variant="primary"
             >
               Предложить тему
@@ -83,43 +132,92 @@ export function ArticleGridSection({
           </Panel>
         ) : (
           <>
-            {/* Count */}
-            <MetaChip aria-live="polite" aria-atomic="true" className="mt-5 border-[var(--border-default)] bg-[var(--accent-soft)] text-[var(--accent)]" variant="filter">
-              Материалов: {content.total}
-            </MetaChip>
+            {/* Featured hero card */}
+            {featuredItem ? (
+              <div className="mt-8">
+                <ArticleFeaturedCard basePath={basePath} item={featuredItem} />
+              </div>
+            ) : null}
 
-            {/* Grid */}
-            <div className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {featuredItem ? (
-                <ArticleCard
-                  basePath={basePath}
-                  featured
-                  item={featuredItem}
-                />
-              ) : null}
-              {visibleItems.map((item) => (
-                <ArticleCard
-                  basePath={basePath}
-                  item={item}
-                  key={item.id}
-                />
-              ))}
+            {/* All articles */}
+            <div className="mt-10">
+              <div className="flex items-center justify-between gap-3">
+                <h2 className="text-xl font-semibold text-[var(--text)]">Все материалы</h2>
+                <div className="flex items-center gap-2">
+                  {/* Sort dropdown */}
+                  <div className="hidden sm:block">
+                    <Select
+                      aria-label="Сортировка"
+                      className="min-h-[3.25rem] min-w-[12.5rem] rounded-full border-[3px] border-[var(--accent)] bg-[var(--surface-card)] px-5 pr-9 text-base font-medium leading-none text-[var(--text)] shadow-[inset_0_0_0_3px_var(--surface-card)] hover:border-[var(--accent)]"
+                      onChange={(e) => handleSortChange(e.target.value)}
+                      value={currentSort}
+                    >
+                      {SORT_OPTIONS.map((opt) => (
+                        <option key={opt.value} value={opt.value}>
+                          {opt.label}
+                        </option>
+                      ))}
+                    </Select>
+                  </div>
+                  {/* View toggle */}
+                  <div className="flex items-center gap-0.5">
+                    <button
+                      aria-label="Вид сеткой"
+                      aria-pressed={view === 'grid'}
+                      className={cn(
+                        'rounded-md p-1.5 transition-colors duration-[var(--motion-duration-fast)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2',
+                        view === 'grid'
+                          ? 'text-[var(--accent)]'
+                          : 'text-[var(--muted)] hover:text-[var(--text-secondary)]'
+                      )}
+                      onClick={() => setView('grid')}
+                      type="button"
+                    >
+                      <LayoutGrid size={18} />
+                    </button>
+                    <button
+                      aria-label="Вид списком"
+                      aria-pressed={view === 'list'}
+                      className={cn(
+                        'rounded-md p-1.5 transition-colors duration-[var(--motion-duration-fast)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2',
+                        view === 'list'
+                          ? 'text-[var(--accent)]'
+                          : 'text-[var(--muted)] hover:text-[var(--text-secondary)]'
+                      )}
+                      onClick={() => setView('list')}
+                      type="button"
+                    >
+                      <List size={18} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {view === 'grid' ? (
+                <div className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                  {visibleItems.map((item) => (
+                    <ArticleCard basePath={basePath} item={item} key={item.id} />
+                  ))}
+                </div>
+              ) : (
+                <div className="mt-4 divide-y divide-[var(--line)]">
+                  {visibleItems.map((item) => (
+                    <ArticleListItem basePath={basePath} item={item} key={item.id} />
+                  ))}
+                </div>
+              )}
             </div>
 
-            {/* Pagination */}
-            {content.totalPages > 1 ? (
-              <div className="public-catalog-pagination mt-8 flex flex-wrap items-center justify-between gap-3">
-                <MetaChip className="border-[var(--border-default)] bg-transparent text-[var(--muted)]" variant="default">
-                  Страница {content.page} из {content.totalPages}
-                </MetaChip>
-                <div className="flex flex-wrap gap-3">
-                  <Button disabled={content.page <= 1} href={pageHref(content, basePath, content.page - 1)} variant="secondary">
-                    Назад
-                  </Button>
-                  <Button disabled={content.page >= content.totalPages} href={pageHref(content, basePath, content.page + 1)} variant="secondary">
-                    Вперед
-                  </Button>
-                </div>
+            {/* Показать ещё */}
+            {content.totalPages > 1 && content.page < content.totalPages ? (
+              <div className="mt-10 flex justify-center">
+                <Button
+                  className="min-w-[160px]"
+                  href={pageHref(content, basePath, content.page + 1)}
+                  variant="secondary"
+                >
+                  Показать ещё
+                </Button>
               </div>
             ) : null}
           </>

@@ -86,7 +86,7 @@ export function isAllowedPrivateResumeUpload(input: { mimeType: string; original
     return false;
   }
 
-  return input.buffer ? signature.matches(input.buffer) : true;
+  return Boolean(input.buffer && signature.matches(input.buffer));
 }
 
 const ZIP_EOCD_SIGNATURE = 0x06054b50;

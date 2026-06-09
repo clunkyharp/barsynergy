@@ -190,10 +190,10 @@ export default async function GeneralSponsorsPage() {
 
           <div className="mt-14 grid grid-cols-2 gap-px border border-[var(--border-default)] bg-[var(--border-default)] md:grid-cols-4">
             {[
-              { num: '01', label: 'Аудитория профессионалов' },
-              { num: '02', label: 'Размещения на площадках' },
-              { num: '03', label: 'Контент и материалы' },
-              { num: '04', label: 'Долгосрочное партнёрство' }
+              { num: '1', label: 'Аудитория профессионалов' },
+              { num: '2', label: 'Размещения на площадках' },
+              { num: '3', label: 'Контент и материалы' },
+              { num: '4', label: 'Долгосрочное партнёрство' }
             ].map((item) => (
               <div className="bg-[var(--surface)] px-5 py-6 md:px-7 md:py-8" key={item.num}>
                 <p className={`${displayFont.className} text-[2.6rem] font-semibold leading-none text-[var(--accent)] md:text-[3.4rem]`}>
@@ -223,7 +223,7 @@ export default async function GeneralSponsorsPage() {
                   key={index}
                 >
                   <span className={`${displayFont.className} select-none text-[2.6rem] font-semibold leading-none text-[var(--line)] md:text-[3.2rem]`}>
-                    {String(index + 1).padStart(2, '0')}.
+                    {index + 1}.
                   </span>
                   <div>
                     <h3 className={`${displayFont.className} text-[1.6rem] font-semibold leading-none text-[var(--text)] md:text-[1.9rem]`}>

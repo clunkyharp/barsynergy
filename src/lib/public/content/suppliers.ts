@@ -139,7 +139,7 @@ export async function getPublishedSuppliers(params: PublicContentSearchParams = 
     },
     (ids) =>
       prisma.supplier.findMany({
-        where: { id: { in: ids } },
+        where: { id: { in: ids }, status: ContentStatus.PUBLISHED },
         include: {
           category: { select: { name: true } },
           city: { select: { name: true } },

@@ -17,6 +17,7 @@ import {
   statusTransitionDates
 } from '@/lib/admin/content-utils';
 import { deleteContentDraft, updateContentStatus } from '@/lib/admin/content-lifecycle';
+import { revalidateGeneralSponsorPublicPaths } from '@/lib/admin/public-content-revalidation';
 import { prisma } from '@/lib/db/prisma';
 import { withAdminAction } from '@/lib/server-action-wrappers';
 import { normalizeExternalUrlInput } from '@/lib/validation/external-url';
@@ -110,8 +111,7 @@ function readGeneralSponsorForm(formData: FormData) {
 
 function revalidateGeneralSponsorPaths() {
   revalidatePath(ADMIN_GENERAL_SPONSORS_PATH);
-  revalidatePath('/general-sponsors');
-  revalidatePath('/');
+  revalidateGeneralSponsorPublicPaths();
 }
 
 export async function createGeneralSponsor(formData: FormData) {

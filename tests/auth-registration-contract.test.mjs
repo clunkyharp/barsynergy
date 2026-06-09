@@ -28,10 +28,11 @@ test('register user page renders registration form with required fields', () => 
   assert.match(pageSource, /Для специалистов бара/);
   assert.match(pageSource, /import \{ RegisterUserForm \}/);
   assert.match(pageSource, /buildPrivatePageMetadata/);
-  assert.match(pageSource, /email-used/);
+  assert.match(pageSource, /account-check/);
   assert.match(pageSource, /rate-limited/);
   assert.match(pageSource, /failed/);
   assert.match(pageSource, /invalid/);
+  assert.match(pageSource, /registered/);
 });
 
 test('register user form has fullName, email, password and consent', () => {
@@ -68,21 +69,19 @@ test('business request form no longer uses role selection', () => {
   assert.doesNotMatch(formSource, /name="role"/);
   assert.doesNotMatch(formSource, /Я работаю в баре/);
   assert.match(formSource, /BusinessRequestForm/);
-  assert.match(formSource, /createBusinessAccountRequestAction/);
+  assert.match(formSource, /action: \(formData: FormData\) => void/);
 });
 
 test('register user action creates ACTIVE user and handles duplicate email', () => {
   const actionsSource = readProjectFile('src/app/auth/register/actions.ts');
 
-  assert.match(actionsSource, /status: UserStatus\.ACTIVE/);
+  assert.match(actionsSource, /status: UserStatus\.PENDING/);
   assert.match(actionsSource, /role: UserRole\.USER/);
-
+  assert.match(actionsSource, /sendUserVerificationEmail/);
   assert.match(actionsSource, /Prisma\.PrismaClientKnownRequestError/);
   assert.match(actionsSource, /error\.code === 'P2002'/);
-  assert.match(actionsSource, /email-used/);
+  assert.match(actionsSource, /account-check/);
   assert.match(actionsSource, /redirectWithAuthResult\('\/auth\/register\/user'/);
-
-  assert.doesNotMatch(actionsSource, /status: UserStatus\.PENDING/);
 });
 
 test('business register action handles forms-disabled, invalid, duplicate and rate-limit', () => {
@@ -94,22 +93,18 @@ test('business register action handles forms-disabled, invalid, duplicate and ra
   assert.match(actionsSource, /redirectWithAuthResult\('\/auth\/register',.*'invalid'/);
   assert.match(actionsSource, /AuthRateLimitError/);
   assert.match(actionsSource, /redirectWithAuthResult\('\/auth\/register',.*'rate-limited'/);
-  assert.match(actionsSource, /let created = false/);
   assert.match(actionsSource, /existingUser \|\| existingRequest/);
   assert.match(actionsSource, /business-request-created/);
-  assert.match(actionsSource, /business-request-duplicate/);
-  assert.match(actionsSource, /if \(created\)/);
-  assert.match(actionsSource, /} else \{[\s\S]*business-request-duplicate/);
+  assert.doesNotMatch(actionsSource, /business-request-duplicate/);
+  assert.match(actionsSource, /if \(existingUser \|\| existingRequest\) return;/);
 });
 
 test('login page shows duplicate business request message', () => {
   const pageSource = readProjectFile('src/app/auth/login/page.tsx');
 
-  assert.match(pageSource, /business-request-duplicate/);
-  assert.match(pageSource, /Заявка по этому email уже получена/);
   assert.match(pageSource, /business-request-created/);
-  assert.match(pageSource, /isRequestSent.*business-request-created/);
-  assert.doesNotMatch(pageSource, /isRequestSent.*business-request-duplicate/);
+  assert.doesNotMatch(pageSource, /business-request-duplicate/);
+  assert.doesNotMatch(pageSource, /Заявка по этому email уже получена/);
 });
 
 test('activate page guards with invalid-invite, blocked-user and mismatch error states', () => {
@@ -160,8 +155,8 @@ test('no PENDING user can reach /profile without valid activation flow', () => {
   const registerActionSource = readProjectFile('src/app/auth/register/actions.ts');
 
   assert.match(currentUserSource, /session\.user\.status !== UserStatus\.ACTIVE/);
-  assert.doesNotMatch(registerActionSource, /status: UserStatus\.PENDING/);
-  assert.match(registerActionSource, /UserStatus\.ACTIVE/);
+  assert.match(registerActionSource, /status: UserStatus\.PENDING/);
+  assert.match(registerActionSource, /sendUserVerificationEmail/);
 });
 
 test('auth route files exist for all expected public auth paths', () => {
@@ -183,7 +178,7 @@ test('header shows login link for guest and account menu for authenticated user'
   assert.match(headerSource, /href="\/auth\/login"/);
   assert.match(headerSource, /AccountMenu/);
   assert.match(headerSource, /\{user \?/);
-  assert.match(headerSource, /<AccountMenu user=\{user\}/);
+  assert.match(headerSource, /<AccountMenu logoutAction=\{logoutAction!\} user=\{user\}/);
 
   assert.doesNotMatch(headerSource, /const navItems = \[/);
   assert.match(headerSource, /const guestNavItems = \[/);
@@ -202,11 +197,11 @@ test('mobile-site-menu shows auth block when user is authenticated', () => {
   const mobileSource = readProjectFile('src/components/layout/mobile-site-menu.tsx');
 
   assert.match(mobileSource, /user\?:/);
-  assert.match(mobileSource, /UserRound/);
-  assert.match(mobileSource, /logoutAction/);
-  assert.match(mobileSource, /getMobileAuthItems/);
-  assert.match(mobileSource, /Профиль/);
-  assert.match(mobileSource, /Выйти/);
+  assert.match(mobileSource, /profileHref\(role: string\)/);
+  assert.match(mobileSource, /Кабинет/);
+  assert.match(mobileSource, /if \(role === 'BUSINESS'\) return '\/business\/cabinet'/);
+  assert.match(mobileSource, /if \(role === 'ADMIN' \|\| role === 'MODERATOR'\) return '\/admin'/);
+  assert.doesNotMatch(mobileSource, /logoutAction/);
 });
 
 test('account-menu has role-based menu items for USER role', () => {

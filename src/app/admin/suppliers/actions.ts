@@ -17,6 +17,7 @@ import {
   statusTransitionDates
 } from '@/lib/admin/content-utils';
 import { deleteContentDraft, updateContentStatus } from '@/lib/admin/content-lifecycle';
+import { revalidateSupplierPublicPaths } from '@/lib/admin/public-content-revalidation';
 import { prisma } from '@/lib/db/prisma';
 import { withAdminAction } from '@/lib/server-action-wrappers';
 import { normalizeExternalUrlInput } from '@/lib/validation/external-url';
@@ -27,7 +28,7 @@ const supplierFormSchema = z.object({
   title: z.string().trim().min(2).max(160),
   slug: z.string().trim().max(180).optional(),
   summary: z.string().trim().min(10).max(500),
-  description: z.string().trim().min(20),
+  description: z.string().trim().min(20).max(100_000),
   status: z.enum(contentStatusValues).default(ContentStatus.DRAFT),
   coverImageAlt: z.string().trim().max(180).optional(),
   categoryId: z.string().trim().optional(),
@@ -75,14 +76,16 @@ export async function createSupplier(formData: FormData) {
 
       const coverImageId = await resolveCoverImageId({ formData, userId: user.id, onUploadedImageId: (fileId) => { uploadedCoverImageId = fileId; } });
 
-      await persistWithUniqueSlugRetry({
+      const createdSupplier = await persistWithUniqueSlugRetry({
         baseSlug: slug, exists: async (candidate) => Boolean(await prisma.supplier.findFirst({ where: { slug: candidate }, select: { id: true } })),
         persist: (uniqueSlug) => prisma.supplier.create({
-          data: { title: parsed.title, slug: uniqueSlug, summary: parsed.summary, description: parsed.description, status: parsed.status, coverImageId, coverImageAlt: nullableString(parsed.coverImageAlt), categoryId: nullableString(parsed.categoryId), cityId: nullableString(parsed.cityId), companyName: parsed.companyName, websiteUrl: nullableString(websiteUrl), contactLabel: nullableString(parsed.contactLabel), isVerified: parsed.isVerified, serviceArea: nullableString(parsed.serviceArea), createdById: user.id, updatedById: user.id, ...initialPublicationDates(parsed.status) }
+          data: { title: parsed.title, slug: uniqueSlug, summary: parsed.summary, description: parsed.description, status: parsed.status, coverImageId, coverImageAlt: nullableString(parsed.coverImageAlt), categoryId: nullableString(parsed.categoryId), cityId: nullableString(parsed.cityId), companyName: parsed.companyName, websiteUrl: nullableString(websiteUrl), contactLabel: nullableString(parsed.contactLabel), isVerified: parsed.isVerified, serviceArea: nullableString(parsed.serviceArea), createdById: user.id, updatedById: user.id, ...initialPublicationDates(parsed.status) },
+          select: { slug: true }
         })
       });
 
       revalidatePath(ADMIN_SUPPLIERS_PATH);
+      revalidateSupplierPublicPaths(createdSupplier.slug);
       return { type: 'success', message: 'Поставщик создан.' };
     }
   });
@@ -111,23 +114,25 @@ export async function updateSupplier(formData: FormData) {
       const slug = slugify(parsed.slug ?? parsed.title);
       if (!slug) throw new Error('Supplier slug is required.');
 
-      const existingSupplier = await prisma.supplier.findUniqueOrThrow({ where: { id: parsed.supplierId }, select: { coverImageId: true, publishedAt: true } });
+      const existingSupplier = await prisma.supplier.findUniqueOrThrow({ where: { id: parsed.supplierId }, select: { coverImageId: true, publishedAt: true, slug: true } });
       const previousCoverImageId = existingSupplier.coverImageId;
 
       await assertActiveContentRelations({ entityName: 'Supplier', categoryId: parsed.categoryId, categoryType: CategoryType.SUPPLIER, cityId: parsed.cityId });
 
       const coverImageId = await resolveCoverImageId({ formData, userId: user.id, currentCoverImageId: existingSupplier.coverImageId, onUploadedImageId: (fileId) => { uploadedCoverImageId = fileId; } });
 
-      await persistWithUniqueSlugRetry({
+      const updatedSupplier = await persistWithUniqueSlugRetry({
         baseSlug: slug, exists: async (candidate) => Boolean(await prisma.supplier.findFirst({ where: { slug: candidate, id: { not: parsed.supplierId } }, select: { id: true } })),
         persist: (uniqueSlug) => prisma.supplier.update({
-          where: { id: parsed.supplierId }, data: { title: parsed.title, slug: uniqueSlug, summary: parsed.summary, description: parsed.description, status: parsed.status, coverImageId, coverImageAlt: nullableString(parsed.coverImageAlt), categoryId: nullableString(parsed.categoryId), cityId: nullableString(parsed.cityId), companyName: parsed.companyName, websiteUrl: nullableString(websiteUrl), contactLabel: nullableString(parsed.contactLabel), isVerified: parsed.isVerified, serviceArea: nullableString(parsed.serviceArea), updatedById: user.id, ...statusTransitionDates(parsed.status, existingSupplier.publishedAt) }
+          where: { id: parsed.supplierId }, data: { title: parsed.title, slug: uniqueSlug, summary: parsed.summary, description: parsed.description, status: parsed.status, coverImageId, coverImageAlt: nullableString(parsed.coverImageAlt), categoryId: nullableString(parsed.categoryId), cityId: nullableString(parsed.cityId), companyName: parsed.companyName, websiteUrl: nullableString(websiteUrl), contactLabel: nullableString(parsed.contactLabel), isVerified: parsed.isVerified, serviceArea: nullableString(parsed.serviceArea), updatedById: user.id, ...statusTransitionDates(parsed.status, existingSupplier.publishedAt) },
+          select: { slug: true }
         })
       });
 
       if (previousCoverImageId !== coverImageId) await deleteUploadedFileIfUnused(previousCoverImageId);
 
       revalidatePath(ADMIN_SUPPLIERS_PATH);
+      revalidateSupplierPublicPaths(updatedSupplier.slug, existingSupplier.slug);
       return { type: 'success', message: 'Поставщик обновлён.' };
     }
   });
@@ -141,9 +146,12 @@ export async function updateSupplierStatus(formData: FormData) {
     handler: async ({ user }) => {
       const parsed = statusFormSchema.parse({ supplierId: getString(formData, 'supplierId'), status: getString(formData, 'status') });
 
+      const supplier = await prisma.supplier.findUniqueOrThrow({ where: { id: parsed.supplierId }, select: { slug: true } });
+
       await updateContentStatus({ status: parsed.status, userId: user.id, findCurrent: (tx) => tx.supplier.findUniqueOrThrow({ where: { id: parsed.supplierId }, select: { publishedAt: true } }), update: (tx, data) => tx.supplier.update({ where: { id: parsed.supplierId }, data }) });
 
       revalidatePath(ADMIN_SUPPLIERS_PATH);
+      revalidateSupplierPublicPaths(supplier.slug);
       return { type: 'success', message: 'Статус поставщика обновлён.' };
     }
   });

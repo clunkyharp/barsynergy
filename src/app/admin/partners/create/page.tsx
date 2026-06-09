@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
+import { MarkdownEditor } from '@/components/admin/markdown-editor';
 import { Textarea } from '@/components/ui/textarea';
 import { PUBLICATION_STATUS_HINT, contentStatusLabels, partnerTypeOptions } from '@/lib/admin/content-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
@@ -104,7 +105,7 @@ export default async function AdminCreatePartnerPage() {
               <Textarea id="partner-summary" name="summary" required minLength={10} maxLength={500} />
             </FormField>
             <FormField htmlFor="partner-description" label="Описание">
-              <Textarea id="partner-description" name="description" required minLength={20} className="min-h-64" />
+              <MarkdownEditor id="partner-description" name="description" required minLength={20} maxLength={100_000} className="min-h-64" />
             </FormField>
           </div>
         </AdminCmsSection>

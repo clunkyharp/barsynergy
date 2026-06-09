@@ -3,7 +3,6 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import process from 'node:process';
 import test from 'node:test';
-import { readGlobalStyles } from './helpers/global-styles.mjs';
 
 const repoRoot = process.cwd();
 
@@ -32,20 +31,19 @@ test('public login keeps a minimal credential form without role selection', () =
 
 test('public login has mobile, loading, error and request-sent state hooks', () => {
   const pageSource = readProjectFile('src/app/auth/login/page.tsx');
-  const cssSource = readGlobalStyles();
 
   assert.match(pageSource, /auth-login-screen/);
   assert.match(pageSource, /w-\[176px\] md:w-\[198px\]/);
   assert.match(pageSource, /import \{ ArrowLeft \} from 'lucide-react'/);
-  assert.match(pageSource, /className="auth-login-back rounded-\[var\(--radius-md\)\] px-4" href="\/" size="sm" variant="secondary"/);
+  assert.match(pageSource, /Вернуться на сайт/);
   assert.match(pageSource, /auth-login-submit/);
   assert.match(pageSource, /pendingText="Входим…"/);
-  assert.match(pageSource, /auth-access-notice/);
-  assert.match(pageSource, /data-state=\{sent \? 'sent' : 'idle'\}/);
-  assert.match(cssSource, /@media \(max-width: 360px\)/);
-  assert.match(cssSource, /\.auth-login-logo img \{\n {4}width: 156px;/);
-  assert.match(cssSource, /\.auth-login-submit\[aria-busy="true"\]/);
-  assert.match(cssSource, /\.auth-access-notice\[data-state="sent"\]/);
+  assert.match(pageSource, /InlineAlert/);
+  assert.match(pageSource, /business-request-created/);
+  assert.match(pageSource, /logged-out/);
+  assert.match(pageSource, /password-reset/);
+  assert.match(pageSource, /formError/);
+  assert.match(pageSource, /topSuccess/);
 });
 
 test('admin login uses the same custom validation contract', () => {

@@ -126,7 +126,7 @@ export async function getPublishedPartners(params: PublicContentSearchParams = {
     },
     (ids) =>
       prisma.partner.findMany({
-        where: { id: { in: ids } },
+        where: { id: { in: ids }, status: ContentStatus.PUBLISHED },
         include: {
           category: { select: { name: true } },
           coverImage: { select: { fileKey: true, bucket: true, visibility: true } }

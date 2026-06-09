@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import { ArrowLeft, ArrowUpRight } from 'lucide-react';
 import { PublicBodyText, PublicDisplayTitle, PublicEyebrow } from '@/components/public/public-primitives';
+import { RichTextContent } from '@/components/public/rich-text-content';
 import { Button } from '@/components/ui/button';
 import { InlineLink } from '@/components/ui/inline-link';
 import { MetaChip } from '@/components/ui/meta-chip';
@@ -36,8 +37,10 @@ export function PublicContentDetailPage({
   actionsBottomSlot
 }: PublicContentDetailPageProps) {
   const rawParagraphs = paragraphsFromBody(body);
-  const paragraphs =
+  const dedupParagraphs =
     rawParagraphs.length > 0 && normalizeText(rawParagraphs[0]) === normalizeText(summary) ? rawParagraphs.slice(1) : rawParagraphs;
+  const effectiveBody = dedupParagraphs.length < rawParagraphs.length ? dedupParagraphs.join('\n\n') : body ?? '';
+  const hasEffectiveBody = dedupParagraphs.length > 0;
   const image = normalizeImage(imageUrl, title) ?? fallbackImage(backHref, title);
   const detailKind = detailKindFromBackHref(backHref);
   const copy = detailCopy(detailKind);
@@ -149,18 +152,9 @@ export function PublicContentDetailPage({
           <div className="order-1 xl:order-2">
             <div className="mx-auto max-w-3xl">
               <PublicEyebrow tone="muted">{copy.bodyLabel}</PublicEyebrow>
-              {paragraphs.length > 0 ? (
-                <div className="mt-8 grid gap-5">
-                  {paragraphs.map((paragraph) => (
-                    <PublicBodyText
-                      className="max-w-none text-[15px] leading-8 text-[var(--text)] md:text-base"
-                      key={paragraph}
-                      size="md"
-                      tone="default"
-                    >
-                      {paragraph}
-                    </PublicBodyText>
-                  ))}
+              {hasEffectiveBody ? (
+                <div className="mt-8">
+                  <RichTextContent markdown={effectiveBody} />
                 </div>
               ) : (
                 <PublicBodyText className="mt-8 max-w-none text-[var(--text)]" size="md" tone="default">

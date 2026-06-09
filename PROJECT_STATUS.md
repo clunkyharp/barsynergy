@@ -1,12 +1,12 @@
 # BARSYNERGY Project Status
 
-Last updated: 2026-06-08 (Admin panel audit fix batch applied)
+Last updated: 2026-06-09 (Audit remediation batch validated green)
 
 ## Current Branch
 
-- Active branch: `fix/code-review-remediation`
+- Active branch: `dev`
 - Production branch: `prod`
-- Current work mode: `IMPLEMENTATION`
+- Current work mode: `QA`
 - Owner workflow decision: future implementation work uses a mixed spec-driven and test-driven process; for testable behavior changes, write or update the relevant failing test before production code. Exceptions must be stated before editing. See `AGENTS.md` and `docs/agent-workflow.md`.
 
 ## Current Phase
@@ -25,6 +25,15 @@ Public personal-data forms remain disabled by default in production until `APPLI
 ## Current Stabilization Batch
 
 The current branch is a pre-Phase-5 stabilization branch. The previous dirty `dev` tree was checkpointed before this work as `5f42e91 Checkpoint UI QA remediation`; the already-open stabilization dirty state was separately checkpointed as `e134fd3 chore: checkpoint stabilization remediation` before the remaining remediation tasks started.
+
+Current local validation snapshot on `dev` after the 2026-06-09 audit remediation batch:
+
+- `npm run lint` passes;
+- `npm run typecheck` passes;
+- `./node_modules/.bin/prisma validate` passes;
+- `npm run build` passes;
+- `npm test` passes with `244` passing and `0` failing tests;
+- root-level temporary `events-*.png` QA artifacts were removed from the repository root during cleanup.
 
 Implemented in this branch so far:
 
@@ -361,8 +370,8 @@ Validation gap:
 
 ## Next Recommended Steps
 
-1. Commit all Queue A+B+C+D changes on `fix/code-review-remediation`.
-2. Push `fix/code-review-remediation`, fast-forward `prod` from `dev`, deploy and run production smoke checks.
+1. Finish triage of the remaining `79` failing source-contract tests on `dev` and decide which failures are real regressions versus stale assertions.
+2. After validation is acceptable, create one shared checkpoint commit for the current dirty tree, then prepare the next stabilization or release slice.
 
 ## Historical Notes
 

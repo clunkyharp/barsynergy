@@ -1,3 +1,5 @@
+'use client';
+
 import {
   ContactChannelFieldset,
   HiddenUtmFields,
@@ -22,6 +24,8 @@ import {
   consultingExpertOptions,
   consultingProjectStageOptions
 } from '@/lib/applications/b2b-request-options';
+import { useRef } from 'react';
+import { useFormDraftAutoSave } from '@/lib/hooks/use-form-draft';
 
 type ConsultingRequestFormProps = PublicApplicationFormProps & {
   direct?: boolean;
@@ -29,6 +33,9 @@ type ConsultingRequestFormProps = PublicApplicationFormProps & {
 };
 
 export function ConsultingRequestForm({ enabled, result, utm, cities, defaults = {}, direct = false, action }: ConsultingRequestFormProps) {
+  const formRef = useRef<HTMLFormElement>(null);
+  useFormDraftAutoSave('consulting-request', formRef);
+
   return (
     <PublicApplicationSection
       eyebrow="Консалтинг / Заявка"
@@ -45,7 +52,7 @@ export function ConsultingRequestForm({ enabled, result, utm, cities, defaults =
       result={result}
       sectionId="consulting-request"
     >
-      <form action={action} className="editorial-form-shell public-form-shell" noValidate>
+      <form action={action} className="editorial-form-shell public-form-shell" noValidate ref={formRef}>
         <PublicFormValidation />
         <HiddenUtmFields utm={utm} />
         <HoneypotField id="consulting-request-website" />

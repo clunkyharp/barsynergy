@@ -11,12 +11,13 @@ function readProjectFile(path) {
 }
 
 test('admin list pages share status tabs and compact filters', () => {
-  const controlsSource = readProjectFile('src/components/admin/content-admin-controls.tsx');
+  const controlsSource = readProjectFile('src/components/admin/content-admin-controls-filters.tsx');
   const articlesSource = readProjectFile('src/app/admin/articles/page.tsx');
   const eventsSource = readProjectFile('src/app/admin/events/page.tsx');
   const suppliersSource = readProjectFile('src/app/admin/suppliers/page.tsx');
   const applicationsSource = readProjectFile('src/app/admin/applications/page.tsx');
 
+  assert.match(controlsSource, /export function AdminFilterBar/);
   assert.match(controlsSource, /export function AdminStatusTabs/);
   assert.match(controlsSource, /export function AdminContentStatusTabs/);
   assert.match(controlsSource, /className=\{cn\('admin-status-tab', item\.current && 'admin-filter-active'\)\}/);

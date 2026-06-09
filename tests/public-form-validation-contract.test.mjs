@@ -13,8 +13,9 @@ function readProjectFile(path) {
 test('public form validation does not show required-field errors on first blur', () => {
   const source = readProjectFile('src/components/public/public-form-validation.tsx');
 
-  assert.match(source, /const submittedFlag = 'publicValidationSubmitted'/);
+  assert.match(source, /export function validatePublicForm\(form: HTMLFormElement/);
+  assert.match(source, /form\.dataset\.publicValidationSubmitted = 'true';/);
   assert.match(source, /function hasSubmittedAttempt\(\)/);
   assert.match(source, /if \(!hasSubmittedAttempt\(\) && !event\.target\.dataset\.publicValidationActive\) \{\s*return;\s*\}/);
-  assert.match(source, /function validateForm\(\) \{\s*markSubmittedAttempt\(\);/);
+  assert.match(source, /function validateForm\(\) \{\s*const valid = validatePublicForm\(formElement\);/);
 });

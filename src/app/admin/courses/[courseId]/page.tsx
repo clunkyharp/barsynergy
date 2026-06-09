@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
+import { MarkdownEditor } from '@/components/admin/markdown-editor';
 import { Textarea } from '@/components/ui/textarea';
 import {
   PUBLICATION_STATUS_HINT,
@@ -167,7 +168,7 @@ export default async function AdminEditCoursePage({ params }: AdminEditCoursePag
               <Textarea id="course-summary" name="summary" required minLength={10} maxLength={500} defaultValue={course.summary} />
             </FormField>
             <FormField htmlFor="course-program" label="Программа">
-              <Textarea id="course-program" name="program" required minLength={20} className="min-h-64" defaultValue={course.program} />
+              <MarkdownEditor id="course-program" name="program" required minLength={20} maxLength={100_000} className="min-h-64" defaultValue={course.program} />
             </FormField>
           </div>
         </AdminCmsSection>

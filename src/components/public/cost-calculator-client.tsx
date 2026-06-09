@@ -138,7 +138,8 @@ function PricingModeFields({
           <FormField
             error={foodCostError ?? undefined}
             htmlFor="calculatorFoodCost"
-            label="Доля себестоимости, %"
+            hint="Если себестоимость занимает 30% от цены, оставьте 30."
+            label="Целевая доля себестоимости, %"
           >
             <Input
               aria-invalid={foodCostError ? true : undefined}
@@ -150,24 +151,34 @@ function PricingModeFields({
               value={foodCostPercent}
             />
           </FormField>
-          <FormField
-            error={salePriceError ?? undefined}
-            htmlFor="calculatorSalePrice"
-            label="Своя цена продажи"
-            hint={isManualMode ? undefined : 'Переключитесь в режим «Проверить цену», чтобы ввести свою цену.'}
-          >
-            <Input
-              aria-invalid={salePriceError ? true : undefined}
-              className="h-11 text-sm font-semibold tabular-nums"
-              disabled={!isManualMode}
-              id="calculatorSalePrice"
-              inputMode="decimal"
-              maxLength={12}
-              onChange={(event) => onSalePriceChange(event.target.value)}
-              placeholder={canShowRecommendedPrice ? decimal(recommendedPrice) : '190'}
-              value={salePrice}
-            />
-          </FormField>
+          <div>
+            <FormField
+              error={salePriceError ?? undefined}
+              htmlFor="calculatorSalePrice"
+              label="Своя цена продажи"
+            >
+              <Input
+                aria-describedby={!isManualMode ? 'calculatorSalePrice-hint' : undefined}
+                aria-invalid={salePriceError ? true : undefined}
+                className="h-11 text-sm font-semibold tabular-nums"
+                disabled={!isManualMode}
+                id="calculatorSalePrice"
+                inputMode="decimal"
+                maxLength={12}
+                onChange={(event) => onSalePriceChange(event.target.value)}
+                placeholder={canShowRecommendedPrice ? decimal(recommendedPrice) : '190'}
+                value={salePrice}
+              />
+            </FormField>
+            {/* Always rendered to reserve height — visibility:hidden keeps layout stable */}
+            <p
+              aria-hidden={isManualMode || undefined}
+              className={`field-hint mt-[0.55rem]${isManualMode ? ' invisible' : ''}`}
+              id="calculatorSalePrice-hint"
+            >
+              Если хотите задать цену вручную, переключитесь в режим «Проверить цену».
+            </p>
+          </div>
         </div>
       </section>
     </div>

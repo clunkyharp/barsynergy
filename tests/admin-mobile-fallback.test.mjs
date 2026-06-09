@@ -14,11 +14,12 @@ test('admin layout exposes a sub-desktop unsupported state and hides the work ar
   assert.match(source, /Нужен широкий экран/);
   assert.match(source, /экран[а-яА-ЯёЁ\s]*от 1024px/);
   assert.match(source, /lg:hidden/);
-  assert.match(source, /<AdminShellFrame email=\{user\.email\} role=\{user\.role\}>/);
+  assert.match(source, /<AdminShellFrame email=\{user\.email\} logoutAction=\{logoutAction\} role=\{user\.role\}>/);
 
   const shellFrameSource = readFileSync(adminShellFramePath, 'utf8');
 
   assert.match(shellFrameSource, /admin-layout-grid hidden min-h-screen lg:grid/);
+  assert.match(shellFrameSource, /useState\(\s*\(\) => typeof window !== 'undefined' && window\.localStorage\.getItem\(sidebarStorageKey\) === 'true'/);
   assert.match(shellFrameSource, /data-sidebar-state=\{isCollapsed \? 'collapsed' : 'expanded'\}/);
-  assert.match(shellFrameSource, /<AdminHeader email=\{email\} role=\{role\} \/>/);
+  assert.match(shellFrameSource, /<AdminHeader email=\{email\} logoutAction=\{logoutAction\} role=\{role\} \/>/);
 });

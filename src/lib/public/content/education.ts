@@ -125,7 +125,7 @@ export async function getPublishedCourses(params: PublicContentSearchParams = {}
     },
     (ids) =>
       prisma.course.findMany({
-        where: { id: { in: ids } },
+        where: { id: { in: ids }, status: ContentStatus.PUBLISHED },
         include: {
           category: { select: { name: true } },
           city: { select: { name: true } },
@@ -154,6 +154,7 @@ export async function getPublishedCourses(params: PublicContentSearchParams = {}
         course.priceLabel
       ].filter(Boolean) as string[],
       metaGroups: [
+        course.instructorName ? { label: 'Преподаватель', value: course.instructorName } : undefined,
         course.format ? { label: 'Формат', value: getAdminOptionLabel(courseFormatOptions, course.format) } : undefined,
         course.level ? { label: 'Уровень', value: getAdminOptionLabel(courseLevelOptions, course.level) } : undefined,
         course.durationLabel ? { label: 'Длительность', value: course.durationLabel } : undefined,

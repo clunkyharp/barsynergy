@@ -17,6 +17,7 @@ import {
   statusTransitionDates
 } from '@/lib/admin/content-utils';
 import { deleteContentDraft, updateContentStatus } from '@/lib/admin/content-lifecycle';
+import { revalidateVacancyPublicPaths } from '@/lib/admin/public-content-revalidation';
 import { prisma } from '@/lib/db/prisma';
 import { vacancyPositionValues } from '@/lib/vacancies/positions';
 import { withAdminAction } from '@/lib/server-action-wrappers';
@@ -27,7 +28,7 @@ const vacancyFormSchema = z.object({
   title: z.string().trim().min(2).max(160),
   slug: z.string().trim().max(180).optional(),
   summary: z.string().trim().min(10).max(500),
-  description: z.string().trim().min(20),
+  description: z.string().trim().min(20).max(100_000),
   status: z.enum(contentStatusValues).default(ContentStatus.DRAFT),
   coverImageAlt: z.string().trim().max(180).optional(),
   categoryId: z.string().trim().optional(),
@@ -97,7 +98,7 @@ export async function createVacancy(formData: FormData) {
         }
       });
 
-      await persistWithUniqueSlugRetry({
+      const createdVacancy = await persistWithUniqueSlugRetry({
         baseSlug: slug,
         exists: async (candidate) =>
           Boolean(
@@ -128,11 +129,13 @@ export async function createVacancy(formData: FormData) {
               createdById: user.id,
               updatedById: user.id,
               ...initialPublicationDates(parsed.status)
-            }
+            },
+            select: { slug: true }
           })
       });
 
       revalidatePath(ADMIN_VACANCIES_PATH);
+      revalidateVacancyPublicPaths(createdVacancy.slug);
       return { type: 'success', message: 'Вакансия создана.' };
     }
   });
@@ -177,7 +180,7 @@ export async function updateVacancy(formData: FormData) {
 
       const existingVacancy = await prisma.vacancy.findUniqueOrThrow({
         where: { id: parsed.vacancyId },
-        select: { coverImageId: true, publishedAt: true }
+        select: { coverImageId: true, publishedAt: true, slug: true }
       });
       const previousCoverImageId = existingVacancy.coverImageId;
 
@@ -197,7 +200,7 @@ export async function updateVacancy(formData: FormData) {
         }
       });
 
-      await persistWithUniqueSlugRetry({
+      const updatedVacancy = await persistWithUniqueSlugRetry({
         baseSlug: slug,
         exists: async (candidate) =>
           Boolean(
@@ -228,7 +231,8 @@ export async function updateVacancy(formData: FormData) {
               businessAccountId: nullableString(parsed.businessAccountId),
               updatedById: user.id,
               ...statusTransitionDates(parsed.status, existingVacancy.publishedAt)
-            }
+            },
+            select: { slug: true }
           })
       });
 
@@ -237,6 +241,7 @@ export async function updateVacancy(formData: FormData) {
       }
 
       revalidatePath(ADMIN_VACANCIES_PATH);
+      revalidateVacancyPublicPaths(updatedVacancy.slug, existingVacancy.slug);
       return { type: 'success', message: 'Вакансия обновлена.' };
     }
   });
@@ -251,6 +256,11 @@ export async function updateVacancyStatus(formData: FormData) {
       const parsed = statusFormSchema.parse({
         vacancyId: getString(formData, 'vacancyId'),
         status: getString(formData, 'status')
+      });
+
+      const vacancy = await prisma.vacancy.findUniqueOrThrow({
+        where: { id: parsed.vacancyId },
+        select: { slug: true }
       });
 
       await updateContentStatus({
@@ -269,6 +279,7 @@ export async function updateVacancyStatus(formData: FormData) {
       });
 
       revalidatePath(ADMIN_VACANCIES_PATH);
+      revalidateVacancyPublicPaths(vacancy.slug);
       return { type: 'success', message: 'Статус вакансии обновлён.' };
     }
   });

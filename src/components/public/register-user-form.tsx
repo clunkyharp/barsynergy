@@ -5,6 +5,7 @@ import { ConsentField } from '@/components/ui/consent-field';
 import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
 import { InlineLink } from '@/components/ui/inline-link';
+import { PasswordInput } from '@/components/ui/password-input';
 import { PasswordPairValidation } from '@/components/ui/password-pair-validation';
 import { SubmitButton } from '@/components/ui/submit-button';
 import { Turnstile } from '@/components/ui/turnstile';
@@ -52,10 +53,9 @@ export function RegisterUserForm({
         />
       </FormField>
       <FormField htmlFor="new-password" hint="Минимум 8 символов" label="Пароль" >
-        <Input
+        <PasswordInput
           id="new-password"
           name="password"
-          type="password"
           autoComplete="new-password"
           placeholder="Минимум 8 символов"
           required
@@ -64,10 +64,9 @@ export function RegisterUserForm({
         />
       </FormField>
       <FormField htmlFor="confirm-password" label="Подтверждение пароля" >
-        <Input
+        <PasswordInput
           id="confirm-password"
           name="confirmPassword"
-          type="password"
           autoComplete="new-password"
           placeholder="Повторите пароль"
           required

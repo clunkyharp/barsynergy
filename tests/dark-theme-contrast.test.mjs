@@ -22,9 +22,9 @@ test('dark public form shells use tokenized inverse and card surfaces', () => {
   assert.match(css, /background: var\(--surface-card\);/);
   assert.match(css, /:root\[data-theme="dark"\] \.editorial-form-shell\.public-form-shell \{/);
   assert.match(publicPrimitives, /tone === 'inverse' && 'text-white\/85'/);
-  assert.match(consultingForm, /bg-\[var\(--surface-inverse\)\]/);
-  assert.match(businessForm, /bg-\[var\(--surface-inverse\)\]/);
-  assert.doesNotMatch(consultingForm, /bg-\[#171311\]/);
+  assert.match(consultingForm, /bg-\[var\(--editorial-dark-surface\)\]/);
+  assert.match(businessForm, /bg-\[var\(--editorial-dark-surface\)\]/);
+  assert.doesNotMatch(`${businessForm}\n${consultingForm}\n${partnerForm}`, /bg-\[#171311\]/);
   assert.doesNotMatch(`${businessForm}\n${consultingForm}\n${partnerForm}`, /text-white\/7[0-9]/);
 });
 

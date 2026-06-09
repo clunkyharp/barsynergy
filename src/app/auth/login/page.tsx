@@ -1,17 +1,16 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
-import { ArrowLeft, Check } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { loginAction } from '@/app/auth/actions';
 import { AppLink } from '@/components/ui/app-link';
 import { Button } from '@/components/ui/button';
 import { InlineAlert } from '@/components/ui/inline-alert';
 import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
+import { PasswordInput } from '@/components/ui/password-input';
 import { SubmitButton } from '@/components/ui/submit-button';
 import { PublicFormValidation } from '@/components/public/public-form-validation';
-import { accentFont } from '@/lib/fonts';
 import { buildPrivatePageMetadata } from '@/lib/public/metadata';
-import { cn } from '@/lib/utils';
 
 const errorMessages: Record<string, string> = {
   invalid: 'Неверный email или пароль.',
@@ -51,17 +50,10 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   const topSuccess = success && successMessages[success] ? successMessages[success] : null;
   const formError = error && wasSubmitted && errorMessages[error] ? errorMessages[error] : null;
 
-  const valueProps = [
-    'Обучение, вакансии и инструменты для баров и кофеен СКФО',
-    'Проверенные поставщики и консалтинг под задачи заведений',
-    'Сообщество специалистов и управляющих в регионе'
-  ] as const;
-
   return (
     <div className="auth-login-screen min-h-screen bg-[var(--background)] relative overflow-hidden">
-      <div className="auth-login-container relative container max-w-[1440px] py-6 md:py-8">
-        <div className="md:grid md:grid-cols-[1fr_1fr] md:gap-8 md:items-start">
-          <main className="auth-login-layout mx-auto max-w-[440px] md:mx-0 md:max-w-[460px]">
+      <div className="auth-login-container relative container flex min-h-screen max-w-[1440px] items-center justify-center py-6 md:py-8">
+          <main className="auth-login-layout mx-auto w-full max-w-[440px] md:max-w-[460px]">
             <section className="min-w-0">
               <header className="auth-login-header mb-6 flex flex-wrap items-center gap-4">
                 <AppLink
@@ -113,10 +105,9 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
                     />
                   </FormField>
                   <FormField htmlFor="password" label="Пароль" labelSize="sm">
-                    <Input
+                    <PasswordInput
                       id="password"
                       name="password"
-                      type="password"
                       autoComplete="current-password"
                       placeholder="Введите пароль"
                       required
@@ -151,42 +142,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
               </div>
             </section>
           </main>
-
-          <aside aria-hidden="true" className="auth-login-brand-panel relative hidden overflow-hidden rounded-[var(--radius-xl)] md:block md:sticky md:top-8" style={{ minHeight: 'calc(100vh - 5rem)' }}>
-            <div className="absolute inset-0 bg-[var(--editorial-dark-surface)]" />
-            <div
-              aria-hidden="true"
-              className="pointer-events-none absolute inset-0 z-[1]"
-              style={{
-                background:
-                  'linear-gradient(160deg, rgba(14,11,9,0.88) 0%, rgba(14,11,9,0.55) 45%, rgba(14,11,9,0.28) 100%), linear-gradient(0deg, rgba(14,11,9,0.72) 0%, transparent 55%), radial-gradient(circle at 65% 20%, rgba(200,132,42,0.22), transparent 22rem)'
-              }}
-            />
-            <Image
-              alt=""
-              className="absolute inset-0 z-0 object-cover object-[center_45%] saturate-[0.85]"
-              fill
-              priority
-              sizes="50vw"
-              src="/images/home/hero-bar-counter-bundo.jpg"
-            />
-            <div className="relative z-[2] flex h-full flex-col justify-end px-8 pb-14 pt-16" style={{ minHeight: 'calc(100vh - 5rem)' }}>
-              <h2 className={`${cn(accentFont.className)} text-[2.8rem] font-semibold leading-[1.02] text-[var(--editorial-dark-text)]`}>
-                Платформа для<br />баров СКФО
-              </h2>
-              <ul className="mt-8 space-y-5">
-                {valueProps.map((prop) => (
-                  <li className="flex items-start gap-3 text-sm leading-6 text-[var(--editorial-dark-muted)]" key={prop}>
-                    <Check className="mt-0.5 shrink-0 text-[var(--accent)]" size={16} strokeWidth={2.5} />
-                    {prop}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </aside>
-        </div>
       </div>
     </div>
   );
 }
-

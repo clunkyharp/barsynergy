@@ -37,12 +37,15 @@ const guardedActionFiles = [
 test('high-risk server action files call same-origin guard', () => {
   for (const file of guardedActionFiles) {
     const source = readFileSync(file, 'utf8');
-    const exportCount = [...source.matchAll(/export async function /g)].length;
+    const exportCount =
+      [...source.matchAll(/export async function /g)].length +
+      [...source.matchAll(/export const [A-Za-z0-9_]+\s*=\s*async\s*\(/g)].length;
     const guardedMutationCount =
       [...source.matchAll(/await assertSameOriginServerAction\(\)/g)].length +
-      [...source.matchAll(/submitPublicApplicationAction\(/g)].length;
+      [...source.matchAll(/submitPublicApplicationAction\(/g)].length +
+      [...source.matchAll(/withAdminAction\(/g)].length;
 
-    assert.match(source, /assertSameOriginServerAction|submitPublicApplicationAction/);
+    assert.match(source, /assertSameOriginServerAction|submitPublicApplicationAction|withAdminAction/);
     assert.equal(
       guardedMutationCount,
       exportCount,

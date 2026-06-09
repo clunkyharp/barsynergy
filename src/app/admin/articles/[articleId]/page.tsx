@@ -8,6 +8,7 @@ import { CheckboxField } from '@/components/ui/checkbox-field';
 import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
+import { MarkdownEditor } from '@/components/admin/markdown-editor';
 import { Textarea } from '@/components/ui/textarea';
 import { PUBLICATION_STATUS_HINT, contentStatusLabels, type AdminContentSearchParams } from '@/lib/admin/content-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
@@ -16,7 +17,7 @@ import { prisma } from '@/modules/admin/queries';
 export const dynamic = 'force-dynamic';
 
 const ADMIN_ARTICLES_PATH = '/admin/articles';
-const ARTICLE_BODY_MAX_LENGTH = 20_000;
+const ARTICLE_BODY_MAX_LENGTH = 100_000;
 
 type AdminArticleDetailPageProps = {
   params: Promise<{ articleId: string }>;
@@ -198,7 +199,7 @@ export default async function AdminArticleDetailPage({ params, searchParams }: A
               <Textarea id="article-summary" name="summary" required minLength={10} maxLength={500} defaultValue={article.summary} />
             </FormField>
             <FormField htmlFor="article-body" label="Текст">
-              <Textarea
+              <MarkdownEditor
                 id="article-body"
                 name="body"
                 required

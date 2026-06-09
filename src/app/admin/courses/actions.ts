@@ -17,6 +17,7 @@ import {
   statusTransitionDates
 } from '@/lib/admin/content-utils';
 import { deleteContentDraft, updateContentStatus } from '@/lib/admin/content-lifecycle';
+import { revalidateCoursePublicPaths } from '@/lib/admin/public-content-revalidation';
 import { prisma } from '@/lib/db/prisma';
 import { withAdminAction } from '@/lib/server-action-wrappers';
 
@@ -26,7 +27,7 @@ const courseFormSchema = z.object({
   title: z.string().trim().min(2).max(160),
   slug: z.string().trim().max(180).optional(),
   summary: z.string().trim().min(10).max(500),
-  program: z.string().trim().min(20),
+  program: z.string().trim().min(20).max(100_000),
   status: z.enum(contentStatusValues).default(ContentStatus.DRAFT),
   coverImageAlt: z.string().trim().max(180).optional(),
   categoryId: z.string().trim().optional(),
@@ -73,14 +74,16 @@ export async function createCourse(formData: FormData) {
 
       const coverImageId = await resolveCoverImageId({ formData, userId: user.id, onUploadedImageId: (fileId) => { uploadedCoverImageId = fileId; } });
 
-      await persistWithUniqueSlugRetry({
+      const createdCourse = await persistWithUniqueSlugRetry({
         baseSlug: slug, exists: async (candidate) => Boolean(await prisma.course.findFirst({ where: { slug: candidate }, select: { id: true } })),
         persist: (uniqueSlug) => prisma.course.create({
-          data: { title: parsed.title, slug: uniqueSlug, summary: parsed.summary, program: parsed.program, status: parsed.status, coverImageId, coverImageAlt: nullableString(parsed.coverImageAlt), categoryId: nullableString(parsed.categoryId), cityId: nullableString(parsed.cityId), format: nullableString(parsed.format), durationLabel: nullableString(parsed.durationLabel), level: nullableString(parsed.level), priceLabel: nullableString(parsed.priceLabel), instructorName: nullableString(parsed.instructorName), createdById: user.id, updatedById: user.id, ...initialPublicationDates(parsed.status) }
+          data: { title: parsed.title, slug: uniqueSlug, summary: parsed.summary, program: parsed.program, status: parsed.status, coverImageId, coverImageAlt: nullableString(parsed.coverImageAlt), categoryId: nullableString(parsed.categoryId), cityId: nullableString(parsed.cityId), format: nullableString(parsed.format), durationLabel: nullableString(parsed.durationLabel), level: nullableString(parsed.level), priceLabel: nullableString(parsed.priceLabel), instructorName: nullableString(parsed.instructorName), createdById: user.id, updatedById: user.id, ...initialPublicationDates(parsed.status) },
+          select: { slug: true }
         })
       });
 
       revalidatePath(ADMIN_COURSES_PATH);
+      revalidateCoursePublicPaths(createdCourse.slug);
       return { type: 'success', message: 'Курс создан.' };
     }
   });
@@ -108,23 +111,25 @@ export async function updateCourse(formData: FormData) {
       const slug = slugify(parsed.slug ?? parsed.title);
       if (!slug) throw new Error('Course slug is required.');
 
-      const existingCourse = await prisma.course.findUniqueOrThrow({ where: { id: parsed.courseId }, select: { coverImageId: true, publishedAt: true } });
+      const existingCourse = await prisma.course.findUniqueOrThrow({ where: { id: parsed.courseId }, select: { coverImageId: true, publishedAt: true, slug: true } });
       const previousCoverImageId = existingCourse.coverImageId;
 
       await assertActiveContentRelations({ entityName: 'Course', categoryId: parsed.categoryId, categoryType: CategoryType.COURSE, cityId: parsed.cityId });
 
       const coverImageId = await resolveCoverImageId({ formData, userId: user.id, currentCoverImageId: existingCourse.coverImageId, onUploadedImageId: (fileId) => { uploadedCoverImageId = fileId; } });
 
-      await persistWithUniqueSlugRetry({
+      const updatedCourse = await persistWithUniqueSlugRetry({
         baseSlug: slug, exists: async (candidate) => Boolean(await prisma.course.findFirst({ where: { slug: candidate, id: { not: parsed.courseId } }, select: { id: true } })),
         persist: (uniqueSlug) => prisma.course.update({
-          where: { id: parsed.courseId }, data: { title: parsed.title, slug: uniqueSlug, summary: parsed.summary, program: parsed.program, status: parsed.status, coverImageId, coverImageAlt: nullableString(parsed.coverImageAlt), categoryId: nullableString(parsed.categoryId), cityId: nullableString(parsed.cityId), format: nullableString(parsed.format), durationLabel: nullableString(parsed.durationLabel), level: nullableString(parsed.level), priceLabel: nullableString(parsed.priceLabel), instructorName: nullableString(parsed.instructorName), updatedById: user.id, ...statusTransitionDates(parsed.status, existingCourse.publishedAt) }
+          where: { id: parsed.courseId }, data: { title: parsed.title, slug: uniqueSlug, summary: parsed.summary, program: parsed.program, status: parsed.status, coverImageId, coverImageAlt: nullableString(parsed.coverImageAlt), categoryId: nullableString(parsed.categoryId), cityId: nullableString(parsed.cityId), format: nullableString(parsed.format), durationLabel: nullableString(parsed.durationLabel), level: nullableString(parsed.level), priceLabel: nullableString(parsed.priceLabel), instructorName: nullableString(parsed.instructorName), updatedById: user.id, ...statusTransitionDates(parsed.status, existingCourse.publishedAt) },
+          select: { slug: true }
         })
       });
 
       if (previousCoverImageId !== coverImageId) await deleteUploadedFileIfUnused(previousCoverImageId);
 
       revalidatePath(ADMIN_COURSES_PATH);
+      revalidateCoursePublicPaths(updatedCourse.slug, existingCourse.slug);
       return { type: 'success', message: 'Курс обновлён.' };
     }
   });
@@ -138,9 +143,12 @@ export async function updateCourseStatus(formData: FormData) {
     handler: async ({ user }) => {
       const parsed = statusFormSchema.parse({ courseId: getString(formData, 'courseId'), status: getString(formData, 'status') });
 
+      const course = await prisma.course.findUniqueOrThrow({ where: { id: parsed.courseId }, select: { slug: true } });
+
       await updateContentStatus({ status: parsed.status, userId: user.id, findCurrent: (tx) => tx.course.findUniqueOrThrow({ where: { id: parsed.courseId }, select: { publishedAt: true } }), update: (tx, data) => tx.course.update({ where: { id: parsed.courseId }, data }) });
 
       revalidatePath(ADMIN_COURSES_PATH);
+      revalidateCoursePublicPaths(course.slug);
       return { type: 'success', message: 'Статус курса обновлён.' };
     }
   });

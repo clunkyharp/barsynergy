@@ -83,6 +83,8 @@ export async function getPublishedArticles(params: PublicContentSearchParams = {
   const page = getPage(params);
   const pageSize = getPageSize(params);
   const q = optionalParam(params, 'q');
+  const sort = optionalParam(params, 'sort');
+  const publishedAtOrder = sort === 'oldest' ? ('asc' as const) : ('desc' as const);
   const baseWhere: Prisma.ArticleWhereInput = {
     status: ContentStatus.PUBLISHED,
     category: optionalParam(params, 'category') ? { slug: optionalParam(params, 'category'), type: CategoryType.ARTICLE } : undefined,
@@ -98,7 +100,7 @@ export async function getPublishedArticles(params: PublicContentSearchParams = {
     pageSize,
     ({ idsOnly }) => {
       const selectIdAndTitle = { id: true, title: true } as const;
-      const orderBy = [{ sortOrder: 'asc' as const }, { publishedAt: 'desc' as const }, { createdAt: 'desc' as const }];
+      const orderBy = [{ sortOrder: 'asc' as const }, { publishedAt: publishedAtOrder }, { createdAt: 'desc' as const }];
       const articleSearchFields = (q: string): Prisma.ArticleWhereInput[] => [
         { title: { contains: q, mode: 'insensitive' as const } },
         { summary: { contains: q, mode: 'insensitive' as const } }
@@ -158,7 +160,8 @@ export async function getPublishedArticles(params: PublicContentSearchParams = {
       ].filter(Boolean) as string[],
       dateIso: (article.publishedAt ?? article.createdAt).toISOString(),
       updatedLabel: (article.publishedAt ?? article.createdAt).toLocaleDateString('ru-RU'),
-      imageUrl: publicImageUrl(article.coverImage)
+      imageUrl: publicImageUrl(article.coverImage),
+      authorName: article.authorName ?? undefined
     }))
   });
 }

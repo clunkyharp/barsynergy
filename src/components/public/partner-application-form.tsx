@@ -1,3 +1,5 @@
+'use client';
+
 import {
   ContactChannelFieldset,
   HiddenUtmFields,
@@ -15,8 +17,12 @@ import { MetaChip } from '@/components/ui/meta-chip';
 import { Select } from '@/components/ui/select';
 import { SubmitButton } from '@/components/ui/submit-button';
 import { Textarea } from '@/components/ui/textarea';
+import { useRef } from 'react';
+import { useFormDraftAutoSave } from '@/lib/hooks/use-form-draft';
 
 export function PartnerApplicationForm({ enabled, result, utm, cities, defaults = {}, action }: PublicApplicationFormProps & { action?: (formData: FormData) => void }) {
+  const formRef = useRef<HTMLFormElement>(null);
+  useFormDraftAutoSave('partner-application', formRef);
   const highlights = [
     'Образовательные проекты',
     'События для заведений',
@@ -45,7 +51,7 @@ export function PartnerApplicationForm({ enabled, result, utm, cities, defaults 
       enabled={enabled}
       result={result}
     >
-      <form action={action} className="editorial-form-shell public-form-shell">
+      <form action={action} className="editorial-form-shell public-form-shell" ref={formRef}>
         <HiddenUtmFields utm={utm} />
         <HoneypotField id="partner-application-website" />
         <div className="relative grid lg:grid-cols-[0.42fr_0.58fr]">

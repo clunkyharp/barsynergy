@@ -12,6 +12,7 @@ import { SubmitButton } from '@/components/ui/submit-button';
 import { Textarea } from '@/components/ui/textarea';
 import { Turnstile } from '@/components/ui/turnstile';
 import { PublicFormValidation, validatePublicForm } from '@/components/public/public-form-validation';
+import { useFormDraftAutoSave } from '@/lib/hooks/use-form-draft';
 
 type BusinessRequestFormProps = {
   cities: Array<{ id: string; name: string }>;
@@ -24,6 +25,7 @@ export function BusinessRequestForm({ cities, action }: BusinessRequestFormProps
   const [email, setEmail] = useState('');
   const [contactPerson, setContactPerson] = useState('');
   const [turnstileToken, setTurnstileToken] = useState('');
+  useFormDraftAutoSave('business-request', formRef);
 
   function handleContinue() {
     const form = formRef.current;

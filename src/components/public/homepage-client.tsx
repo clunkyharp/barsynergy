@@ -1,13 +1,13 @@
 import Link from 'next/link';
-import { ArrowUpRight, BookOpen, BriefcaseBusiness, Calculator, GraduationCap, PackageCheck, Users } from 'lucide-react';
+import { ArrowUpRight, BriefcaseBusiness, Calculator, GraduationCap, BookOpen, PackageCheck, Users } from 'lucide-react';
 import { HomeHeroRouter } from './homepage-hero';
-import { HomeEventsStrip, FeaturedNowCard, NowCard } from './homepage-current';
+import { HomeEventsStrip, EditorialFeatured, EditorialSupportCard } from './homepage-current';
 import { CommunityChannelRows } from './homepage-community';
 import { HomeSponsorLogoStrip } from './homepage-sponsors';
 import { HomeCtaFaqSection } from './home-cta-faq-section';
 import { Button } from '@/components/ui/button';
-import { displayFont } from '@/lib/fonts';
-import type { HomepageData } from '@/lib/public/home';
+import { bodyFont, displayFont } from '@/lib/fonts';
+import type { HomepageData, HomepageLiveCard } from '@/lib/public/home';
 
 const platformTools = [
   { href: '/vacancies', label: 'Вакансии', description: 'Открытые позиции в барах и кофейнях СКФО — от бариста до управляющего', icon: BriefcaseBusiness },
@@ -23,29 +23,42 @@ type HomepageClientProps = {
 };
 
 export function HomepageClient({ data }: HomepageClientProps) {
+  const materialsCard: HomepageLiveCard = data.secondaryArticle ?? {
+    kind: 'article',
+    eyebrow: 'Материал',
+    title: 'Материалы',
+    summary: 'Другие материалы',
+    meta: [],
+    href: '/articles',
+    actionLabel: 'Читать',
+    imageUrl: '/images/home/current-event-card.png',
+    isFallback: true
+  };
+
   return (
     <div className="overflow-x-hidden">
       <HomeHeroRouter stats={data.stats} />
 
-      <section className="background-zone background-zone-beige scroll-mt-28 border-b border-[var(--line)] py-14 md:py-20" id="home-fresh">
+      <section className="editorial-current-section scroll-mt-28 border-b border-white/8 py-14 md:py-20" data-theme="dark" id="home-fresh">
         <div className="container">
-          <div className="mb-7 flex flex-wrap items-end justify-between gap-4">
-            <div>
-              <h2 className={`${displayFont.className} text-[2.35rem] font-semibold leading-none text-[var(--text)] md:text-[3.2rem]`}>
-                Актуальное
-              </h2>
-            </div>
-            <Button className="px-0 text-sm tracking-normal" href="/articles" variant="link">
+          <div className="mb-7 flex flex-wrap items-end justify-between gap-4 md:mb-9">
+            <h2 className={`${displayFont.className} text-[2.35rem] font-semibold leading-none text-[var(--editorial-dark-text)] md:text-[3.2rem]`}>
+              Актуальное
+            </h2>
+            <Link
+              className={`${bodyFont.className} inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--editorial-dark-muted)] transition-colors hover:text-[var(--accent)]`}
+              href="/articles"
+            >
               Смотреть всё
-              <ArrowUpRight size={16} />
-            </Button>
+              <ArrowUpRight size={15} strokeWidth={2} />
+            </Link>
           </div>
-          <div className="home-current-layout flex flex-col gap-4">
-            <FeaturedNowCard card={data.article} />
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 [&>a:last-child]:border-b-0 sm:[&>a:last-child]:border-b">
-              <NowCard actionLabel={data.vacancy ? 'Откликнуться' : 'Все вакансии'} card={data.vacancy} href="/vacancies" icon={BriefcaseBusiness} label="Вакансии" />
-              <NowCard actionLabel="Читать" card={data.secondaryArticle} fallbackMeta="Другие материалы" href="/articles" icon={BookOpen} label="Материалы" />
-              <NowCard actionLabel={data.supplier ? 'Открыть' : 'Смотреть поставщиков'} card={data.supplier} href="/suppliers" icon={PackageCheck} label="Поставщики" />
+          <div className="editorial-current-layout flex flex-col gap-5 md:gap-6">
+            <EditorialFeatured card={data.article} />
+            <div className="editorial-current-support-row grid grid-cols-1 gap-4 sm:grid-cols-3 md:gap-5">
+              <EditorialSupportCard actionLabel={data.vacancy ? 'Откликнуться' : 'Все вакансии'} card={data.vacancy} label="Вакансии" />
+              <EditorialSupportCard actionLabel="Читать" card={materialsCard} fallbackMeta="Другие материалы" label="Материалы" />
+              <EditorialSupportCard actionLabel={data.supplier ? 'Открыть' : 'Смотреть поставщиков'} card={data.supplier} label="Поставщики" />
             </div>
           </div>
         </div>
@@ -66,14 +79,14 @@ export function HomepageClient({ data }: HomepageClientProps) {
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 md:gap-4">
             {platformTools.map((tool) => (
               <Link
-                className="group relative flex flex-col gap-4 overflow-hidden rounded-[var(--radius-lg)] border border-[var(--line)] bg-[var(--surface-card)] p-5 transition-[border-color,background-color,box-shadow] duration-[var(--motion-duration-base)] hover:border-[var(--accent)]/50 hover:bg-[var(--surface-card-hover)] hover:shadow-[0_4px_20px_rgba(0,0,0,0.07)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] md:p-6"
+                className="home-section-card group relative flex min-h-[140px] flex-col gap-4 overflow-hidden rounded-[var(--radius-lg)] border border-[var(--line)] bg-[var(--surface-card)] p-5 transition-[border-color,background-color,box-shadow] duration-[var(--motion-duration-base)] hover:border-[var(--accent)]/50 hover:bg-[var(--surface-card-hover)] hover:shadow-[0_4px_20px_rgba(0,0,0,0.07)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] md:p-6"
                 href={tool.href}
                 key={tool.href}
               >
                 <span className="absolute inset-x-0 top-0 h-[3px] rounded-t-[var(--radius-lg)] bg-[var(--accent)] opacity-0 transition-opacity duration-[var(--motion-duration-base)] group-hover:opacity-100" />
                 <span className="flex items-start justify-between gap-2">
-                  <span className="grid h-11 w-11 place-items-center rounded-[var(--radius-md)] bg-[var(--accent-soft)] transition-colors duration-[var(--motion-duration-base)] group-hover:bg-[var(--accent)]/15">
-                    <tool.icon className="text-[var(--accent)]" size={22} strokeWidth={1.5} />
+                  <span className="inline-flex h-11 w-11 items-center justify-center rounded-[var(--radius-sm)] bg-[var(--accent)] text-white transition-colors duration-[var(--motion-duration-base)] group-hover:bg-[var(--accent-strong)]">
+                    <tool.icon size={18} strokeWidth={1.5} />
                   </span>
                   <ArrowUpRight className="mt-1 shrink-0 text-[var(--muted)] transition-[transform,color] duration-[var(--motion-duration-base)] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-[var(--accent)]" size={16} strokeWidth={1.8} />
                 </span>
@@ -126,7 +139,7 @@ export function HomepageClient({ data }: HomepageClientProps) {
                 className="inline-flex min-h-10 items-center gap-2 rounded-[var(--radius-sm)] text-sm font-semibold text-[var(--editorial-dark-muted)] transition hover:text-[var(--editorial-dark-text)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
                 href="/contacts"
               >
-                Написать команде
+                Связаться с нами
                 <ArrowUpRight size={16} strokeWidth={1.8} />
               </Link>
             )}

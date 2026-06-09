@@ -12,19 +12,19 @@ function readProjectFile(path) {
 }
 
 test('homepage featured card keeps metadata only in the top badge row', () => {
-  const source = readProjectFile('src/components/public/homepage-client.tsx');
-  const featuredCardStart = source.indexOf('function FeaturedNowCard');
-  const featuredCardEnd = source.indexOf('function HomeEventsStrip');
+  const source = readProjectFile('src/components/public/homepage-current.tsx');
+  const featuredCardStart = source.indexOf('export function EditorialFeatured');
+  const featuredCardEnd = source.indexOf('export function EditorialSupportCard');
   const featuredCardSource = source.slice(featuredCardStart, featuredCardEnd);
 
   assert.match(source, /function getVisibleFeaturedMeta\(card: HomepageLiveCard\)/);
   assert.match(source, /const hiddenMeta = new Set\(\['Открытый доступ', card\.eyebrow\]\.map\(normalizedMetaKey\)\)/);
   assert.match(source, /seenMeta\.has\(key\)/);
   assert.match(featuredCardSource, /const visibleMeta = getVisibleFeaturedMeta\(card\)/);
-  assert.match(featuredCardSource, /featured-now-card/);
-  assert.match(featuredCardSource, /featured-now-meta-row/);
-  assert.match(featuredCardSource, /featured-now-footer/);
-  assert.match(featuredCardSource, /featured-now-action/);
+  assert.match(featuredCardSource, /editorial-featured/);
+  assert.match(featuredCardSource, /editorial-featured-chips/);
+  assert.match(featuredCardSource, /editorial-featured-footer/);
+  assert.match(featuredCardSource, /editorial-featured-cta/);
   assert.doesNotMatch(featuredCardSource, /const footerMeta = compactMeta\(card\)/);
   assert.doesNotMatch(featuredCardSource, /featured-now-footnote/);
   assert.doesNotMatch(featuredCardSource, /justify-between/);
@@ -33,32 +33,28 @@ test('homepage featured card keeps metadata only in the top badge row', () => {
 test('homepage featured card CSS has scoped density and mobile wrapping rules', () => {
   const css = readGlobalStyles();
 
-  assert.match(css, /\.featured-now-card/);
-  assert.match(css, /\.featured-now-content/);
-  assert.match(css, /\.featured-now-footer/);
+  assert.match(css, /\.editorial-featured/);
+  assert.match(css, /\.editorial-featured-content/);
+  assert.match(css, /\.editorial-featured-footer/);
   assert.match(css, /overflow-wrap: anywhere/);
   assert.doesNotMatch(css, /\.featured-now-footnote/);
-  assert.match(css, /@media \(max-width: 480px\)/);
+  assert.match(css, /@media \(min-width: 640px\)/);
 });
 
 test('homepage hero explains the product with one primary action and no search', () => {
-  const source = readProjectFile('src/components/public/homepage-client.tsx');
-  const heroStart = source.indexOf('function HomeHeroRouter');
-  const heroEnd = source.indexOf('function HomeSectionCards');
-  const heroSource = source.slice(heroStart, heroEnd);
+  const heroSource = readProjectFile('src/components/public/homepage-hero.tsx');
 
   assert.match(heroSource, /accentFont\.className/);
   assert.match(heroSource, /BARSYNERGY/);
-  assert.match(heroSource, /max-w-\[55rem\]/);
+  assert.match(heroSource, /max-w-\[58rem\]/);
   assert.match(heroSource, /leading-\[1\.04\]/);
   assert.doesNotMatch(heroSource, /max-w-\[19ch\]/);
-  assert.doesNotMatch(heroSource, /max-w-\[13ch\]/);
   assert.doesNotMatch(heroSource, /leading-\[0\.98\]/);
-  assert.match(heroSource, /Обучение, вакансии и поставщики для кофейных баров Северного Кавказа/);
   assert.match(heroSource, /Обучение, вакансии, поставщики, события и инструменты/);
+  assert.match(heroSource, /Платформа для кофейных баров СКФО/);
   assert.doesNotMatch(heroSource, /Платформа, которая объединяет/);
+  assert.match(heroSource, /Смотреть вакансии/);
   assert.match(heroSource, /Найти обучение/);
-  assert.match(heroSource, /Смотреть афишу/);
   assert.doesNotMatch(heroSource, /home-hero-search/);
   assert.doesNotMatch(heroSource, /action="\/search"/);
   assert.doesNotMatch(heroSource, /Глобальный поиск по платформе/);
@@ -74,13 +70,11 @@ test('homepage hero explains the product with one primary action and no search',
 });
 
 test('homepage stats animate once when the stats row enters the viewport', () => {
-  const source = readProjectFile('src/components/public/homepage-client.tsx');
-  const statsStart = source.indexOf('function HomeStatsLine');
-  const statsEnd = source.indexOf('function HomeHeroRouter');
-  const statsSource = source.slice(statsStart, statsEnd);
+  const statsSource = readProjectFile('src/components/public/homepage-hero.tsx');
 
-  assert.match(statsSource, /items\.filter\(\(item\) => item\.value > 0\)/);
-  assert.match(statsSource, /No live counters are better than showing a zeroed platform/);
+  assert.match(statsSource, /statItems = \[/);
+  assert.match(statsSource, /\.filter\(\(item\) => item\.value > 0\)/);
+  assert.match(statsSource, /if \(statItems\.length === 0\) \{/);
   assert.doesNotMatch(statsSource, /IntersectionObserver/);
   assert.doesNotMatch(statsSource, /requestAnimationFrame/);
   assert.doesNotMatch(statsSource, /setDisplayValues/);
@@ -110,25 +104,23 @@ test('public viewport reveal applies only to inner sections and staggered cards'
 
 test('homepage mobile rules keep the first screen and scannable cards phone-native', () => {
   const source = readProjectFile('src/components/public/homepage-client.tsx');
+  const heroSource = readProjectFile('src/components/public/homepage-hero.tsx');
   const headerSource = readProjectFile('src/components/layout/site-header.tsx');
   const menuSource = readProjectFile('src/components/layout/mobile-site-menu.tsx');
   const css = readGlobalStyles();
 
-  assert.match(source, /min-h-\[100svh\]/);
-  assert.match(source, /mt-8 flex flex-col gap-3 sm:flex-row/);
-  assert.match(source, /background-zone background-zone-ivory scroll-mt-28 border-b border-\[var\(--line\)\] py-12 md:py-16/);
-  assert.match(source, /xl:grid-cols-\[minmax\(0,0\.48fr\)_minmax\(0,1\.52fr\)\]/);
-  assert.match(source, /grid gap-5 md:grid-cols-2 md:gap-4 xl:grid-cols-3/);
-  assert.match(source, /home-section-card group relative min-h-\[140px\]/);
-  assert.match(source, /inline-flex h-10 w-10 items-center justify-center rounded-\[var\(--radius-sm\)\] bg-\[var\(--accent\)\] text-white/);
-  assert.match(source, /home-events-scroll flex gap-3 overflow-x-auto/);
-  assert.doesNotMatch(source, /home-events.*button/i);
+  assert.match(heroSource, /min-h-\[100svh\]/);
+  assert.match(heroSource, /mt-8 flex flex-col gap-3 sm:flex-row/);
+  assert.match(source, /background-zone background-zone-ivory border-b border-\[var\(--line\)\] py-12 md:py-16/);
+  assert.match(source, /grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 md:gap-4/);
+  assert.match(source, /home-section-card group relative flex min-h-\[140px\]/);
+  assert.match(source, /inline-flex h-11 w-11 items-center justify-center rounded-\[var\(--radius-sm\)\] bg-\[var\(--accent\)\] text-white/);
   assert.match(headerSource, /min-h-\[56px\]/);
   assert.match(headerSource, /xl:min-h-\[64px\]/);
   assert.match(menuSource, /fixed inset-0/);
-  assert.match(menuSource, /text-center/);
-  assert.match(menuSource, /justify-items-center/);
-  assert.match(menuSource, /Бизнес и партнёры/);
+  assert.match(menuSource, /text-\[24px\]/);
+  assert.match(menuSource, /grid gap-6/);
+  assert.match(menuSource, /Сотрудничество/);
   assert.doesNotMatch(menuSource, /ThemeSegmentedToggle/);
   assert.match(menuSource, /Telegram/);
   assert.match(css, /@media \(max-width: 640px\)[\s\S]*line-height: 1\.65/);
@@ -138,7 +130,7 @@ test('homepage section badges and inline icons use the filled square accent trea
   const source = readProjectFile('src/components/public/homepage-client.tsx');
 
   assert.match(source, /rounded-\[var\(--radius-sm\)\] bg-\[var\(--accent\)\] text-white/);
-  assert.match(source, /<Icon size=\{18\} strokeWidth=\{1\.5\} \/>/);
+  assert.match(source, /<tool\.icon size=\{18\} strokeWidth=\{1\.5\} \/>/);
   assert.doesNotMatch(source, /rounded-full bg-\[var\(--accent-soft\)\] text-\[var\(--accent\)\]/);
 });
 
@@ -180,26 +172,21 @@ test('homepage removes duplicate role router cards', () => {
 test('homepage fresh section replaces duplicate reading and current blocks', () => {
   const source = readProjectFile('src/components/public/homepage-client.tsx');
   const sectionStart = source.indexOf('id="home-fresh"');
-  const sectionEnd = source.indexOf('{data.calculatorTeaser');
+  const sectionEnd = source.indexOf('<HomeEventsStrip');
   const sectionSource = source.slice(sectionStart, sectionEnd);
 
-  assert.match(sectionSource, /Свежее на платформе/);
-  assert.match(sectionSource, /home-current-layout grid gap-4/);
-  assert.match(sectionSource, /home-current-support-grid/);
-  assert.match(sectionSource, /lg:grid-cols-\[minmax\(0,0\.62fr\)_minmax\(0,0\.38fr\)\]/);
-  assert.match(sectionSource, /lg:grid-cols-1/);
+  assert.match(sectionSource, /Актуальное/);
+  assert.match(sectionSource, /editorial-current-layout/);
+  assert.match(sectionSource, /editorial-current-support-row/);
+  assert.match(sectionSource, /sm:grid-cols-3/);
   assert.doesNotMatch(source, /function HomeReadingSection/);
   assert.doesNotMatch(source, /id="home-reading"/);
   assert.doesNotMatch(source, /id="home-current"/);
-  assert.match(source, /sm:min-h-\[11\.5rem\]/);
-  assert.doesNotMatch(sectionSource, /xl:grid-cols-\[minmax\(0,1\.08fr\)_minmax\(20rem,0\.62fr\)\]/);
+  assert.doesNotMatch(sectionSource, /home-reading/);
 });
 
 test('homepage calculator teaser uses existing steps and a compact CTA rail', () => {
-  const source = readProjectFile('src/components/public/platform-ui.tsx');
-  const teaserStart = source.indexOf('export function ToolTeaser');
-  const teaserEnd = source.indexOf('function pageHref');
-  const teaserSource = source.slice(teaserStart, teaserEnd);
+  const teaserSource = readProjectFile('src/components/public/platform-ui-tool-teaser.tsx');
 
   assert.match(teaserSource, /const steps = teaser\.steps\.filter\(Boolean\)\.slice\(0, 3\)/);
   assert.match(teaserSource, /<PublicEyebrow>\{teaser\.eyebrow\}<\/PublicEyebrow>/);
@@ -237,48 +224,39 @@ test('homepage removes the digital-solutions service promo block', () => {
 
 test('homepage sponsors render as a compact logo strip', () => {
   const source = readProjectFile('src/components/public/homepage-client.tsx');
-  const sectionStart = source.indexOf('function HomeSponsorLogoStrip');
-  const sectionEnd = source.indexOf('function HomeCtaFaqSection');
-  const sectionSource = source.slice(sectionStart, sectionEnd);
-  const currentSectionIndex = source.indexOf('<HomeCurrent');
+  const sectionSource = readProjectFile('src/components/public/homepage-sponsors.tsx');
+  const currentSectionIndex = source.indexOf('id="home-fresh"');
   const sponsorsRenderIndex = source.indexOf('<HomeSponsorLogoStrip');
-  const calculatorRenderIndex = source.indexOf('<ToolTeaser');
+  const faqRenderIndex = source.indexOf('<HomeCtaFaqSection');
 
-  assert.match(sectionSource, /function HomeSponsorLogoStrip/);
+  assert.match(sectionSource, /export function HomeSponsorLogoStrip/);
   assert.match(sectionSource, /Генеральные спонсоры сезона/);
   assert.match(sectionSource, /sponsor\.shortDescription/);
   assert.match(sectionSource, /Смотреть профиль →/);
   assert.match(sectionSource, /justify-items-center/);
   assert.match(sectionSource, /max-h-36/);
   assert.match(sectionSource, /max-w-\[18rem\]/);
-  assert.match(sectionSource, /#\$\{sponsor\.name\.toLowerCase\(\)\.includes\('hustle brew'\)/);
   assert.match(sectionSource, /sponsor\.logoSrc/);
   assert.doesNotMatch(sectionSource, /Кофе, какао и поставки для баров и кофеен СКФО/);
   assert.ok(currentSectionIndex < sponsorsRenderIndex);
-  assert.ok(sponsorsRenderIndex < calculatorRenderIndex);
+  assert.ok(sponsorsRenderIndex < faqRenderIndex);
   assert.doesNotMatch(source, /<GeneralSponsorCard/);
   assert.doesNotMatch(source, /variant="home"/);
 });
 
 test('homepage help CTA has a direct contact heading', () => {
-  const source = readProjectFile('src/components/public/homepage-client.tsx');
-  const sectionStart = source.indexOf('function HomeCtaFaqSection');
-  const sectionEnd = source.indexOf('export function HomepageClient');
-  const sectionSource = source.slice(sectionStart, sectionEnd);
+  const sectionSource = readProjectFile('src/components/public/home-cta-faq-section.tsx');
 
   assert.match(sectionSource, /Напишите команде/);
   assert.match(sectionSource, /Ответим на вопрос, примем идею события или поможем выбрать нужный раздел\./);
   assert.doesNotMatch(sectionSource, /Соберите маршрут/);
-  assert.doesNotMatch(sectionSource, /href="\/contacts\?topic=other#contact-form"/);
+  assert.match(sectionSource, /href="\/contacts#contact-form"/);
   assert.doesNotMatch(sectionSource, /isCtaHovered/);
 });
 
 test('homepage help FAQ keeps accordion expansion inside a stable column', () => {
-  const source = readProjectFile('src/components/public/homepage-client.tsx');
+  const sectionSource = readProjectFile('src/components/public/home-cta-faq-section.tsx');
   const css = readGlobalStyles();
-  const sectionStart = source.indexOf('function HomeCtaFaqSection');
-  const sectionEnd = source.indexOf('export function HomepageClient');
-  const sectionSource = source.slice(sectionStart, sectionEnd);
 
   assert.match(sectionSource, /home-help-faq-list/);
   assert.match(sectionSource, /home-help-faq-item/);
@@ -292,28 +270,19 @@ test('homepage help FAQ keeps accordion expansion inside a stable column', () =>
 });
 
 test('events empty agenda state guides users to formats and submission', () => {
-  const source = readProjectFile('src/components/public/platform-ui.tsx');
-  const sectionStart = source.indexOf('export function EventAgendaSection');
-  const sectionEnd = source.indexOf('<div className="mt-8 grid gap-10">');
-  const sectionSource = source.slice(sectionStart, sectionEnd);
-  const emptyStateStart = sectionSource.indexOf('content.items.length === 0');
+  const sectionSource = readProjectFile('src/components/public/platform-ui-event-agenda.tsx');
+  const emptyStateStart = sectionSource.indexOf('isTrueUpcomingEmpty ? (');
   const emptyStateEnd = sectionSource.indexOf(') : (', emptyStateStart);
   const emptyStateSource = sectionSource.slice(emptyStateStart, emptyStateEnd);
 
-  assert.match(sectionSource, /event-empty-state grid gap-6 p-5 md:p-6/);
-  assert.match(sectionSource, /padding="none"/);
-  assert.match(emptyStateSource, /text-xl font-semibold leading-7/);
-  assert.match(emptyStateSource, /Готовим новые события/);
-  assert.match(emptyStateSource, /Интенсив/);
-  assert.match(emptyStateSource, /Каппинг/);
-  assert.match(emptyStateSource, /Гостевая смена/);
+  assert.match(sectionSource, /background-zone background-zone-graphite border-b border-\[var\(--line\)\] py-10 md:py-14/);
+  assert.match(emptyStateSource, /CalendarDays/);
+  assert.match(emptyStateSource, /События появятся совсем скоро/);
+  assert.match(emptyStateSource, /интенсив или каппинг/);
   assert.match(emptyStateSource, /Подписаться на анонсы/);
-  assert.match(emptyStateSource, /Предложить событие/);
+  assert.match(emptyStateSource, /Хотите провести своё\?/);
   assert.match(emptyStateSource, /<Button/);
   assert.doesNotMatch(emptyStateSource, /Предложить тему/);
   assert.doesNotMatch(emptyStateSource, /Партнёрский контакт/);
   assert.doesNotMatch(emptyStateSource, /форму ниже/);
-  assert.doesNotMatch(emptyStateSource, /md:grid-cols-\[minmax\(0,1fr\)_auto\]/);
-  assert.doesNotMatch(emptyStateSource, /space-y-4/);
-  assert.doesNotMatch(sectionSource, /padding="lg"/);
 });

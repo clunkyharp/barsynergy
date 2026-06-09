@@ -2,7 +2,6 @@
 
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { Send } from 'lucide-react';
 import { AppLink } from '@/components/ui/app-link';
 import { ThemeToggle } from '@/components/layout/theme-toggle';
 
@@ -79,7 +78,6 @@ export function SiteFooter({ userRole }: SiteFooterProps = {}) {
                 Контакты
               </AppLink>
               <AppLink className={footerLinkClassName} href="https://t.me/barsynergy">
-                <Send size={14} strokeWidth={1.8} className="mr-1.5 inline-block shrink-0" />
                 Telegram
               </AppLink>
             </nav>

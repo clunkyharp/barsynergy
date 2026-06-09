@@ -89,7 +89,7 @@ export async function getPublishedVacancies(params: PublicContentSearchParams = 
     },
     (ids) =>
       prisma.vacancy.findMany({
-        where: { id: { in: ids } },
+        where: { id: { in: ids }, status: ContentStatus.PUBLISHED },
         include: {
           category: { select: { name: true } },
           city: { select: { name: true } },

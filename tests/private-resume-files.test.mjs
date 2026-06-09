@@ -5,6 +5,32 @@ import test from 'node:test';
 const { isAllowedPrivateResumeUpload } = await import('../src/lib/applications/private-resume-file-rules.ts');
 const { isAllowedPublicImageUpload } = await import('../src/lib/storage/file-signatures.ts');
 
+function zipContainerWithEntry(entryName) {
+  const entryNameBuffer = Buffer.from(entryName, 'utf8');
+  const localHeader = Buffer.alloc(30 + entryNameBuffer.length);
+  localHeader.writeUInt32LE(0x04034b50, 0);
+  localHeader.writeUInt16LE(20, 4);
+  localHeader.writeUInt16LE(entryNameBuffer.length, 26);
+  entryNameBuffer.copy(localHeader, 30);
+
+  const centralDirectory = Buffer.alloc(46 + entryNameBuffer.length);
+  centralDirectory.writeUInt32LE(0x02014b50, 0);
+  centralDirectory.writeUInt16LE(20, 4);
+  centralDirectory.writeUInt16LE(20, 6);
+  centralDirectory.writeUInt16LE(entryNameBuffer.length, 28);
+  centralDirectory.writeUInt32LE(0, 42);
+  entryNameBuffer.copy(centralDirectory, 46);
+
+  const eocd = Buffer.alloc(22);
+  eocd.writeUInt32LE(0x06054b50, 0);
+  eocd.writeUInt16LE(1, 8);
+  eocd.writeUInt16LE(1, 10);
+  eocd.writeUInt32LE(centralDirectory.length, 12);
+  eocd.writeUInt32LE(localHeader.length, 16);
+
+  return Buffer.concat([localHeader, centralDirectory, eocd]);
+}
+
 test('private resume validator accepts safe document formats only', () => {
   assert.equal(
     isAllowedPrivateResumeUpload({
@@ -19,9 +45,18 @@ test('private resume validator accepts safe document formats only', () => {
     isAllowedPrivateResumeUpload({
       mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
       originalName: 'resume.docx',
-      buffer: Buffer.from([0x50, 0x4b, 0x03, 0x04])
+      buffer: zipContainerWithEntry('word/document.xml')
     }),
     true
+  );
+
+  assert.equal(
+    isAllowedPrivateResumeUpload({
+      mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      originalName: 'resume.docx',
+      buffer: Buffer.from([0x50, 0x4b, 0x03, 0x04])
+    }),
+    false
   );
 
   assert.equal(
@@ -143,7 +178,7 @@ test('private resume validator covers rtf, legacy doc and zip-based document sig
     isAllowedPrivateResumeUpload({
       mimeType: 'application/vnd.oasis.opendocument.text',
       originalName: 'resume.odt',
-      buffer: Buffer.from([0x50, 0x4b, 0x03, 0x04])
+      buffer: zipContainerWithEntry('content.xml')
     }),
     true
   );
@@ -153,6 +188,6 @@ test('private resume validator covers rtf, legacy doc and zip-based document sig
       mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
       originalName: 'resume.docx'
     }),
-    true
+    false
   );
 });
