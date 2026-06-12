@@ -4,47 +4,39 @@ import { Button } from '@/components/ui/button';
 import { bodyFont, displayFont } from '@/lib/fonts';
 import type { HomepageLiveCard } from '@/lib/public/home';
 
-function normalizedMetaKey(value: string) {
-  return value.trim().toLowerCase();
+function extractReadingTime(meta: string[]): string | undefined {
+  return meta.find((entry) => /\d+\s*мин/.test(entry));
 }
-function getVisibleFeaturedMeta(card: HomepageLiveCard) {
-  const hiddenMeta = new Set(['Открытый доступ', card.eyebrow].map(normalizedMetaKey));
-  const seenMeta = new Set<string>();
 
-  return card.meta
-    .map((entry) => entry.trim())
-    .filter((entry) => {
-      if (!entry) {
-        return false;
-      }
+function buildFeaturedFooterMeta(card: HomepageLiveCard): string {
+  const kindLabels: Record<string, string> = {
+    article: 'Материал',
+    course: 'Курс',
+    event: 'Событие',
+    vacancy: 'Вакансия',
+    supplier: 'Поставщик'
+  };
+  const kindLabel = kindLabels[card.kind] ?? 'Материал';
+  const parts: string[] = [kindLabel];
 
-      const key = normalizedMetaKey(entry);
+  if (card.authorName) {
+    parts.push(`Автор: ${card.authorName}`);
+  }
 
-      if (hiddenMeta.has(key) || seenMeta.has(key)) {
-        return false;
-      }
+  const readingTime = extractReadingTime(card.meta);
+  if (readingTime) {
+    parts.push(`${readingTime} чтения`);
+  }
 
-      seenMeta.add(key);
-      return true;
-    })
-    .slice(0, 3);
+  return parts.join(' · ');
 }
-const kindLabels: Record<string, string> = {
-  article: 'Материал',
-  course: 'Курс',
-  event: 'Событие',
-  vacancy: 'Вакансия',
-  supplier: 'Поставщик'
-};
 
 function supportMetaText(card: HomepageLiveCard) {
   return card.meta.filter(Boolean).slice(0, 2).join(' / ');
 }
 
 export function EditorialFeatured({ card }: { card: HomepageLiveCard }) {
-  const visibleMeta = getVisibleFeaturedMeta(card);
-  const kindLabel = kindLabels[card.kind] ?? 'Материал';
-  const authorMeta = card.meta.filter(Boolean).slice(0, 2).join(' · ');
+  const footerMeta = buildFeaturedFooterMeta(card);
 
   return (
     <Link
@@ -60,11 +52,8 @@ export function EditorialFeatured({ card }: { card: HomepageLiveCard }) {
       <span aria-hidden="true" className="editorial-featured-gradient absolute inset-0" />
 
       <span className="editorial-featured-content absolute inset-0 flex flex-col justify-end p-5 md:p-8 lg:p-10">
-        <span className="editorial-featured-chips mb-3 flex flex-wrap gap-2 md:mb-4">
-          <span className="editorial-chip--accent">{card.eyebrow}</span>
-          {visibleMeta.map((entry) => (
-            <span className="editorial-chip" key={entry}>{entry}</span>
-          ))}
+        <span className="mb-1.5 block text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--accent)] md:mb-2">
+          {card.eyebrow}
         </span>
 
         <h3 className={`${displayFont.className} editorial-featured-headline text-[1.6rem] font-bold leading-[1.05] tracking-[-0.01em] text-[var(--editorial-dark-text)] md:text-[2.2rem] lg:text-[3rem]`}>
@@ -75,13 +64,13 @@ export function EditorialFeatured({ card }: { card: HomepageLiveCard }) {
           {card.summary}
         </p>
 
-        <span className="editorial-featured-footer mt-5 flex flex-wrap items-center gap-4 md:mt-6">
-          <span className="editorial-featured-cta inline-flex items-center gap-2 rounded-[var(--radius-pill)] border border-[var(--accent)]/50 px-4 py-2 text-sm font-semibold text-[var(--editorial-dark-text)] transition-colors duration-[var(--motion-duration-fast)] group-hover:border-[var(--accent)] group-hover:text-[var(--accent)]">
+        <span className="editorial-featured-footer mt-5 flex flex-col gap-3 md:mt-6 md:flex-row md:items-center md:gap-6">
+          <span className="editorial-featured-cta inline-flex w-fit items-center gap-2 rounded-[var(--radius-pill)] border border-[var(--accent)]/50 px-4 py-2 text-sm font-semibold text-[var(--editorial-dark-text)] transition-colors duration-[var(--motion-duration-fast)] group-hover:border-[var(--accent)] group-hover:text-[var(--accent)]">
             {card.actionLabel}
             <ArrowUpRight size={15} strokeWidth={2} />
           </span>
-          <span className={`${bodyFont.className} text-xs text-[var(--editorial-dark-muted)]`}>
-            {kindLabel}{authorMeta ? ` · ${authorMeta}` : ''}
+          <span className={`${bodyFont.className} text-xs leading-5 text-[var(--editorial-dark-muted)] md:leading-none`}>
+            {footerMeta}
           </span>
         </span>
       </span>
@@ -159,13 +148,13 @@ export function HomeEventsStrip({ event }: { event: HomepageLiveCard }) {
         </div>
         <div className="md:max-w-md">
           <Link
-            className="home-event-card block rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--surface-card)] p-5 text-[var(--text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)]"
+            className="home-event-card block rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--surface-card)] p-4 text-[var(--text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] md:p-5"
             href={event.href}
           >
-            <span className="block text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--accent)]">{event.eyebrow}</span>
-            <span className={`${displayFont.className} mt-4 block text-[1.7rem] font-semibold leading-none text-[var(--text)]`}>{event.title}</span>
-            <span className="mt-3 block text-sm leading-6 text-[var(--muted)]">{event.summary}</span>
-            <span className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-[var(--accent)]">
+            <span className="block text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--accent)]">{event.eyebrow}</span>
+            <span className={`${displayFont.className} mt-3 block text-[1.35rem] font-semibold leading-none text-[var(--text)] md:mt-4 md:text-[1.7rem]`}>{event.title}</span>
+            <span className="mt-2 block text-sm leading-6 text-[var(--muted)] md:mt-3">{event.summary}</span>
+            <span className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-[var(--accent)] md:mt-5">
               {event.actionLabel}
               <ArrowUpRight size={15} strokeWidth={1.8} />
             </span>

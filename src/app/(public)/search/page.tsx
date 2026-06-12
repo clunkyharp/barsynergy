@@ -1,8 +1,9 @@
 import type { Metadata } from 'next';
 import { Search } from 'lucide-react';
 import Link from 'next/link';
-import { EditorialPublicPage } from '@/components/public/editorial-public-page';
+import { PageHero } from '@/components/public/page-hero';
 import { Button } from '@/components/ui/button';
+import { SearchInput } from '@/components/ui/search-input';
 import { SearchResultsClient } from '@/components/public/search-results-client';
 import type { SearchResultItem } from '@/components/public/search-results-client';
 import {
@@ -22,6 +23,12 @@ type SearchPageProps = {
   searchParams?: Promise<PublicContentSearchParams>;
 };
 
+type SearchChipSource = {
+  label: string;
+  total: number;
+  items: SearchResultItem[];
+};
+
 export const metadata: Metadata = {
   title: 'Поиск',
   description: 'Поиск по вакансиям, поставщикам, материалам, обучению, событиям и партнёрам BARSYNERGY.',
@@ -31,7 +38,18 @@ export const metadata: Metadata = {
   }
 };
 
-const SUGGESTION_CHIPS = ['бариста', 'кофе', 'каппинг', 'поставщики', 'обучение', 'оборудование'];
+const SEARCH_CHIP_STOP_WORDS = new Set([
+  'для',
+  'как',
+  'или',
+  'что',
+  'это',
+  'где',
+  'под',
+  'без',
+  'the',
+  'and'
+]);
 
 function firstParam(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] : value;
@@ -43,6 +61,65 @@ function searchQuery(params: PublicContentSearchParams) {
 
 function isPublishedContentList(value: PublishedContentList | undefined): value is PublishedContentList {
   return Boolean(value);
+}
+
+function addChipWeight(counts: Map<string, number>, value: string, weight: number) {
+  const normalized = value.trim().toLowerCase();
+
+  if (
+    normalized.length < 4 ||
+    SEARCH_CHIP_STOP_WORDS.has(normalized) ||
+    /^\d+$/.test(normalized)
+  ) {
+    return;
+  }
+
+  counts.set(normalized, (counts.get(normalized) ?? 0) + weight);
+}
+
+function extractSearchChipCandidates(sources: SearchChipSource[]) {
+  const counts = new Map<string, number>();
+
+  for (const source of sources) {
+    if (source.total <= 0) {
+      continue;
+    }
+
+    const sectionWeight = Math.max(1, Math.ceil(source.total / Math.max(source.items.length, 1)));
+    addChipWeight(counts, source.label, sectionWeight * 3);
+
+    for (const item of source.items) {
+      const weightedChunks: Array<[string, number]> = [
+        [item.title, sectionWeight * 2],
+        [item.summary, sectionWeight],
+        [item.subtitle ?? '', sectionWeight],
+        [item.label ?? '', sectionWeight * 2],
+        [item.meta.join(' '), sectionWeight]
+      ];
+
+      for (const [chunk, weight] of weightedChunks) {
+        const words = chunk.toLowerCase().match(/[a-zа-яё0-9-]+/gi) ?? [];
+
+        for (const word of words) {
+          addChipWeight(counts, word, weight);
+        }
+      }
+    }
+  }
+
+  const ranked = [...counts.entries()]
+    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'ru'))
+    .map(([word]) => word)
+    .slice(0, 6);
+
+  if (ranked.length > 0) {
+    return ranked;
+  }
+
+  return sources
+    .filter((source) => source.total > 0)
+    .map((source) => source.label.toLowerCase())
+    .slice(0, 6);
 }
 
 export default async function SearchPage({ searchParams }: SearchPageProps) {
@@ -59,36 +136,57 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         getPublishedEvents({ q, pageSize: '8', period: 'all' }),
         getPublishedPartners({ q, pageSize: '8' })
       ])
-    : [];
+    : await Promise.all([
+        getPublishedVacancies({ pageSize: '6' }),
+        getPublishedSuppliers({ pageSize: '6' }),
+        getPublishedArticles({ pageSize: '6' }),
+        getPublishedCourses({ pageSize: '6' }),
+        getPublishedEvents({ pageSize: '6', period: 'all' }),
+        getPublishedPartners({ pageSize: '6' })
+      ]);
 
   const totalResults = [vacancies, suppliers, articles, courses, events, partners]
     .filter(isPublishedContentList)
     .reduce((sum, content) => sum + content.total, 0);
 
+  const articleItems = articles.items.map((item) => ({ ...item, contentType: 'article' as const, basePath: '/articles', actionLabel: 'Читать материал' }));
+  const vacancyItems = vacancies.items.map((item) => ({ ...item, contentType: 'vacancy' as const, basePath: '/vacancies', actionLabel: 'Смотреть вакансию' }));
+  const supplierItems = suppliers.items.map((item) => ({ ...item, contentType: 'supplier' as const, basePath: '/suppliers', actionLabel: 'Открыть каталог' }));
+  const courseItems = courses.items.map((item) => ({ ...item, contentType: 'course' as const, basePath: '/education', actionLabel: 'Открыть программу' }));
+  const eventItems = events.items.map((item) => ({ ...item, contentType: 'event' as const, basePath: '/events', actionLabel: 'Подробнее' }));
+  const partnerItems = partners.items.map((item) => ({ ...item, contentType: 'partner' as const, basePath: '/partners', actionLabel: 'Смотреть профиль' }));
+
   const flatItems: SearchResultItem[] = [
-    ...(articles?.items.map((item) => ({ ...item, contentType: 'article' as const, basePath: '/articles', actionLabel: 'Читать материал' })) ?? []),
-    ...(vacancies?.items.map((item) => ({ ...item, contentType: 'vacancy' as const, basePath: '/vacancies', actionLabel: 'Смотреть вакансию' })) ?? []),
-    ...(suppliers?.items.map((item) => ({ ...item, contentType: 'supplier' as const, basePath: '/suppliers', actionLabel: 'Открыть каталог' })) ?? []),
-    ...(courses?.items.map((item) => ({ ...item, contentType: 'course' as const, basePath: '/education', actionLabel: 'Открыть программу' })) ?? []),
-    ...(events?.items.map((item) => ({ ...item, contentType: 'event' as const, basePath: '/events', actionLabel: 'Подробнее' })) ?? []),
-    ...(partners?.items.map((item) => ({ ...item, contentType: 'partner' as const, basePath: '/partners', actionLabel: 'Смотреть профиль' })) ?? []),
+    ...articleItems,
+    ...vacancyItems,
+    ...supplierItems,
+    ...courseItems,
+    ...eventItems,
+    ...partnerItems,
   ];
+  const suggestionSources: SearchChipSource[] = [
+    { label: 'материалы', total: articles.total, items: articleItems },
+    { label: 'вакансии', total: vacancies.total, items: vacancyItems },
+    { label: 'поставщики', total: suppliers.total, items: supplierItems },
+    { label: 'обучение', total: courses.total, items: courseItems },
+    { label: 'события', total: events.total, items: eventItems },
+    { label: 'партнёры', total: partners.total, items: partnerItems },
+  ];
+  const suggestionChips = extractSearchChipCandidates(suggestionSources);
 
   return (
     <>
       <JsonLd data={buildStaticPageBreadcrumbJsonLd('/search', 'Поиск')} />
-      <EditorialPublicPage
+      <PageHero
+        breadcrumbs={[{ label: 'Поиск' }]}
         eyebrow="Поиск"
-        path="/search"
         title="Поиск по платформе"
-        description="Ищите вакансии, поставщиков, материалы, обучение, события и партнёров одним запросом."
-        summary="Введите запрос и перейдите в нужный раздел, если нужны дополнительные фильтры."
+        subtitle="Ищите вакансии, поставщиков, материалы, обучение, события и партнёров одним запросом."
+        tone="light-editorial"
         density="compact"
-        metrics={hasQuery ? [{ value: String(totalResults), label: 'результатов' }] : []}
-        rows={[]}
+        bottom={hasQuery ? { kind: 'stats' as const, items: [{ value: String(totalResults), label: 'результатов' }] } : undefined}
       />
 
-      {/* Search form */}
       <section className="background-zone background-zone-ivory border-b border-[var(--line)] py-8 md:py-12">
         <div className="container">
           <form
@@ -101,24 +199,26 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
             <label className="sr-only" htmlFor="global-search-query">
               Глобальный поиск по платформе
             </label>
-            <div className="grid min-h-12 grid-cols-[2.5rem_minmax(0,1fr)] items-center rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--surface-wash)] px-3">
-              <Search aria-hidden="true" className="text-[var(--muted)]" size={20} strokeWidth={1.8} />
-              <input
-                className="min-w-0 bg-transparent text-base text-[var(--text)] outline-none placeholder:text-[var(--muted)]"
-                defaultValue={q}
-                id="global-search-query"
-                name="q"
-                placeholder="Например: вакансии, зерно, каппинг"
-                required
-                type="search"
-              />
-            </div>
+            <SearchInput
+              aria-label="Глобальный поиск по платформе"
+              autoComplete="off"
+              className="public-filter-control min-h-12 rounded-[var(--radius-md)] bg-[var(--surface-wash)] text-base"
+              defaultValue={q}
+              enterKeyHint="search"
+              id="global-search-query"
+              inputMode="search"
+              name="q"
+              placeholder="Например: вакансии, зерно, каппинг"
+              required
+              spellCheck={false}
+              type="search"
+            />
             <Button className="min-h-12 rounded-[var(--radius-md)] px-6 tracking-normal" type="submit">
               Найти
             </Button>
           </form>
           <div className="mt-3 flex flex-wrap gap-2">
-            {SUGGESTION_CHIPS.map((chip) => {
+            {suggestionChips.map((chip) => {
               const isActive = q.toLowerCase() === chip.toLowerCase();
               return (
                 <Link
@@ -155,7 +255,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
                   </p>
                 </div>
                 <div className="flex flex-wrap justify-center gap-2">
-                  {['бариста', 'поставщики', 'обучение'].map((chip) => (
+                  {suggestionChips.slice(0, 3).map((chip) => (
                     <Link
                       className="inline-flex min-h-9 items-center rounded-[var(--radius-pill)] border border-[var(--line)] bg-[var(--surface)] px-3.5 text-sm font-medium text-[var(--muted)] transition-colors hover:border-[var(--accent)] hover:text-[var(--accent)]"
                       href={`/search?q=${encodeURIComponent(chip)}`}

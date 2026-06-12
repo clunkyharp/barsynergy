@@ -2,6 +2,7 @@ import Image from 'next/image';
 import { ArrowLeft, ArrowUpRight } from 'lucide-react';
 import { PublicBodyText, PublicDisplayTitle, PublicEyebrow } from '@/components/public/public-primitives';
 import { RichTextContent } from '@/components/public/rich-text-content';
+import { ActionCard } from '@/components/ui/cards';
 import { Button } from '@/components/ui/button';
 import { InlineLink } from '@/components/ui/inline-link';
 import { MetaChip } from '@/components/ui/meta-chip';
@@ -20,7 +21,7 @@ export type { DetailLink, PublicContentDetailPageProps } from './public-content-
 export { paragraphsFromBody, normalizeText, normalizeImage, fallbackImage, detailKindFromBackHref, detailCopy } from './public-content-detail-page-helpers';
 
 export function PublicContentDetailPage({
-  eyebrow,
+  eyebrow: _eyebrow,
   backHref,
   backLabel,
   title,
@@ -34,7 +35,9 @@ export function PublicContentDetailPage({
   primaryLink,
   secondaryLink,
   actionsSlot,
-  actionsBottomSlot
+  actionsBottomSlot,
+  metaSlot,
+  sourceReferences
 }: PublicContentDetailPageProps) {
   const rawParagraphs = paragraphsFromBody(body);
   const dedupParagraphs =
@@ -60,18 +63,9 @@ export function PublicContentDetailPage({
           <Panel className="mt-5 overflow-hidden border-[var(--border-default)] bg-[var(--surface)] p-0 md:mt-6" padding="none">
             <div className="grid gap-0 lg:grid-cols-[minmax(0,1.45fr)_minmax(16rem,0.55fr)] lg:items-stretch">
               <div className="grid min-w-0 content-center px-5 py-8 sm:px-7 md:px-8 md:py-10 xl:px-9">
-                <div className="flex flex-wrap gap-2">
-                  <MetaChip variant="default">{eyebrow}</MetaChip>
-                  {heroMeta.slice(0, 5).map((entry, index) => (
-                    <MetaChip key={`${entry}-${index}`} variant="default">
-                      {entry}
-                    </MetaChip>
-                  ))}
-                </div>
-
                 <PublicDisplayTitle
                   as="h1"
-                  className="public-detail-hero-title mt-6 max-w-[22ch] text-pretty text-[clamp(2.25rem,4vw,4.1rem)] leading-[1.02] text-[var(--text)] [overflow-wrap:normal] [text-wrap:pretty] [word-break:normal] max-[480px]:max-w-full max-[480px]:text-[clamp(1.82rem,7.2vw,2.2rem)]"
+                  className="public-detail-hero-title mt-0 max-w-[22ch] text-pretty text-[clamp(2.25rem,4vw,4.1rem)] leading-[1.02] text-[var(--text)] [overflow-wrap:normal] [text-wrap:pretty] [word-break:normal] max-[480px]:max-w-full max-[480px]:text-[clamp(1.82rem,7.2vw,2.2rem)]"
                   size="section"
                 >
                   {title}
@@ -125,7 +119,7 @@ export function PublicContentDetailPage({
       </section>
 
       <section className="background-zone background-zone-beige border-b border-[var(--line)] py-9 md:py-12">
-        <div className="container grid gap-7 xl:grid-cols-[minmax(14rem,0.36fr)_minmax(0,1fr)_minmax(14rem,0.38fr)]">
+        <div className="container grid gap-7 xl:grid-cols-[minmax(16rem,0.36fr)_minmax(0,1fr)_minmax(18rem,0.38fr)]">
           <aside className="order-2 xl:order-1 xl:self-start">
             <div className="space-y-4">
               <Panel className="bg-[var(--surface-wash-strong)]" padding="lg">
@@ -179,15 +173,23 @@ export function PublicContentDetailPage({
                   ))}
                 </div>
               ) : null}
+
+              {sourceReferences ? (
+                <Panel className="mt-9 border-[var(--border-default)] bg-[var(--surface-wash-strong)]" padding="lg">
+                  <h2 className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Источники и дополнительное чтение</h2>
+                  <div className="mt-5">
+                    <RichTextContent markdown={sourceReferences} />
+                  </div>
+                </Panel>
+              ) : null}
             </div>
           </div>
 
           <aside className="order-3 xl:self-start">
             <div className="space-y-4">
               {(actionsSlot || secondaryLink || actionsBottomSlot) ? (
-                <Panel className="bg-[var(--surface-wash)]" padding="lg">
-                  <PublicEyebrow tone="muted">Действия</PublicEyebrow>
-                  <div className="mt-4 grid gap-3">
+                <ActionCard title="Действия" variant="plain">
+                  <div className="grid gap-3">
                     {actionsSlot ? <>{actionsSlot}</> : null}
                     {secondaryLink ? (
                       <Button
@@ -202,10 +204,10 @@ export function PublicContentDetailPage({
                     ) : null}
                     {actionsBottomSlot ? <div className="border-t border-[var(--line)] pt-3">{actionsBottomSlot}</div> : null}
                   </div>
-                </Panel>
+                </ActionCard>
               ) : null}
 
-              {heroMeta.length > 0 ? (
+              {metaSlot !== undefined ? metaSlot : (heroMeta.length > 0 && detailKind !== 'vacancy' ? (
                 <Panel padding="lg">
                   <PublicEyebrow tone="muted">{copy.metaLabel}</PublicEyebrow>
                   <div className="mt-4 flex flex-wrap gap-2">
@@ -216,7 +218,7 @@ export function PublicContentDetailPage({
                     ))}
                   </div>
                 </Panel>
-              ) : null}
+              ) : null)}
             </div>
           </aside>
         </div>

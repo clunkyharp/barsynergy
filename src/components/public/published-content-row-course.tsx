@@ -14,20 +14,20 @@ function courseMetaChips(item: PublishedContentItem) {
   return (
     <div className="flex flex-wrap gap-2">
       {duration ? (
-        <MetaChip variant="filter" className="border-[var(--border-default)] bg-transparent text-[var(--text)]">
-          <Clock aria-hidden="true" size={13} strokeWidth={1.8} className="mr-1 inline-block text-[var(--accent)]" />
+        <MetaChip variant="filter" className="inline-flex items-center gap-1 border-[var(--border-default)] bg-transparent text-[var(--text)]">
+          <Clock aria-hidden="true" size={13} strokeWidth={1.8} className="shrink-0 text-[var(--accent)]" />
           {duration}
         </MetaChip>
       ) : null}
       {level ? (
-        <MetaChip variant="filter" className="border-[var(--border-default)] bg-transparent text-[var(--text)]">
-          <Crosshair aria-hidden="true" size={13} strokeWidth={1.8} className="mr-1 inline-block text-[var(--accent)]" />
+        <MetaChip variant="filter" className="inline-flex items-center gap-1 border-[var(--border-default)] bg-transparent text-[var(--text)]">
+          <Crosshair aria-hidden="true" size={13} strokeWidth={1.8} className="shrink-0 text-[var(--accent)]" />
           {level}
         </MetaChip>
       ) : null}
       {format ? (
-        <MetaChip variant="filter" className="border-[var(--border-default)] bg-transparent text-[var(--text)]">
-          <MapPin aria-hidden="true" size={13} strokeWidth={1.8} className="mr-1 inline-block text-[var(--accent)]" />
+        <MetaChip variant="filter" className="inline-flex items-center gap-1 border-[var(--border-default)] bg-transparent text-[var(--text)]">
+          <MapPin aria-hidden="true" size={13} strokeWidth={1.8} className="shrink-0 text-[var(--accent)]" />
           {format}
         </MetaChip>
       ) : null}
@@ -51,7 +51,7 @@ export function CourseListRow({
         href={`${basePath}/${item.slug}`}
       >
         <div className="min-w-0">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">{item.label ?? 'Программа'}</p>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--accent)]">{item.label ?? 'Программа'}</p>
           {item.imageUrl ? (
             <div className="mt-4 hidden md:block">
               <div

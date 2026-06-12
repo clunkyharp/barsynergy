@@ -1,3 +1,6 @@
+'use client';
+
+import { useActionState } from 'react';
 import {
   ContactChannelFieldset,
   HiddenUtmFields,
@@ -6,6 +9,7 @@ import {
   PublicFormShellFooter,
   type PublicApplicationFormProps
 } from '@/components/public/application-form-section';
+import type { PublicApplicationResult } from '@/lib/applications/public-form-helpers';
 import { PublicBodyText, PublicDisplayTitle, PublicEyebrow } from '@/components/public/public-primitives';
 import { PublicFormValidation } from '@/components/public/public-form-validation';
 import { ConsentField } from '@/components/ui/consent-field';
@@ -18,12 +22,13 @@ import { SubmitButton } from '@/components/ui/submit-button';
 import { Textarea } from '@/components/ui/textarea';
 import { businessVenueTypeOptions } from '@/lib/applications/b2b-request-options';
 
-type BusinessSolutionFormProps = PublicApplicationFormProps & {
+type BusinessSolutionFormProps = Omit<PublicApplicationFormProps, 'result'> & {
   direct?: boolean;
-  action: (formData: FormData) => void;
+  action: (prevState: PublicApplicationResult | null, formData: FormData) => Promise<PublicApplicationResult>;
 };
 
-export function BusinessSolutionForm({ enabled, result, utm, cities, defaults = {}, direct = false, action }: BusinessSolutionFormProps) {
+export function BusinessSolutionForm({ enabled, utm, cities, defaults = {}, direct = false, action }: BusinessSolutionFormProps) {
+  const [result, formAction] = useActionState(action, null);
   return (
     <PublicApplicationSection
       eyebrow="Каталог / Заявка"
@@ -37,10 +42,10 @@ export function BusinessSolutionForm({ enabled, result, utm, cities, defaults = 
       disclosureTitle="Заявка на размещение"
       enabled={enabled}
       introVariant={direct ? 'compact' : undefined}
-      result={result}
+      result={result ?? undefined}
       sectionId="business-request"
     >
-      <form action={action} className="editorial-form-shell public-form-shell" noValidate>
+      <form action={formAction} className="editorial-form-shell public-form-shell" noValidate>
         <PublicFormValidation />
         <HiddenUtmFields utm={utm} />
         <HoneypotField id="business-solution-website" />

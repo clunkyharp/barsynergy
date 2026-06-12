@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { AdminActionAlert } from '@/components/admin/content-admin-controls';
 import { RequestLedger } from '@/components/business/business-cabinet';
 import { BusinessRequestForm } from '@/components/business/business-request-form';
-import { createBusinessApplication } from '@/lib/business/actions';
+import { createBusinessApplication } from '@/lib/business/application-actions';
 import { PageHeader } from '@/components/ui/page-header';
 import { firstParam } from '@/lib/admin/content-utils';
 import type { AdminContentSearchParams } from '@/lib/admin/content-utils';

@@ -1,23 +1,14 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import {
-  ArrowUpRight,
-  Calculator,
-  ClipboardCheck,
-  GraduationCap,
-  PackageCheck,
-  Utensils,
-  Wine,
-  type LucideIcon
-} from 'lucide-react';
+import { ArrowUpRight } from 'lucide-react';
+import { SectionIcon, type SectionIconType } from '@/components/public/section-icon';
 import { Button } from '@/components/ui/button';
-import { ConsultingTabs } from '@/components/public/consulting-tabs';
 import { ConsultingRequestForm } from '@/components/public/consulting-request-form';
 import { submitConsultingRequest } from '@/app/(public)/consulting/actions';
-import { EditorialPublicPage } from '@/components/public/editorial-public-page';
+import { PageHero } from '@/components/public/page-hero';
 import { PublicBodyText, PublicDisplayTitle, PublicEyebrow } from '@/components/public/public-primitives';
 import { getApplicationCityOptions } from '@/lib/applications/form-options';
-import { firstParam, getPublicApplicationResult, getPublicApplicationUtm } from '@/lib/applications/public-form-helpers';
+import { firstParam, getPublicApplicationUtm } from '@/lib/applications/public-form-helpers';
 import { arePublicApplicationFormsEnabled } from '@/lib/applications/public-forms';
 import {
   consultingDirectionOptions,
@@ -25,6 +16,8 @@ import {
 } from '@/lib/applications/b2b-request-options';
 import { displayFont } from '@/lib/fonts';
 import type { PublicContentSearchParams } from '@/lib/public/content';
+import { JsonLd } from '@/components/seo/json-ld';
+import { buildStaticPageBreadcrumbJsonLd } from '@/lib/public/structured-data';
 import { buildPublicPageMetadata } from '@/lib/public/metadata';
 import { getEnv } from '@/lib/validation/env';
 
@@ -92,7 +85,7 @@ const directionMeta: Record<
 const consultingDirectionCards: {
   code: string;
   description: string;
-  icon: LucideIcon;
+  icon: SectionIconType;
   imagePath: string;
   result: string;
   tags: string[];
@@ -109,7 +102,7 @@ const consultingDirectionCards: {
     tags: ['Запуск', 'Процессы'],
     imagePath: '/images/home/hero-bar-counter-bundo.jpg',
     tone: 'consulting-launch',
-    icon: Utensils
+    icon: 'espresso'
   },
   {
     value: 'bar_menu',
@@ -120,7 +113,7 @@ const consultingDirectionCards: {
     tags: ['Меню', 'Подача'],
     imagePath: '/images/generated/program-intensive.jpg',
     tone: 'consulting-menu',
-    icon: Wine
+    icon: 'dripper'
   },
   {
     value: 'team_training',
@@ -131,7 +124,7 @@ const consultingDirectionCards: {
     tags: ['Сервис', 'Навыки'],
     imagePath: '/images/home/professional-education.webp',
     tone: 'consulting-team',
-    icon: GraduationCap
+    icon: 'education'
   },
   {
     value: 'cost_pricing',
@@ -142,7 +135,7 @@ const consultingDirectionCards: {
     tags: ['Экономика', 'Маржа'],
     imagePath: '/images/generated/content-guide.jpg',
     tone: 'consulting-cost',
-    icon: Calculator
+    icon: 'calculator'
   },
   {
     value: 'suppliers_procurement',
@@ -153,7 +146,7 @@ const consultingDirectionCards: {
     tags: ['Закупки', 'Контроль'],
     imagePath: '/images/generated/sponsorship-coffee-bar.jpg',
     tone: 'consulting-procurement',
-    icon: PackageCheck
+    icon: 'suppliers'
   },
   {
     value: 'operational_audit',
@@ -164,7 +157,7 @@ const consultingDirectionCards: {
     tags: ['Смены', 'Аудит'],
     imagePath: '/images/home/audience-venues-coffee-bar.jpg',
     tone: 'consulting-audit',
-    icon: ClipboardCheck
+    icon: 'chart'
   }
 ];
 
@@ -207,51 +200,6 @@ const expertDisplayTitles: Record<(typeof consultingExpertOptions)[number]['valu
   economics_advisor: 'Себестоимость'
 };
 
-const consultingCases = [
-  {
-    image: '/images/home/hero-bar-counter-bundo.jpg',
-    title: 'Запуск кофейного бара',
-    task: 'Разложить формат, оборудование, стартовое меню и список закупок до открытия.',
-    result: 'Команда получает короткий запусковой план, чек-лист поставщиков и порядок первых смен.'
-  },
-  {
-    image: '/images/generated/program-intensive.jpg',
-    title: 'Пересборка барной карты',
-    task: 'Убрать слабые позиции, проверить себестоимость и собрать понятную сезонную структуру.',
-    result: 'В карте остаются позиции с ясной ролью, ценой и технологией приготовления.'
-  },
-  {
-    image: '/images/home/professional-education.webp',
-    title: 'Обучение смены',
-    task: 'Выровнять базовые навыки команды, стандарты сервиса и контроль качества напитков.',
-    result: 'Появляется план обучения, роли наставников и проверочные листы для управляющего.'
-  },
-  {
-    image: '/images/home/audience-venues-coffee-bar.jpg',
-    title: 'Операционный аудит',
-    task: 'Найти потери времени, ошибки в запасах и слабые места в ежедневных процессах.',
-    result: 'Собирается список быстрых правок и отдельный план для системных изменений.'
-  }
-] as const;
-
-const consultingPriceItems = [
-  {
-    title: 'Экспресс-разбор',
-    price: 'от 15 000 ₽',
-    description: 'Одна задача, короткая подготовка и итоговые рекомендации после консультации.'
-  },
-  {
-    title: 'Проектный разбор',
-    price: 'от 45 000 ₽',
-    description: 'Несколько встреч, разбор материалов, расчётов, меню, команды или запуска.'
-  },
-  {
-    title: 'Операционный аудит',
-    price: 'от 75 000 ₽',
-    description: 'Проверка процессов заведения, фиксация проблем и план внедрения изменений.'
-  }
-] as const;
-
 const defaultParamKeys = [
   'contactName',
   'cityId',
@@ -283,8 +231,6 @@ function ConsultingDirectionCards() {
   return (
     <div className="home-services-grid consulting-services-grid mt-8">
       {consultingDirectionCards.map((direction) => {
-        const Icon = direction.icon;
-
         return (
           <article className={`home-service-card home-service-card--${direction.tone}`} key={direction.value}>
             <div className="home-service-card-top">
@@ -296,9 +242,7 @@ function ConsultingDirectionCards() {
               <span className="home-service-code">{direction.code}</span>
             </div>
             <div className="home-service-card-body">
-              <span className="home-service-icon" aria-hidden="true">
-                <Icon size={18} strokeWidth={1.8} />
-              </span>
+              <SectionIcon size={40} type={direction.icon} />
               <span className="home-service-eyebrow">{directionMeta[direction.value].kind}</span>
               <h3 className={`${displayFont.className} home-service-title`}>{direction.title}</h3>
               <p className="home-service-description">{direction.description}</p>
@@ -330,23 +274,22 @@ export default async function ConsultingPage({ searchParams }: ConsultingPagePro
 
   return (
     <>
-      <EditorialPublicPage
+      <JsonLd data={buildStaticPageBreadcrumbJsonLd('/consulting', 'Консалтинг')} />
+      <PageHero
+        breadcrumbs={[{ label: 'Консалтинг' }]}
         eyebrow="Консалтинг"
-        path="/consulting"
         title="Экспертная помощь для кофейных баров и заведений"
-        description="Разбираем запуск, меню, команду, себестоимость, поставщиков и операционные процессы."
-        summary="Опишите задачу, стадию проекта и тему консультации. Мы уточним детали и предложим удобный формат."
-        summaryHeading="Практика"
-        heroVariant="cover"
-        metrics={[]}
-        rows={[]}
-        primaryLink={{ label: 'Описать задачу', href: '#consulting-request' }}
-        secondaryLink={{ label: 'Рассчитать себестоимость', href: '/tools/cost-calculator' }}
+        subtitle="Разбираем запуск, меню, команду, себестоимость, поставщиков и операционные процессы."
+        tone="light-editorial"
+        actions={[
+          { label: 'Описать задачу', href: '#consulting-request', kind: 'primary' },
+          { label: 'Рассчитать себестоимость', href: '/tools/cost-calculator', kind: 'secondary' }
+        ]}
       />
 
       <section className="background-zone background-zone-beige editorial-grid border-b border-[var(--line)] py-10 md:py-14">
         <div className="container grid gap-8 xl:grid-cols-[minmax(16rem,0.58fr)_minmax(0,1.42fr)]">
-          <div className="xl:self-start">
+          <div className="xl:self-center">
             <PublicEyebrow>Эксперты</PublicEyebrow>
             <PublicDisplayTitle className="mt-4 max-w-sm">Подбор эксперта</PublicDisplayTitle>
             <PublicBodyText className="mt-5 max-w-md" size="md">
@@ -409,8 +352,6 @@ export default async function ConsultingPage({ searchParams }: ConsultingPagePro
         </div>
       </section>
 
-      <ConsultingTabs cases={consultingCases} prices={consultingPriceItems} />
-
       <section className="background-zone background-zone-cta border-b border-[var(--line)] py-10 md:py-14">
         <div className="container grid gap-5 md:grid-cols-[minmax(0,1fr)_auto] md:items-center">
           <div>
@@ -434,7 +375,6 @@ export default async function ConsultingPage({ searchParams }: ConsultingPagePro
         direct
         defaults={defaults}
         enabled={applicationFormsEnabled}
-        result={getPublicApplicationResult(params)}
         utm={getPublicApplicationUtm(params)}
         cities={cities}
         action={submitConsultingRequest}

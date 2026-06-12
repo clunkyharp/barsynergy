@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import { CategoryType, ContentStatus } from '@/modules/admin/queries';
-import { updateEvent, updateEventStatus } from '@/app/admin/events/actions';
-import { AdminCmsActions, AdminCmsForm, AdminCmsGrid, AdminCmsSection, AdminCmsSummary } from '@/components/admin/admin-cms-form';
+import { deleteEventDraft, updateEvent, updateEventStatus } from '@/app/admin/events/actions';
+import { AdminCmsActions, AdminCmsAdvancedSection, AdminCmsForm, AdminCmsGrid, AdminCmsSection, AdminCmsSummary } from '@/components/admin/admin-cms-form';
 import { AdminContentVisibilityPanel, CoverImageField, HiddenRedirect } from '@/components/admin/content-admin-controls';
 import { Button } from '@/components/ui/button';
 import { FormField } from '@/components/ui/form-field';
@@ -13,11 +13,10 @@ import {
   eventFormatOptions,
   eventRegistrationModeOptions,
   getAdminOptionLabel,
-  PUBLICATION_STATUS_HINT,
   withCurrentValueOption
 } from '@/lib/admin/content-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
-import { prisma } from '@/modules/admin/queries';
+import { getEventById, getActiveCategories, getActiveCities } from '@/lib/admin/admin-queries';
 
 export const dynamic = 'force-dynamic';
 
@@ -45,20 +44,9 @@ export default async function AdminEventEditPage({ params }: AdminEventEditPageP
   const { eventId } = await params;
 
   const [event, categories, cities] = await Promise.all([
-    prisma.event.findUnique({
-      where: { id: eventId },
-      include: { coverImage: { select: { originalName: true } } }
-    }),
-    prisma.category.findMany({
-      where: { type: CategoryType.EVENT, isActive: true },
-      orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
-      select: { id: true, name: true }
-    }),
-    prisma.city.findMany({
-      where: { isActive: true },
-      orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
-      select: { id: true, name: true }
-    })
+    getEventById(eventId),
+    getActiveCategories(CategoryType.EVENT),
+    getActiveCities()
   ]);
 
   if (!event) {
@@ -71,8 +59,8 @@ export default async function AdminEventEditPage({ params }: AdminEventEditPageP
     <div className="space-y-8">
       <header className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Админка / События / Редактирование</p>
-          <h1 className="mt-2 text-3xl font-semibold">Редактировать событие</h1>
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Админка / Событие / Редактирование</p>
+          <h1 className="mt-2 text-3xl font-semibold">{event.title}</h1>
         </div>
         <Button href={ADMIN_EVENTS_PATH} variant="secondary">
           Назад к списку
@@ -100,13 +88,10 @@ export default async function AdminEventEditPage({ params }: AdminEventEditPageP
             ]}
           />
           
-          <AdminCmsSection title="Публикация" description="Название, адрес, категория и статус события.">
+          <AdminCmsSection title="Публикация" description="Название и категория события.">
             <AdminCmsGrid>
               <FormField htmlFor="event-title" label="Название">
                 <Input id="event-title" name="title" required minLength={2} maxLength={160} defaultValue={event.title} />
-              </FormField>
-              <FormField htmlFor="event-slug" label="Адрес страницы">
-                <Input id="event-slug" name="slug" maxLength={180} defaultValue={event.slug} />
               </FormField>
               <FormField htmlFor="event-categoryId" label="Категория">
                 <Select id="event-categoryId" name="categoryId" defaultValue={event.categoryId ?? ''}>
@@ -118,17 +103,16 @@ export default async function AdminEventEditPage({ params }: AdminEventEditPageP
                   ))}
                 </Select>
               </FormField>
-              <FormField htmlFor="event-status" label="Статус" hint={PUBLICATION_STATUS_HINT}>
-                <Select id="event-status" name="status" defaultValue={event.status}>
-                  {Object.values(ContentStatus).map((status) => (
-                    <option key={status} value={status}>
-                      {contentStatusLabels[status]}
-                    </option>
-                  ))}
-                </Select>
-              </FormField>
             </AdminCmsGrid>
           </AdminCmsSection>
+
+          <AdminCmsAdvancedSection title="Технические настройки" description="Адрес страницы. Изменение сломает существующие ссылки.">
+            <AdminCmsGrid>
+              <FormField htmlFor="event-slug" label="Адрес страницы">
+                <Input id="event-slug" name="slug" readOnly defaultValue={event.slug} />
+              </FormField>
+            </AdminCmsGrid>
+          </AdminCmsAdvancedSection>
 
           <AdminCmsSection title="Классификация" description="Город, площадка, формат и условия регистрации.">
             <AdminCmsGrid>
@@ -211,19 +195,25 @@ export default async function AdminEventEditPage({ params }: AdminEventEditPageP
 
           <AdminCmsSection title="Контент" description="Краткое описание события для публичных списков.">
             <div className="grid gap-4">
-                <FormField htmlFor="event-summary" label="Краткое описание">
+                <FormField htmlFor="event-summary" label="Описание для карточки" hint="Показывается в каталоге. До 500 символов.">
                   <Textarea id="event-summary" name="summary" required minLength={10} maxLength={500} defaultValue={event.summary} />
                 </FormField>
             </div>
           </AdminCmsSection>
 
           <AdminCmsActions>
-            <Button href={ADMIN_EVENTS_PATH} type="button" variant="secondary">
-              Отмена
-            </Button>
             <Button type="submit">Сохранить изменения</Button>
           </AdminCmsActions>
       </AdminCmsForm>
+
+      {event.status === ContentStatus.DRAFT ? (
+        <form action={deleteEventDraft}>
+          <input name="eventId" type="hidden" value={event.id} />
+          <Button type="submit" variant="ghost">
+            Удалить черновик
+          </Button>
+        </form>
+      ) : null}
     </div>
   );
 }

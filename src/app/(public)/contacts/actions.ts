@@ -1,22 +1,20 @@
 'use server';
 
-import { redirect } from 'next/navigation';
 import { ApplicationType } from '@prisma/client';
 import { z } from 'zod';
 import { buildApplicationPayload } from '@/lib/applications/application-payloads';
 import {
   assertActiveCity,
   baseContactSchema,
-  getPublicApplicationResultPath,
   getString,
   nullableString,
   optionalString,
   PERSONAL_DATA_CONSENT_TEXT,
+  type PublicApplicationResult,
   utmSchema
 } from '@/lib/applications/public-form-helpers';
 import { submitPublicApplicationAction } from '@/lib/applications/submit-public-application-action';
 
-const CONTACTS_PATH = '/contacts';
 const contactTopicValues = [
   'education-program',
   'education-launch',
@@ -113,17 +111,12 @@ function splitContactChannel(contact?: string) {
   return { phone: value };
 }
 
-function redirectWithContactsResult(result: { type: 'success' | 'error'; message: string }): never {
-  redirect(getPublicApplicationResultPath(CONTACTS_PATH, result));
-}
-
-export async function submitContactMessage(formData: FormData) {
-  await submitPublicApplicationAction({
+export async function submitContactMessage(_prevState: PublicApplicationResult | null, formData: FormData): Promise<PublicApplicationResult> {
+  return submitPublicApplicationAction({
     actionName: 'public:contact-message',
     applicationType: ApplicationType.CONTACT_MESSAGE,
     formData,
     successMessage: 'Сообщение получено. Мы свяжемся с вами после проверки обращения.',
-    redirectWithResult: redirectWithContactsResult,
     parse: async (data) => {
       const contactChannels = splitContactChannel(getString(data, 'contact'));
       const parsed = contactMessageSchema.parse({

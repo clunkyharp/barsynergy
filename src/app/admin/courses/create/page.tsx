@@ -1,4 +1,4 @@
-import { CategoryType, ContentStatus } from '@/modules/admin/queries';
+import { CategoryType } from '@/modules/admin/queries';
 import { createCourse } from '@/app/admin/courses/actions';
 import { AdminCmsActions, AdminCmsForm, AdminCmsGrid, AdminCmsSection } from '@/components/admin/admin-cms-form';
 import { CoverImageField } from '@/components/admin/content-admin-controls';
@@ -8,9 +8,9 @@ import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
 import { MarkdownEditor } from '@/components/admin/markdown-editor';
 import { Textarea } from '@/components/ui/textarea';
-import { PUBLICATION_STATUS_HINT, contentStatusLabels, courseFormatOptions, courseLevelOptions } from '@/lib/admin/content-utils';
+import { courseFormatOptions, courseLevelOptions } from '@/lib/admin/content-utils';
+import { getActiveCategories, getActiveCities } from '@/lib/admin/admin-queries';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
-import { prisma } from '@/modules/admin/queries';
 
 export const dynamic = 'force-dynamic';
 
@@ -18,16 +18,8 @@ export default async function AdminCreateCoursePage() {
   await requireAdminSectionAccess('courses');
 
   const [categories, cities] = await Promise.all([
-    prisma.category.findMany({
-      where: { type: CategoryType.COURSE, isActive: true },
-      orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
-      select: { id: true, name: true }
-    }),
-    prisma.city.findMany({
-      where: { isActive: true },
-      orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
-      select: { id: true, name: true }
-    })
+    getActiveCategories(CategoryType.COURSE),
+    getActiveCities()
   ]);
 
   return (
@@ -38,28 +30,11 @@ export default async function AdminCreateCoursePage() {
       </header>
 
       <AdminCmsForm action={createCourse}>
-        <AdminCmsSection title="Публикация" description="Название, адрес страницы и публикационный статус курса.">
+        <AdminCmsSection title="Публикация" description="Название и категория курса.">
           <AdminCmsGrid>
             <FormField htmlFor="course-title" label="Название">
               <Input id="course-title" name="title" required minLength={2} maxLength={160} />
             </FormField>
-            <FormField htmlFor="course-slug" label="Адрес страницы">
-              <Input id="course-slug" name="slug" maxLength={180} placeholder="Если пусто, будет создан из названия" />
-            </FormField>
-            <FormField htmlFor="course-status" label="Статус" hint={PUBLICATION_STATUS_HINT}>
-              <Select id="course-status" name="status" defaultValue={ContentStatus.DRAFT}>
-                {Object.values(ContentStatus).map((status) => (
-                  <option key={status} value={status}>
-                    {contentStatusLabels[status]}
-                  </option>
-                ))}
-              </Select>
-            </FormField>
-          </AdminCmsGrid>
-        </AdminCmsSection>
-
-        <AdminCmsSection title="Параметры обучения" description="Рубрика, город, формат и учебные параметры для каталога.">
-          <AdminCmsGrid>
             <FormField htmlFor="course-categoryId" label="Категория">
               <Select id="course-categoryId" name="categoryId" defaultValue="">
                 <option value="">Без категории</option>
@@ -70,6 +45,11 @@ export default async function AdminCreateCoursePage() {
                 ))}
               </Select>
             </FormField>
+          </AdminCmsGrid>
+        </AdminCmsSection>
+
+        <AdminCmsSection title="Параметры обучения" description="Город, формат и учебные параметры для каталога.">
+          <AdminCmsGrid>
             <FormField htmlFor="course-cityId" label="Город">
               <Select id="course-cityId" name="cityId" defaultValue="">
                 <option value="">Без города</option>
@@ -120,19 +100,16 @@ export default async function AdminCreateCoursePage() {
 
         <AdminCmsSection title="Контент" description="Короткое описание и программа курса.">
           <div className="grid gap-4">
-            <FormField htmlFor="course-summary" label="Краткое описание">
+            <FormField htmlFor="course-summary" label="Описание для карточки" hint="Показывается в каталоге. До 500 символов.">
               <Textarea id="course-summary" name="summary" required minLength={10} maxLength={500} />
             </FormField>
-            <FormField htmlFor="course-program" label="Программа">
-              <MarkdownEditor id="course-program" name="program" required minLength={20} maxLength={100_000} className="min-h-64" />
+            <FormField htmlFor="course-program" label="Программа" hint="Полное содержимое публичной страницы курса">
+              <MarkdownEditor id="course-program" name="program" required minLength={20} maxLength={100_000} />
             </FormField>
           </div>
         </AdminCmsSection>
 
         <AdminCmsActions>
-            <Button type="button" variant="secondary" href="/admin/courses">
-              Отмена
-            </Button>
             <Button type="submit">Создать курс</Button>
         </AdminCmsActions>
       </AdminCmsForm>

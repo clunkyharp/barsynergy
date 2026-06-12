@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import { CategoryType, ContentStatus } from '@/modules/admin/queries';
-import { updateVacancy, updateVacancyStatus } from '@/app/admin/vacancies/actions';
-import { AdminCmsActions, AdminCmsForm, AdminCmsGrid, AdminCmsSection, AdminCmsSummary } from '@/components/admin/admin-cms-form';
+import { deleteVacancyDraft, updateVacancy, updateVacancyStatus } from '@/app/admin/vacancies/actions';
+import { AdminCmsActions, AdminCmsAdvancedSection, AdminCmsForm, AdminCmsGrid, AdminCmsSection, AdminCmsSummary } from '@/components/admin/admin-cms-form';
 import { AdminContentVisibilityPanel, CoverImageField, HiddenRedirect } from '@/components/admin/content-admin-controls';
 import { Button } from '@/components/ui/button';
 import { FormField } from '@/components/ui/form-field';
@@ -12,13 +12,12 @@ import { Textarea } from '@/components/ui/textarea';
 import {
   contentStatusLabels,
   getAdminOptionLabel,
-  PUBLICATION_STATUS_HINT,
   vacancyEmploymentTypeOptions,
   vacancyExperienceOptions,
   withCurrentValueOption
 } from '@/lib/admin/content-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
-import { prisma } from '@/modules/admin/queries';
+import { getVacancyById, getActiveCategories, getActiveCities, getActiveBusinessAccounts } from '@/lib/admin/admin-queries';
 import { vacancyPositionValues } from '@/lib/vacancies/positions';
 
 export const dynamic = 'force-dynamic';
@@ -34,28 +33,10 @@ export default async function AdminVacancyEditPage({ params }: AdminVacancyEditP
   const { vacancyId } = await params;
 
   const [vacancy, categories, cities, businessAccounts] = await Promise.all([
-    prisma.vacancy.findUnique({
-      where: { id: vacancyId },
-      include: {
-        coverImage: { select: { originalName: true } },
-        _count: { select: { applications: true } }
-      }
-    }),
-    prisma.category.findMany({
-      where: { type: CategoryType.VACANCY, isActive: true },
-      orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
-      select: { id: true, name: true }
-    }),
-    prisma.city.findMany({
-      where: { isActive: true },
-      orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
-      select: { id: true, name: true }
-    }),
-    prisma.businessAccount.findMany({
-      where: { status: 'ACTIVE' },
-      orderBy: { companyName: 'asc' },
-      select: { id: true, companyName: true }
-    })
+    getVacancyById(vacancyId),
+    getActiveCategories(CategoryType.VACANCY),
+    getActiveCities(),
+    getActiveBusinessAccounts()
   ]);
 
   if (!vacancy) {
@@ -103,28 +84,11 @@ export default async function AdminVacancyEditPage({ params }: AdminVacancyEditP
           }
         />
 
-        <AdminCmsSection title="Публикация" description="Заголовок, адрес страницы и статус вакансии.">
+        <AdminCmsSection title="Публикация" description="Название вакансии, категория и классификация.">
           <AdminCmsGrid>
-            <FormField htmlFor="vacancy-title" label="Заголовок">
+            <FormField htmlFor="vacancy-title" label="Название вакансии">
               <Input id="vacancy-title" name="title" required minLength={2} maxLength={160} defaultValue={vacancy.title} />
             </FormField>
-            <FormField htmlFor="vacancy-slug" label="Адрес страницы">
-              <Input id="vacancy-slug" name="slug" maxLength={180} defaultValue={vacancy.slug} />
-            </FormField>
-            <FormField htmlFor="vacancy-status" label="Статус" hint={PUBLICATION_STATUS_HINT}>
-              <Select id="vacancy-status" name="status" defaultValue={vacancy.status}>
-                {Object.values(ContentStatus).map((status) => (
-                  <option key={status} value={status}>
-                    {contentStatusLabels[status]}
-                  </option>
-                ))}
-              </Select>
-            </FormField>
-          </AdminCmsGrid>
-        </AdminCmsSection>
-
-        <AdminCmsSection title="Классификация" description="Рубрика вакансии для каталога и фильтров.">
-          <AdminCmsGrid>
             <FormField htmlFor="vacancy-categoryId" label="Категория">
               <Select id="vacancy-categoryId" name="categoryId" defaultValue={vacancy.categoryId ?? ''}>
                 <option value="">Без категории</option>
@@ -137,6 +101,14 @@ export default async function AdminVacancyEditPage({ params }: AdminVacancyEditP
             </FormField>
           </AdminCmsGrid>
         </AdminCmsSection>
+
+        <AdminCmsAdvancedSection title="Технические настройки" description="Адрес страницы. Изменение сломает существующие ссылки.">
+          <AdminCmsGrid>
+            <FormField htmlFor="vacancy-slug" label="Адрес страницы">
+              <Input id="vacancy-slug" name="slug" readOnly defaultValue={vacancy.slug} />
+            </FormField>
+          </AdminCmsGrid>
+        </AdminCmsAdvancedSection>
 
         <AdminCmsSection title="Условия работы" description="Компания, позиция, город, формат занятости и требования к опыту.">
           <AdminCmsGrid>
@@ -218,22 +190,28 @@ export default async function AdminVacancyEditPage({ params }: AdminVacancyEditP
 
         <AdminCmsSection title="Контент" description="Краткое описание и полный текст вакансии.">
           <div className="grid gap-4">
-            <FormField htmlFor="vacancy-summary" label="Краткое описание">
+            <FormField htmlFor="vacancy-summary" label="Описание для карточки" hint="Показывается в каталоге. До 500 символов.">
               <Textarea id="vacancy-summary" name="summary" required minLength={10} maxLength={500} defaultValue={vacancy.summary} />
             </FormField>
-            <FormField htmlFor="vacancy-description" label="Описание">
-              <MarkdownEditor id="vacancy-description" name="description" required minLength={20} maxLength={100_000} className="min-h-64" defaultValue={vacancy.description} />
+            <FormField htmlFor="vacancy-description" label="Текст страницы" hint="Полное содержимое публичной страницы">
+              <MarkdownEditor id="vacancy-description" name="description" required minLength={20} maxLength={100_000} defaultValue={vacancy.description} />
             </FormField>
           </div>
         </AdminCmsSection>
 
         <AdminCmsActions>
-          <Button href={ADMIN_VACANCIES_PATH} type="button" variant="secondary">
-            Отмена
-          </Button>
           <Button type="submit">Сохранить изменения</Button>
         </AdminCmsActions>
       </AdminCmsForm>
+
+      {vacancy.status === ContentStatus.DRAFT ? (
+        <form action={deleteVacancyDraft}>
+          <input name="vacancyId" type="hidden" value={vacancy.id} />
+          <Button type="submit" variant="ghost">
+            Удалить черновик
+          </Button>
+        </form>
+      ) : null}
     </div>
   );
 }

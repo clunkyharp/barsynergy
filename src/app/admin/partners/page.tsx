@@ -38,8 +38,8 @@ import {
   partnerTypeOptions,
   type AdminContentSearchParams
 } from '@/lib/admin/content-utils';
+import { getActiveCategories, getPartnerList } from '@/lib/admin/admin-queries';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
-import { prisma } from '@/modules/admin/queries';
 
 export const dynamic = 'force-dynamic';
 
@@ -85,24 +85,9 @@ export default async function AdminPartnersPage({ searchParams }: AdminPartnersP
       : {})
   };
 
-  const [total, partners, categories] = await Promise.all([
-    prisma.partner.count({ where }),
-    prisma.partner.findMany({
-      where,
-      orderBy: [{ createdAt: 'desc' }],
-      skip: (page - 1) * ADMIN_CONTENT_PAGE_SIZE,
-      take: ADMIN_CONTENT_PAGE_SIZE,
-      include: {
-        category: { select: { name: true } },
-        coverImage: { select: { originalName: true } },
-        updatedBy: { select: { email: true } }
-      }
-    }),
-    prisma.category.findMany({
-      where: { type: CategoryType.PARTNER, isActive: true },
-      orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
-      select: { id: true, name: true }
-    })
+  const [[partners, total], categories] = await Promise.all([
+    getPartnerList(where, (page - 1) * ADMIN_CONTENT_PAGE_SIZE, ADMIN_CONTENT_PAGE_SIZE),
+    getActiveCategories(CategoryType.PARTNER)
   ]);
   const totalPages = getAdminTotalPages(total);
   const hasActiveFilters = Boolean(q || status || categoryId || partnerType || featuredFilter);

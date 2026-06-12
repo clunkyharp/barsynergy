@@ -1,21 +1,23 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { PublicContentDetailPage } from '@/components/public/public-content-detail-page';
-import { PublicRelatedContentSection } from '@/components/public/public-related-content-section';
+import { VacancyDetailBody } from '@/components/public/vacancy-detail-body';
+import { VacancyDetailHero } from '@/components/public/vacancy-detail-hero';
+import { VacancyRelatedSection } from '@/components/public/vacancy-related-section';
 import { ToggleSavedVacancyButton } from '@/components/public/toggle-saved-vacancy-button';
-import { getPublishedVacancyDetail } from '@/modules/content/vacancies/queries';
-import { toggleSavedVacancy } from '@/lib/profile/saved-vacancies-actions';
 import { VacancyResponseDialog } from '@/components/public/vacancy-application-forms';
 import { submitVacancyResponseApplication } from '@/app/(public)/vacancies/actions';
+import { VacancyMobileStickyBar } from '@/app/(public)/vacancies/[slug]/vacancy-detail-client';
 import { JsonLd } from '@/components/seo/json-ld';
 import { arePublicApplicationFormsEnabled } from '@/lib/applications/public-forms';
 import { getPublicApplicationUtm } from '@/lib/applications/public-form-helpers';
 import { getCurrentUser } from '@/lib/auth/current-user';
 import { getPublishedVacancies } from '@/lib/public/content';
 import {
+  getPublishedVacancyDetail,
   getVacancyApplicationFormOptions,
   getVacancyUserPrefill
 } from '@/modules/content/vacancies/queries';
+import { toggleSavedVacancy } from '@/lib/profile/saved-vacancies-actions';
 import { buildMissingPublicContentMetadata, buildPublicContentMetadata } from '@/lib/public/metadata';
 import { buildBreadcrumbJsonLd, buildPublicContentJsonLd } from '@/lib/public/structured-data';
 import { getEnv } from '@/lib/validation/env';
@@ -83,6 +85,21 @@ export default async function VacancyDetailPage({ params, searchParams }: Vacanc
     isSaved = result.isSaved;
   }
 
+  const dialogSelectedVacancy = {
+    id: vacancy.id,
+    slug: vacancy.slug,
+    title: vacancy.title,
+    companyName: vacancy.companyName ?? '',
+    cityName: vacancy.cityName
+  };
+
+  const salaryLabel = vacancy.facts.find((f) => f.label === 'Зарплата')?.value;
+  const employmentTypeLabel = vacancy.facts.find((f) => f.label === 'График')?.value;
+  const experienceLabel = vacancy.facts.find((f) => f.label === 'Опыт')?.value;
+  const positionLabel = vacancy.facts.find((f) => f.label === 'Позиция')?.value;
+
+  const showUserActions = !currentUser || currentUser.role === 'USER';
+
   return (
     <>
       <JsonLd
@@ -95,45 +112,56 @@ export default async function VacancyDetailPage({ params, searchParams }: Vacanc
           buildPublicContentJsonLd({ detail: vacancy, path: detailPath, kind: 'vacancy' })
         ]}
       />
-      <PublicContentDetailPage
-        backHref="/vacancies"
-        backLabel="Ко всем вакансиям"
-        body={vacancy.body}
-        eyebrow="Вакансии"
-        facts={vacancy.facts}
-        imageUrl={vacancy.imageUrl}
-        label={vacancy.label}
-        meta={vacancy.meta}
-        sections={vacancy.sections}
-        summary={vacancy.summary}
-        title={vacancy.title}
-        actionsSlot={
-          <VacancyResponseDialog
+      <div className={showUserActions ? 'pb-20 xl:pb-0' : undefined}>
+        <VacancyDetailHero
+          cityName={vacancy.cityName}
+          companyName={vacancy.companyName}
+          employmentTypeLabel={employmentTypeLabel}
+          experienceLabel={experienceLabel}
+          image={vacancy.imageUrl}
+          label={vacancy.label}
+          positionLabel={positionLabel}
+          salaryLabel={salaryLabel}
+          summary={vacancy.summary}
+          title={vacancy.title}
+        />
+        <VacancyDetailBody
+          applyRail={
+            showUserActions ? (
+              <div className="space-y-4 p-5 md:p-6">
+                <VacancyResponseDialog
+                  enabled={formsEnabled}
+                  options={options}
+                  profile={profilePrefill}
+                  selectedVacancy={dialogSelectedVacancy}
+                  utm={getPublicApplicationUtm(sp)}
+                  submitVacancyResponseApplication={submitVacancyResponseApplication}
+                />
+                {currentUser?.role === 'USER' ? (
+                  <ToggleSavedVacancyButton
+                    initialSaved={isSaved}
+                    toggleAction={toggleSavedVacancy}
+                    vacancyId={vacancy.id}
+                  />
+                ) : null}
+              </div>
+            ) : null
+          }
+          body={vacancy.body}
+          facts={vacancy.facts}
+        />
+        {showUserActions && (
+          <VacancyMobileStickyBar
             enabled={formsEnabled}
             options={options}
             profile={profilePrefill}
-            selectedVacancy={{
-              id: vacancy.id,
-              slug: vacancy.slug,
-              title: vacancy.title,
-              companyName: vacancy.companyName ?? '',
-              cityName: vacancy.cityName
-            }}
+            selectedVacancy={dialogSelectedVacancy}
             utm={getPublicApplicationUtm(sp)}
             submitVacancyResponseApplication={submitVacancyResponseApplication}
           />
-        }
-        actionsBottomSlot={
-          currentUser && (
-            <ToggleSavedVacancyButton vacancyId={vacancy.id} initialSaved={isSaved} toggleAction={toggleSavedVacancy} />
-          )
-        }
-      />
-      <PublicRelatedContentSection
-        basePath="/vacancies"
-        items={relatedItems}
-        title="Другие вакансии"
-      />
+        )}
+      </div>
+      <VacancyRelatedSection items={relatedItems} />
     </>
   );
 }

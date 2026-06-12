@@ -13,14 +13,14 @@ function opportunityLabel(item: PublishedContentItem) {
   const city = item.metaGroups?.find((entry) => entry.label === 'Город')?.value;
   return (
     <div className="flex flex-wrap items-center gap-2.5">
-      <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">{item.label ?? 'Вакансия'}</span>
-      {city ? <span className="text-[11px] font-medium uppercase tracking-[0.12em] text-[var(--muted)]">{city}</span> : null}
+      <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--accent)]">{item.label ?? 'Вакансия'}</span>
+      {city ? <span className="text-[11px] font-medium text-[var(--muted)]">{city}</span> : null}
     </div>
   );
 }
 
 function opportunityLabelMeta(item: PublishedContentItem) {
-  return item.updatedLabel ? <span className="text-[11px] font-medium uppercase tracking-[0.12em] text-[var(--muted)]">{item.updatedLabel}</span> : null;
+  return item.updatedLabel ? <span className="text-[11px] font-medium text-[var(--muted)]">{item.updatedLabel}</span> : null;
 }
 
 function opportunityMeta(item: PublishedContentItem) {
@@ -89,7 +89,7 @@ export function OpportunityListRow({
               </span>
             ) : null}
           </div>
-          <h3 className="public-list-row-title mt-3 text-balance text-[1.85rem] font-bold leading-[1.08] text-[var(--text)] md:text-[2.2rem]">
+          <h3 className="public-list-row-title mt-3 text-balance text-[1.35rem] font-bold leading-[1.15] text-[var(--text)] md:text-[1.55rem]">
             {item.title}
           </h3>
           <div className="public-list-row-lead mt-3 text-[1.25rem] font-semibold leading-8 text-[var(--text)] md:text-[1.45rem]">

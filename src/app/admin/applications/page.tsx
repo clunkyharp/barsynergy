@@ -25,7 +25,6 @@ import {
   applicationStatusBadgeVariants,
   applicationStatusLabels,
   applicationTypeLabels,
-  applicationTypeValues,
   parseApplicationStatus,
   parseApplicationType
 } from '@/lib/admin/application-utils';
@@ -38,7 +37,7 @@ import {
 } from '@/lib/admin/content-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
 import { getApplicationPayloadText } from '@/lib/applications/application-payloads';
-import { prisma } from '@/modules/admin/queries';
+import { getApplicationList } from '@/lib/admin/admin-queries';
 
 export const dynamic = 'force-dynamic';
 
@@ -190,36 +189,22 @@ export default async function AdminApplicationsPage({ searchParams }: AdminAppli
     ...(selectedStatus ? { status: selectedStatus } : {})
   };
 
-  const [total, applications] = await Promise.all([
-    prisma.application.count({ where }),
-    prisma.application.findMany({
-      where,
-      orderBy: [{ createdAt: 'desc' }],
-      skip: (page - 1) * ADMIN_CONTENT_PAGE_SIZE,
-      take: ADMIN_CONTENT_PAGE_SIZE,
-      select: {
-        id: true,
-        type: true,
-        status: true,
-        subject: true,
-        name: true,
-        email: true,
-        phone: true,
-        telegram: true,
-        payload: true,
-        resumeFileId: true,
-        consentAcceptedAt: true,
-        createdAt: true,
-        city: { select: { name: true } },
-        vacancy: { select: { title: true, slug: true } },
-        supplier: { select: { title: true, slug: true } },
-        partner: { select: { title: true, slug: true } },
-        businessAccount: { select: { companyName: true } }
-      }
-    })
-  ]);
+  const [applications, total] = await getApplicationList(
+    where,
+    { createdAt: 'desc' },
+    (page - 1) * ADMIN_CONTENT_PAGE_SIZE,
+    ADMIN_CONTENT_PAGE_SIZE
+  );
   const totalPages = getAdminTotalPages(total);
   const hasActiveFilters = Boolean(search || selectedType || selectedStatus);
+
+  function hrefWithoutType(type: ApplicationType | '') {
+    const sp = new URLSearchParams();
+    if (type) sp.set('type', type);
+    const q = sp.toString();
+    return `${ADMIN_APPLICATIONS_PATH}${q ? `?${q}` : ''}`;
+  }
+
   const currentParams = new URLSearchParams();
 
   if (search) {
@@ -251,27 +236,56 @@ export default async function AdminApplicationsPage({ searchParams }: AdminAppli
 
       <AdminStatusTabs
         items={[
-          { current: !selectedStatus, href: ADMIN_APPLICATIONS_PATH, label: 'Все' },
-          ...quickStatusFilters.map((item) => ({
-            current: selectedStatus === item.status,
-            href: `${ADMIN_APPLICATIONS_PATH}?status=${encodeURIComponent(item.status)}`,
-            label: item.label
-          }))
+          { current: !selectedType, href: hrefWithoutType(''), label: 'Все' },
+          {
+            current: selectedType === ApplicationType.VACANCY_RESPONSE,
+            href: hrefWithoutType(ApplicationType.VACANCY_RESPONSE),
+            label: 'Отклики'
+          },
+          {
+            current: selectedType === ApplicationType.VACANCY_SUBMISSION,
+            href: hrefWithoutType(ApplicationType.VACANCY_SUBMISSION),
+            label: 'Размещения вакансий'
+          },
+          {
+            current: selectedType === ApplicationType.CERTIFICATE_ORDER,
+            href: hrefWithoutType(ApplicationType.CERTIFICATE_ORDER),
+            label: 'Заказы'
+          },
+          {
+            current: selectedType === ApplicationType.SUPPLIER_SUBMISSION,
+            href: hrefWithoutType(ApplicationType.SUPPLIER_SUBMISSION),
+            label: 'Заявки поставщиков'
+          },
+          {
+            current: selectedType === ApplicationType.PARTNER_APPLICATION,
+            href: hrefWithoutType(ApplicationType.PARTNER_APPLICATION),
+            label: 'Партнёры'
+          },
+          {
+            current: selectedType === ApplicationType.BUSINESS_ACCOUNT_REQUEST,
+            href: hrefWithoutType(ApplicationType.BUSINESS_ACCOUNT_REQUEST),
+            label: 'Бизнес-доступ'
+          },
+          {
+            current: selectedType === ApplicationType.CONTACT_MESSAGE,
+            href: hrefWithoutType(ApplicationType.CONTACT_MESSAGE),
+            label: 'Контакты'
+          }
         ]}
-        label="Статусы заявок"
+        label="Типы заявок"
       />
 
       <AdminFilterBar action={ADMIN_APPLICATIONS_PATH}>
+        {selectedType ? <input name="type" type="hidden" value={selectedType} /> : null}
         <FormField htmlFor="search" label="Поиск">
           <Input id="search" name="search" defaultValue={search} placeholder="Поиск по заявке" />
         </FormField>
-        <FormField htmlFor="type" label="Тип">
-          <Select id="type" name="type" defaultValue={selectedType ?? ''}>
-            <option value="">Все типы</option>
-            {applicationTypeValues.map((type) => (
-              <option key={type} value={type}>
-                {applicationTypeLabels[type]}
-              </option>
+        <FormField htmlFor="status-filter" label="Статус">
+          <Select defaultValue={selectedStatus ?? ''} id="status-filter" name="status">
+            <option value="">Все статусы</option>
+            {quickStatusFilters.map((item) => (
+              <option key={item.status} value={item.status}>{item.label}</option>
             ))}
           </Select>
         </FormField>

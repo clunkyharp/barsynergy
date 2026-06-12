@@ -1,4 +1,4 @@
-import { UserRole, ContentStatus, EmploymentType, JobSearchStatus, ApplicationStatus, ApplicationType, ConversationSender } from '@prisma/client';
+import { UserRole, ContentStatus, EmploymentType, JobSearchStatus, ApplicationStatus, ApplicationType, ConversationSender, Prisma } from '@prisma/client';
 import { prisma } from '@/lib/db/prisma';
 
 export { UserRole, ContentStatus, EmploymentType, JobSearchStatus, ApplicationStatus, ApplicationType, ConversationSender };
@@ -15,6 +15,13 @@ export const profileResponseStatusValues: readonly ApplicationStatus[] = [
   ApplicationStatus.COMPLETED,
   ApplicationStatus.ARCHIVED
 ] as const;
+
+export type ProfileResponseFilters = {
+  userId: string;
+  type: ApplicationType;
+  status: { not: ApplicationStatus } | ApplicationStatus;
+  OR?: Array<{ subject: { contains: string; mode: 'insensitive' } } | { message: { contains: string; mode: 'insensitive' } }>;
+};
 
 export async function getFullUser(userId: string) {
   return prisma.user.findUnique({
@@ -111,14 +118,14 @@ export type ResponseRow = {
 };
 
 export async function getUserResponses(
-  where: Record<string, unknown>,
+  where: Prisma.ApplicationWhereInput,
   sort: string,
   page: number,
   pageSize: number
 ) {
   return Promise.all([
     prisma.application.findMany({
-      where: where as never,
+      where,
       select: {
         id: true,
         type: true,
@@ -134,7 +141,7 @@ export async function getUserResponses(
       skip: (page - 1) * pageSize,
       take: pageSize
     }) as Promise<ResponseRow[]>,
-    prisma.application.count({ where: where as never })
+    prisma.application.count({ where })
   ]);
 }
 

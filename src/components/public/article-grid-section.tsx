@@ -6,11 +6,9 @@ import { useCallback, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Panel } from '@/components/ui/panel';
 import { Select } from '@/components/ui/select';
-import { displayFont } from '@/lib/fonts';
 import type { PublishedContentItem, PublishedContentList } from '@/lib/public/content';
 import type { PublicTaxonomyOption } from '@/lib/public/filter-options';
 import { cn } from '@/lib/utils';
-import { PublicBreadcrumbs } from './public-primitives';
 import { ArticleCard, ArticleFeaturedCard, ArticleListItem } from './article-grid-card';
 import { CategoryPill } from './article-grid-category-pill';
 import { listingHref, pageHref } from './article-grid-utils';
@@ -64,25 +62,10 @@ export function ArticleGridSection({
     typeof content.params.category === 'string' ? content.params.category : undefined;
 
   return (
-    <section aria-label="Материалы" className="border-b border-[var(--line)] pt-3 pb-10 sm:pb-14" id="articles-list">
+    <section aria-label="Материалы" className="border-b border-[var(--line)] pt-6 pb-10 sm:pb-14" id="articles-list">
       <div className="container">
-        <PublicBreadcrumbs current="Материалы" />
-        {/* Page header */}
-        <div className="mt-4 flex flex-wrap items-start justify-between gap-x-6 gap-y-4">
-          <div>
-            <h1
-              className={cn(
-                displayFont.className,
-                'text-[2.5rem] font-semibold leading-[1.05] text-[var(--text)] sm:text-[3.25rem]'
-              )}
-            >
-              Материалы
-            </h1>
-            <p className="mt-3 max-w-[440px] text-[15px] leading-6 text-[var(--muted)]">
-              Редакционные материалы, интервью, обзоры и практические разборы для кофейной индустрии.
-            </p>
-          </div>
-          <Button className="mt-1 w-full gap-2 sm:w-auto sm:shrink-0" href={SUBMIT_TOPIC_HREF} variant="primary">
+        <div className="flex items-start justify-end">
+          <Button className="w-full gap-2 sm:w-auto sm:shrink-0" href={SUBMIT_TOPIC_HREF} variant="primary">
             <Pencil size={14} />
             Предложить тему
           </Button>
@@ -213,10 +196,12 @@ export function ArticleGridSection({
               <div className="mt-10 flex justify-center">
                 <Button
                   className="min-w-[160px]"
-                  href={pageHref(content, basePath, content.page + 1)}
+                  onClick={() => {
+                    router.push(pageHref(content, basePath, content.page + 1), { scroll: false });
+                  }}
                   variant="secondary"
                 >
-                  Показать ещё
+                  Следующая страница →
                 </Button>
               </div>
             ) : null}

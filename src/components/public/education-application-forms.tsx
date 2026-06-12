@@ -1,3 +1,6 @@
+'use client';
+
+import { useActionState } from 'react';
 import {
   ContactChannelFieldset,
   HiddenUtmFields,
@@ -7,6 +10,7 @@ import {
   PublicFormShellHeader,
   type PublicApplicationFormProps
 } from '@/components/public/application-form-section';
+import type { PublicApplicationResult } from '@/lib/applications/public-form-helpers';
 import { AppLink } from '@/components/ui/app-link';
 import { Button } from '@/components/ui/button';
 import { ConsentField } from '@/components/ui/consent-field';
@@ -17,7 +21,14 @@ import { Select } from '@/components/ui/select';
 import { SubmitButton } from '@/components/ui/submit-button';
 import { Textarea } from '@/components/ui/textarea';
 
-export function EducationApplicationForms({ enabled, result, utm, cities, defaults = {}, submitCourseApplication, submitCorporateTrainingApplication, submitCertificateOrderApplication }: PublicApplicationFormProps & { submitCourseApplication?: (formData: FormData) => void; submitCorporateTrainingApplication?: (formData: FormData) => void; submitCertificateOrderApplication?: (formData: FormData) => void }) {
+type EducationActionFn = (prevState: PublicApplicationResult | null, formData: FormData) => Promise<PublicApplicationResult>;
+
+export function EducationApplicationForms({ enabled, utm, cities, defaults = {}, submitCourseApplication, submitCorporateTrainingApplication, submitCertificateOrderApplication }: Omit<PublicApplicationFormProps, 'result'> & { submitCourseApplication?: EducationActionFn; submitCorporateTrainingApplication?: EducationActionFn; submitCertificateOrderApplication?: EducationActionFn }) {
+  const noopAction: EducationActionFn = async () => ({ type: 'error' as const, message: '' });
+  const [courseResult, courseFormAction] = useActionState(submitCourseApplication ?? noopAction, null);
+  const [corporateResult, corporateFormAction] = useActionState(submitCorporateTrainingApplication ?? noopAction, null);
+  const [certificateResult, certificateFormAction] = useActionState(submitCertificateOrderApplication ?? noopAction, null);
+  const result = courseResult ?? corporateResult ?? certificateResult;
   const selectedFormType =
     defaults.formType === 'course' || defaults.formType === 'corporate' || defaults.formType === 'certificate'
       ? defaults.formType
@@ -95,11 +106,11 @@ export function EducationApplicationForms({ enabled, result, utm, cities, defaul
       disclosureId="education-request"
       disclosureShowDefaultTrigger={false}
       enabled={enabled}
-      result={result}
+      result={result ?? undefined}
     >
       <div className="grid grid-flow-dense gap-6 lg:grid-cols-2">
         {showCourseForm ? (
-          <form action={submitCourseApplication!} className="editorial-form-shell public-form-shell h-full">
+          <form action={courseFormAction} className="editorial-form-shell public-form-shell h-full">
             <HiddenUtmFields utm={utm} />
             <HoneypotField id="course-application-website" />
             <PublicFormShellHeader
@@ -146,7 +157,7 @@ export function EducationApplicationForms({ enabled, result, utm, cities, defaul
         ) : null}
 
         {showCorporateTrainingForm ? (
-          <form action={submitCorporateTrainingApplication!} className="editorial-form-shell public-form-shell h-full">
+          <form action={corporateFormAction} className="editorial-form-shell public-form-shell h-full">
             <HiddenUtmFields utm={utm} />
             <HoneypotField id="corporate-training-website" />
             <PublicFormShellHeader
@@ -205,7 +216,7 @@ export function EducationApplicationForms({ enabled, result, utm, cities, defaul
         ) : null}
 
         {showCertificateOrderForm ? (
-          <form action={submitCertificateOrderApplication!} className="editorial-form-shell public-form-shell h-full lg:col-span-2">
+          <form action={certificateFormAction} className="editorial-form-shell public-form-shell h-full lg:col-span-2">
             <HiddenUtmFields utm={utm} />
             <HoneypotField id="certificate-order-website" />
             <PublicFormShellHeader

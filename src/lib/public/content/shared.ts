@@ -65,6 +65,14 @@ export function optionalParam(params: PublicContentSearchParams, key: string) {
   return value && value.length > 0 ? value : undefined;
 }
 
+export function optionalParams(params: PublicContentSearchParams, key: string): string[] | undefined {
+  const raw = params[key];
+  if (!raw) return undefined;
+  const values = (Array.isArray(raw) ? raw : [raw])
+    .flatMap((item) => item.split(',').map((v) => v.trim()).filter(Boolean));
+  return values.length > 0 ? values : undefined;
+}
+
 export function getPage(params: PublicContentSearchParams) {
   const value = Number.parseInt(firstParam(params.page) ?? '1', 10);
   return Number.isFinite(value) && value > 0 ? value : 1;

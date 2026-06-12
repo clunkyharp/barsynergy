@@ -38,7 +38,7 @@ import {
   type AdminContentSearchParams
 } from '@/lib/admin/content-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
-import { prisma } from '@/modules/admin/queries';
+import { getSupplierList, getSupplierStatusCounts, getActiveCategories, getActiveCities } from '@/lib/admin/admin-queries';
 
 export const dynamic = 'force-dynamic';
 
@@ -93,38 +93,14 @@ export default async function AdminSuppliersPage({ searchParams }: AdminSupplier
     ...(andWhere.length > 0 ? { AND: andWhere } : {})
   };
 
-  const [total, suppliers, supplierStatusCounts, categories, cities] = await Promise.all([
-    prisma.supplier.count({ where }),
-    prisma.supplier.findMany({
-      where,
-      orderBy: [{ createdAt: 'desc' }],
-      skip: (page - 1) * ADMIN_CONTENT_PAGE_SIZE,
-      take: ADMIN_CONTENT_PAGE_SIZE,
-      include: {
-        category: { select: { name: true } },
-        city: { select: { name: true } },
-        coverImage: { select: { originalName: true } },
-        updatedBy: { select: { email: true } }
-      }
-    }),
-    prisma.supplier.groupBy({
-      by: ['status'],
-      where: searchWhere,
-      _count: { _all: true }
-    }),
-    prisma.category.findMany({
-      where: { type: CategoryType.SUPPLIER, isActive: true },
-      orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
-      select: { id: true, name: true }
-    }),
-    prisma.city.findMany({
-      where: { isActive: true },
-      orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
-      select: { id: true, name: true }
-    })
+  const [[suppliers, total], supplierStatusCounts, categories, cities] = await Promise.all([
+    getSupplierList(where, (page - 1) * ADMIN_CONTENT_PAGE_SIZE, ADMIN_CONTENT_PAGE_SIZE),
+    getSupplierStatusCounts(searchWhere),
+    getActiveCategories(CategoryType.SUPPLIER),
+    getActiveCities()
   ]);
   const totalPages = getAdminTotalPages(total);
-  const supplierCountByStatus = new Map(supplierStatusCounts.map((item) => [item.status, item._count._all] as const));
+  const supplierCountByStatus = new Map(supplierStatusCounts.map((item) => [item.status, item._count.id] as const));
   const hasActiveFilters = Boolean(q || status || categoryId || cityId || verifiedFilter || isNoCityFilter);
 
   return (

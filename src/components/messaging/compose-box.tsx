@@ -54,17 +54,17 @@ export function ComposeBox({
 
     if (isEmpty || isOverLimit || isDisabled) return;
 
-    addOptimistic({
-      id: `opt-${Date.now()}`,
-      body: trimmed,
-      senderRole,
-      createdAt: new Date(),
-      optimistic: true
-    });
-
-    setBody('');
-
     startTransition(async () => {
+      addOptimistic({
+        id: `opt-${Date.now()}`,
+        body: trimmed,
+        senderRole,
+        createdAt: new Date(),
+        optimistic: true
+      });
+
+      setBody('');
+
       const result = await sendConversationMessage({
         applicationId,
         body: trimmed,

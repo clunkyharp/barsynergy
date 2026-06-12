@@ -1,12 +1,13 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { PublicContentDetailPage } from '@/components/public/public-content-detail-page';
-import { PublicRelatedContentSection } from '@/components/public/public-related-content-section';
+import { ArticleDetailBody } from '@/components/public/article-detail-body';
+import { ArticleDetailHero } from '@/components/public/article-detail-hero';
+import { ArticleRelatedSection } from '@/components/public/article-related-section';
 import { JsonLd } from '@/components/seo/json-ld';
-import { getPublishedArticles } from '@/lib/public/content';
-import { getPublishedArticleDetail } from '@/lib/public/content';
+import { getPublishedArticleDetail, getPublishedArticles, parseToc } from '@/lib/public/content/articles';
 import { buildMissingPublicContentMetadata, buildPublicContentMetadata } from '@/lib/public/metadata';
 import { buildBreadcrumbJsonLd, buildPublicContentJsonLd } from '@/lib/public/structured-data';
+import { compact } from '@/modules/content/shared/detail-helpers';
 
 type ArticleDetailPageProps = {
   params: Promise<{ slug: string }>;
@@ -41,6 +42,11 @@ export default async function ArticleDetailPage({ params }: ArticleDetailPagePro
   const detailPath = `/articles/${article.slug}`;
   const relatedItems = related.items.filter((item) => item.slug !== slug).slice(0, 3);
 
+  const knownMetaItems = compact([article.cityName, article.authorName, article.readingTime]);
+  const tags = article.meta.filter((item) => !knownMetaItems.includes(item));
+
+  const toc = parseToc(article.body);
+
   return (
     <>
       <JsonLd
@@ -53,24 +59,30 @@ export default async function ArticleDetailPage({ params }: ArticleDetailPagePro
           buildPublicContentJsonLd({ detail: article, path: detailPath, kind: 'article' })
         ]}
       />
-      <PublicContentDetailPage
-        backHref="/articles"
-        backLabel="Ко всем материалам"
-        body={article.body}
-        eyebrow="Материалы"
-        facts={article.facts}
-        imageUrl={article.imageUrl}
+      <ArticleDetailHero
+        authorName={article.authorName}
+        cityName={article.cityName}
+        image={article.imageUrl}
         label={article.label}
-        meta={article.meta}
-        primaryLink={{ href: '/articles', label: 'Смотреть все материалы' }}
-        sections={article.sections}
+        publishedAtIso={article.publishedAtIso}
+        readingTime={article.readingTime}
+        slug={article.slug}
         summary={article.summary}
+        tags={tags}
         title={article.title}
       />
-      <PublicRelatedContentSection
-        basePath="/articles"
+      <ArticleDetailBody
+        authorName={article.authorName}
+        body={article.body}
+        cityName={article.cityName}
+        publishedAtIso={article.publishedAtIso}
+        readingTime={article.readingTime}
+        sourceReferences={article.sourceReferences}
+        tags={tags}
+        toc={toc}
+      />
+      <ArticleRelatedSection
         items={relatedItems}
-        title="Еще по теме"
       />
     </>
   );

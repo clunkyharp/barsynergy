@@ -40,6 +40,7 @@ export type ProgramFormatMatrixItem = {
   includes: ReactNode;
   result: ReactNode;
   status: ReactNode;
+  meta?: ReactNode;
   action: EditorialAction;
 };
 

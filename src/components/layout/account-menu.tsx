@@ -3,7 +3,6 @@
 import Image from 'next/image';
 import { LogOut, UserRound } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { ThemeSegmentedToggle } from '@/components/layout/theme-toggle';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, useDropdownMenu } from '@/components/ui/dropdown-menu';
 import { AppLink } from '@/components/ui/app-link';
 import { cn } from '@/lib/utils';
@@ -120,9 +119,6 @@ export function AccountMenu({ user, logoutAction }: AccountMenuProps) {
             {item.label}
           </AppLink>
         ))}
-        <div className="border-t border-[var(--line)] pt-1 mt-1">
-          <ThemeSegmentedToggle />
-        </div>
         <div className="border-t border-[var(--line)] pt-1 mt-1">
           <LogoutForm logoutAction={logoutAction} />
         </div>

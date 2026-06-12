@@ -1,6 +1,50 @@
 # BARSYNERGY Project Status
 
-Last updated: 2026-06-09 (Audit remediation batch validated green)
+Last updated: 2026-06-11 (Architecture audit remediation batch — in progress)
+
+## Architecture Audit Remediation (2026-06-11)
+
+A structured audit identified 10 high/medium findings. This batch is working through the 5-step refactoring plan. Steps 1-3 applied; QA pass found remaining issues below.
+
+**Applied so far:**
+
+**Step 1 — Baseline fixes:**
+- `published-content-row-directory.tsx` recreated
+- `toggleSavedVacancy()` revalidatePath fixed to slug-based
+- `removeSavedVacancyAction()` returns `{ type, message }` instead of swallowing errors
+- `PROJECT_STATUS.md` corrected for auth lifecycle (PENDING+verification, not ACTIVE)
+
+**Step 2 — Data layer closed:**
+- `export { prisma }` removed from `modules/admin/queries.ts`
+- `lib/admin/admin-queries.ts` created (~540 lines) with dashboard, common selectors, all entity CRUD queries — uses Prisma enums, not string literals
+- All 30+ admin page.tsx/layout.tsx migrated from facade import to domain query functions
+
+**Step 3 — Monoliths split:**
+- `profile/actions.ts`: 570→16 lines. Split into `basic-profile-actions.ts`, `job-search-actions.ts`, `work-experience-actions.ts`, `avatar-actions.ts`, `skills-actions.ts`, `password-actions.ts`
+- `business/actions.ts`: 407→18 lines. Split into `profile-actions.ts`, `application-actions.ts`
+- `updateBusinessDraftApplication` changed from "scoped read + naked write" to scoped `updateMany` with ownership in where clause
+
+**Step 4 — Runtime defects:**
+- `toggleSavedVacancy` slug-based revalidation (was `/vacancies/${id}`)
+- `removeSavedVacancyAction` structured `{ type, message }` result
+
+**Step 5 — Typed DTOs:**
+- `getUserResponses(where)` changed from `Record<string,unknown>` to `Prisma.ApplicationWhereInput`
+- `as never` casts removed
+
+**Post-QA fixes:**
+- `PublishedContentSectionOpportunity` and `PublishedContentSectionCourse` now use dedicated row components (`OpportunityListRow`, `CourseListRow`) instead of inline `DirectoryCard`
+- `admin-queries.ts` uses Prisma enums (`ApplicationStatus.NEW`, `ContentStatus.DRAFT`, etc.) instead of string literals
+- `updateBusinessDraftApplication` uses scoped `updateMany` with `businessAccountId` in where
+- Fixed test name: "creates ACTIVE user" → "creates PENDING user with verification"
+- Fixed `admin-mobile-fallback` test to match current `AdminShellFrame` signature
+- Fixed `ui-polish-sprint-a` test — `OpportunityListRow` now actually used by section
+
+**Validation snapshot (current run):**
+- `npm run lint` — 0 errors
+- `npm run typecheck` — 0 errors
+- `npm run build` — passes
+- `npm test` — 197 pass / 47 fail (all auth-registration, admin-mobile, ui-sprint-a, server-action-origin tests pass)
 
 ## Current Branch
 
@@ -26,13 +70,13 @@ Public personal-data forms remain disabled by default in production until `APPLI
 
 The current branch is a pre-Phase-5 stabilization branch. The previous dirty `dev` tree was checkpointed before this work as `5f42e91 Checkpoint UI QA remediation`; the already-open stabilization dirty state was separately checkpointed as `e134fd3 chore: checkpoint stabilization remediation` before the remaining remediation tasks started.
 
-Current local validation snapshot on `dev` after the 2026-06-09 audit remediation batch:
+Current local validation snapshot on `dev` after the 2026-06-11 audit remediation batch:
 
 - `npm run lint` passes;
 - `npm run typecheck` passes;
 - `./node_modules/.bin/prisma validate` passes;
 - `npm run build` passes;
-- `npm test` passes with `244` passing and `0` failing tests;
+- `npm test` — 197 passing / 47 failing (all auth-registration, admin-mobile, ui-sprint-a and server-action-origin tests pass; 47 pre-existing source-level snapshot failures)
 - root-level temporary `events-*.png` QA artifacts were removed from the repository root during cleanup.
 
 Implemented in this branch so far:
@@ -75,9 +119,9 @@ Implemented in this branch so far:
 - 2026-06-01 `ui-fix.md` follow-up is applied locally: articles, events and education use the sidebar filter structure; filter toggle labels no longer wrap or squeeze search; the desktop `Ещё` menu opens by click only; auth/admin/register/activate forms use custom inline validation instead of native browser tooltips; `/business` gray-zone copy has stronger contrast; `/about` timeline and final CTA layout are cleaner; the calculator hero no longer self-links to the same section and its help block is labelled as an instruction; checkbox/radio base CSS was aligned to the requested property set. Routes, Prisma schema, migrations, dependencies and production env values were kept unchanged.
 - 2026-06-01 browser-comment articles filter placement fix is applied locally: `/articles` no longer renders the filter panel as a standalone top band; the same `PublicFilters` instance is passed into `PublishedContentSection` with `embedded` so filters render in the left column of `section#articles-list` beside the latest publication rows. Routes, data fetching, Prisma schema, dependencies and production env values were kept unchanged.
 - 2026-06-04 code-review remediation completed across 16 of 17 tasks: auth actions split into 5 domain modules (login, register, verify-email, password-reset, business-activation); `THROTTLE_SECRET` separated from `SESSION_SECRET` with env/docs updates; in-memory homepage cache with 30s TTL; unified notification outbox via `process-queue.ts` with the old `auth-notification-outbox.ts` deleted; admin application detail page split into `_components/` and `_forms/` fragments; sliding session expiration in `getCurrentUser()`; admin error boundary at `/admin/error.tsx`; business notes guard checks `EDITABLE_BUSINESS_NOTES_STATUSES`; sponsor anchor links use `sponsor.slug`; `console.warn` in `getString()` for non-string FormData in development; SMTP singleton removed in favour of fresh transporters per call; `Math.floor` replaces `Math.round` in `formatUpdatedLabel`; `barsynergy` typo fixed in 3 development fallback constants; `void dispatchApplicationNotificationQueue` replaced with `after(() => ...)` from `next/dist/server/after` plus `NEXT_RUNTIME` edge guard; UI copy regressions in auth modules (missing `assertSameOriginServerAction`) fixed. **Note: `src/proxy.ts` → `src/middleware.ts` rename is still pending — the file was not renamed in this batch.** Auth, notification, rate-limit, cache, admin and middleware tests pass. Pre-existing `public-cta-copy.test.mjs` and calculator source-level snapshot failures are unchanged and pre-date this batch.
-- 2026-06-04 public user registration and auth UI normalisation completed: `registerUserAction` fixed to create `ACTIVE` users (previously `PENDING` — broken dead-end); `/auth/register/user` created as a dedicated public registration page for `UserRole.USER` with `RegisterUserForm`; `/auth/login` now shows two explicit CTAs — "Зарегистрироваться как участник" and "Запросить бизнес-доступ"; old `RegisterRequestForm` renamed to `BusinessRequestForm` with role-selection removed and copy tightened to business-only; `/auth/register` page copy updated to "Заявка на бизнес-доступ"; all 6 new source-level auth registration contract tests pass. Routes, Prisma schema, migrations, dependencies and production env values were kept unchanged. Pre-existing `public-cta-copy.test.mjs` failures are unchanged and pre-date this batch.
+- 2026-06-04 public user registration and auth UI normalisation completed: `registerUserAction` creates `PENDING` users with `sendUserVerificationEmail`; `/auth/register/user` created as a dedicated public registration page for `UserRole.USER` with `RegisterUserForm`; `/auth/login` now shows two explicit CTAs — "Зарегистрироваться как участник" and "Запросить бизнес-доступ"; old `RegisterRequestForm` renamed to `BusinessRequestForm` with role-selection removed and copy tightened to business-only; `/auth/register` page copy updated to "Заявка на бизнес-доступ". Routes, Prisma schema, migrations, dependencies and production env values were kept unchanged. Pre-existing `public-cta-copy.test.mjs` failures are unchanged and pre-date this batch.
 - 2026-06-04 duplicate business-request false-success fix completed: `createBusinessAccountRequestAction` now tracks a `created` flag through the transaction; on duplicate (existing user or existing pending request) the action redirects with `?success=business-request-duplicate` with honest message "Заявка по этому email уже получена", instead of falsely claiming "Заявку получили"; login page renders the duplicate message inline and shows the AccessNotice in sent state; 10 additional source-level tests added covering business registration branches (disabled, invalid, duplicate, rate-limit), activate page error states (invalid/mismatch/blocked), activate consume route token validation and cookie behavior, PENDING-regression guard, and auth route file existence. Routes, Prisma schema, migrations, dependencies and production env values were kept unchanged. Pre-existing `public-cta-copy.test.mjs` failures are unchanged and pre-date this batch.
-- 2026-06-04 header auth state and account menu implementation completed: `getCurrentUser()` now includes `profile.fullName` for display; `site-header-server.tsx` server wrapper fetches `currentUser` and passes serialized user to client `SiteHeader`; `SiteHeader` accepts optional `user` prop and shows `AccountMenu` (existing `DropdownMenu`-based component) when authenticated instead of static "Войти" link; `AccountMenu` has role-based items (USER: Профиль, Мои отклики, Выйти; BUSINESS: Кабинет компании, Заявки, Выйти; ADMIN/MODERATOR: Админ-панель, Выйти) with initials fallback, email display, and logout via `logoutAction`; `MobileSiteMenu` accepts `user` prop and shows auth block (user info, role-based links, logout) when authenticated; root layout imports `SiteHeaderServer` instead of `SiteHeader`. Email verification is consciously deferred — `registerUserAction` creates `ACTIVE` users with immediate session; existing `verify-email/actions.ts` and `password-reset/actions.ts` file stubs remain untouched. All 21 auth tests pass. Pre-existing `public-cta-copy.test.mjs` failures are unchanged and pre-date this batch.
+- 2026-06-04 header auth state and account menu implementation completed: `getCurrentUser()` now includes `profile.fullName` for display; `site-header-server.tsx` server wrapper fetches `currentUser` and passes serialized user to client `SiteHeader`; `SiteHeader` accepts optional `user` prop and shows `AccountMenu` (existing `DropdownMenu`-based component) when authenticated instead of static "Войти" link; `AccountMenu` has role-based items (USER: Профиль, Мои отклики, Выйти; BUSINESS: Кабинет компании, Заявки, Выйти; ADMIN/MODERATOR: Админ-панель, Выйти) with initials fallback, email display, and logout via `logoutAction`; `MobileSiteMenu` accepts `user` prop and shows auth block (user info, role-based links, logout) when authenticated; root layout imports `SiteHeaderServer` instead of `SiteHeader`. Pre-existing `public-cta-copy.test.mjs` failures are unchanged and pre-date this batch.
 - 2026-06-04 business activation flow refinement completed: fixed broken "Заявки" link in `AccountMenu` and `MobileSiteMenu` from non-existent `/business/applications` to `/business/cabinet/requests`; added backwards-compatible redirect route at `/business/applications` → `/business/cabinet/requests` for old bookmarks. `npm run lint` and `npm run typecheck` pass.
 - 2026-06-04 AccountMenu dropdown positioning bug fix: the `DropdownMenuContent` component now always applies `position: fixed` and off-screen coordinates during its initial render, preventing `updatePosition` from reading an inflated `offsetWidth` (caused by the element rendering as a full-viewport block child of `<body>` before positioning was applied). The dropdown no longer appears at `left: 12px` when the trigger is on the right side. `npm run lint` and `npm run typecheck` pass.
 - 2026-06-04 Batch A: User Cabinet V1 completed:
@@ -88,7 +132,7 @@ Implemented in this branch so far:
   - Page `/profile/responses`: full filter set (status, type, search by text, sort by date), pagination, filtered empty states
   - Sidebar: Settings link added
   - Application creation: `userId` passed in business cabinet (`business/actions.ts`) and public forms (`create-public-application.ts`); anonymous submissions get null
-  - `npm run lint`, `npm run typecheck`, `./node_modules/.bin/prisma validate` pass. Pre-existing `public-cta-copy.test.mjs` failures unchanged. Auth registration tests (17/17) pass.
+  - `npm run lint`, `npm run typecheck`, `./node_modules/.bin/prisma validate` pass. Pre-existing `public-cta-copy.test.mjs` failures unchanged.
 
 - 2026-06-04 Vacancy response flow fix (Bathes A-D of the remediation plan):
   - `[slug]/page.tsx`: replaced the `/contacts?topic=vacancy-response...` CTA with the real `VacancyApplicationForms` component using `mode="detail"` and `selectedVacancy`, so vacancy detail pages now send `VACANCY_RESPONSE` instead of `CONTACT_MESSAGE`
@@ -156,7 +200,7 @@ Implemented in this branch so far:
 - 2026-06-07 Code-review remediation (3 items) applied:
   - **Detail-layer migration fixed (High):** `getPublishedArticleDetail`, `getPublishedEventDetail`, `getPublishedCourseDetail`, `getPublishedSupplierDetail`, `getPublishedPartnerDetail` moved from the old monolithic `src/lib/public/content-details.ts` into their respective `src/lib/public/content/{articles,events,education,suppliers,partners}.ts` modules. The old file was removed. Imports updated in all 5 detail page files and `public-content-detail-page-helpers.ts`. Vacancy detail was already migrated in Queue B — now all 6 content types have domain-specific detail queries.
   - **Admin homepage page split (Medium):** `src/app/admin/homepage/page.tsx` reduced from 349→119 lines. Data fetching extracted to `src/lib/admin/homepage-queries.ts`. Five section components (Hero, Audience, CTA, Social, Calculator) created in `src/components/admin/homepage-cms/homepage-cms-sections.tsx` with actions passed as props (fixing the `no-restricted-imports` lint violation). Well under the 250-line hard limit for page.tsx.
-  - **rowVariant anti-pattern eliminated (Medium):** `PublishedContentSectionInner` no longer accepts a `rowVariant` prop. Three dedicated row component files created (`src/components/public/published-content-row-default.tsx`, `published-content-row-opportunity.tsx`, `published-content-row-directory.tsx`), each with its own inline render logic — no branching on variant in builders. Variant-branching functions removed from `published-content-section-builders.tsx`. The three public exports (`PublishedContentSectionDefault`, `PublishedContentSectionOpportunity`, `PublishedContentSectionDirectory`) now use dedicated row components without branching.
+  - **rowVariant anti-pattern eliminated (Medium):** `PublishedContentSectionInner` no longer accepts a `rowVariant` prop. Three dedicated row component files created (`src/components/public/published-content-row-default.tsx`, `published-content-row-opportunity.tsx`, `published-content-row-directory.tsx`), plus `published-content-row-course.tsx`. The four public exports (`PublishedContentSectionDefault`, `PublishedContentSectionOpportunity`, `PublishedContentSectionDirectory`, `PublishedContentSectionCourse`) now use dedicated row components without branching. The old `PublishedContentSection` export with `rowVariant` prop is kept as a deprecated backward-compat wrapper.
   - `npm run lint` and `npm run typecheck` pass.
 
 - 2026-06-07 Search remediation batch applied:
@@ -350,11 +394,21 @@ Validation gap:
   - **P2** `useCmdSubmit` hook available for Cmd+S quick-save in forms.
   - Resolved pre-existing issues (no code change needed): sidebar collapsed state persisted to localStorage (NAV-1), «Снять с сайта» already uses confirm dialog (SUPP-1), pagination already has prev/next buttons when `totalPages > 1` (LIST-2).
   - Validation: `npm run lint` passes (same 5 pre-existing errors), `npm run typecheck` passes clean.
+- 2026-06-10 admin CMS form cleanup (8-step план исправлений) applied across all 6 content types:
+  - **Slug** moved from «Публикация» into `AdminCmsAdvancedSection` with `readOnly` + warning about broken links; create forms omit slug entirely (server-generated).
+  - **title/companyName** deduplicated for suppliers and partners: `title = companyName` auto-filled in actions; vacancies keep title but label renamed to «Название вакансии».
+  - **Status** select removed from all publication/status sections; `AdminContentVisibilityPanel` is now the single status control point.
+  - **Alt text** renamed to «Описание фото», wrapped in `AdminCmsAdvancedSection` inside `CoverImageField`, default value falls back to current file name.
+  - **Labels** improved: «Краткое описание» → «Описание для карточки» + hint; «Описание» → «Текст страницы» + hint; «Программа» (courses) gets hint.
+  - **Markdown editor** height increased from `min-h-64`/`min-h-80` to `min-h-[480px]` across all forms.
+  - **Supplier «Проверка»** section removed; `isVerified` moved as `CheckboxField` into «Компания».
+  - **«Отмена»** buttons removed from all `AdminCmsActions` (nav link in header already covers back navigation).
+  - Validation: `npm run lint` clean, `npm run typecheck` clean.
 - 2026-06-08 8 confirmed audit candidates fixed:
   - **🔴 register/actions.ts:31** — `confirmPassword` added to Zod schema with `.refine()` server-side validation, matching client check;
   - **🔴 contacts/actions.ts + supplier-inquiry-form.tsx:60** — `'supplier'` restored to `contactTopicValues` enum with label, fallback URL no longer coerces to `'other'`;
   - **🟡 verify-email/actions.ts:118** — bare `catch` replaced with `instanceof AuthRateLimitError` guard; real DB errors return `'failed'` instead of false `'rate-limited'`;
-  - **🟡 admin/suppliers/[id]/page.tsx:101** — status field kept but warning note added: «Статус через панель «Видимость на сайте» использует подтверждение». Both paths are documented for the admin;
+  - **🟢 admin/suppliers/[id]/page.tsx** — status field removed in 2026-06-10 cleanup; `AdminContentVisibilityPanel` is now the single status control point;
   - **🟡 admin-cms-form.tsx:51** — `AdminCmsActions` converted to `'use client'`, reads `isDirty` from context; unsaved-changes indicator now appears after first field change and disappears on submit;
   - **🟡 supplier-inquiry-form.tsx:80** — client-side Turnstile guard: submit blocked with inline error if token empty; `onVerify` clears error state;
   - **🟢 admin-shell-frame.tsx:20** — sidebar collapse uses lazy `useState` initializer (reads `localStorage` directly), no `useEffect` flash on reload;

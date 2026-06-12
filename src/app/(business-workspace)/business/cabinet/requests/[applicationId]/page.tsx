@@ -4,7 +4,7 @@ import {
   archiveBusinessDraftApplication,
   submitBusinessDraftApplication,
   updateBusinessDraftApplication
-} from '@/lib/business/actions';
+} from '@/lib/business/application-actions';
 import { AdminActionAlert } from '@/components/admin/content-admin-controls';
 import { NextActionPanel } from '@/components/business/business-cabinet';
 import { ActionRow } from '@/components/ui/action-row';

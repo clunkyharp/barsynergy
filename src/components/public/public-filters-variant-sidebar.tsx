@@ -2,10 +2,10 @@
 
 import type { ReactNode } from 'react';
 import { ChevronDown, RotateCcw, SlidersHorizontal } from 'lucide-react';
+import type { ActiveFilter } from '@/components/public/public-filters-types';
 import { PublicFiltersActiveChip } from '@/components/public/public-filters-fields';
 import { Panel } from '@/components/ui/panel';
 import { cn } from '@/lib/utils';
-import type { ActiveFilter } from './public-filters-types';
 
 type Props = {
   title: string;
@@ -25,12 +25,13 @@ type Props = {
   collapseLabel: string;
   contextSummary: ReactNode | null;
   hasActiveFilters: boolean;
+  activeSummaryCountLabel?: string;
   activeFilters: ActiveFilter[];
-  onClearFilter: (name: string) => void;
   activeChipClassName: string;
   filterFields: ReactNode;
   isPending: boolean;
   onClearAll: () => void;
+  onClearFilter: (name: string, value?: string) => void;
   panelSurfaceClass: string;
   panelPadding: 'sm' | 'md';
 };
@@ -53,12 +54,13 @@ export function PublicFiltersSidebarVariant({
   collapseLabel,
   contextSummary,
   hasActiveFilters,
+  activeSummaryCountLabel,
   activeFilters,
-  onClearFilter,
   activeChipClassName,
   filterFields,
   isPending,
   onClearAll,
+  onClearFilter,
   panelSurfaceClass,
   panelPadding
 }: Props) {
@@ -95,19 +97,6 @@ export function PublicFiltersSidebarVariant({
 
         {contextSummary && !areSidebarFieldsCollapsed ? <div className="mt-3">{contextSummary}</div> : null}
 
-        {hasActiveFilters ? (
-          <div className="mt-4 flex flex-wrap gap-2">
-            {activeFilters.map((filter) => (
-              <PublicFiltersActiveChip
-                className={activeChipClassName}
-                filter={filter}
-                key={`${filter.name}-${filter.value}`}
-                onClear={onClearFilter}
-              />
-            ))}
-          </div>
-        ) : null}
-
         {hasFilters && !areSidebarFieldsCollapsed ? (
           <div
             id={filterPanelId}
@@ -117,6 +106,36 @@ export function PublicFiltersSidebarVariant({
             )}
           >
             {filterFields}
+          </div>
+        ) : null}
+
+        {hasActiveFilters ? (
+          <div className="mt-4 border-t border-[var(--line)] pt-4">
+            <div className="flex items-center justify-between gap-3">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--muted)]">
+                {activeSummaryCountLabel ?? title}
+              </p>
+              <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--accent)]">
+                {activeFilters.length}
+              </span>
+            </div>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {activeFilters.flatMap((filter) =>
+                filter.values.map((value) => (
+                  <PublicFiltersActiveChip
+                    className={activeChipClassName}
+                    filter={{
+                      label: filter.label,
+                      name: filter.name,
+                      value: value.value,
+                      displayValue: value.label
+                    }}
+                    key={`${filter.name}-${value.value}`}
+                    onClear={onClearFilter}
+                  />
+                ))
+              )}
+            </div>
           </div>
         ) : null}
 

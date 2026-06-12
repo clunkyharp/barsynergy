@@ -1,8 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useActionState, useState } from 'react';
+import { AppLink } from '@/components/ui/app-link';
 import { ConsentField } from '@/components/ui/consent-field';
 import { FormField } from '@/components/ui/form-field';
+import { InlineAlert } from '@/components/ui/inline-alert';
 import { Input } from '@/components/ui/input';
 import { InlineLink } from '@/components/ui/inline-link';
 import { PasswordInput } from '@/components/ui/password-input';
@@ -11,26 +13,42 @@ import { SubmitButton } from '@/components/ui/submit-button';
 import { Turnstile } from '@/components/ui/turnstile';
 import { PublicFormValidation } from '@/components/public/public-form-validation';
 
+type RegisterUserActionResult = { type: 'error'; code: string } | null;
+
+const errorMessages: Record<string, string> = {
+  invalid: 'Не удалось завершить регистрацию. Проверьте поля формы.',
+  'account-check': 'Если регистрация уже начиналась, проверьте почту. Иначе попробуйте войти или восстановить доступ.',
+  'rate-limited': 'Слишком много попыток за короткое время. Повторите позже.',
+  failed: 'Не удалось выполнить действие прямо сейчас. Повторите попытку позже.'
+};
+
 export function RegisterUserForm({
-  action,
-  defaults
+  action
 }: {
-  action: (formData: FormData) => void;
-  defaults?: {
-    email?: string;
-    fullName?: string;
-  };
+  action: (prevState: RegisterUserActionResult, formData: FormData) => Promise<RegisterUserActionResult>;
 }) {
+  const [result, formAction] = useActionState<RegisterUserActionResult, FormData>(action, null);
   const [turnstileToken, setTurnstileToken] = useState('');
+  const errorCode = result?.type === 'error' ? result.code : null;
 
   return (
-    <form action={action} className="auth-register-user-form grid gap-3.5" data-public-validation="true" noValidate>
+    <form action={formAction} className="auth-register-user-form grid gap-3.5" data-public-validation="true" noValidate>
       <PublicFormValidation />
       <PasswordPairValidation />
       <input name="turnstileToken" type="hidden" value={turnstileToken} />
-      <FormField htmlFor="fullName" label="Полное имя" >
+      {errorCode ? (
+        <InlineAlert tone="error">
+          <span>{errorMessages[errorCode] ?? errorMessages.failed}</span>
+          {errorCode === 'account-check' ? (
+            <span className="mt-1 flex flex-wrap gap-3 text-xs">
+              <AppLink className="font-semibold underline" href="/auth/login">Войти</AppLink>
+              <AppLink className="font-semibold underline" href="/auth/password-reset">Восстановить доступ</AppLink>
+            </span>
+          ) : null}
+        </InlineAlert>
+      ) : null}
+      <FormField htmlFor="fullName" label="Полное имя">
         <Input
-          defaultValue={defaults?.fullName ?? ''}
           id="fullName"
           name="fullName"
           type="text"
@@ -41,9 +59,8 @@ export function RegisterUserForm({
           maxLength={200}
         />
       </FormField>
-      <FormField htmlFor="email" label="Email" >
+      <FormField htmlFor="email" label="Email">
         <Input
-          defaultValue={defaults?.email ?? ''}
           id="email"
           name="email"
           type="email"
@@ -52,7 +69,7 @@ export function RegisterUserForm({
           required
         />
       </FormField>
-      <FormField htmlFor="new-password" hint="Минимум 8 символов" label="Пароль" >
+      <FormField htmlFor="new-password" hint="Минимум 8 символов" label="Пароль">
         <PasswordInput
           id="new-password"
           name="password"
@@ -63,11 +80,11 @@ export function RegisterUserForm({
           maxLength={200}
         />
       </FormField>
-      <FormField htmlFor="confirm-password" label="Подтверждение пароля" >
+      <FormField htmlFor="confirm-password" label="Подтверждение пароля">
         <PasswordInput
           id="confirm-password"
           name="confirmPassword"
-          autoComplete="new-password"
+          autoComplete="off"
           placeholder="Повторите пароль"
           required
           minLength={8}

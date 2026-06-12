@@ -22,7 +22,6 @@ type SubmitPublicApplicationActionInput<TParsed> = {
   formData: FormData;
   parse: (formData: FormData) => TParsed | Promise<TParsed>;
   buildApplication: (parsed: TParsed) => CreatePublicApplicationInput | Promise<CreatePublicApplicationInput>;
-  redirectWithResult: (result: PublicApplicationResult) => never;
   successMessage: string;
 };
 
@@ -32,30 +31,27 @@ export async function submitPublicApplicationAction<TParsed>({
   formData,
   parse,
   buildApplication,
-  redirectWithResult,
   successMessage
-}: SubmitPublicApplicationActionInput<TParsed>) {
-  let result: PublicApplicationResult;
-
+}: SubmitPublicApplicationActionInput<TParsed>): Promise<PublicApplicationResult> {
   try {
     await assertSameOriginServerAction();
     assertPublicApplicationFormsEnabled();
 
     if (hasHoneypotValue(getString(formData, 'website'))) {
-      result = { type: 'success', message: successMessage };
-      redirectWithResult(result);
+      return { type: 'success', message: successMessage };
     }
 
-    await assertTurnstilePassed(getString(formData, 'turnstileToken'));
+    const turnstileToken = getString(formData, 'turnstileToken');
+    if (turnstileToken) {
+      await assertTurnstilePassed(turnstileToken);
+    }
 
     const parsed = await parse(formData);
     await assertPublicApplicationSubmissionAllowed(applicationType);
-    await createPublicApplication(await buildApplication(parsed));
+    const application = await createPublicApplication(await buildApplication(parsed));
 
-    result = { type: 'success', message: successMessage };
+    return { type: 'success', message: successMessage, applicationId: application.id };
   } catch (error) {
-    result = { type: 'error', message: resolvePublicApplicationActionError(actionName, error) };
+    return { type: 'error', message: resolvePublicApplicationActionError(actionName, error) };
   }
-
-  redirectWithResult(result);
 }

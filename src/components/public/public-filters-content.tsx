@@ -1,23 +1,42 @@
 'use client';
 
-import { useEffect, useId, useMemo, useState, useTransition } from 'react';
+import { useCallback, useEffect, useId, useMemo, useState, useTransition } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import type { PublicFiltersProps, ActiveFilter } from './public-filters-types';
 import { resolveFilterVariant } from './public-filters-fallback';
 import { PublicFiltersToolbarVariant } from './public-filters-variant-toolbar';
 import { PublicFiltersSidebarVariant } from './public-filters-variant-sidebar';
 import { PublicFiltersStackedVariant } from './public-filters-variant-stacked';
-import { PublicFiltersSearchField, PublicFiltersSelectField } from '@/components/public/public-filters-fields';
+import {
+  PublicFiltersSearchField,
+  PublicFiltersSelectField,
+  PublicFiltersMultiSelectField
+} from '@/components/public/public-filters-fields';
 import { cn } from '@/lib/utils';
+
+function getParamValues(searchParams: URLSearchParams, name: string): string[] {
+  const raw = searchParams?.get(name) ?? '';
+  return raw
+    .split(',')
+    .map((v) => v.trim())
+    .filter(Boolean);
+}
+
+function parseSingleParam(searchParams: URLSearchParams, name: string): string {
+  return searchParams?.get(name) ?? '';
+}
 
 export function PublicFiltersContent({
   activeSummaryLabel = 'Сейчас выбрано',
+  activeSummaryCountLabel,
   categoryAllLabel = 'Все категории',
   categoryLabel = 'Категория',
   categories = [],
+  categoryMode = 'single',
   cityAllLabel = 'Все города',
   cityLabel = 'Город',
   cities = [],
+  cityMode = 'single',
   collapseLabel = 'Свернуть параметры',
   compact = false,
   contextItems = [],
@@ -46,39 +65,67 @@ export function PublicFiltersContent({
   const filterIdPrefix = `${filterInstanceId}-filter`;
   const filterStatusId = `${filterInstanceId}-status`;
 
-  const currentQ = searchParams?.get('q') ?? '';
-  const currentCategory = searchParams?.get('category') ?? '';
-  const currentCity = searchParams?.get('city') ?? '';
+  const params = useMemo(() => searchParams ?? new URLSearchParams(), [searchParams]);
+
+  const currentQ = parseSingleParam(params, 'q');
+  const currentCategory = parseSingleParam(params, 'category');
+  const currentCity = parseSingleParam(params, 'city');
+  const currentCategories = categoryMode === 'multiple' ? getParamValues(params, 'category') : [];
+  const currentCities = cityMode === 'multiple' ? getParamValues(params, 'city') : [];
   const hasFilters = categories.length > 0 || cities.length > 0 || extraFilters.length > 0;
 
   useEffect(() => { setDraftQuery(currentQ); }, [currentQ]);
 
-  function pushParams(params: URLSearchParams, options?: { replace?: boolean }) {
-    const query = params.toString();
+  const pushParams = useCallback((nextParams: URLSearchParams, options?: { replace?: boolean }) => {
+    const query = nextParams.toString();
     const nextPath = pathname ?? '/';
     startTransition(() => {
       const nextUrl = query ? `${nextPath}?${query}` : nextPath;
       if (options?.replace) { router.replace(nextUrl, { scroll: false }); return; }
       router.push(nextUrl, { scroll: false });
     });
-  }
+  }, [pathname, router]);
 
-  function handleFilter(name: string, value: string, options?: { replace?: boolean }) {
-    const params = new URLSearchParams(searchParams?.toString() ?? '');
-    if (value) { params.set(name, value); } else { params.delete(name); }
-    params.delete('page');
-    pushParams(params, options);
-  }
+  const handleFilter = useCallback((name: string, value: string, options?: { replace?: boolean }) => {
+    const nextParams = new URLSearchParams(params.toString());
+    if (value) { nextParams.set(name, value); } else { nextParams.delete(name); }
+    nextParams.delete('page');
+    pushParams(nextParams, options);
+  }, [params, pushParams]);
+
+  const handleMultiSelect = useCallback((name: string, values: string[]) => {
+    const nextParams = new URLSearchParams(params.toString());
+    if (values.length > 0) {
+      nextParams.set(name, values.join(','));
+    } else {
+      nextParams.delete(name);
+    }
+    nextParams.delete('page');
+    pushParams(nextParams);
+  }, [params, pushParams]);
 
   function clearAllFilters() {
     setDraftQuery('');
     pushParams(new URLSearchParams());
   }
 
-  function clearSingleFilter(name: string) {
-    if (name === 'q') { setDraftQuery(''); }
-    handleFilter(name, '', { replace: name === 'q' });
-  }
+  const clearSingleFilter = useCallback((name: string, value?: string) => {
+    if (name === 'q') { setDraftQuery(''); handleFilter('q', '', { replace: true }); return; }
+    if (value !== undefined) {
+      const currentValues = getParamValues(params, name);
+      const nextValues = currentValues.filter((v) => v !== value);
+      if (nextValues.length > 0) {
+        const nextParams = new URLSearchParams(params.toString());
+        nextParams.set(name, nextValues.join(','));
+        nextParams.delete('page');
+        pushParams(nextParams);
+      } else {
+        handleFilter(name, '');
+      }
+    } else {
+      handleFilter(name, '');
+    }
+  }, [handleFilter, params, pushParams]);
 
   useEffect(() => {
     const normalizedDraft = draftQuery.trim();
@@ -86,27 +133,93 @@ export function PublicFiltersContent({
     if (normalizedDraft === normalizedCurrent) { return; }
     const timerId = window.setTimeout(() => { handleFilter('q', normalizedDraft, { replace: true }); }, 300);
     return () => { window.clearTimeout(timerId); };
-  }, [draftQuery, currentQ, pathname, router, searchParams]);
+  }, [draftQuery, currentQ, handleFilter]);
 
   const activeFilters = useMemo(() => {
     const items: ActiveFilter[] = [];
-    if (currentQ.trim()) { items.push({ name: 'q', label: 'Поиск', value: currentQ.trim() }); }
-    if (currentCategory) {
+
+    if (currentQ.trim()) {
+      items.push({
+        name: 'q',
+        label: 'Поиск',
+        mode: 'single',
+        values: [{ label: currentQ.trim(), value: currentQ.trim() }]
+      });
+    }
+
+    if (categoryMode === 'multiple') {
+      const selectedCategories = currentCategories
+        .map((slug) => {
+          const cat = categories.find((item) => item.slug === slug);
+          return cat ? { label: cat.name, value: cat.slug } : null;
+        })
+        .filter(Boolean) as { label: string; value: string }[];
+      if (selectedCategories.length > 0) {
+        items.push({ name: 'category', label: categoryLabel, mode: 'multiple', values: selectedCategories });
+      }
+    } else if (currentCategory) {
       const category = categories.find((item) => item.slug === currentCategory);
-      items.push({ name: 'category', label: categoryLabel, value: category?.name ?? currentCategory });
+      items.push({
+        name: 'category',
+        label: categoryLabel,
+        mode: 'single',
+        values: [{ label: category?.name ?? currentCategory, value: currentCategory }]
+      });
     }
-    if (currentCity) {
+
+    if (cityMode === 'multiple') {
+      const selectedCities = currentCities
+        .map((slug) => {
+          const city = cities.find((item) => item.slug === slug);
+          return city ? { label: city.name, value: city.slug } : null;
+        })
+        .filter(Boolean) as { label: string; value: string }[];
+      if (selectedCities.length > 0) {
+        items.push({ name: 'city', label: cityLabel, mode: 'multiple', values: selectedCities });
+      }
+    } else if (currentCity) {
       const city = cities.find((item) => item.slug === currentCity);
-      items.push({ name: 'city', label: cityLabel, value: city?.name ?? currentCity });
+      items.push({
+        name: 'city',
+        label: cityLabel,
+        mode: 'single',
+        values: [{ label: city?.name ?? currentCity, value: currentCity }]
+      });
     }
+
     extraFilters.forEach((filter) => {
-      const value = searchParams?.get(filter.name) ?? '';
-      if (!value) { return; }
-      const option = filter.options.find((item) => item.value === value);
-      items.push({ name: filter.name, label: filter.label, value: option?.label ?? value });
+      const mode = filter.mode ?? 'single';
+      if (mode === 'multiple') {
+        const values = getParamValues(params, filter.name);
+        if (values.length === 0) return;
+        const matched = values
+          .map((v) => {
+            const option = filter.options.find((item) => item.value === v);
+            return option ? { label: option.label, value: option.value } : null;
+          })
+          .filter(Boolean) as { label: string; value: string }[];
+        if (matched.length > 0) {
+          items.push({ name: filter.name, label: filter.label, mode: 'multiple', values: matched });
+        }
+      } else {
+        const value = parseSingleParam(params, filter.name);
+        if (!value) return;
+        const option = filter.options.find((item) => item.value === value);
+        items.push({
+          name: filter.name,
+          label: filter.label,
+          mode: 'single',
+          values: [{ label: option?.label ?? value, value }]
+        });
+      }
     });
+
     return items;
-  }, [categories, categoryLabel, cities, cityLabel, currentCategory, currentCity, currentQ, extraFilters, searchParams]);
+  }, [
+    categories, categoryLabel, categoryMode, cities, cityLabel, cityMode,
+    currentCategory, currentCategories, currentCity, currentCities, currentQ,
+    extraFilters, params
+  ]);
 
   const hasActiveFilters = activeFilters.length > 0;
 
@@ -128,10 +241,12 @@ export function PublicFiltersContent({
     compact ? 'min-h-10 text-[13px]' : 'min-h-12 text-[14px]'
   );
   const panelPadding = isDirectoryTone || compact ? 'sm' : 'md';
+
   const activeChipClassName = cn(
-    'public-filter-chip inline-flex max-w-full items-center gap-2 rounded-[var(--radius-sm)] border border-[var(--accent)]/25 bg-[var(--accent-soft)] px-3 py-1.5 text-[11px] leading-5 text-[var(--accent)] transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] hover:border-[var(--accent)]/40 motion-reduce:transition-none',
-    isDirectoryTone && 'border-[var(--accent)]/22 bg-[color-mix(in_oklab,var(--accent-soft),transparent_18%)]'
+    'public-filter-chip inline-flex max-w-full items-center gap-2 rounded-[var(--radius-sm)] border border-[var(--border-default)] bg-white/[0.04] px-3 py-1.5 text-[11px] leading-5 text-[var(--text)] transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] hover:border-white/15 hover:bg-white/[0.07] motion-reduce:transition-none group',
+    isDirectoryTone && 'border-[var(--accent)]/18'
   );
+
   const shouldShowSearchLabel = isDirectoryTone || resolvedVariant === 'sidebar';
   const shouldShowFilterIntro = !(isDirectoryTone && resolvedVariant === 'sidebar');
   const liveStatusText = isPending
@@ -166,37 +281,73 @@ export function PublicFiltersContent({
 
   const filterFields = (
     <>
-      {categories.length > 0 ? (
+      {categories.length > 0 ? categoryMode === 'multiple' ? (
+        <PublicFiltersMultiSelectField
+          activeValues={currentCategories} allLabel={categoryAllLabel} ariaLabel={categoryLabel}
+          controlClassName={controlClassName} fieldLabelClassName={fieldLabelClassName}
+          id={`${filterIdPrefix}-category`} label={categoryLabel} name="category"
+          onChange={(values) => handleMultiSelect('category', values)}
+          onClear={clearSingleFilter}
+          options={categories.map((cat) => ({ label: cat.name, value: cat.slug }))}
+          wrapperClassName={fieldShellClassName}
+        />
+      ) : (
         <PublicFiltersSelectField
           activeValue={currentCategory} allLabel={categoryAllLabel} ariaLabel={categoryLabel}
           controlClassName={controlClassName} fieldLabelClassName={fieldLabelClassName}
           id={`${filterIdPrefix}-category`} label={categoryLabel} name="category"
           onChange={(event) => handleFilter('category', event.target.value)}
           onClear={clearSingleFilter}
-          options={categories.map((category) => ({ label: category.name, value: category.slug }))}
+          options={categories.map((cat) => ({ label: cat.name, value: cat.slug }))}
           wrapperClassName={fieldShellClassName}
         />
       ) : null}
-      {cities.length > 0 ? (
+      {cities.length > 0 ? cityMode === 'multiple' ? (
+        <PublicFiltersMultiSelectField
+          activeValues={currentCities} allLabel={cityAllLabel} ariaLabel={cityLabel}
+          controlClassName={controlClassName} fieldLabelClassName={fieldLabelClassName}
+          id={`${filterIdPrefix}-city`} label={cityLabel} name="city"
+          onChange={(values) => handleMultiSelect('city', values)}
+          onClear={clearSingleFilter}
+          options={cities.map((ct) => ({ label: ct.name, value: ct.slug }))}
+          wrapperClassName={fieldShellClassName}
+        />
+      ) : (
         <PublicFiltersSelectField
           activeValue={currentCity} allLabel={cityAllLabel} ariaLabel={cityLabel}
           controlClassName={controlClassName} fieldLabelClassName={fieldLabelClassName}
           id={`${filterIdPrefix}-city`} label={cityLabel} name="city"
           onChange={(event) => handleFilter('city', event.target.value)}
           onClear={clearSingleFilter}
-          options={cities.map((city) => ({ label: city.name, value: city.slug }))}
+          options={cities.map((ct) => ({ label: ct.name, value: ct.slug }))}
           wrapperClassName={fieldShellClassName}
         />
       ) : null}
       {extraFilters.map((filter) => {
-        const currentValue = searchParams?.get(filter.name) ?? '';
+        const mode = filter.mode ?? 'single';
+        if (mode === 'multiple') {
+          const currentValues = getParamValues(params, filter.name);
+          return (
+            <PublicFiltersMultiSelectField
+              activeValues={currentValues} allLabel={filter.allLabel ?? filter.label} ariaLabel={filter.label}
+              controlClassName={controlClassName} fieldLabelClassName={fieldLabelClassName}
+              id={`${filterIdPrefix}-${filter.name}`} key={filter.name} label={filter.label} name={filter.name}
+              onChange={(values) => handleMultiSelect(filter.name, values)}
+              onClear={clearSingleFilter}
+              options={filter.options}
+              wrapperClassName={fieldShellClassName}
+            />
+          );
+        }
+        const currentValue = parseSingleParam(params, filter.name);
         return (
           <PublicFiltersSelectField
             activeValue={currentValue} allLabel={filter.allLabel ?? filter.label} ariaLabel={filter.label}
             controlClassName={controlClassName} fieldLabelClassName={fieldLabelClassName}
             id={`${filterIdPrefix}-${filter.name}`} key={filter.name} label={filter.label} name={filter.name}
             onChange={(event) => handleFilter(filter.name, event.target.value)}
-            onClear={clearSingleFilter} options={filter.options}
+            onClear={clearSingleFilter}
+            options={filter.options}
             wrapperClassName={fieldShellClassName}
           />
         );
@@ -220,7 +371,9 @@ export function PublicFiltersContent({
 
   if (resolvedVariant === 'sidebar') {
     return <PublicFiltersSidebarVariant
-      activeChipClassName={activeChipClassName} activeFilters={activeFilters}
+      activeChipClassName={activeChipClassName}
+      activeFilters={activeFilters}
+      activeSummaryCountLabel={activeSummaryCountLabel}
       areSidebarFieldsCollapsed={areSidebarFieldsCollapsed}
       collapseLabel={collapseLabel} contextSummary={contextSummary} description={description}
       embedded={embedded} expandLabel={expandLabel}
@@ -228,7 +381,8 @@ export function PublicFiltersContent({
       filterTitleClassName={filterTitleClassName}
       hasActiveFilters={hasActiveFilters} hasFilters={hasFilters}
       isDirectoryTone={isDirectoryTone} isPending={isPending} liveStatusText={liveStatusText}
-      onClearAll={clearAllFilters} onClearFilter={clearSingleFilter}
+      onClearAll={clearAllFilters}
+      onClearFilter={clearSingleFilter}
       onToggleSidebarFields={() => setAreSidebarFieldsCollapsed((value) => !value)}
       panelPadding={panelPadding} panelSurfaceClass={panelSurfaceClass}
       searchField={searchField} shouldShowFilterIntro={shouldShowFilterIntro} title={title}

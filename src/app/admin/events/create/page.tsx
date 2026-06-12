@@ -1,4 +1,4 @@
-import { CategoryType, ContentStatus } from '@/modules/admin/queries';
+import { CategoryType } from '@/modules/admin/queries';
 import { createEvent } from '@/app/admin/events/actions';
 import { AdminCmsActions, AdminCmsForm, AdminCmsGrid, AdminCmsSection } from '@/components/admin/admin-cms-form';
 import { CoverImageField, HiddenRedirect } from '@/components/admin/content-admin-controls';
@@ -7,9 +7,9 @@ import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { PUBLICATION_STATUS_HINT, contentStatusLabels, eventFormatOptions, eventRegistrationModeOptions } from '@/lib/admin/content-utils';
+import { eventFormatOptions, eventRegistrationModeOptions } from '@/lib/admin/content-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
-import { prisma } from '@/modules/admin/queries';
+import { getActiveCategories, getActiveCities } from '@/lib/admin/admin-queries';
 
 export const dynamic = 'force-dynamic';
 
@@ -19,16 +19,8 @@ export default async function AdminEventsCreatePage() {
   await requireAdminSectionAccess('events');
 
   const [categories, cities] = await Promise.all([
-    prisma.category.findMany({
-      where: { type: CategoryType.EVENT, isActive: true },
-      orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
-      select: { id: true, name: true }
-    }),
-    prisma.city.findMany({
-      where: { isActive: true },
-      orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
-      select: { id: true, name: true }
-    })
+    getActiveCategories(CategoryType.EVENT),
+    getActiveCities()
   ]);
 
   return (
@@ -46,13 +38,10 @@ export default async function AdminEventsCreatePage() {
       <AdminCmsForm action={createEvent}>
           <HiddenRedirect value={ADMIN_EVENTS_PATH} />
           
-          <AdminCmsSection title="Публикация" description="Название, адрес, категория и статус события.">
+          <AdminCmsSection title="Публикация" description="Название и категория события.">
             <AdminCmsGrid>
               <FormField htmlFor="event-title" label="Название">
                 <Input id="event-title" name="title" required minLength={2} maxLength={160} />
-              </FormField>
-              <FormField htmlFor="event-slug" label="Адрес страницы">
-                <Input id="event-slug" name="slug" maxLength={180} placeholder="Если пусто, будет создан из названия" />
               </FormField>
               <FormField htmlFor="event-categoryId" label="Категория">
                 <Select id="event-categoryId" name="categoryId" defaultValue="">
@@ -60,15 +49,6 @@ export default async function AdminEventsCreatePage() {
                   {categories.map((category) => (
                     <option key={category.id} value={category.id}>
                       {category.name}
-                    </option>
-                  ))}
-                </Select>
-              </FormField>
-              <FormField htmlFor="event-status" label="Статус" hint={PUBLICATION_STATUS_HINT}>
-                <Select id="event-status" name="status" defaultValue={ContentStatus.DRAFT}>
-                  {Object.values(ContentStatus).map((status) => (
-                    <option key={status} value={status}>
-                      {contentStatusLabels[status]}
                     </option>
                   ))}
                 </Select>
@@ -142,16 +122,13 @@ export default async function AdminEventsCreatePage() {
 
           <AdminCmsSection title="Контент" description="Краткое описание события для публичных списков.">
             <div className="grid gap-4">
-                <FormField htmlFor="event-summary" label="Краткое описание">
+                <FormField htmlFor="event-summary" label="Описание для карточки" hint="Показывается в каталоге. До 500 символов.">
                   <Textarea id="event-summary" name="summary" required minLength={10} maxLength={500} />
                 </FormField>
             </div>
           </AdminCmsSection>
 
           <AdminCmsActions>
-            <Button href={ADMIN_EVENTS_PATH} type="button" variant="secondary">
-              Отмена
-            </Button>
             <Button type="submit">Создать событие</Button>
           </AdminCmsActions>
       </AdminCmsForm>

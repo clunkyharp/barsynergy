@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
-import { Button } from '@/components/ui/button';
-import { PublicContentDetailPage } from '@/components/public/public-content-detail-page';
-import { PublicRelatedContentSection } from '@/components/public/public-related-content-section';
+import { notFound } from 'next/navigation';
+import { SupplierDetailBody } from '@/components/public/supplier-detail-body';
+import { SupplierDetailHero } from '@/components/public/supplier-detail-hero';
+import { SupplierRelatedSection } from '@/components/public/supplier-related-section';
 import { JsonLd } from '@/components/seo/json-ld';
 import { SupplierInquiryForm } from '@/components/messaging/supplier-inquiry-form';
 import { getPublishedSuppliers } from '@/lib/public/content';
@@ -9,7 +10,8 @@ import { getPublishedSupplierDetail } from '@/lib/public/content';
 import { buildMissingPublicContentMetadata, buildPublicContentMetadata } from '@/lib/public/metadata';
 import { buildBreadcrumbJsonLd, buildPublicContentJsonLd } from '@/lib/public/structured-data';
 import { arePublicApplicationFormsEnabled } from '@/lib/applications/public-forms';
-import { getPublicApplicationResult, getPublicApplicationUtm } from '@/lib/applications/public-form-helpers';
+import { getPublicApplicationUtm } from '@/lib/applications/public-form-helpers';
+import { submitSupplierInquiryFormAction } from '@/lib/messaging/supplier-inquiry-action';
 import { getCurrentUser } from '@/lib/auth/current-user';
 import { getEnv } from '@/lib/validation/env';
 
@@ -42,19 +44,7 @@ export default async function SupplierDetailPage({ params, searchParams }: Suppl
   const [supplier, related] = await Promise.all([getPublishedSupplierDetail(slug), getPublishedSuppliers({ pageSize: '4' })]);
 
   if (!supplier) {
-    return (
-      <div className="container py-10 md:py-14">
-        <div className="mx-auto max-w-md text-center">
-          <h1 className="text-3xl font-bold leading-tight text-[var(--text)]">Поставщик не найден</h1>
-          <p className="mt-3 text-sm leading-6 text-[var(--muted)]">
-            Поставщик удалён, ещё не опубликован или ссылка неправильная.
-          </p>
-          <Button className="mt-6 rounded-[var(--radius-md)]" href="/suppliers" size="lg">
-            Вернуться в каталог поставщиков
-          </Button>
-        </div>
-      </div>
-    );
+    notFound();
   }
 
   const sp = (await searchParams) ?? {};
@@ -70,6 +60,12 @@ export default async function SupplierDetailPage({ params, searchParams }: Suppl
     email: currentUser.email ?? undefined
   } : undefined;
 
+  const isVerified = supplier.isVerified ?? false;
+  const serviceArea = supplier.facts.find((f) => f.label === 'География')?.value;
+  const contactLabel = supplier.facts.find((f) => f.label === 'Контакты')?.value;
+
+  const showUserActions = !currentUser || currentUser.role === 'USER';
+
   return (
     <>
       <JsonLd
@@ -82,41 +78,40 @@ export default async function SupplierDetailPage({ params, searchParams }: Suppl
           buildPublicContentJsonLd({ detail: supplier, path: detailPath, kind: 'organization' })
         ]}
       />
-      <PublicContentDetailPage
-        backHref="/suppliers"
-        backLabel="Ко всем поставщикам"
-        body={supplier.body}
-        eyebrow="Поставщики"
-        facts={supplier.facts}
-        imageUrl={supplier.imageUrl}
+      <SupplierDetailHero
+        cityName={supplier.cityName}
+        companyName={supplier.companyName}
+        contactHref="#supplier-contact-rail"
+        contactLabel={contactLabel}
+        externalUrl={supplier.externalUrl}
+        externalUrlLabel={supplier.externalUrlLabel}
+        image={supplier.imageUrl}
+        isVerified={isVerified}
         label={supplier.label}
-        meta={supplier.meta}
-        secondaryLink={
-          supplier.externalUrl && supplier.externalUrlLabel
-            ? { href: supplier.externalUrl, label: supplier.externalUrlLabel, external: true }
-            : { href: '/suppliers', label: 'Вернуться в каталог' }
-        }
-        sections={supplier.sections}
+        serviceArea={serviceArea}
+        showContactCta={showUserActions}
         summary={supplier.summary}
         title={supplier.title}
-        actionsSlot={
-          <SupplierInquiryForm
-            enabled={formsEnabled}
-            isAuthenticated={isAuthenticated}
-            profile={profile}
-            supplierId={supplier.id}
-            supplierTitle={supplier.title}
-            supplierSlug={supplier.slug}
-            utm={getPublicApplicationUtm(sp)}
-            result={getPublicApplicationResult(sp)}
-          />
+      />
+      <SupplierDetailBody
+        body={supplier.body}
+        contactRail={
+          showUserActions ? (
+            <SupplierInquiryForm
+              enabled={formsEnabled}
+              isAuthenticated={isAuthenticated}
+              profile={profile}
+              supplierId={supplier.id}
+              supplierTitle={supplier.title}
+              supplierSlug={supplier.slug}
+              utm={getPublicApplicationUtm(sp)}
+              submitAction={submitSupplierInquiryFormAction}
+            />
+          ) : null
         }
+        facts={supplier.facts}
       />
-      <PublicRelatedContentSection
-        basePath="/suppliers"
-        items={relatedItems}
-        title="Другие поставщики"
-      />
+      <SupplierRelatedSection items={relatedItems} />
     </>
   );
 }

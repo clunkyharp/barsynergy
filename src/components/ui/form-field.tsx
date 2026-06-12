@@ -87,9 +87,15 @@ export function FormField({ label, htmlFor, error, hint, className, labelClassNa
     <div className={cn('form-field', className)} data-state={error ? 'error' : success ? 'success' : undefined}>
       <FieldLabel className={labelClassName} htmlFor={htmlFor} required={isRequired} size={labelSize}>{label}</FieldLabel>
       {field}
-      {hint ? <FieldHint id={hintId}>{hint}</FieldHint> : null}
-      {success ? <FieldSuccess id={successId}>{success}</FieldSuccess> : null}
-      {error ? <FieldError id={errorId}>{error}</FieldError> : null}
+      <div className="field-message-slot">
+        {error
+          ? <FieldError id={errorId}>{error}</FieldError>
+          : success
+          ? <FieldSuccess id={successId}>{success}</FieldSuccess>
+          : hint
+          ? <FieldHint id={hintId}>{hint}</FieldHint>
+          : null}
+      </div>
     </div>
   );
 }

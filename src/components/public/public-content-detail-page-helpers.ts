@@ -8,7 +8,7 @@ type DetailLink = {
 };
 
 type PublicContentDetailPageProps = {
-  eyebrow: string;
+  eyebrow?: string;
   backHref: string;
   backLabel: string;
   title: string;
@@ -23,6 +23,8 @@ type PublicContentDetailPageProps = {
   secondaryLink?: DetailLink;
   actionsSlot?: ReactNode;
   actionsBottomSlot?: ReactNode;
+  metaSlot?: ReactNode;
+  sourceReferences?: string;
 };
 
 type DetailKind = 'article' | 'event' | 'course' | 'vacancy' | 'supplier' | 'partner';

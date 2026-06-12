@@ -1,10 +1,10 @@
 import type { Metadata } from 'next';
 import { CategoryType } from '@/modules/content/shared/types';
-import { PackageCheck } from 'lucide-react';
-import { EditorialPublicPage } from '@/components/public/editorial-public-page';
+import { PageHero } from '@/components/public/page-hero';
 import { PublishedContentSectionDirectory } from '@/components/public/published-content-section';
 import { PublicFilters } from '@/components/public/public-filters';
 import { PublicPrelaunchSection } from '@/components/public/public-prelaunch-section';
+import { SuppliersHeroActions } from '@/app/(public)/suppliers/suppliers-hero-actions';
 import { stripPublicApplicationResultParams } from '@/lib/applications/public-form-helpers';
 import { getPublishedSuppliers, hasActivePublicContentParams, type PublicContentSearchParams } from '@/lib/public/content';
 import { getPublicCategoryOptions, getPublicCityFilterOptions } from '@/lib/public/filter-options';
@@ -20,9 +20,24 @@ export const metadata: Metadata = buildPublicPageMetadata({
   path: '/suppliers'
 });
 
+const supplierSortOptions = [
+  { value: 'recent', label: 'Сначала новые' },
+  { value: 'verified', label: 'Сначала проверенные' },
+  { value: 'name', label: 'По названию компании' }
+] as const;
+
+function firstParam(value: string | string[] | undefined) {
+  return Array.isArray(value) ? value[0] : value;
+}
+
+function getSupplierSortLabel(sort?: string) {
+  return supplierSortOptions.find((option) => option.value === sort)?.label;
+}
+
 export default async function SuppliersPage({ searchParams }: SuppliersPageProps) {
   const params = (await searchParams) ?? {};
   const contentParams = stripPublicApplicationResultParams(params);
+  const selectedSort = firstParam(contentParams.sort);
   const [content, filterCities, categories] = await Promise.all([
     getPublishedSuppliers(contentParams),
     getPublicCityFilterOptions(),
@@ -35,21 +50,13 @@ export default async function SuppliersPage({ searchParams }: SuppliersPageProps
 
   return (
     <>
-      <EditorialPublicPage
-        eyebrow="Поставщики"
-        path="/suppliers"
+      <PageHero
         title="Поставщики"
-        description="Компании, оборудование, сервис и контакты для заведений региона."
-        summary="Каталог пополняется. Фильтры по направлению, городу и статусу раскрываются по кнопке."
-        density="compact"
-        summaryHeading="В фокусе"
-        metrics={[]}
-        rows={[]}
-        primaryLink={{ label: 'Добавить свою компанию', href: supplierContactHref }}
-        secondaryLink={isEmpty ? { label: 'Связаться с нами', href: supplierContactHref } : undefined}
-        accentGradient="radial-gradient(ellipse 90% 60% at 70% 50%, rgba(40,180,180,0.08), transparent)"
-        accentIcon={PackageCheck}
-      />
+        subtitle="Проверенные поставщики кофе, оборудования, упаковки и продуктов для вашего бизнеса."
+        media={{ kind: 'image' as const, src: '/images/suppliers-hero.jpg', alt: 'Кофейные пачки, зерно и аксессуары для кофейного бизнеса' }}
+      >
+        <SuppliersHeroActions />
+      </PageHero>
       {isPrelaunchEmpty ? (
         <PublicPrelaunchSection
           actions={[
@@ -84,12 +91,15 @@ export default async function SuppliersPage({ searchParams }: SuppliersPageProps
           filters={
             <PublicFilters
               activeSummaryLabel="Параметры каталога"
+              activeSummaryCountLabel="Фильтры каталога"
               categories={categories}
               categoryAllLabel="Все направления"
               categoryLabel="Направление"
+              categoryMode="multiple"
               cities={filterCities}
               cityAllLabel="Все города работы"
               cityLabel="Город работы"
+              cityMode="multiple"
               embedded
               extraFilters={[
                 {
@@ -97,7 +107,13 @@ export default async function SuppliersPage({ searchParams }: SuppliersPageProps
                   label: 'Статус',
                   allLabel: 'Любой статус',
                   options: [{ value: 'true', label: 'Проверенные компании' }]
-                }
+                },
+                {
+                  name: 'sort',
+                  label: 'Сортировка',
+                  allLabel: 'По умолчанию',
+                  options: [...supplierSortOptions]
+                },
               ]}
               placeholder="Компания или поставка…"
               title="Фильтры"
@@ -110,6 +126,7 @@ export default async function SuppliersPage({ searchParams }: SuppliersPageProps
           rowActionLabel="Смотреть профиль"
           sectionId="suppliers-list"
           showSidebarTitle={false}
+          sortLabel={getSupplierSortLabel(selectedSort)}
           title="Каталог"
         />
       )}

@@ -1,16 +1,16 @@
 import type { Metadata } from 'next';
-import Image from 'next/image';
+
 import { Suspense } from 'react';
-import { ArrowUpRight, HelpCircle, Plus } from 'lucide-react';
+import { ArrowUpRight, BarChart2, Clock, Monitor, User } from 'lucide-react';
 import { CategoryType } from '@/modules/content/shared/types';
-import { ProgramFormatMatrix } from '@/components/public/editorial-display-primitives';
-import { Button } from '@/components/ui/button';
 import { AppLink } from '@/components/ui/app-link';
-import { CourseGridCard } from '@/components/public/course-grid-card';
-import { PublicBreadcrumbs } from '@/components/public/public-primitives';
+import { EditorialCard } from '@/components/ui/cards';
+import { metaGroupValue } from '@/components/public/published-content-section-builders';
 import { PublishedContentSectionCourse } from '@/components/public/published-content-section';
-import { EducationBenefitsStrip } from '@/components/public/education-benefits-strip';
 import { EducationFilterBar } from '@/components/public/education-filter-bar';
+import { PublicPrelaunchSection } from '@/components/public/public-prelaunch-section';
+import { EducationHeroActions } from '@/app/(public)/education/education-hero-actions';
+import { PageHero } from '@/components/public/page-hero';
 import { JsonLd } from '@/components/seo/json-ld';
 import { stripPublicApplicationResultParams } from '@/lib/applications/public-form-helpers';
 import { getPublishedCourses, hasActivePublicContentParams, type PublicContentSearchParams } from '@/lib/public/content';
@@ -33,152 +33,17 @@ export const metadata: Metadata = buildPublicPageMetadata({
 
 const FEATURED_COUNT = 4;
 
-type EducationFormType = 'course' | 'corporate' | 'certificate';
-
-const educationFormats = [
-  {
-    label: 'Интенсив',
-    title: 'Интенсив для бариста',
-    description: 'Разберёте параметры экстракции, настроите помол под зерно и отработаете стабильный эспрессо.',
-    audience: 'Для бариста, которые работают за стойкой и хотят точнее управлять вкусом.',
-    outcome: 'Понятный рецепт, контроль помола и повторяемая чашка на смене.',
-    formType: 'course',
-    meta: []
-  },
-  {
-    label: 'Лекция',
-    title: 'Лекция или каппинг-разбор',
-    description: 'Одна тема за встречу: зерно, обработка, молоко, сервис или сезонное меню.',
-    audience: 'Для специалистов и команд, которым нужен быстрый профессиональный разбор.',
-    outcome: 'Конспект, ответы на вопросы и список действий для следующей смены.',
-    formType: 'course',
-    meta: []
-  },
-  {
-    label: 'Команда',
-    title: 'Корпоративное обучение',
-    description: 'Программа под кофейный бар: эспрессо, молочные напитки, стандарты смены и контроль качества.',
-    audience: 'Для владельцев и управляющих, которые обучают команду целиком.',
-    outcome: 'Единый протокол напитков, смены и проверки результата.',
-    formType: 'corporate',
-    meta: []
-  },
-  {
-    label: 'Меню',
-    title: 'Разбор меню',
-    description: 'Практическая сессия по эспрессо, фильтру, авторским напиткам, себестоимости и подаче.',
-    audience: 'Для шефов, бар-менеджеров и концепт-команд.',
-    outcome: 'Разбор меню и список правок для запуска.',
-    formType: 'course',
-    meta: []
-  },
-  {
-    label: 'Сервис',
-    title: 'Сервисная сессия',
-    description: 'Работа со стандартами смены, скоростью выдачи, коммуникацией с гостем и качеством напитка.',
-    audience: 'Для команд зала и сервиса, которым нужно договориться о работе смены.',
-    outcome: 'Разбор сервиса, стандартов и действий в смене.',
-    formType: 'course',
-    meta: []
-  },
-  {
-    label: 'Управление',
-    title: 'Программа для управляющих',
-    description: 'Команда, закупки зерна и молока, списания, себестоимость и операционные процессы.',
-    audience: 'Для управляющих ресторанов и тех, кто отвечает за работу точки.',
-    outcome: 'План по команде, закупкам, деньгам и процессам.',
-    formType: 'course',
-    meta: []
-  },
-  {
-    label: 'Подарок',
-    title: 'Сертификат на обучение',
-    description: 'Подарочный сертификат на занятие, интенсив или программу для команды.',
-    audience: 'Для подарка специалисту или команде.',
-    outcome: 'Сертификат под нужный формат и сумму.',
-    formType: 'certificate',
-    meta: []
-  }
-] as const satisfies readonly {
-  label: string;
-  title: string;
-  description: string;
-  audience: string;
-  outcome: string;
-  formType: EducationFormType;
-  meta: readonly string[];
-}[];
-
-function getEducationApplicationHref(format: (typeof educationFormats)[number]) {
-  const params = new URLSearchParams({ topic: 'education-program', topicTitle: format.title });
-  return `/contacts?${params.toString()}#contact-form`;
-}
-
-function getEducationActionLabel(format: (typeof educationFormats)[number]) {
-  if (format.formType === 'corporate') return 'Описать задачу команды';
-  if (format.formType === 'certificate') return 'Заказать сертификат';
-  if (format.label === 'Интенсив') return 'Записаться на интенсив';
-  if (format.label === 'Лекция') return 'Записаться на разбор';
-  if (format.label === 'Меню') return 'Записаться на разбор меню';
-  if (format.label === 'Сервис') return 'Записаться на сессию';
-  if (format.label === 'Управление') return 'Записаться на программу';
-  return 'Описать задачу обучения';
-}
-
 function EducationHero() {
   return (
     <>
       <JsonLd data={buildStaticPageBreadcrumbJsonLd('/education', 'Обучение')} />
-      <section className="relative isolate overflow-hidden border-b border-[var(--line)] bg-[var(--editorial-dark-surface)] text-[var(--editorial-dark-text)]">
-        {/* Background image — full-width cover */}
-        <Image
-          alt=""
-          aria-hidden="true"
-          className="absolute inset-0 h-full w-full object-cover object-center"
-          fill
-          priority
-          sizes="100vw"
-          src="/images/home/education-hero.png"
-        />
-        {/* Subtle overlay: keeps text readable on left, image visible across full width */}
-        <div
-          aria-hidden="true"
-          className="absolute inset-0 bg-[linear-gradient(to_right,rgba(10,9,8,0.82)_0%,rgba(10,9,8,0.60)_40%,rgba(10,9,8,0.22)_70%,rgba(10,9,8,0.08)_100%)]"
-        />
-        <div className="container relative z-10">
-          <div className="flex min-h-[360px] max-w-xl flex-col justify-center pt-3 pb-10 md:min-h-[400px] md:pt-3 md:pb-14">
-            <PublicBreadcrumbs current="Обучение" />
-            <h1
-              className={cn(
-                displayFont.className,
-                'mt-4 text-[clamp(2.4rem,5.5vw,4.2rem)] font-semibold leading-none'
-              )}
-            >
-              Обучение
-            </h1>
-            <p className="mt-4 text-[15px] leading-7 text-white/65">
-              Курсы, мастер-классы и практические программы для специалистов кофейной индустрии.
-            </p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Button
-                className="gap-2 rounded-[var(--radius-md)]"
-                href="/contacts?topic=education-program#contact-form"
-              >
-                <Plus aria-hidden="true" size={15} />
-                Добавить программу
-              </Button>
-              <Button
-                className="gap-2 rounded-[var(--radius-md)] border-white/20 text-white hover:border-white/40 hover:bg-white/8"
-                href="#education-formats"
-                variant="secondary"
-              >
-                <HelpCircle aria-hidden="true" size={15} />
-                Как это работает?
-              </Button>
-            </div>
-          </div>
-        </div>
-      </section>
+      <PageHero
+        title="Обучение"
+        subtitle="Курсы, мастер-классы и практические программы для специалистов кофейной индустрии."
+        tone="graphite"
+      >
+        <EducationHeroActions />
+      </PageHero>
     </>
   );
 }
@@ -208,42 +73,35 @@ function EducationFeaturedSection({
           </AppLink>
         </div>
         <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {items.map((item, i) => (
-            <CourseGridCard
-              actionLabel="Подробнее"
-              basePath={basePath}
-              isFeatured={i === 0}
-              item={item}
-              key={item.id}
-            />
-          ))}
+          {items.map((item, i) => {
+            const href = `${basePath}/${item.slug}`;
+            const instructor = metaGroupValue(item, 'Преподаватель');
+            const duration = metaGroupValue(item, 'Длительность');
+            const level = metaGroupValue(item, 'Уровень');
+            const format = metaGroupValue(item, 'Формат');
+            const hasMeta = Boolean(instructor || duration || level || format);
+            return (
+              <EditorialCard
+                action={{ href: `${href}#course-request`, label: 'Подробнее' }}
+                eyebrow={item.label ?? undefined}
+                href={href}
+                isFeatured={i === 0}
+                key={item.id}
+                media={item.imageUrl ? { kind: 'image' as const, src: item.imageUrl } : undefined}
+                meta={hasMeta ? (
+                  <div className="flex flex-wrap gap-x-3 gap-y-1 text-[12px] text-[var(--muted)]">
+                    {instructor ? <span className="flex items-center gap-1"><User aria-hidden="true" className="shrink-0 text-[var(--accent)]" size={12} />{instructor}</span> : null}
+                    {duration ? <span className="flex items-center gap-1"><Clock aria-hidden="true" className="shrink-0 text-[var(--accent)]" size={12} />{duration}</span> : null}
+                    {level ? <span className="flex items-center gap-1"><BarChart2 aria-hidden="true" className="shrink-0 text-[var(--accent)]" size={12} />{level}</span> : null}
+                    {format ? <span className="flex items-center gap-1"><Monitor aria-hidden="true" className="shrink-0 text-[var(--accent)]" size={12} />{format}</span> : null}
+                  </div>
+                ) : undefined}
+                summary={item.summary ?? undefined}
+                title={item.title}
+              />
+            );
+          })}
         </div>
-      </div>
-    </section>
-  );
-}
-
-function EducationFormatsGrid() {
-  return (
-    <section className="background-zone background-zone-beige editorial-grid border-b border-[var(--line)] py-10 md:py-14" id="education-formats">
-      <div className="container">
-        <ProgramFormatMatrix
-          className="border-0 py-0"
-          description="Выберите разбор, интенсив, обучение для команды или сертификат. В каждой строке видно, кому подходит формат и что будет на выходе."
-          eyebrow="Форматы"
-          items={educationFormats.map((format) => ({
-            action: {
-              href: getEducationApplicationHref(format),
-              label: getEducationActionLabel(format)
-            },
-            audience: format.audience,
-            format: format.title,
-            includes: format.description,
-            result: format.outcome,
-            status: 'Заявки принимаются'
-          }))}
-          title="Какие форматы есть"
-        />
       </div>
     </section>
   );
@@ -319,20 +177,33 @@ export default async function EducationPage({ searchParams }: EducationPageProps
         </>
       ) : null}
 
-      <EducationFormatsGrid />
-
       {isPrelaunchEmpty ? (
-        <section className="background-zone background-zone-ivory border-b border-[var(--line)] py-16">
-          <div className="container text-center">
-            <p className="text-[var(--muted)]">Конкретные программы с датами и записью скоро появятся. Напишите нам, если хотите попасть на ближайший запуск.</p>
-            <Button className="mt-6" href="/contacts?topic=education-program#contact-form">
-              Предложить программу
-            </Button>
-          </div>
-        </section>
+        <PublicPrelaunchSection
+          actions={[
+            { href: '/contacts?topic=education-program#contact-form', label: 'Предложить программу' },
+            { href: '/contacts?topic=education-launch#contact-form', label: 'Связаться с нами', variant: 'secondary' }
+          ]}
+          badges={['Раздел уже принимает заявки', 'Подходит для открытых и корпоративных форматов']}
+          cards={[
+            {
+              title: 'Интенсивы и мастер-классы',
+              description: 'Короткие практические форматы для бариста, менеджеров и команд.'
+            },
+            {
+              title: 'Корпоративное обучение',
+              description: 'Программы под запуск, адаптацию команды и развитие внутренних стандартов.'
+            },
+            {
+              title: 'Онлайн и долгие программы',
+              description: 'Лекции, циклы занятий и системные треки с записью или набором.'
+            }
+          ]}
+          description="Добавьте программу, если она помогает специалистам или командам заведений развивать навыки в барной индустрии."
+          eyebrow="Обучение"
+          title="Какие программы можно добавить"
+        />
       ) : null}
 
-      <EducationBenefitsStrip />
     </>
   );
 }

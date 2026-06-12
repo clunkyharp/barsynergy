@@ -123,6 +123,17 @@ export function PublicSubmissionFeedback({
     <InlineAlert className={cn('public-submission-feedback', className)} tone={result.type === 'error' ? 'error' : 'success'}>
       <strong className="public-submission-feedback-title">{feedbackTitle}</strong>
       <span className="public-submission-feedback-body">{result.message}</span>
+      {result.type === 'success' && result.applicationId ? (
+        <p className="mt-2 text-xs leading-5 opacity-85">
+          Номер заявки: <span className="font-mono">{result.applicationId}</span>
+          <span className="block mt-1">
+            <a className="font-semibold underline underline-offset-2 hover:no-underline" href="/auth/register/user">
+              Зарегистрируйтесь
+            </a>,
+            чтобы отслеживать статус заявки в личном кабинете.
+          </span>
+        </p>
+      ) : null}
     </InlineAlert>
   );
 }

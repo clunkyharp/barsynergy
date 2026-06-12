@@ -39,8 +39,8 @@ import {
   getAdminTotalPages,
   type AdminContentSearchParams
 } from '@/lib/admin/content-utils';
+import { getActiveCities, getGeneralSponsorList } from '@/lib/admin/admin-queries';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
-import { prisma } from '@/modules/admin/queries';
 
 export const dynamic = 'force-dynamic';
 
@@ -82,25 +82,9 @@ export default async function AdminGeneralSponsorsPage({ searchParams }: AdminGe
       : {})
   };
 
-  const [total, sponsors, cities] = await Promise.all([
-    prisma.generalSponsor.count({ where }),
-    prisma.generalSponsor.findMany({
-      where,
-      orderBy: [{ isFeatured: 'desc' }, { priority: 'asc' }, { createdAt: 'desc' }],
-      skip: (page - 1) * ADMIN_CONTENT_PAGE_SIZE,
-      take: ADMIN_CONTENT_PAGE_SIZE,
-      include: {
-        city: { select: { name: true } },
-        logoImage: { select: { originalName: true } },
-        coverImage: { select: { originalName: true } },
-        updatedBy: { select: { email: true } }
-      }
-    }),
-    prisma.city.findMany({
-      where: { isActive: true },
-      orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
-      select: { id: true, name: true }
-    })
+  const [[sponsors, total], cities] = await Promise.all([
+    getGeneralSponsorList(where, (page - 1) * ADMIN_CONTENT_PAGE_SIZE, ADMIN_CONTENT_PAGE_SIZE),
+    getActiveCities()
   ]);
   const totalPages = getAdminTotalPages(total);
   const hasActiveFilters = Boolean(q || status || cityId || featuredFilter);

@@ -21,7 +21,7 @@ type Props = {
   contextSummary: ReactNode | null;
   hasActiveFilters: boolean;
   activeFilters: ActiveFilter[];
-  onClearFilter: (name: string) => void;
+  onClearFilter: (name: string, value?: string) => void;
   hasFilters: boolean;
   onClearAll: () => void;
   showFilters: boolean;
@@ -126,15 +126,17 @@ export function PublicFiltersStackedVariant({
           </div>
 
           {hasActiveFilters ? (
-            <div className="mt-4 flex flex-wrap gap-2">
-              {activeFilters.map((filter) => (
-                <PublicFiltersActiveChip
-                  className={activeChipClassName}
-                  filter={filter}
-                  key={`${filter.name}-${filter.value}`}
-                  onClear={onClearFilter}
-                />
-              ))}
+            <div className="mt-4 flex flex-wrap gap-1.5">
+              {activeFilters.flatMap((filter) =>
+                filter.values.map((v) => (
+                  <PublicFiltersActiveChip
+                    className={activeChipClassName}
+                    filter={{ label: filter.label, name: filter.name, value: v.value, displayValue: v.label }}
+                    key={`${filter.name}-${v.value}`}
+                    onClear={onClearFilter}
+                  />
+                ))
+              )}
             </div>
           ) : null}
 

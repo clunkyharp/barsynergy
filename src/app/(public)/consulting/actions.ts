@@ -1,6 +1,5 @@
 'use server';
 
-import { redirect } from 'next/navigation';
 import { ApplicationType } from '@prisma/client';
 import { z } from 'zod';
 import { buildApplicationPayload } from '@/lib/applications/application-payloads';
@@ -14,16 +13,15 @@ import {
 import {
   assertActiveCity,
   baseContactSchema,
-  getPublicApplicationResultPath,
   getString,
   nullableString,
   optionalString,
   PERSONAL_DATA_CONSENT_TEXT,
+  type PublicApplicationResult,
   utmSchema
 } from '@/lib/applications/public-form-helpers';
 import { submitPublicApplicationAction } from '@/lib/applications/submit-public-application-action';
 
-const CONSULTING_PATH = '/consulting';
 const consultingBusinessTypeValues = consultingBusinessTypeOptions.map((option) => option.value) as [
   (typeof consultingBusinessTypeOptions)[number]['value'],
   ...(typeof consultingBusinessTypeOptions)[number]['value'][]
@@ -55,17 +53,12 @@ const consultingRequestSchema = baseContactSchema
   })
   .refine((data) => data.email || data.phone || data.telegram, { message: 'contact is required' });
 
-function redirectWithConsultingResult(result: { type: 'success' | 'error'; message: string }): never {
-  redirect(getPublicApplicationResultPath(CONSULTING_PATH, result, 'consulting-request'));
-}
-
-export async function submitConsultingRequest(formData: FormData) {
-  await submitPublicApplicationAction({
+export async function submitConsultingRequest(_prevState: PublicApplicationResult | null, formData: FormData): Promise<PublicApplicationResult> {
+  return submitPublicApplicationAction({
     actionName: 'public:consulting-request',
     applicationType: ApplicationType.CONSULTING_REQUEST,
     formData,
     successMessage: 'Заявку на консультацию получили.',
-    redirectWithResult: redirectWithConsultingResult,
     parse: async (data) => {
       const parsed = consultingRequestSchema.parse({
         contactName: getString(data, 'contactName'),

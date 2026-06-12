@@ -61,7 +61,7 @@ export default async function SavedVacanciesPage() {
                     {v.employmentType && <MetaChip variant="filter">{getAdminOptionLabel(vacancyEmploymentTypeOptions, v.employmentType)}</MetaChip>}
                   </div>
                 </div>
-                <form action={removeSavedVacancyAction}>
+                <form action={async (formData) => { await removeSavedVacancyAction(formData); }}>
                   <input name="savedVacancyId" type="hidden" value={sv.id} />
                   <Button className="rounded-[var(--radius-md)]" size="sm" type="submit" variant="secondary">
                     <BookmarkX size={14} strokeWidth={1.8} />

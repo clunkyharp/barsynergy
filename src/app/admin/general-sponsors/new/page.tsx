@@ -1,8 +1,8 @@
 import { createGeneralSponsor } from '@/app/admin/general-sponsors/actions';
 import { GeneralSponsorForm } from '@/app/admin/general-sponsors/general-sponsor-form';
 import { Button } from '@/components/ui/button';
+import { getActiveCities } from '@/lib/admin/admin-queries';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
-import { prisma } from '@/modules/admin/queries';
 
 export const dynamic = 'force-dynamic';
 
@@ -11,11 +11,7 @@ const ADMIN_GENERAL_SPONSORS_PATH = '/admin/general-sponsors';
 export default async function AdminGeneralSponsorCreatePage() {
   await requireAdminSectionAccess('generalSponsors');
 
-  const cities = await prisma.city.findMany({
-    where: { isActive: true },
-    orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
-    select: { id: true, name: true }
-  });
+  const cities = await getActiveCities();
 
   return (
     <div className="space-y-8">

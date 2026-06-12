@@ -4,8 +4,8 @@ import { GeneralSponsorForm } from '@/app/admin/general-sponsors/general-sponsor
 import { AdminActionAlert, AdminContentVisibilityPanel } from '@/components/admin/content-admin-controls';
 import { Button } from '@/components/ui/button';
 import type { AdminContentSearchParams } from '@/lib/admin/content-utils';
+import { getActiveCities, getGeneralSponsorById } from '@/lib/admin/admin-queries';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
-import { prisma } from '@/modules/admin/queries';
 
 export const dynamic = 'force-dynamic';
 
@@ -23,18 +23,8 @@ export default async function AdminGeneralSponsorEditPage({ params, searchParams
   const currentPath = `${ADMIN_GENERAL_SPONSORS_PATH}/${id}/edit`;
   const query = (await searchParams) ?? {};
   const [sponsor, cities] = await Promise.all([
-    prisma.generalSponsor.findUnique({
-      where: { id },
-      include: {
-        logoImage: { select: { originalName: true } },
-        coverImage: { select: { originalName: true } }
-      }
-    }),
-    prisma.city.findMany({
-      where: { isActive: true },
-      orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
-      select: { id: true, name: true }
-    })
+    getGeneralSponsorById(id),
+    getActiveCities()
   ]);
 
   if (!sponsor) {

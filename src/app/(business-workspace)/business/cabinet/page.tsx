@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
-import { ArrowRight } from 'lucide-react';
-import { updateBusinessProfile } from '@/lib/business/actions';
+import { ArrowRight, Building2, FileText, PartyPopper, Users } from 'lucide-react';
+import { updateBusinessProfile } from '@/lib/business/profile-actions';
 import { AdminActionAlert } from '@/components/admin/content-admin-controls';
 import {
   BusinessProfileSheet,
@@ -30,6 +30,7 @@ export const metadata: Metadata = buildPrivatePageMetadata({
 export default async function BusinessDashboardPage({ searchParams }: BusinessDashboardPageProps) {
   const { businessAccount } = await requireBusinessAccountAccess();
   const params = (await searchParams) ?? {};
+  const isWelcome = (Array.isArray(params.welcome) ? params.welcome[0] : params.welcome) === '1';
   const cities = await getActiveCities();
   const {
     requestCount, activeRequestCount, draftRequestCount,
@@ -49,6 +50,43 @@ export default async function BusinessDashboardPage({ searchParams }: BusinessDa
       <PageHeader eyebrow="Компания" title={businessAccount.companyName} />
       <AdminActionAlert params={params} />
 
+      {isWelcome ? (
+        <section className="rounded-[var(--radius-lg)] border border-[var(--line)] bg-[var(--surface-elevated)] p-5 shadow-[var(--shadow-panel)]">
+          <div className="flex items-start gap-4">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[var(--accent-soft)]">
+              <PartyPopper aria-hidden className="text-[var(--accent)]" size={22} strokeWidth={1.5} />
+            </div>
+            <div className="min-w-0 flex-1">
+              <h2 className="text-[1.25rem] font-semibold leading-tight text-[var(--text)]">
+                Добро пожаловать в кабинет компании
+              </h2>
+              <p className="mt-1 text-sm leading-6 text-[var(--muted)]">
+                Доступ открыт. Сначала заполните профиль, затем создайте первую заявку и проверьте отклики команды.
+              </p>
+              <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-3">
+                {[
+                  { href: '#business-profile', icon: Building2, label: 'Заполнить профиль', description: 'Контакты, город и описание компании' },
+                  { href: '/business/cabinet/requests', icon: FileText, label: 'Создать заявку', description: 'Вакансия, обучение, партнёрство или каталог' },
+                  { href: '/business/cabinet/responses', icon: Users, label: 'Проверить отклики', description: 'Ответы команды и новые реакции' }
+                ].map((item) => (
+                  <a
+                    className="group flex items-center gap-3 rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--surface-wash)] px-3 py-2.5 transition-colors hover:border-[var(--accent)]/35 hover:bg-[var(--accent-soft)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
+                    href={item.href}
+                    key={item.href}
+                  >
+                    <item.icon aria-hidden className="shrink-0 text-[var(--muted)] transition-colors group-hover:text-[var(--accent)]" size={18} strokeWidth={1.5} />
+                    <span>
+                      <span className="block text-[13px] font-semibold text-[var(--text)]">{item.label}</span>
+                      <span className="block text-[11px] leading-4 text-[var(--muted)]">{item.description}</span>
+                    </span>
+                  </a>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+      ) : null}
+
       <div className="flex flex-wrap items-center gap-4 rounded-[var(--radius-lg)] border border-[var(--line)] bg-[var(--surface-elevated)] px-5 py-4">
         <div className="flex items-center gap-4 text-sm">
           <span className="font-semibold text-[var(--text)]">Активных заявок: <span className="text-[var(--accent)]">{activeRequestCount}</span></span>
@@ -62,7 +100,9 @@ export default async function BusinessDashboardPage({ searchParams }: BusinessDa
       </div>
 
       <section className="grid gap-5 xl:grid-cols-[minmax(0,1.1fr)_minmax(300px,0.45fr)]">
-        <BusinessProfileSheet account={businessAccount} action={updateBusinessProfile} cities={cities} />
+        <div id="business-profile">
+          <BusinessProfileSheet account={businessAccount} action={updateBusinessProfile} cities={cities} />
+        </div>
         <div className="space-y-5">
           <RequestStatusRail
             items={[
@@ -102,7 +142,13 @@ export default async function BusinessDashboardPage({ searchParams }: BusinessDa
         </div>
       </section>
 
-      <RequestLedger applications={latestApplications} title="Последние заявки" viewAllHref="/business/cabinet/requests" />
+      <RequestLedger
+        applications={latestApplications}
+        emptyAction={{ href: '/business/cabinet/requests', label: 'Создать первую заявку' }}
+        emptyDescription="Когда компания создаст первую заявку, здесь появятся её статус, рабочие комментарии и быстрый переход к записи."
+        title="Последние заявки"
+        viewAllHref="/business/cabinet/requests"
+      />
     </div>
   );
 }

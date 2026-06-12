@@ -777,15 +777,15 @@
 .admin-data-table td.admin-table-actions-cell {
   background: var(--admin-surface);
   border-left-color: var(--border-default);
-  width: 10rem;
-  min-width: 10rem;
+  width: 7rem;
+  min-width: 7rem;
   white-space: nowrap;
 }
 
 .admin-data-table th:has(+ .admin-table-actions-header),
 .admin-data-table td:has(+ .admin-table-actions-cell) {
-  width: 10rem;
-  min-width: 10rem;
+  width: 7rem;
+  min-width: 7rem;
   white-space: nowrap;
 }
 
@@ -1601,6 +1601,7 @@
   border-radius: 0;
   background: transparent;
   box-shadow: none;
+  min-height: 320px;
 }
 
 .markdown-editor textarea:focus {

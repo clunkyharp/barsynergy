@@ -10,7 +10,7 @@ import { Select } from '@/components/ui/select';
 import { AdminStatusChip } from '@/components/ui/status-badge';
 import type { AdminContentSearchParams } from '@/lib/admin/content-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
-import { prisma } from '@/modules/admin/queries';
+import { getCityList } from '@/lib/admin/admin-queries';
 
 export const dynamic = 'force-dynamic';
 
@@ -24,9 +24,7 @@ export default async function AdminCitiesPage({ searchParams }: AdminCitiesPageP
   await requireAdminSectionAccess('cities');
 
   const params = (await searchParams) ?? {};
-  const cities = await prisma.city.findMany({
-    orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }]
-  });
+  const cities = await getCityList();
 
   return (
     <div className="space-y-8">

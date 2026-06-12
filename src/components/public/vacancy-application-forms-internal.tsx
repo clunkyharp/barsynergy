@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useActionState, useState } from 'react';
+import type { PublicApplicationResult } from '@/lib/applications/public-form-helpers';
 import {
   ContactChannelFieldset,
   HiddenUtmFields,
@@ -228,12 +229,13 @@ export function VacancySubmissionForm({
 }: {
   options: VacancyApplicationFormOptions;
   utm: VacancyApplicationFormsProps['utm'];
-  action: (formData: FormData) => void;
+  action: (prevState: PublicApplicationResult | null, formData: FormData) => Promise<PublicApplicationResult>;
 }) {
+  const [, formAction] = useActionState(action, null);
   const [turnstileToken, setTurnstileToken] = useState('');
 
   return (
-    <form action={action} className="editorial-form-shell public-form-shell" id="vacancy-submission-form">
+    <form action={formAction} className="editorial-form-shell public-form-shell" id="vacancy-submission-form">
       <HiddenUtmFields utm={utm} />
       <HoneypotField id="vacancy-submission-website" />
       <PublicFormShellHeader

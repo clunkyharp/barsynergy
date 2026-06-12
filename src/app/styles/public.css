@@ -181,14 +181,18 @@
   transition:
     transform var(--motion-duration-base) var(--motion-ease-move),
     border-color var(--motion-duration-base) var(--motion-ease-standard),
-    background-color var(--motion-duration-base) var(--motion-ease-standard);
+    background-color var(--motion-duration-base) var(--motion-ease-standard),
+    box-shadow var(--motion-duration-base) var(--motion-ease-standard);
 }
 
 .home-section-card:hover,
 .home-section-card:focus-visible,
 .home-event-card:hover,
 .home-event-card:focus-visible {
-  border-color: color-mix(in oklab, var(--accent) 50%, var(--border-default));
+  border-color: var(--card-border-hover);
+  background: var(--surface-card-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(0,0,0,0.05);
 }
 
 .home-events-scroll {
@@ -247,13 +251,21 @@
 }
 
 .editorial-chip {
-  border: 1px solid var(--editorial-dark-border);
-  color: var(--editorial-dark-muted);
+  border: 1px solid rgb(255 255 255 / 0.18);
+  background: color-mix(in oklab, var(--editorial-dark-surface) 72%, transparent);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+  color: var(--editorial-dark-text);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.12);
 }
 
 .editorial-chip--accent {
   border: 1px solid var(--accent);
+  background: color-mix(in oklab, var(--editorial-dark-surface) 72%, transparent);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
   color: var(--accent);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.12);
 }
 
 .editorial-featured-headline {
@@ -505,25 +517,25 @@
 }
 
 .home-service-card--consulting-menu {
-  --home-service-bg: var(--support-coral);
-  --home-service-fg: #1c1c1e;
-  --home-service-muted: rgb(28 28 30 / 0.72);
-  --home-service-border: rgb(28 28 30 / 0.14);
-  --home-service-chip-bg: rgb(255 255 255 / 0.36);
-  --home-service-chip-border: rgb(28 28 30 / 0.14);
-  --home-service-action-bg: rgb(28 28 30 / 0.82);
-  --home-service-action-fg: #f5f7fb;
+  --home-service-bg: #252030;
+  --home-service-fg: #f5f7fb;
+  --home-service-muted: rgb(245 247 251 / 0.76);
+  --home-service-border: rgb(224 226 232 / 0.18);
+  --home-service-chip-bg: rgb(245 247 251 / 0.08);
+  --home-service-chip-border: rgb(224 226 232 / 0.18);
+  --home-service-action-bg: var(--accent);
+  --home-service-action-fg: var(--accent-contrast);
 }
 
 .home-service-card--consulting-team {
-  --home-service-bg: var(--support-rose);
-  --home-service-fg: #1c1c1e;
-  --home-service-muted: rgb(28 28 30 / 0.72);
-  --home-service-border: rgb(28 28 30 / 0.14);
-  --home-service-chip-bg: rgb(255 255 255 / 0.36);
-  --home-service-chip-border: rgb(28 28 30 / 0.14);
-  --home-service-action-bg: rgb(28 28 30 / 0.82);
-  --home-service-action-fg: #f5f7fb;
+  --home-service-bg: #201e32;
+  --home-service-fg: #f5f7fb;
+  --home-service-muted: rgb(245 247 251 / 0.76);
+  --home-service-border: rgb(224 226 232 / 0.18);
+  --home-service-chip-bg: rgb(245 247 251 / 0.08);
+  --home-service-chip-border: rgb(224 226 232 / 0.18);
+  --home-service-action-bg: var(--accent);
+  --home-service-action-fg: var(--accent-contrast);
 }
 
 .home-service-card--consulting-cost {
@@ -746,10 +758,21 @@
 
 .public-list-row-shell {
   background: transparent;
+  padding-block: 1rem;
   transition:
     border-color var(--motion-duration-base) var(--motion-ease-standard),
     background var(--motion-duration-base) var(--motion-ease-standard),
     box-shadow var(--motion-duration-base) var(--motion-ease-standard);
+}
+
+@media (max-width: 767px) {
+  .public-list-row-shell:first-child {
+    padding-block-start: 0;
+  }
+
+  .public-list-row-shell:last-child {
+    padding-block-end: 0;
+  }
 }
 
 @media (min-width: 768px) {
@@ -1087,6 +1110,12 @@
 
 .auth-access-notice[data-state="sent"] {
   border-style: solid;
+}
+
+/* ── Article Detail Page ── */
+
+.background-zone-graphite .article-body blockquote {
+  border-left-color: var(--accent);
 }
 
 .public-detail-page {

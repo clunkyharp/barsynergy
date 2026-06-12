@@ -1,13 +1,16 @@
 import type { Metadata } from 'next';
-import { ArrowUpRight, BadgeCheck, MapPinned, SearchCheck, Store } from 'lucide-react';
+import { ArrowUpRight } from 'lucide-react';
+import { SectionIcon, type SectionIconType } from '@/components/public/section-icon';
 import { BusinessSolutionForm } from '@/components/public/business-solution-form';
 import { submitBusinessSolutionRequest } from '@/app/(public)/business/actions';
-import { EditorialPublicPage } from '@/components/public/editorial-public-page';
-import { RoleTaskCard } from '@/components/public/public-card-patterns';
+import { PageHero } from '@/components/public/page-hero';
 import { PublicBodyText, PublicDisplayTitle, PublicEyebrow } from '@/components/public/public-primitives';
 import { Button } from '@/components/ui/button';
+import { JsonLd } from '@/components/seo/json-ld';
+import { displayFont } from '@/lib/fonts';
+import { buildStaticPageBreadcrumbJsonLd } from '@/lib/public/structured-data';
 import { getApplicationCityOptions } from '@/lib/applications/form-options';
-import { firstParam, getPublicApplicationResult, getPublicApplicationUtm } from '@/lib/applications/public-form-helpers';
+import { firstParam, getPublicApplicationUtm } from '@/lib/applications/public-form-helpers';
 import { arePublicApplicationFormsEnabled } from '@/lib/applications/public-forms';
 import { buildPublicPageMetadata } from '@/lib/public/metadata';
 import { getEnv } from '@/lib/validation/env';
@@ -40,34 +43,39 @@ const processSteps = [
   }
 ] as const;
 
-const benefits = [
+const benefits: { label: string; title: string; description: string; icon: SectionIconType }[] = [
   {
     label: 'Каталог',
     title: 'Видимость в профильной среде',
-    description: 'Карточка помогает гостям, поставщикам, кандидатам и партнёрам быстрее найти ваше заведение.'
+    description: 'Карточка помогает гостям, поставщикам, кандидатам и партнёрам быстрее найти ваше заведение.',
+    icon: 'building'
   },
   {
     label: 'Контекст',
     title: 'Фокус на СКФО',
-    description: 'Платформа собирает локальные бары, кофейни, поставщиков, события и образовательные форматы региона.'
+    description: 'Платформа собирает локальные бары, кофейни, поставщиков, события и образовательные форматы региона.',
+    icon: 'location'
   },
   {
     label: 'Проверка',
     title: 'Без случайных карточек',
-    description: 'Команда вручную сверяет базовые данные, чтобы каталог оставался аккуратным и полезным.'
+    description: 'Команда вручную сверяет базовые данные, чтобы каталог оставался аккуратным и полезным.',
+    icon: 'star'
   },
   {
     label: 'Контакт',
     title: 'Понятный первый контакт',
-    description: 'Гость, кандидат или партнёр быстро видит ссылку, город и формат заведения и понимает, куда писать дальше.'
+    description: 'Гость, кандидат или партнёр быстро видит ссылку, город и формат заведения и понимает, куда писать дальше.',
+    icon: 'contact'
   }
-] as const;
-
-const heroMetrics = [
-  { label: 'Форматы', value: '4' },
-  { label: 'Регион', value: 'СКФО' },
-  { label: 'Проверка', value: 'ручная' }
 ];
+
+const targetAudiences = [
+  { label: 'Кофейни', description: 'Specialty, авторские и третья волна' },
+  { label: 'Кофейные бары', description: 'Стойки, концепты, мини-форматы' },
+  { label: 'Обжарочные', description: 'Роастеры с розничными продажами' },
+  { label: 'Поставщики', description: 'Зерно, молоко, расходники, оборудование' },
+] as const;
 
 const defaultParamKeys = ['projectName', 'contactName', 'cityId', 'solutionType', 'comment'] as const;
 
@@ -81,54 +89,69 @@ export default async function BusinessPage({ searchParams }: BusinessPageProps) 
 
   return (
     <>
-      <EditorialPublicPage
+      <JsonLd data={buildStaticPageBreadcrumbJsonLd('/business', 'Каталог заведений')} />
+      <PageHero
+        breadcrumbs={[{ label: 'Каталог заведений' }]}
         eyebrow="Каталог заведений"
-        path="/business"
         title="Разместите заведение в каталоге"
-        description="Добавляем кофейные бары, кофейни, обжарочные и близкие форматы в профильный каталог BARSYNERGY."
-        summary="Заполните карточку заведения — команда проверит данные и подготовит публикацию в каталоге BARSYNERGY."
-        summaryHeading="Каталог"
-        heroVariant="split"
-        metrics={heroMetrics}
-        rows={[]}
-        primaryLink={{ label: 'Заполнить заявку', href: '#business-request' }}
-        secondaryLink={{ label: 'Посмотреть каталог', href: '/suppliers' }}
+        subtitle="Добавляем кофейные бары, кофейни, обжарочные и близкие форматы в профильный каталог BARSYNERGY."
+        tone="light-editorial"
+        density="compact"
+        actions={[
+          { label: 'Посмотреть каталог', href: '/suppliers', kind: 'secondary' }
+        ]}
       />
 
-      <section className="background-zone background-zone-beige border-b border-[var(--line)] py-10 md:py-14">
-        <div className="container grid gap-8 xl:grid-cols-[minmax(18rem,0.54fr)_minmax(0,1.46fr)]">
-          <div className="xl:sticky xl:top-24 xl:self-start">
-            <PublicEyebrow>Как это работает</PublicEyebrow>
-            <PublicDisplayTitle className="mt-4 max-w-sm">Три шага до карточки</PublicDisplayTitle>
-            <PublicBodyText className="mt-5 max-w-md" size="md">
-              Нужна короткая заявка. Сложные анкеты, тарифы и оплату на этой странице не собираем.
-            </PublicBodyText>
-            <Button className="mt-7 rounded-[var(--radius-md)]" href="#business-request" size="lg">
-              Перейти к форме
-              <ArrowUpRight size={16} />
-            </Button>
-          </div>
-
-          <div className="[&>article:last-child]:border-b-0">
-            {processSteps.map((step) => (
-              <RoleTaskCard
-                density="compact"
-                description={step.description}
-                eyebrow={step.label}
-                key={step.title}
-                presentation="row"
-                title={step.title}
-              />
+      {/* Who it's for */}
+      <section className="background-zone background-zone-beige border-b border-[var(--line)] py-10 md:py-12">
+        <div className="container">
+          <PublicEyebrow>Кому подходит</PublicEyebrow>
+          <div className="mt-5 grid gap-3 sm:grid-cols-2 md:grid-cols-4">
+            {targetAudiences.map((audience) => (
+              <article
+                className="public-card-shell flex flex-col gap-2 px-4 py-4"
+                key={audience.label}
+              >
+                <h3 className="text-[15px] font-semibold leading-tight text-[var(--text)]">{audience.label}</h3>
+                <p className="text-[13px] leading-5 text-[var(--muted)]">{audience.description}</p>
+              </article>
             ))}
           </div>
         </div>
       </section>
 
+      {/* How it works */}
+      <section className="background-zone background-zone-beige border-b border-[var(--line)] py-10 md:py-14">
+        <div className="container">
+          <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <PublicEyebrow>Как это работает</PublicEyebrow>
+              <PublicDisplayTitle className="mt-3 max-w-sm">Три шага до карточки</PublicDisplayTitle>
+            </div>
+          </div>
+          <div className="grid gap-px sm:grid-cols-3">
+            {processSteps.map((step, i) => (
+              <div
+                className="relative flex flex-col gap-3 border border-[var(--line)] bg-[var(--surface-card)] px-5 py-6 first:rounded-t-[var(--radius-md)] last:rounded-b-[var(--radius-md)] sm:first:rounded-l-[var(--radius-md)] sm:first:rounded-tr-none sm:last:rounded-r-[var(--radius-md)] sm:last:rounded-bl-none"
+                key={step.title}
+              >
+                <span className={`${displayFont.className} text-[2.2rem] font-bold leading-none text-[var(--accent)] opacity-60 tabular-nums`}>
+                  0{i + 1}
+                </span>
+                <h3 className="text-[1rem] font-semibold leading-tight text-[var(--text)]">{step.title}</h3>
+                <p className="text-[13px] leading-5 text-[var(--muted)]">{step.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Benefits */}
       <section className="home-services-section background-zone background-zone-beige border-b border-[var(--line)] py-12 md:py-16">
         <div className="container grid gap-8 xl:grid-cols-[minmax(18rem,0.54fr)_minmax(0,1.46fr)]">
-          <div className="min-w-0 xl:sticky xl:top-24 xl:self-start">
+          <div className="min-w-0 xl:self-start">
             <div className="min-w-0">
-              <PublicEyebrow tone="muted">Польза</PublicEyebrow>
+              <PublicEyebrow>Польза</PublicEyebrow>
               <PublicDisplayTitle className="mt-4 max-w-[13ch]">Что получает заведение</PublicDisplayTitle>
               <PublicBodyText className="mt-5 max-w-md" size="md" tone="default">
                 Каталог нужен не для рекламы «обо всём», а для аккуратной отраслевой навигации по местам и командам региона.
@@ -141,16 +164,12 @@ export default async function BusinessPage({ searchParams }: BusinessPageProps) 
           </div>
 
           <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:mt-0">
-            {benefits.map((benefit, index) => {
-              const Icon = [Store, MapPinned, SearchCheck, BadgeCheck][index] ?? BadgeCheck;
-
+            {benefits.map((benefit) => {
               return (
                 <article className="public-card-shell p-5 md:p-6" key={benefit.title}>
                   <div className="flex items-center justify-between gap-3">
                     <span className="public-meta-label">{benefit.label}</span>
-                    <span className="inline-flex h-10 w-10 items-center justify-center rounded-[var(--radius-sm)] bg-[var(--accent)] text-white">
-                      <Icon size={18} strokeWidth={1.8} />
-                    </span>
+                    <SectionIcon size={40} type={benefit.icon} />
                   </div>
                   <h3 className="mt-5 text-xl font-semibold leading-7 text-[var(--text)]">{benefit.title}</h3>
                   <p className="mt-3 text-sm leading-6 text-[var(--muted)]">{benefit.description}</p>
@@ -165,7 +184,6 @@ export default async function BusinessPage({ searchParams }: BusinessPageProps) 
         direct
         defaults={defaults}
         enabled={applicationFormsEnabled}
-        result={getPublicApplicationResult(params)}
         utm={getPublicApplicationUtm(params)}
         cities={cities}
         action={submitBusinessSolutionRequest}

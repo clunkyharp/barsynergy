@@ -40,7 +40,7 @@ export function MetaText({ children, className }: { children: ReactNode; classNa
 export function StatusPill({ children, accent = false }: { children: ReactNode; accent?: boolean }) {
   return (
     <span
-      className="public-status-badge"
+      className="public-status-badge shrink-0 whitespace-nowrap"
       data-tone={accent ? 'accent' : 'muted'}
     >
       {children}
@@ -127,7 +127,7 @@ export function StructuredCard({
   return (
     <article
       className={cn(
-        'public-card-shell flex flex-col p-4 md:p-5',
+        'public-card-shell flex h-full flex-col p-4 md:p-5',
         className
       )}
     >

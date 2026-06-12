@@ -1,4 +1,4 @@
-import { CategoryType, ContentStatus } from '@/modules/admin/queries';
+import { CategoryType } from '@/modules/admin/queries';
 import { createArticle } from '@/app/admin/articles/actions';
 import { AdminCmsActions, AdminCmsAdvancedSection, AdminCmsForm, AdminCmsGrid, AdminCmsSection } from '@/components/admin/admin-cms-form';
 import { CoverImageField, HiddenRedirect } from '@/components/admin/content-admin-controls';
@@ -9,9 +9,8 @@ import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
 import { MarkdownEditor } from '@/components/admin/markdown-editor';
 import { Textarea } from '@/components/ui/textarea';
-import { PUBLICATION_STATUS_HINT, contentStatusLabels } from '@/lib/admin/content-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
-import { prisma } from '@/modules/admin/queries';
+import { getActiveCategories, getActiveCities, getActiveTags } from '@/lib/admin/admin-queries';
 
 export const dynamic = 'force-dynamic';
 
@@ -22,21 +21,9 @@ export default async function AdminArticlesCreatePage() {
   await requireAdminSectionAccess('articles');
 
   const [categories, cities, tags] = await Promise.all([
-    prisma.category.findMany({
-      where: { type: CategoryType.ARTICLE, isActive: true },
-      orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
-      select: { id: true, name: true }
-    }),
-    prisma.city.findMany({
-      where: { isActive: true },
-      orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
-      select: { id: true, name: true }
-    }),
-    prisma.tag.findMany({
-      where: { type: CategoryType.ARTICLE, isActive: true },
-      orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
-      select: { id: true, name: true }
-    })
+    getActiveCategories(CategoryType.ARTICLE),
+    getActiveCities(),
+    getActiveTags(CategoryType.ARTICLE)
   ]);
 
   return (
@@ -54,28 +41,11 @@ export default async function AdminArticlesCreatePage() {
       <AdminCmsForm action={createArticle}>
           <HiddenRedirect value={ADMIN_ARTICLES_PATH} />
           
-          <AdminCmsSection title="Публикация" description="Название, адрес и первичный статус материала.">
+          <AdminCmsSection title="Публикация" description="Название и категория материала.">
             <AdminCmsGrid>
               <FormField htmlFor="title" label="Заголовок">
                 <Input id="title" name="title" required minLength={2} maxLength={160} />
               </FormField>
-              <FormField htmlFor="slug" label="Адрес страницы">
-                <Input id="slug" name="slug" maxLength={180} placeholder="Если пусто, будет создан из заголовка" />
-              </FormField>
-              <FormField htmlFor="status" label="Статус" hint={PUBLICATION_STATUS_HINT}>
-                <Select id="status" name="status" defaultValue={ContentStatus.DRAFT}>
-                  {Object.values(ContentStatus).map((status) => (
-                    <option key={status} value={status}>
-                      {contentStatusLabels[status]}
-                    </option>
-                  ))}
-                </Select>
-              </FormField>
-            </AdminCmsGrid>
-          </AdminCmsSection>
-
-          <AdminCmsSection title="Классификация" description="Рубрики, город и теги для публичных фильтров и редакционного поиска.">
-            <AdminCmsGrid>
               <FormField htmlFor="categoryId" label="Категория">
                 <Select id="categoryId" name="categoryId" defaultValue="">
                   <option value="">Без категории</option>
@@ -86,6 +56,11 @@ export default async function AdminArticlesCreatePage() {
                   ))}
                 </Select>
               </FormField>
+            </AdminCmsGrid>
+          </AdminCmsSection>
+
+          <AdminCmsSection title="Классификация" description="Город и теги для публичных фильтров и редакционного поиска.">
+            <AdminCmsGrid>
               <FormField htmlFor="cityId" label="Город">
                 <Select id="cityId" name="cityId" defaultValue="">
                   <option value="">Без города</option>
@@ -130,6 +105,14 @@ export default async function AdminArticlesCreatePage() {
             </AdminCmsGrid>
           </AdminCmsAdvancedSection>
 
+          <AdminCmsSection title="Источники и дополнительное чтение" description="Ссылки и описания источников, которые использовались при подготовке материала. Отображаются в конце статьи.">
+            <div className="grid gap-4">
+              <FormField htmlFor="sourceReferences" label="Список источников">
+                <Textarea id="sourceReferences" name="sourceReferences" maxLength={5000} placeholder="Например:&#10;- [Perfect Daily Grind](https://perfectdailygrind.com/...)&#10;- [SCA](https://sca.coffee/...)&#10;- [Daily Coffee News](https://dailycoffeenews.com/...)" />
+              </FormField>
+            </div>
+          </AdminCmsSection>
+
           <AdminCmsSection title="Медиа" description="Обложка и alt-текст для карточки и страницы материала.">
             <AdminCmsGrid>
               <CoverImageField id="article-coverImage" />
@@ -138,19 +121,16 @@ export default async function AdminArticlesCreatePage() {
 
           <AdminCmsSection title="Контент" description="Короткое описание для списков и основной текст материала.">
             <div className="grid gap-4">
-                <FormField htmlFor="summary" label="Краткое описание">
+                <FormField htmlFor="summary" label="Описание для карточки" hint="Показывается в каталоге. До 500 символов.">
                   <Textarea id="summary" name="summary" required minLength={10} maxLength={500} />
                 </FormField>
-                <FormField htmlFor="body" label="Текст">
-                  <MarkdownEditor id="body" name="body" required minLength={20} maxLength={ARTICLE_BODY_MAX_LENGTH} className="min-h-64" />
+                <FormField htmlFor="body" label="Текст страницы" hint="Полное содержимое публичной страницы">
+                  <MarkdownEditor id="body" name="body" required minLength={20} maxLength={ARTICLE_BODY_MAX_LENGTH} />
                 </FormField>
             </div>
           </AdminCmsSection>
 
           <AdminCmsActions>
-            <Button href={ADMIN_ARTICLES_PATH} type="button" variant="secondary">
-              Отмена
-            </Button>
             <Button type="submit">Создать статью</Button>
           </AdminCmsActions>
       </AdminCmsForm>

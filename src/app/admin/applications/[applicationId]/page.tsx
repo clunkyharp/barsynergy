@@ -3,17 +3,18 @@ import { notFound } from 'next/navigation';
 import { ApplicationStatus, ApplicationType, BusinessAccountStatus, ConversationSender, UserStatus } from '@/modules/admin/queries';
 import { AdminActionAlert } from '@/components/admin/content-admin-controls';
 import { Button } from '@/components/ui/button';
+import { StatusBadge } from '@/components/ui/status-badge';
 import { ConversationThread } from '@/components/messaging/conversation-thread';
 import { getAvailableApplicationStatuses } from '@/lib/admin/application-transitions';
 import { isApplicationPublicationStatusAllowed } from '@/lib/admin/application-publication';
-import { applicationStatusValues } from '@/lib/admin/application-utils';
+import { applicationStatusBadgeVariants, applicationStatusLabels, applicationStatusValues, applicationTypeLabels } from '@/lib/admin/application-utils';
 import type { AdminContentSearchParams } from '@/lib/admin/content-utils';
 import {
   BUSINESS_ACCESS_PREVIEW_COOKIE_NAME, isBusinessAccessInvitePreparationStatusAllowed
 } from '@/lib/auth/business-access';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
 import { getConversationThread } from '@/lib/messaging/get-conversation';
-import { prisma } from '@/modules/admin/queries';
+import { getApplicationById } from '@/lib/admin/admin-queries';
 import { ApplicationInfo } from './_components/application-info';
 import { BusinessAccessForm } from './_forms/business-access-form';
 import { PartnerPublicationForm, SupplierPublicationForm, VacancyPublicationForm } from './_forms/publication-form';
@@ -48,20 +49,7 @@ export default async function AdminApplicationDetailPage({ params, searchParams 
     } catch { return null; }
   })();
 
-  const application = await prisma.application.findUnique({
-    where: { id: applicationId },
-    include: {
-      city: { select: { name: true } },
-      vacancy: { select: { id: true, title: true, slug: true, companyName: true } },
-      supplier: { select: { id: true, title: true, slug: true, companyName: true } },
-      partner: { select: { id: true, title: true, slug: true, companyName: true } },
-      resumeFile: { select: { originalName: true, mimeType: true, size: true } },
-      forwardedBy: { select: { email: true } },
-      businessAccount: {
-        select: { id: true, companyName: true, status: true, owner: { select: { id: true, email: true, status: true } } }
-      }
-    }
-  });
+  const application = await getApplicationById(applicationId);
 
   if (!application) notFound();
 
@@ -80,6 +68,24 @@ export default async function AdminApplicationDetailPage({ params, searchParams 
 
   return (
     <div className="space-y-8">
+      <header className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Админка / Заявки / {applicationTypeLabels[application.type]}</p>
+          <h1 className="mt-2 text-3xl font-semibold">{application.subject || applicationTypeLabels[application.type]}</h1>
+          <div className="mt-3 flex flex-wrap items-center gap-3">
+            <StatusBadge variant={applicationStatusBadgeVariants[application.status]}>
+              {applicationStatusLabels[application.status]}
+            </StatusBadge>
+            <span className="text-sm text-[var(--muted)]">
+              {applicationTypeLabels[application.type]} / создана {dateTimeFormatter.format(application.createdAt)}
+            </span>
+          </div>
+        </div>
+        <Button href={ADMIN_APPLICATIONS_PATH} variant="secondary">
+          Вернуться к списку
+        </Button>
+      </header>
+
       <div className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
         <div className="space-y-6">
           <ApplicationInfo application={application} />
@@ -105,8 +111,6 @@ export default async function AdminApplicationDetailPage({ params, searchParams 
           {application.type === ApplicationType.BUSINESS_ACCOUNT_REQUEST ? (
             <BusinessAccessForm application={application} canPrepareInvite={canPrepareBusinessAccessInvite} isAccessActive={isBusinessAccessActive} activationPreview={activationPreview} currentPath={currentPath} />
           ) : null}
-
-          <Button href={ADMIN_APPLICATIONS_PATH} variant="ghost">Вернуться к списку</Button>
         </div>
       </div>
 

@@ -12,6 +12,7 @@ import {
   listResult,
   listResultWithRelevance,
   optionalParam,
+  optionalParams,
   publicImageUrl,
   type PublishedContentMetaGroup,
   type PublicContentSearchParams
@@ -41,17 +42,49 @@ const vacancySearchFields = (q: string): Prisma.VacancyWhereInput[] => [
   { city: { name: { contains: q, mode: 'insensitive' as const } } }
 ];
 
+function getVacancyOrderBy(sort?: string): Prisma.VacancyOrderByWithRelationInput[] {
+  if (sort === 'recent') {
+    return [{ publishedAt: 'desc' }, { createdAt: 'desc' }, { sortOrder: 'asc' }];
+  }
+
+  if (sort === 'company') {
+    return [{ companyName: 'asc' }, { publishedAt: 'desc' }, { createdAt: 'desc' }];
+  }
+
+  return [{ sortOrder: 'asc' }, { publishedAt: 'desc' }, { createdAt: 'desc' }];
+}
+
 export async function getPublishedVacancies(params: PublicContentSearchParams = {}) {
   const page = getPage(params);
   const pageSize = getPageSize(params);
   const q = optionalParam(params, 'q');
+  const sort = optionalParam(params, 'sort');
+
+  const categoryValues = optionalParams(params, 'category');
+  const cityValues = optionalParams(params, 'city');
+  const employmentTypeValues = optionalParams(params, 'employmentType');
+
+  const andConditions: Prisma.VacancyWhereInput[] = [];
+
+  if (categoryValues) {
+    andConditions.push({
+      category: { slug: { in: categoryValues }, type: CategoryType.VACANCY }
+    });
+  }
+  if (cityValues) {
+    andConditions.push({
+      city: { slug: { in: cityValues } }
+    });
+  }
+  if (employmentTypeValues) {
+    andConditions.push({
+      OR: employmentTypeValues.map((v) => ({ employmentType: { equals: v, mode: 'insensitive' as const } }))
+    });
+  }
+
   const baseWhere: Prisma.VacancyWhereInput = {
     status: ContentStatus.PUBLISHED,
-    category: optionalParam(params, 'category') ? { slug: optionalParam(params, 'category'), type: CategoryType.VACANCY } : undefined,
-    city: optionalParam(params, 'city') ? { slug: optionalParam(params, 'city') } : undefined,
-    employmentType: optionalParam(params, 'employmentType')
-      ? { equals: optionalParam(params, 'employmentType'), mode: 'insensitive' }
-      : undefined
+    ...(andConditions.length > 0 ? { AND: andConditions } : {})
   };
 
   const { items, total } = await listResultWithRelevance(
@@ -69,7 +102,7 @@ export async function getPublishedVacancies(params: PublicContentSearchParams = 
           .findMany({
             where: searchWhere,
             select: selectIdAndTitle,
-            orderBy: [{ sortOrder: 'asc' }, { publishedAt: 'desc' }, { createdAt: 'desc' }]
+            orderBy: getVacancyOrderBy(sort)
           })
           .then(async (items) => {
             const total = await prisma.vacancy.count({ where: searchWhere });
@@ -80,7 +113,7 @@ export async function getPublishedVacancies(params: PublicContentSearchParams = 
         .findMany({
           where: baseWhere,
           select: selectIdAndTitle,
-          orderBy: [{ sortOrder: 'asc' }, { publishedAt: 'desc' }, { createdAt: 'desc' }]
+          orderBy: getVacancyOrderBy(sort)
         })
         .then(async (items) => {
           const total = await prisma.vacancy.count({ where: baseWhere });
@@ -171,6 +204,7 @@ export async function getPublishedVacancyDetail(slug: string) {
     facts: compact([
       `Компания: ${vacancy.companyName}`,
       `Позиция: ${vacancy.position}`,
+      vacancy.city?.name ? `Город: ${vacancy.city.name}` : undefined,
       vacancy.salaryLabel ? `Зарплата: ${vacancy.salaryLabel}` : undefined,
       vacancy.employmentType ? `График: ${getAdminOptionLabel(vacancyEmploymentTypeOptions, vacancy.employmentType)}` : undefined,
       vacancy.experienceLabel ? `Опыт: ${getAdminOptionLabel(vacancyExperienceOptions, vacancy.experienceLabel)}` : undefined,
@@ -179,25 +213,7 @@ export async function getPublishedVacancyDetail(slug: string) {
     ]).map((entry) => {
       const [label, ...rest] = entry.split(': ');
       return { label, value: rest.join(': ') };
-    }),
-    sections: [
-      {
-        title: 'Условия',
-        items: compact([
-          `Компания: ${vacancy.companyName}.`,
-          vacancy.city?.name ? `Город: ${vacancy.city.name}.` : undefined,
-          vacancy.salaryLabel ? `Зарплата: ${vacancy.salaryLabel}.` : undefined,
-          vacancy.employmentType ? `График: ${getAdminOptionLabel(vacancyEmploymentTypeOptions, vacancy.employmentType)}.` : undefined,
-          vacancy.experienceLabel ? `Опыт: ${getAdminOptionLabel(vacancyExperienceOptions, vacancy.experienceLabel)}.` : undefined
-        ])
-      },
-      {
-        title: 'Контакт для отклика',
-        items: compact([
-          vacancy.contactMode ? `Контакт для отклика: ${vacancy.contactMode}.` : undefined
-        ])
-      }
-    ].filter((section) => section.items.length > 0)
+    })
   };
 }
 

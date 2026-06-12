@@ -43,7 +43,7 @@ export function HomeCtaFaqSection() {
   return (
     <section
       aria-labelledby="home-cta-title"
-      className="background-zone background-zone-ivory render-deferred-section border-b border-[var(--line)] py-16 text-[var(--text)] max-[900px]:py-[60px]"
+      className="background-zone background-zone-ivory render-deferred-section border-b border-[var(--line)] py-10 md:py-14 text-[var(--text)]"
       id="home-platform-help"
     >
       <div className="mx-auto w-full max-w-[1100px] px-5">

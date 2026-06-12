@@ -1,22 +1,19 @@
 'use server';
 
-import { redirect } from 'next/navigation';
 import { ApplicationType } from '@prisma/client';
 import { z } from 'zod';
 import { buildApplicationPayload } from '@/lib/applications/application-payloads';
 import {
   assertActiveCity,
   baseContactSchema,
-  getPublicApplicationResultPath,
   getString,
   nullableString,
   optionalString,
   PERSONAL_DATA_CONSENT_TEXT,
+  type PublicApplicationResult,
   utmSchema
 } from '@/lib/applications/public-form-helpers';
 import { submitPublicApplicationAction } from '@/lib/applications/submit-public-application-action';
-
-const EVENTS_PATH = '/events';
 
 const eventApplicationSchema = baseContactSchema
   .merge(utmSchema)
@@ -29,17 +26,12 @@ const eventApplicationSchema = baseContactSchema
   })
   .refine((data) => data.email || data.phone || data.telegram, { message: 'contact is required' });
 
-function redirectWithEventsResult(result: { type: 'success' | 'error'; message: string }): never {
-  redirect(getPublicApplicationResultPath(EVENTS_PATH, result));
-}
-
-export async function submitEventApplication(formData: FormData) {
-  await submitPublicApplicationAction({
+export async function submitEventApplication(_prevState: PublicApplicationResult | null, formData: FormData): Promise<PublicApplicationResult> {
+  return submitPublicApplicationAction({
     actionName: 'public:event-application',
     applicationType: ApplicationType.EVENT_APPLICATION,
     formData,
     successMessage: 'Заявку на событие получили.',
-    redirectWithResult: redirectWithEventsResult,
     parse: async (data) => {
       const parsed = eventApplicationSchema.parse({
         name: getString(data, 'name'),

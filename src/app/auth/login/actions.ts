@@ -19,6 +19,8 @@ import {
 import { prisma } from '@/lib/db/prisma';
 import { assertSameOriginServerAction } from '@/lib/security/server-action-origin';
 
+export type LoginActionResult = { type: 'error'; code: string } | null;
+
 const loginSchema = z.object({
   email: z.string().trim().email().max(255),
   password: z.string().min(1).max(200),
@@ -30,170 +32,103 @@ const loginSchema = z.object({
 type LoginRoleIntent = z.infer<typeof loginSchema>['role'];
 type LoginSurface = z.infer<typeof loginSchema>['surface'];
 
-function authResultPath(path: string, result: { type: 'success' | 'error'; code: string }) {
-  const url = new URL(path, 'http://localhost');
-  url.searchParams.set(result.type, result.code);
-  if (result.type === 'error') {
-    url.searchParams.set('_s', '1');
-  }
-  return `${url.pathname}${url.search}`;
-}
-
-function redirectWithAuthResult(path: string, result: { type: 'success' | 'error'; code: string }): never {
-  redirect(authResultPath(path, result));
-}
-
-function getLoginPath(surface: LoginSurface, role: LoginRoleIntent) {
-  if (surface === 'admin') {
-    return '/admin/login';
-  }
-
-  if (!role) {
-    return '/auth/login';
-  }
-
-  const url = new URL('/auth/login', 'http://localhost');
-  url.searchParams.set('role', role);
-  return `${url.pathname}${url.search}`;
-}
-
 function canUseSelectedLoginRole(selectedRole: LoginRoleIntent, userRole: UserRole) {
-  if (!selectedRole) {
-    return true;
-  }
-
-  if (selectedRole === 'participant') {
-    return userRole === UserRole.USER;
-  }
-
-  if (selectedRole === 'business') {
-    return userRole === UserRole.BUSINESS;
-  }
-
+  if (!selectedRole) return true;
+  if (selectedRole === 'participant') return userRole === UserRole.USER;
+  if (selectedRole === 'business') return userRole === UserRole.BUSINESS;
   return false;
 }
 
 function resolveAuthLoginErrorCode(error: unknown) {
-  return resolveServerActionError({
-    action: 'auth:login',
-    error,
-    fallbackMessage: 'failed'
-  });
+  return resolveServerActionError({ action: 'auth:login', error, fallbackMessage: 'failed' });
 }
 
 function getPostLoginPath(role: UserRole) {
-  if (role === UserRole.ADMIN || role === UserRole.MODERATOR) {
-    return '/admin';
-  }
-
-  if (role === UserRole.BUSINESS) {
-    return '/business/cabinet';
-  }
-
-  if (role === UserRole.USER) {
-    return '/profile';
-  }
-
+  if (role === UserRole.ADMIN || role === UserRole.MODERATOR) return '/admin';
+  if (role === UserRole.BUSINESS) return '/business/cabinet';
+  if (role === UserRole.USER) return '/profile';
   return '/';
 }
 
-export async function loginAction(formData: FormData) {
+export async function loginAction(_prevState: LoginActionResult, formData: FormData): Promise<LoginActionResult> {
   const rawSurface: LoginSurface = getString(formData, 'surface') === 'admin' ? 'admin' : 'public';
   const parsed = loginSchema.safeParse({
     email: getString(formData, 'email').toLowerCase(),
     password: getString(formData, 'password'),
     role: optionalString(getString(formData, 'role')),
-    surface: rawSurface
+    surface: rawSurface,
+    returnTo: optionalString(getString(formData, 'returnTo'))
   });
 
   if (!parsed.success) {
-    redirectWithAuthResult(getLoginPath(rawSurface, undefined), { type: 'error', code: 'invalid' });
+    return { type: 'error', code: 'invalid' };
   }
 
-  const loginPath = getLoginPath(parsed.data.surface, parsed.data.role);
-
   await assertSameOriginServerAction();
+
+  let successRedirectTo: string | null = null;
 
   try {
     await assertAuthAttemptAllowed({ action: 'login', email: parsed.data.email });
 
     const user = await prisma.user.findUnique({
       where: { email: parsed.data.email },
-      select: { id: true, email: true, passwordHash: true, role: true, status: true }
+      select: { id: true, email: true, passwordHash: true, role: true, status: true, createdAt: true }
     });
 
     if (!user) {
       await verifyPasswordAgainstDummyHash(parsed.data.password);
-      redirectWithAuthResult(loginPath, { type: 'error', code: 'invalid' });
+      return { type: 'error', code: 'invalid' };
     }
 
     if (!(await verifyPassword(parsed.data.password, user.passwordHash))) {
-      redirectWithAuthResult(loginPath, { type: 'error', code: 'invalid' });
+      return { type: 'error', code: 'invalid' };
     }
 
-    if (user.status === UserStatus.PENDING) {
-      redirectWithAuthResult(loginPath, { type: 'error', code: 'pending' });
-    }
-
-    if (user.status === UserStatus.BLOCKED) {
-      redirectWithAuthResult(loginPath, { type: 'error', code: 'blocked' });
-    }
-
-    if (!canUseSelectedLoginRole(parsed.data.role, user.role)) {
-      redirectWithAuthResult(loginPath, { type: 'error', code: 'role-mismatch' });
-    }
+    if (user.status === UserStatus.PENDING) return { type: 'error', code: 'pending' };
+    if (user.status === UserStatus.BLOCKED) return { type: 'error', code: 'blocked' };
+    if (!canUseSelectedLoginRole(parsed.data.role, user.role)) return { type: 'error', code: 'role-mismatch' };
 
     const token = createSessionToken();
     await prisma.session.create({
-      data: {
-        userId: user.id,
-        tokenHash: hashSessionToken(token),
-        expiresAt: getSessionExpiresAt()
-      }
+      data: { userId: user.id, tokenHash: hashSessionToken(token), expiresAt: getSessionExpiresAt() }
     });
-
     const cookieStore = await cookies();
     cookieStore.set(SESSION_COOKIE_NAME, token, getSessionCookieOptions());
 
     const returnTo = parsed.data.returnTo;
     if (returnTo && isSafeReturnTo(returnTo)) {
-      redirect(returnTo);
+      successRedirectTo = returnTo;
+    } else {
+      const isNewUser = user.role === UserRole.USER && Date.now() - user.createdAt.getTime() < 7 * 24 * 60 * 60 * 1000;
+      const postLoginPath = getPostLoginPath(user.role);
+      successRedirectTo = isNewUser ? `${postLoginPath}?welcome=1` : postLoginPath;
     }
-
-    redirect(getPostLoginPath(user.role));
   } catch (error) {
-    if (error instanceof AuthRateLimitError) {
-      redirectWithAuthResult(loginPath, { type: 'error', code: 'rate-limited' });
-    }
-
-    redirectWithAuthResult(loginPath, {
-      type: 'error',
-      code: resolveAuthLoginErrorCode(error)
-    });
+    if (error instanceof AuthRateLimitError) return { type: 'error', code: 'rate-limited' };
+    return { type: 'error', code: resolveAuthLoginErrorCode(error) };
   }
+
+  // redirect() must be called outside try/catch
+  if (successRedirectTo) redirect(successRedirectTo);
+  return null;
 }
 
 export async function logoutAction() {
   await assertSameOriginServerAction();
 
+  let redirectTo = '/auth/login?success=logged-out';
+
   try {
     const cookieStore = await cookies();
     const token = cookieStore.get(SESSION_COOKIE_NAME)?.value;
-
     if (token) {
       await prisma.session.deleteMany({ where: { tokenHash: hashSessionToken(token) } });
     }
-
     cookieStore.delete(SESSION_COOKIE_NAME);
-    redirectWithAuthResult('/auth/login', { type: 'success', code: 'logged-out' });
-  } catch (error) {
-    redirectWithAuthResult('/auth/login', {
-      type: 'error',
-      code: resolveServerActionError({
-        action: 'auth:logout',
-        error,
-        fallbackMessage: 'failed'
-      })
-    });
+  } catch {
+    redirectTo = '/auth/login?error=failed';
   }
+
+  redirect(redirectTo);
 }

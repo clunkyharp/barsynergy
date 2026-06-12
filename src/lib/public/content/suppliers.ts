@@ -16,6 +16,7 @@ import {
   listResult,
   listResultWithRelevance,
   optionalParam,
+  optionalParams,
   publicImageUrl,
   type PublishedContentMetaGroup,
   type PublicContentSearchParams
@@ -59,27 +60,9 @@ export async function getPublishedSupplierDetail(slug: string): Promise<PublicCo
       supplier.isVerified ? 'Статус: проверен BARSYNERGY' : 'Статус: контакт для уточнения',
       'Условия: уточняйте у компании'
     ])),
+    isVerified: supplier.isVerified,
     externalUrl,
     externalUrlLabel: externalUrl ? 'Сайт компании' : undefined,
-    sections: [
-      {
-        title: 'Профиль поставщика',
-        items: compact([
-          supplier.category?.name ? `Категория: ${supplier.category.name}.` : undefined,
-          supplier.city?.name ? `Базовый город: ${supplier.city.name}.` : undefined,
-          supplier.serviceArea ? `Зона поставки: ${supplier.serviceArea}.` : undefined,
-          supplier.isVerified ? 'Поставщик отмечен как проверенный в BARSYNERGY.' : 'Условия и актуальность контакта нужно уточнить у компании.'
-        ])
-      },
-      {
-        title: 'Контакт',
-        items: compact([
-          'Используйте кнопку связи, чтобы передать запрос с выбранным поставщиком.',
-          supplier.contactLabel ? `Контактный ориентир: ${supplier.contactLabel}.` : undefined,
-          externalUrl ? 'Сайт компании доступен отдельной ссылкой.' : undefined
-        ])
-      }
-    ].filter((section) => section.items.length > 0)
   };
 }
 
@@ -92,15 +75,40 @@ const supplierSearchFields = (q: string): Prisma.SupplierWhereInput[] => [
   { city: { name: { contains: q, mode: 'insensitive' as const } } }
 ];
 
+function getSupplierOrderBy(sort?: string): Prisma.SupplierOrderByWithRelationInput[] {
+  if (sort === 'recent') {
+    return [{ publishedAt: 'desc' }, { createdAt: 'desc' }, { sortOrder: 'asc' }];
+  }
+
+  if (sort === 'verified') {
+    return [{ isVerified: 'desc' }, { sortOrder: 'asc' }, { publishedAt: 'desc' }, { createdAt: 'desc' }];
+  }
+
+  if (sort === 'name') {
+    return [{ companyName: 'asc' }, { publishedAt: 'desc' }, { createdAt: 'desc' }];
+  }
+
+  return [{ sortOrder: 'asc' }, { publishedAt: 'desc' }, { createdAt: 'desc' }];
+}
+
 export async function getPublishedSuppliers(params: PublicContentSearchParams = {}) {
   const page = getPage(params);
   const pageSize = getPageSize(params);
   const q = optionalParam(params, 'q');
+  const sort = optionalParam(params, 'sort');
   const verified = optionalParam(params, 'verified');
+  const categoryValues = optionalParams(params, 'category');
+  const cityValues = optionalParams(params, 'city');
+  const andConditions: Prisma.SupplierWhereInput[] = [];
+  if (categoryValues) {
+    andConditions.push({ category: { slug: { in: categoryValues }, type: CategoryType.SUPPLIER } });
+  }
+  if (cityValues) {
+    andConditions.push({ city: { slug: { in: cityValues } } });
+  }
   const baseWhere: Prisma.SupplierWhereInput = {
     status: ContentStatus.PUBLISHED,
-    category: optionalParam(params, 'category') ? { slug: optionalParam(params, 'category'), type: CategoryType.SUPPLIER } : undefined,
-    city: optionalParam(params, 'city') ? { slug: optionalParam(params, 'city') } : undefined,
+    ...(andConditions.length > 0 ? { AND: andConditions } : {}),
     isVerified: verified === 'true' ? true : verified === 'false' ? false : undefined
   };
 
@@ -119,7 +127,7 @@ export async function getPublishedSuppliers(params: PublicContentSearchParams = 
           .findMany({
             where: searchWhere,
             select: selectIdAndTitle,
-            orderBy: [{ sortOrder: 'asc' }, { publishedAt: 'desc' }, { createdAt: 'desc' }]
+            orderBy: getSupplierOrderBy(sort)
           })
           .then(async (items) => {
             const total = await prisma.supplier.count({ where: searchWhere });
@@ -130,7 +138,7 @@ export async function getPublishedSuppliers(params: PublicContentSearchParams = 
         .findMany({
           where: baseWhere,
           select: selectIdAndTitle,
-          orderBy: [{ sortOrder: 'asc' }, { publishedAt: 'desc' }, { createdAt: 'desc' }]
+          orderBy: getSupplierOrderBy(sort)
         })
         .then(async (items) => {
           const total = await prisma.supplier.count({ where: baseWhere });

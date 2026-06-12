@@ -1,4 +1,4 @@
-import { prisma } from '@/modules/admin/queries';
+import { prisma } from '@/lib/db/prisma';
 
 export type HomepageCmsData = {
   heroes: Awaited<ReturnType<typeof getHomepageCmsData>>['heroes'];

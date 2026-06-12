@@ -26,16 +26,32 @@ export function canForwardApplicationToEmployer(application: ApplicationTransiti
   );
 }
 
+const PAYMENT_STATUSES: readonly ApplicationStatus[] = [
+  ApplicationStatus.PAYMENT_PENDING,
+  ApplicationStatus.PAID_MANUALLY
+];
+
+const PAYMENT_TYPES: readonly ApplicationType[] = [
+  ApplicationType.CERTIFICATE_ORDER
+];
+
 export function getAvailableApplicationStatuses(
   application: ApplicationTransitionRecord,
   statusValues: readonly ApplicationStatus[]
 ) {
-  return statusValues.filter(
-    (status) =>
-      status === application.status ||
-      status !== ApplicationStatus.FORWARDED_TO_EMPLOYER ||
-      canForwardApplicationToEmployer(application)
-  );
+  return statusValues.filter((status) => {
+    if (status === application.status) return true;
+
+    if (status === ApplicationStatus.DRAFT) return false;
+
+    if (PAYMENT_STATUSES.includes(status) && !PAYMENT_TYPES.includes(application.type)) return false;
+
+    if (status === ApplicationStatus.FORWARDED_TO_EMPLOYER) {
+      return canForwardApplicationToEmployer(application);
+    }
+
+    return true;
+  });
 }
 
 export function canUpdateApplicationBusinessNotes(application: { businessAccountId: string | null; status: ApplicationStatus }) {

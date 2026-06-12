@@ -34,8 +34,8 @@ const adminLinks: { icon: LucideIcon; label: string; href: string; section: Admi
   { icon: BriefcaseBusiness, label: 'Вакансии', href: '/admin/vacancies', section: 'vacancies', available: true },
   { icon: Package, label: 'Поставщики', href: '/admin/suppliers', section: 'suppliers', available: true },
   { icon: Handshake, label: 'Партнёры', href: '/admin/partners', section: 'partners', available: true },
-  { icon: BadgePercent, label: 'Генспонсоры', href: '/admin/general-sponsors', section: 'generalSponsors', available: true },
-  { icon: Home, label: 'Главная сайта', href: '/admin/homepage', section: 'homepage', available: true },
+  { icon: BadgePercent, label: 'Генеральные спонсоры', href: '/admin/general-sponsors', section: 'generalSponsors', available: true },
+  { icon: Home, label: 'Главная страница', href: '/admin/homepage', section: 'homepage', available: true },
   { icon: Inbox, label: 'Заявки', href: '/admin/applications', section: 'applications', available: true },
   { icon: Users, label: 'Бизнес-доступы', href: '/admin/users', section: 'users', available: true },
   { icon: Tags, label: 'Категории', href: '/admin/categories', section: 'categories', available: true },
@@ -58,10 +58,11 @@ const adminSidebarGroups: { title: string; sections: AdminSection[] }[] = [
 type AdminSidebarProps = {
   collapsed: boolean;
   onCollapsedChange: (nextValue: boolean) => void;
+  newApplicationsCount: number;
   role: UserRole;
 };
 
-export function AdminSidebar({ collapsed, onCollapsedChange, role }: AdminSidebarProps) {
+export function AdminSidebar({ collapsed, onCollapsedChange, newApplicationsCount, role }: AdminSidebarProps) {
   const pathname = usePathname();
   const visibleLinks = adminLinks.filter((item) => item.available && canAccessAdminSection(role, item.section));
   const visibleGroups = adminSidebarGroups
@@ -123,6 +124,11 @@ export function AdminSidebar({ collapsed, onCollapsedChange, role }: AdminSideba
                       >
                         <Icon aria-hidden="true" className="admin-sidebar-link-icon" size={18} strokeWidth={2.1} />
                         <span className="admin-sidebar-link-label">{item.label}</span>
+                        {item.section === 'applications' && newApplicationsCount > 0 ? (
+                          <span className="ml-auto inline-flex min-h-5 min-w-5 items-center justify-center rounded-full bg-[var(--accent)] px-1.5 text-[11px] font-bold leading-none text-[var(--accent-contrast)]">
+                            {newApplicationsCount}
+                          </span>
+                        ) : null}
                       </NavLink>
                     );
                   })}

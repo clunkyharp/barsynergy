@@ -173,27 +173,10 @@ export function validatePublicForm(form: HTMLFormElement, controls: ValidatableC
   invalidControls.forEach((control) => setControlError(control, true));
   getVisualControl(invalidControls[0])?.focus();
 
-  const summary = form.querySelector<HTMLElement>('[data-public-validation-summary]');
-
-  if (summary) {
-    const list = summary.querySelector('ul');
-
-    if (list) {
-      list.innerHTML = invalidControls
-        .map((control) => {
-          const id = getControlId(control);
-
-          return `<li><a href="#${id}">${getValidationMessage(control)}</a></li>`;
-        })
-        .join('');
-      summary.hidden = false;
-    }
-  }
-
   return false;
 }
 
-export function PublicFormValidation() {
+export function PublicFormValidation({ showSummary = true }: { showSummary?: boolean }) {
   const markerRef = useRef<HTMLSpanElement>(null);
   const [errorItems, setErrorItems] = useState<ErrorSummaryItem[]>([]);
 
@@ -209,7 +192,7 @@ export function PublicFormValidation() {
     setErrorItems(
       invalidControls.map((control) => ({
         id: getControlId(control),
-        label: getLabelText(control)
+        label: getValidationMessage(control)
       }))
     );
   }, []);
@@ -320,29 +303,31 @@ export function PublicFormValidation() {
 
   return (
     <>
-      <div
-        aria-labelledby="public-validation-summary-heading"
-        className="rounded-[var(--radius-md)] border border-[var(--danger-border)] bg-[var(--danger-bg)] p-4"
-        data-public-validation-summary
-        hidden={errorItems.length === 0}
-        role="alert"
-      >
-        <h2 className="text-sm font-semibold text-[var(--danger-text)]" id="public-validation-summary-heading">
-          Необходимо исправить
-        </h2>
-        <ul className="mt-2 space-y-1">
-          {errorItems.map((item) => (
-            <li key={item.id}>
-              <a
-                className="text-sm text-[var(--danger-text)] underline transition-colors hover:text-[var(--accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
-                href={`#${item.id}`}
-              >
-                {item.label}
-              </a>
-            </li>
-          ))}
-        </ul>
-      </div>
+      {showSummary ? (
+        <div
+          aria-labelledby="public-validation-summary-heading"
+          className="rounded-[var(--radius-md)] border border-[var(--danger-border)] bg-[var(--danger-bg)] p-4"
+          data-public-validation-summary
+          hidden={errorItems.length === 0}
+          role="alert"
+        >
+          <h2 className="text-sm font-semibold text-[var(--danger-text)]" id="public-validation-summary-heading">
+            Необходимо исправить
+          </h2>
+          <ul className="mt-2 space-y-1">
+            {errorItems.map((item) => (
+              <li key={item.id}>
+                <a
+                  className="text-sm text-[var(--danger-text)] underline transition-colors hover:text-[var(--accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
+                  href={`#${item.id}`}
+                >
+                  {item.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
       <span aria-hidden="true" hidden ref={markerRef} />
     </>
   );

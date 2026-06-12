@@ -1,3 +1,6 @@
+'use client';
+
+import { useActionState } from 'react';
 import {
   ContactChannelFieldset,
   HiddenUtmFields,
@@ -7,6 +10,7 @@ import {
   PublicFormShellHeader,
   type PublicApplicationFormProps
 } from '@/components/public/application-form-section';
+import type { PublicApplicationResult } from '@/lib/applications/public-form-helpers';
 import { ConsentField } from '@/components/ui/consent-field';
 import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
@@ -15,7 +19,8 @@ import { Select } from '@/components/ui/select';
 import { SubmitButton } from '@/components/ui/submit-button';
 import { Textarea } from '@/components/ui/textarea';
 
-export function EventApplicationForm({ enabled, result, utm, cities, defaults = {}, action }: PublicApplicationFormProps & { action: (formData: FormData) => void }) {
+export function EventApplicationForm({ enabled, utm, cities, defaults = {}, action }: Omit<PublicApplicationFormProps, 'result'> & { action: (prevState: PublicApplicationResult | null, formData: FormData) => Promise<PublicApplicationResult> }) {
+  const [result, formAction] = useActionState(action, null);
   const hasEventContext = Boolean(defaults.eventTitle);
 
   return (
@@ -30,9 +35,9 @@ export function EventApplicationForm({ enabled, result, utm, cities, defaults = 
       disclosureTitle={hasEventContext ? 'Запись на событие' : 'Заявка на событие'}
       disclosureDescription="Оставьте контакт для участия или предложите событие в афишу."
       enabled={enabled}
-      result={result}
+      result={result ?? undefined}
     >
-      <form action={action} className="editorial-form-shell public-form-shell">
+      <form action={formAction} className="editorial-form-shell public-form-shell">
         <HiddenUtmFields utm={utm} />
         <HoneypotField id="event-application-website" />
         <PublicFormShellHeader

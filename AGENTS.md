@@ -41,6 +41,10 @@ Use `docs/project-plan.md` as the canonical product plan and `docs/phase-plan.md
 - `docs/pr-checklist.md` — pre-merge checks for every branch
 - `docs/scaling-playbook.md` — step-by-step guides for new content types, roles, notifications
 
+## Research When Uncertain
+
+When unsure about any library, framework, API, tool, service, dependency, configuration, syntax, version behavior, or best practice — do not rely on training data. Go to the relevant official docs, package pages, primary sources, or run targeted terminal commands to get accurate up-to-date information.
+
 ## Documentation And Kanban Sync
 
 Every meaningful change must include a documentation sync decision before closeout.
@@ -222,6 +226,104 @@ Full standards are in `docs/engineering-standards.md`. Key rules enforced inline
 - Do not introduce new libraries unless they are necessary and consistent with the stack.
 - Keep validation close to boundaries using existing Zod/env patterns.
 
+## Project Map (Self-Instruction)
+
+### Route groups
+
+| Group | Path | Content |
+|-------|------|---------|
+| Public | `(public)/` | Main site — articles, vacancies, suppliers, courses, events, partners, education, about, contacts, business, consulting, tools/cost-calculator |
+| Admin | `admin/` | CMS — CRUD for all content types + applications, categories, cities, tags, skills, homepage |
+| Auth | `auth/` | Login, register, password-reset, verify-email, activate |
+| Admin auth | `(admin-auth)/admin/login` | Separate admin login |
+| Profile | `profile/` | User profile, inquiries, saved vacancies |
+| Business | `(business-workspace)/business/` | Business cabinet, applications |
+
+### Component layers
+
+- `components/ui/` — Generic primitives (Button, Input, Select, Dialog, Badge, Table, Card, etc.)
+- `components/admin/` — Admin CMS shell, forms, filters, markdown editor, cover image input
+- `components/public/` — Public page components (article grid, filters, detail page, application forms, modals, cost calculator)
+- `components/layout/` — Header, footer, admin sidebar, business sidebar, mobile menu
+- `components/messaging/` — Conversation thread, compose, supplier inquiry form
+
+### Data flow
+
+```
+Page (server component) → lib function → Prisma query → DB
+Page (server component) → <form action={serverAction}> → action.ts → lib → Prisma
+```
+
+- **Server actions** live at `app/*/actions.ts` per route group
+- **Admin CRUD actions** in `src/app/admin/{section}/actions.ts`
+- **Public form submissions** go through `submitPublicApplicationAction()` in `src/lib/applications/submit-public-application-action.ts`
+- **Lead forms** (vacancies, suppliers, education) in their respective `(public)/*/actions.ts` — must include all 5 guards manually
+
+### Security guards (always include in public server actions)
+
+```ts
+import { assertSameOriginServerAction } from '@/lib/security/server-action-origin';
+import { assertTurnstilePassed } from '@/lib/security/turnstile';
+import { assertPublicApplicationFormsEnabled, assertPublicApplicationSubmissionAllowed, hasHoneypotValue } from '@/lib/applications/public-submission-guards';
+
+await assertSameOriginServerAction();
+assertPublicApplicationFormsEnabled();
+if (hasHoneypotValue(getString(formData, 'website'))) return successEarly;
+const token = getString(formData, 'turnstileToken');
+if (token) await assertTurnstilePassed(token);   // conditional — not all forms have Turnstile
+await assertPublicApplicationSubmissionAllowed(type);
+```
+
+### Key module locations
+
+| Concern | Location |
+|---------|----------|
+| Prisma client | `src/lib/db/prisma.ts` |
+| Auth session | `src/lib/auth/session.ts` |
+| Current user | `src/lib/auth/current-user.ts` (wrapped in `cache()`) |
+| Permissions | `src/lib/auth/permissions.ts` |
+| Admin form shell | `src/components/admin/admin-cms-form.tsx` |
+| Content admin panels | `src/components/admin/content-admin-controls-panels.tsx` |
+| Markdown editor | `src/components/admin/markdown-editor.tsx` |
+| Public form validation | `src/components/public/public-form-validation.tsx` |
+| Form field primitives | `src/components/ui/form-field.tsx` |
+| Application transitions | `src/lib/admin/application-transitions.ts` |
+| Application labels/utils | `src/lib/admin/application-utils.ts` |
+| Public form guards | `src/lib/applications/public-submission-guards.ts` |
+| Public form helpers | `src/lib/applications/public-form-helpers.ts` |
+| Content labels | `src/lib/admin/content-utils.ts` |
+| Admin action wrapper | `src/lib/server-action-wrappers.ts` |
+| CSS design tokens | `src/app/styles/tokens.css` |
+| Public CSS | `src/app/styles/public.css` |
+| Admin CSS | `src/app/styles/admin.css` |
+| Form CSS | `src/app/styles/forms.css` |
+| UI primitives CSS | `src/app/styles/ui-primitives.css` |
+| Lead modal | `src/components/public/modals/lead-modal.tsx` |
+
+### Key patterns
+
+- **Edit pages** (`admin/{section}/[id]/page.tsx`): import `AdminCmsForm`, `AdminCmsSection`, `AdminCmsAdvancedSection`, `AdminCmsActions`, `AdminCmsGrid`, `AdminCmsSummary` from `admin-cms-form.tsx`. Use `AdminContentVisibilityPanel` as single status control.
+- **Create pages** (`admin/{section}/create/page.tsx`): same shell but no status field (defaults to DRAFT server-side), no slug field (server-generated).
+- **Application detail** (`admin/applications/[id]/page.tsx`): uses `ApplicationInfo`, `ProcessingForm`, type-specific publication forms.
+- **Status filtering** in admin lists: `AdminStatusTabs` with `href` builder that preserves `type` param.
+- **Slug in edit forms**: always inside `AdminCmsAdvancedSection` as `<Input readOnly>`.
+- **CoverImageField alt**: always visible input, never defaults to file name — use `currentAlt ?? ''`.
+
+### Quick reference: Admin form changes
+
+When editing an admin CMS form page, touch these files:
+1. Edit form: `admin/{section}/[id]/page.tsx`
+2. Create form: `admin/{section}/create/page.tsx`
+3. Actions: `admin/{section}/actions.ts`
+4. Shared panels: `components/admin/content-admin-controls-panels.tsx`
+
+When editing a public application form, touch:
+1. Action file: `(public)/{section}/actions.ts`
+2. Form component: `components/public/{form-name}.tsx`
+3. Modal (if lead form): `components/public/modals/lead-modal.tsx`
+
+---
+
 ## Verification And Closeout
 
 Use the smallest meaningful check first, then broaden only when risk requires it.
@@ -237,3 +339,326 @@ For meaningful batches, close with:
 - next recommended step.
 
 If task status, blocker, owner decision, or active phase changed, update the Obsidian Kanban status according to `docs/kanban-sync.md`.
+
+## Small-Agent Safe Mode
+
+Some tasks in this repository may be delegated to smaller or less capable AI coding models. These models must work under stricter constraints than the default agent workflow.
+
+Use this mode when the task is small, local, repetitive, visual, copy-related, or clearly bounded.
+
+Examples:
+
+* fix a small UI alignment issue;
+* replace copy in one component;
+* adjust spacing, icon alignment, button consistency;
+* inspect one page/component for a known bug;
+* slice or register static assets;
+* update a small mapping or config;
+* run a narrow QA check.
+
+Do **not** use small-agent mode for:
+
+* authentication;
+* authorization;
+* sessions;
+* middleware;
+* database schema changes;
+* Prisma migrations;
+* production deployment;
+* payment or billing logic;
+* file upload security;
+* admin permissions;
+* broad refactors;
+* routing architecture;
+* cross-feature state management;
+* unknown bugs with unclear cause;
+* tasks requiring product decisions.
+
+If a small agent encounters one of these areas, it must stop and report instead of continuing.
+
+---
+
+### Small-Agent Task Contract
+
+Before editing, the small agent must write a short task contract:
+
+```txt
+MODE: IMPLEMENTATION or QA
+TASK TYPE: small-agent
+GOAL:
+FILES I EXPECT TO TOUCH:
+FILES I WILL NOT TOUCH:
+OUT OF SCOPE:
+VALIDATION:
+STOP CONDITIONS:
+```
+
+The agent may proceed only if the task can be completed by touching a small, predictable set of files.
+
+If the affected files cannot be identified quickly, stop and ask for a stronger model or owner clarification.
+
+---
+
+### Small-Agent Scope Limits
+
+Small agents must follow these limits by default:
+
+* Touch at most 1–3 files unless explicitly allowed.
+* Prefer editing existing components over creating new abstractions.
+* Do not introduce new libraries.
+* Do not change data models.
+* Do not change route structure.
+* Do not change server actions unless the task explicitly requires it.
+* Do not rename files, components, routes, types, or public APIs unless explicitly requested.
+* Do not perform "cleanup" outside the requested area.
+* Do not reformat unrelated code.
+* Do not fix unrelated issues found nearby unless asked.
+* Do not make visual redesign decisions beyond the provided reference or instruction.
+
+If the task appears to require more than these limits, stop and report the reason.
+
+---
+
+### Small-Agent File Discovery Rules
+
+Small agents should avoid broad exploration.
+
+Allowed discovery:
+
+* search exact visible text from the screenshot or task;
+* search exact component names if provided;
+* inspect the nearest component and its direct children;
+* inspect existing UI components before creating new ones.
+
+Avoid:
+
+* reading the whole repository;
+* opening unrelated pages;
+* changing shared components without checking where they are used;
+* guessing component ownership from filename only.
+
+Before editing a shared component, check at least where it is imported or used.
+
+---
+
+### Small-Agent UI Fix Rules
+
+For small visible UI fixes:
+
+1. Identify the exact page, section, component and target element.
+2. State the current visual bug in one sentence.
+3. Make the smallest styling/layout change that fixes the bug.
+4. Preserve existing tokens, spacing scale, colors and component patterns.
+5. Do not hardcode hex colors in component className strings.
+6. Do not add new CSS files.
+7. Do not add decorative effects unless requested.
+8. Do not change copy unless the task asks for copy changes.
+9. Validate at the target viewport and one nearby responsive viewport when practical.
+
+For screenshot-based tasks, the small agent must not invent a broader redesign. It should match the provided correction only.
+
+---
+
+### Small-Agent Visual Consistency Checklist
+
+For UI edits, check these before closeout:
+
+* alignment;
+* spacing;
+* vertical rhythm;
+* icon/text baseline;
+* hover state;
+* focus-visible state if interactive;
+* mobile behavior if the component is responsive;
+* dark theme contrast;
+* overflow/truncation;
+* no accidental layout shift;
+* no unrelated visual changes.
+
+If visual verification was not run, say exactly why and mark it as a validation gap.
+
+---
+
+### Small-Agent Form And Modal Rules
+
+Small agents may adjust styling of existing forms or modals, but must not create production form behavior unless explicitly scoped.
+
+Allowed:
+
+* improve spacing;
+* align labels/icons;
+* adjust existing input/dropdown styles;
+* fix z-index/overflow for existing dropdowns;
+* improve existing modal layout.
+
+Not allowed without stronger review:
+
+* create new server actions;
+* change validation schema;
+* change submit endpoints;
+* change auth-related behavior;
+* fake successful submission in production;
+* store user data differently;
+* weaken required fields or consent behavior.
+
+If a form change touches validation, server actions, storage, or user data, escalate to a stronger model.
+
+---
+
+### Small-Agent Escalation Triggers
+
+Stop and escalate if any of these happen:
+
+* more than 3 files need edits;
+* the fix requires architectural changes;
+* the issue involves auth, sessions, roles, ownership, or private data;
+* the issue involves Prisma schema or migrations;
+* the issue involves production environment or deployment;
+* the issue involves security-sensitive form behavior;
+* the existing code is unclear after 10–15 minutes of inspection;
+* the first attempted fix causes unrelated changes;
+* tests fail for reasons not directly related to the task;
+* the task requires choosing between multiple product/UX directions;
+* the agent is not sure whether a change is safe.
+
+When escalating, report:
+
+* what was inspected;
+* what was found;
+* why the task is unsafe or unclear;
+* suggested next step.
+
+---
+
+### Small-Agent Output Format
+
+Every small-agent closeout must be short and structured:
+
+```txt
+Done:
+- ...
+
+Files changed:
+- ...
+
+Validation:
+- ...
+
+Not changed:
+- ...
+
+Risks / gaps:
+- ...
+
+Next step:
+- ...
+```
+
+Do not write long narrative summaries.
+
+If no files were changed, say so explicitly.
+
+---
+
+### Small-Agent Patch Discipline
+
+Small agents must prefer small patches.
+
+Before editing:
+
+* identify the exact line/block/component to change;
+* avoid moving large blocks of code;
+* avoid broad formatting changes;
+* avoid changing import order unless needed;
+* avoid changing public component APIs unless explicitly scoped.
+
+After editing:
+
+* review the diff;
+* remove accidental whitespace-only changes;
+* make sure no unrelated file changed.
+
+---
+
+### Small-Agent Design-System Guardrails
+
+Small agents working on UI must use existing project patterns.
+
+Required:
+
+* use existing CSS tokens;
+* use existing Tailwind patterns;
+* prefer existing `src/components/ui`, `src/components/layout`, and `src/components/public`;
+* preserve dark editorial style;
+* keep yellow as an accent, not a default fill everywhere;
+* avoid SaaS-like generic UI unless already used in that component.
+
+Not allowed:
+
+* new color palette;
+* random shadows/glows;
+* hardcoded one-off spacing values without reason;
+* mixing icon styles;
+* changing typography hierarchy globally;
+* adding new animations without request.
+
+---
+
+### Small-Agent Copy Rules
+
+For public Russian copy edits:
+
+* keep text simple and literal;
+* avoid marketing fluff;
+* avoid machine-like phrasing;
+* avoid changing meaning;
+* do not rewrite entire sections unless requested;
+* keep terminology consistent with nearby pages.
+
+If the task only asks for layout, do not edit copy.
+
+---
+
+### Small-Agent Validation Levels
+
+Use the smallest useful validation.
+
+For copy-only:
+
+* inspect changed file;
+* run typecheck only if the file is TypeScript/TSX and risk justifies it.
+
+For small UI-only:
+
+* run lint or targeted typecheck when practical;
+* perform browser smoke or screenshot check if available;
+* otherwise state visual validation gap.
+
+For component logic:
+
+* run targeted test if one exists;
+* otherwise run typecheck and a browser smoke.
+
+For shared component changes:
+
+* check at least two usages or affected routes.
+
+Do not run expensive broad validation unless the task risk requires it.
+
+---
+
+### Small-Agent Forbidden Phrases
+
+Small agents should not close with vague claims like:
+
+* "should work";
+* "probably fixed";
+* "improved the design";
+* "made it better";
+* "everything is done" without validation.
+
+Use concrete statements:
+
+* "Aligned icon and label with `items-center` in `TrainingFormatCard`."
+* "Checked `/education` at desktop width."
+* "Did not run browser QA because local dev server was not started."

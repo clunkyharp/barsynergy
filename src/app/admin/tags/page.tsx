@@ -17,7 +17,7 @@ import { AdminStatusChip } from '@/components/ui/status-badge';
 import { Textarea } from '@/components/ui/textarea';
 import type { AdminContentSearchParams } from '@/lib/admin/content-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
-import { prisma } from '@/modules/admin/queries';
+import { getTagList } from '@/lib/admin/admin-queries';
 
 export const dynamic = 'force-dynamic';
 
@@ -42,12 +42,7 @@ export default async function AdminTagsPage({ searchParams }: AdminTagsPageProps
   await requireAdminSectionAccess('tags');
 
   const params = (await searchParams) ?? {};
-  const tags = await prisma.tag.findMany({
-    orderBy: [{ type: 'asc' }, { sortOrder: 'asc' }, { name: 'asc' }],
-    include: {
-      _count: { select: { articleTags: true } }
-    }
-  });
+  const tags = await getTagList();
 
   return (
     <div className="space-y-8">

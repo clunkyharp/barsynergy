@@ -134,7 +134,7 @@ export function RoleTaskCard({
   return (
     <article
       className={cn(
-        'public-card-shell group flex min-h-0 flex-col p-4 md:p-5',
+        'public-card-shell group flex h-full min-h-0 flex-col p-4 md:p-5',
         className
       )}
       data-priority={priority || undefined}
@@ -279,7 +279,7 @@ export function FeatureCard({
   return (
     <article
       className={cn(
-        'public-card-shell flex min-h-0 flex-col p-4 md:p-5',
+        'public-card-shell flex h-full min-h-0 flex-col p-4 md:p-5',
         className
       )}
     >

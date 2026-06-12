@@ -19,7 +19,7 @@ import { AdminStatusChip, type StatusBadgeVariant } from '@/components/ui/status
 import { AdminFilterBar } from '@/components/admin/content-admin-controls';
 import { applicationStatusLabels } from '@/lib/admin/application-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
-import { prisma } from '@/modules/admin/queries';
+import { getUserList } from '@/lib/admin/admin-queries';
 import { firstParam, getAdminCurrentPath, type AdminContentSearchParams } from '@/lib/admin/content-utils';
 import { cn } from '@/lib/utils';
 
@@ -162,33 +162,7 @@ export default async function AdminUsersPage({ searchParams }: AdminUsersPagePro
     ...getBusinessAccessWhere(accessFilter),
     ...searchWhere
   };
-  const users = await prisma.user.findMany({
-    where,
-    orderBy: [{ createdAt: 'desc' }],
-    take: 50,
-    select: {
-      id: true,
-      email: true,
-      status: true,
-      createdAt: true,
-      businessAccount: {
-        select: {
-          companyName: true,
-          status: true,
-          contactPerson: true,
-          phone: true,
-          telegram: true,
-          city: { select: { name: true } },
-          applications: {
-            where: { type: ApplicationType.BUSINESS_ACCOUNT_REQUEST },
-            orderBy: [{ createdAt: 'desc' }],
-            take: 1,
-            select: { id: true, status: true }
-          }
-        }
-      }
-    }
-  });
+  const [users] = await getUserList(where, 0, 50);
 
   return (
     <div className="space-y-8">

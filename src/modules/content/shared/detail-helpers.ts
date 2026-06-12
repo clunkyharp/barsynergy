@@ -36,7 +36,11 @@ export type PublicContentDetail = {
   cityName?: string;
   locationName?: string;
   address?: string;
+  authorName?: string;
+  readingTime?: string;
+  isVerified?: boolean;
   sections?: PublicContentDetailSection[];
+  sourceReferences?: string;
 };
 
 export function detailImageUrl(

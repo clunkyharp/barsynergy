@@ -8,7 +8,7 @@ import { getCurrentUser } from '@/lib/auth/current-user';
 import { assertSameOriginServerAction } from '@/lib/security/server-action-origin';
 import { resolveServerActionError } from '@/lib/actions/server-action-errors';
 
-export async function removeSavedVacancyAction(formData: FormData) {
+export async function removeSavedVacancyAction(formData: FormData): Promise<{ type: 'success' | 'error'; message: string }> {
   try {
     await assertSameOriginServerAction();
     const user = await getCurrentUser();
@@ -20,7 +20,16 @@ export async function removeSavedVacancyAction(formData: FormData) {
     const savedVacancyId = formData.get('savedVacancyId') as string;
 
     if (!savedVacancyId) {
-      throw new Error('savedVacancyId is required');
+      return { type: 'error', message: 'Не указан ID избранной вакансии.' };
+    }
+
+    const existing = await prisma.savedVacancy.findUnique({
+      where: { id: savedVacancyId, userId: user.id },
+      select: { id: true }
+    });
+
+    if (!existing) {
+      return { type: 'error', message: 'Вакансия не найдена в избранном.' };
     }
 
     await prisma.savedVacancy.delete({
@@ -28,8 +37,10 @@ export async function removeSavedVacancyAction(formData: FormData) {
     });
 
     revalidatePath('/profile/saved-vacancies');
+    return { type: 'success', message: 'Вакансия удалена из избранного.' };
   } catch (error) {
     console.error('Failed to remove saved vacancy:', error);
+    return { type: 'error', message: 'Не удалось удалить вакансию из избранного. Попробуйте позже.' };
   }
 }
 
@@ -44,7 +55,7 @@ export async function toggleSavedVacancy(vacancyId: string) {
 
     const vacancy = await prisma.vacancy.findUnique({
       where: { id: vacancyId },
-      select: { status: true }
+      select: { status: true, slug: true }
     });
 
     if (!vacancy || vacancy.status !== ContentStatus.PUBLISHED) {
@@ -63,7 +74,7 @@ export async function toggleSavedVacancy(vacancyId: string) {
       });
     }
 
-    revalidatePath(`/vacancies/${vacancyId}`);
+    revalidatePath(`/vacancies/${vacancy.slug}`);
     revalidatePath('/profile/saved-vacancies');
     return { saved: !existing };
   } catch (error) {

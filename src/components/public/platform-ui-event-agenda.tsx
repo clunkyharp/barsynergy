@@ -186,7 +186,7 @@ function CompactEventCard({ item }: { item: PublishedContentItem }) {
   const catStyle = getCategoryStyle(item.label, false);
 
   return (
-    <article className={cn('public-card-shell flex flex-col overflow-hidden', isPast && 'opacity-70')}>
+    <article className={cn('public-card-shell flex h-full flex-col overflow-hidden', isPast && 'opacity-70')}>
       <div className="flex items-start justify-between gap-2 border-b border-[var(--line)] p-3">
         <CompactDateBlock dateIso={item.dateIso} />
         {item.imageUrl ? (
@@ -229,7 +229,16 @@ function CompactEventCard({ item }: { item: PublishedContentItem }) {
           <p className="line-clamp-2 text-[12px] leading-[1.55] text-[var(--muted)]">{item.summary}</p>
         ) : null}
 
-        <div className="mt-auto pt-2">
+        <div className="mt-auto flex flex-wrap items-center gap-3 pt-2">
+          {!isPast ? (
+            <Button
+              className="rounded-[var(--radius-sm)] px-3 text-[12px]"
+              href={`/events/${item.slug}#event-request`}
+              size="sm"
+            >
+              Зарегистрироваться
+            </Button>
+          ) : null}
           <AppLink
             className="inline-flex items-center gap-1 text-[12px] font-semibold text-[var(--accent)] transition-colors hover:text-[var(--accent-strong)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
             href={`/events/${item.slug}`}

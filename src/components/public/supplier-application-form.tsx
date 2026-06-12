@@ -1,5 +1,6 @@
 'use client';
 
+import { useActionState } from 'react';
 import {
   ContactChannelFieldset,
   HiddenUtmFields,
@@ -9,6 +10,7 @@ import {
   PublicFormShellHeader,
   type PublicApplicationFormProps
 } from '@/components/public/application-form-section';
+import type { PublicApplicationResult } from '@/lib/applications/public-form-helpers';
 import { ConsentField } from '@/components/ui/consent-field';
 import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
@@ -19,7 +21,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { useRef } from 'react';
 import { useFormDraftAutoSave } from '@/lib/hooks/use-form-draft';
 
-export function SupplierApplicationForm({ enabled, result, utm, cities, action }: PublicApplicationFormProps & { action?: (formData: FormData) => void }) {
+export function SupplierApplicationForm({ enabled, utm, cities, action }: Omit<PublicApplicationFormProps, 'result'> & { action?: (prevState: PublicApplicationResult | null, formData: FormData) => Promise<PublicApplicationResult> }) {
+  const [result, formAction] = useActionState(action ?? (async () => ({ type: 'error' as const, message: '' })), null);
   const formRef = useRef<HTMLFormElement>(null);
   useFormDraftAutoSave('supplier-application', formRef);
   return (
@@ -35,9 +38,9 @@ export function SupplierApplicationForm({ enabled, result, utm, cities, action }
       disclosureDescription="Укажите компанию, категорию, географию, продукты или услуги и контакт для заведений. Логотип или фото нужны перед публикацией профиля."
       enabled={enabled}
       introVariant="compact"
-      result={result}
+      result={result ?? undefined}
     >
-      <form action={action} className="editorial-form-shell public-form-shell" ref={formRef}>
+      <form action={formAction} className="editorial-form-shell public-form-shell" ref={formRef}>
         <HiddenUtmFields utm={utm} />
         <HoneypotField id="supplier-application-website" />
         <PublicFormShellHeader

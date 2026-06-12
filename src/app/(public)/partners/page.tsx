@@ -1,10 +1,12 @@
 import type { Metadata } from 'next';
-import { ArrowUpRight, Handshake } from 'lucide-react';
+import { ArrowUpRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { PartnerFormatTable } from '@/components/public/editorial-display-primitives';
-import { EditorialPublicPage } from '@/components/public/editorial-public-page';
+import { PageHero } from '@/components/public/page-hero';
 import { RoleTaskCard } from '@/components/public/public-card-patterns';
 import { PublicBodyText, PublicDisplayTitle, PublicEyebrow } from '@/components/public/public-primitives';
+import { JsonLd } from '@/components/seo/json-ld';
+import { buildStaticPageBreadcrumbJsonLd } from '@/lib/public/structured-data';
 import { buildPublicPageMetadata } from '@/lib/public/metadata';
 
 export const metadata: Metadata = buildPublicPageMetadata({
@@ -88,7 +90,7 @@ function PartnershipStartSequence() {
   return (
     <section className="background-zone background-zone-gray editorial-grid border-b border-[var(--line)] py-10 md:py-14">
       <div className="container grid gap-8 xl:grid-cols-[minmax(16rem,0.58fr)_minmax(0,1.42fr)]">
-        <div className="xl:sticky xl:top-24 xl:self-start">
+        <div className="xl:self-start">
           <PublicEyebrow>Партнёрство</PublicEyebrow>
           <PublicDisplayTitle className="mt-4 max-w-[13ch]">С чего можно начать</PublicDisplayTitle>
           <PublicBodyText className="mt-5 max-w-md" size="md">
@@ -122,19 +124,17 @@ function PartnershipStartSequence() {
 export default function PartnersPage() {
   return (
     <>
-      <EditorialPublicPage
+      <JsonLd data={buildStaticPageBreadcrumbJsonLd('/partners', 'Партнёры')} />
+      <PageHero
+        breadcrumbs={[{ label: 'Партнёры' }]}
         eyebrow="Партнёры"
-        path="/partners"
         title="Партнёрство для брендов, школ и заведений"
-        description="Партнёры участвуют форматами, экспертами, продуктом и контентом. Спонсоры финансируют проект, а поставщики размещают рабочие контакты в каталоге."
-        summary="Опишите задачу: событие, обучение, материал, каталог или спецпроект. После обращения уточним детали."
-        heroVariant="split"
-        metrics={[]}
-        rows={[]}
-        primaryLink={{ label: 'Описать партнёрскую задачу', href: getPartnerContactHref() }}
-        secondaryLink={{ label: 'Смотреть спонсорство', href: '/general-sponsors' }}
-        accentGradient="radial-gradient(ellipse 90% 60% at 40% 20%, rgba(200,80,120,0.08), transparent)"
-        accentIcon={Handshake}
+        subtitle="Партнёры участвуют форматами, экспертами, продуктом и контентом. Спонсоры финансируют проект, а поставщики размещают рабочие контакты в каталоге. Опишите задачу: событие, обучение, материал, каталог или спецпроект."
+        tone="light-editorial"
+        actions={[
+          { label: 'Описать партнёрскую задачу', href: getPartnerContactHref(), kind: 'primary' },
+          { label: 'Смотреть спонсорство', href: '/general-sponsors', kind: 'secondary' }
+        ]}
       />
       <section className="background-zone background-zone-beige editorial-grid border-b border-[var(--line)] py-10 md:py-14">
         <div className="container">

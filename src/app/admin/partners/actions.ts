@@ -57,7 +57,7 @@ export async function createPartner(formData: FormData) {
     cleanup: () => deleteUploadedFileIfUnused(uploadedCoverImageId),
     handler: async ({ formData, user }) => {
       const parsed = partnerFormSchema.parse({
-        title: getString(formData, 'title'), slug: optionalString(getString(formData, 'slug')),
+        title: getString(formData, 'companyName'), slug: optionalString(getString(formData, 'slug')),
         summary: getString(formData, 'summary'), description: getString(formData, 'description'),
         status: getString(formData, 'status') || ContentStatus.DRAFT,
         coverImageAlt: optionalString(getString(formData, 'coverImageAlt')),
@@ -76,7 +76,7 @@ export async function createPartner(formData: FormData) {
       const createdPartner = await persistWithUniqueSlugRetry({
         baseSlug: slug, exists: async (candidate) => Boolean(await prisma.partner.findFirst({ where: { slug: candidate }, select: { id: true } })),
         persist: (uniqueSlug) => prisma.partner.create({
-          data: { title: parsed.title, slug: uniqueSlug, summary: parsed.summary, description: parsed.description, status: parsed.status, coverImageId, coverImageAlt: nullableString(parsed.coverImageAlt), categoryId: nullableString(parsed.categoryId), companyName: parsed.companyName, websiteUrl: nullableString(websiteUrl), partnerType: nullableString(parsed.partnerType), isFeatured: parsed.isFeatured, createdById: user.id, updatedById: user.id, ...initialPublicationDates(parsed.status) },
+          data: { title: parsed.companyName, slug: uniqueSlug, summary: parsed.summary, description: parsed.description, status: parsed.status, coverImageId, coverImageAlt: nullableString(parsed.coverImageAlt), categoryId: nullableString(parsed.categoryId), companyName: parsed.companyName, websiteUrl: nullableString(websiteUrl), partnerType: nullableString(parsed.partnerType), isFeatured: parsed.isFeatured, createdById: user.id, updatedById: user.id, ...initialPublicationDates(parsed.status) },
           select: { slug: true }
         })
       });
@@ -97,12 +97,13 @@ export async function updatePartner(formData: FormData) {
     defaultRedirectPath: ADMIN_PARTNERS_PATH,
     cleanup: () => deleteUploadedFileIfUnused(uploadedCoverImageId),
     handler: async ({ formData, user }) => {
+      const companyName = getString(formData, 'companyName');
       const parsed = partnerFormSchema.extend({ partnerId: z.string().trim().min(1) }).parse({
-        partnerId: getString(formData, 'partnerId'), title: getString(formData, 'title'),
+        partnerId: getString(formData, 'partnerId'), title: companyName,
         slug: optionalString(getString(formData, 'slug')), summary: getString(formData, 'summary'),
         description: getString(formData, 'description'), status: getString(formData, 'status') || ContentStatus.DRAFT,
         coverImageAlt: optionalString(getString(formData, 'coverImageAlt')),
-        categoryId: optionalString(getString(formData, 'categoryId')), companyName: getString(formData, 'companyName'),
+        categoryId: optionalString(getString(formData, 'categoryId')), companyName,
         websiteUrl: optionalString(getString(formData, 'websiteUrl')), partnerType: optionalString(getString(formData, 'partnerType')),
         isFeatured: getString(formData, 'isFeatured') === 'true'
       });
@@ -120,7 +121,7 @@ export async function updatePartner(formData: FormData) {
       const updatedPartner = await persistWithUniqueSlugRetry({
         baseSlug: slug, exists: async (candidate) => Boolean(await prisma.partner.findFirst({ where: { slug: candidate, id: { not: parsed.partnerId } }, select: { id: true } })),
         persist: (uniqueSlug) => prisma.partner.update({
-          where: { id: parsed.partnerId }, data: { title: parsed.title, slug: uniqueSlug, summary: parsed.summary, description: parsed.description, status: parsed.status, coverImageId, coverImageAlt: nullableString(parsed.coverImageAlt), categoryId: nullableString(parsed.categoryId), companyName: parsed.companyName, websiteUrl: nullableString(websiteUrl), partnerType: nullableString(parsed.partnerType), isFeatured: parsed.isFeatured, updatedById: user.id, ...statusTransitionDates(parsed.status, existingPartner.publishedAt) },
+          where: { id: parsed.partnerId }, data: { title: parsed.companyName, slug: uniqueSlug, summary: parsed.summary, description: parsed.description, status: parsed.status, coverImageId, coverImageAlt: nullableString(parsed.coverImageAlt), categoryId: nullableString(parsed.categoryId), companyName: parsed.companyName, websiteUrl: nullableString(websiteUrl), partnerType: nullableString(parsed.partnerType), isFeatured: parsed.isFeatured, updatedById: user.id, ...statusTransitionDates(parsed.status, existingPartner.publishedAt) },
           select: { slug: true }
         })
       });

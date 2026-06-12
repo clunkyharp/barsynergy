@@ -35,6 +35,7 @@ const articleFormSchema = z.object({
   cityId: z.string().trim().optional(),
   authorName: z.string().trim().max(120).optional(),
   sourceLabel: z.string().trim().max(160).optional(),
+  sourceReferences: z.string().trim().max(5000).optional(),
   readingTimeMinutes: z.coerce.number().int().positive().max(240).optional()
 });
 
@@ -94,6 +95,7 @@ export async function createArticle(formData: FormData) {
         coverImageAlt: optionalString(getString(formData, 'coverImageAlt')),
         categoryId: optionalString(getString(formData, 'categoryId')), cityId: optionalString(getString(formData, 'cityId')),
         authorName: optionalString(getString(formData, 'authorName')), sourceLabel: optionalString(getString(formData, 'sourceLabel')),
+        sourceReferences: optionalString(getString(formData, 'sourceReferences')),
         readingTimeMinutes: optionalString(getString(formData, 'readingTimeMinutes'))
       });
       const slug = slugify(parsed.slug ?? parsed.title);
@@ -109,7 +111,7 @@ export async function createArticle(formData: FormData) {
         baseSlug: slug, exists: async (candidate) => Boolean(await prisma.article.findFirst({ where: { slug: candidate }, select: { id: true } })),
         persist: (uniqueSlug) => prisma.$transaction(async (tx) => {
           const article = await tx.article.create({
-            data: { title: parsed.title, slug: uniqueSlug, summary: parsed.summary, body: parsed.body, status: parsed.status, coverImageId, coverImageAlt: nullableString(parsed.coverImageAlt), categoryId: nullableString(parsed.categoryId), cityId: nullableString(parsed.cityId), authorName: nullableString(parsed.authorName), sourceLabel: nullableString(parsed.sourceLabel), readingTimeMinutes: parsed.readingTimeMinutes, createdById: user.id, updatedById: user.id, ...initialPublicationDates(parsed.status) },
+            data: { title: parsed.title, slug: uniqueSlug, summary: parsed.summary, body: parsed.body, status: parsed.status, coverImageId, coverImageAlt: nullableString(parsed.coverImageAlt), categoryId: nullableString(parsed.categoryId), cityId: nullableString(parsed.cityId), authorName: nullableString(parsed.authorName), sourceLabel: nullableString(parsed.sourceLabel), sourceReferences: nullableString(parsed.sourceReferences), readingTimeMinutes: parsed.readingTimeMinutes, createdById: user.id, updatedById: user.id, ...initialPublicationDates(parsed.status) },
             select: { id: true, slug: true }
           });
 
@@ -143,6 +145,7 @@ export async function updateArticle(formData: FormData) {
         coverImageAlt: optionalString(getString(formData, 'coverImageAlt')),
         categoryId: optionalString(getString(formData, 'categoryId')), cityId: optionalString(getString(formData, 'cityId')),
         authorName: optionalString(getString(formData, 'authorName')), sourceLabel: optionalString(getString(formData, 'sourceLabel')),
+        sourceReferences: optionalString(getString(formData, 'sourceReferences')),
         readingTimeMinutes: optionalString(getString(formData, 'readingTimeMinutes'))
       });
       const slug = slugify(parsed.slug ?? parsed.title);
@@ -160,7 +163,7 @@ export async function updateArticle(formData: FormData) {
       const updatedArticle = await persistWithUniqueSlugRetry({
         baseSlug: slug, exists: async (candidate) => Boolean(await prisma.article.findFirst({ where: { slug: candidate, id: { not: parsed.articleId } }, select: { id: true } })),
         persist: (uniqueSlug) => prisma.$transaction(async (tx) => {
-          const article = await tx.article.update({ where: { id: parsed.articleId }, data: { title: parsed.title, slug: uniqueSlug, summary: parsed.summary, body: parsed.body, status: parsed.status, coverImageId, coverImageAlt: nullableString(parsed.coverImageAlt), categoryId: nullableString(parsed.categoryId), cityId: nullableString(parsed.cityId), authorName: nullableString(parsed.authorName), sourceLabel: nullableString(parsed.sourceLabel), readingTimeMinutes: parsed.readingTimeMinutes, updatedById: user.id, ...statusTransitionDates(parsed.status, existingArticle.publishedAt) }, select: { id: true, slug: true } });
+          const article = await tx.article.update({ where: { id: parsed.articleId }, data: { title: parsed.title, slug: uniqueSlug, summary: parsed.summary, body: parsed.body, status: parsed.status, coverImageId, coverImageAlt: nullableString(parsed.coverImageAlt), categoryId: nullableString(parsed.categoryId), cityId: nullableString(parsed.cityId), authorName: nullableString(parsed.authorName), sourceLabel: nullableString(parsed.sourceLabel), sourceReferences: nullableString(parsed.sourceReferences), readingTimeMinutes: parsed.readingTimeMinutes, updatedById: user.id, ...statusTransitionDates(parsed.status, existingArticle.publishedAt) }, select: { id: true, slug: true } });
           await tx.articleTag.deleteMany({ where: { articleId: article.id } });
 
           if (tagIds.length > 0) await tx.articleTag.createMany({ data: tagIds.map((tagId) => ({ articleId: article.id, tagId })), skipDuplicates: true });

@@ -37,7 +37,7 @@ import {
   type AdminContentSearchParams
 } from '@/lib/admin/content-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
-import { prisma } from '@/modules/admin/queries';
+import { getEventList, getActiveCategories, getActiveCities } from '@/lib/admin/admin-queries';
 
 export const dynamic = 'force-dynamic';
 
@@ -83,30 +83,10 @@ export default async function AdminEventsPage({ searchParams }: AdminEventsPageP
       : {})
   };
 
-  const [total, events, categories, cities] = await Promise.all([
-    prisma.event.count({ where }),
-    prisma.event.findMany({
-      where,
-      orderBy: [{ startsAt: 'desc' }],
-      skip: (page - 1) * ADMIN_CONTENT_PAGE_SIZE,
-      take: ADMIN_CONTENT_PAGE_SIZE,
-      include: {
-        category: { select: { name: true } },
-        city: { select: { name: true } },
-        coverImage: { select: { originalName: true } },
-        updatedBy: { select: { email: true } }
-      }
-    }),
-    prisma.category.findMany({
-      where: { type: CategoryType.EVENT, isActive: true },
-      orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
-      select: { id: true, name: true }
-    }),
-    prisma.city.findMany({
-      where: { isActive: true },
-      orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
-      select: { id: true, name: true }
-    })
+  const [[events, total], categories, cities] = await Promise.all([
+    getEventList(where, (page - 1) * ADMIN_CONTENT_PAGE_SIZE, ADMIN_CONTENT_PAGE_SIZE),
+    getActiveCategories(CategoryType.EVENT),
+    getActiveCities()
   ]);
   const totalPages = getAdminTotalPages(total);
   const hasActiveFilters = Boolean(q || status || categoryId || cityId || format);

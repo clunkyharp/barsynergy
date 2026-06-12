@@ -25,7 +25,7 @@ export function PublicBreadcrumbs({
   const resolvedItems = items ?? [{ href: '/', label: 'Главная' }];
 
   return (
-    <nav aria-label="Хлебные крошки" className={cn('text-sm leading-6 text-[var(--muted)]', className)}>
+    <nav aria-label="Хлебные крошки" className={cn('text-xs leading-5 text-[var(--muted)] md:text-sm md:leading-6', className)}>
       <ol className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
         {resolvedItems.map((item, index) => (
           <li className="inline-flex min-w-0 items-center gap-2" key={`${item.label}-${item.href ?? index}`}>

@@ -11,6 +11,7 @@ export const VACANCY_RESPONSE_CONSENT_TEXT =
 export type PublicApplicationResult = {
   type: 'success' | 'error';
   message: string;
+  applicationId?: string;
 };
 
 export type PublicApplicationUtm = {
@@ -37,9 +38,11 @@ export function firstParam(value: string | string[] | undefined) {
 
 export function stripPublicApplicationResultParams(params: PublicContentSearchParams) {
   return Object.fromEntries(
-    Object.entries(params).filter(([key]) => key !== 'applicationSuccess' && key !== 'applicationError')
+    Object.entries(params).filter(([key]) => key !== 'applicationSuccess' && key !== 'applicationError' && key !== 'applicationId')
   );
 }
+
+const APPLICATION_ID_RE = /^[a-z0-9]{20,30}$/i;
 
 export function getPublicApplicationResult(params: PublicContentSearchParams): PublicApplicationResult | undefined {
   const error = firstParam(params.applicationError);
@@ -49,7 +52,11 @@ export function getPublicApplicationResult(params: PublicContentSearchParams): P
   }
 
   const success = firstParam(params.applicationSuccess);
-  return success ? { type: 'success', message: success } : undefined;
+  if (!success) return undefined;
+
+  const rawId = firstParam(params.applicationId);
+  const applicationId = rawId && APPLICATION_ID_RE.test(rawId) ? rawId : undefined;
+  return applicationId ? { type: 'success', message: success, applicationId } : { type: 'success', message: success };
 }
 
 export function getPublicApplicationUtm(params: PublicContentSearchParams): PublicApplicationUtm {
@@ -90,6 +97,9 @@ export function getPublicApplicationResultPath(
 ) {
   const url = new URL(basePath, 'http://localhost');
   url.searchParams.set(result.type === 'success' ? 'applicationSuccess' : 'applicationError', result.message);
+  if (result.applicationId) {
+    url.searchParams.set('applicationId', result.applicationId);
+  }
   url.hash = hash;
   return `${url.pathname}${url.search}${url.hash}`;
 }

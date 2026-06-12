@@ -1,6 +1,5 @@
 'use server';
 
-import { redirect } from 'next/navigation';
 import { ApplicationType } from '@prisma/client';
 import { z } from 'zod';
 import { buildApplicationPayload } from '@/lib/applications/application-payloads';
@@ -11,16 +10,14 @@ import {
 import {
   assertActiveCity,
   baseContactSchema,
-  getPublicApplicationResultPath,
   getString,
   nullableString,
   optionalString,
   PERSONAL_DATA_CONSENT_TEXT,
+  type PublicApplicationResult,
   utmSchema
 } from '@/lib/applications/public-form-helpers';
 import { submitPublicApplicationAction } from '@/lib/applications/submit-public-application-action';
-
-const BUSINESS_PATH = '/business';
 const businessVenueTypeValues = businessVenueTypeOptions.map((option) => option.value) as [
   (typeof businessVenueTypeOptions)[number]['value'],
   ...(typeof businessVenueTypeOptions)[number]['value'][]
@@ -38,17 +35,12 @@ const businessSolutionSchema = baseContactSchema
   })
   .refine((data) => data.email || data.phone || data.telegram, { message: 'contact is required' });
 
-function redirectWithBusinessResult(result: { type: 'success' | 'error'; message: string }): never {
-  redirect(getPublicApplicationResultPath(BUSINESS_PATH, result, 'business-request'));
-}
-
-export async function submitBusinessSolutionRequest(formData: FormData) {
-  await submitPublicApplicationAction({
+export async function submitBusinessSolutionRequest(_prevState: PublicApplicationResult | null, formData: FormData): Promise<PublicApplicationResult> {
+  return submitPublicApplicationAction({
     actionName: 'public:business-solution',
     applicationType: ApplicationType.BUSINESS_SOLUTION,
     formData,
     successMessage: 'Заявку на размещение получили. Проверим данные и ответим в течение 2 рабочих дней.',
-    redirectWithResult: redirectWithBusinessResult,
     parse: async (data) => {
       const parsed = businessSolutionSchema.parse({
         projectName: getString(data, 'projectName'),

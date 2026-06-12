@@ -1,4 +1,4 @@
-import { CategoryType, ContentStatus } from '@/modules/admin/queries';
+import { CategoryType } from '@/modules/admin/queries';
 import { createPartner } from '@/app/admin/partners/actions';
 import { AdminCmsActions, AdminCmsForm, AdminCmsGrid, AdminCmsSection } from '@/components/admin/admin-cms-form';
 import { CoverImageField } from '@/components/admin/content-admin-controls';
@@ -8,20 +8,16 @@ import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
 import { MarkdownEditor } from '@/components/admin/markdown-editor';
 import { Textarea } from '@/components/ui/textarea';
-import { PUBLICATION_STATUS_HINT, contentStatusLabels, partnerTypeOptions } from '@/lib/admin/content-utils';
+import { partnerTypeOptions } from '@/lib/admin/content-utils';
+import { getActiveCategories } from '@/lib/admin/admin-queries';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
-import { prisma } from '@/modules/admin/queries';
 
 export const dynamic = 'force-dynamic';
 
 export default async function AdminCreatePartnerPage() {
   await requireAdminSectionAccess('partners');
 
-  const categories = await prisma.category.findMany({
-    where: { type: CategoryType.PARTNER, isActive: true },
-    orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
-    select: { id: true, name: true }
-  });
+  const categories = await getActiveCategories(CategoryType.PARTNER);
 
   return (
     <div className="space-y-8">
@@ -31,19 +27,14 @@ export default async function AdminCreatePartnerPage() {
       </header>
 
       <AdminCmsForm action={createPartner}>
-        <AdminCmsSection title="Публикация" description="Заголовок, адрес страницы и публикационный статус партнёра.">
+        <AdminCmsSection title="Публикация" description="Категория партнёра.">
           <AdminCmsGrid>
-            <FormField htmlFor="partner-title" label="Заголовок">
-              <Input id="partner-title" name="title" required minLength={2} maxLength={160} />
-            </FormField>
-            <FormField htmlFor="partner-slug" label="Адрес страницы">
-              <Input id="partner-slug" name="slug" maxLength={180} placeholder="Если пусто, будет создан из заголовка" />
-            </FormField>
-            <FormField htmlFor="partner-status" label="Статус" hint={PUBLICATION_STATUS_HINT}>
-              <Select id="partner-status" name="status" defaultValue={ContentStatus.DRAFT}>
-                {Object.values(ContentStatus).map((status) => (
-                  <option key={status} value={status}>
-                    {contentStatusLabels[status]}
+            <FormField htmlFor="partner-categoryId" label="Категория">
+              <Select id="partner-categoryId" name="categoryId" defaultValue="">
+                <option value="">Без категории</option>
+                {categories.map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {category.name}
                   </option>
                 ))}
               </Select>
@@ -62,18 +53,8 @@ export default async function AdminCreatePartnerPage() {
           </AdminCmsGrid>
         </AdminCmsSection>
 
-        <AdminCmsSection title="Тип сотрудничества" description="Категория, тип партнёра и показ в подборке партнёров.">
+        <AdminCmsSection title="Тип сотрудничества" description="Тип партнёра и показ в подборке.">
           <AdminCmsGrid>
-            <FormField htmlFor="partner-categoryId" label="Категория">
-              <Select id="partner-categoryId" name="categoryId" defaultValue="">
-                <option value="">Без категории</option>
-                {categories.map((category) => (
-                  <option key={category.id} value={category.id}>
-                    {category.name}
-                  </option>
-                ))}
-              </Select>
-            </FormField>
             <FormField htmlFor="partner-partnerType" label="Тип партнёра">
               <Select id="partner-partnerType" name="partnerType" defaultValue="">
                 <option value="">Не указан</option>
@@ -101,19 +82,16 @@ export default async function AdminCreatePartnerPage() {
 
         <AdminCmsSection title="Контент" description="Краткое описание и полный текст карточки партнёра.">
           <div className="grid gap-4">
-            <FormField htmlFor="partner-summary" label="Краткое описание">
+            <FormField htmlFor="partner-summary" label="Описание для карточки" hint="Показывается в каталоге. До 500 символов.">
               <Textarea id="partner-summary" name="summary" required minLength={10} maxLength={500} />
             </FormField>
-            <FormField htmlFor="partner-description" label="Описание">
-              <MarkdownEditor id="partner-description" name="description" required minLength={20} maxLength={100_000} className="min-h-64" />
+            <FormField htmlFor="partner-description" label="Текст страницы" hint="Полное содержимое публичной страницы">
+              <MarkdownEditor id="partner-description" name="description" required minLength={20} maxLength={100_000} />
             </FormField>
           </div>
         </AdminCmsSection>
 
         <AdminCmsActions>
-          <Button type="button" variant="secondary" href="/admin/partners">
-            Отмена
-          </Button>
           <Button type="submit">Создать партнёра</Button>
         </AdminCmsActions>
       </AdminCmsForm>

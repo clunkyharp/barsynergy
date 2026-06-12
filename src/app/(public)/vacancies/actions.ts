@@ -1,24 +1,24 @@
 'use server';
 
-import { redirect } from 'next/navigation';
 import { ApplicationType, ContentStatus, UserRole } from '@prisma/client';
 import { z } from 'zod';
 import { deleteUploadedFileIfUnused } from '@/lib/admin/content-utils';
 import { buildApplicationPayload } from '@/lib/applications/application-payloads';
-import { createPublicApplication } from '@/lib/applications/create-public-application';
 import { submitPublicApplicationAction } from '@/lib/applications/submit-public-application-action';
 import {
   assertActiveCity,
   baseContactSchema,
-  getPublicApplicationResultPath,
+  formatPublicApplicationActionError,
   getString,
   nullableString,
   optionalString,
   PERSONAL_DATA_CONSENT_TEXT,
+  type PublicApplicationResult,
   resolvePublicApplicationActionError,
   utmSchema,
   VACANCY_RESPONSE_CONSENT_TEXT
 } from '@/lib/applications/public-form-helpers';
+import { createPublicApplication } from '@/lib/applications/create-public-application';
 import { uploadPrivateResumeFromFormData } from '@/lib/applications/private-resume-files';
 import {
   assertPublicApplicationFormsEnabled,
@@ -31,9 +31,7 @@ import { assertTurnstilePassed } from '@/lib/security/turnstile';
 import { vacancyPositionValues } from '@/lib/vacancies/positions';
 import { getCurrentUser } from '@/lib/auth/current-user';
 
-const VACANCIES_PATH = '/vacancies';
-
-export type VacancyResponseActionResult = { type: 'success' | 'error'; message: string } | null;
+export type VacancyResponseActionResult = { type: 'success' | 'error'; message: string; applicationId?: string } | null;
 
 const vacancySubmissionSchema = baseContactSchema
   .merge(utmSchema)
@@ -64,20 +62,12 @@ const vacancyResponseSchema = baseContactSchema
   })
   .refine((data) => data.email || data.phone || data.telegram, { message: 'contact is required' });
 
-function redirectWithApplicationResult(
-  result: { type: 'success' | 'error'; message: string },
-  basePath = VACANCIES_PATH
-): never {
-  redirect(getPublicApplicationResultPath(basePath, result));
-}
-
-export async function submitVacancyPlacementApplication(formData: FormData) {
-  await submitPublicApplicationAction({
+export async function submitVacancyPlacementApplication(_prevState: PublicApplicationResult | null, formData: FormData): Promise<PublicApplicationResult> {
+  return submitPublicApplicationAction({
     actionName: 'public:vacancy-submission',
     applicationType: ApplicationType.VACANCY_SUBMISSION,
     formData,
     successMessage: 'Заявку на размещение вакансии получили.',
-    redirectWithResult: redirectWithApplicationResult,
     parse: async (data) => {
       const parsed = vacancySubmissionSchema.parse({
         companyName: getString(data, 'companyName'),
@@ -179,7 +169,7 @@ export async function submitVacancyResponseApplication(
 
     const currentUser = await getCurrentUser();
 
-    await createPublicApplication({
+    const application = await createPublicApplication({
       type: ApplicationType.VACANCY_RESPONSE,
       userId: currentUser?.role === UserRole.USER ? currentUser.id : null,
       subject: `Отклик: ${vacancy.title}`,
@@ -205,9 +195,82 @@ export async function submitVacancyResponseApplication(
       })
     });
 
-    return { type: 'success', message: 'Отклик отправлен.' };
+    return { type: 'success', message: 'Отклик отправлен.', applicationId: application.id };
   } catch (error) {
     await deleteUploadedFileIfUnused(uploadedResumeFileId);
     return { type: 'error', message: resolvePublicApplicationActionError('public:vacancy-response', error) };
+  }
+}
+
+const vacancyLeadSchema = z.object({
+  companyName: z.string().trim().min(2, 'Укажите название компании').max(180),
+  city: z.string().trim().max(120).optional(),
+  position: z.string().trim().min(2, 'Укажите должность').max(180),
+  employmentType: z.string().trim().max(100).optional(),
+  contact: z.string().trim().min(2, 'Укажите контакт для связи').max(200),
+  comment: z.string().trim().max(4000).optional(),
+  consent: z.literal('accepted')
+});
+
+export type VacancyLeadActionResult = { type: 'success'; message: string } | { type: 'error'; message: string } | null;
+
+export async function submitVacancyLead(
+  _prevState: VacancyLeadActionResult,
+  formData: FormData
+): Promise<VacancyLeadActionResult> {
+  try {
+    await assertSameOriginServerAction();
+    assertPublicApplicationFormsEnabled();
+
+    if (hasHoneypotValue(getString(formData, 'website'))) {
+      return { type: 'success', message: 'Заявка на размещение вакансии отправлена. Команда BARSYNERGY свяжется с вами.' };
+    }
+
+    const turnstileToken = getString(formData, 'turnstileToken');
+    if (turnstileToken) {
+      await assertTurnstilePassed(turnstileToken);
+    }
+    await assertPublicApplicationSubmissionAllowed(ApplicationType.VACANCY_SUBMISSION);
+
+    const parsed = vacancyLeadSchema.parse({
+      companyName: getString(formData, 'companyName'),
+      city: optionalString(getString(formData, 'city')),
+      position: getString(formData, 'position'),
+      employmentType: optionalString(getString(formData, 'employmentType')),
+      contact: getString(formData, 'contact'),
+      comment: optionalString(getString(formData, 'comment')),
+      consent: getString(formData, 'consent')
+    });
+
+    const cityPart = parsed.city ? ` (${parsed.city})` : '';
+    const subject = `Вакансия: ${parsed.companyName}${cityPart} — ${parsed.position}`;
+    const message = [
+      `Компания: ${parsed.companyName}`,
+      parsed.city ? `Город: ${parsed.city}` : null,
+      `Должность: ${parsed.position}`,
+      parsed.employmentType ? `Занятость: ${parsed.employmentType}` : null,
+      `Контакт: ${parsed.contact}`,
+      parsed.comment ? `Комментарий: ${parsed.comment}` : null
+    ]
+      .filter(Boolean)
+      .join('\n');
+
+    await createPublicApplication({
+      type: ApplicationType.VACANCY_SUBMISSION,
+      subject,
+      message,
+      name: parsed.companyName,
+      consentText: PERSONAL_DATA_CONSENT_TEXT
+    });
+
+    return {
+      type: 'success',
+      message: 'Заявка на размещение вакансии отправлена. Команда BARSYNERGY свяжется с вами.'
+    };
+  } catch (error) {
+    if (error instanceof Error) {
+      return { type: 'error', message: formatPublicApplicationActionError(error) };
+    }
+    return { type: 'error', message: 'Не удалось отправить заявку. Попробуйте ещё раз.' };
   }
 }

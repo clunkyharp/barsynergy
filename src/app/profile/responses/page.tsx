@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Mail, Search } from 'lucide-react';
 import { redirect } from 'next/navigation';
+import type { Prisma } from '@/modules/admin/queries';
 import { AppLink } from '@/components/ui/app-link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -50,13 +51,13 @@ export default async function ProfileResponsesPage({ searchParams }: ProfileResp
   const sort = firstParam(params.sort) ?? 'desc';
   const page = Math.max(1, Number(firstParam(params.page)) || 1);
 
-  const where: Record<string, unknown> = { userId: user.id,
+  const where: Prisma.ApplicationWhereInput = { userId: user.id,
     type: profileResponseType,
     status: { not: ApplicationStatus.DRAFT }
   };
 
   if (statusFilter && profileResponseStatusValues.includes(statusFilter as ApplicationStatus)) {
-    where.status = statusFilter;
+    where.status = statusFilter as ApplicationStatus;
   }
   if (q) {
     where.OR = [

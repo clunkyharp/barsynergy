@@ -14,7 +14,7 @@ test('admin layout exposes a sub-desktop unsupported state and hides the work ar
   assert.match(source, /Нужен широкий экран/);
   assert.match(source, /экран[а-яА-ЯёЁ\s]*от 1024px/);
   assert.match(source, /lg:hidden/);
-  assert.match(source, /<AdminShellFrame email=\{user\.email\} logoutAction=\{logoutAction\} role=\{user\.role\}>/);
+  assert.match(source, /<AdminShellFrame\s+email=\{user\.email\} logoutAction=\{logoutAction\} role=\{user\.role\} newApplicationsCount=/);
 
   const shellFrameSource = readFileSync(adminShellFramePath, 'utf8');
 

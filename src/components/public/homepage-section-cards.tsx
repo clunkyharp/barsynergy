@@ -1,61 +1,60 @@
 import Link from 'next/link';
 import type { CSSProperties } from 'react';
-import {
-  ArrowUpRight,
-  BookOpen,
-  BriefcaseBusiness,
-  CalendarDays,
-  Coffee,
-  PackageCheck,
-  Calculator
-} from 'lucide-react';
+import { ArrowUpRight } from 'lucide-react';
+import { SectionIcon, type SectionIconType } from '@/components/public/section-icon';
 import { PublicDisplayTitle, PublicEyebrow } from '@/components/public/public-primitives';
 import { displayFont } from '@/lib/fonts';
 
-const homeSectionCards = [
+const homeSectionCards: {
+  title: string;
+  description: string;
+  href: string;
+  status: string;
+  icon: SectionIconType;
+}[] = [
   {
     title: 'Обучение',
     description: 'Курсы для бариста и обучение команды: от базовой экстракции до авторских молочных программ.',
     href: '/education',
     status: 'Открыто',
-    icon: Coffee
+    icon: 'education'
   },
   {
     title: 'Афиша',
     description: 'Каппинги, открытые тренинги, отраслевые встречи и чемпионаты бариста по всему СКФО.',
     href: '/events',
     status: 'Сезон',
-    icon: CalendarDays
+    icon: 'events'
   },
   {
     title: 'Вакансии',
     description: 'Specialty-кофейни и кофейные бары ищут бариста, управляющих и технологов.',
     href: '/vacancies',
     status: 'Найм',
-    icon: BriefcaseBusiness
+    icon: 'vacancies'
   },
   {
     title: 'Материалы',
     description: 'Экстракция, обжарка, себестоимость напитка, работа с зерном: читать и применять сразу.',
     href: '/articles',
     status: 'Редакция',
-    icon: BookOpen
+    icon: 'articles'
   },
   {
     title: 'Калькулятор',
     description: 'Считает себестоимость эспрессо, альтернативы или коктейля и показывает рекомендованную цену.',
     href: '/tools/cost-calculator',
     status: 'Инструмент',
-    icon: Calculator
+    icon: 'calculator'
   },
   {
     title: 'Поставщики',
     description: 'Обжарщики, дистрибьюторы зерна и оборудования, которые работают с кофейными барами СКФО.',
     href: '/suppliers',
     status: 'Каталог',
-    icon: PackageCheck
+    icon: 'suppliers'
   }
-] as const;
+];
 
 export function HomeSectionCards() {
   return (
@@ -68,14 +67,10 @@ export function HomeSectionCards() {
           </div>
           <div className="grid gap-5 sm:grid-cols-2 md:gap-4 lg:grid-cols-3">
             {homeSectionCards.map((card) => {
-              const Icon = card.icon;
-
               return (
                 <Link className="home-section-card group relative min-h-[140px] rounded-[var(--radius-lg)] border border-[var(--border-strong)] bg-[var(--surface-card)] p-5 text-[var(--text)] shadow-[var(--shadow-card)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)]" href={card.href} key={card.title}>
                   <span className="flex items-start justify-between gap-4">
-                    <span className="inline-flex h-10 w-10 items-center justify-center rounded-[var(--radius-sm)] bg-[var(--accent)] text-white">
-                      <Icon size={18} strokeWidth={1.5} />
-                    </span>
+                    <SectionIcon size={40} type={card.icon} />
                     <span className="rounded-[var(--radius-sm)] border border-[var(--border-default)] px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--muted)]">
                       {card.status}
                     </span>

@@ -1,7 +1,8 @@
 'use client';
 
 import { useMemo, useState, type ReactNode } from 'react';
-import { ArrowUpRight, BookOpen, BriefcaseBusiness, CalendarDays, Check, Coffee, Handshake, Settings2, Store, User, Users } from 'lucide-react';
+import { ArrowUpRight, Check, User } from 'lucide-react';
+import { SectionIcon, type SectionIconType } from '@/components/public/section-icon';
 import { AppLink } from '@/components/ui/app-link';
 import { displayFont } from '@/lib/fonts';
 import { cn } from '@/lib/utils';
@@ -86,7 +87,6 @@ export function ProgramFormatMatrix({ items, className, ...props }: PrimitiveShe
     { id: 'manager' as const, label: 'Менеджер' },
     { id: 'owner' as const, label: 'Владелец' }
   ];
-  const icons = [Coffee, BookOpen, Users, Settings2, Handshake, BriefcaseBusiness, CalendarDays];
   const filteredItems = useMemo(() => {
     if (audienceFilter === 'all') { return items; }
     const matches: Record<Exclude<typeof audienceFilter, 'all'>, RegExp> = {
@@ -99,12 +99,12 @@ export function ProgramFormatMatrix({ items, className, ...props }: PrimitiveShe
 
   return (
     <PrimitiveShell className={className} {...props}>
-      <div className="mb-5 flex flex-wrap gap-2">
+      <div className="mb-6 flex flex-nowrap gap-2 overflow-x-auto pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {filters.map((filter) => (
           <button
             aria-pressed={audienceFilter === filter.id}
             className={cn(
-              'inline-flex min-h-10 items-center rounded-[var(--radius-sm)] border px-3 text-sm font-semibold transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] motion-reduce:transition-none',
+              'inline-flex shrink-0 min-h-10 items-center rounded-[var(--radius-sm)] border px-3 text-sm font-semibold transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] motion-reduce:transition-none',
               audienceFilter === filter.id
                 ? 'border-[var(--accent)] bg-[var(--accent)] text-[var(--accent-contrast)]'
                 : 'border-[var(--border-default)] bg-[var(--surface-wash)] text-[var(--text)] hover:border-[var(--accent)]/35'
@@ -117,34 +117,54 @@ export function ProgramFormatMatrix({ items, className, ...props }: PrimitiveShe
           </button>
         ))}
       </div>
-      <div className="grid gap-4">
+      <div className="grid gap-4 sm:grid-cols-2">
         {filteredItems.map((item, index) => {
-          const Icon = icons[index % icons.length] ?? Coffee;
           return (
-            <article className="public-card-shell flex flex-col gap-4 p-4 md:p-5" key={index}>
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex min-w-0 items-center gap-3">
-                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[var(--radius-sm)] border border-[var(--accent)]/22 bg-[var(--accent-soft)] text-[var(--accent)]">
-                    <Icon size={18} strokeWidth={1.8} />
-                  </span>
-                  <h3 className={`${displayFont.className} text-[1.35rem] font-semibold leading-tight text-[var(--text)] md:text-[1.65rem]`}>
+            <article className="public-card-shell flex h-full flex-col p-4 md:p-5" key={index}>
+              {/* Upper zone: title + status + description */}
+              <div>
+                <div className="flex items-start justify-between gap-3">
+                  <h3 className={`${displayFont.className} text-[1.25rem] font-semibold leading-tight text-[var(--text)] md:text-[1.4rem]`}>
                     {item.format}
                   </h3>
+                  {item.status ? <StatusPill>{item.status}</StatusPill> : null}
                 </div>
-                <StatusPill>{item.status}</StatusPill>
+                <p className="mt-1.5 text-[13px] leading-5 text-[var(--muted)] line-clamp-2">
+                  {item.includes}
+                </p>
               </div>
-              <p className="text-sm leading-7 text-[var(--muted)]">{item.includes}</p>
-              <div className="grid gap-2 text-sm leading-6">
-                <div className="flex items-center gap-2 text-[var(--text)]">
-                  <User size={15} strokeWidth={1.8} className="shrink-0 text-[var(--accent)]" />
-                  <span>{item.audience}</span>
-                </div>
-                <div className="flex items-center gap-2 text-[var(--text)]">
-                  <Check size={15} strokeWidth={1.8} className="shrink-0 text-[var(--accent)]" />
-                  <span>{item.result}</span>
+
+              {/* Middle zone: info boxes — flex-1 fills remaining space, keeps footer at bottom */}
+              <div className="mt-5 flex-1">
+                <div className="grid h-full gap-2.5 sm:grid-cols-2">
+                  <div className="flex flex-col rounded-[var(--radius-sm)] border border-[var(--border-subtle)] bg-[var(--surface-card-muted)] px-3 py-2.5">
+                    <span className="flex items-center gap-2">
+                      <User size={14} strokeWidth={1.8} className="shrink-0 text-[var(--accent)]" />
+                      <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">Для кого</span>
+                    </span>
+                    <p className="mt-1 flex-1 text-[13px] leading-5 text-[var(--text)]">{item.audience}</p>
+                  </div>
+                  <div className="flex flex-col rounded-[var(--radius-sm)] border border-[var(--border-subtle)] bg-[var(--surface-card-muted)] px-3 py-2.5">
+                    <span className="flex items-center gap-2">
+                      <Check size={14} strokeWidth={1.8} className="shrink-0 text-[var(--accent)]" />
+                      <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">Что получите</span>
+                    </span>
+                    <p className="mt-1 flex-1 text-[13px] leading-5 text-[var(--text)]">{item.result}</p>
+                  </div>
                 </div>
               </div>
-              <div className="pt-2"><InlineAction action={item.action} /></div>
+
+              {/* Lower zone: divider + meta + CTA */}
+              <div className="mt-6 border-t border-[var(--line)] pt-4">
+                <div className="flex items-center justify-between gap-3">
+                  {item.meta ? (
+                    <span className="text-xs leading-5 text-[var(--muted)]">{item.meta}</span>
+                  ) : (
+                    <span />
+                  )}
+                  <InlineAction action={item.action} />
+                </div>
+              </div>
             </article>
           );
         })}
@@ -154,19 +174,17 @@ export function ProgramFormatMatrix({ items, className, ...props }: PrimitiveShe
 }
 
 export function PartnerFormatTable({ items, className, ...props }: PrimitiveShellProps & { items: PartnerFormatTableItem[] }) {
-  const icons = [CalendarDays, BookOpen, Coffee, Store, Handshake];
+  const sectionIcons: SectionIconType[] = ['events', 'articles', 'coffee', 'building', 'handshake'];
   return (
     <PrimitiveShell className={className} {...props}>
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {items.map((item, index) => {
-          const Icon = icons[index % icons.length] ?? Handshake;
+          const iconType = sectionIcons[index % sectionIcons.length] ?? 'handshake';
           return (
-            <article className="public-card-shell flex min-h-[21rem] flex-col p-4 md:p-5" key={index}>
+            <article className="public-card-shell flex h-full min-h-[21rem] flex-col p-4 md:p-5" key={index}>
               <div className="flex items-start justify-between gap-4">
                 <MetaText>Партнёрский формат</MetaText>
-                <span className="grid h-10 w-10 place-items-center rounded-[var(--radius-sm)] border border-[var(--accent)]/22 bg-[var(--accent-soft)] text-[var(--accent)]">
-                  <Icon size={18} strokeWidth={1.8} />
-                </span>
+                <SectionIcon size={40} type={iconType} />
               </div>
               <h3 className={`${displayFont.className} mt-4 text-[1.65rem] font-semibold leading-none text-[var(--text)] md:text-[2rem]`}>
                 {item.format}

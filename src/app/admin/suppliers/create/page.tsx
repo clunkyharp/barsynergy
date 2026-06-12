@@ -1,16 +1,16 @@
-import { CategoryType, ContentStatus } from '@/modules/admin/queries';
+import { CategoryType } from '@/modules/admin/queries';
 import { createSupplier } from '@/app/admin/suppliers/actions';
 import { AdminCmsActions, AdminCmsForm, AdminCmsGrid, AdminCmsSection } from '@/components/admin/admin-cms-form';
 import { CoverImageField, HiddenRedirect } from '@/components/admin/content-admin-controls';
 import { Button } from '@/components/ui/button';
+import { CheckboxField } from '@/components/ui/checkbox-field';
 import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
 import { MarkdownEditor } from '@/components/admin/markdown-editor';
 import { Textarea } from '@/components/ui/textarea';
-import { PUBLICATION_STATUS_HINT, contentStatusLabels } from '@/lib/admin/content-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
-import { prisma } from '@/modules/admin/queries';
+import { getActiveCategories, getActiveCities } from '@/lib/admin/admin-queries';
 
 export const dynamic = 'force-dynamic';
 
@@ -20,16 +20,8 @@ export default async function AdminSuppliersCreatePage() {
   await requireAdminSectionAccess('suppliers');
 
   const [categories, cities] = await Promise.all([
-    prisma.category.findMany({
-      where: { type: CategoryType.SUPPLIER, isActive: true },
-      orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
-      select: { id: true, name: true }
-    }),
-    prisma.city.findMany({
-      where: { isActive: true },
-      orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
-      select: { id: true, name: true }
-    })
+    getActiveCategories(CategoryType.SUPPLIER),
+    getActiveCities()
   ]);
 
   return (
@@ -47,29 +39,14 @@ export default async function AdminSuppliersCreatePage() {
       <AdminCmsForm action={createSupplier}>
         <HiddenRedirect value={ADMIN_SUPPLIERS_PATH} />
 
-        <AdminCmsSection title="Публикация" description="Заголовок, адрес страницы, категория и статус поставщика.">
+        <AdminCmsSection title="Публикация" description="Категория поставщика.">
           <AdminCmsGrid>
-            <FormField htmlFor="supplier-title" label="Заголовок">
-              <Input id="supplier-title" name="title" required minLength={2} maxLength={160} />
-            </FormField>
-            <FormField htmlFor="supplier-slug" label="Адрес страницы">
-              <Input id="supplier-slug" name="slug" maxLength={180} placeholder="Если пусто, будет создан из заголовка" />
-            </FormField>
             <FormField htmlFor="supplier-categoryId" label="Категория">
               <Select id="supplier-categoryId" name="categoryId" defaultValue="">
                 <option value="">Без категории</option>
                 {categories.map((category) => (
                   <option key={category.id} value={category.id}>
                     {category.name}
-                  </option>
-                ))}
-              </Select>
-            </FormField>
-            <FormField htmlFor="supplier-status" label="Статус" hint={PUBLICATION_STATUS_HINT}>
-              <Select id="supplier-status" name="status" defaultValue={ContentStatus.DRAFT}>
-                {Object.values(ContentStatus).map((status) => (
-                  <option key={status} value={status}>
-                    {contentStatusLabels[status]}
                   </option>
                 ))}
               </Select>
@@ -88,6 +65,9 @@ export default async function AdminSuppliersCreatePage() {
             <FormField htmlFor="supplier-contactLabel" label="Контакт" hint="Коротко: имя, телефон, Telegram или email. Если контактов несколько, разделяйте точкой с запятой.">
               <Textarea id="supplier-contactLabel" name="contactLabel" maxLength={160} className="min-h-24" />
             </FormField>
+            <CheckboxField name="isVerified" value="true">
+              Поставщик проверен
+            </CheckboxField>
           </AdminCmsGrid>
         </AdminCmsSection>
 
@@ -109,17 +89,6 @@ export default async function AdminSuppliersCreatePage() {
           </AdminCmsGrid>
         </AdminCmsSection>
 
-        <AdminCmsSection title="Проверка" description="Редакционная отметка о проверке поставщика.">
-          <AdminCmsGrid>
-            <FormField htmlFor="supplier-isVerified" label="Проверка">
-              <Select id="supplier-isVerified" name="isVerified" defaultValue="false">
-                <option value="false">Не проверен</option>
-                <option value="true">Проверен</option>
-              </Select>
-            </FormField>
-          </AdminCmsGrid>
-        </AdminCmsSection>
-
         <AdminCmsSection title="Медиа" description="Обложка поставщика для каталога и публичной страницы.">
           <AdminCmsGrid>
             <CoverImageField id="supplier-coverImage" />
@@ -128,19 +97,16 @@ export default async function AdminSuppliersCreatePage() {
 
         <AdminCmsSection title="Контент" description="Краткое описание и полный текст карточки поставщика.">
           <div className="grid gap-4">
-            <FormField htmlFor="supplier-summary" label="Краткое описание">
+            <FormField htmlFor="supplier-summary" label="Описание для карточки" hint="Показывается в каталоге. До 500 символов.">
               <Textarea id="supplier-summary" name="summary" required minLength={10} maxLength={500} />
             </FormField>
-            <FormField htmlFor="supplier-description" label="Описание">
-              <MarkdownEditor id="supplier-description" name="description" required minLength={20} maxLength={100_000} className="min-h-64" />
+            <FormField htmlFor="supplier-description" label="Текст страницы" hint="Полное содержимое публичной страницы">
+              <MarkdownEditor id="supplier-description" name="description" required minLength={20} maxLength={100_000} />
             </FormField>
           </div>
         </AdminCmsSection>
 
         <AdminCmsActions>
-          <Button type="button" variant="secondary" href={ADMIN_SUPPLIERS_PATH}>
-            Отмена
-          </Button>
           <Button type="submit">Создать поставщика</Button>
         </AdminCmsActions>
       </AdminCmsForm>

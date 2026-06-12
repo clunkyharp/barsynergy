@@ -2,14 +2,16 @@ import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import { CategoryType } from '@/modules/content/shared/types';
 import { EventAgendaSection } from '@/components/public/platform-ui';
-import { EventsHeroSection, EventsSearchBar, EventsQuickFilters, EventsCtaBanner } from '@/components/public/events-page-header';
+import { PageHero } from '@/components/public/page-hero';
+import { PublicPrelaunchSection } from '@/components/public/public-prelaunch-section';
+import { EventsSearchBar, EventsQuickFilters, EventsCtaBanner } from '@/components/public/events-page-header';
 import { JsonLd } from '@/components/seo/json-ld';
 import { stripPublicApplicationResultParams } from '@/lib/applications/public-form-helpers';
 import { getPublishedEvents, hasActivePublicContentParams, type PublicContentSearchParams } from '@/lib/public/content';
 import { getEventFilterOptions, getPublicCategoryOptions, getPublicCityFilterOptions } from '@/lib/public/filter-options';
 import { buildPublicPageMetadata } from '@/lib/public/metadata';
 import { buildStaticPageBreadcrumbJsonLd } from '@/lib/public/structured-data';
-import { Button } from '@/components/ui/button';
+
 
 type EventsPageProps = {
   searchParams?: Promise<PublicContentSearchParams>;
@@ -53,7 +55,11 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
     <>
       <JsonLd data={buildStaticPageBreadcrumbJsonLd('/events', 'События')} />
 
-      <EventsHeroSection />
+      <PageHero
+        title="События"
+        subtitle="Каппинги, чемпионаты, лекции, мастер-классы и встречи кофейного сообщества."
+        tone="graphite"
+      />
 
       <EventsSearchBar
         cities={filterCities}
@@ -72,14 +78,30 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
       />
 
       {isPrelaunchEmpty ? (
-        <section className="background-zone background-zone-graphite border-b border-[var(--line)] py-16">
-          <div className="container text-center">
-            <p className="text-[var(--muted)]">Первые события готовятся к публикации.</p>
-            <Button className="mt-6" href="/contacts?topic=event#contact-form">
-              Предложить событие
-            </Button>
-          </div>
-        </section>
+        <PublicPrelaunchSection
+          actions={[
+            { href: '/contacts?topic=event#contact-form', label: 'Добавить событие' },
+            { href: '/contacts', label: 'Связаться с нами', variant: 'secondary' }
+          ]}
+          badges={['Афиша уже принимает заявки', 'Подходит для любых форматов']}
+          cards={[
+            {
+              title: 'Каппинги и дегустации',
+              description: 'Открытые дегустации кофе, чая, крепких напитков для профессиональной аудитории.'
+            },
+            {
+              title: 'Чемпионаты и конкурсы',
+              description: 'Соревнования для бариста, обжарщиков и специалистов индустрии.'
+            },
+            {
+              title: 'Лекции и мастер-классы',
+              description: 'Образовательные встречи, тренинги и практические занятия.'
+            }
+          ]}
+          description="Добавьте мероприятие, если оно открыто для профессионального сообщества и связано с барной или кофейной культурой."
+          eyebrow="Афиша"
+          title="Какие события можно добавить"
+        />
       ) : (
         <Suspense
           fallback={

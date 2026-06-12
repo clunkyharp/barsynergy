@@ -1,39 +1,38 @@
 'use client';
 
 import { type ReactNode } from 'react';
+import { Download, Link2, RotateCcw } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { useToast } from '@/components/ui/toast';
 import { FormField } from '@/components/ui/form-field';
-import { Input } from '@/components/ui/input';
-import { SegmentedControl } from '@/components/ui/segmented-control';
-import { IngredientEditor } from '@/components/public/cost-calculator/ingredient-editor';
 import { CalculatorResultRail } from '@/components/public/cost-calculator/result-rail';
+import { CalculatorParameters } from '@/components/public/cost-calculator/calculator-parameters';
+import { AdditionalCostsEditor } from '@/components/public/cost-calculator/additional-costs-editor';
+import { PopularDrinks } from '@/components/public/cost-calculator/popular-drinks';
+import { HelpfulTips } from '@/components/public/cost-calculator/helpful-tips';
+import { MarkupPricing } from '@/components/public/cost-calculator/markup-pricing';
+import { IngredientEditor } from '@/components/public/cost-calculator/ingredient-editor';
 import { decimal, money } from '@/components/public/cost-calculator/format';
 import { useCostCalculatorState } from '@/components/public/cost-calculator/use-cost-calculator-state';
-import { displayFont } from '@/lib/fonts';
 import {
-  type CalculatorPricingMode as PricingMode,
-  type CalculatorSummary
+  type CalculatorPricingMode,
+  type CalculatorSummary,
 } from '@/lib/calculator/cost-calculator';
 
-type CalculatorHeaderProps = {
-  itemName: string;
-  foodCostError: string | null;
-  foodCostPercent: string;
-  isManualMode: boolean;
-  pricingMode: PricingMode;
-  recommendedPrice: number;
-  salePrice: string;
-  salePriceError: string | null;
-  canShowRecommendedPrice: boolean;
-  onFoodCostChange: (value: string) => void;
-  onItemNameChange: (value: string) => void;
-  onPricingModeChange: (value: PricingMode) => void;
-  onSalePriceChange: (value: string) => void;
-};
+/* ------------------------------------------------------------------ */
+/* Stacked divider between sections inside the left panel              */
+/* ------------------------------------------------------------------ */
+function SectionDivider() {
+  return <div className="mt-10 border-t border-[var(--line)] pt-10" />;
+}
 
+/* ------------------------------------------------------------------ */
+/* Shell – two‑column grid                                            */
+/* ------------------------------------------------------------------ */
 function CalculatorShell({ children, resultRail }: { children: ReactNode; resultRail: ReactNode }) {
   return (
     <section className="calculator-workspace-section background-zone background-zone-ivory border-b border-[var(--line)] py-8 md:py-12">
-      <div className="container grid gap-5 xl:grid-cols-[minmax(0,1fr)_22rem] xl:items-start 2xl:grid-cols-[minmax(0,1fr)_25rem]">
+      <div className="container grid gap-6 xl:grid-cols-[minmax(0,1fr)_22rem] xl:items-start 2xl:grid-cols-[minmax(0,1fr)_25rem]">
         {children}
         {resultRail}
       </div>
@@ -41,274 +40,421 @@ function CalculatorShell({ children, resultRail }: { children: ReactNode; result
   );
 }
 
-function CalculatorHeader({
-  itemName,
-  foodCostError,
-  foodCostPercent,
-  isManualMode,
-  pricingMode,
-  recommendedPrice,
-  salePrice,
-  salePriceError,
-  canShowRecommendedPrice,
-  onFoodCostChange,
-  onItemNameChange,
-  onPricingModeChange,
-  onSalePriceChange
-}: CalculatorHeaderProps) {
+/* ------------------------------------------------------------------ */
+/* Toolbar (page‑level actions)                                       */
+/* ------------------------------------------------------------------ */
+function formatTime(date: Date) {
+  return date.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+}
+
+function CalculatorToolbar({
+  canExport,
+  hasAnyInput,
+  lastSavedAt,
+  onClear,
+  onExport,
+  onFillDemo,
+  onShare,
+}: {
+  canExport: boolean;
+  hasAnyInput: boolean;
+  lastSavedAt: Date | null;
+  onClear: () => void;
+  onExport: () => void;
+  onFillDemo: () => void;
+  onShare: () => void;
+}) {
   return (
-    <div className="calculator-panel-header grid gap-4">
-      <div className="min-w-0">
-        <h2 className={`${displayFont.className} calculator-panel-title`}>Калькулятор себестоимости</h2>
-        <p className="mt-1.5 max-w-xl text-[13px] leading-5 text-[var(--muted)]">
-          Укажите ингредиенты напитка и долю себестоимости — калькулятор рассчитает цену для меню.
-        </p>
+    <div className="flex flex-wrap items-center justify-between gap-2">
+      <div className="flex flex-wrap gap-2">
+        <Button
+          className="min-h-10 rounded-[var(--radius-sm)] px-3 text-sm"
+          onClick={onFillDemo}
+          size="sm"
+          type="button"
+          variant="secondary"
+        >
+          Заполнить примером
+        </Button>
+        <Button
+          className="min-h-10 rounded-[var(--radius-sm)] px-3 text-sm"
+          disabled={!hasAnyInput}
+          onClick={onClear}
+          size="sm"
+          type="button"
+          variant="ghost"
+        >
+          <RotateCcw size={15} strokeWidth={1.8} />
+          Новый расчёт
+        </Button>
+        <Button
+          className="min-h-10 rounded-[var(--radius-sm)] px-3 text-sm"
+          disabled={!canExport}
+          onClick={onShare}
+          size="sm"
+          type="button"
+          variant="ghost"
+        >
+          <Link2 size={15} strokeWidth={1.8} />
+          Поделиться ссылкой
+        </Button>
+        <Button
+          className="min-h-10 rounded-[var(--radius-sm)] px-3 text-sm"
+          disabled={!canExport}
+          onClick={onExport}
+          size="sm"
+          type="button"
+          variant="ghost"
+        >
+          <Download size={15} strokeWidth={1.8} />
+          Экспорт JSON
+        </Button>
       </div>
-      <PricingModeFields
-        canShowRecommendedPrice={canShowRecommendedPrice}
-        foodCostError={foodCostError}
-        foodCostPercent={foodCostPercent}
-        isManualMode={isManualMode}
-        itemName={itemName}
-        onFoodCostChange={onFoodCostChange}
-        onItemNameChange={onItemNameChange}
-        onPricingModeChange={onPricingModeChange}
-        onSalePriceChange={onSalePriceChange}
-        pricingMode={pricingMode}
-        recommendedPrice={recommendedPrice}
-        salePrice={salePrice}
-        salePriceError={salePriceError}
-      />
+      {lastSavedAt ? (
+        <span aria-live="polite" className="text-[11px] leading-none text-[var(--muted)]">
+          Сохранено локально · {formatTime(lastSavedAt)}
+        </span>
+      ) : null}
     </div>
   );
 }
 
-function PricingModeFields({
-  itemName,
+/* ------------------------------------------------------------------ */
+/* Mode selector (two equal compact cards)                            */
+/* ------------------------------------------------------------------ */
+function ModeSelector({
+  onChange,
+  value,
+}: {
+  onChange: (v: CalculatorPricingMode) => void;
+  value: CalculatorPricingMode;
+}) {
+  const modes: { value: CalculatorPricingMode; label: string; desc: string }[] = [
+    {
+      value: 'auto',
+      label: 'Рассчитать цену',
+      desc: 'Укажите целевой food cost — калькулятор предложит цену меню.',
+    },
+    {
+      value: 'manual',
+      label: 'Проверить цену',
+      desc: 'Введите цену продажи и проверьте маржу.',
+    },
+  ];
+
+  return (
+    <div className="grid grid-cols-2 gap-3">
+      {modes.map((m) => (
+        <button
+          key={m.value}
+          className="choice-card rounded-[var(--radius-md)] border px-3 py-2.5 text-left transition"
+          data-selected={value === m.value ? 'true' : 'false'}
+          onClick={() => onChange(m.value)}
+          type="button"
+        >
+          <span className="block text-[13px] font-semibold leading-snug text-[var(--text)]">{m.label}</span>
+          <span className="mt-0.5 block text-[11px] leading-[1.45] text-[var(--muted)]">{m.desc}</span>
+        </button>
+      ))}
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Basic parameters row                                               */
+/* ------------------------------------------------------------------ */
+function ParameterFields({
+  canShowRecommendedPrice,
   foodCostError,
   foodCostPercent,
   isManualMode,
-  pricingMode,
+  itemName,
+  onFoodCostChange,
+  onItemNameChange,
+  onSalePriceChange,
   recommendedPrice,
   salePrice,
   salePriceError,
-  canShowRecommendedPrice,
-  onFoodCostChange,
-  onItemNameChange,
-  onPricingModeChange,
-  onSalePriceChange
-}: CalculatorHeaderProps) {
+}: {
+  canShowRecommendedPrice: boolean;
+  foodCostError: string | null;
+  foodCostPercent: string;
+  isManualMode: boolean;
+  itemName: string;
+  onFoodCostChange: (v: string) => void;
+  onItemNameChange: (v: string) => void;
+  onSalePriceChange: (v: string) => void;
+  recommendedPrice: number;
+  salePrice: string;
+  salePriceError: string | null;
+}) {
   return (
-    <div className="grid gap-4">
-      <section className="calculator-input-group" aria-labelledby="calculator-mode-title">
-        <h3 id="calculator-mode-title" className="calculator-input-group-title">Режим</h3>
-        <SegmentedControl
-          className="calculator-mode-control calculator-mode-inline"
-          items={[
-            {
-              value: 'auto',
-              label: 'Рассчитать цену по доле себестоимости',
-              description: 'Введите целевую долю, и калькулятор покажет цену меню.'
-            },
-            {
-              value: 'manual',
-              label: 'Проверить введённую цену',
-              description: 'Укажите цену продажи, чтобы проверить себестоимость и маржу.'
-            }
-          ]}
-          onChange={onPricingModeChange}
-          value={pricingMode}
-          variant="compact"
+    <div className="grid gap-3 sm:grid-cols-[minmax(0,1.2fr)_minmax(8rem,0.55fr)_minmax(10rem,0.7fr)]">
+      <FormField htmlFor="calculatorItemName" label="Напиток">
+        <input
+          autoComplete="off"
+          className="field-base h-11 w-full text-sm font-semibold"
+          id="calculatorItemName"
+          maxLength={120}
+          onChange={(e) => onItemNameChange(e.target.value)}
+          placeholder="Например, эспрессо тоник"
+          value={itemName}
         />
-      </section>
-      <section className="calculator-input-group" aria-labelledby="calculator-fields-title">
-        <h3 id="calculator-fields-title" className="calculator-input-group-title">Параметры</h3>
-        <div className="calculator-parameter-fields grid gap-4 md:grid-cols-[minmax(0,1.15fr)_minmax(8rem,0.55fr)_minmax(10rem,0.7fr)]">
-          <FormField htmlFor="calculatorItemName" label="Напиток">
-            <Input
-              autoComplete="off"
-              className="h-11 text-sm font-semibold"
-              id="calculatorItemName"
-              maxLength={120}
-              onChange={(event) => onItemNameChange(event.target.value)}
-              placeholder="Например, эспрессо тоник"
-              value={itemName}
-            />
-          </FormField>
-          <FormField
-            error={foodCostError ?? undefined}
-            htmlFor="calculatorFoodCost"
-            hint="Если себестоимость занимает 30% от цены, оставьте 30."
-            label="Целевая доля себестоимости, %"
-          >
-            <Input
-              aria-invalid={foodCostError ? true : undefined}
-              className="h-11 text-sm font-semibold tabular-nums"
-              id="calculatorFoodCost"
-              inputMode="decimal"
-              maxLength={8}
-              onChange={(event) => onFoodCostChange(event.target.value)}
-              value={foodCostPercent}
-            />
-          </FormField>
-          <div>
-            <FormField
-              error={salePriceError ?? undefined}
-              htmlFor="calculatorSalePrice"
-              label="Своя цена продажи"
-            >
-              <Input
-                aria-describedby={!isManualMode ? 'calculatorSalePrice-hint' : undefined}
-                aria-invalid={salePriceError ? true : undefined}
-                className="h-11 text-sm font-semibold tabular-nums"
-                disabled={!isManualMode}
-                id="calculatorSalePrice"
-                inputMode="decimal"
-                maxLength={12}
-                onChange={(event) => onSalePriceChange(event.target.value)}
-                placeholder={canShowRecommendedPrice ? decimal(recommendedPrice) : '190'}
-                value={salePrice}
-              />
-            </FormField>
-            {/* Always rendered to reserve height — visibility:hidden keeps layout stable */}
-            <p
-              aria-hidden={isManualMode || undefined}
-              className={`field-hint mt-[0.55rem]${isManualMode ? ' invisible' : ''}`}
-              id="calculatorSalePrice-hint"
-            >
-              Если хотите задать цену вручную, переключитесь в режим «Проверить цену».
-            </p>
-          </div>
-        </div>
-      </section>
+      </FormField>
+
+      <FormField
+        htmlFor="calculatorFoodCost"
+        label="Food cost, %"
+        error={foodCostError ?? undefined}
+      >
+        <input
+          aria-invalid={foodCostError ? 'true' : undefined}
+          className="field-base h-11 w-full text-right text-sm font-semibold tabular-nums disabled:opacity-50"
+          disabled={isManualMode}
+          id="calculatorFoodCost"
+          inputMode="decimal"
+          maxLength={8}
+          onChange={(e) => onFoodCostChange(e.target.value)}
+          placeholder="30"
+          value={foodCostPercent}
+        />
+      </FormField>
+
+      <FormField
+        htmlFor="calculatorSalePrice"
+        label="Своя цена, ₽"
+        error={salePriceError ?? undefined}
+      >
+        <input
+          aria-invalid={salePriceError ? 'true' : undefined}
+          className="field-base h-11 w-full text-right text-sm font-semibold tabular-nums disabled:opacity-50"
+          disabled={!isManualMode}
+          id="calculatorSalePrice"
+          inputMode="decimal"
+          maxLength={12}
+          onChange={(e) => onSalePriceChange(e.target.value)}
+          placeholder={canShowRecommendedPrice ? decimal(recommendedPrice) : '190'}
+          value={salePrice}
+        />
+      </FormField>
     </div>
   );
 }
 
+/* ------------------------------------------------------------------ */
+/* Mobile result strip                                                */
+/* ------------------------------------------------------------------ */
 function CalculatorMobileResultStrip({ summary }: { summary: CalculatorSummary }) {
-  const hasBlockingError = summary.rowErrors.length > 0 || Boolean(summary.foodCostError || summary.salePriceError);
-  const state = hasBlockingError ? 'error' : summary.canShowSalePrice ? 'calculated' : summary.totalCost > 0 ? 'partial' : 'empty';
+  const hasError = summary.rowErrors.length > 0 || Boolean(summary.foodCostError || summary.salePriceError);
+  const can = summary.canShowSalePrice;
+  const state = hasError ? 'error' : can ? 'calculated' : summary.totalCost > 0 ? 'partial' : 'empty';
   let line = 'Итог появится после заполнения ингредиентов.';
-
-  if (hasBlockingError) {
-    line = 'Проверьте поля: итог временно не рассчитан.';
-  } else if (summary.canShowSalePrice) {
-    line = `Цена ${money(summary.activeSalePrice)} · себестоимость ${money(summary.totalCost)}`;
-  } else if (summary.totalCost > 0) {
-    line = `Себестоимость ${money(summary.totalCost)} · цена пока не рассчитана`;
-  }
+  if (hasError) line = 'Проверьте поля: итог временно не рассчитан.';
+  else if (can) line = `Цена ${money(summary.activeSalePrice)} · себестоимость ${money(summary.totalCost)}`;
+  else if (summary.totalCost > 0) line = `Себестоимость ${money(summary.totalCost)} · цена пока не рассчитана`;
 
   return (
-    <div aria-live="polite" role="status" className="calculator-mobile-result-strip sticky top-16 z-10 xl:hidden" data-calculator-mobile-result-state={state}>
+    <div
+      aria-live="polite"
+      role="status"
+      className="calculator-mobile-result-strip sticky top-16 z-10 xl:hidden"
+      data-calculator-mobile-result-state={state}
+    >
       <span className="sr-only">Итог: </span>
       <strong className="calculator-mobile-result-strip-value">{line}</strong>
     </div>
   );
 }
 
+/* ------------------------------------------------------------------ */
+/* Collapsed formula help                                             */
+/* ------------------------------------------------------------------ */
 function CalculatorFormulaHelp() {
   return (
-    <details className="calculator-formula-help border-b border-[var(--line)] text-xs leading-5 text-[var(--muted)]">
-      <summary className="calculator-formula-help-summary flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 px-4 text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--accent)] md:px-5 [&::-webkit-details-marker]:hidden">
-        Инструкция
+    <details className="mt-8 text-xs leading-5 text-[var(--muted)]">
+      <summary className="calculator-formula-help-summary flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--accent)] [&::-webkit-details-marker]:hidden">
+        Как считается
         <span className="calculator-formula-help-icon" aria-hidden="true">+</span>
       </summary>
-      <FormulaHelpGrid className="calculator-formula-help-grid grid gap-4 border-t border-[var(--line)] px-4 py-4 md:grid-cols-3 md:px-5" />
+      <div className="mt-3 border-t border-[var(--line)] pt-3 grid gap-3 md:grid-cols-2">
+        <div>
+          <span className="block font-semibold text-[var(--text)]">Формула строки</span>
+          <p>Цена упаковки ÷ размер упаковки × расход на порцию = себестоимость ингредиента.</p>
+        </div>
+        <div>
+          <span className="block font-semibold text-[var(--text)]">Цена продажи</span>
+          <p>В авто-режиме: себестоимость ÷ целевая доля = цена меню. В ручном — укажите свою цену.</p>
+        </div>
+      </div>
     </details>
   );
 }
 
-function FormulaHelpGrid({ className }: { className: string }) {
-  return (
-    <div className={className}>
-      <div className="grid gap-3 md:col-span-2">
-        <div>
-          <span className="block font-semibold text-[var(--text)]">Как пользоваться</span>
-          <p className="mt-1">1. Добавьте ингредиенты — название, цену упаковки, размер и расход на порцию.</p>
-          <p className="mt-1">2. Выберите режим: авто (по целевой доле) или ручной (проверить свою цену).</p>
-          <p className="mt-1">3. Итог и цена появятся справа после заполнения.</p>
-        </div>
-        <p>
-          <span className="block font-semibold text-[var(--text)]">Формула строки</span>
-          Цена упаковки <DivisionSign /> размер упаковки × расход на порцию = себестоимость ингредиента.
-          Итог — сумма всех заполненных строк без ошибок.
-        </p>
-      </div>
-      <div className="grid gap-3">
-        <p>
-          <span className="block font-semibold text-[var(--text)]">Цена продажи</span>
-          В автоматическом режиме: себестоимость <DivisionSign /> целевая доля.
-          В ручном — укажите свою цену, калькулятор покажет фактическую долю и маржу.
-        </p>
-        <p>
-          <span className="block font-semibold text-[var(--text)]">Подсказка</span>
-          Целевая доля себестоимости для кофеен обычно 25–35%. Чем ниже доля, тем выше маржа.
-        </p>
-      </div>
-    </div>
-  );
-}
-
-function DivisionSign() {
-  return (
-    <span className="mx-1 inline-flex h-[1em] w-[0.72em] items-center justify-center">
-      <span className="sr-only">÷</span>
-      <span className="inline-flex h-[1em] w-[0.72em] flex-col items-center justify-center gap-[0.12em]" aria-hidden="true">
-        <span className="size-[3px] rounded-full bg-current" />
-        <span className="h-px w-full bg-current" />
-        <span className="size-[3px] rounded-full bg-current" />
-      </span>
-    </span>
-  );
-}
-
+/* ================================================================== */
+/* Main client component                                              */
+/* ================================================================== */
 export function CostCalculatorClient() {
-  const calculator = useCostCalculatorState();
+  const calc = useCostCalculatorState();
+  const { showToast } = useToast();
+
+  async function handleShareRecipe() {
+    const result = await calc.shareRecipe();
+
+    if (result === 'shared') {
+      showToast({
+        id: 'calculator-share',
+        title: 'Ссылка готова',
+        description: 'Рецепт передан через системное окно.',
+        tone: 'success',
+        duration: 3200
+      });
+      return;
+    }
+
+    if (result === 'copied') {
+      showToast({
+        id: 'calculator-share',
+        title: 'Ссылка скопирована',
+        description: 'Откройте её на другом устройстве или отправьте в чат.',
+        tone: 'success',
+        duration: 3200
+      });
+      return;
+    }
+
+    showToast({
+      id: 'calculator-share',
+      title: 'Не удалось поделиться',
+      description: 'Попробуйте ещё раз. Если не получится, экспортируйте JSON.',
+      tone: 'error',
+      duration: 5000
+    });
+  }
+
+  function handleExportRecipe() {
+    const exported = calc.exportRecipe();
+
+    showToast({
+      id: 'calculator-export',
+      title: exported ? 'JSON выгружен' : 'Экспорт недоступен',
+      description: exported ? 'Файл рецепта сохранён через браузер.' : 'Попробуйте снова в браузере.',
+      tone: exported ? 'success' : 'error',
+      duration: exported ? 3200 : 5000
+    });
+  }
 
   return (
-    <CalculatorShell
-      resultRail={
-        <CalculatorResultRail
-          copyState={calculator.copyState}
-          foodCost={calculator.summary.foodCost}
-          onCopyResult={calculator.copyResult}
-          resultMessage={calculator.resultMessage}
-          rowErrors={calculator.summary.rowErrors}
-          salePriceTone={calculator.salePriceTone}
-          summary={calculator.summary}
-        />
-      }
-    >
-      <div className="calculator-panel cost-sheet min-w-0">
-        <CalculatorHeader
-          canShowRecommendedPrice={calculator.summary.canShowRecommendedPrice}
-          foodCostError={calculator.foodCostError}
-          foodCostPercent={calculator.foodCostPercent}
-          isManualMode={calculator.isManualMode}
-          itemName={calculator.itemName}
-          onFoodCostChange={calculator.setFoodCostPercent}
-          onItemNameChange={calculator.setItemName}
-          onPricingModeChange={calculator.setPricingMode}
-          onSalePriceChange={calculator.setSalePrice}
-          pricingMode={calculator.pricingMode}
-          recommendedPrice={calculator.recommendedPrice}
-          salePrice={calculator.salePrice}
-          salePriceError={calculator.salePriceError}
-        />
-        <CalculatorMobileResultStrip summary={calculator.summary} />
-        <IngredientEditor
-          hasAnyInput={calculator.hasAnyInput}
-          onAddIngredient={calculator.addIngredient}
-          onClear={calculator.clearCalculator}
-          onDuplicate={calculator.duplicateIngredient}
-          onFillDemo={calculator.fillDemo}
-          onRemove={calculator.removeIngredient}
-          onUpdate={calculator.updateIngredient}
-          rowStatusText={calculator.rowStatusText}
-          rows={calculator.rows}
-        />
-        <CalculatorFormulaHelp />
-      </div>
-    </CalculatorShell>
+    <>
+      <CalculatorShell
+        resultRail={
+          <CalculatorResultRail
+            breakdown={calc.breakdown}
+            copyState={calc.copyState}
+            onCopyResult={calc.copyResult}
+            resultMessage={calc.resultMessage}
+            resultMessageKind={calc.resultMessageKind}
+            summary={calc.summary}
+          />
+        }
+      >
+        {/* LEFT PANEL */}
+        <div className="calculator-panel cost-sheet min-w-0">
+
+          {/* Toolbar */}
+          <CalculatorToolbar
+            canExport={calc.hasAnyInput}
+            hasAnyInput={calc.hasAnyInput}
+            lastSavedAt={calc.lastSavedAt}
+            onClear={calc.clearCalculator}
+            onExport={handleExportRecipe}
+            onFillDemo={calc.fillDemo}
+            onShare={handleShareRecipe}
+          />
+
+          {/* Mode selector */}
+          <div className="mt-6">
+            <h3 className="calculator-input-group-title mb-3">Режим</h3>
+            <ModeSelector onChange={calc.setPricingMode} value={calc.pricingMode} />
+          </div>
+
+          {/* Basic parameters */}
+          <div className="mt-6">
+            <h3 className="calculator-input-group-title mb-3">Параметры</h3>
+            <ParameterFields
+              canShowRecommendedPrice={calc.summary.canShowRecommendedPrice}
+              foodCostError={calc.foodCostError}
+              foodCostPercent={calc.foodCostPercent}
+              isManualMode={calc.isManualMode}
+              itemName={calc.itemName}
+              onFoodCostChange={calc.setFoodCostPercent}
+              onItemNameChange={calc.setItemName}
+              onSalePriceChange={calc.setSalePrice}
+              recommendedPrice={calc.recommendedPrice}
+              salePrice={calc.salePrice}
+              salePriceError={calc.salePriceError}
+            />
+          </div>
+
+          <CalculatorMobileResultStrip summary={calc.summary} />
+
+          <SectionDivider />
+
+          {/* Ingredients */}
+          <IngredientEditor
+            hasAnyInput={calc.hasAnyInput}
+            onAddIngredient={calc.addIngredient}
+            onDuplicate={calc.duplicateIngredient}
+            onRemove={calc.removeIngredient}
+            onUpdate={calc.updateIngredient}
+            rowStatusText={calc.rowStatusText}
+            rows={calc.rows}
+          />
+
+          <SectionDivider />
+
+          {/* Additional costs */}
+          <AdditionalCostsEditor
+            costs={calc.additionalCostRows}
+            onAdd={calc.addAdditionalCost}
+            onRemove={calc.removeAdditionalCost}
+            onUpdate={calc.updateAdditionalCost}
+            total={calc.additionalCostTotal}
+          />
+
+          <SectionDivider />
+
+          {/* Drink parameters */}
+          <CalculatorParameters
+            params={calc.drinkParams}
+            onParamChange={calc.updateDrinkParam}
+          />
+
+          <SectionDivider />
+
+          {/* Markup & pricing */}
+          <MarkupPricing
+            customMarkupPercent={calc.customMarkupPercent}
+            grossProfit={calc.grossProfit}
+            markupPercent={calc.markupPercent}
+            onMarkupChange={calc.setCustomMarkupPercent}
+            onRoundingChange={calc.setRoundingMode}
+            roundingMode={calc.roundingMode}
+            totalCost={calc.totalCost}
+          />
+
+          {/* Formula help (no divider — it's always last) */}
+          <CalculatorFormulaHelp />
+        </div>
+      </CalculatorShell>
+
+      {/* Below calculator: popular drinks + tips */}
+      <section className="background-zone background-zone-ivory border-b border-[var(--line)] py-10">
+        <div className="container">
+          <PopularDrinks />
+        </div>
+      </section>
+
+      <HelpfulTips />
+    </>
   );
 }

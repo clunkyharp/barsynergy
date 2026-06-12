@@ -1,9 +1,9 @@
 import type { Metadata } from 'next';
 import { CategoryType } from '@/modules/content/shared/types';
-import { Briefcase } from 'lucide-react';
-import { EditorialPublicPage } from '@/components/public/editorial-public-page';
+import { PageHero } from '@/components/public/page-hero';
 import { PublishedContentSectionOpportunity } from '@/components/public/published-content-section';
 import { PublicFilters } from '@/components/public/public-filters';
+import { VacanciesHeroActions } from '@/app/(public)/vacancies/vacancies-hero-actions';
 import {
   stripPublicApplicationResultParams
 } from '@/lib/applications/public-form-helpers';
@@ -24,47 +24,62 @@ export const metadata: Metadata = buildPublicPageMetadata({
   path: '/vacancies'
 });
 
+const vacancySortOptions = [
+  { value: 'recent', label: 'Сначала новые' },
+  { value: 'company', label: 'По названию компании' }
+] as const;
+
+function firstParam(value: string | string[] | undefined) {
+  return Array.isArray(value) ? value[0] : value;
+}
+
+function getVacancySortLabel(sort?: string) {
+  return vacancySortOptions.find((option) => option.value === sort)?.label;
+}
+
 export default async function VacanciesPage({ searchParams }: VacanciesPageProps) {
   const params = (await searchParams) ?? {};
   const contentParams = stripPublicApplicationResultParams(params);
+  const selectedSort = firstParam(contentParams.sort);
   const [content, categories, cities, filterOptions] = await Promise.all([
     getPublishedVacancies(contentParams),
     getPublicCategoryOptions(CategoryType.VACANCY),
     getPublicCityFilterOptions(),
     getVacancyFilterOptions()
   ]);
-  const vacancyContactHref = '/contacts?topic=vacancy#contact-form';
 
   return (
     <>
-      <EditorialPublicPage
-        eyebrow="Вакансии"
-        path="/vacancies"
+      <PageHero
         title="Вакансии"
-        description="Открытые позиции в барах, кофейнях, обжарках и сервисных командах региона."
-        summary="Поиск виден сразу. Дополнительные фильтры раскрываются по кнопке."
-        chips={['Бариста', 'Управляющие', 'Тренеры']}
-        density="compact"
-        metrics={[]}
-        rows={[]}
-        primaryLink={{ label: 'Добавить вакансию для команды', href: vacancyContactHref }}
-        accentGradient="radial-gradient(ellipse 90% 60% at 20% 30%, rgba(210,150,50,0.14), transparent)"
-        accentIcon={Briefcase}
-      />
+        subtitle="Работа для бариста, обжарщиков, управляющих и специалистов кофейной индустрии."
+        media={{ kind: 'image' as const, src: '/images/vacancies-hero.jpg', alt: 'Бариста за приготовлением кофе с latte art' }}
+      >
+        <VacanciesHeroActions />
+      </PageHero>
       <PublishedContentSectionOpportunity
         basePath="/vacancies"
         content={content}
-        emptyActions={[]}
-        emptyDescription="Открытых вакансий сейчас нет. Подпишитесь на Telegram-канал — публикуем вакансии там первыми."
+        emptyActions={[
+          { href: 'https://t.me/barsynergy', label: 'Открыть Telegram' },
+          { href: '/vacancies/new', label: 'Разместить вакансию', variant: 'secondary' as const }
+        ]}
+        emptyDescription="Открытых вакансий сейчас нет. Подпишитесь на Telegram — публикуем вакансии там первыми."
         emptyTitle="Вакансий пока нет"
         title="Открытые позиции"
         filters={
           <PublicFilters
+            activeSummaryCountLabel="Фильтры вакансий"
             categories={categories}
+            categoryMode="multiple"
             cities={cities}
+            cityMode="multiple"
             description="Отберите позиции по городу, позиции и формату занятости."
             embedded
-            extraFilters={[{ name: 'employmentType', label: 'Все форматы', options: filterOptions.employmentTypes }]}
+            extraFilters={[
+              { name: 'employmentType', label: 'Все форматы', mode: 'multiple', options: filterOptions.employmentTypes },
+              { name: 'sort', label: 'Сортировка', allLabel: 'По умолчанию', options: [...vacancySortOptions] }
+            ]}
             placeholder="Должность, компания или город"
             variant="sidebar"
           />
@@ -72,6 +87,7 @@ export default async function VacanciesPage({ searchParams }: VacanciesPageProps
         sectionId="vacancy-list"
         listLabel="Вакансии индустрии"
         rowActionLabel="Открыть вакансию"
+        sortLabel={getVacancySortLabel(selectedSort)}
       />
     </>
   );

@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils';
 type ConsentFieldProps = {
   children: ReactNode;
   className?: string;
+  density?: 'default' | 'compact';
   disabled?: boolean;
   name?: string;
   required?: boolean;
@@ -15,6 +16,7 @@ type ConsentFieldProps = {
 export function ConsentField({
   children,
   className,
+  density = 'default',
   disabled = false,
   name = 'consent',
   required = true,
@@ -22,7 +24,11 @@ export function ConsentField({
 }: ConsentFieldProps) {
   return (
     <CheckboxField
-      className={cn(consentFieldClassName, className)}
+      className={cn(
+        consentFieldClassName,
+        density === 'compact' && 'text-xs leading-5',
+        className
+      )}
       disabled={disabled}
       labelClassName="min-w-0"
       name={name}

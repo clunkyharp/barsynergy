@@ -15,7 +15,7 @@ import { money } from './format';
 import type { IngredientUpdate } from './use-cost-calculator-state';
 
 export const ingredientDesktopGridClassName =
-  'lg:grid-cols-[minmax(178px,1.35fr)_78px_minmax(132px,0.86fr)_minmax(132px,0.86fr)_104px_88px]';
+  'lg:grid-cols-[minmax(178px,1.35fr)_78px_minmax(132px,0.86fr)_minmax(132px,0.86fr)_112px_88px]';
 
 function UnitField({
   className,

@@ -20,7 +20,7 @@ type Props = {
   onToggleFilters: () => void;
   hasActiveFilters: boolean;
   activeFilters: ActiveFilter[];
-  onClearFilter: (name: string) => void;
+  onClearFilter: (name: string, value?: string) => void;
   activeChipClassName: string;
   filterFields: ReactNode;
   isPending: boolean;
@@ -136,14 +136,16 @@ export function PublicFiltersToolbarVariant({
 
         {hasActiveFilters ? (
           <div className={cn('flex flex-wrap', compact ? 'mt-3 gap-1.5' : 'mt-4 gap-2')}>
-            {activeFilters.map((filter) => (
-              <PublicFiltersActiveChip
-                className={activeChipClassName}
-                filter={filter}
-                key={`${filter.name}-${filter.value}`}
-                onClear={onClearFilter}
-              />
-            ))}
+            {activeFilters.flatMap((filter) =>
+              filter.values.map((v) => (
+                <PublicFiltersActiveChip
+                  className={activeChipClassName}
+                  filter={{ label: filter.label, name: filter.name, value: v.value, displayValue: v.label }}
+                  key={`${filter.name}-${v.value}`}
+                  onClear={onClearFilter}
+                />
+              ))
+            )}
           </div>
         ) : null}
       </Panel>

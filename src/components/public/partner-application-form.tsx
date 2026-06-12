@@ -1,5 +1,6 @@
 'use client';
 
+import { useActionState } from 'react';
 import {
   ContactChannelFieldset,
   HiddenUtmFields,
@@ -8,6 +9,7 @@ import {
   PublicApplicationSection,
   type PublicApplicationFormProps
 } from '@/components/public/application-form-section';
+import type { PublicApplicationResult } from '@/lib/applications/public-form-helpers';
 import { PublicBodyText, PublicDisplayTitle, PublicEyebrow } from '@/components/public/public-primitives';
 import { ConsentField } from '@/components/ui/consent-field';
 import { FormField } from '@/components/ui/form-field';
@@ -20,7 +22,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { useRef } from 'react';
 import { useFormDraftAutoSave } from '@/lib/hooks/use-form-draft';
 
-export function PartnerApplicationForm({ enabled, result, utm, cities, defaults = {}, action }: PublicApplicationFormProps & { action?: (formData: FormData) => void }) {
+export function PartnerApplicationForm({ enabled, utm, cities, defaults = {}, action }: Omit<PublicApplicationFormProps, 'result'> & { action?: (prevState: PublicApplicationResult | null, formData: FormData) => Promise<PublicApplicationResult> }) {
+  const [result, formAction] = useActionState(action ?? (async () => ({ type: 'error' as const, message: '' })), null);
   const formRef = useRef<HTMLFormElement>(null);
   useFormDraftAutoSave('partner-application', formRef);
   const highlights = [
@@ -49,9 +52,9 @@ export function PartnerApplicationForm({ enabled, result, utm, cities, defaults 
       disclosureDescription="Укажите компанию, формат, город, ссылку и короткое описание задачи."
       disclosureDefaultOpen={Boolean(defaults.partnerType)}
       enabled={enabled}
-      result={result}
+      result={result ?? undefined}
     >
-      <form action={action} className="editorial-form-shell public-form-shell" ref={formRef}>
+      <form action={formAction} className="editorial-form-shell public-form-shell" ref={formRef}>
         <HiddenUtmFields utm={utm} />
         <HoneypotField id="partner-application-website" />
         <div className="relative grid lg:grid-cols-[0.42fr_0.58fr]">

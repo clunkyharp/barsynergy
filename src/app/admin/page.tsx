@@ -1,4 +1,5 @@
-import { ApplicationStatus, ApplicationType, BusinessAccountStatus, ContentStatus, UserRole } from '@/modules/admin/queries';
+import { ApplicationStatus, ApplicationType, ContentStatus, UserRole } from '@/modules/admin/queries';
+import { getDashboardStats } from '@/lib/admin/admin-queries';
 import { AppLink } from '@/components/ui/app-link';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -13,7 +14,6 @@ import {
 import { contentStatusBadgeVariants, contentStatusLabels } from '@/lib/admin/content-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
 import { canAccessAdminSection } from '@/lib/auth/permissions';
-import { prisma } from '@/modules/admin/queries';
 import { cn } from '@/lib/utils';
 
 export const dynamic = 'force-dynamic';
@@ -88,44 +88,7 @@ export default async function AdminPage() {
     activeCities,
     activeTags,
     latestApplications
-  ] = await Promise.all([
-    prisma.application.count({ where: { status: ApplicationStatus.NEW } }),
-    prisma.application.count({ where: { status: ApplicationStatus.IN_REVIEW } }),
-    prisma.application.count({ where: { status: ApplicationStatus.PAYMENT_PENDING } }),
-    prisma.businessAccount.count({ where: { status: BusinessAccountStatus.PENDING } }),
-    prisma.article.count({ where: { status: ContentStatus.DRAFT } }),
-    prisma.event.count({ where: { status: ContentStatus.DRAFT } }),
-    prisma.vacancy.count({ where: { status: ContentStatus.DRAFT } }),
-    prisma.supplier.count({ where: { status: ContentStatus.DRAFT } }),
-    prisma.generalSponsor.count({ where: { status: ContentStatus.DRAFT } }),
-    prisma.article.count({ where: { status: ContentStatus.PUBLISHED } }),
-    prisma.article.count({ where: { status: ContentStatus.ARCHIVED } }),
-    prisma.event.count({ where: { status: ContentStatus.PUBLISHED } }),
-    prisma.vacancy.count({ where: { status: ContentStatus.PUBLISHED } }),
-    prisma.course.count({ where: { status: ContentStatus.PUBLISHED } }),
-    prisma.partner.count({ where: { status: ContentStatus.PUBLISHED } }),
-    prisma.supplier.count({ where: { status: ContentStatus.PUBLISHED } }),
-    prisma.generalSponsor.count({ where: { status: ContentStatus.PUBLISHED } }),
-    prisma.supplier.count({ where: { status: ContentStatus.PUBLISHED, cityId: null } }),
-    prisma.category.count({ where: { isActive: true } }),
-    prisma.city.count({ where: { isActive: true } }),
-    prisma.tag.count({ where: { isActive: true } }),
-    prisma.application.findMany({
-      where: {
-        status: {
-          in: [
-            ApplicationStatus.NEW,
-            ApplicationStatus.IN_REVIEW,
-            ApplicationStatus.PAYMENT_PENDING,
-            ApplicationStatus.APPROVED
-          ]
-        }
-      },
-      orderBy: [{ createdAt: 'desc' }],
-      take: 8,
-      select: { id: true, type: true, status: true, subject: true, name: true, createdAt: true }
-    })
-  ]);
+  ] = await getDashboardStats();
   const canManageUsers = canAccessAdminSection(currentUser.role, 'users');
   const businessAccessHref = canManageUsers
     ? '/admin/users'

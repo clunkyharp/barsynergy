@@ -70,7 +70,7 @@ export function CoverImageField({
   currentAlt,
   inputName = 'coverImage',
   label = 'Обложка',
-  altLabel = 'Alt text',
+  altLabel = 'Описание фото',
   altName = inputName === 'coverImage' ? 'coverImageAlt' : `${inputName}Alt`,
   removeName = 'removeCoverImage'
 }: CoverImageFieldProps) {

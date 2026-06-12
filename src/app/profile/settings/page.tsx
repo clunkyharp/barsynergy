@@ -1,6 +1,11 @@
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
-import { changePassword, updateAvatar, updateBasicProfile, updateJobSearch, updateProfileSkills, updateWorkExperiences } from '@/lib/profile/actions';
+import { updateAvatar } from '@/lib/profile/avatar-actions';
+import { updateBasicProfile } from '@/lib/profile/basic-profile-actions';
+import { updateJobSearch } from '@/lib/profile/job-search-actions';
+import { updateProfileSkills } from '@/lib/profile/skills-actions';
+import { updateWorkExperiences } from '@/lib/profile/work-experience-actions';
+import { changePassword } from '@/lib/profile/password-actions';
 import { ExperienceEditor } from '@/components/profile/experience-editor';
 import { ProfileTabs } from '@/components/profile/profile-tabs';
 import { SettingsAlert } from '@/components/profile/settings-alert';

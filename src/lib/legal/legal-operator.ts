@@ -21,7 +21,7 @@ export function getLegalOperatorProfile(env: AppEnv = getEnv()): LegalOperatorPr
   return {
     type,
     typeLabel: type === 'individual_entrepreneur' ? 'Индивидуальный предприниматель' : 'Юридическое лицо',
-    name: env.LEGAL_OPERATOR_NAME?.trim() || 'Реквизиты оператора будут добавлены после утверждения владельцем',
+    name: env.LEGAL_OPERATOR_NAME?.trim() || 'Реквизиты будут добавлены после утверждения владельцем',
     email: env.LEGAL_OPERATOR_EMAIL?.trim() || null,
     address: env.LEGAL_OPERATOR_ADDRESS?.trim() || null,
     taxId: env.LEGAL_OPERATOR_TAX_ID?.trim() || null,

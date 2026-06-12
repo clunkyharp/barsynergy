@@ -1,12 +1,8 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
+import { Briefcase, Calendar, GraduationCap, Handshake, Package, Wrench } from 'lucide-react';
 import { AppLink } from '@/components/ui/app-link';
-import {
-  BadgeCheck,
-  PanelsTopLeft,
-  type LucideIcon
-} from 'lucide-react';
-import { PublicBreadcrumbs } from '@/components/public/public-primitives';
+import { PageHero } from '@/components/public/page-hero';
 import { JsonLd } from '@/components/seo/json-ld';
 import { Button } from '@/components/ui/button';
 import { displayFont } from '@/lib/fonts';
@@ -19,14 +15,14 @@ export const metadata: Metadata = buildPublicPageMetadata({
   path: '/about'
 });
 
-const insidePlatform = [
-  'события и профессиональные встречи',
-  'программы и интенсивы',
-  'вакансии для команд',
-  'каталог поставщиков',
-  'партнёрские и спонсорские форматы',
-  'инструменты для заведений'
-] as const;
+const insidePlatform: { title: string; icon: React.ComponentType<{ size?: number }> }[] = [
+  { title: 'события и профессиональные встречи', icon: Calendar },
+  { title: 'программы и интенсивы',              icon: GraduationCap },
+  { title: 'вакансии для команд',                icon: Briefcase },
+  { title: 'каталог поставщиков',                icon: Package },
+  { title: 'партнёрские и спонсорские форматы',  icon: Handshake },
+  { title: 'инструменты для заведений',          icon: Wrench },
+];
 
 const timeline = [
   {
@@ -41,12 +37,6 @@ const timeline = [
     title: 'Развитие',
     text: 'Довести каталог заведений, поставщиков и событий до ежедневного рабочего инструмента.'
   }
-] as const;
-
-const facts = [
-  ['6+', 'публичных разделов в MVP'],
-  ['СКФО', 'региональный фокус'],
-  ['1', 'точка входа для заявок']
 ] as const;
 
 function SectionTitle({
@@ -71,57 +61,47 @@ function SectionTitle({
   );
 }
 
-function DirectionIcon({ icon: Icon }: { icon: LucideIcon }) {
-  return (
-    <span className="flex h-12 w-12 items-center justify-center rounded-[var(--radius-pill)] border border-[var(--border-default)] bg-[var(--surface-wash-strong)] text-[var(--accent)]">
-      <Icon size={20} strokeWidth={1.8} />
-    </span>
-  );
-}
 
 export default function AboutPage() {
+  const insideMedia = (
+    <aside className="w-full max-w-sm rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--surface-card)] p-5 shadow-[var(--shadow-card)] md:p-8">
+      <div className="flex items-center gap-3">
+        <Image alt="" aria-hidden="true" height={56} priority src="/icons/platform/platform-core.png" width={56} />
+        <div>
+          <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--muted)]">Что внутри</p>
+          <h2 className="mt-1 text-2xl font-semibold leading-7 text-[var(--text)]">Платформа для рабочих задач</h2>
+        </div>
+      </div>
+      <ul className="mt-7 grid gap-1">
+        {insidePlatform.map((item) => (
+          <li className="flex items-center gap-3 border-t border-[var(--line)] py-2.5 text-sm leading-6 text-[var(--text)]" key={item.title}>
+            <span className="flex size-9 shrink-0 items-center justify-center rounded-[var(--radius-sm)] bg-[var(--accent-soft)] text-[var(--accent)]" aria-hidden="true">
+              {(() => {
+                const Icon = item.icon;
+                return <Icon size={18} />;
+              })()}
+            </span>
+            <span>{item.title}</span>
+          </li>
+        ))}
+      </ul>
+    </aside>
+  );
+
   return (
     <div className="bg-[var(--background)]">
       <JsonLd data={buildStaticPageBreadcrumbJsonLd('/about', 'О проекте')} />
-      <section className="background-zone background-zone-hero border-b border-[var(--line)] py-12 md:py-16">
-        <div className="mx-auto grid max-w-[1240px] gap-8 px-5 md:min-h-[520px] md:px-12 xl:grid-cols-[minmax(0,0.58fr)_minmax(0,0.42fr)] xl:items-center">
-          <div className="min-w-0">
-            <PublicBreadcrumbs current="О проекте" />
-            <h1 className={`${displayFont.className} mt-5 max-w-4xl text-[clamp(2.5rem,5.6vw,4.25rem)] font-semibold leading-[0.96] text-[var(--text)]`}>
-              BARSYNERGY — платформа для барной индустрии Северного Кавказа
-            </h1>
-            <p className="mt-6 max-w-3xl text-base leading-7 text-[var(--muted)] md:text-lg md:leading-8">
-              Здесь собраны события, вакансии, поставщики, партнёрские форматы и инструменты для бариста, кофеен, команд, экспертов и брендов региона.
-            </p>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <Button className="h-12 rounded-[var(--radius-md)] px-7" href="/contacts?topic=other#contact-form" size="lg">
-                Связаться с командой
-              </Button>
-              <Button className="h-12 rounded-[var(--radius-md)] px-7" href="/education" size="lg" variant="secondary">
-                Найти обучение
-              </Button>
-            </div>
-          </div>
-
-          <aside className="rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--surface-card)] p-5 shadow-[var(--shadow-card)] md:p-8">
-            <div className="flex items-center gap-3">
-              <DirectionIcon icon={PanelsTopLeft} />
-              <div>
-                <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--muted)]">Что внутри</p>
-                <h2 className="mt-1 text-2xl font-semibold leading-7 text-[var(--text)]">Платформа для рабочих задач</h2>
-              </div>
-            </div>
-            <ul className="mt-7 grid gap-3">
-              {insidePlatform.map((item) => (
-                <li className="flex gap-3 border-t border-[var(--line)] pt-3 text-sm leading-6 text-[var(--text)]" key={item}>
-                  <BadgeCheck className="mt-0.5 shrink-0 text-[var(--accent)]" size={18} strokeWidth={1.8} />
-                  <span>{item}</span>
-                </li>
-              ))}
-            </ul>
-          </aside>
-        </div>
-      </section>
+      <PageHero
+        breadcrumbs={[{ label: 'О проекте' }]}
+        title="BARSYNERGY — платформа для барной индустрии Северного Кавказа"
+        subtitle="Здесь собраны события, вакансии, поставщики, партнёрские форматы и инструменты для бариста, кофеен, команд, экспертов и брендов региона."
+        tone="light-editorial"
+        actions={[
+          { label: 'Связаться с командой', href: '/contacts?topic=other#contact-form', kind: 'primary' },
+          { label: 'Найти обучение', href: '/education', kind: 'secondary' }
+        ]}
+        media={{ kind: 'slot' as const, children: insideMedia }}
+      />
 
       <section className="background-zone background-zone-ivory border-b border-[var(--line)] py-14 md:py-20">
         <div className="mx-auto grid max-w-[1240px] gap-9 px-5 md:px-12 xl:grid-cols-[minmax(0,0.62fr)_minmax(18rem,0.38fr)]">
@@ -144,14 +124,6 @@ export default function AboutPage() {
                 Ближайшее направление развития — сделать каталог кофеен и поставщиков полезным для ежедневной работы: по городам, категориям, условиям и понятным контактам без лишней переписки.
               </p>
             </div>
-            <dl className="mt-8 grid gap-3 sm:grid-cols-3">
-              {facts.map(([value, label]) => (
-                <div className="rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--surface-card)] p-4" key={label}>
-                  <dt className="text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--muted)]">{label}</dt>
-                  <dd className="mt-2 text-2xl font-semibold leading-none text-[var(--accent)]">{value}</dd>
-                </div>
-              ))}
-            </dl>
           </div>
 
           <aside className="grid gap-5">
@@ -190,11 +162,11 @@ export default function AboutPage() {
                   <Button className="h-12 rounded-[var(--radius-md)] px-7" href="/contacts?topic=other#contact-form" size="lg">
                     Связаться с командой
                   </Button>
-                  <AppLink className="font-medium text-white/70 hover:text-white transition-colors" href="/contacts?topic=event#contact-form">
+                  <AppLink className="inline-flex items-center gap-1.5 font-medium text-white/70 hover:text-white transition-colors" href="/contacts?topic=event#contact-form">
                     Предложить событие
                   </AppLink>
                   <span className="text-white/30" aria-hidden="true">·</span>
-                  <AppLink className="font-medium text-white/70 hover:text-white transition-colors" href="/contacts?topic=partnership#contact-form">
+                  <AppLink className="inline-flex items-center gap-1.5 font-medium text-white/70 hover:text-white transition-colors" href="/contacts?topic=partnership#contact-form">
                     Стать партнёром
                   </AppLink>
                 </div>

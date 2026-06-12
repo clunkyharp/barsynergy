@@ -128,9 +128,8 @@ function SponsorPhoneLink({ contact }: { contact: GeneralSponsor['contacts'][num
       href={contact.href}
       icon={Phone}
       kind="phone"
-      label="Телефон"
+      label={contact.name}
     >
-      <span className="sponsor-contact-compact-value">{contact.name}</span>
       <span className="sponsor-contact-compact-value sponsor-contact-compact-phone" data-sponsor-phone-number>
         {contact.phone}
       </span>
@@ -253,10 +252,20 @@ export function GeneralSponsorCard({ priority = false, sponsor, variant = 'full'
           </div>
 
           <div>
-            <p className="general-sponsor-status-label text-[11px] font-semibold uppercase tracking-[0.16em]">{sponsor.status}</p>
-            <p className={`${displayFont.className} general-sponsor-short-description mt-3 max-w-lg text-[1.55rem] font-semibold leading-[1.05] text-[var(--text)] md:mt-4 md:text-[2.55rem]`}>
-              {sponsor.shortDescription}
-            </p>
+            <p className="general-sponsor-status-label text-[10px] font-semibold uppercase tracking-[0.18em]">{sponsor.status}</p>
+            <p className="mt-2 text-[13px] leading-[1.55] text-[var(--muted)]">{sponsor.shortDescription}</p>
+            {sponsor.brands.length > 0 ? (
+              <div className="mt-3 flex flex-wrap gap-1.5">
+                {sponsor.brands.slice(0, 5).map((brand) => (
+                  <span
+                    className="rounded-full border border-[var(--line)] px-2.5 py-0.5 text-[11px] font-medium text-[var(--muted)]"
+                    key={brand}
+                  >
+                    {brand}
+                  </span>
+                ))}
+              </div>
+            ) : null}
           </div>
         </div>
 
@@ -300,23 +309,15 @@ export function GeneralSponsorCard({ priority = false, sponsor, variant = 'full'
           {sponsor.contacts.length > 0 || sponsor.links.length > 0 ? (
             <section className="mt-5 max-w-3xl">
               <div className="sponsor-contact-compact-list rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--surface-wash)] px-4 py-3 md:px-5">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">Контакты спонсора</p>
-                <div className="mt-3 divide-y-0">
-                  {sponsor.contacts.length > 0 ? (
-                    <div className="grid">
-                      {sponsor.contacts.map((contact) => (
-                        <SponsorPhoneLink contact={contact} key={contact.phone} />
-                      ))}
-                    </div>
-                  ) : null}
-
-                  {sponsor.links.length > 0 ? (
-                    <div className="grid">
-                      {sponsor.links.map((link) => (
-                        <SponsorContactLink key={`${link.kind}-${link.href}`} link={link} />
-                      ))}
-                    </div>
-                  ) : null}
+                <p className="text-[13px] font-semibold leading-5 text-[var(--text)]">Связаться со спонсором</p>
+                <p className="mt-1 text-[12px] leading-[1.5] text-[var(--muted)]">Поставки, условия сотрудничества и подбор продуктов под формат заведения.</p>
+                <div className="mt-3">
+                  {sponsor.contacts.map((contact) => (
+                    <SponsorPhoneLink contact={contact} key={contact.phone} />
+                  ))}
+                  {sponsor.links.map((link) => (
+                    <SponsorContactLink key={`${link.kind}-${link.href}`} link={link} />
+                  ))}
                 </div>
               </div>
             </section>
@@ -324,7 +325,7 @@ export function GeneralSponsorCard({ priority = false, sponsor, variant = 'full'
 
           <CardActionRow>
             <Button className="rounded-[var(--radius-md)] px-7" href="/general-sponsors">
-              Смотреть спонсорство
+              Смотреть условия партнёрства
             </Button>
           </CardActionRow>
         </div>

@@ -1,26 +1,28 @@
 'use server';
 
-import { redirect } from 'next/navigation';
 import { ApplicationType } from '@prisma/client';
 import { z } from 'zod';
 import { buildApplicationPayload } from '@/lib/applications/application-payloads';
 import {
   assertActiveCity,
   baseContactSchema,
-  getPublicApplicationResultPath,
+  formatPublicApplicationActionError,
   getString,
   nullableString,
   optionalString,
   PERSONAL_DATA_CONSENT_TEXT,
+  type PublicApplicationResult,
   utmSchema
 } from '@/lib/applications/public-form-helpers';
+import { createPublicApplication } from '@/lib/applications/create-public-application';
 import { submitPublicApplicationAction } from '@/lib/applications/submit-public-application-action';
-
-const EDUCATION_PATH = '/education';
-
-function redirectWithEducationResult(result: { type: 'success' | 'error'; message: string }): never {
-  redirect(getPublicApplicationResultPath(EDUCATION_PATH, result));
-}
+import {
+  assertPublicApplicationFormsEnabled,
+  assertPublicApplicationSubmissionAllowed,
+  hasHoneypotValue
+} from '@/lib/applications/public-submission-guards';
+import { assertSameOriginServerAction } from '@/lib/security/server-action-origin';
+import { assertTurnstilePassed } from '@/lib/security/turnstile';
 
 const courseApplicationSchema = baseContactSchema
   .merge(utmSchema)
@@ -57,13 +59,12 @@ const certificateOrderSchema = baseContactSchema
   })
   .refine((data) => data.email || data.phone || data.telegram, { message: 'contact is required' });
 
-export async function submitCourseApplication(formData: FormData) {
-  await submitPublicApplicationAction({
+export async function submitCourseApplication(_prevState: PublicApplicationResult | null, formData: FormData): Promise<PublicApplicationResult> {
+  return submitPublicApplicationAction({
     actionName: 'public:course-application',
     applicationType: ApplicationType.COURSE_APPLICATION,
     formData,
     successMessage: 'Заявку на программу получили.',
-    redirectWithResult: redirectWithEducationResult,
     parse: async (data) => {
       const parsed = courseApplicationSchema.parse({
         name: getString(data, 'name'),
@@ -105,13 +106,12 @@ export async function submitCourseApplication(formData: FormData) {
   });
 }
 
-export async function submitCorporateTrainingApplication(formData: FormData) {
-  await submitPublicApplicationAction({
+export async function submitCorporateTrainingApplication(_prevState: PublicApplicationResult | null, formData: FormData): Promise<PublicApplicationResult> {
+  return submitPublicApplicationAction({
     actionName: 'public:corporate-training',
     applicationType: ApplicationType.CORPORATE_TRAINING_APPLICATION,
     formData,
     successMessage: 'Запрос на корпоративное обучение получили.',
-    redirectWithResult: redirectWithEducationResult,
     parse: async (data) => {
       const parsed = corporateTrainingSchema.parse({
         companyName: getString(data, 'companyName'),
@@ -155,13 +155,12 @@ export async function submitCorporateTrainingApplication(formData: FormData) {
   });
 }
 
-export async function submitCertificateOrderApplication(formData: FormData) {
-  await submitPublicApplicationAction({
+export async function submitCertificateOrderApplication(_prevState: PublicApplicationResult | null, formData: FormData): Promise<PublicApplicationResult> {
+  return submitPublicApplicationAction({
     actionName: 'public:certificate-order',
     applicationType: ApplicationType.CERTIFICATE_ORDER,
     formData,
     successMessage: 'Заказ сертификата получили.',
-    redirectWithResult: redirectWithEducationResult,
     parse: async (data) => {
       const parsed = certificateOrderSchema.parse({
         name: getString(data, 'name'),
@@ -203,4 +202,72 @@ export async function submitCertificateOrderApplication(formData: FormData) {
       })
     })
   });
+}
+
+const educationLeadSchema = z.object({
+  name: z.string().trim().min(2, 'Укажите имя').max(160),
+  contact: z.string().trim().min(2, 'Укажите контакт для связи').max(200),
+  role: z.string().trim().min(1, 'Выберите роль'),
+  format: z.string().trim().min(1, 'Выберите или укажите формат').max(180),
+  comment: z.string().trim().max(4000).optional(),
+  consent: z.literal('accepted')
+});
+
+export type EducationLeadActionResult = { type: 'success'; message: string } | { type: 'error'; message: string } | null;
+
+export async function submitEducationLead(
+  _prevState: EducationLeadActionResult,
+  formData: FormData
+): Promise<EducationLeadActionResult> {
+  try {
+    await assertSameOriginServerAction();
+    assertPublicApplicationFormsEnabled();
+
+    if (hasHoneypotValue(getString(formData, 'website'))) {
+      return { type: 'success', message: 'Заявка на программу отправлена. Команда BARSYNERGY свяжется с вами.' };
+    }
+
+    const turnstileToken = getString(formData, 'turnstileToken');
+    if (turnstileToken) {
+      await assertTurnstilePassed(turnstileToken);
+    }
+    await assertPublicApplicationSubmissionAllowed(ApplicationType.COURSE_APPLICATION);
+
+    const parsed = educationLeadSchema.parse({
+      name: getString(formData, 'name'),
+      contact: getString(formData, 'contact'),
+      role: getString(formData, 'role'),
+      format: getString(formData, 'format'),
+      comment: optionalString(getString(formData, 'comment')),
+      consent: getString(formData, 'consent')
+    });
+
+    const subject = `Обучение: ${parsed.name} (${parsed.role})`;
+    const message = [
+      `Роль: ${parsed.role}`,
+      `Формат: ${parsed.format}`,
+      `Контакт: ${parsed.contact}`,
+      parsed.comment ? `Комментарий: ${parsed.comment}` : null
+    ]
+      .filter(Boolean)
+      .join('\n');
+
+    await createPublicApplication({
+      type: ApplicationType.COURSE_APPLICATION,
+      subject,
+      message,
+      name: parsed.name,
+      consentText: PERSONAL_DATA_CONSENT_TEXT
+    });
+
+    return {
+      type: 'success',
+      message: 'Заявка на программу отправлена. Команда BARSYNERGY свяжется с вами.'
+    };
+  } catch (error) {
+    if (error instanceof Error) {
+      return { type: 'error', message: formatPublicApplicationActionError(error) };
+    }
+    return { type: 'error', message: 'Не удалось отправить заявку. Попробуйте ещё раз.' };
+  }
 }

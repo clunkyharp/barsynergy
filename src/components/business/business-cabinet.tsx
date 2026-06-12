@@ -52,6 +52,10 @@ type RequestLedgerProps = {
   applications: RequestLedgerApplication[];
   className?: string;
   description?: string;
+  emptyAction?: {
+    href: string;
+    label: string;
+  };
   emptyDescription?: string;
   title?: string;
   viewAllHref?: string;
@@ -213,6 +217,7 @@ export function RequestLedger({
   applications,
   className,
   description = 'Последние записи, статусы и рабочие комментарии по компании.',
+  emptyAction,
   emptyDescription = 'Когда компания создаст заявку, здесь появится её статус и рабочий комментарий.',
   title = 'Журнал заявок',
   viewAllHref
@@ -267,6 +272,11 @@ export function RequestLedger({
             <FileText aria-hidden="true" size={20} strokeWidth={1.8} />
           </span>
           <p className="text-sm leading-6 text-[var(--muted)]">{emptyDescription}</p>
+          {emptyAction ? (
+            <Button href={emptyAction.href} size="sm" variant="secondary">
+              {emptyAction.label}
+            </Button>
+          ) : null}
         </div>
       )}
     </section>

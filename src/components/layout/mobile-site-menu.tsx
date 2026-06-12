@@ -31,11 +31,11 @@ const MOBILE_MENU_CONTENT_TOP_CLASS = 'pt-[72px] sm:pt-[76px]';
 const navGroups = [
   {
     label: 'Платформа',
-    hrefs: ['/events', '/education', '/vacancies', '/suppliers', '/articles', '/tools/cost-calculator']
+    hrefs: ['/events', '/education', '/vacancies', '/suppliers', '/articles', '/tools/cost-calculator', '/consulting']
   },
   {
     label: 'Сотрудничество',
-    hrefs: ['/business', '/partners', '/general-sponsors', '/consulting']
+    hrefs: ['/business', '/partners']
   },
   {
     label: 'О проекте',
@@ -83,6 +83,7 @@ export function MobileSiteMenu({ isOpen, navItems, onOpenChange, user }: MobileS
   const portalTarget = typeof document !== 'undefined' ? document.querySelector('.site-shell') ?? document.body : null;
   const groups = getGroupNavItems(navItems);
   const loginItem = navItems.find((item) => item.href === '/auth/login');
+  const registerUserItem = { href: '/auth/register/user', label: 'Регистрация' };
 
   useEffect(() => {
     if (isOpen) {
@@ -281,16 +282,29 @@ export function MobileSiteMenu({ isOpen, navItems, onOpenChange, user }: MobileS
 
                 <div className="mt-auto border-t border-[var(--editorial-dark-border)] pt-5 text-[13px] text-[var(--editorial-dark-muted)]">
                   <div className="flex items-center justify-between">
-                    {user ? null : loginItem ? (
-                      <AppLink
-                        className="inline-flex items-center gap-2 rounded-[var(--radius-md)] bg-[var(--accent)] px-4 py-2.5 text-sm font-semibold text-[var(--accent-contrast)] transition-colors hover:bg-[var(--accent-strong)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
-                        href="/auth/login"
-                        onClick={() => onOpenChange(false)}
-                      >
-                        <LogIn size={15} strokeWidth={1.8} />
-                        {loginItem.label}
-                      </AppLink>
-                    ) : null}
+                    {user ? null : (
+                      <div className="flex flex-wrap items-center gap-2">
+                        {loginItem ? (
+                          <AppLink
+                            className="inline-flex items-center gap-2 rounded-[var(--radius-md)] bg-[var(--accent)] px-4 py-2.5 text-sm font-semibold text-[var(--accent-contrast)] transition-colors hover:bg-[var(--accent-strong)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
+                            href="/auth/login"
+                            onClick={() => onOpenChange(false)}
+                          >
+                            <LogIn size={15} strokeWidth={1.8} />
+                            {loginItem.label}
+                          </AppLink>
+                        ) : null}
+                        {registerUserItem ? (
+                          <AppLink
+                            className="inline-flex items-center rounded-[var(--radius-md)] border border-[var(--editorial-dark-border)] px-4 py-2.5 text-sm font-semibold text-[var(--editorial-dark-text)] transition-colors hover:border-[var(--accent)]/45 hover:text-[var(--accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
+                            href="/auth/register/user"
+                            onClick={() => onOpenChange(false)}
+                          >
+                            Регистрация
+                          </AppLink>
+                        ) : null}
+                      </div>
+                    )}
                     <AppLink
                       className="transition-colors duration-[var(--motion-duration-fast)] hover:text-[var(--editorial-dark-text)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] motion-reduce:transition-none"
                       href="https://t.me/barsynergy"

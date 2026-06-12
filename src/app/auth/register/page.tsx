@@ -41,6 +41,9 @@ export default async function RegisterPage({ searchParams }: RegisterPageProps) 
   const formsEnabled = arePublicApplicationFormsEnabled(env);
   const params = (await searchParams) ?? {};
   const error = firstParam(params.error);
+  const success = firstParam(params.success);
+  const applicationId = firstParam(params.applicationId);
+  const showSuccess = success === 'business-request-created';
   const cities = formsEnabled
     ? await getActiveCities()
     : [];
@@ -71,23 +74,67 @@ export default async function RegisterPage({ searchParams }: RegisterPageProps) 
               Я владею заведением или представляю бренд
             </span>
           </div>
-          <div className="mt-8 border-t border-black/10 pt-5">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Что указать</p>
-            <ul className="mt-4 grid gap-3 text-sm leading-6 text-[var(--muted)]">
-              <li className="grid grid-cols-[0.5rem_minmax(0,1fr)] gap-3">
-                <span className="mt-2 h-2 w-2 rounded-full bg-[var(--accent)]" />
-                <span>Шаг 1: контактные данные.</span>
-              </li>
-              <li className="grid grid-cols-[0.5rem_minmax(0,1fr)] gap-3">
-                <span className="mt-2 h-2 w-2 rounded-full bg-[var(--accent)]" />
-                <span>Шаг 2: информация о компании.</span>
-              </li>
-            </ul>
-          </div>
+          {!showSuccess ? (
+            <div className="mt-8 border-t border-black/10 pt-5">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Что указать</p>
+              <ul className="mt-4 grid gap-3 text-sm leading-6 text-[var(--muted)]">
+                <li className="grid grid-cols-[0.5rem_minmax(0,1fr)] gap-3">
+                  <span className="mt-2 h-2 w-2 rounded-full bg-[var(--accent)]" />
+                  <span>Шаг 1: контактные данные.</span>
+                </li>
+                <li className="grid grid-cols-[0.5rem_minmax(0,1fr)] gap-3">
+                  <span className="mt-2 h-2 w-2 rounded-full bg-[var(--accent)]" />
+                  <span>Шаг 2: информация о компании.</span>
+                </li>
+              </ul>
+            </div>
+          ) : null}
         </section>
 
         <section className="editorial-form-shell overflow-hidden">
-          {!formsEnabled ? (
+          {showSuccess ? (
+            <div className="p-6 md:p-8">
+              <InlineAlert className="mb-4" density="compact" tone="success">
+                Заявка принята
+              </InlineAlert>
+              {applicationId ? (
+                <p className="mb-4 text-xs leading-5 text-[var(--muted)]">
+                  Номер заявки: <span className="font-mono text-[var(--text)]">{applicationId}</span>
+                </p>
+              ) : null}
+              <h2 className="mt-2 text-2xl font-semibold leading-tight">Что дальше?</h2>
+              <ol className="mt-6 grid gap-4 text-sm leading-6 text-[var(--text)]">
+                <li className="flex items-start gap-3">
+                  <span className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-[var(--accent-soft)] text-[11px] font-bold text-[var(--accent)]">1</span>
+                  <span>Мы проверяем данные — обычно это занимает 1–2 рабочих дня.</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-[var(--accent-soft)] text-[11px] font-bold text-[var(--accent)]">2</span>
+                  <span>Если всё в порядке, пришлём на указанный email ссылку для активации кабинета.</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-[var(--accent-soft)] text-[11px] font-bold text-[var(--accent)]">3</span>
+                  <span>После активации вы сможете войти в кабинет и управлять заявками компании.</span>
+                </li>
+              </ol>
+              <div className="mt-8 flex flex-wrap items-center gap-3 border-t border-[var(--line)] pt-6">
+                <Button href="/auth/login" size="md">
+                  Перейти ко входу
+                </Button>
+                <Button href="/" size="md" variant="secondary">
+                  На главную
+                </Button>
+              </div>
+              {!applicationId ? (
+                <p className="mt-4 text-xs leading-5 text-[var(--muted)]">
+                  Если вы уже отправляли заявку раньше — повторная не нужна. Если письмо не пришло, напишите на{' '}
+                  <a className="font-semibold text-[var(--accent)] hover:text-[var(--accent-strong)]" href={PUBLIC_CONTACT_MAILTO}>
+                    {SUPPORT_EMAIL}
+                  </a>.
+                </p>
+              ) : null}
+            </div>
+          ) : !formsEnabled ? (
             <div className="p-5 md:p-6">
               <Panel className="border-[var(--warning-border)] bg-[var(--warning-bg)] p-6 md:p-7" padding="lg">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--warning)]">Доступ временно закрыт</p>

@@ -1,4 +1,4 @@
-/* global fetch, setTimeout */
+/* global fetch */
 
 import { access, readdir } from 'node:fs/promises';
 import path from 'node:path';

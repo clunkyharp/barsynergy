@@ -4,6 +4,7 @@ import { useEffect, useState, useActionState } from 'react';
 import { PublicApplicationSection } from '@/components/public/application-form-section';
 import { Button } from '@/components/ui/button';
 import { Dialog } from '@/components/ui/dialog';
+import { SUPPORT_EMAIL } from '@/lib/contact-info';
 import {
   VacancyResponseForm,
   VacancySubmissionForm,
@@ -29,6 +30,7 @@ export function VacancyResponseDialog({
   utm,
   profile,
   enabled,
+  compact = false,
   submitVacancyResponseApplication
 }: {
   options: VacancyApplicationFormOptions;
@@ -36,6 +38,7 @@ export function VacancyResponseDialog({
   utm: VacancyApplicationFormsProps['utm'];
   profile?: ProfilePrefill;
   enabled: boolean;
+  compact?: boolean;
   submitVacancyResponseApplication: (prevState: ActionResult | null, formData: FormData) => Promise<ActionResult | null>;
 }) {
   const [open, setOpen] = useState(false);
@@ -48,10 +51,32 @@ export function VacancyResponseDialog({
     }
   }, [state]);
 
-  if (!enabled) return null;
+  if (!enabled) {
+    return (
+      <div className="space-y-4">
+        <h3 className="text-base font-semibold leading-7">Приём откликов временно закрыт</h3>
+        <p className="text-sm leading-7 text-[var(--muted)]">
+          Напишите команде BARSYNERGY — мы передадим вашу кандидатуру работодателю.
+        </p>
+        <div className="flex flex-wrap gap-3">
+          <Button className="rounded-[var(--radius-md)]" href="/contacts?topic=vacancy#contact-form" size="lg">
+            Написать команде
+          </Button>
+          <Button className="rounded-[var(--radius-md)]" href={`mailto:${SUPPORT_EMAIL}`} size="lg" variant="secondary">
+            Написать на почту
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
+      {!compact ? (
+        <p className="text-sm leading-6 text-[var(--muted)]">
+          Заполните форму — мы передадим вашу кандидатуру работодателю.
+        </p>
+      ) : null}
       <Button
         className="w-full min-w-0 justify-center rounded-[var(--radius-sm)] px-4 !whitespace-normal leading-5"
         onClick={() => setOpen(true)}
@@ -86,10 +111,9 @@ export function VacancyResponseDialog({
 export function VacancyApplicationForms({
   enabled,
   options,
-  result,
   utm,
   submitVacancyPlacementApplication
-}: VacancyApplicationFormsProps & { submitVacancyPlacementApplication?: (formData: FormData) => void }) {
+}: Omit<VacancyApplicationFormsProps, 'result'> & { submitVacancyPlacementApplication?: (prevState: import('@/lib/applications/public-form-helpers').PublicApplicationResult | null, formData: FormData) => Promise<import('@/lib/applications/public-form-helpers').PublicApplicationResult> }) {
   return (
     <PublicApplicationSection
       eyebrow="Вакансии / Заявки"
@@ -104,7 +128,6 @@ export function VacancyApplicationForms({
       disclosureDescription="Укажите роль, город, график, условия, требования и контакт для отклика."
       introVariant="compact"
       enabled={enabled}
-      result={result}
     >
       <div className="grid gap-6" id="vacancy-forms">
         <VacancySubmissionForm options={options} utm={utm} action={submitVacancyPlacementApplication!} />

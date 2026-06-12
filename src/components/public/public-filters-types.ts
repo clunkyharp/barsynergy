@@ -9,11 +9,14 @@ export type SelectOption = {
   label: string;
 };
 
+export type FilterMode = 'single' | 'multiple';
+
 export type ExtraFilter = {
   name: string;
   label: string;
   allLabel?: string;
   options: SelectOption[];
+  mode?: FilterMode;
 };
 
 export type FilterContextItem = {
@@ -23,12 +26,15 @@ export type FilterContextItem = {
 
 export type PublicFiltersProps = {
   activeSummaryLabel?: string;
+  activeSummaryCountLabel?: string;
   categoryAllLabel?: string;
   categoryLabel?: string;
   categories?: CategoryOption[];
+  categoryMode?: FilterMode;
   cityAllLabel?: string;
   cityLabel?: string;
   cities?: CategoryOption[];
+  cityMode?: FilterMode;
   compact?: boolean;
   contextItems?: FilterContextItem[];
   collapseLabel?: string;
@@ -43,8 +49,14 @@ export type PublicFiltersProps = {
   variant?: 'stacked' | 'toolbar' | 'sidebar';
 };
 
+export type ActiveFilterValue = {
+  label: string;
+  value: string;
+};
+
 export type ActiveFilter = {
   name: string;
   label: string;
-  value: string;
+  mode?: FilterMode;
+  values: ActiveFilterValue[];
 };

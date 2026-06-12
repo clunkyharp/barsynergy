@@ -42,8 +42,8 @@ export function PublicPrelaunchSection({
 }: PublicPrelaunchSectionProps) {
   return (
     <section className="background-zone background-zone-gray border-b border-[var(--line)] py-8 md:py-14" id={id}>
-      <div className="container grid gap-6 md:gap-8 xl:grid-cols-[minmax(16rem,0.62fr)_minmax(0,1.38fr)] xl:gap-10">
-        <div className="xl:sticky xl:top-24 xl:self-start">
+      <div className="container grid gap-8 md:gap-10 xl:grid-cols-[minmax(18rem,0.9fr)_minmax(0,1.1fr)] xl:gap-12">
+        <div className="xl:self-start">
           <PublicEyebrow>{eyebrow}</PublicEyebrow>
           <PublicDisplayTitle className="mt-4 max-w-[13ch]">{title}</PublicDisplayTitle>
           <PublicBodyText className="mt-5 max-w-md" size="md">
@@ -73,41 +73,41 @@ export function PublicPrelaunchSection({
           </div>
         </div>
 
-        <div className="divide-y divide-[var(--line)] border-y border-[var(--line)]">
-          {cards.map((card) => (
-            <article
-              className="grid gap-3 py-4 md:grid-cols-[minmax(10rem,0.38fr)_minmax(0,1fr)_auto] md:items-start md:gap-5 md:px-3 md:py-5"
-              key={card.title}
-            >
-              <div className="min-w-0">
-                <h3 className="text-lg font-semibold leading-7 text-[var(--text)]">{card.title}</h3>
-                {card.hint ? <p className="mt-1 text-[12px] font-semibold uppercase tracking-[0.12em] text-[var(--accent)]">{card.hint}</p> : null}
-              </div>
-              <div className="min-w-0">
-                <p className="text-sm leading-6 text-[var(--muted)]">{card.description}</p>
-                {card.details && card.details.length > 0 ? (
-                  <dl className="mt-3 grid gap-2 sm:grid-cols-2">
-                    {card.details.map((detail) => (
-                      <div className="rounded-[var(--radius-sm)] bg-[var(--surface-wash)] px-3 py-2" key={`${detail.label}-${detail.value}`}>
-                        <dt className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--muted)]">{detail.label}</dt>
-                        <dd className="mt-1 text-sm leading-5 text-[var(--text)]">{detail.value}</dd>
-                      </div>
-                    ))}
-                  </dl>
+        <ol className="grid gap-3">
+          {cards.map((card, idx) => (
+            <li key={card.title}>
+              <article className="group relative grid gap-4 rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--surface-card)] p-5 transition-colors hover:border-[var(--accent)]/35 md:grid-cols-[auto_minmax(0,1fr)_auto] md:items-start md:gap-6 md:p-6">
+                <span aria-hidden="true" className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[var(--accent)]/30 bg-[var(--surface-wash)] text-sm font-semibold tracking-[0.06em] text-[var(--accent)]">
+                  {String(idx + 1).padStart(2, '0')}
+                </span>
+                <div className="min-w-0">
+                  <h3 className="text-lg font-semibold leading-7 text-[var(--text)] md:text-xl md:leading-8">{card.title}</h3>
+                  {card.hint ? <p className="mt-1 text-[12px] font-semibold uppercase tracking-[0.12em] text-[var(--accent)]">{card.hint}</p> : null}
+                  <p className="mt-2 text-sm leading-6 text-[var(--muted)] md:text-[15px] md:leading-7">{card.description}</p>
+                  {card.details && card.details.length > 0 ? (
+                    <dl className="mt-4 grid gap-2 sm:grid-cols-2">
+                      {card.details.map((detail) => (
+                        <div className="rounded-[var(--radius-sm)] bg-[var(--surface-wash)] px-3 py-2" key={`${detail.label}-${detail.value}`}>
+                          <dt className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--muted)]">{detail.label}</dt>
+                          <dd className="mt-1 text-sm leading-5 text-[var(--text)]">{detail.value}</dd>
+                        </div>
+                      ))}
+                    </dl>
+                  ) : null}
+                </div>
+                {card.action ? (
+                  <AppLink
+                    className="inline-flex min-h-11 w-fit items-center gap-2 rounded-[var(--radius-sm)] text-sm font-semibold text-[var(--accent)] transition-colors hover:text-[var(--accent-strong)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] md:justify-self-end"
+                    href={card.action.href}
+                  >
+                    {card.action.label}
+                    <ArrowUpRight size={16} />
+                  </AppLink>
                 ) : null}
-              </div>
-              {card.action ? (
-                <AppLink
-                  className="inline-flex min-h-11 w-fit items-center gap-2 rounded-[var(--radius-sm)] text-sm font-semibold text-[var(--accent)] transition-colors hover:text-[var(--accent-strong)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] md:justify-self-end"
-                  href={card.action.href}
-                >
-                  {card.action.label}
-                  <ArrowUpRight size={16} />
-                </AppLink>
-              ) : null}
-            </article>
+              </article>
+            </li>
           ))}
-        </div>
+        </ol>
       </div>
     </section>
   );

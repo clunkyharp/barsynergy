@@ -59,7 +59,7 @@ export async function createSupplier(formData: FormData) {
     cleanup: () => deleteUploadedFileIfUnused(uploadedCoverImageId),
     handler: async ({ formData, user }) => {
       const parsed = supplierFormSchema.parse({
-        title: getString(formData, 'title'), slug: optionalString(getString(formData, 'slug')),
+        title: getString(formData, 'companyName'), slug: optionalString(getString(formData, 'slug')),
         summary: getString(formData, 'summary'), description: getString(formData, 'description'),
         status: getString(formData, 'status') || ContentStatus.DRAFT,
         coverImageAlt: optionalString(getString(formData, 'coverImageAlt')),
@@ -79,7 +79,7 @@ export async function createSupplier(formData: FormData) {
       const createdSupplier = await persistWithUniqueSlugRetry({
         baseSlug: slug, exists: async (candidate) => Boolean(await prisma.supplier.findFirst({ where: { slug: candidate }, select: { id: true } })),
         persist: (uniqueSlug) => prisma.supplier.create({
-          data: { title: parsed.title, slug: uniqueSlug, summary: parsed.summary, description: parsed.description, status: parsed.status, coverImageId, coverImageAlt: nullableString(parsed.coverImageAlt), categoryId: nullableString(parsed.categoryId), cityId: nullableString(parsed.cityId), companyName: parsed.companyName, websiteUrl: nullableString(websiteUrl), contactLabel: nullableString(parsed.contactLabel), isVerified: parsed.isVerified, serviceArea: nullableString(parsed.serviceArea), createdById: user.id, updatedById: user.id, ...initialPublicationDates(parsed.status) },
+          data: { title: parsed.companyName, slug: uniqueSlug, summary: parsed.summary, description: parsed.description, status: parsed.status, coverImageId, coverImageAlt: nullableString(parsed.coverImageAlt), categoryId: nullableString(parsed.categoryId), cityId: nullableString(parsed.cityId), companyName: parsed.companyName, websiteUrl: nullableString(websiteUrl), contactLabel: nullableString(parsed.contactLabel), isVerified: parsed.isVerified, serviceArea: nullableString(parsed.serviceArea), createdById: user.id, updatedById: user.id, ...initialPublicationDates(parsed.status) },
           select: { slug: true }
         })
       });
@@ -100,13 +100,14 @@ export async function updateSupplier(formData: FormData) {
     defaultRedirectPath: ADMIN_SUPPLIERS_PATH,
     cleanup: () => deleteUploadedFileIfUnused(uploadedCoverImageId),
     handler: async ({ formData, user }) => {
+      const companyName = getString(formData, 'companyName');
       const parsed = supplierFormSchema.extend({ supplierId: z.string().trim().min(1) }).parse({
-        supplierId: getString(formData, 'supplierId'), title: getString(formData, 'title'),
+        supplierId: getString(formData, 'supplierId'), title: companyName,
         slug: optionalString(getString(formData, 'slug')), summary: getString(formData, 'summary'),
         description: getString(formData, 'description'), status: getString(formData, 'status') || ContentStatus.DRAFT,
         coverImageAlt: optionalString(getString(formData, 'coverImageAlt')),
         categoryId: optionalString(getString(formData, 'categoryId')), cityId: optionalString(getString(formData, 'cityId')),
-        companyName: getString(formData, 'companyName'), websiteUrl: optionalString(getString(formData, 'websiteUrl')),
+        companyName, websiteUrl: optionalString(getString(formData, 'websiteUrl')),
         contactLabel: optionalString(getString(formData, 'contactLabel')),
         isVerified: getString(formData, 'isVerified') === 'true', serviceArea: optionalString(getString(formData, 'serviceArea'))
       });
@@ -124,7 +125,7 @@ export async function updateSupplier(formData: FormData) {
       const updatedSupplier = await persistWithUniqueSlugRetry({
         baseSlug: slug, exists: async (candidate) => Boolean(await prisma.supplier.findFirst({ where: { slug: candidate, id: { not: parsed.supplierId } }, select: { id: true } })),
         persist: (uniqueSlug) => prisma.supplier.update({
-          where: { id: parsed.supplierId }, data: { title: parsed.title, slug: uniqueSlug, summary: parsed.summary, description: parsed.description, status: parsed.status, coverImageId, coverImageAlt: nullableString(parsed.coverImageAlt), categoryId: nullableString(parsed.categoryId), cityId: nullableString(parsed.cityId), companyName: parsed.companyName, websiteUrl: nullableString(websiteUrl), contactLabel: nullableString(parsed.contactLabel), isVerified: parsed.isVerified, serviceArea: nullableString(parsed.serviceArea), updatedById: user.id, ...statusTransitionDates(parsed.status, existingSupplier.publishedAt) },
+          where: { id: parsed.supplierId }, data: { title: parsed.companyName, slug: uniqueSlug, summary: parsed.summary, description: parsed.description, status: parsed.status, coverImageId, coverImageAlt: nullableString(parsed.coverImageAlt), categoryId: nullableString(parsed.categoryId), cityId: nullableString(parsed.cityId), companyName: parsed.companyName, websiteUrl: nullableString(websiteUrl), contactLabel: nullableString(parsed.contactLabel), isVerified: parsed.isVerified, serviceArea: nullableString(parsed.serviceArea), updatedById: user.id, ...statusTransitionDates(parsed.status, existingSupplier.publishedAt) },
           select: { slug: true }
         })
       });

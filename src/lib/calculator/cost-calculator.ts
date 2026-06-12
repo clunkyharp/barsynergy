@@ -3,6 +3,77 @@ import { parseCalculatorNumberInput } from './number-input.ts';
 export type CalculatorUnit = 'ml' | 'l' | 'g' | 'kg' | 'pcs';
 export type CalculatorUnitKind = 'volume' | 'weight' | 'piece';
 export type CalculatorPricingMode = 'auto' | 'manual';
+export type CalculatorRoundingMode = 'none' | 'ruble' | 'five' | 'ten' | 'kopek10';
+
+export type CalculatorRoundModeOption = {
+  value: CalculatorRoundingMode;
+  label: string;
+};
+
+export const calculatorRoundingOptions: CalculatorRoundModeOption[] = [
+  { value: 'none', label: 'Без округления' },
+  { value: 'ruble', label: 'До 1 рубля' },
+  { value: 'five', label: 'До 5 рублей' },
+  { value: 'ten', label: 'До 10 рублей' },
+  { value: 'kopek10', label: 'До 10 копеек' }
+];
+
+export function roundPrice(price: number, mode: CalculatorRoundingMode): number {
+  if (!Number.isFinite(price) || price <= 0) return price;
+  switch (mode) {
+    case 'none':
+      return price;
+    case 'ruble':
+      return Math.round(price);
+    case 'five':
+      return Math.round(price / 5) * 5;
+    case 'ten':
+      return Math.round(price / 10) * 10;
+    case 'kopek10':
+      return Math.round(price * 10) / 10;
+    default:
+      return price;
+  }
+}
+
+export type CalculatorPrefMethod =
+  | 'espresso'
+  | 'filter'
+  | 'alternative'
+  | 'cocktail'
+  | 'other';
+
+export type CalculatorPrefMethodOption = {
+  value: CalculatorPrefMethod;
+  label: string;
+};
+
+export const calculatorPrepMethodOptions: CalculatorPrefMethodOption[] = [
+  { value: 'espresso', label: 'Эспрессо' },
+  { value: 'filter', label: 'Фильтр' },
+  { value: 'alternative', label: 'Альтернатива' },
+  { value: 'cocktail', label: 'Коктейль' },
+  { value: 'other', label: 'Другое' }
+];
+
+export type CalculatorDrinkParams = {
+  drinkVolume: string;
+  drinkYield: string;
+  prepMethod: CalculatorPrefMethod;
+};
+
+export type CalculatorAdditionalCost = {
+  id: string;
+  name: string;
+  amount: string;
+};
+
+export type CalculatorAdditionalCostRow = CalculatorAdditionalCost & {
+  cost: number | null;
+  error: string | null;
+  note: string | null;
+  isComplete: boolean;
+};
 
 export type CalculatorIngredient = {
   id: string;
@@ -110,16 +181,97 @@ export function calculateIngredientCost(ingredient: CalculatorIngredient): Calcu
   };
 }
 
+export function calculateAdditionalCostRow(cost: CalculatorAdditionalCost): CalculatorAdditionalCostRow {
+  const amount = parseCalculatorNumberInput(cost.amount);
+
+  if (cost.name.trim() === '' && cost.amount.trim() === '') {
+    return { ...cost, cost: null, error: null, note: null, isComplete: false };
+  }
+
+  if (amount !== null && amount < 0) {
+    return { ...cost, cost: null, error: 'Сумма не может быть отрицательной.', note: null, isComplete: false };
+  }
+
+  if (amount === null) {
+    return { ...cost, cost: null, error: null, note: null, isComplete: false };
+  }
+
+  return { ...cost, cost: amount, error: null, note: null, isComplete: true };
+}
+
+export type CostBreakdownCategory = 'coffee' | 'milk' | 'syrups' | 'cups' | 'consumables' | 'additional' | 'other';
+
+export type CostBreakdownItem = {
+  category: CostBreakdownCategory;
+  label: string;
+  amount: number;
+  percentage: number;
+};
+
+export function classifyIngredient(name: string): CostBreakdownCategory {
+  const lower = name.toLowerCase();
+  if (/зерн|кофе|coffee|эспрессо|espresso|дрип|фильтр|воронк|аэропресс|френч/.test(lower)) return 'coffee';
+  if (/молок|milk|сливк|cream|латте|латте/.test(lower)) return 'milk';
+  if (/сироп|syrup|топпинг|topping|шоколад|карамел|ванил|мед|сахар|sugar/.test(lower)) return 'syrups';
+  if (/стакан|cup|крышк|крышка|lid|трубочк|straw|подстакан/.test(lower)) return 'cups';
+  if (/салфетк|napkin|фильтр|filter|вода|water|лёд|ice/.test(lower)) return 'consumables';
+  return 'other';
+}
+
+export function buildCostBreakdown(
+  ingredientRows: CalculatorIngredientRow[],
+  additionalCostRows: CalculatorAdditionalCostRow[]
+): CostBreakdownItem[] {
+  const categories: Map<CostBreakdownCategory, number> = new Map();
+
+  for (const row of ingredientRows) {
+    if (row.cost === null || row.cost <= 0) continue;
+    const category = classifyIngredient(row.name);
+    categories.set(category, (categories.get(category) ?? 0) + row.cost);
+  }
+
+  for (const row of additionalCostRows) {
+    if (row.cost === null || row.cost <= 0) continue;
+    categories.set('additional', (categories.get('additional') ?? 0) + row.cost);
+  }
+
+  const total = [...categories.values()].reduce((sum, v) => sum + v, 0);
+
+  const categoryLabels: Record<CostBreakdownCategory, string> = {
+    coffee: 'Кофе',
+    milk: 'Молоко / сливки',
+    syrups: 'Сиропы / топпинги',
+    cups: 'Стакан / крышка',
+    consumables: 'Расходники',
+    additional: 'Доп. расходы',
+    other: 'Прочее'
+  };
+
+  return [...categories.entries()]
+    .map(([category, amount]) => ({
+      category,
+      label: categoryLabels[category],
+      amount,
+      percentage: total > 0 ? (amount / total) * 100 : 0
+    }))
+    .sort((a, b) => b.amount - a.amount);
+}
+
 export type CalculatorSummaryInput = {
   foodCostPercent: string;
   ingredients: CalculatorIngredient[];
+  additionalCosts: CalculatorAdditionalCost[];
   pricingMode: CalculatorPricingMode;
+  roundingMode: CalculatorRoundingMode;
   salePrice: string;
+  customMarkupPercent: string;
 };
 
 export type CalculatorSummary = {
   activeSalePrice: number;
   actualFoodCostPercent: number;
+  additionalCostTotal: number;
+  breakdown: CostBreakdownItem[];
   canShowRecommendedPrice: boolean;
   canShowSalePrice: boolean;
   completedRows: number;
@@ -129,9 +281,11 @@ export type CalculatorSummary = {
   grossProfit: number;
   hasManualSalePrice: boolean;
   hasPartialRows: boolean;
+  ingredientCost: number;
   isManualMode: boolean;
   markupPercent: number;
   recommendedPrice: number;
+  roundedSalePrice: number;
   rowErrors: CalculatorIngredientRow[];
   rows: CalculatorIngredientRow[];
   salePriceError: string | null;
@@ -141,41 +295,65 @@ export type CalculatorSummary = {
 export function calculateCostSummary({
   foodCostPercent,
   ingredients,
+  additionalCosts,
   pricingMode,
-  salePrice
+  roundingMode,
+  salePrice,
+  customMarkupPercent
 }: CalculatorSummaryInput): CalculatorSummary {
   const rows = ingredients.map((ingredient) => calculateIngredientCost(ingredient));
+  const additionalCostRows = additionalCosts.map((cost) => calculateAdditionalCostRow(cost));
   const rowErrors = rows.filter((ingredient) => ingredient.error);
-  const totalCost = rows.reduce((sum, ingredient) => sum + (ingredient.cost ?? 0), 0);
+  const ingredientCost = rows.reduce((sum, ingredient) => sum + (ingredient.cost ?? 0), 0);
+  const additionalCostTotal = additionalCostRows.reduce((sum, row) => sum + (row.cost ?? 0), 0);
+  const totalCost = ingredientCost + additionalCostTotal;
+
   const foodCostInput = parseCalculatorNumberInput(foodCostPercent);
   const foodCostError = foodCostPercent.trim() && (foodCostInput === null || foodCostInput <= 0 || foodCostInput > 100)
     ? 'Целевая доля себестоимости должна быть больше 0 и не выше 100 %.'
     : null;
   const foodCost = foodCostInput && foodCostInput > 0 && foodCostInput <= 100 ? foodCostInput / 100 : 0;
+
   const isManualMode = pricingMode === 'manual';
+
   const manualSalePriceInput = parseCalculatorNumberInput(salePrice);
   const salePriceError = isManualMode && salePrice.trim() !== '' && (manualSalePriceInput === null || manualSalePriceInput <= 0)
     ? 'В ручном режиме цена продажи должна быть больше нуля.'
     : null;
   const manualSalePrice = manualSalePriceInput && manualSalePriceInput > 0 ? manualSalePriceInput : 0;
   const hasManualSalePrice = isManualMode && manualSalePrice > 0 && !salePriceError;
+
   const canShowRecommendedPrice = rowErrors.length === 0 && totalCost > 0 && !foodCostError && foodCost > 0;
   const recommendedPrice = canShowRecommendedPrice ? totalCost / foodCost : 0;
-  const activeSalePrice = isManualMode ? manualSalePrice : recommendedPrice;
+
+  const customMarkupInput = parseCalculatorNumberInput(customMarkupPercent);
+  const useCustomMarkup = customMarkupInput !== null && customMarkupInput > 0 && !isManualMode;
+  const markupBasedPrice = useCustomMarkup && totalCost > 0
+    ? totalCost * (1 + customMarkupInput / 100)
+    : recommendedPrice;
+
+  const activeSalePrice = isManualMode ? manualSalePrice : markupBasedPrice;
+  const roundedSalePrice = roundPrice(activeSalePrice, roundingMode);
+
   const canShowSalePrice = rowErrors.length === 0 && totalCost > 0 && (isManualMode ? hasManualSalePrice : canShowRecommendedPrice);
   const actualFoodCostPercent = canShowSalePrice ? (totalCost / activeSalePrice) * 100 : 0;
   const grossProfit = canShowSalePrice ? activeSalePrice - totalCost : 0;
   const grossMargin = canShowSalePrice && activeSalePrice > 0 ? (grossProfit / activeSalePrice) * 100 : 0;
   const markupPercent = canShowSalePrice && totalCost > 0 ? (grossProfit / totalCost) * 100 : 0;
+
   const completedRows = rows.filter((ingredient) => ingredient.isComplete).length;
   const hasPartialRows = rows.some((ingredient) => {
     const filledFields = [ingredient.packagePrice, ingredient.packageAmount, ingredient.recipeAmount].filter((value) => value.trim()).length;
     return filledFields > 0 && !ingredient.isComplete && !ingredient.error;
   });
 
+  const breakdown = buildCostBreakdown(rows, additionalCostRows);
+
   return {
     activeSalePrice,
     actualFoodCostPercent,
+    additionalCostTotal,
+    breakdown,
     canShowRecommendedPrice,
     canShowSalePrice,
     completedRows,
@@ -185,9 +363,11 @@ export function calculateCostSummary({
     grossProfit,
     hasManualSalePrice,
     hasPartialRows,
+    ingredientCost,
     isManualMode,
     markupPercent,
     recommendedPrice,
+    roundedSalePrice,
     rowErrors,
     rows,
     salePriceError,

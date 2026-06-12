@@ -107,6 +107,7 @@ export function parseApplicationStatus(value?: string) {
 export const applicationPayloadFieldLabels: Record<string, string> = {
   amountLabel: 'Сумма / формат',
   companyName: 'Компания',
+  contactPerson: 'Контактное лицо',
   businessType: 'Тип бизнеса',
   businessTypeLabel: 'Тип бизнеса',
   comment: 'Комментарий',

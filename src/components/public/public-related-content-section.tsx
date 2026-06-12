@@ -1,6 +1,6 @@
 import { ArrowUpRight } from 'lucide-react';
 import { PublicBodyText, PublicDisplayTitle, PublicEyebrow } from '@/components/public/public-primitives';
-import { InlineLink } from '@/components/ui/inline-link';
+import { AppLink } from '@/components/ui/app-link';
 import { MetaChip } from '@/components/ui/meta-chip';
 import { displayFont } from '@/lib/fonts';
 import type { PublishedContentItem } from '@/lib/public/content';
@@ -67,7 +67,11 @@ export function PublicRelatedContentSection({
 
         <div>
           {items.map((item, index) => (
-            <article className="grid gap-4 border-b border-[var(--line)] py-5 last:border-b-0 md:grid-cols-[auto_minmax(0,1fr)_auto] md:items-start md:gap-6" key={item.id}>
+            <article
+              className="-mx-3 grid cursor-pointer gap-4 rounded-[var(--radius-md)] border-b border-[var(--line)] px-3 py-5 last:border-b-0 transition-colors hover:bg-[var(--surface-wash)] md:grid-cols-[auto_minmax(0,1fr)_auto] md:items-start md:gap-6"
+              key={item.id}
+              style={{ position: 'relative' }}
+            >
               <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">
                 {index + 1}
               </p>
@@ -87,10 +91,13 @@ export function PublicRelatedContentSection({
                 <PublicBodyText className="mt-3 max-w-2xl text-[var(--muted)]">{item.summary}</PublicBodyText>
               </div>
 
-              <InlineLink className="inline-flex items-center gap-2 md:mt-1 md:self-start" href={itemHref(basePath, item.slug)}>
+              <AppLink
+                className="relative z-10 inline-flex shrink-0 items-center gap-2 text-sm font-semibold text-[var(--accent)] transition-colors hover:text-[var(--accent-strong)] md:mt-1 md:self-start after:absolute after:inset-0 after:content-['']"
+                href={itemHref(basePath, item.slug)}
+              >
                 {relatedActionLabel(basePath)}
-                <ArrowUpRight size={16} />
-              </InlineLink>
+                <ArrowUpRight aria-hidden size={16} />
+              </AppLink>
             </article>
           ))}
         </div>

@@ -1,11 +1,9 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { redirect } from 'next/navigation';
 import { ApplicationStatus, ApplicationType } from '@prisma/client';
 import { z } from 'zod';
-import { hasErrorMessage, resolveServerActionError } from '@/lib/actions/server-action-errors';
-import { getString, nullableString, optionalString } from '@/lib/admin/content-utils';
+import { getString, optionalString } from '@/lib/admin/content-utils';
 import {
   buildBusinessApplicationPayload,
   parseBusinessApplicationInput
@@ -14,52 +12,15 @@ import { PERSONAL_DATA_CONSENT_TEXT } from '@/lib/applications/public-form-helpe
 import { requireBusinessAccountAccess } from '@/lib/auth/require-business-account';
 import { prisma } from '@/lib/db/prisma';
 import { assertSameOriginServerAction } from '@/lib/security/server-action-origin';
+import { assertActiveCity } from '@/lib/business/business-helpers';
+import { resolveBusinessActionError, redirectWithBusinessResult } from '@/lib/business/business-action-utils';
 
 const BUSINESS_PATH = '/business/cabinet';
 const BUSINESS_REQUESTS_PATH = '/business/cabinet/requests';
 
-const businessProfileSchema = z.object({
-  companyName: z.string().trim().min(2).max(160),
-  contactPerson: z.string().trim().min(2).max(120),
-  cityId: z.string().trim().optional(),
-  phone: z.string().trim().max(80).optional(),
-  telegram: z.string().trim().max(80).optional(),
-  websiteUrl: z.string().trim().url().max(240).optional().or(z.literal('')),
-  description: z.string().trim().max(1000).optional()
-});
-
 const applicationIdSchema = z.object({
   applicationId: z.string().trim().min(1)
 });
-
-function businessResultPath(path: string, result: { type: 'success' | 'error'; message: string }) {
-  const url = new URL(path, 'http://localhost');
-  url.searchParams.delete('success');
-  url.searchParams.delete('error');
-  url.searchParams.set(result.type, result.message);
-  return `${url.pathname}${url.search}`;
-}
-
-function redirectWithBusinessResult(path: string, result: { type: 'success' | 'error'; message: string }): never {
-  redirect(businessResultPath(path, result));
-}
-
-async function assertActiveCity(cityId?: string | null) {
-  if (!cityId) {
-    return null;
-  }
-
-  const city = await prisma.city.findFirst({
-    where: { id: cityId, isActive: true },
-    select: { id: true, name: true }
-  });
-
-  if (!city) {
-    throw new Error('city is invalid');
-  }
-
-  return city;
-}
 
 function getApplicationSubject(input: { type: ApplicationType; companyName: string; title: string }) {
   if (input.type === ApplicationType.VACANCY_SUBMISSION) {
@@ -100,102 +61,6 @@ function getBusinessApplicationFormData(formData: FormData) {
     amountLabel: optionalString(getString(formData, 'amountLabel')),
     consent: getString(formData, 'consent')
   };
-}
-
-function resolveBusinessActionError(
-  action: string,
-  error: unknown,
-  messages: {
-    zod: string;
-    fallback: string;
-    city?: string;
-    draft?: string;
-    application?: string;
-  }
-) {
-  return resolveServerActionError({
-    action,
-    error,
-    zodMessage: messages.zod,
-    known: [
-      ...(messages.city
-        ? [
-            {
-              matches: (candidate: Error) => hasErrorMessage(candidate, 'city is invalid'),
-              message: messages.city
-            }
-          ]
-        : []),
-      ...(messages.draft
-        ? [
-            {
-              matches: (candidate: Error) => hasErrorMessage(candidate, 'draft is invalid'),
-              message: messages.draft
-            }
-          ]
-        : []),
-      ...(messages.application
-        ? [
-            {
-              matches: (candidate: Error) => hasErrorMessage(candidate, 'application is invalid'),
-              message: messages.application
-            },
-            {
-              matches: (candidate: Error) => hasErrorMessage(candidate, 'draft type cannot be changed'),
-              message: messages.application
-            }
-          ]
-        : [])
-    ],
-    fallbackMessage: messages.fallback
-  });
-}
-
-export async function updateBusinessProfile(formData: FormData) {
-  let result: { type: 'success' | 'error'; message: string };
-
-  try {
-    await assertSameOriginServerAction();
-    const { businessAccount } = await requireBusinessAccountAccess();
-    const parsed = businessProfileSchema.parse({
-      companyName: getString(formData, 'companyName'),
-      contactPerson: getString(formData, 'contactPerson'),
-      cityId: optionalString(getString(formData, 'cityId')),
-      phone: optionalString(getString(formData, 'phone')),
-      telegram: optionalString(getString(formData, 'telegram')),
-      websiteUrl: getString(formData, 'websiteUrl'),
-      description: optionalString(getString(formData, 'description'))
-    });
-    const city = await assertActiveCity(parsed.cityId);
-
-    await prisma.businessAccount.update({
-      where: { id: businessAccount.id },
-      data: {
-        companyName: parsed.companyName,
-        contactPerson: parsed.contactPerson,
-        cityId: city?.id ?? null,
-        phone: nullableString(parsed.phone),
-        telegram: nullableString(parsed.telegram),
-        websiteUrl: nullableString(parsed.websiteUrl),
-        description: nullableString(parsed.description)
-      }
-    });
-
-    revalidatePath(BUSINESS_PATH);
-    revalidatePath(BUSINESS_REQUESTS_PATH);
-    result = { type: 'success', message: 'Профиль компании сохранён.' };
-  } catch (error) {
-    result = {
-      type: 'error',
-      message: resolveBusinessActionError('business:update-profile', error, {
-        zod: 'Не удалось сохранить профиль. Проверьте обязательные поля и сайт.',
-        city: 'Этот город сейчас недоступен для выбора.',
-        fallback: 'Не удалось сохранить профиль. Попробуйте позже.'
-      })
-    };
-  }
-
-  redirectWithBusinessResult(BUSINESS_PATH, result);
 }
 
 export async function createBusinessApplication(formData: FormData) {
@@ -262,6 +127,7 @@ export async function updateBusinessDraftApplication(formData: FormData) {
     const { user, businessAccount } = await requireBusinessAccountAccess();
     const parsed = parseBusinessApplicationInput(getBusinessApplicationFormData(formData));
     const city = await assertActiveCity(parsed.cityId);
+
     const existing = await prisma.application.findFirst({
       where: {
         id: parsed.applicationId,
@@ -279,8 +145,12 @@ export async function updateBusinessDraftApplication(formData: FormData) {
       throw new Error('draft type cannot be changed');
     }
 
-    await prisma.application.update({
-      where: { id: existing.id },
+    const update = await prisma.application.updateMany({
+      where: {
+        id: parsed.applicationId,
+        businessAccountId: businessAccount.id,
+        status: ApplicationStatus.DRAFT
+      },
       data: {
         type: parsed.type,
         subject: getApplicationSubject({
@@ -300,6 +170,10 @@ export async function updateBusinessDraftApplication(formData: FormData) {
         consentText: PERSONAL_DATA_CONSENT_TEXT
       }
     });
+
+    if (update.count !== 1) {
+      throw new Error('draft is invalid');
+    }
 
     revalidatePath(BUSINESS_PATH);
     revalidatePath(BUSINESS_REQUESTS_PATH);

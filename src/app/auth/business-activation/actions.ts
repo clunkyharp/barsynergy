@@ -191,7 +191,6 @@ export async function activateBusinessAccessAction(formData: FormData) {
     const cookieStore = await cookies();
     cookieStore.set(SESSION_COOKIE_NAME, sessionToken, getSessionCookieOptions());
     clearBusinessAccessActivationCookie(cookieStore);
-    redirect('/business/cabinet?success=Доступ%20подключен.%20Теперь%20можно%20работать%20в%20кабинете.');
   } catch (error) {
     await preserveBusinessAccessActivationCookie(parsed.token);
     redirectWithActivationResult({
@@ -199,4 +198,6 @@ export async function activateBusinessAccessAction(formData: FormData) {
       code: resolveBusinessAccessActivationErrorCode(error)
     });
   }
+
+  redirect('/business/cabinet?welcome=1&success=Доступ%20подключен.%20Теперь%20можно%20работать%20в%20кабинете.');
 }

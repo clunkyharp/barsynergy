@@ -10,9 +10,9 @@ import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
 import { MarkdownEditor } from '@/components/admin/markdown-editor';
 import { Textarea } from '@/components/ui/textarea';
-import { PUBLICATION_STATUS_HINT, contentStatusLabels, type AdminContentSearchParams } from '@/lib/admin/content-utils';
+import { contentStatusLabels, type AdminContentSearchParams } from '@/lib/admin/content-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
-import { prisma } from '@/modules/admin/queries';
+import { getActiveCategories, getActiveCities, getActiveTags, getArticleById } from '@/lib/admin/admin-queries';
 
 export const dynamic = 'force-dynamic';
 
@@ -31,28 +31,10 @@ export default async function AdminArticleDetailPage({ params, searchParams }: A
   const currentPath = `${ADMIN_ARTICLES_PATH}/${articleId}`;
   const query = (await searchParams) ?? {};
   const [article, categories, cities, tags] = await Promise.all([
-    prisma.article.findUnique({
-      where: { id: articleId },
-      include: {
-        coverImage: { select: { originalName: true } },
-        tags: { select: { tagId: true } }
-      }
-    }),
-    prisma.category.findMany({
-      where: { type: CategoryType.ARTICLE, isActive: true },
-      orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
-      select: { id: true, name: true }
-    }),
-    prisma.city.findMany({
-      where: { isActive: true },
-      orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
-      select: { id: true, name: true }
-    }),
-    prisma.tag.findMany({
-      where: { type: CategoryType.ARTICLE, isActive: true },
-      orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
-      select: { id: true, name: true }
-    })
+    getArticleById(articleId),
+    getActiveCategories(CategoryType.ARTICLE),
+    getActiveCities(),
+    getActiveTags(CategoryType.ARTICLE)
   ]);
 
   if (!article) {
@@ -94,19 +76,11 @@ export default async function AdminArticleDetailPage({ params, searchParams }: A
             { label: 'Теги', value: article.tags.length }
           ]}
           />
-          <AdminCmsSection title="Публикация" description="Название и адрес материала.">
+          <AdminCmsSection title="Публикация" description="Название и категория материала.">
             <AdminCmsGrid>
           <FormField htmlFor="article-title" label="Заголовок">
             <Input id="article-title" name="title" required minLength={2} maxLength={160} defaultValue={article.title} />
           </FormField>
-          <FormField htmlFor="article-slug" label="Адрес страницы">
-            <Input id="article-slug" name="slug" maxLength={180} defaultValue={article.slug} />
-          </FormField>
-            </AdminCmsGrid>
-          </AdminCmsSection>
-
-          <AdminCmsSection title="Классификация" description="Рубрика и город для публичных фильтров.">
-            <AdminCmsGrid>
           <FormField htmlFor="article-categoryId" label="Категория">
             <Select id="article-categoryId" name="categoryId" defaultValue={article.categoryId ?? ''}>
               <option value="">Без категории</option>
@@ -117,6 +91,19 @@ export default async function AdminArticleDetailPage({ params, searchParams }: A
               ))}
             </Select>
           </FormField>
+            </AdminCmsGrid>
+          </AdminCmsSection>
+
+          <AdminCmsAdvancedSection title="Технические настройки" description="Адрес страницы. Изменение сломает существующие ссылки.">
+            <AdminCmsGrid>
+          <FormField htmlFor="article-slug" label="Адрес страницы">
+            <Input id="article-slug" name="slug" readOnly defaultValue={article.slug} />
+          </FormField>
+            </AdminCmsGrid>
+          </AdminCmsAdvancedSection>
+
+          <AdminCmsSection title="Классификация" description="Город для публичных фильтров.">
+            <AdminCmsGrid>
           <FormField htmlFor="article-cityId" label="Город">
             <Select id="article-cityId" name="cityId" defaultValue={article.cityId ?? ''}>
               <option value="">Без города</option>
@@ -131,7 +118,7 @@ export default async function AdminArticleDetailPage({ params, searchParams }: A
           </AdminCmsSection>
 
           <AdminCmsAdvancedSection
-            defaultOpen={Boolean(article.authorName || article.sourceLabel || article.readingTimeMinutes)}
+            defaultOpen={Boolean(article.authorName || article.sourceLabel || article.readingTimeMinutes || article.sourceReferences)}
             title="Редакционные данные"
             description="Автор, источник и время чтения. Вторичные поля раскрыты только если уже заполнены."
           >
@@ -155,23 +142,28 @@ export default async function AdminArticleDetailPage({ params, searchParams }: A
             </AdminCmsGrid>
           </AdminCmsAdvancedSection>
 
+          <AdminCmsSection title="Источники и дополнительное чтение" description="Ссылки и описания источников, которые использовались при подготовке материала. Отображаются в конце статьи.">
+            <div className="grid gap-4">
+              <FormField htmlFor="article-sourceReferences" label="Список источников">
+                <Textarea
+                  id="article-sourceReferences"
+                  name="sourceReferences"
+                  maxLength={5000}
+                  defaultValue={article.sourceReferences ?? ''}
+                  placeholder="Например:&#10;- [Perfect Daily Grind](https://perfectdailygrind.com/...)&#10;- [SCA](https://sca.coffee/...)"
+                />
+              </FormField>
+            </div>
+          </AdminCmsSection>
+
           <AdminCmsSection title="Медиа" description="Обложка и alt-текст для карточки и страницы материала.">
             <AdminCmsGrid>
           <CoverImageField id="article-coverImage" currentName={article.coverImage?.originalName} currentAlt={article.coverImageAlt} />
             </AdminCmsGrid>
           </AdminCmsSection>
 
-          <AdminCmsSection title="Статус и настройки" description="Публикационный статус и теги материала.">
+          <AdminCmsSection title="Настройки" description="Теги материала.">
             <AdminCmsGrid>
-          <FormField htmlFor="article-status" label="Статус" hint={PUBLICATION_STATUS_HINT}>
-            <Select id="article-status" name="status" defaultValue={article.status}>
-              {Object.values(ContentStatus).map((status) => (
-                <option key={status} value={status}>
-                  {contentStatusLabels[status]}
-                </option>
-              ))}
-            </Select>
-          </FormField>
           {tags.length > 0 ? (
             <div className="lg:col-span-2">
               <p className="mb-3 text-sm font-semibold">Теги</p>
@@ -195,17 +187,16 @@ export default async function AdminArticleDetailPage({ params, searchParams }: A
 
           <AdminCmsSection title="Контент" description="Короткое описание для списков и основной текст материала.">
             <div className="grid gap-4">
-            <FormField htmlFor="article-summary" label="Краткое описание">
+            <FormField htmlFor="article-summary" label="Описание для карточки" hint="Показывается в каталоге. До 500 символов.">
               <Textarea id="article-summary" name="summary" required minLength={10} maxLength={500} defaultValue={article.summary} />
             </FormField>
-            <FormField htmlFor="article-body" label="Текст">
+            <FormField htmlFor="article-body" label="Текст страницы" hint="Полное содержимое публичной страницы">
               <MarkdownEditor
                 id="article-body"
                 name="body"
                 required
                 minLength={20}
                 maxLength={ARTICLE_BODY_MAX_LENGTH}
-                className="min-h-80"
                 defaultValue={article.body}
               />
             </FormField>
@@ -213,9 +204,6 @@ export default async function AdminArticleDetailPage({ params, searchParams }: A
           </AdminCmsSection>
 
           <AdminCmsActions>
-            <Button href={ADMIN_ARTICLES_PATH} type="button" variant="secondary">
-              Отмена
-            </Button>
             <Button type="submit">Сохранить статью</Button>
           </AdminCmsActions>
       </AdminCmsForm>

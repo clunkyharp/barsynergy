@@ -17,7 +17,7 @@ import { AdminStatusChip } from '@/components/ui/status-badge';
 import { Textarea } from '@/components/ui/textarea';
 import type { AdminContentSearchParams } from '@/lib/admin/content-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
-import { prisma } from '@/modules/admin/queries';
+import { getCategoryList } from '@/lib/admin/admin-queries';
 
 export const dynamic = 'force-dynamic';
 
@@ -42,9 +42,7 @@ export default async function AdminCategoriesPage({ searchParams }: AdminCategor
   await requireAdminSectionAccess('categories');
 
   const params = (await searchParams) ?? {};
-  const categories = await prisma.category.findMany({
-    orderBy: [{ type: 'asc' }, { sortOrder: 'asc' }, { name: 'asc' }]
-  });
+  const categories = await getCategoryList();
 
   return (
     <div className="space-y-8">

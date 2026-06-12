@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
 import { ArrowUpRight, Check } from 'lucide-react';
 import { GeneralSponsorCard } from '@/components/public/general-sponsor-card';
-import { PublicBreadcrumbs, PublicEyebrow } from '@/components/public/public-primitives';
+import { PageHero } from '@/components/public/page-hero';
+import { PublicEyebrow } from '@/components/public/public-primitives';
 import { JsonLd } from '@/components/seo/json-ld';
 import { Button } from '@/components/ui/button';
 import { Panel } from '@/components/ui/panel';
@@ -10,6 +11,7 @@ import { displayFont } from '@/lib/fonts';
 import { getPublishedGeneralSponsors } from '@/lib/public/general-sponsors';
 import { buildPublicPageMetadata } from '@/lib/public/metadata';
 import { buildStaticPageBreadcrumbJsonLd } from '@/lib/public/structured-data';
+import { cn } from '@/lib/utils';
 
 export const metadata: Metadata = buildPublicPageMetadata({
   title: 'Спонсорство',
@@ -96,46 +98,35 @@ const tickerItems = [
 export default async function GeneralSponsorsPage() {
   const generalSponsors = await getPublishedGeneralSponsors();
 
+  const sponsorMedia = (
+    <div className="relative hidden w-80 lg:block">
+      <div
+        aria-hidden="true"
+        className="aspect-[4/3] rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[url('/images/generated/sponsorship-coffee-bar.jpg')] bg-cover bg-center shadow-[0_24px_60px_rgba(20,20,18,0.08)] grayscale-[0.03]"
+      />
+      <div className="absolute -bottom-5 -left-5 rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--surface-elevated)] px-5 py-4 shadow-[0_8px_24px_rgba(20,20,18,0.1)]">
+        <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--muted)]">Барная индустрия</p>
+        <p className={`${displayFont.className} mt-1 text-[1.55rem] font-semibold leading-none text-[var(--text)]`}>СКФО</p>
+      </div>
+    </div>
+  );
+
   return (
     <>
       <JsonLd data={buildStaticPageBreadcrumbJsonLd('/general-sponsors', 'Спонсорство')} />
 
-      {/* ── Hero ── */}
-      <section className="background-zone background-zone-hero border-b border-[var(--line)] pb-16 pt-8 md:pb-24 md:pt-10">
-        <div className="container">
-          <PublicBreadcrumbs current="Спонсорство" />
-          <div className="mt-10 grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.82fr)]">
-            <div className="min-w-0">
-              <PublicEyebrow className="mb-5">Спонсорство BARSYNERGY</PublicEyebrow>
-              <h1 className={`${displayFont.className} text-[clamp(3rem,6.5vw,6.4rem)] font-semibold leading-[0.94] text-[var(--text)]`}>
-                Бренд рядом<br />
-                с профессией
-              </h1>
-              <p className="mt-6 max-w-lg text-base leading-7 text-[var(--muted)]">
-                Поддержите события, обучение и материалы для барной индустрии СКФО. Формат, период и места размещения обсуждаем отдельно.
-              </p>
-              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-                <Button className="rounded-[var(--radius-md)] px-8" href="/contacts?topic=sponsorship#contact-form" size="lg">
-                  Запросить условия сотрудничества
-                </Button>
-                <Button className="rounded-[var(--radius-md)] px-8" href="/contacts?topic=sponsorship-presentation#contact-form" size="lg" variant="secondary">
-                  Получить презентацию
-                </Button>
-              </div>
-            </div>
-            <div className="relative hidden lg:block">
-              <div
-                aria-hidden="true"
-                className="aspect-[4/3] rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[url('/images/generated/sponsorship-coffee-bar.jpg')] bg-cover bg-center shadow-[0_24px_60px_rgba(20,20,18,0.08)] grayscale-[0.03]"
-              />
-              <div className="absolute -bottom-5 -left-5 rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--surface-elevated)] px-5 py-4 shadow-[0_8px_24px_rgba(20,20,18,0.1)]">
-                <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--muted)]">Барная индустрия</p>
-                <p className={`${displayFont.className} mt-1 text-[1.55rem] font-semibold leading-none text-[var(--text)]`}>СКФО</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      <PageHero
+        breadcrumbs={[{ label: 'Спонсорство' }]}
+        eyebrow="Спонсорство BARSYNERGY"
+        title="Бренд рядом с профессией"
+        subtitle="Поддержите события, обучение и материалы для барной индустрии СКФО. Формат, период и места размещения обсуждаем отдельно."
+        tone="light-editorial"
+        actions={[
+          { label: 'Запросить условия сотрудничества', href: '/contacts?topic=sponsorship#contact-form', kind: 'primary' },
+          { label: 'Получить презентацию', href: '/contacts?topic=sponsorship-presentation#contact-form', kind: 'secondary' }
+        ]}
+        media={{ kind: 'slot' as const, children: sponsorMedia }}
+      />
 
       {/* ── Marquee ticker ── */}
       <div className="overflow-hidden border-b border-[var(--line)] bg-[var(--editorial-dark-surface)] py-3.5">
@@ -210,7 +201,7 @@ export default async function GeneralSponsorsPage() {
       <section className="background-zone background-zone-beige border-b border-[var(--line)] py-12 md:py-20">
         <div className="container">
           <div className="grid gap-10 lg:grid-cols-[minmax(0,0.42fr)_minmax(0,1fr)] lg:gap-16">
-            <div className="lg:sticky lg:top-24 lg:self-start">
+            <div className="lg:self-center">
               <PublicEyebrow>Спонсорский лист</PublicEyebrow>
               <h2 className={`${displayFont.className} mt-4 text-[clamp(2.4rem,4.2vw,4.2rem)] font-semibold leading-[0.96] text-[var(--text)]`}>
                 Что получает<br />бренд
@@ -252,9 +243,26 @@ export default async function GeneralSponsorsPage() {
           <div className="grid gap-4 md:grid-cols-3">
             {packageLevels.map((pkg, index) => (
               <article
-                className="flex flex-col rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--surface-card)] p-6 md:p-7"
+                className={cn(
+                  'flex flex-col rounded-[var(--radius-lg)] border p-6 md:p-7',
+                  pkg.recommended
+                    ? 'relative border-[var(--accent)]/40 bg-gradient-to-b from-[var(--accent)]/[0.05] to-transparent shadow-[0_0_12px_-8px_var(--accent)]'
+                    : 'border-[var(--border-default)] bg-[var(--surface-card)]'
+                )}
                 key={index}
               >
+                <span
+                  className={cn(
+                    'mb-4 inline-flex w-fit items-center rounded-full border px-3 py-0.5 text-[11px] font-semibold uppercase tracking-[0.1em]',
+                    pkg.recommended
+                      ? 'border-[var(--accent)]/30 bg-[var(--accent)]/10 text-[var(--accent)]'
+                      : 'border-transparent opacity-0'
+                  )}
+                  aria-hidden={!pkg.recommended}
+                >
+                  Главный формат
+                </span>
+
                 <div>
                   <h3 className={`${displayFont.className} text-[2rem] font-semibold leading-none text-[var(--text)] md:text-[2.2rem]`}>
                     {pkg.packageName}
@@ -276,9 +284,9 @@ export default async function GeneralSponsorsPage() {
                 <div className="flex-1">
                   <ul className="grid gap-3">
                     {pkg.placements.map((item) => (
-                      <li className="flex items-start gap-2.5 text-sm leading-[1.5] text-[var(--text)]" key={item}>
+                      <li className="flex items-center gap-2.5 text-sm leading-[1.5] text-[var(--text)]" key={item}>
                         <Check
-                          className="mt-0.5 shrink-0 text-[var(--text)]"
+                          className="shrink-0 text-[var(--text)]"
                           size={14}
                           strokeWidth={2.5}
                         />
@@ -289,12 +297,22 @@ export default async function GeneralSponsorsPage() {
                 </div>
 
                 <div className="mt-7">
-                  <Button
-                    className="w-full rounded-[var(--radius-md)] !border-[var(--text)] !bg-[var(--text)] !text-[var(--background)] hover:opacity-80"
-                    href={`/contacts?topic=sponsorship&partnerType=${encodeURIComponent(pkg.packageName)}#contact-form`}
-                  >
-                    Запросить условия
-                  </Button>
+                  {pkg.recommended ? (
+                    <Button
+                      className="w-full rounded-[var(--radius-md)]"
+                      href={`/contacts?topic=sponsorship&partnerType=${encodeURIComponent(pkg.packageName)}#contact-form`}
+                      variant="primary"
+                    >
+                      Запросить условия
+                    </Button>
+                  ) : (
+                    <Button
+                      className="w-full rounded-[var(--radius-md)] !border-[var(--text)] !bg-[var(--text)] !text-[var(--background)] hover:opacity-80"
+                      href={`/contacts?topic=sponsorship&partnerType=${encodeURIComponent(pkg.packageName)}#contact-form`}
+                    >
+                      Запросить условия
+                    </Button>
+                  )}
                 </div>
               </article>
             ))}

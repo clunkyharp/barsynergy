@@ -103,7 +103,7 @@ export function EditorialPublicPage({
       <section
         className={cn(
           'background-zone background-zone-hero border-b border-[var(--line)]',
-          isCompact ? 'pt-3 pb-7 md:pt-3 md:pb-10' : 'pt-3 pb-10 md:pt-3 md:pb-14',
+          isCompact ? 'pt-4 pb-7 md:pt-4 md:pb-10' : 'pt-4 pb-10 md:pt-4 md:pb-14',
           isCoverHero && 'relative isolate overflow-hidden bg-[var(--editorial-dark-surface)] text-[var(--editorial-dark-text)]',
           accentGradient && !isCoverHero && 'relative overflow-hidden'
         )}
@@ -161,7 +161,7 @@ export function EditorialPublicPage({
                 <PublicBreadcrumbs current={breadcrumbLabel ?? eyebrow} />
                 <PublicDisplayTitle
                   as="h1"
-                  className="mt-5 max-w-4xl break-words text-[32px] sm:text-[44px] md:text-[58px] xl:text-[68px]"
+                  className="mt-3 max-w-4xl break-words text-[32px] sm:text-[44px] md:text-[58px] xl:text-[68px]"
                   size="section"
                 >
                   {title}

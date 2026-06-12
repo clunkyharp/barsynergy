@@ -88,7 +88,7 @@ export function EditorialListRow({
               </h3>
             </AppLink>
           ) : (
-            <h3 className="public-list-row-title mt-3 text-balance text-[1.85rem] font-bold leading-[1.08] text-[var(--text)] md:text-[2.2rem]">{title}</h3>
+            <h3 className="public-list-row-title mt-3 text-balance text-[1.35rem] font-bold leading-[1.15] text-[var(--text)] md:text-[1.55rem]">{title}</h3>
           )}
           {lead ? <div className="public-list-row-lead mt-3 text-[1.25rem] font-semibold leading-8 text-[var(--text)] md:text-[1.45rem]">{lead}</div> : null}
           {meta ? <div className="public-list-row-meta mt-4">{meta}</div> : null}

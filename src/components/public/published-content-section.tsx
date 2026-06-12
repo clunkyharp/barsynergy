@@ -6,8 +6,8 @@ import { Panel } from '@/components/ui/panel';
 import type { PublishedContentList } from '@/lib/public/content';
 import { cn } from '@/lib/utils';
 import { DefaultListRow } from './published-content-row-default';
-import { OpportunityListRow } from './published-content-row-opportunity';
 import { DirectoryListRow } from './published-content-row-directory';
+import { OpportunityListRow } from './published-content-row-opportunity';
 import { CourseListRow } from './published-content-row-course';
 import {
   pageHref,
@@ -86,8 +86,7 @@ function PublishedContentSectionLayout({
   const listToolbar = (
     <div className="public-catalog-toolbar flex flex-wrap items-center justify-between gap-3">
       <div className="flex items-center gap-2">
-        <span className="text-sm font-semibold text-[var(--accent)]">{countLabel}: {content.total}</span>
-        <span className="text-xs text-[var(--muted)]">{listLabel}</span>
+        <span className="text-sm text-[var(--muted)]">{content.total} {countLabel.toLowerCase()}</span>
       </div>
       <div className="flex items-center gap-3">
         {sortLabel ? (
@@ -109,16 +108,18 @@ function PublishedContentSectionLayout({
       className="public-catalog-section background-zone background-zone-ivory editorial-grid border-b border-[var(--line)] py-8 md:py-14"
       id={sectionId}
     >
-      <div className="container">
-        <PublicDisplayTitle
-          as="h2"
-          className={cn('public-catalog-title max-w-sm', !showSidebarTitle && 'sr-only')}
-        >
-          {title}
-        </PublicDisplayTitle>
-      </div>
-      <div className={cn('container grid gap-6 md:gap-8 xl:grid-cols-[minmax(16rem,0.48fr)_minmax(0,1.52fr)] xl:gap-8', showSidebarTitle && 'mt-5 md:mt-6')}>
-        <aside className="public-catalog-sidebar min-w-0 xl:self-start">
+      {showSidebarTitle ? (
+        <div className="container mb-6 md:mb-8">
+          <PublicDisplayTitle
+            as="h2"
+            className="public-catalog-title max-w-sm"
+          >
+            {title}
+          </PublicDisplayTitle>
+        </div>
+      ) : null}
+      <div className="public-catalog-layout container grid gap-6 md:gap-8 xl:grid-cols-[minmax(16rem,0.48fr)_minmax(0,1.52fr)] xl:items-start xl:gap-8">
+        <aside className="public-catalog-sidebar min-w-0">
           {filters}
         </aside>
 
@@ -213,7 +214,7 @@ export function PublishedContentSectionOpportunity(props: PublishedContentSectio
       listClassName="grid gap-3 md:flex md:flex-col md:gap-4"
       renderRow={(item) => (
         <OpportunityListRow
-          actionLabel={props.rowActionLabel}
+          actionLabel={props.rowActionLabel ?? 'Открыть вакансию'}
           basePath={props.basePath}
           item={item}
         />

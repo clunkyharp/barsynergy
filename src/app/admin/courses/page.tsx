@@ -37,8 +37,8 @@ import {
   getAdminTotalPages,
   type AdminContentSearchParams
 } from '@/lib/admin/content-utils';
+import { getActiveCities, getCourseList } from '@/lib/admin/admin-queries';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
-import { prisma } from '@/modules/admin/queries';
 
 export const dynamic = 'force-dynamic';
 
@@ -81,25 +81,9 @@ export default async function AdminCoursesPage({ searchParams }: AdminCoursesPag
       : {})
   };
 
-  const [total, courses, cities] = await Promise.all([
-    prisma.course.count({ where }),
-    prisma.course.findMany({
-      where,
-      orderBy: [{ createdAt: 'desc' }],
-      skip: (page - 1) * ADMIN_CONTENT_PAGE_SIZE,
-      take: ADMIN_CONTENT_PAGE_SIZE,
-      include: {
-        category: { select: { name: true } },
-        city: { select: { name: true } },
-        coverImage: { select: { originalName: true } },
-        updatedBy: { select: { email: true } }
-      }
-    }),
-    prisma.city.findMany({
-      where: { isActive: true },
-      orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
-      select: { id: true, name: true }
-    })
+  const [[courses, total], cities] = await Promise.all([
+    getCourseList(where, (page - 1) * ADMIN_CONTENT_PAGE_SIZE, ADMIN_CONTENT_PAGE_SIZE),
+    getActiveCities()
   ]);
   const totalPages = getAdminTotalPages(total);
   const hasActiveFilters = Boolean(q || status || cityId || format || level);

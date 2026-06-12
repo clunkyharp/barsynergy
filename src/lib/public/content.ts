@@ -9,7 +9,8 @@ export type {
   PublishedContentMetaGroup,
   PublicContentSearchParams
 } from './content/shared';
-export { getPublishedArticles, getPublishedArticleDetail } from './content/articles';
+export { getPublishedArticles, getPublishedArticleDetail, parseToc } from './content/articles';
+export type { TocItem } from './content/articles';
 export { getPublishedEvents, getPublishedEventDetail } from './content/events';
 export { getPublishedCourses, getPublishedCourseDetail } from './content/education';
 export {

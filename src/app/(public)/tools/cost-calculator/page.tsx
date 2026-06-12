@@ -1,29 +1,35 @@
 import type { Metadata } from 'next';
 import { CostCalculatorClient } from '@/components/public/cost-calculator-client';
-import { EditorialPublicPage } from '@/components/public/editorial-public-page';
+import { PageHero } from '@/components/public/page-hero';
 import { buildPublicPageMetadata } from '@/lib/public/metadata';
+import { JsonLd } from '@/components/seo/json-ld';
+import { buildStaticPageBreadcrumbJsonLd } from '@/lib/public/structured-data';
 
 export const metadata: Metadata = buildPublicPageMetadata({
-  title: 'Сколько стоит ваш напиток',
-  description: 'Считайте себестоимость эспрессо, фильтра, альтернативы или коктейля.',
+  title: 'Калькулятор себестоимости напитка',
+  description: 'Рассчитайте себестоимость напитка, установите оптимальную цену и контролируйте прибыль. Ингредиенты, дополнительные расходы, наценка и рентабельность.',
   path: '/tools/cost-calculator'
 });
 
 export default function CostCalculatorPage() {
   return (
     <>
-      <EditorialPublicPage
-        breadcrumbLabel="Калькулятор себестоимости"
-        description="Считайте себестоимость эспрессо, фильтра, альтернативы или коктейля: введите ингредиенты и получите цену продажи."
+      <JsonLd data={buildStaticPageBreadcrumbJsonLd('/tools/cost-calculator', 'Калькулятор себестоимости')} />
+
+      <PageHero
+        breadcrumbs={[
+          { href: '/', label: 'Главная' },
+          { href: '/tools', label: 'Инструменты' },
+          { label: 'Калькулятор себестоимости' }
+        ]}
         eyebrow="Инструменты"
-        path="/tools/cost-calculator"
-        metrics={[]}
-        rows={[]}
-        summary="Подходит, если нужно быстро проверить цену, подготовить меню или разобрать расчёт с командой."
-        summaryHeading="Для меню и обучения"
-        title="Рассчитайте себестоимость напитка"
+        title="Калькулятор себестоимости"
+        subtitle="Рассчитайте себестоимость напитка, установите оптимальную цену и контролируйте прибыль."
+        tone="light-editorial"
+        density="compact"
       />
-      <div className="scroll-mt-24 md:scroll-mt-28" id="calculator">
+
+      <div className="scroll-mt-4" id="calculator">
         <CostCalculatorClient />
       </div>
     </>

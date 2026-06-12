@@ -13,10 +13,11 @@ type AdminShellFrameProps = {
   children: ReactNode;
   email: string;
   logoutAction: (formData: FormData) => Promise<void>;
+  newApplicationsCount: number;
   role: UserRole;
 };
 
-export function AdminShellFrame({ children, email, logoutAction, role }: AdminShellFrameProps) {
+export function AdminShellFrame({ children, email, logoutAction, newApplicationsCount, role }: AdminShellFrameProps) {
   const [isCollapsed, setIsCollapsed] = useState(
     () => typeof window !== 'undefined' && window.localStorage.getItem(sidebarStorageKey) === 'true'
   );
@@ -28,7 +29,7 @@ export function AdminShellFrame({ children, email, logoutAction, role }: AdminSh
 
   return (
     <div className="admin-layout-grid hidden min-h-screen lg:grid" data-sidebar-state={isCollapsed ? 'collapsed' : 'expanded'}>
-      <AdminSidebar collapsed={isCollapsed} onCollapsedChange={handleCollapsedChange} role={role} />
+      <AdminSidebar collapsed={isCollapsed} onCollapsedChange={handleCollapsedChange} newApplicationsCount={newApplicationsCount} role={role} />
       <div className="admin-main-shell min-w-0">
         <AdminHeader email={email} logoutAction={logoutAction} role={role} />
         <div className="admin-content-area">

@@ -1,10 +1,12 @@
 import type { Metadata } from 'next';
-import { EditorialPublicPage } from '@/components/public/editorial-public-page';
+import { PageHero } from '@/components/public/page-hero';
 import { ContactApplicationForm } from '@/components/public/contact-application-form';
 import { submitContactMessage } from '@/app/(public)/contacts/actions';
+import { JsonLd } from '@/components/seo/json-ld';
+import { buildStaticPageBreadcrumbJsonLd } from '@/lib/public/structured-data';
 import { arePublicApplicationFormsEnabled } from '@/lib/applications/public-forms';
 import { getApplicationCityOptions } from '@/lib/applications/form-options';
-import { getPublicApplicationResult, getPublicApplicationUtm } from '@/lib/applications/public-form-helpers';
+import { getPublicApplicationUtm } from '@/lib/applications/public-form-helpers';
 import { buildPublicPageMetadata } from '@/lib/public/metadata';
 import { getEnv } from '@/lib/validation/env';
 
@@ -29,7 +31,7 @@ const contactTopicAliases: Record<string, string> = {
   'article-topic': 'article-topic',
   'article-interview': 'article-topic',
   'article-launch': 'article-topic',
-  supplier: 'other'
+  supplier: 'supplier'
 };
 
 const contextParamKeys = [
@@ -70,22 +72,18 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
 
   return (
     <>
-      <EditorialPublicPage
-        eyebrow="Команда"
-        path="/contacts"
-        title="Напишите нам"
-        description="Отвечаем в течение рабочего дня. Выберите тему — форма подстроится."
-        summary="Форма — основной способ связаться с командой. Email и Telegram оставили ниже как запасной вариант."
+      <JsonLd data={buildStaticPageBreadcrumbJsonLd('/contacts', 'Контакты')} />
+      <PageHero
+        breadcrumbs={[{ label: 'Контакты' }]}
+        eyebrow="Контакты"
+        title="Контакты"
+        subtitle="Отвечаем в течение рабочего дня. Выберите тему — форма подстроится."
+        tone="light-editorial"
         density="compact"
-        summaryHeading="Связь"
-        accentGradient="radial-gradient(ellipse 90% 60% at 60% 40%, rgba(180,120,60,0.08), transparent)"
-        metrics={[]}
-        rows={[]}
       />
       <ContactApplicationForm
         defaultTopic={defaultTopic}
         enabled={applicationFormsEnabled}
-        result={getPublicApplicationResult(params)}
         utm={getPublicApplicationUtm(params)}
         defaults={defaults}
         cities={cities}

@@ -1,6 +1,5 @@
 'use server';
 
-import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { ApplicationStatus, ApplicationType, UserRole, UserStatus } from '@prisma/client';
 import { Prisma } from '@prisma/client';
@@ -25,7 +24,7 @@ const businessRequestSchema = z.object({
   telegram: z.string().trim().max(80).optional(),
   websiteUrl: z.string().trim().url().max(240).optional().or(z.literal('')),
   description: z.string().trim().max(1000).optional(),
-  consent: z.literal('on')
+  consent: z.literal('accepted')
 });
 
 const registerUserSchema = z.object({
@@ -33,18 +32,13 @@ const registerUserSchema = z.object({
   email: z.string().trim().email().max(255).transform((value) => value.toLowerCase()),
   password: z.string().min(8).max(200),
   confirmPassword: z.string().min(8).max(200),
-  consent: z.literal('on')
+  consent: z.literal('accepted')
 }).refine((data) => data.password === data.confirmPassword, {
   message: 'passwords do not match',
   path: ['confirmPassword']
 });
 
-const REGISTER_USER_FLASH_COOKIE = 'barsynergy-register-user-flash';
-
-type RegisterUserFlash = {
-  email: string;
-  fullName: string;
-};
+export type RegisterUserActionResult = { type: 'error'; code: string } | null;
 
 function authResultPath(path: string, result: { type: 'success' | 'error'; code: string }) {
   const url = new URL(path, 'http://localhost');
@@ -52,35 +46,8 @@ function authResultPath(path: string, result: { type: 'success' | 'error'; code:
   return `${url.pathname}${url.search}`;
 }
 
-async function setRegisterUserFlashCookie(value: RegisterUserFlash | null) {
-  const cookieStore = await cookies();
-
-  if (!value) {
-    cookieStore.delete(REGISTER_USER_FLASH_COOKIE);
-    return;
-  }
-
-  cookieStore.set(
-    REGISTER_USER_FLASH_COOKIE,
-    encodeURIComponent(JSON.stringify(value)),
-    {
-      httpOnly: true,
-      maxAge: 60 * 10,
-      path: '/auth/register/user',
-      sameSite: 'lax'
-    }
-  );
-}
-
-async function redirectWithAuthResult(path: string, result: { type: 'success' | 'error'; code: string }): Promise<never> {
+function redirectWithAuthResult(path: string, result: { type: 'success' | 'error'; code: string }): never {
   redirect(authResultPath(path, result));
-}
-
-function getRegisterUserFlash(formData: FormData): RegisterUserFlash {
-  return {
-    fullName: getString(formData, 'fullName').trim(),
-    email: getString(formData, 'email').trim()
-  };
 }
 
 async function sendUserVerificationEmail(input: { email: string; userId: string }) {
@@ -113,7 +80,7 @@ async function sendUserVerificationEmail(input: { email: string; userId: string 
   sendVerificationEmail({ to: input.email, verificationUrl }).catch(() => {});
 }
 
-async function redirectForExistingUserRegistration(email: string, flash: RegisterUserFlash): Promise<never> {
+async function handleExistingUserRegistration(email: string): Promise<RegisterUserActionResult> {
   const existingUser = await prisma.user.findUnique({
     where: { email },
     select: { id: true, status: true, emailVerifiedAt: true }
@@ -123,8 +90,7 @@ async function redirectForExistingUserRegistration(email: string, flash: Registe
     await sendUserVerificationEmail({ email, userId: existingUser.id });
   }
 
-  await setRegisterUserFlashCookie(flash);
-  return redirectWithAuthResult('/auth/register/user', { type: 'error', code: 'account-check' });
+  return { type: 'error', code: 'account-check' };
 }
 
 function resolveRegisterErrorCode(error: unknown) {
@@ -166,7 +132,7 @@ export async function createBusinessAccountRequestAction(formData: FormData) {
   try {
     await assertAuthAttemptAllowed({ action: 'register', email: businessRequest.email });
 
-    await prisma.$transaction(async (tx) => {
+    const applicationId = await prisma.$transaction(async (tx) => {
       const [existingUser, existingRequest] = await Promise.all([
         tx.user.findUnique({ where: { email: businessRequest.email }, select: { id: true } }),
         tx.application.findFirst({
@@ -178,14 +144,14 @@ export async function createBusinessAccountRequestAction(formData: FormData) {
         })
       ]);
 
-      if (existingUser || existingRequest) return;
+      if (existingUser || existingRequest) return null;
 
       if (businessRequest.cityId) {
         const city = await tx.city.findFirst({ where: { id: businessRequest.cityId, isActive: true }, select: { id: true } });
         if (!city) throw new Error('city is invalid');
       }
 
-      await tx.application.create({
+      const application = await tx.application.create({
         data: {
           type: ApplicationType.BUSINESS_ACCOUNT_REQUEST, status: ApplicationStatus.NEW,
           subject: `Заявка на бизнес-доступ: ${businessRequest.companyName}`,
@@ -197,7 +163,16 @@ export async function createBusinessAccountRequestAction(formData: FormData) {
           consentText: 'Пользователь согласился с политикой обработки персональных данных и дал согласие на обработку персональных данных для рассмотрения заявки на бизнес-доступ.'
         }
       });
+
+      return application.id;
     });
+
+    const url = new URL('/auth/register', 'http://localhost');
+    url.searchParams.set('success', 'business-request-created');
+    if (applicationId) {
+      url.searchParams.set('applicationId', applicationId);
+    }
+    redirect(`${url.pathname}${url.search}`);
   } catch (error) {
     if (error instanceof AuthRateLimitError) {
       await redirectWithAuthResult('/auth/register', { type: 'error', code: 'rate-limited' });
@@ -205,14 +180,16 @@ export async function createBusinessAccountRequestAction(formData: FormData) {
     await redirectWithAuthResult('/auth/register', { type: 'error', code: resolveRegisterErrorCode(error) });
   }
 
-  await redirectWithAuthResult('/auth/login', { type: 'success', code: 'business-request-created' });
+  await redirectWithAuthResult('/auth/register', { type: 'error', code: 'failed' });
 }
 
-export async function registerUserAction(formData: FormData) {
+export async function registerUserAction(
+  _prevState: RegisterUserActionResult,
+  formData: FormData
+): Promise<RegisterUserActionResult> {
   await assertSameOriginServerAction();
 
   await assertTurnstilePassed(getString(formData, 'turnstileToken'));
-  const flash = getRegisterUserFlash(formData);
 
   const parsed = registerUserSchema.safeParse({
     fullName: getString(formData, 'fullName'), email: getString(formData, 'email'),
@@ -221,11 +198,10 @@ export async function registerUserAction(formData: FormData) {
   });
 
   if (!parsed.success) {
-    await setRegisterUserFlashCookie(flash);
-    await redirectWithAuthResult('/auth/register/user', { type: 'error', code: 'invalid' });
+    return { type: 'error', code: 'invalid' };
   }
 
-  const registerRequest = parsed.data!;
+  const registerRequest = parsed.data;
 
   try {
     await assertAuthAttemptAllowed({ action: 'register', email: registerRequest.email });
@@ -235,11 +211,10 @@ export async function registerUserAction(formData: FormData) {
     });
 
     if (existingUser) {
-      return redirectForExistingUserRegistration(registerRequest.email, flash);
+      return handleExistingUserRegistration(registerRequest.email);
     }
 
     const passwordHash = await hashPassword(registerRequest.password);
-
     const user = await prisma.user.create({
       data: {
         email: registerRequest.email, passwordHash, role: UserRole.USER, status: UserStatus.PENDING,
@@ -247,17 +222,14 @@ export async function registerUserAction(formData: FormData) {
       }
     });
     await sendUserVerificationEmail({ email: registerRequest.email, userId: user.id });
-    await setRegisterUserFlashCookie(null);
-    await redirectWithAuthResult('/auth/register/user', { type: 'success', code: 'registered' });
   } catch (error) {
-    if (error instanceof AuthRateLimitError) {
-      await setRegisterUserFlashCookie(flash);
-      await redirectWithAuthResult('/auth/register/user', { type: 'error', code: 'rate-limited' });
-    }
+    if (error instanceof AuthRateLimitError) return { type: 'error', code: 'rate-limited' };
     if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
-      return redirectForExistingUserRegistration(registerRequest.email, flash);
+      return handleExistingUserRegistration(registerRequest.email);
     }
-    await setRegisterUserFlashCookie(flash);
-    await redirectWithAuthResult('/auth/register/user', { type: 'error', code: resolveRegisterErrorCode(error) });
+    return { type: 'error', code: resolveRegisterErrorCode(error) };
   }
+
+  // Success: navigate to success screen (intentional navigation)
+  redirect(authResultPath('/auth/register/user', { type: 'success', code: 'registered' }));
 }

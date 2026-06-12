@@ -1,6 +1,7 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useActionState, useMemo, useState } from 'react';
+import type { PublicApplicationResult } from '@/lib/applications/public-form-helpers';
 import {
   HiddenUtmFields,
   HoneypotField,
@@ -23,7 +24,8 @@ import { contactMethods, contactTopicOptions, type ContactTopicValue } from './c
 
 export { contactMethods, contactTopicOptions, type ContactTopicValue } from './contact-application-form-constants';
 
-export function ContactApplicationForm({ enabled, result, utm, cities, defaultTopic, defaults = {}, action }: PublicApplicationFormProps & { action: (formData: FormData) => void }) {
+export function ContactApplicationForm({ enabled, utm, cities, defaultTopic, defaults = {}, action }: Omit<PublicApplicationFormProps, 'result'> & { action: (prevState: PublicApplicationResult | null, formData: FormData) => Promise<PublicApplicationResult> }) {
+  const [result, formAction] = useActionState(action, null);
   const hasDefaultTopic = defaultTopic ? contactTopicOptions.some((option) => option.value === defaultTopic) : false;
   const initialTopic = hasDefaultTopic ? (defaultTopic as ContactTopicValue) : '';
   const [topic, setTopic] = useState<ContactTopicValue | ''>(initialTopic);
@@ -51,9 +53,47 @@ export function ContactApplicationForm({ enabled, result, utm, cities, defaultTo
                 : topic === 'education-launch'
                   ? 'Расскажите о программе обучения'
                   : 'Сообщение';
+  const showTopicDetails = [
+    'education-program',
+    'education-launch',
+    'vacancy-placement',
+    'partnership',
+    'sponsorship',
+    'consulting',
+    'event',
+    'article-topic'
+  ].includes(topic);
+  const topicDetailsTitle =
+    topic === 'vacancy-placement'
+      ? 'Детали вакансии'
+      : topic === 'event'
+        ? 'Детали события'
+        : topic === 'partnership' || topic === 'sponsorship'
+          ? 'Детали сотрудничества'
+          : topic === 'consulting'
+            ? 'Детали задачи'
+            : topic === 'education-program' || topic === 'education-launch'
+              ? 'Детали по обучению'
+              : topic === 'article-topic'
+                ? 'Детали материала'
+                : 'Детали по теме';
+  const topicDetailsHint =
+    topic === 'vacancy-placement'
+      ? 'Добавили поля: компания, должность, формат занятости и оплата.'
+      : topic === 'event'
+        ? 'Добавили поля: название, дата, площадка, формат и ссылка на регистрацию.'
+        : topic === 'partnership' || topic === 'sponsorship'
+          ? 'Добавили поля: формат и сайт или соцсеть.'
+          : topic === 'consulting'
+            ? 'Добавили поля: компания и направление консультации.'
+            : topic === 'education-program' || topic === 'education-launch'
+              ? 'Добавили поля: компания, тема программы и размер команды.'
+              : topic === 'article-topic'
+                ? 'Добавили поля: тема и формат материала.'
+                : '';
 
   const form = enabled ? (
-    <form action={action} className="editorial-form-shell public-form-shell">
+    <form action={formAction} className="editorial-form-shell public-form-shell">
       <HiddenUtmFields utm={utm} />
       <HoneypotField id="contact-message-website" />
       <PublicFormShellHeader
@@ -102,95 +142,105 @@ export function ContactApplicationForm({ enabled, result, utm, cities, defaultTo
                 </Select>
               </FormField>
               <p className="form-inline-note md:col-span-2">{selectedTopic.description}</p>
-              {(topic === 'education-program' ||
-                topic === 'education-launch' ||
-                topic === 'vacancy-placement' ||
-                topic === 'partnership' ||
-                topic === 'sponsorship' ||
-                topic === 'consulting') ? (
-                <FormField htmlFor="contactCompanyName" label="Компания">
-                  <Input autoComplete="organization" id="contactCompanyName" name="companyName" defaultValue={defaults.companyName} placeholder="Например, Coffee Point" maxLength={180} />
-                </FormField>
-              ) : null}
-              {topic === 'education-program' ? (
-                <>
-                  <FormField htmlFor="contactTopicTitle" label="Тема или программа">
-                    <Input autoComplete="off" id="contactTopicTitle" name="topicTitle" defaultValue={defaults.topicTitle} placeholder="Например, обучение для новой команды" maxLength={180} />
-                  </FormField>
-                  <FormField htmlFor="contactTeamSize" label="Размер команды">
-                    <Input autoComplete="off" id="contactTeamSize" name="teamSize" defaultValue={defaults.teamSize} inputMode="numeric" placeholder="Например, 8 человек" maxLength={80} />
-                  </FormField>
-                </>
-              ) : null}
-              {topic === 'education-launch' ? (
-                <>
-                  <FormField htmlFor="contactTopicTitle" label="Тема или программа">
-                    <Input autoComplete="off" id="contactTopicTitle" name="topicTitle" defaultValue={defaults.topicTitle} placeholder="Например, интенсив по сервису" maxLength={180} />
-                  </FormField>
-                  <FormField htmlFor="contactTeamSize" label="Размер команды">
-                    <Input autoComplete="off" id="contactTeamSize" name="teamSize" defaultValue={defaults.teamSize} inputMode="numeric" placeholder="Например, 12 человек" maxLength={80} />
-                  </FormField>
-                </>
-              ) : null}
-              {topic === 'consulting' ? (
-                <FormField htmlFor="contactTopicTitle" label="Направление консультации">
-                  <Input autoComplete="off" id="contactTopicTitle" name="topicTitle" defaultValue={defaults.topicTitle} placeholder="Например, запуск кофейни" maxLength={180} />
-                </FormField>
-              ) : null}
-              {topic === 'vacancy-placement' ? (
-                <>
-                  <FormField htmlFor="contactPosition" label="Должность">
-                    <Input autoComplete="organization-title" id="contactPosition" name="position" defaultValue={defaults.position} placeholder="Например, бариста" maxLength={160} />
-                  </FormField>
-                  <FormField htmlFor="contactEmploymentType" label="Формат занятости">
-                    <Input autoComplete="off" id="contactEmploymentType" name="employmentType" defaultValue={defaults.employmentType} placeholder="Например, сменный график" maxLength={120} />
-                  </FormField>
-                  <FormField htmlFor="contactSalaryLabel" label="Оплата">
-                    <Input autoComplete="off" id="contactSalaryLabel" name="salaryLabel" defaultValue={defaults.salaryLabel} placeholder="Например, 80 000 + бонусы" maxLength={120} />
-                  </FormField>
-                </>
-              ) : null}
-              {topic === 'event' ? (
-                <>
-                  <FormField htmlFor="contactEventTitle" label="Название события">
-                    <Input autoComplete="off" id="contactEventTitle" name="eventTitle" defaultValue={defaults.eventTitle} placeholder="Например, гостевая смена" maxLength={180} />
-                  </FormField>
-                  <FormField htmlFor="contactEventDate" label="Дата">
-                    <Input id="contactEventDate" name="eventDate" defaultValue={defaults.eventDate} type="date" />
-                  </FormField>
-                  <FormField htmlFor="contactVenueName" label="Площадка">
-                    <Input autoComplete="off" id="contactVenueName" name="venueName" defaultValue={defaults.venueName} placeholder="Например, бар на 40 гостей" maxLength={180} />
-                  </FormField>
-                  <FormField htmlFor="contactFormatLabel" label="Формат">
-                    <Input autoComplete="off" id="contactFormatLabel" name="formatLabel" defaultValue={defaults.formatLabel} placeholder="Например, лекция и дегустация" maxLength={120} />
-                  </FormField>
-                  <FormField className="md:col-span-2" htmlFor="contactRegistrationUrl" label="Ссылка на регистрацию">
-                    <Input autoComplete="url" id="contactRegistrationUrl" name="registrationUrl" defaultValue={defaults.registrationUrl} placeholder="https://example.ru/register" maxLength={500} type="url" />
-                  </FormField>
-                </>
-              ) : null}
-              {(topic === 'partnership' || topic === 'sponsorship') ? (
-                <>
-                  <FormField htmlFor="contactPartnerType" label="Формат">
-                    <Input autoComplete="off" id="contactPartnerType" name="partnerType" defaultValue={defaults.partnerType} placeholder="Например, совместное событие" maxLength={160} />
-                  </FormField>
-                  <FormField htmlFor="contactWebsiteUrl" label="Сайт или соцсеть">
-                    <Input autoComplete="url" id="contactWebsiteUrl" name="websiteUrl" defaultValue={defaults.websiteUrl} placeholder="https://example.ru" maxLength={500} type="url" />
-                  </FormField>
-                </>
-              ) : null}
-              {topic === 'article-topic' ? (
-                <>
-                  <FormField htmlFor="contactTopicTitle" label="Тема или герой">
-                    <Input autoComplete="off" id="contactTopicTitle" name="topicTitle" defaultValue={defaults.topicTitle} placeholder="Например, история локального бара" maxLength={180} />
-                  </FormField>
-                  <FormField htmlFor="contactFormatLabel" label="Формат">
-                    <Input autoComplete="off" id="contactFormatLabel" name="formatLabel" defaultValue={defaults.formatLabel} placeholder="Например, интервью" maxLength={120} />
-                  </FormField>
-                </>
-              ) : null}
             </div>
           </FormSection>
+
+          {showTopicDetails ? (
+            <FormSection title={topicDetailsTitle}>
+              <div className="form-topic-details grid gap-4">
+                <p className="form-inline-note">{topicDetailsHint}</p>
+                <div className="form-topic-details-panel grid gap-4 md:grid-cols-2">
+                  {(topic === 'education-program' ||
+                    topic === 'education-launch' ||
+                    topic === 'vacancy-placement' ||
+                    topic === 'partnership' ||
+                    topic === 'sponsorship' ||
+                    topic === 'consulting') ? (
+                    <FormField htmlFor="contactCompanyName" label="Компания">
+                      <Input autoComplete="organization" id="contactCompanyName" name="companyName" defaultValue={defaults.companyName} placeholder="Например, Coffee Point" maxLength={180} />
+                    </FormField>
+                  ) : null}
+                  {topic === 'education-program' ? (
+                    <>
+                      <FormField htmlFor="contactTopicTitle" label="Тема или программа">
+                        <Input autoComplete="off" id="contactTopicTitle" name="topicTitle" defaultValue={defaults.topicTitle} placeholder="Например, обучение для новой команды" maxLength={180} />
+                      </FormField>
+                      <FormField htmlFor="contactTeamSize" label="Размер команды">
+                        <Input autoComplete="off" id="contactTeamSize" name="teamSize" defaultValue={defaults.teamSize} inputMode="numeric" placeholder="Например, 8 человек" maxLength={80} />
+                      </FormField>
+                    </>
+                  ) : null}
+                  {topic === 'education-launch' ? (
+                    <>
+                      <FormField htmlFor="contactTopicTitle" label="Тема или программа">
+                        <Input autoComplete="off" id="contactTopicTitle" name="topicTitle" defaultValue={defaults.topicTitle} placeholder="Например, интенсив по сервису" maxLength={180} />
+                      </FormField>
+                      <FormField htmlFor="contactTeamSize" label="Размер команды">
+                        <Input autoComplete="off" id="contactTeamSize" name="teamSize" defaultValue={defaults.teamSize} inputMode="numeric" placeholder="Например, 12 человек" maxLength={80} />
+                      </FormField>
+                    </>
+                  ) : null}
+                  {topic === 'consulting' ? (
+                    <FormField htmlFor="contactTopicTitle" label="Направление консультации">
+                      <Input autoComplete="off" id="contactTopicTitle" name="topicTitle" defaultValue={defaults.topicTitle} placeholder="Например, запуск кофейни" maxLength={180} />
+                    </FormField>
+                  ) : null}
+                  {topic === 'vacancy-placement' ? (
+                    <>
+                      <FormField htmlFor="contactPosition" label="Должность">
+                        <Input autoComplete="organization-title" id="contactPosition" name="position" defaultValue={defaults.position} placeholder="Например, бариста" maxLength={160} />
+                      </FormField>
+                      <FormField htmlFor="contactEmploymentType" label="Формат занятости">
+                        <Input autoComplete="off" id="contactEmploymentType" name="employmentType" defaultValue={defaults.employmentType} placeholder="Например, сменный график" maxLength={120} />
+                      </FormField>
+                      <FormField htmlFor="contactSalaryLabel" label="Оплата">
+                        <Input autoComplete="off" id="contactSalaryLabel" name="salaryLabel" defaultValue={defaults.salaryLabel} placeholder="Например, 80 000 + бонусы" maxLength={120} />
+                      </FormField>
+                    </>
+                  ) : null}
+                  {topic === 'event' ? (
+                    <>
+                      <FormField htmlFor="contactEventTitle" label="Название события">
+                        <Input autoComplete="off" id="contactEventTitle" name="eventTitle" defaultValue={defaults.eventTitle} placeholder="Например, гостевая смена" maxLength={180} />
+                      </FormField>
+                      <FormField htmlFor="contactEventDate" label="Дата">
+                        <Input id="contactEventDate" name="eventDate" defaultValue={defaults.eventDate} type="date" />
+                      </FormField>
+                      <FormField htmlFor="contactVenueName" label="Площадка">
+                        <Input autoComplete="off" id="contactVenueName" name="venueName" defaultValue={defaults.venueName} placeholder="Например, бар на 40 гостей" maxLength={180} />
+                      </FormField>
+                      <FormField htmlFor="contactFormatLabel" label="Формат">
+                        <Input autoComplete="off" id="contactFormatLabel" name="formatLabel" defaultValue={defaults.formatLabel} placeholder="Например, лекция и дегустация" maxLength={120} />
+                      </FormField>
+                      <FormField className="md:col-span-2" htmlFor="contactRegistrationUrl" label="Ссылка на регистрацию">
+                        <Input autoComplete="url" id="contactRegistrationUrl" name="registrationUrl" defaultValue={defaults.registrationUrl} placeholder="https://example.ru/register" maxLength={500} type="url" />
+                      </FormField>
+                    </>
+                  ) : null}
+                  {(topic === 'partnership' || topic === 'sponsorship') ? (
+                    <>
+                      <FormField htmlFor="contactPartnerType" label="Формат">
+                        <Input autoComplete="off" id="contactPartnerType" name="partnerType" defaultValue={defaults.partnerType} placeholder="Например, совместное событие" maxLength={160} />
+                      </FormField>
+                      <FormField htmlFor="contactWebsiteUrl" label="Сайт или соцсеть">
+                        <Input autoComplete="url" id="contactWebsiteUrl" name="websiteUrl" defaultValue={defaults.websiteUrl} placeholder="https://example.ru" maxLength={500} type="url" />
+                      </FormField>
+                    </>
+                  ) : null}
+                  {topic === 'article-topic' ? (
+                    <>
+                      <FormField htmlFor="contactTopicTitle" label="Тема или герой">
+                        <Input autoComplete="off" id="contactTopicTitle" name="topicTitle" defaultValue={defaults.topicTitle} placeholder="Например, история локального бара" maxLength={180} />
+                      </FormField>
+                      <FormField htmlFor="contactFormatLabel" label="Формат">
+                        <Input autoComplete="off" id="contactFormatLabel" name="formatLabel" defaultValue={defaults.formatLabel} placeholder="Например, интервью" maxLength={120} />
+                      </FormField>
+                    </>
+                  ) : null}
+                </div>
+              </div>
+            </FormSection>
+          ) : null}
 
           <FormSection title="Сообщение">
             <FormField
@@ -207,7 +257,7 @@ export function ContactApplicationForm({ enabled, result, utm, cities, defaultTo
             <InlineLink href="/legal/personal-data-consent">согласие на обработку персональных данных</InlineLink>, чтобы мы могли ответить на сообщение.
           </ConsentField>
         </div>
-        <PublicFormShellFooter note="После отправки ответим по указанному способу связи.">
+        <PublicFormShellFooter note="После отправки ответим в течение рабочего дня по указанному способу связи.">
           <SubmitButton className="min-h-12 rounded-[var(--radius-md)] px-6 tracking-normal sm:self-start">
             Отправить сообщение
           </SubmitButton>

@@ -36,7 +36,7 @@ import {
   type AdminContentSearchParams
 } from '@/lib/admin/content-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
-import { prisma } from '@/modules/admin/queries';
+import { getActiveCategories, getActiveCities, getArticleList } from '@/lib/admin/admin-queries';
 
 export const dynamic = 'force-dynamic';
 
@@ -77,40 +77,10 @@ export default async function AdminArticlesPage({ searchParams }: AdminArticlesP
       : {})
   };
 
-  const [total, articles, categories, cities] = await Promise.all([
-    prisma.article.count({ where }),
-    prisma.article.findMany({
-      where,
-      orderBy: [{ createdAt: 'desc' }],
-      skip: (page - 1) * ADMIN_CONTENT_PAGE_SIZE,
-      take: ADMIN_CONTENT_PAGE_SIZE,
-      select: {
-        id: true,
-        title: true,
-        slug: true,
-        status: true,
-        updatedAt: true,
-        category: { select: { name: true } },
-        city: { select: { name: true } },
-        coverImage: { select: { originalName: true } },
-        tags: {
-          where: { tag: { isActive: true, type: CategoryType.ARTICLE } },
-          orderBy: { tag: { sortOrder: 'asc' } },
-          select: { tag: { select: { name: true } } }
-        },
-        updatedBy: { select: { email: true } }
-      }
-    }),
-    prisma.category.findMany({
-      where: { type: CategoryType.ARTICLE, isActive: true },
-      orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
-      select: { id: true, name: true }
-    }),
-    prisma.city.findMany({
-      where: { isActive: true },
-      orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
-      select: { id: true, name: true }
-    })
+  const [[articles, total], categories, cities] = await Promise.all([
+    getArticleList(where, (page - 1) * ADMIN_CONTENT_PAGE_SIZE, ADMIN_CONTENT_PAGE_SIZE),
+    getActiveCategories(CategoryType.ARTICLE),
+    getActiveCities()
   ]);
   const totalPages = getAdminTotalPages(total);
   const hasActiveFilters = Boolean(q || status || categoryId || cityId);

@@ -18,6 +18,35 @@ import {
   type PublicContentSearchParams
 } from './shared';
 
+export type TocItem = {
+  id: string;
+  title: string;
+  level: number;
+};
+
+function slugifyHeading(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/[^а-яёa-z0-9\s-]/gi, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '');
+}
+
+export function parseToc(body: string | null | undefined): TocItem[] {
+  if (!body) return [];
+  const headingRegex = /^(#{2,3})\s+(.+)$/gm;
+  const items: TocItem[] = [];
+  let match: RegExpExecArray | null;
+  while ((match = headingRegex.exec(body)) !== null) {
+    const level = match[1].length;
+    const title = match[2].trim();
+    const id = slugifyHeading(title);
+    items.push({ id, title, level });
+  }
+  return items;
+}
+
 export async function getPublishedArticleDetail(slug: string): Promise<PublicContentDetail | null> {
   const article = await prisma.article.findFirst({
     where: { slug, status: ContentStatus.PUBLISHED },
@@ -46,6 +75,9 @@ export async function getPublishedArticleDetail(slug: string): Promise<PublicCon
     updatedAtIso: article.updatedAt.toISOString(),
     body: article.body ? cleanPublicDetailText(article.body) : article.body,
     label: article.category?.name,
+    authorName: article.authorName ?? undefined,
+    readingTime: article.readingTimeMinutes ? `${article.readingTimeMinutes} мин` : undefined,
+    cityName: article.city?.name ?? undefined,
     meta: compact([
       article.city?.name,
       article.authorName,
@@ -57,25 +89,8 @@ export async function getPublishedArticleDetail(slug: string): Promise<PublicCon
       article.sourceLabel ? `Источник: ${article.sourceLabel}` : undefined,
       formatDate(article.publishedAt) ? `Опубликовано: ${formatDate(article.publishedAt)}` : undefined
     ])),
-    sections: [
-      {
-        title: 'В материале',
-        items: compact([
-          article.category?.name ? `Тема: ${article.category.name}.` : undefined,
-          article.city?.name ? `Городской контекст: ${article.city.name}.` : undefined,
-          article.authorName ? `Автор: ${article.authorName}.` : undefined,
-          article.readingTimeMinutes ? `Время чтения: ${article.readingTimeMinutes} мин.` : undefined
-        ])
-      },
-      {
-        title: 'Как использовать',
-        items: compact([
-          'Сохраните материал как ориентир по теме.',
-          article.tags.length > 0 ? `Связанные метки: ${article.tags.map((entry) => entry.tag.name).join(', ')}.` : undefined,
-          'Переходите к похожим материалам ниже, если нужен следующий контекст.'
-        ])
-      }
-    ].filter((section) => section.items.length > 0)
+    sections: [],
+    sourceReferences: article.sourceReferences ?? undefined
   };
 }
 

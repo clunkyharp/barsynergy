@@ -3,101 +3,19 @@
 import { useEffect, useRef, useState } from 'react';
 import { ChevronDown, Search, UserRound } from 'lucide-react';
 import Image from 'next/image';
-import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { AccountMenu } from '@/components/layout/account-menu';
 import { MobileSiteMenu } from '@/components/layout/mobile-site-menu';
+import {
+  type SiteHeaderProps,
+  guestNavItems,
+  desktopPrimaryNavItems,
+  desktopMoreNavItems,
+  isWorkspacePath,
+  isActiveItem
+} from '@/components/layout/site-header-types';
 import { AppLink } from '@/components/ui/app-link';
 import { cn } from '@/lib/utils';
-
-type HeaderUser = {
-  id: string;
-  email: string;
-  role: string;
-  displayName: string | null;
-  avatarUrl: string | null;
-};
-
-type SiteHeaderProps = {
-  user?: HeaderUser | null;
-  logoutAction?: () => Promise<void>;
-};
-
-const guestNavItems = [
-  { label: 'О проекте', href: '/about' },
-  { label: 'Обучение', href: '/education' },
-  { label: 'События', href: '/events' },
-  { label: 'Материалы', href: '/articles' },
-  { label: 'Вакансии', href: '/vacancies' },
-  { label: 'Поставщики', href: '/suppliers' },
-  { label: 'Калькулятор', href: '/tools/cost-calculator' },
-  { label: 'Для бизнеса', href: '/business' },
-  { label: 'Консалтинг', href: '/consulting' },
-  { label: 'Партнёры', href: '/partners' },
-  { label: 'Спонсорство', href: '/general-sponsors' },
-  { label: 'Контакты', href: '/contacts' },
-  { label: 'Войти', href: '/auth/login' }
-];
-
-function getNavItems(hrefs: string[]) {
-  return hrefs
-    .map((href) => guestNavItems.find((item) => item.href === href))
-    .filter((item): item is (typeof guestNavItems)[number] => Boolean(item));
-}
-
-const desktopPrimaryNavItems = getNavItems(['/education', '/events', '/vacancies', '/suppliers', '/business', '/about']);
-const desktopMoreNavItems = getNavItems(['/articles', '/tools/cost-calculator', '/consulting', '/partners', '/general-sponsors', '/contacts']);
-
-function isWorkspacePath(pathname: string | null) {
-  return Boolean(pathname?.startsWith('/admin') || pathname?.startsWith('/business/cabinet') || pathname?.startsWith('/auth'));
-}
-
-const quickLinkItems = [
-  { label: 'Вакансии', href: '/vacancies' },
-  { label: 'Поставщики', href: '/suppliers' },
-  { label: 'Обучение', href: '/education' }
-];
-
-function MobileQuickLinks({ pathname, isHomePath }: { pathname: string | null; isHomePath: boolean }) {
-  if (pathname?.startsWith('/admin') || pathname?.startsWith('/business/cabinet') || pathname?.startsWith('/auth') || pathname?.startsWith('/profile')) {
-    return null;
-  }
-
-  return (
-    <div className={cn('flex items-center gap-2 overflow-x-auto border-b border-[var(--line)] bg-[var(--surface-wash)] px-4 py-2.5 xl:hidden', isHomePath && 'mt-14')}>
-      {quickLinkItems.map((item) => {
-        const isActive = pathname === item.href || pathname?.startsWith(`${item.href}/`);
-
-        return (
-          <Link
-            className={cn(
-              'shrink-0 rounded-[var(--radius-pill)] border px-3 py-1.5 text-[12px] font-semibold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]',
-              isActive
-                ? 'border-[var(--accent)]/35 bg-[var(--accent-soft)] text-[var(--accent)]'
-                : 'border-[var(--line)] bg-[var(--surface)] text-[var(--muted)] hover:border-[var(--accent)] hover:text-[var(--accent)]'
-            )}
-            href={item.href}
-            key={item.href}
-          >
-            {item.label}
-          </Link>
-        );
-      })}
-    </div>
-  );
-}
-
-function isActiveItem(pathname: string, href: string) {
-  if (href === '/auth/login') {
-    return pathname.startsWith('/auth');
-  }
-
-  if (href === '/') {
-    return pathname === '/';
-  }
-
-  return pathname === href || pathname.startsWith(`${href}/`);
-}
 
 export function SiteHeader({ user, logoutAction }: SiteHeaderProps) {
   const pathname = usePathname();
@@ -164,7 +82,6 @@ export function SiteHeader({ user, logoutAction }: SiteHeaderProps) {
   );
 
   return (
-    <div className="contents">
     <header
       className={cn(
         'site-header border-b transition-[background-color,border-color,backdrop-filter] duration-[var(--motion-duration-base)] ease-[var(--motion-ease-standard)]',
@@ -322,17 +239,31 @@ export function SiteHeader({ user, logoutAction }: SiteHeaderProps) {
             {user ? (
               <AccountMenu logoutAction={logoutAction!} user={user} />
             ) : (
-              <AppLink
-                aria-label="Войти в кабинет"
-                className={cn(
-                  'inline-flex min-h-10 shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-[var(--radius-md)] px-3 text-[12px] font-semibold text-inherit transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] hover:bg-[rgba(255,253,249,0.12)] motion-reduce:transition-none',
-                  focusClassName
-                )}
-                href="/auth/login"
-              >
-                <UserRound size={16} strokeWidth={1.8} />
-                <span>Войти</span>
-              </AppLink>
+              <div className="flex items-center gap-1">
+                <AppLink
+                  aria-label="Войти в кабинет"
+                  className={cn(
+                    'inline-flex min-h-10 shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-[var(--radius-md)] px-3 text-[12px] font-semibold text-inherit transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] hover:bg-[rgba(255,253,249,0.12)] motion-reduce:transition-none',
+                    focusClassName
+                  )}
+                  href="/auth/login"
+                >
+                  <UserRound size={16} strokeWidth={1.8} />
+                  <span>Войти</span>
+                </AppLink>
+                <AppLink
+                  className={cn(
+                    'inline-flex min-h-10 shrink-0 items-center justify-center whitespace-nowrap rounded-[var(--radius-md)] border px-3 text-[12px] font-semibold transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] motion-reduce:transition-none',
+                    isHomeTop
+                      ? 'border-white/16 bg-white/8 text-[var(--editorial-dark-text)] hover:bg-white/14'
+                      : 'border-[var(--border-default)] bg-[var(--surface-elevated)] text-[var(--text)] hover:border-[var(--accent)] hover:text-[var(--accent-strong)]',
+                    focusClassName
+                  )}
+                  href="/auth/register/user"
+                >
+                  Регистрация
+                </AppLink>
+              </div>
             )}
           </div>
           <div className="flex shrink-0 items-center gap-2 xl:hidden">
@@ -352,7 +283,5 @@ export function SiteHeader({ user, logoutAction }: SiteHeaderProps) {
         </div>
       </div>
     </header>
-    <MobileQuickLinks isHomePath={isHomePath} pathname={pathname} />
-    </div>
   );
 }

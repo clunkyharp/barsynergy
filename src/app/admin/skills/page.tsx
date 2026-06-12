@@ -14,7 +14,7 @@ import { Select } from '@/components/ui/select';
 import { AdminStatusChip } from '@/components/ui/status-badge';
 import type { AdminContentSearchParams } from '@/lib/admin/content-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
-import { prisma } from '@/modules/admin/queries';
+import { getSkillList } from '@/lib/admin/admin-queries';
 
 export const dynamic = 'force-dynamic';
 
@@ -28,9 +28,7 @@ export default async function AdminSkillsPage({ searchParams }: AdminSkillsPageP
   await requireAdminSectionAccess('skills');
 
   const params = (await searchParams) ?? {};
-  const skills = await prisma.skill.findMany({
-    orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }]
-  });
+  const skills = await getSkillList();
 
   return (
     <div className="space-y-8">

@@ -7,7 +7,7 @@ import { PublicRelatedContentSection } from '@/components/public/public-related-
 import { JsonLd } from '@/components/seo/json-ld';
 import { getApplicationCityOptions } from '@/lib/applications/form-options';
 import { arePublicApplicationFormsEnabled } from '@/lib/applications/public-forms';
-import { getPublicApplicationResult, getPublicApplicationUtm } from '@/lib/applications/public-form-helpers';
+import { getPublicApplicationUtm } from '@/lib/applications/public-form-helpers';
 import { getPublishedEvents } from '@/lib/public/content';
 import { getPublishedEventDetail } from '@/lib/public/content';
 import { buildMissingPublicContentMetadata, buildPublicContentMetadata } from '@/lib/public/metadata';
@@ -93,7 +93,6 @@ export default async function EventDetailPage({ params, searchParams }: EventDet
           cities={cities}
           defaults={{ eventTitle: event.title }}
           enabled={applicationFormsEnabled}
-          result={getPublicApplicationResult(query)}
           utm={getPublicApplicationUtm(query)}
           action={submitEventApplication}
         />

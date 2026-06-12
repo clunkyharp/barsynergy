@@ -31,7 +31,8 @@ const guardedActionFiles = [
   'src/app/auth/verify-email/actions.ts',
   'src/app/auth/password-reset/actions.ts',
   'src/app/auth/business-activation/actions.ts',
-  'src/lib/business/actions.ts'
+  'src/lib/business/profile-actions.ts',
+  'src/lib/business/application-actions.ts'
 ];
 
 test('high-risk server action files call same-origin guard', () => {

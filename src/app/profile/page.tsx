@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
-import { ArrowRight, FileText, Heart, Search, Settings } from 'lucide-react';
+import { ArrowRight, BookOpen, BriefcaseBusiness, FileText, Heart, PartyPopper, Search, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { InlineAlert } from '@/components/ui/inline-alert';
 import { MetaChip } from '@/components/ui/meta-chip';
@@ -9,6 +9,7 @@ import { ProfileProgressRing } from '@/components/profile/profile-progress-ring'
 import { getCurrentUser } from '@/lib/auth/current-user';
 import { getFullUser } from '@/modules/profile/queries';
 import { buildPrivatePageMetadata } from '@/lib/public/metadata';
+import { displayFont } from '@/lib/fonts';
 
 export const metadata: Metadata = buildPrivatePageMetadata({
   title: 'Профиль',
@@ -64,7 +65,13 @@ function formatSalary(value: number | null): string | null {
   return value.toLocaleString('ru-RU');
 }
 
-export default async function ProfileDashboardPage() {
+type ProfileDashboardPageProps = {
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+};
+
+export default async function ProfileDashboardPage({ searchParams }: ProfileDashboardPageProps) {
+  const params = (await searchParams) ?? {};
+  const isWelcome = (Array.isArray(params.welcome) ? params.welcome[0] : params.welcome) === '1';
   const currentUser = await getCurrentUser();
 
   if (!currentUser) {
@@ -92,6 +99,42 @@ export default async function ProfileDashboardPage() {
 
   return (
     <div className="space-y-6">
+      {isWelcome ? (
+        <Panel padding="lg" tone="elevated">
+          <div className="flex items-start gap-4">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[var(--accent-soft)]">
+              <PartyPopper aria-hidden className="text-[var(--accent)]" size={22} strokeWidth={1.5} />
+            </div>
+            <div className="min-w-0 flex-1">
+              <h2 className={`${displayFont.className} text-[1.25rem] font-semibold leading-tight text-[var(--text)]`}>
+                Добро пожаловать в BARSYNERGY!
+              </h2>
+              <p className="mt-1 text-sm leading-6 text-[var(--muted)]">
+                Аккаунт активирован. Заполните профиль, чтобы работодатели могли найти вас, и исследуйте платформу.
+              </p>
+              <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-3">
+                {[
+                  { href: '/profile/settings', icon: Settings, label: 'Заполнить профиль', description: 'Имя, город, профессия, контакты' },
+                  { href: '/vacancies', icon: BriefcaseBusiness, label: 'Найти вакансии', description: 'Открытые позиции в СКФО' },
+                  { href: '/education', icon: BookOpen, label: 'Найти обучение', description: 'Интенсивы и курсы' },
+                ].map((item) => (
+                  <a
+                    className="group flex items-center gap-3 rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--surface-wash)] px-3 py-2.5 transition-colors hover:border-[var(--accent)]/35 hover:bg-[var(--accent-soft)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
+                    href={item.href}
+                    key={item.href}
+                  >
+                    <item.icon aria-hidden className="shrink-0 text-[var(--muted)] transition-colors group-hover:text-[var(--accent)]" size={18} strokeWidth={1.5} />
+                    <span>
+                      <span className="block text-[13px] font-semibold text-[var(--text)]">{item.label}</span>
+                      <span className="block text-[11px] leading-4 text-[var(--muted)]">{item.description}</span>
+                    </span>
+                  </a>
+                ))}
+              </div>
+            </div>
+          </div>
+        </Panel>
+      ) : null}
       <Panel padding="lg" tone="elevated">
         <div className="grid grid-cols-[4rem_1fr_auto] items-start gap-4">
           <span className="grid size-16 place-items-center rounded-full bg-[var(--accent-soft)] text-xl font-bold text-[var(--accent)]">

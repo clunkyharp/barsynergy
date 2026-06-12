@@ -2,7 +2,7 @@ import type { ApplicationStatus as AppStatus, ApplicationType as AppType } from 
 import { StatusBadge } from '@/components/ui/status-badge';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { applicationStatusBadgeVariants, applicationStatusLabels, applicationTypeLabels, formatApplicationPayloadValue, getApplicationPayloadFieldLabel } from '@/lib/admin/application-utils';
+import { applicationStatusBadgeVariants, applicationStatusLabels, formatApplicationPayloadValue, getApplicationPayloadFieldLabel } from '@/lib/admin/application-utils';
 
 type ApplicationInfoProps = {
   application: {
@@ -61,14 +61,6 @@ export function ApplicationInfo({ application }: ApplicationInfoProps) {
     : application.type === 'CONSULTING_REQUEST' ? 'Описание задачи' : 'Сообщение';
   return (
     <>
-      <header>
-        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Админка / Заявки</p>
-        <h1 className="mt-2 text-3xl font-semibold">{application.subject || applicationTypeLabels[application.type]}</h1>
-        <p className="mt-2 max-w-2xl text-[var(--muted)]">
-          {applicationTypeLabels[application.type]} / создана {dateTimeFormatter.format(application.createdAt)}
-        </p>
-      </header>
-
       <Card className="p-5">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 className="text-lg font-semibold">Данные заявки</h2>

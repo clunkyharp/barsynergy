@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ArrowUpRight, BriefcaseBusiness, Calculator, GraduationCap, BookOpen, PackageCheck, Users } from 'lucide-react';
+import { ArrowUpRight } from 'lucide-react';
 import { HomeHeroRouter } from './homepage-hero';
 import { HomeEventsStrip, EditorialFeatured, EditorialSupportCard } from './homepage-current';
 import { CommunityChannelRows } from './homepage-community';
@@ -8,15 +8,6 @@ import { HomeCtaFaqSection } from './home-cta-faq-section';
 import { Button } from '@/components/ui/button';
 import { bodyFont, displayFont } from '@/lib/fonts';
 import type { HomepageData, HomepageLiveCard } from '@/lib/public/home';
-
-const platformTools = [
-  { href: '/vacancies', label: 'Вакансии', description: 'Открытые позиции в барах и кофейнях СКФО — от бариста до управляющего', icon: BriefcaseBusiness },
-  { href: '/education', label: 'Обучение', description: 'Интенсивы и профессиональные курсы для специалистов и команд', icon: GraduationCap },
-  { href: '/articles', label: 'Материалы', description: 'Разборы, интервью и практические кейсы по работе с баром', icon: BookOpen },
-  { href: '/suppliers', label: 'Поставщики', description: 'Проверенные обжарщики, дистрибьюторы и сервисные компании', icon: PackageCheck },
-  { href: '/consulting', label: 'Консалтинг', description: 'Экспертная помощь при открытии, запуске и развитии заведения', icon: Users },
-  { href: '/tools/cost-calculator', label: 'Калькулятор', description: 'Себестоимость напитка, наценка и рекомендованная цена', icon: Calculator }
-];
 
 type HomepageClientProps = {
   data: HomepageData;
@@ -34,12 +25,13 @@ export function HomepageClient({ data }: HomepageClientProps) {
     imageUrl: '/images/home/current-event-card.png',
     isFallback: true
   };
+  const liveSectionCards = [data.vacancy, data.supplier, data.event, data.course, data.article, materialsCard];
 
   return (
     <div className="overflow-x-hidden">
       <HomeHeroRouter stats={data.stats} />
 
-      <section className="editorial-current-section scroll-mt-28 border-b border-white/8 py-14 md:py-20" data-theme="dark" id="home-fresh">
+      <section className="editorial-current-section scroll-mt-28 border-b border-white/8 py-12 md:py-20" data-theme="dark" id="home-fresh">
         <div className="container">
           <div className="mb-7 flex flex-wrap items-end justify-between gap-4 md:mb-9">
             <h2 className={`${displayFont.className} text-[2.35rem] font-semibold leading-none text-[var(--editorial-dark-text)] md:text-[3.2rem]`}>
@@ -66,35 +58,32 @@ export function HomepageClient({ data }: HomepageClientProps) {
 
       <HomeEventsStrip event={data.event} />
 
-      <section className="background-zone background-zone-ivory border-b border-[var(--line)] py-12 md:py-16" id="home-tools">
+      <section className="background-zone background-zone-ivory border-b border-[var(--line)] py-10 md:py-14" id="home-tools">
         <div className="container">
           <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
             <div>
-              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--muted)]">Разделы платформы</p>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--muted)]">Свежие карточки</p>
               <h2 className={`${displayFont.className} mt-2 text-[2rem] font-semibold leading-none text-[var(--text)] md:text-[2.6rem]`}>
-                Всё для вашего заведения
+                Свежее на платформе
               </h2>
+              <p className="mt-3 max-w-2xl text-sm leading-7 text-[var(--muted)]">
+                Живые карточки из вакансий, поставщиков, событий, обучения и материалов без промежуточного меню-раздела.
+              </p>
             </div>
+            <Button className="px-0 text-sm tracking-normal" href="/search" variant="link">
+              Открыть поиск
+              <ArrowUpRight size={16} />
+            </Button>
           </div>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 md:gap-4">
-            {platformTools.map((tool) => (
-              <Link
-                className="home-section-card group relative flex min-h-[140px] flex-col gap-4 overflow-hidden rounded-[var(--radius-lg)] border border-[var(--line)] bg-[var(--surface-card)] p-5 transition-[border-color,background-color,box-shadow] duration-[var(--motion-duration-base)] hover:border-[var(--accent)]/50 hover:bg-[var(--surface-card-hover)] hover:shadow-[0_4px_20px_rgba(0,0,0,0.07)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] md:p-6"
-                href={tool.href}
-                key={tool.href}
-              >
-                <span className="absolute inset-x-0 top-0 h-[3px] rounded-t-[var(--radius-lg)] bg-[var(--accent)] opacity-0 transition-opacity duration-[var(--motion-duration-base)] group-hover:opacity-100" />
-                <span className="flex items-start justify-between gap-2">
-                  <span className="inline-flex h-11 w-11 items-center justify-center rounded-[var(--radius-sm)] bg-[var(--accent)] text-white transition-colors duration-[var(--motion-duration-base)] group-hover:bg-[var(--accent-strong)]">
-                    <tool.icon size={18} strokeWidth={1.5} />
-                  </span>
-                  <ArrowUpRight className="mt-1 shrink-0 text-[var(--muted)] transition-[transform,color] duration-[var(--motion-duration-base)] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-[var(--accent)]" size={16} strokeWidth={1.8} />
-                </span>
-                <span className="flex flex-col gap-1.5">
-                  <span className="text-base font-semibold text-[var(--text)]">{tool.label}</span>
-                  <span className="text-sm leading-[1.55] text-[var(--muted)]">{tool.description}</span>
-                </span>
-              </Link>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            {liveSectionCards.map((card, index) => (
+              <EditorialSupportCard
+                actionLabel={card.actionLabel}
+                card={card}
+                fallbackMeta="Раздел платформы"
+                key={`${card.kind}-${card.href}-${index}`}
+                label={card.eyebrow}
+              />
             ))}
           </div>
         </div>

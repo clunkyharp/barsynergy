@@ -11,7 +11,7 @@ import { cn } from '@/lib/utils';
 export function EventsHeroSection() {
   return (
     <section
-      className="background-zone background-zone-graphite relative overflow-hidden border-b border-[var(--line)] pt-3 pb-10 md:pt-3 md:pb-14"
+      className="background-zone background-zone-graphite relative overflow-hidden border-b border-[var(--line)]"
       style={{
         backgroundImage: [
           'linear-gradient(105deg, rgba(10,9,8,0.90) 0%, rgba(12,11,9,0.72) 50%, rgba(10,9,8,0.52) 100%)',
@@ -22,16 +22,17 @@ export function EventsHeroSection() {
         backgroundRepeat: 'no-repeat',
       }}
     >
-
       <div className="container">
-        <PublicBreadcrumbs current="События" />
-        <h1 className={`${displayFont.className} mt-5 text-[clamp(3rem,6.5vw,5.5rem)] font-semibold leading-none text-[var(--text)]`}>
-          События
-        </h1>
-        <p className="mt-4 max-w-md text-[15px] leading-7 text-[var(--muted)]">
-          Каппинги, чемпионаты, лекции, мастер-классы<br className="hidden sm:block" />
-          и встречи кофейного сообщества.
-        </p>
+        <div className="flex min-h-[360px] max-w-xl flex-col pt-4 pb-10 md:min-h-[400px] md:pt-4 md:pb-14">
+          <PublicBreadcrumbs current="События" />
+          <h1 className={`${displayFont.className} mt-3 text-[clamp(2.4rem,5.5vw,4.2rem)] font-semibold leading-none text-[var(--text)]`}>
+            События
+          </h1>
+          <p className="mt-4 text-[15px] leading-7 text-[var(--muted)]">
+            Каппинги, чемпионаты, лекции, мастер-классы<br className="hidden sm:block" />
+            и встречи кофейного сообщества.
+          </p>
+        </div>
       </div>
     </section>
   );
@@ -133,23 +134,30 @@ function PillLink({ href, active, children }: { href: string; active: boolean; c
 export function EventsQuickFilters({ categories, formats, selectedPeriod, selectedFormat, selectedCategory }: EventsQuickFiltersProps) {
   const isAll = (!selectedPeriod || selectedPeriod === 'upcoming') && !selectedFormat && !selectedCategory;
 
+  const hasExtras = formats.length > 0 || categories.length > 0;
+
   return (
     <section className="background-zone background-zone-graphite border-b border-[var(--line)] py-3">
-      <div className="container overflow-x-auto">
-        <div className="flex flex-nowrap items-center gap-2 sm:flex-wrap">
-          <PillLink active={isAll} href="/events">Все</PillLink>
-          <PillLink active={selectedPeriod === 'today'} href="/events?period=today">Сегодня</PillLink>
-          <PillLink active={selectedPeriod === 'this_week'} href="/events?period=this_week">На этой неделе</PillLink>
-          {formats.map((fmt) => (
-            <PillLink active={selectedFormat === fmt.value} href={`/events?format=${fmt.value}`} key={fmt.value}>
-              {fmt.label}
-            </PillLink>
-          ))}
-          {categories.map((cat) => (
-            <PillLink active={selectedCategory === cat.slug} href={`/events?category=${cat.slug}`} key={cat.id}>
-              {cat.name}
-            </PillLink>
-          ))}
+      <div className="container">
+        <div className="-mx-4 overflow-x-auto px-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <div className="flex flex-nowrap items-center gap-2 pb-0.5">
+            <PillLink active={isAll} href="/events">Все</PillLink>
+            <PillLink active={selectedPeriod === 'today'} href="/events?period=today">Сегодня</PillLink>
+            <PillLink active={selectedPeriod === 'this_week'} href="/events?period=this_week">На этой неделе</PillLink>
+            {hasExtras && (
+              <span aria-hidden="true" className="mx-1 h-4 w-px shrink-0 bg-[var(--line)]" />
+            )}
+            {formats.map((fmt) => (
+              <PillLink active={selectedFormat === fmt.value} href={`/events?format=${fmt.value}`} key={fmt.value}>
+                {fmt.label}
+              </PillLink>
+            ))}
+            {categories.map((cat) => (
+              <PillLink active={selectedCategory === cat.slug} href={`/events?category=${cat.slug}`} key={cat.id}>
+                {cat.name}
+              </PillLink>
+            ))}
+          </div>
         </div>
       </div>
     </section>

@@ -1,22 +1,19 @@
 'use server';
 
-import { redirect } from 'next/navigation';
 import { ApplicationType } from '@prisma/client';
 import { z } from 'zod';
 import { buildApplicationPayload } from '@/lib/applications/application-payloads';
 import {
   assertActiveCity,
   baseContactSchema,
-  getPublicApplicationResultPath,
   getString,
   nullableString,
   optionalString,
   PERSONAL_DATA_CONSENT_TEXT,
+  type PublicApplicationResult,
   utmSchema
 } from '@/lib/applications/public-form-helpers';
 import { submitPublicApplicationAction } from '@/lib/applications/submit-public-application-action';
-
-const PARTNERS_PATH = '/partners';
 
 const partnerApplicationSchema = baseContactSchema
   .merge(utmSchema)
@@ -31,17 +28,12 @@ const partnerApplicationSchema = baseContactSchema
   })
   .refine((data) => data.email || data.phone || data.telegram, { message: 'contact is required' });
 
-function redirectWithPartnersResult(result: { type: 'success' | 'error'; message: string }): never {
-  redirect(getPublicApplicationResultPath(PARTNERS_PATH, result));
-}
-
-export async function submitPartnerApplication(formData: FormData) {
-  await submitPublicApplicationAction({
+export async function submitPartnerApplication(_prevState: PublicApplicationResult | null, formData: FormData): Promise<PublicApplicationResult> {
+  return submitPublicApplicationAction({
     actionName: 'public:partner-application',
     applicationType: ApplicationType.PARTNER_APPLICATION,
     formData,
     successMessage: 'Заявку на партнёрство получили.',
-    redirectWithResult: redirectWithPartnersResult,
     parse: async (data) => {
       const parsed = partnerApplicationSchema.parse({
         companyName: getString(data, 'companyName'),

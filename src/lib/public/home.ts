@@ -26,6 +26,7 @@ export type HomepageLiveCard = {
   href: string;
   actionLabel: string;
   imageUrl?: string;
+  authorName?: string;
   isFallback: boolean;
 };
 
@@ -253,6 +254,7 @@ function toHomepageCard(
     href,
     actionLabel,
     imageUrl: item.imageUrl ?? fallbackCards[kind].imageUrl,
+    authorName: item.authorName,
     isFallback: false
   };
 }
@@ -346,11 +348,11 @@ export async function getHomepageData(): Promise<HomepageData> {
       )
     : undefined;
   const featuredVacancy = withHomepageImageOverride(
-    toHomepageCard(vacancies.items[0], 'vacancy', '/vacancies', 'Найти вакансию', 'Открытая вакансия'),
+    toHomepageCard(vacancies.items[0], 'vacancy', vacancies.items[0] ? `/vacancies/${vacancies.items[0].slug}` : '/vacancies', 'Найти вакансию', 'Открытая вакансия'),
     homepageEditorialImageOverrides.vacancy
   );
   const supplierCard = withHomepageImageOverride(
-    toHomepageCard(featuredSupplier, 'supplier', '/suppliers', 'Смотреть поставщиков', 'Поставщик'),
+    toHomepageCard(featuredSupplier, 'supplier', featuredSupplier ? `/suppliers/${featuredSupplier.slug}` : '/suppliers', 'Смотреть поставщиков', 'Поставщик'),
     homepageEditorialImageOverrides.supplier
   );
   const partnerSignals =
@@ -378,8 +380,8 @@ export async function getHomepageData(): Promise<HomepageData> {
       imagePath: card.imagePath ?? undefined,
       iconKey: card.iconKey ?? undefined
     })),
-    course: toHomepageCard(courses.items[0], 'course', '/education', 'Выбрать программу', 'Обучение'),
-    event: toHomepageCard(featuredEvent, 'event', '/events', 'Выбрать событие', 'Ближайшее событие'),
+    course: toHomepageCard(courses.items[0], 'course', courses.items[0] ? `/education/${courses.items[0].slug}` : '/education', 'Выбрать программу', 'Обучение'),
+    event: toHomepageCard(featuredEvent, 'event', featuredEvent ? `/events/${featuredEvent.slug}` : '/events', 'Выбрать событие', 'Ближайшее событие'),
     article: featuredArticle,
     secondaryArticle,
     vacancy: featuredVacancy,

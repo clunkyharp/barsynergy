@@ -1,5 +1,6 @@
 'use client';
 
+import { useActionState } from 'react';
 import {
   ContactChannelFieldset,
   HiddenUtmFields,
@@ -8,6 +9,7 @@ import {
   PublicFormShellFooter,
   type PublicApplicationFormProps
 } from '@/components/public/application-form-section';
+import type { PublicApplicationResult } from '@/lib/applications/public-form-helpers';
 import { PublicBodyText, PublicDisplayTitle, PublicEyebrow } from '@/components/public/public-primitives';
 import { PublicFormValidation } from '@/components/public/public-form-validation';
 import { ConsentField } from '@/components/ui/consent-field';
@@ -27,12 +29,13 @@ import {
 import { useRef } from 'react';
 import { useFormDraftAutoSave } from '@/lib/hooks/use-form-draft';
 
-type ConsultingRequestFormProps = PublicApplicationFormProps & {
+type ConsultingRequestFormProps = Omit<PublicApplicationFormProps, 'result'> & {
   direct?: boolean;
-  action: (formData: FormData) => void;
+  action: (prevState: PublicApplicationResult | null, formData: FormData) => Promise<PublicApplicationResult>;
 };
 
-export function ConsultingRequestForm({ enabled, result, utm, cities, defaults = {}, direct = false, action }: ConsultingRequestFormProps) {
+export function ConsultingRequestForm({ enabled, utm, cities, defaults = {}, direct = false, action }: ConsultingRequestFormProps) {
+  const [result, formAction] = useActionState(action, null);
   const formRef = useRef<HTMLFormElement>(null);
   useFormDraftAutoSave('consulting-request', formRef);
 
@@ -49,10 +52,10 @@ export function ConsultingRequestForm({ enabled, result, utm, cities, defaults =
       disclosureTitle="Заявка на консультацию"
       enabled={enabled}
       introVariant={direct ? 'compact' : undefined}
-      result={result}
+      result={result ?? undefined}
       sectionId="consulting-request"
     >
-      <form action={action} className="editorial-form-shell public-form-shell" noValidate ref={formRef}>
+      <form action={formAction} className="editorial-form-shell public-form-shell" noValidate ref={formRef}>
         <PublicFormValidation />
         <HiddenUtmFields utm={utm} />
         <HoneypotField id="consulting-request-website" />

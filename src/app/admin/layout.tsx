@@ -6,6 +6,7 @@ import { Panel } from '@/components/ui/panel';
 import { getCurrentUser } from '@/lib/auth/current-user';
 import { canAccessAdmin } from '@/lib/auth/permissions';
 import { logoutAction } from '@/app/auth/login/actions';
+import { getNewApplicationCount } from '@/lib/admin/admin-queries';
 
 function AdminMobileUnsupportedState() {
   return (
@@ -42,10 +43,12 @@ export default async function AdminLayout({ children }: { children: ReactNode })
     redirect('/');
   }
 
+  const newApplicationsCount = await getNewApplicationCount();
+
   return (
     <div className="admin-shell min-h-screen">
       <AdminMobileUnsupportedState />
-      <AdminShellFrame email={user.email} logoutAction={logoutAction} role={user.role}>{children}</AdminShellFrame>
+      <AdminShellFrame email={user.email} logoutAction={logoutAction} role={user.role} newApplicationsCount={newApplicationsCount}>{children}</AdminShellFrame>
     </div>
   );
 }
