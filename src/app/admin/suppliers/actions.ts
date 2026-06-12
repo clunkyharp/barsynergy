@@ -20,6 +20,7 @@ import { deleteContentDraft, updateContentStatus } from '@/lib/admin/content-lif
 import { revalidateSupplierPublicPaths } from '@/lib/admin/public-content-revalidation';
 import { prisma } from '@/lib/db/prisma';
 import { withAdminAction } from '@/lib/server-action-wrappers';
+import { maybeNotifyFirstPublication } from '@/lib/notifications/web-push/publish-trigger';
 import { normalizeExternalUrlInput } from '@/lib/validation/external-url';
 
 const ADMIN_SUPPLIERS_PATH = '/admin/suppliers';
@@ -80,9 +81,16 @@ export async function createSupplier(formData: FormData) {
         baseSlug: slug, exists: async (candidate) => Boolean(await prisma.supplier.findFirst({ where: { slug: candidate }, select: { id: true } })),
         persist: (uniqueSlug) => prisma.supplier.create({
           data: { title: parsed.companyName, slug: uniqueSlug, summary: parsed.summary, description: parsed.description, status: parsed.status, coverImageId, coverImageAlt: nullableString(parsed.coverImageAlt), categoryId: nullableString(parsed.categoryId), cityId: nullableString(parsed.cityId), companyName: parsed.companyName, websiteUrl: nullableString(websiteUrl), contactLabel: nullableString(parsed.contactLabel), isVerified: parsed.isVerified, serviceArea: nullableString(parsed.serviceArea), createdById: user.id, updatedById: user.id, ...initialPublicationDates(parsed.status) },
-          select: { slug: true }
+          select: { slug: true, id: true, title: true }
         })
       });
+
+      await maybeNotifyFirstPublication(
+        'supplier',
+        ContentStatus.DRAFT,
+        parsed.status,
+        { id: createdSupplier.id, title: createdSupplier.title, slug: createdSupplier.slug, publishedAt: null }
+      );
 
       revalidatePath(ADMIN_SUPPLIERS_PATH);
       revalidateSupplierPublicPaths(createdSupplier.slug);
@@ -115,7 +123,7 @@ export async function updateSupplier(formData: FormData) {
       const slug = slugify(parsed.slug ?? parsed.title);
       if (!slug) throw new Error('Supplier slug is required.');
 
-      const existingSupplier = await prisma.supplier.findUniqueOrThrow({ where: { id: parsed.supplierId }, select: { coverImageId: true, publishedAt: true, slug: true } });
+      const existingSupplier = await prisma.supplier.findUniqueOrThrow({ where: { id: parsed.supplierId }, select: { id: true, coverImageId: true, publishedAt: true, slug: true, title: true, status: true } });
       const previousCoverImageId = existingSupplier.coverImageId;
 
       await assertActiveContentRelations({ entityName: 'Supplier', categoryId: parsed.categoryId, categoryType: CategoryType.SUPPLIER, cityId: parsed.cityId });
@@ -132,6 +140,8 @@ export async function updateSupplier(formData: FormData) {
 
       if (previousCoverImageId !== coverImageId) await deleteUploadedFileIfUnused(previousCoverImageId);
 
+      await maybeNotifyFirstPublication('supplier', existingSupplier.status, parsed.status, existingSupplier);
+
       revalidatePath(ADMIN_SUPPLIERS_PATH);
       revalidateSupplierPublicPaths(updatedSupplier.slug, existingSupplier.slug);
       return { type: 'success', message: 'Поставщик обновлён.' };
@@ -147,12 +157,14 @@ export async function updateSupplierStatus(formData: FormData) {
     handler: async ({ user }) => {
       const parsed = statusFormSchema.parse({ supplierId: getString(formData, 'supplierId'), status: getString(formData, 'status') });
 
-      const supplier = await prisma.supplier.findUniqueOrThrow({ where: { id: parsed.supplierId }, select: { slug: true } });
+      const existing = await prisma.supplier.findUniqueOrThrow({ where: { id: parsed.supplierId }, select: { id: true, slug: true, title: true, publishedAt: true, status: true } });
 
       await updateContentStatus({ status: parsed.status, userId: user.id, findCurrent: (tx) => tx.supplier.findUniqueOrThrow({ where: { id: parsed.supplierId }, select: { publishedAt: true } }), update: (tx, data) => tx.supplier.update({ where: { id: parsed.supplierId }, data }) });
 
+      await maybeNotifyFirstPublication('supplier', existing.status, parsed.status, existing);
+
       revalidatePath(ADMIN_SUPPLIERS_PATH);
-      revalidateSupplierPublicPaths(supplier.slug);
+      revalidateSupplierPublicPaths(existing.slug);
       return { type: 'success', message: 'Статус поставщика обновлён.' };
     }
   });

@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { Plus, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -21,6 +22,20 @@ export function AdditionalCostsEditor({
   total: number;
 }) {
   const completedCount = costs.filter((c) => c.isComplete && c.cost !== null && c.cost > 0).length;
+  const hasOnlyPlaceholderRow = costs.length === 1 && costs.every((cost) => !cost.name.trim() && !cost.amount.trim());
+  const hasContent = costs.some((cost) => cost.name.trim() || cost.amount.trim());
+
+  const [revealed, setRevealed] = useState(false);
+  useEffect(() => {
+    if (hasContent || !hasOnlyPlaceholderRow) setRevealed(true);
+  }, [hasContent, hasOnlyPlaceholderRow]);
+
+  const showHint = (costs.length === 0 || hasOnlyPlaceholderRow) && !revealed;
+
+  function handleAdd() {
+    setRevealed(true);
+    onAdd();
+  }
 
   return (
     <div className="calculator-subpanel">
@@ -35,7 +50,7 @@ export function AdditionalCostsEditor({
         </div>
         <Button
           className="min-h-10 rounded-[var(--radius-sm)] px-3 text-sm"
-          onClick={onAdd}
+          onClick={handleAdd}
           size="sm"
           type="button"
           variant="secondary"
@@ -45,7 +60,7 @@ export function AdditionalCostsEditor({
         </Button>
       </div>
 
-      {costs.length === 0 || costs.every((c) => !c.name.trim() && !c.amount.trim()) ? (
+      {showHint ? (
         <div className="mx-1 mt-3 rounded-[var(--radius-md)] border border-dashed border-[var(--border-default)] bg-[var(--surface-wash)] p-3">
           <p className="text-xs leading-5 text-[var(--muted)]">
             Укажите дополнительные расходы на порцию напитка. Например: аренда, зарплата бариста, амортизация оборудования.

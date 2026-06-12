@@ -1,5 +1,7 @@
 import { ApplicationStatus, ApplicationType, ConversationSender } from '@prisma/client';
 import { prisma } from '@/lib/db/prisma';
+import type { ConversationStatusGroup } from '@/lib/messaging/conversation-status-groups';
+import { getConversationStatusFilter } from '@/lib/messaging/conversation-status-groups';
 
 export { ApplicationStatus, ApplicationType, ConversationSender };
 
@@ -70,11 +72,11 @@ export async function getBusinessDashboardData(businessAccountId: string) {
   return { cities, requestCount, activeRequestCount, draftRequestCount, closedRequestCount, latestApplications, responseCount, newResponseCount };
 }
 
-export async function getBusinessResponses(businessAccountId: string) {
+export async function getBusinessResponses(businessAccountId: string, statusGroup: ConversationStatusGroup) {
   return prisma.application.findMany({
     where: {
       type: ApplicationType.VACANCY_RESPONSE,
-      status: { notIn: [ApplicationStatus.DRAFT, ApplicationStatus.ARCHIVED] },
+      status: getConversationStatusFilter(statusGroup),
       vacancy: { businessAccountId }
     },
     select: {
@@ -115,12 +117,21 @@ export async function getBusinessResponseDetail(applicationId: string, businessA
   });
 }
 
-export async function getBusinessRequestsPage(businessAccountId: string, skip: number, take: number) {
+export async function getBusinessRequestsPage(
+  businessAccountId: string,
+  statusGroup: ConversationStatusGroup,
+  skip: number,
+  take: number
+) {
+  const where = {
+    businessAccountId,
+    status: getConversationStatusFilter(statusGroup, { includeDraft: true })
+  };
   const [cities, totalCount, applications] = await Promise.all([
     getActiveCities(),
-    prisma.application.count({ where: { businessAccountId } }),
+    prisma.application.count({ where }),
     prisma.application.findMany({
-      where: { businessAccountId },
+      where,
       orderBy: [{ createdAt: 'desc' }],
       skip,
       take,

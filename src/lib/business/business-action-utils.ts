@@ -1,6 +1,17 @@
 import { redirect } from 'next/navigation';
-import { z } from 'zod';
+import { z, ZodError } from 'zod';
 import { hasErrorMessage, resolveServerActionError } from '@/lib/actions/server-action-errors';
+
+export function formatZodFieldErrors(error: unknown, fieldLabels: Record<string, string>, fallback: string): string {
+  if (!(error instanceof ZodError)) return fallback;
+  const fields = new Set<string>();
+  for (const issue of error.issues) {
+    const path = issue.path.find((segment) => typeof segment === 'string') as string | undefined;
+    if (path && fieldLabels[path]) fields.add(fieldLabels[path]);
+  }
+  if (fields.size === 0) return fallback;
+  return `Заполните обязательные поля: ${Array.from(fields).join(', ')}.`;
+}
 
 export const businessProfileSchema = z.object({
   companyName: z.string().trim().min(2).max(160),
@@ -11,8 +22,6 @@ export const businessProfileSchema = z.object({
   websiteUrl: z.string().trim().url().max(240).optional().or(z.literal('')),
   description: z.string().trim().max(1000).optional()
 });
-
-const BUSINESS_PATH = '/business/cabinet';
 
 function businessResultPath(path: string, result: { type: 'success' | 'error'; message: string }) {
   const url = new URL(path, 'http://localhost');

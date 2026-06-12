@@ -158,7 +158,7 @@ export default async function BusinessRequestDetailPage({ params, searchParams }
 
   return (
     <div className="space-y-8">
-      <PageHeader eyebrow={applicationTypeLabels[application.type]} title={application.subject ?? applicationTypeLabels[application.type]} />
+      <PageHeader bare title={application.subject ?? applicationTypeLabels[application.type]} />
       <AdminActionAlert params={query} />
       <div className="grid gap-6 xl:grid-cols-[1fr_0.75fr]">
         <Panel padding="md" tone="elevated">

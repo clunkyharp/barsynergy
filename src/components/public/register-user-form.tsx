@@ -12,12 +12,14 @@ import { PasswordPairValidation } from '@/components/ui/password-pair-validation
 import { SubmitButton } from '@/components/ui/submit-button';
 import { Turnstile } from '@/components/ui/turnstile';
 import { PublicFormValidation } from '@/components/public/public-form-validation';
+import { PASSWORD_HINT, PASSWORD_MIN_LENGTH } from '@/lib/auth/password-policy-constants';
 
 type RegisterUserActionResult = { type: 'error'; code: string } | null;
 
 const errorMessages: Record<string, string> = {
   invalid: 'Не удалось завершить регистрацию. Проверьте поля формы.',
   'account-check': 'Если регистрация уже начиналась, проверьте почту. Иначе попробуйте войти или восстановить доступ.',
+  'compromised-password': 'Этот пароль уже встречался в утечках. Выберите другую фразу или пароль.',
   'rate-limited': 'Слишком много попыток за короткое время. Повторите позже.',
   failed: 'Не удалось выполнить действие прямо сейчас. Повторите попытку позже.'
 };
@@ -69,14 +71,14 @@ export function RegisterUserForm({
           required
         />
       </FormField>
-      <FormField htmlFor="new-password" hint="Минимум 8 символов" label="Пароль">
+      <FormField htmlFor="new-password" hint={PASSWORD_HINT} label="Пароль">
         <PasswordInput
           id="new-password"
           name="password"
           autoComplete="new-password"
-          placeholder="Минимум 8 символов"
+          placeholder={PASSWORD_HINT}
           required
-          minLength={8}
+          minLength={PASSWORD_MIN_LENGTH}
           maxLength={200}
         />
       </FormField>
@@ -87,7 +89,7 @@ export function RegisterUserForm({
           autoComplete="off"
           placeholder="Повторите пароль"
           required
-          minLength={8}
+          minLength={PASSWORD_MIN_LENGTH}
           maxLength={200}
         />
       </FormField>

@@ -121,7 +121,7 @@ export function LeadModal({
               )}
             </button>
           </div>
-          <PublicFormValidation showSummary={false} />
+          <PublicFormValidation />
           {state?.type === 'error' && !isPending ? (
             <p
               aria-live="polite"

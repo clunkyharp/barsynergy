@@ -1,20 +1,12 @@
 'use client';
 
-import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { Bookmark, LayoutDashboard, Mail, MessageSquare, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { NavLink } from '@/components/ui/nav-link';
 import { Panel } from '@/components/ui/panel';
 
-type SidebarUser = {
-  displayName: string | null;
-  initials: string | null;
-  avatarUrl: string | null;
-};
-
 type ProfileSidebarProps = {
-  user?: SidebarUser | null;
   logoutAction: () => Promise<void>;
 };
 
@@ -26,35 +18,11 @@ const links = [
   { href: '/profile/settings', label: 'Настройки', icon: Settings }
 ];
 
-export function ProfileSidebar({ user, logoutAction }: ProfileSidebarProps) {
+export function ProfileSidebar({ logoutAction }: ProfileSidebarProps) {
   const pathname = usePathname();
 
   return (
     <Panel className="h-fit" padding="md" tone="elevated">
-      {user?.displayName && (
-        <div className="flex items-center gap-3 border-b border-[var(--line)] pb-4 mb-4">
-          {user.avatarUrl ? (
-            <Image
-              alt=""
-              className="h-10 w-10 shrink-0 rounded-full object-cover"
-              height={40}
-              src={user.avatarUrl}
-              width={40}
-            />
-          ) : user.initials ? (
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--accent-soft)] text-sm font-bold text-[var(--accent)]">
-              {user.initials}
-            </span>
-          ) : null}
-          <div className="min-w-0">
-            <p className="text-sm font-semibold truncate">{user.displayName}</p>
-            <p className="text-[11px] text-[var(--muted)]">Кабинет специалиста</p>
-          </div>
-        </div>
-      )}
-      {!user?.displayName && (
-        <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Кабинет специалиста</p>
-      )}
       <nav aria-label="Profile navigation" className="grid gap-2 text-sm">
         {links.map((link) => {
           const isActive = link.href === '/profile'

@@ -10,10 +10,12 @@ import { arePublicApplicationFormsEnabled } from '@/lib/applications/public-form
 import { AuthRateLimitError, assertAuthAttemptAllowed } from '@/lib/auth/auth-rate-limit';
 import { createHash, randomBytes } from 'node:crypto';
 import { hashPassword } from '@/lib/auth/password';
+import { PASSWORD_MIN_LENGTH } from '@/lib/auth/password-policy';
 import { prisma } from '@/lib/db/prisma';
 import { getEnv } from '@/lib/validation/env';
 import { assertSameOriginServerAction } from '@/lib/security/server-action-origin';
 import { assertTurnstilePassed } from '@/lib/security/turnstile';
+import { CompromisedPasswordError, assertPasswordNotCompromised } from '@/lib/security/hibp';
 
 const businessRequestSchema = z.object({
   companyName: z.string().trim().min(2).max(160),
@@ -30,8 +32,8 @@ const businessRequestSchema = z.object({
 const registerUserSchema = z.object({
   fullName: z.string().trim().min(1).max(200),
   email: z.string().trim().email().max(255).transform((value) => value.toLowerCase()),
-  password: z.string().min(8).max(200),
-  confirmPassword: z.string().min(8).max(200),
+  password: z.string().min(PASSWORD_MIN_LENGTH).max(200),
+  confirmPassword: z.string().min(PASSWORD_MIN_LENGTH).max(200),
   consent: z.literal('accepted')
 }).refine((data) => data.password === data.confirmPassword, {
   message: 'passwords do not match',
@@ -205,6 +207,7 @@ export async function registerUserAction(
 
   try {
     await assertAuthAttemptAllowed({ action: 'register', email: registerRequest.email });
+    await assertPasswordNotCompromised(registerRequest.password);
     const existingUser = await prisma.user.findUnique({
       where: { email: registerRequest.email },
       select: { id: true, status: true, emailVerifiedAt: true }
@@ -224,6 +227,7 @@ export async function registerUserAction(
     await sendUserVerificationEmail({ email: registerRequest.email, userId: user.id });
   } catch (error) {
     if (error instanceof AuthRateLimitError) return { type: 'error', code: 'rate-limited' };
+    if (error instanceof CompromisedPasswordError) return { type: 'error', code: 'compromised-password' };
     if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
       return handleExistingUserRegistration(registerRequest.email);
     }

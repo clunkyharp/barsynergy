@@ -9,6 +9,8 @@ import { getCurrentUser } from '@/lib/auth/current-user';
 import { hashPassword, verifyPassword } from '@/lib/auth/password';
 import { PASSWORD_MIN_LENGTH } from '@/lib/auth/password-policy';
 import { prisma } from '@/lib/db/prisma';
+import type { ProfileActionResult } from '@/lib/profile/profile-action-result';
+import { CompromisedPasswordError, assertPasswordNotCompromised } from '@/lib/security/hibp';
 import { assertSameOriginServerAction } from '@/lib/security/server-action-origin';
 
 const changePasswordSchema = z.object({
@@ -22,8 +24,8 @@ const changePasswordSchema = z.object({
 
 const SETTINGS_PATH = '/profile/settings';
 
-export async function changePassword(formData: FormData) {
-  let result: { type: 'success' | 'error'; message: string };
+export async function changePassword(_prevState: ProfileActionResult, formData: FormData): Promise<ProfileActionResult> {
+  let result: Exclude<ProfileActionResult, null>;
 
   try {
     await assertSameOriginServerAction();
@@ -54,6 +56,7 @@ export async function changePassword(formData: FormData) {
       throw new Error('current password is invalid');
     }
 
+    await assertPasswordNotCompromised(parsed.newPassword);
     const newPasswordHash = await hashPassword(parsed.newPassword);
 
     await prisma.$transaction(async (tx) => {
@@ -77,6 +80,10 @@ export async function changePassword(formData: FormData) {
           {
             matches: (e: Error) => e.message === 'current password is invalid',
             message: 'Текущий пароль указан неверно.'
+          },
+          {
+            matches: (e: Error) => e instanceof CompromisedPasswordError,
+            message: 'Этот пароль уже встречался в утечках. Выберите другую фразу или пароль.'
           }
         ],
         fallbackMessage: 'Не удалось сменить пароль. Попробуйте позже.'
@@ -84,9 +91,5 @@ export async function changePassword(formData: FormData) {
     };
   }
 
-  const url = new URL(SETTINGS_PATH, 'http://localhost');
-  url.searchParams.delete('success');
-  url.searchParams.delete('error');
-  url.searchParams.set(result.type, result.message);
-  redirect(`${url.pathname}${url.search}`);
+  return result;
 }

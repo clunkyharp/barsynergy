@@ -1,13 +1,8 @@
 import type { ReactNode } from 'react';
-import { FileText } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, FileText } from 'lucide-react';
 import { ApplicationStatus, ApplicationType } from '@prisma/client';
 import { Button } from '@/components/ui/button';
-import { FormField } from '@/components/ui/form-field';
-import { Input } from '@/components/ui/input';
-import { Select } from '@/components/ui/select';
 import { StatusBadge, type StatusBadgeVariant } from '@/components/ui/status-badge';
-import { SubmitButton } from '@/components/ui/submit-button';
-import { Textarea } from '@/components/ui/textarea';
 import {
   applicationStatusBadgeVariants,
   applicationStatusLabels,
@@ -15,12 +10,7 @@ import {
 } from '@/modules/content/shared/labels';
 import { cn } from '@/lib/utils';
 
-type BusinessFormAction = (formData: FormData) => void | Promise<void>;
-
-type CityOption = {
-  id: string;
-  name: string;
-};
+export { BusinessProfileSheet } from './business-profile-sheet';
 
 type BusinessProfileAccount = {
   cityId: string | null;
@@ -32,10 +22,10 @@ type BusinessProfileAccount = {
   websiteUrl: string | null;
 };
 
-type BusinessProfileSheetProps = {
+type BusinessProfileSummaryProps = {
   account: BusinessProfileAccount;
-  action: BusinessFormAction;
-  cities: CityOption[];
+  editHref?: string;
+  missingFields?: string[];
 };
 
 type RequestLedgerApplication = {
@@ -104,88 +94,54 @@ function formatRequestDate(application: RequestLedgerApplication) {
   return value ? requestDateFormatter.format(value) : 'Без даты';
 }
 
-function SheetSection({ children, title }: { children: ReactNode; title: string }) {
-  return (
-    <section className="border-t border-[var(--line)] pt-5 first:border-t-0 first:pt-0">
-      <h3 className="mb-4 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">{title}</h3>
-      {children}
-    </section>
-  );
-}
+export function BusinessProfileSummary({
+  account,
+  editHref = '/business/cabinet/settings',
+  missingFields = []
+}: BusinessProfileSummaryProps) {
+  const rows = [
+    { label: 'Контакт', value: account.contactPerson },
+    { label: 'Телефон', value: account.phone },
+    { label: 'Telegram', value: account.telegram },
+    { label: 'Сайт', value: account.websiteUrl }
+  ].filter((row) => Boolean(row.value));
 
-export function BusinessProfileSheet({ account, action, cities }: BusinessProfileSheetProps) {
   return (
-    <section className="overflow-hidden rounded-[var(--radius-lg)] border border-[var(--line)] bg-[var(--surface-elevated)] shadow-[var(--shadow-panel)]">
-      <div className="grid gap-4 border-b border-[var(--line)] px-5 py-5 md:px-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
-        <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Профильный лист</p>
-          <h2 className="mt-3 text-[1.65rem] font-semibold leading-tight tracking-normal">
-            Данные компании
-          </h2>
+    <section className="rounded-[var(--radius-lg)] border border-[var(--line)] bg-[var(--surface-elevated)] p-5 shadow-[var(--shadow-panel)]">
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div className="min-w-0">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Профиль компании</p>
+          <h2 className="mt-2 text-xl font-semibold leading-tight tracking-normal">{account.companyName}</h2>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--muted)]">
-            Эти данные подставляются в заявки и помогают команде быстрее сверить контекст.
+            {account.description || 'Добавьте короткое описание компании, чтобы команда быстрее понимала контекст заявок.'}
           </p>
         </div>
-        <StatusBadge variant="success">Доступ активен</StatusBadge>
+        <Button className="shrink-0 rounded-[var(--radius-md)]" href={editHref} size="sm" variant="secondary">
+          Редактировать
+        </Button>
       </div>
 
-      <form action={action} className="grid gap-6 p-5 md:p-6">
-        <SheetSection title="Компания">
-          <div className="grid gap-5 md:grid-cols-2">
-            <FormField htmlFor="companyName" label="Компания">
-              <Input id="companyName" name="companyName" required maxLength={160} placeholder="Например, Coffee Point" defaultValue={account.companyName} />
-            </FormField>
-            <FormField htmlFor="contactPerson" label="Контактное лицо">
-              <Input id="contactPerson" name="contactPerson" required maxLength={120} placeholder="Иван Иванов" defaultValue={account.contactPerson ?? ''} />
-            </FormField>
-            <FormField htmlFor="cityId" label="Город">
-              <Select id="cityId" name="cityId" defaultValue={account.cityId ?? ''}>
-                <option value="">Не выбран</option>
-                {cities.map((city) => (
-                  <option key={city.id} value={city.id}>
-                    {city.name}
-                  </option>
-                ))}
-              </Select>
-            </FormField>
-          </div>
-        </SheetSection>
+      {rows.length > 0 ? (
+        <dl className="mt-5 grid gap-3 border-t border-[var(--line)] pt-4 text-sm sm:grid-cols-2">
+          {rows.map((row) => (
+            <div className="min-w-0" key={row.label}>
+              <dt className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--muted)]">{row.label}</dt>
+              <dd className="mt-1 break-all font-semibold text-[var(--text)]">{row.value}</dd>
+            </div>
+          ))}
+        </dl>
+      ) : null}
 
-        <SheetSection title="Контакты">
-          <div className="grid gap-5 md:grid-cols-3">
-            <FormField htmlFor="phone" label="Телефон">
-              <Input id="phone" name="phone" maxLength={80} placeholder="+7 999 123 45 67" defaultValue={account.phone ?? ''} />
-            </FormField>
-            <FormField htmlFor="telegram" label="Telegram">
-              <Input id="telegram" name="telegram" maxLength={80} placeholder="@username" defaultValue={account.telegram ?? ''} />
-            </FormField>
-            <FormField htmlFor="websiteUrl" label="Сайт">
-              <Input id="websiteUrl" name="websiteUrl" type="url" placeholder="https://example.ru" maxLength={240} defaultValue={account.websiteUrl ?? ''} />
-            </FormField>
-          </div>
-        </SheetSection>
-
-        <SheetSection title="Описание">
-          <FormField htmlFor="description" label="О компании">
-            <Textarea
-              id="description"
-              name="description"
-              className="min-h-36"
-              maxLength={1000}
-              rows={5}
-              placeholder="Например: кофейня в центре города, завтраки весь день, спешелти-кофе и вечерние события."
-              defaultValue={account.description ?? ''}
-            />
-          </FormField>
-        </SheetSection>
-
-        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[var(--line)] pt-5">
-          <p className="max-w-xl text-sm leading-6 text-[var(--muted)]">
-            После сохранения новые заявки будут использовать обновлённые данные компании.
-          </p>
-          <SubmitButton className="rounded-[var(--radius-md)]">Сохранить профиль</SubmitButton>
+      {missingFields.length > 0 ? (
+        <div className="mt-5 rounded-[var(--radius-md)] border border-[var(--line)] bg-[var(--surface-wash)] px-4 py-3 text-sm leading-6 text-[var(--muted)]">
+          Не заполнено: {missingFields.join(', ')}.
         </div>
-      </form>
+      ) : (
+        <div className="mt-5 inline-flex items-center gap-2 rounded-[var(--radius-md)] border border-[var(--line)] bg-[var(--surface-wash)] px-3 py-2 text-sm font-semibold text-[var(--text)]">
+          <CheckCircle2 aria-hidden className="text-[var(--accent)]" size={16} strokeWidth={1.8} />
+          Основные данные заполнены
+        </div>
+      )}
     </section>
   );
 }
@@ -304,7 +260,12 @@ export function NextActionPanel({
                 <div className="flex flex-wrap items-center gap-2">
                   <p className="text-sm font-semibold">{item.label}</p>
                   {item.status ? (
-                    <span className="rounded-[var(--radius-sm)] border border-[var(--line)] px-2 py-0.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">
+                    <span className="inline-flex items-center gap-1.5 rounded-[var(--radius-sm)] border border-[var(--line)] px-2 py-0.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">
+                      {item.status === 'готово' ? (
+                        <CheckCircle2 aria-hidden className="text-[var(--accent)]" size={13} strokeWidth={2} />
+                      ) : item.status === 'нужно' ? (
+                        <AlertTriangle aria-hidden className="text-[var(--warning)]" size={13} strokeWidth={2} />
+                      ) : null}
                       {item.status}
                     </span>
                   ) : null}

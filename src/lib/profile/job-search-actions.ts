@@ -7,6 +7,7 @@ import { getString, getArray, optionalString } from '@/lib/admin/content-utils';
 import { resolveServerActionError } from '@/lib/actions/server-action-errors';
 import { getCurrentUser } from '@/lib/auth/current-user';
 import { prisma } from '@/lib/db/prisma';
+import type { ProfileActionResult } from '@/lib/profile/profile-action-result';
 import { assertSameOriginServerAction } from '@/lib/security/server-action-origin';
 
 const jobSearchSchema = z.object({
@@ -19,8 +20,8 @@ const jobSearchSchema = z.object({
 
 const SETTINGS_PATH = '/profile/settings';
 
-export async function updateJobSearch(formData: FormData) {
-  let result: { type: 'success' | 'error'; message: string };
+export async function updateJobSearch(_prevState: ProfileActionResult, formData: FormData): Promise<ProfileActionResult> {
+  let result: Exclude<ProfileActionResult, null>;
 
   try {
     await assertSameOriginServerAction();
@@ -74,9 +75,5 @@ export async function updateJobSearch(formData: FormData) {
     };
   }
 
-  const url = new URL(SETTINGS_PATH, 'http://localhost');
-  url.searchParams.delete('success');
-  url.searchParams.delete('error');
-  url.searchParams.set(result.type, result.message);
-  redirect(`${url.pathname}${url.search}`);
+  return result;
 }

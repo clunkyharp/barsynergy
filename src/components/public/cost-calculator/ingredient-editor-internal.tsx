@@ -162,7 +162,7 @@ function IngredientRow({
   return (
     <div className={cn('hidden gap-2 px-4 py-3 md:px-5 md:py-4 lg:grid lg:items-start', ingredientDesktopGridClassName)}>
       <IngredientFields ingredient={ingredient} index={index} onUpdate={onUpdate} scope="desktop" />
-      <div className="hidden min-h-10 items-center justify-start truncate text-left text-sm font-semibold tabular-nums text-[var(--text)] lg:flex">
+      <div className="hidden h-10 items-center justify-end truncate pr-1 text-right text-sm font-semibold tabular-nums text-[var(--text)] lg:flex">
         {ingredient.error ? '—' : ingredient.cost === null ? 'Пока нет' : money(ingredient.cost)}
       </div>
       <IngredientActionButtons ingredient={ingredient} index={index} onDuplicate={onDuplicate} onRemove={onRemove} rowCount={rowCount} />

@@ -7,6 +7,7 @@ import { getString, optionalString } from '@/lib/admin/content-utils';
 import { resolveServerActionError } from '@/lib/actions/server-action-errors';
 import { getCurrentUser } from '@/lib/auth/current-user';
 import { prisma } from '@/lib/db/prisma';
+import type { ProfileActionResult } from '@/lib/profile/profile-action-result';
 import { assertSameOriginServerAction } from '@/lib/security/server-action-origin';
 
 const workExperienceSchema = z.object({
@@ -21,8 +22,8 @@ const workExperienceSchema = z.object({
 
 const SETTINGS_PATH = '/profile/settings';
 
-export async function updateWorkExperiences(formData: FormData) {
-  let result: { type: 'success' | 'error'; message: string };
+export async function updateWorkExperiences(_prevState: ProfileActionResult, formData: FormData): Promise<ProfileActionResult> {
+  let result: Exclude<ProfileActionResult, null>;
 
   try {
     await assertSameOriginServerAction();
@@ -126,9 +127,5 @@ export async function updateWorkExperiences(formData: FormData) {
     };
   }
 
-  const url = new URL(SETTINGS_PATH, 'http://localhost');
-  url.searchParams.delete('success');
-  url.searchParams.delete('error');
-  url.searchParams.set(result.type, result.message);
-  redirect(`${url.pathname}${url.search}`);
+  return result;
 }

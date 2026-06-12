@@ -1,22 +1,17 @@
 import type { Metadata } from 'next';
 import { ArrowRight, Building2, FileText, PartyPopper, Users } from 'lucide-react';
-import { updateBusinessProfile } from '@/lib/business/profile-actions';
 import { AdminActionAlert } from '@/components/admin/content-admin-controls';
 import {
-  BusinessProfileSheet,
+  BusinessProfileSummary,
   NextActionPanel,
-  RequestLedger,
-  RequestStatusRail
+  RequestLedger
 } from '@/components/business/business-cabinet';
 import { Button } from '@/components/ui/button';
 import { PageHeader } from '@/components/ui/page-header';
 import type { AdminContentSearchParams } from '@/lib/admin/content-utils';
 import { requireBusinessAccountAccess } from '@/lib/auth/require-business-account';
 import { buildPrivatePageMetadata } from '@/lib/public/metadata';
-import {
-  getBusinessDashboardData,
-  getActiveCities
-} from '@/modules/business/queries';
+import { getBusinessDashboardData } from '@/modules/business/queries';
 
 type BusinessDashboardPageProps = {
   searchParams?: Promise<AdminContentSearchParams>;
@@ -31,7 +26,6 @@ export default async function BusinessDashboardPage({ searchParams }: BusinessDa
   const { businessAccount } = await requireBusinessAccountAccess();
   const params = (await searchParams) ?? {};
   const isWelcome = (Array.isArray(params.welcome) ? params.welcome[0] : params.welcome) === '1';
-  const cities = await getActiveCities();
   const {
     requestCount, activeRequestCount, draftRequestCount,
     closedRequestCount, latestApplications,
@@ -47,7 +41,7 @@ export default async function BusinessDashboardPage({ searchParams }: BusinessDa
 
   return (
     <div className="space-y-8">
-      <PageHeader eyebrow="Компания" title={businessAccount.companyName} />
+      <PageHeader bare eyebrow="Компания" title={businessAccount.companyName} />
       <AdminActionAlert params={params} />
 
       {isWelcome ? (
@@ -61,13 +55,13 @@ export default async function BusinessDashboardPage({ searchParams }: BusinessDa
                 Добро пожаловать в кабинет компании
               </h2>
               <p className="mt-1 text-sm leading-6 text-[var(--muted)]">
-                Доступ открыт. Сначала заполните профиль, затем создайте первую заявку и проверьте отклики команды.
+                Кабинет активен. Сначала заполните профиль, затем создайте первую заявку и проверьте отклики команды.
               </p>
               <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-3">
                 {[
-                  { href: '#business-profile', icon: Building2, label: 'Заполнить профиль', description: 'Контакты, город и описание компании' },
-                  { href: '/business/cabinet/requests', icon: FileText, label: 'Создать заявку', description: 'Вакансия, обучение, партнёрство или каталог' },
-                  { href: '/business/cabinet/responses', icon: Users, label: 'Проверить отклики', description: 'Ответы команды и новые реакции' }
+                  { href: '/business/cabinet/settings', icon: Building2, label: 'Заполнить профиль', description: 'Контакты, город и описание компании' },
+                  { href: '/business/cabinet/requests#new-request', icon: FileText, label: 'Создать заявку', description: 'Вакансия, обучение, партнёрство или каталог' },
+                  { href: '/business/cabinet/responses', icon: Users, label: 'Проверить отклики', description: 'Ответы команды и новые отклики' }
                 ].map((item) => (
                   <a
                     className="group flex items-center gap-3 rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--surface-wash)] px-3 py-2.5 transition-colors hover:border-[var(--accent)]/35 hover:bg-[var(--accent-soft)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
@@ -87,31 +81,36 @@ export default async function BusinessDashboardPage({ searchParams }: BusinessDa
         </section>
       ) : null}
 
-      <div className="flex flex-wrap items-center gap-4 rounded-[var(--radius-lg)] border border-[var(--line)] bg-[var(--surface-elevated)] px-5 py-4">
-        <div className="flex items-center gap-4 text-sm">
-          <span className="font-semibold text-[var(--text)]">Активных заявок: <span className="text-[var(--accent)]">{activeRequestCount}</span></span>
-          <span className="h-4 w-px bg-[var(--line)]" aria-hidden="true" />
-          <span className="font-semibold text-[var(--text)]">Новых откликов: <span className="text-[var(--accent)]">{newResponseCount}</span></span>
+      <div className="grid gap-3 rounded-[var(--radius-lg)] border border-[var(--line)] bg-[var(--surface-elevated)] px-5 py-4 md:grid-cols-4 lg:grid-cols-[repeat(4,minmax(0,1fr))_auto] md:items-center">
+        <div>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--muted)]">Всего заявок</p>
+          <p className="mt-1 text-xl font-semibold text-[var(--text)]">{requestCount}</p>
         </div>
-        <Button className="ml-auto shrink-0 rounded-[var(--radius-md)]" href="/business/cabinet/requests" size="sm" variant="primary">
-          Создать заявку
-          <ArrowRight size={15} strokeWidth={1.8} />
-        </Button>
+        <div>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--muted)]">В работе</p>
+          <p className="mt-1 text-xl font-semibold text-[var(--text)]">{activeRequestCount}</p>
+        </div>
+        <div>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--muted)]">Черновики</p>
+          <p className="mt-1 text-xl font-semibold text-[var(--text)]">{draftRequestCount}</p>
+        </div>
+        <div>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--muted)]">Новые отклики</p>
+          <p className="mt-1 text-xl font-semibold text-[var(--text)]">{newResponseCount}</p>
+        </div>
+        <div className="md:col-span-4 lg:col-span-1 lg:ml-auto">
+          <Button className="shrink-0 rounded-[var(--radius-md)]" href="/business/cabinet/requests#new-request" size="md" variant="primary">
+            Создать заявку
+            <ArrowRight size={15} strokeWidth={1.8} />
+          </Button>
+        </div>
       </div>
 
       <section className="grid gap-5 xl:grid-cols-[minmax(0,1.1fr)_minmax(300px,0.45fr)]">
         <div id="business-profile">
-          <BusinessProfileSheet account={businessAccount} action={updateBusinessProfile} cities={cities} />
+          <BusinessProfileSummary account={businessAccount} missingFields={missingProfileFields} />
         </div>
         <div className="space-y-5">
-          <RequestStatusRail
-            items={[
-              { label: 'Всего', value: requestCount, detail: 'Все заявки компании' },
-              { label: 'В работе', value: activeRequestCount, detail: 'Отправленные и неархивные', tone: 'pending' },
-              { label: 'Черновики', value: draftRequestCount, detail: 'Можно открыть и отправить', tone: 'neutral' },
-              { label: 'Закрытые', value: closedRequestCount, detail: 'Завершены, отклонены или в архиве', tone: 'neutral' }
-            ]}
-          />
           <NextActionPanel
             description={
               missingProfileFields.length > 0
@@ -122,12 +121,13 @@ export default async function BusinessDashboardPage({ searchParams }: BusinessDa
               {
                 label: 'Проверить профиль',
                 detail: missingProfileFields.length > 0 ? 'Дозаполните поля перед новой заявкой.' : 'Данные компании готовы для новых заявок.',
+                href: '/business/cabinet/settings',
                 status: missingProfileFields.length > 0 ? 'нужно' : 'готово'
               },
               {
                 label: 'Создать заявку',
                 detail: 'Вакансия, поставщик, партнёрство, обучение или сертификат.',
-                href: '/business/cabinet/requests',
+                href: '/business/cabinet/requests#new-request',
                 status: undefined
               },
               {
@@ -139,6 +139,11 @@ export default async function BusinessDashboardPage({ searchParams }: BusinessDa
             ]}
             primaryAction={{ href: '/business/cabinet/requests', label: 'Открыть журнал заявок' }}
           />
+          {closedRequestCount > 0 ? (
+            <div className="rounded-[var(--radius-lg)] border border-[var(--line)] bg-[var(--surface-elevated)] p-5 text-sm leading-6 text-[var(--muted)]">
+              Закрытых заявок: <span className="font-semibold text-[var(--text)]">{closedRequestCount}</span>. Архив и завершённые записи доступны в журнале.
+            </div>
+          ) : null}
         </div>
       </section>
 

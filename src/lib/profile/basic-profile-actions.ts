@@ -7,6 +7,7 @@ import { getString, nullableString, optionalString } from '@/lib/admin/content-u
 import { resolveServerActionError } from '@/lib/actions/server-action-errors';
 import { getCurrentUser } from '@/lib/auth/current-user';
 import { prisma } from '@/lib/db/prisma';
+import type { ProfileActionResult } from '@/lib/profile/profile-action-result';
 import { assertSameOriginServerAction } from '@/lib/security/server-action-origin';
 
 const basicProfileSchema = z.object({
@@ -16,14 +17,13 @@ const basicProfileSchema = z.object({
   company: z.string().trim().max(160).optional(),
   bio: z.string().trim().max(1000).optional(),
   phone: z.string().trim().max(80).optional(),
-  telegram: z.string().trim().max(80).optional(),
-  website: z.string().trim().url().max(240).optional().or(z.literal(''))
+  telegram: z.string().trim().max(80).optional()
 });
 
 const SETTINGS_PATH = '/profile/settings';
 
-export async function updateBasicProfile(formData: FormData) {
-  let result: { type: 'success' | 'error'; message: string };
+export async function updateBasicProfile(_prevState: ProfileActionResult, formData: FormData): Promise<ProfileActionResult> {
+  let result: Exclude<ProfileActionResult, null>;
 
   try {
     await assertSameOriginServerAction();
@@ -40,8 +40,7 @@ export async function updateBasicProfile(formData: FormData) {
       company: optionalString(getString(formData, 'company')),
       bio: optionalString(getString(formData, 'bio')),
       phone: optionalString(getString(formData, 'phone')),
-      telegram: optionalString(getString(formData, 'telegram')),
-      website: getString(formData, 'website')
+      telegram: optionalString(getString(formData, 'telegram'))
     });
 
     if (parsed.cityId) {
@@ -65,8 +64,7 @@ export async function updateBasicProfile(formData: FormData) {
         company: nullableString(parsed.company),
         bio: nullableString(parsed.bio),
         phone: nullableString(parsed.phone),
-        telegram: nullableString(parsed.telegram),
-        website: nullableString(parsed.website)
+        telegram: nullableString(parsed.telegram)
       },
       update: {
         fullName: parsed.fullName,
@@ -75,8 +73,7 @@ export async function updateBasicProfile(formData: FormData) {
         company: nullableString(parsed.company),
         bio: nullableString(parsed.bio),
         phone: nullableString(parsed.phone),
-        telegram: nullableString(parsed.telegram),
-        website: nullableString(parsed.website)
+        telegram: nullableString(parsed.telegram)
       }
     });
 
@@ -101,9 +98,5 @@ export async function updateBasicProfile(formData: FormData) {
     };
   }
 
-  const url = new URL(SETTINGS_PATH, 'http://localhost');
-  url.searchParams.delete('success');
-  url.searchParams.delete('error');
-  url.searchParams.set(result.type, result.message);
-  redirect(`${url.pathname}${url.search}`);
+  return result;
 }

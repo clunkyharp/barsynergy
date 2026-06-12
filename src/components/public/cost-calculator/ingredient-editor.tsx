@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -39,6 +40,22 @@ export function IngredientEditor({
   rowStatusText: string;
   rows: CalculatorIngredientRow[];
 }) {
+  const hasOnlyPlaceholderRow =
+    rows.length === 1 &&
+    rows.every((row) => !row.name.trim() && !row.packagePrice.trim() && !row.packageAmount.trim() && !row.recipeAmount.trim());
+
+  const [revealed, setRevealed] = useState(false);
+  useEffect(() => {
+    if (hasAnyInput || !hasOnlyPlaceholderRow) setRevealed(true);
+  }, [hasAnyInput, hasOnlyPlaceholderRow]);
+
+  const showEmptyState = !hasAnyInput && hasOnlyPlaceholderRow && !revealed;
+
+  function handleAdd() {
+    setRevealed(true);
+    onAddIngredient();
+  }
+
   return (
     <>
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -48,7 +65,7 @@ export function IngredientEditor({
         </div>
       </div>
 
-      {!hasAnyInput || rows.every((r) => !r.name.trim() && !r.packagePrice.trim() && !r.packageAmount.trim() && !r.recipeAmount.trim()) ? (
+      {showEmptyState ? (
         <div className="mt-4 rounded-[var(--radius-lg)] border border-dashed border-[var(--border-default)] bg-[var(--surface-wash)] p-5">
           <p className="text-sm font-semibold text-[var(--text)]">Рецепт пока пуст</p>
           <p className="mt-1.5 text-[13px] leading-6 text-[var(--muted)]">
@@ -57,7 +74,7 @@ export function IngredientEditor({
           <div className="mt-4 flex flex-wrap gap-2">
             <Button
               className="min-h-10 rounded-[var(--radius-sm)] px-3 text-sm"
-              onClick={onAddIngredient}
+              onClick={handleAdd}
               type="button"
               variant="secondary"
             >
@@ -107,11 +124,11 @@ export function IngredientEditor({
         </div>
       )}
 
-      {!(!hasAnyInput || rows.every((r) => !r.name.trim() && !r.packagePrice.trim() && !r.packageAmount.trim() && !r.recipeAmount.trim())) ? (
+      {!showEmptyState ? (
         <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
           <Button
             className="min-h-10 rounded-[var(--radius-sm)] px-3 text-sm"
-            onClick={onAddIngredient}
+            onClick={handleAdd}
             type="button"
             variant="secondary"
           >

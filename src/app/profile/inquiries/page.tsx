@@ -3,9 +3,9 @@ import { MessageSquare } from 'lucide-react';
 import { redirect } from 'next/navigation';
 import { AppLink } from '@/components/ui/app-link';
 import { Button } from '@/components/ui/button';
+import { ConversationListTabs } from '@/components/messaging/conversation-list-tabs';
 import { PageHeader } from '@/components/ui/page-header';
 import { Panel } from '@/components/ui/panel';
-import { Select } from '@/components/ui/select';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { UnreadBadge } from '@/components/messaging/unread-badge';
 import {
@@ -14,11 +14,10 @@ import {
 } from '@/lib/admin/application-utils';
 import { getCurrentUser } from '@/lib/auth/current-user';
 import { getUnreadMessageCounts } from '@/lib/messaging/get-conversation';
+import { parseConversationStatusGroup } from '@/lib/messaging/conversation-status-groups';
 import { buildPrivatePageMetadata } from '@/lib/public/metadata';
 import {
-  getUserInquiries,
-  inquiryResponseStatusValues,
-  ApplicationStatus
+  getUserInquiries
 } from '@/modules/profile/queries';
 
 const PAGE_SIZE = 20;
@@ -44,15 +43,11 @@ export default async function ProfileInquiriesPage({ searchParams }: ProfileInqu
   }
 
   const params = (await searchParams) ?? {};
-  const statusFilter = firstParam(params.status);
+  const statusGroup = parseConversationStatusGroup(firstParam(params.statusGroup));
   const sort = firstParam(params.sort) ?? 'desc';
   const page = Math.max(1, Number(firstParam(params.page)) || 1);
 
-  if (statusFilter && !inquiryResponseStatusValues.includes(statusFilter as ApplicationStatus)) {
-    redirect('/profile/inquiries');
-  }
-
-  const [inquiries, totalCount] = await getUserInquiries(user.id, sort, page, PAGE_SIZE);
+  const [inquiries, totalCount] = await getUserInquiries(user.id, statusGroup, sort, page, PAGE_SIZE);
   const inquiryIds = inquiries.map((i) => i.id);
   const unreadCounts = await getUnreadMessageCounts(inquiryIds, 'user');
   const totalPages = Math.ceil(totalCount / PAGE_SIZE);
@@ -60,7 +55,7 @@ export default async function ProfileInquiriesPage({ searchParams }: ProfileInqu
   function filterHref(overrides: Record<string, string | undefined>) {
     const url = new URL('/profile/inquiries', 'http://localhost');
     const merged: Record<string, string | undefined> = {};
-    if (statusFilter) merged.status = statusFilter;
+    if (statusGroup !== 'active') merged.statusGroup = statusGroup;
     merged.sort = sort;
     Object.assign(merged, overrides);
     if (!merged.page) delete merged.page;
@@ -73,27 +68,15 @@ export default async function ProfileInquiriesPage({ searchParams }: ProfileInqu
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        eyebrow="История запросов"
-        description="Запросы к поставщикам и переписка с платформой."
-        title="Запросы поставщикам"
-      />
+      <PageHeader bare title="Запросы поставщикам" />
 
-      <form action="/profile/inquiries" className="flex flex-wrap gap-2">
-        <Select className="min-w-[140px]" defaultValue={statusFilter ?? ''} name="status">
-          <option value="">Все статусы</option>
-          {inquiryResponseStatusValues.map((s) => (
-            <option key={s} value={s}>
-              {applicationStatusLabels[s]}
-            </option>
-          ))}
-        </Select>
-        <Select className="min-w-[140px]" defaultValue={sort} name="sort">
-          <option value="desc">Сначала новые</option>
-          <option value="asc">Сначала старые</option>
-        </Select>
-        <Button type="submit" variant="secondary">Применить</Button>
-      </form>
+      <ConversationListTabs value={statusGroup} />
+
+      <div className="flex justify-end">
+        <Button href={filterHref({ sort: sort === 'asc' ? 'desc' : 'asc', page: undefined })} variant="secondary">
+          {sort === 'asc' ? 'Сначала старые ↑' : 'Сначала новые ↓'}
+        </Button>
+      </div>
 
       <div className="space-y-4">
         {inquiries.length === 0 ? (
@@ -104,13 +87,17 @@ export default async function ProfileInquiriesPage({ searchParams }: ProfileInqu
               </span>
               <div>
                 <h2 className="text-xl font-semibold leading-7 text-[var(--text)]">
-                  Запросов пока нет
+                  {statusGroup === 'active' ? 'Запросов пока нет' : 'В этом разделе пусто'}
                 </h2>
                 <p className="mt-2 max-w-md text-sm leading-6 text-[var(--muted)]">
-                  Найдите поставщика в каталоге и отправьте запрос — переписка появится здесь.
+                  {statusGroup === 'active'
+                    ? 'Найдите поставщика в каталоге и отправьте запрос — переписка появится здесь.'
+                    : 'Переключите вкладку или сбросьте фильтры.'}
                 </p>
               </div>
-              <Button href="/suppliers">Смотреть поставщиков</Button>
+              <Button href={statusGroup === 'active' ? '/suppliers' : '/profile/inquiries'}>
+                {statusGroup === 'active' ? 'Смотреть поставщиков' : 'Сбросить фильтры'}
+              </Button>
             </div>
           </Panel>
         ) : (

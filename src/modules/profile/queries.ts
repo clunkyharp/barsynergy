@@ -1,5 +1,7 @@
 import { UserRole, ContentStatus, EmploymentType, JobSearchStatus, ApplicationStatus, ApplicationType, ConversationSender, Prisma } from '@prisma/client';
 import { prisma } from '@/lib/db/prisma';
+import type { ConversationStatusGroup } from '@/lib/messaging/conversation-status-groups';
+import { getConversationStatusFilter } from '@/lib/messaging/conversation-status-groups';
 
 export { UserRole, ContentStatus, EmploymentType, JobSearchStatus, ApplicationStatus, ApplicationType, ConversationSender };
 
@@ -19,7 +21,7 @@ export const profileResponseStatusValues: readonly ApplicationStatus[] = [
 export type ProfileResponseFilters = {
   userId: string;
   type: ApplicationType;
-  status: { not: ApplicationStatus } | ApplicationStatus;
+  status: Prisma.EnumApplicationStatusFilter | ApplicationStatus;
   OR?: Array<{ subject: { contains: string; mode: 'insensitive' } } | { message: { contains: string; mode: 'insensitive' } }>;
 };
 
@@ -37,6 +39,44 @@ export async function getFullUser(userId: string) {
       }
     }
   });
+}
+
+export async function getProfileDashboardStats(userId: string) {
+  const activeResponseStatuses: ApplicationStatus[] = [
+    ApplicationStatus.NEW,
+    ApplicationStatus.IN_REVIEW,
+    ApplicationStatus.CONTACTED,
+    ApplicationStatus.FORWARDED_TO_EMPLOYER,
+    ApplicationStatus.APPROVED
+  ];
+
+  const [activeResponseCount, unreadMessageCount, savedVacancyCount] = await Promise.all([
+    prisma.application.count({
+      where: {
+        userId,
+        type: profileResponseType,
+        status: { in: activeResponseStatuses }
+      }
+    }),
+    prisma.conversationMessage.count({
+      where: {
+        isReadByUser: false,
+        senderRole: { not: ConversationSender.USER },
+        application: {
+          userId,
+          status: { not: ApplicationStatus.DRAFT }
+        }
+      }
+    }),
+    prisma.savedVacancy.count({
+      where: {
+        userId,
+        vacancy: { status: ContentStatus.PUBLISHED }
+      }
+    })
+  ]);
+
+  return { activeResponseCount, unreadMessageCount, savedVacancyCount };
 }
 
 export async function getProfileSettingsData(userId: string) {
@@ -168,6 +208,7 @@ export type InquiryRow = {
 
 export async function getUserInquiries(
   userId: string,
+  statusGroup: ConversationStatusGroup,
   sort: string,
   page: number,
   pageSize: number
@@ -175,7 +216,7 @@ export async function getUserInquiries(
   const where = {
     userId,
     type: inquiryResponseType,
-    status: { not: ApplicationStatus.DRAFT }
+    status: getConversationStatusFilter(statusGroup)
   };
 
   return Promise.all([

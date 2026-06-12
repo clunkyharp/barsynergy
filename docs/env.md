@@ -92,6 +92,22 @@ Production rule:
 - `ALLOW_PUBLIC_FORMS_WITH_PENDING_LEGAL_REVIEW=true` is a temporary override for owner-approved intake before final operator details are filled;
 - this is meant to prevent enabling public personal-data forms before the operator, legal review, Roskomnadzor notification decision, processor agreements and retention rule are actually confirmed.
 
+## Web Push Notifications
+
+Web Push (browser push notifications) is optional and env-driven.
+
+- `NEXT_PUBLIC_WEB_PUSH_PUBLIC_KEY` — VAPID public key exposed to the browser for `PushManager.subscribe()`. Must be a base64-encoded URL-safe key.
+- `WEB_PUSH_PRIVATE_KEY` — VAPID private key used server-side to sign push messages. Keep secret.
+- `WEB_PUSH_SUBJECT` — Contact URI (typically `mailto:`), sent to the push service as identification.
+
+Generate VAPID keys with:
+
+```bash
+npx web-push generate-vapid-keys
+```
+
+Missing Web Push env vars must not block publishing content. Push notifications are dispatched from `ContentNotificationOutbox` and retried on failure.
+
 ## Optional Notifications
 
 Public application notifications are optional and env-driven.

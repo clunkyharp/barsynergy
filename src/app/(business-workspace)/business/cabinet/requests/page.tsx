@@ -2,11 +2,13 @@ import type { Metadata } from 'next';
 import { AdminActionAlert } from '@/components/admin/content-admin-controls';
 import { RequestLedger } from '@/components/business/business-cabinet';
 import { BusinessRequestForm } from '@/components/business/business-request-form';
+import { ConversationListTabs } from '@/components/messaging/conversation-list-tabs';
 import { createBusinessApplication } from '@/lib/business/application-actions';
 import { PageHeader } from '@/components/ui/page-header';
 import { firstParam } from '@/lib/admin/content-utils';
 import type { AdminContentSearchParams } from '@/lib/admin/content-utils';
 import { requireBusinessAccountAccess } from '@/lib/auth/require-business-account';
+import { parseConversationStatusGroup } from '@/lib/messaging/conversation-status-groups';
 import { buildPrivatePageMetadata } from '@/lib/public/metadata';
 import { getBusinessRequestsPage } from '@/modules/business/queries';
 
@@ -24,20 +26,38 @@ export const metadata: Metadata = buildPrivatePageMetadata({
 export default async function BusinessRequestsPage({ searchParams }: BusinessRequestsPageProps) {
   const { businessAccount } = await requireBusinessAccountAccess();
   const params = (await searchParams) ?? {};
+  const statusGroup = parseConversationStatusGroup(firstParam(params.statusGroup));
   const page = Math.max(1, Number(firstParam(params.page) ?? '1'));
   const skip = (page - 1) * PAGE_SIZE;
 
-  const { cities, totalCount, applications } = await getBusinessRequestsPage(businessAccount.id, skip, PAGE_SIZE);
+  const { cities, totalCount, applications } = await getBusinessRequestsPage(businessAccount.id, statusGroup, skip, PAGE_SIZE);
 
   const totalPages = Math.ceil(totalCount / PAGE_SIZE);
 
+  function pageHref(nextPage: number) {
+    const url = new URL('/business/cabinet/requests', 'http://localhost');
+
+    if (statusGroup !== 'active') {
+      url.searchParams.set('statusGroup', statusGroup);
+    }
+
+    if (nextPage > 1) {
+      url.searchParams.set('page', String(nextPage));
+    }
+
+    return `${url.pathname}${url.search}`;
+  }
+
   return (
     <div className="space-y-8">
-      <PageHeader eyebrow="Бизнес-заявки" title="Заявки компании" />
+      <PageHeader bare title="Заявки компании" />
       <AdminActionAlert params={params} />
       <section className="grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
-        <BusinessRequestForm cities={cities} defaultCityId={businessAccount.cityId} action={createBusinessApplication} />
+        <div id="new-request" className="scroll-mt-24">
+          <BusinessRequestForm cities={cities} defaultCityId={businessAccount.cityId} action={createBusinessApplication} />
+        </div>
         <div className="space-y-4">
+          <ConversationListTabs value={statusGroup} />
           <RequestLedger
             applications={applications}
             className="h-fit"
@@ -54,7 +74,7 @@ export default async function BusinessRequestsPage({ searchParams }: BusinessReq
                 {page > 1 ? (
                   <a
                     className="inline-flex min-h-9 items-center justify-center rounded-[var(--radius-md)] border border-[var(--line)] bg-[var(--surface)] px-3 text-sm font-semibold text-[var(--text)] transition-colors hover:bg-[var(--surface-muted)]"
-                    href={page === 2 ? '/business/cabinet/requests' : `/business/cabinet/requests?page=${page - 1}`}
+                    href={pageHref(page - 1)}
                   >
                     Назад
                   </a>
@@ -62,7 +82,7 @@ export default async function BusinessRequestsPage({ searchParams }: BusinessReq
                 {page < totalPages ? (
                   <a
                     className="inline-flex min-h-9 items-center justify-center rounded-[var(--radius-md)] border border-[var(--line)] bg-[var(--surface)] px-3 text-sm font-semibold text-[var(--text)] transition-colors hover:bg-[var(--surface-muted)]"
-                    href={`/business/cabinet/requests?page=${page + 1}`}
+                    href={pageHref(page + 1)}
                   >
                     Вперед
                   </a>

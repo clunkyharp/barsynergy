@@ -13,7 +13,11 @@ export function ProfileProgressRing({ percent }: { percent: number }) {
   const dash = mounted ? target : 0;
 
   return (
-    <div className="relative flex h-14 w-14 shrink-0 items-center justify-center">
+    <div
+      aria-label={`Профиль заполнен на ${percent}%`}
+      className="relative flex h-14 w-14 shrink-0 items-center justify-center"
+      role="img"
+    >
       <svg aria-hidden="true" className="absolute inset-0 h-full w-full -rotate-90" viewBox="0 0 36 36">
         <circle cx="18" cy="18" fill="none" r="15.5" stroke="var(--line)" strokeWidth="3" />
         <circle

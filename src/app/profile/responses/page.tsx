@@ -4,26 +4,23 @@ import { redirect } from 'next/navigation';
 import type { Prisma } from '@/modules/admin/queries';
 import { AppLink } from '@/components/ui/app-link';
 import { Button } from '@/components/ui/button';
+import { ConversationListTabs } from '@/components/messaging/conversation-list-tabs';
 import { Input } from '@/components/ui/input';
-import { MetaChip } from '@/components/ui/meta-chip';
 import { PageHeader } from '@/components/ui/page-header';
 import { Panel } from '@/components/ui/panel';
-import { Select } from '@/components/ui/select';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { UnreadBadge } from '@/components/messaging/unread-badge';
 import {
   applicationStatusBadgeVariants,
-  applicationStatusLabels,
-  applicationTypeLabels
+  applicationStatusLabels
 } from '@/modules/content/shared/labels';
 import { firstParam } from '@/lib/admin/content-utils';
 import { getCurrentUser } from '@/lib/auth/current-user';
 import { getUnreadMessageCounts } from '@/lib/messaging/get-conversation';
+import { getConversationStatusFilter, parseConversationStatusGroup } from '@/lib/messaging/conversation-status-groups';
 import { buildPrivatePageMetadata } from '@/lib/public/metadata';
 import {
   getUserResponses,
-  ApplicationStatus,
-  profileResponseStatusValues,
   profileResponseType
 } from '@/modules/profile/queries';
 
@@ -46,19 +43,17 @@ export default async function ProfileResponsesPage({ searchParams }: ProfileResp
   }
 
   const params = (await searchParams) ?? {};
-  const statusFilter = firstParam(params.status);
+  const statusGroup = parseConversationStatusGroup(firstParam(params.statusGroup));
   const q = firstParam(params.q);
   const sort = firstParam(params.sort) ?? 'desc';
   const page = Math.max(1, Number(firstParam(params.page)) || 1);
 
-  const where: Prisma.ApplicationWhereInput = { userId: user.id,
+  const where: Prisma.ApplicationWhereInput = {
+    userId: user.id,
     type: profileResponseType,
-    status: { not: ApplicationStatus.DRAFT }
+    status: getConversationStatusFilter(statusGroup)
   };
 
-  if (statusFilter && profileResponseStatusValues.includes(statusFilter as ApplicationStatus)) {
-    where.status = statusFilter as ApplicationStatus;
-  }
   if (q) {
     where.OR = [
       { subject: { contains: q, mode: 'insensitive' } },
@@ -76,7 +71,7 @@ export default async function ProfileResponsesPage({ searchParams }: ProfileResp
   function filterHref(overrides: Record<string, string | undefined>) {
     const url = new URL('/profile/responses', 'http://localhost');
     const merged: Record<string, string | undefined> = {};
-    if (statusFilter) merged.status = statusFilter;
+    if (statusGroup !== 'active') merged.statusGroup = statusGroup;
     if (q) merged.q = q;
     merged.sort = sort;
     Object.assign(merged, overrides);
@@ -90,32 +85,20 @@ export default async function ProfileResponsesPage({ searchParams }: ProfileResp
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        eyebrow="История активности"
-        description="История ваших откликов на вакансии."
-        title="Мои отклики"
-      />
+      <PageHeader bare title="Мои отклики" />
 
-      <form action="/profile/responses" className="space-y-3">
+      <ConversationListTabs value={statusGroup} />
+
+      <form action="/profile/responses" className="grid gap-2 md:grid-cols-[1fr_auto] md:items-center">
+        {statusGroup !== 'active' ? <input name="statusGroup" type="hidden" value={statusGroup} /> : null}
+        <input name="sort" type="hidden" value={sort} />
         <div className="relative">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--muted)]" />
           <Input className="pl-9" defaultValue={q ?? ''} name="q" placeholder="Поиск по тексту..." />
         </div>
-        <div className="flex flex-wrap gap-2">
-          <Select className="min-w-[140px]" defaultValue={statusFilter ?? ''} name="status">
-            <option value="">Все статусы</option>
-            {profileResponseStatusValues.map((s) => (
-              <option key={s} value={s}>
-                {applicationStatusLabels[s]}
-              </option>
-            ))}
-          </Select>
-          <Select className="min-w-[140px]" defaultValue={sort} name="sort">
-            <option value="desc">Сначала новые</option>
-            <option value="asc">Сначала старые</option>
-          </Select>
-          <Button type="submit" variant="secondary">Применить</Button>
-        </div>
+        <Button href={filterHref({ sort: sort === 'asc' ? 'desc' : 'asc', page: undefined })} variant="secondary">
+          {sort === 'asc' ? 'Сначала старые ↑' : 'Сначала новые ↓'}
+        </Button>
       </form>
 
       <div className="space-y-4">
@@ -127,15 +110,15 @@ export default async function ProfileResponsesPage({ searchParams }: ProfileResp
               </span>
               <div>
                 <h2 className="text-xl font-semibold leading-7 text-[var(--text)]">
-                  {q || statusFilter ? 'Ничего не найдено' : 'Откликов пока нет'}
+                  {q || statusGroup !== 'active' ? 'Ничего не найдено' : 'Откликов пока нет'}
                 </h2>
                 <p className="mt-2 max-w-md text-sm leading-6 text-[var(--muted)]">
-                  {q || statusFilter
+                  {q || statusGroup !== 'active'
                     ? 'Попробуйте изменить параметры поиска.'
                     : 'Найдите вакансию, войдите в аккаунт и откликнитесь — отклики появятся здесь. Отклики, отправленные без входа, могут не отображаться в истории.'}
                 </p>
               </div>
-              {q || statusFilter ? (
+              {q || statusGroup !== 'active' ? (
                 <Button href="/profile/responses" variant="secondary">Сбросить фильтры</Button>
               ) : (
                 <Button href="/vacancies">Смотреть вакансии →</Button>
@@ -148,10 +131,6 @@ export default async function ProfileResponsesPage({ searchParams }: ProfileResp
               <Panel className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between" key={response.id} padding="md" tone="elevated">
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
-                    <MetaChip variant="filter">
-                      {applicationTypeLabels[response.type]}
-                    </MetaChip>
-                    <span className="text-[var(--muted)]">•</span>
                     <span className="text-xs text-[var(--muted)]">
                       {new Date(response.createdAt).toLocaleDateString('ru-RU')}
                     </span>

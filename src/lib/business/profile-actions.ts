@@ -6,13 +6,14 @@ import { requireBusinessAccountAccess } from '@/lib/auth/require-business-accoun
 import { prisma } from '@/lib/db/prisma';
 import { assertSameOriginServerAction } from '@/lib/security/server-action-origin';
 import { assertActiveCity } from '@/lib/business/business-helpers';
-import { businessProfileSchema, resolveBusinessActionError, redirectWithBusinessResult } from '@/lib/business/business-action-utils';
+import { businessProfileSchema, resolveBusinessActionError } from '@/lib/business/business-action-utils';
 
 const BUSINESS_PATH = '/business/cabinet';
+const BUSINESS_SETTINGS_PATH = '/business/cabinet/settings';
 
-export async function updateBusinessProfile(formData: FormData) {
-  let result: { type: 'success' | 'error'; message: string };
+type ActionResult = { type: 'success' | 'error'; message: string };
 
+export async function updateBusinessProfile(_prevState: ActionResult | null, formData: FormData): Promise<ActionResult> {
   try {
     await assertSameOriginServerAction();
     const { businessAccount } = await requireBusinessAccountAccess();
@@ -41,10 +42,12 @@ export async function updateBusinessProfile(formData: FormData) {
     });
 
     revalidatePath(BUSINESS_PATH);
+    revalidatePath(BUSINESS_SETTINGS_PATH);
     revalidatePath('/business/cabinet/requests');
-    result = { type: 'success', message: 'Профиль компании сохранён.' };
+
+    return { type: 'success', message: 'Профиль компании сохранён.' };
   } catch (error) {
-    result = {
+    return {
       type: 'error',
       message: resolveBusinessActionError('business:update-profile', error, {
         zod: 'Не удалось сохранить профиль. Проверьте обязательные поля и сайт.',
@@ -53,6 +56,4 @@ export async function updateBusinessProfile(formData: FormData) {
       })
     };
   }
-
-  redirectWithBusinessResult(BUSINESS_PATH, result);
 }

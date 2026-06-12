@@ -1,6 +1,42 @@
 # BARSYNERGY Project Status
 
-Last updated: 2026-06-11 (Architecture audit remediation batch — in progress)
+Last updated: 2026-06-12 (Cabinets UX audit remediation — P0/P1/S1/S2/S3 packages)
+
+## Cabinets UX Audit Remediation (2026-06-12)
+
+Source: `docs/ux-audit-2026-06-12-deep.md`.
+
+Applied in this batch:
+
+- profile overview no longer duplicates the sidebar avatar or the repeated responses/saved/settings/vacancies action row, and now shows KPI tiles for active responses, unread messages and saved vacancies;
+- profile response list/detail pages no longer repeat the known `Отклик на вакансию` type chip;
+- `ProfileProgressRing` now has an accessible label;
+- business cabinet overview now shows a compact company profile summary instead of the full edit form;
+- full business profile editing moved to `/business/cabinet/settings`, and save redirects back to that settings route;
+- business request creation has a stable `/business/cabinet/requests#new-request` anchor;
+- A5 — `updateBusinessProfile` converted to `useActionState`, no full-page redirect, no draft loss; flash-сообщения inline;
+- P0-1 — profile settings forms now use `useActionState`, return inline save/error results and keep short-lived local drafts instead of redirecting through query flash messages;
+- P0-4 — `/business` and `/about` anti-proof copy now avoids unsupported facts, fake counters and manual-review claims where no authoritative metric source is wired;
+- S2 skills — `SkillsSelector` converted from preset checkboxes to tag-input with autocomplete, custom skill creation and `Skill.source = USER_GENERATED`;
+- S2 skills moderation — `/admin/skills` now has a user-generated source filter and marks custom skills as `На модерации`;
+- S1/S2 conversation tabs — profile/business response and request lists now use `Активные / Закрытые / Архив` tabs backed by shared status groups instead of 7-status dropdowns;
+- S3 password policy — register/reset/activate/profile password-setting flows now share 10-character minimum copy and run HIBP Pwned Passwords k-anonymity checks before hashing;
+- S1 avatar cropper — profile avatar upload now uses a client cropper with circular preview and exports 512×512 JPEG before the existing `updateAvatar` action;
+- source-level regression tests added in `tests/cabinets-ux-audit.test.mjs`.
+
+Validation snapshot for this batch:
+
+- `node --test tests/cabinets-ux-audit.test.mjs` passes (12/12);
+- `git diff --check` passes;
+- `npm run lint` is currently blocked by unrelated untracked `scripts/reset-local-accounts.mjs` unused variables (`Buffer`, `MIN_PASSWORD_LENGTH`);
+- targeted ESLint for the latest touched files passes;
+- `./node_modules/.bin/prisma validate` passes;
+- `npm run typecheck` passes.
+
+Remaining from the 2026-06-12 audit:
+
+- S3 remaining profile/business accessibility polish;
+- S4 measurement/retrospective work.
 
 ## Architecture Audit Remediation (2026-06-11)
 

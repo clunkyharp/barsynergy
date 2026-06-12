@@ -1,7 +1,7 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import type { UserRole } from '@prisma/client';
 import { AdminHeader } from '@/components/layout/admin-header';
 import { AdminSidebar } from '@/components/layout/admin-sidebar';
@@ -18,9 +18,14 @@ type AdminShellFrameProps = {
 };
 
 export function AdminShellFrame({ children, email, logoutAction, newApplicationsCount, role }: AdminShellFrameProps) {
-  const [isCollapsed, setIsCollapsed] = useState(
-    () => typeof window !== 'undefined' && window.localStorage.getItem(sidebarStorageKey) === 'true'
-  );
+  const [isCollapsed, setIsCollapsed] = useState(false);
+
+  useEffect(() => {
+    const stored = window.localStorage.getItem(sidebarStorageKey);
+    if (stored === 'true') {
+      setIsCollapsed(true);
+    }
+  }, []);
 
   const handleCollapsedChange = useCallback((nextValue: boolean) => {
     setIsCollapsed(nextValue);

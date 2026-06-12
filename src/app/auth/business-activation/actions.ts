@@ -13,6 +13,7 @@ import {
 } from '@/lib/auth/business-access';
 import { hasErrorMessage, resolveServerActionError } from '@/lib/actions/server-action-errors';
 import { hashPassword } from '@/lib/auth/password';
+import { PASSWORD_MIN_LENGTH } from '@/lib/auth/password-policy';
 import {
   SESSION_COOKIE_NAME,
   createSessionToken,
@@ -21,13 +22,14 @@ import {
   hashSessionToken
 } from '@/lib/auth/session';
 import { prisma } from '@/lib/db/prisma';
+import { CompromisedPasswordError, assertPasswordNotCompromised } from '@/lib/security/hibp';
 import { assertSameOriginServerAction } from '@/lib/security/server-action-origin';
 
 const businessAccessActivationSchema = z
   .object({
     token: z.string().trim().min(1),
-    password: z.string().min(8).max(200),
-    confirmPassword: z.string().min(8).max(200)
+    password: z.string().min(PASSWORD_MIN_LENGTH).max(200),
+    confirmPassword: z.string().min(PASSWORD_MIN_LENGTH).max(200)
   })
   .refine((data) => data.password === data.confirmPassword, {
     path: ['confirmPassword'],
@@ -79,6 +81,10 @@ function resolveBusinessAccessActivationErrorCode(error: unknown) {
       {
         matches: (candidate) => hasErrorMessage(candidate, 'business access invite is blocked'),
         message: 'blocked'
+      },
+      {
+        matches: (candidate) => candidate instanceof CompromisedPasswordError,
+        message: 'compromised-password'
       }
     ],
     fallbackMessage: 'failed'
@@ -131,6 +137,7 @@ export async function activateBusinessAccessAction(formData: FormData) {
 
     const businessAccountId = invite.application.businessAccount.id;
     const now = new Date();
+    await assertPasswordNotCompromised(parsed.password);
     const passwordHash = await hashPassword(parsed.password);
     const sessionToken = createSessionToken();
     const sessionExpiresAt = getSessionExpiresAt();

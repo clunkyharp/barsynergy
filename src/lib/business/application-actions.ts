@@ -13,10 +13,24 @@ import { requireBusinessAccountAccess } from '@/lib/auth/require-business-accoun
 import { prisma } from '@/lib/db/prisma';
 import { assertSameOriginServerAction } from '@/lib/security/server-action-origin';
 import { assertActiveCity } from '@/lib/business/business-helpers';
-import { resolveBusinessActionError, redirectWithBusinessResult } from '@/lib/business/business-action-utils';
+import { resolveBusinessActionError, redirectWithBusinessResult, formatZodFieldErrors } from '@/lib/business/business-action-utils';
 
 const BUSINESS_PATH = '/business/cabinet';
 const BUSINESS_REQUESTS_PATH = '/business/cabinet/requests';
+
+const BUSINESS_APPLICATION_FIELD_LABELS: Record<string, string> = {
+  title: 'короткое название',
+  details: 'подробности',
+  cityId: 'город',
+  position: 'должность',
+  shortDescription: 'краткое описание',
+  serviceArea: 'зона поставки',
+  partnerType: 'тип партнёрства',
+  teamSize: 'размер команды',
+  recipientName: 'получатель',
+  amountLabel: 'сумма',
+  consent: 'согласие на обработку данных'
+};
 
 const applicationIdSchema = z.object({
   applicationId: z.string().trim().min(1)
@@ -107,7 +121,7 @@ export async function createBusinessApplication(formData: FormData) {
     result = {
       type: 'error',
       message: resolveBusinessActionError('business:create-application', error, {
-        zod: 'Не удалось сохранить заявку. Проверьте обязательные поля.',
+        zod: formatZodFieldErrors(error, BUSINESS_APPLICATION_FIELD_LABELS, 'Не удалось сохранить заявку. Проверьте обязательные поля.'),
         city: 'Этот город сейчас недоступен для выбора.',
         fallback: 'Не удалось сохранить заявку. Попробуйте позже.'
       })
@@ -183,7 +197,7 @@ export async function updateBusinessDraftApplication(formData: FormData) {
     result = {
       type: 'error',
       message: resolveBusinessActionError('business:update-draft', error, {
-        zod: 'Не удалось обновить заявку. Проверьте обязательные поля.',
+        zod: formatZodFieldErrors(error, BUSINESS_APPLICATION_FIELD_LABELS, 'Не удалось обновить заявку. Проверьте обязательные поля.'),
         city: 'Этот город сейчас недоступен для выбора.',
         draft: 'Черновик не найден или уже недоступен.',
         application: 'Тип черновика нельзя изменить. Создайте новую заявку другого типа.',

@@ -1,16 +1,11 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 
 const CONTROL_SELECTOR =
   'input:not([type="hidden"]):not([type="button"]):not([type="submit"]):not([type="reset"]), textarea, select';
 
 type ValidatableControl = HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
-
-type ErrorSummaryItem = {
-  id: string;
-  label: string;
-};
 
 function isValidatableControl(target: EventTarget | null): target is ValidatableControl {
   return target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement || target instanceof HTMLSelectElement;
@@ -108,10 +103,6 @@ function updateDescribedBy(control: ValidatableControl, errorId: string, hasErro
   }
 }
 
-function getControlId(control: ValidatableControl) {
-  return control.id || control.name;
-}
-
 function setControlError(control: ValidatableControl, shouldShow: boolean) {
   const container = getFieldContainer(control);
 
@@ -176,26 +167,8 @@ export function validatePublicForm(form: HTMLFormElement, controls: ValidatableC
   return false;
 }
 
-export function PublicFormValidation({ showSummary = true }: { showSummary?: boolean }) {
+export function PublicFormValidation() {
   const markerRef = useRef<HTMLSpanElement>(null);
-  const [errorItems, setErrorItems] = useState<ErrorSummaryItem[]>([]);
-
-  const buildErrorSummary = useCallback((form: HTMLFormElement) => {
-    const controls = getFormControls(form);
-    const invalidControls = controls.filter((control) => !control.validity.valid);
-
-    if (invalidControls.length === 0) {
-      setErrorItems([]);
-      return;
-    }
-
-    setErrorItems(
-      invalidControls.map((control) => ({
-        id: getControlId(control),
-        label: getValidationMessage(control)
-      }))
-    );
-  }, []);
 
   useEffect(() => {
     const form = markerRef.current?.closest('form.public-form-shell, form[data-public-validation="true"]');
@@ -220,7 +193,6 @@ export function PublicFormValidation({ showSummary = true }: { showSummary?: boo
       }
 
       setControlError(event.target, !event.target.validity.valid);
-      buildErrorSummary(formElement);
     }
 
     function handleInput(event: Event) {
@@ -229,15 +201,10 @@ export function PublicFormValidation({ showSummary = true }: { showSummary?: boo
       }
 
       setControlError(event.target, !event.target.validity.valid);
-      buildErrorSummary(formElement);
     }
 
     function validateForm() {
-      const valid = validatePublicForm(formElement);
-
-      buildErrorSummary(formElement);
-
-      return valid;
+      return validatePublicForm(formElement);
     }
 
     function handleInvalid(event: Event) {
@@ -256,8 +223,6 @@ export function PublicFormValidation({ showSummary = true }: { showSummary?: boo
           delete formElement.dataset.publicValidationFocusing;
         }, 0);
       }
-
-      buildErrorSummary(formElement);
     }
 
     function handleSubmit(event: SubmitEvent) {
@@ -299,36 +264,7 @@ export function PublicFormValidation({ showSummary = true }: { showSummary?: boo
       formElement.removeEventListener('pointerdown', handleSubmitPointerDown, true);
       formElement.removeEventListener('submit', handleSubmit);
     };
-  }, [buildErrorSummary]);
+  }, []);
 
-  return (
-    <>
-      {showSummary ? (
-        <div
-          aria-labelledby="public-validation-summary-heading"
-          className="rounded-[var(--radius-md)] border border-[var(--danger-border)] bg-[var(--danger-bg)] p-4"
-          data-public-validation-summary
-          hidden={errorItems.length === 0}
-          role="alert"
-        >
-          <h2 className="text-sm font-semibold text-[var(--danger-text)]" id="public-validation-summary-heading">
-            Необходимо исправить
-          </h2>
-          <ul className="mt-2 space-y-1">
-            {errorItems.map((item) => (
-              <li key={item.id}>
-                <a
-                  className="text-sm text-[var(--danger-text)] underline transition-colors hover:text-[var(--accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
-                  href={`#${item.id}`}
-                >
-                  {item.label}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </div>
-      ) : null}
-      <span aria-hidden="true" hidden ref={markerRef} />
-    </>
-  );
+  return <span aria-hidden="true" hidden ref={markerRef} />;
 }

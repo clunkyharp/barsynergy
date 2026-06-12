@@ -89,31 +89,49 @@ function createEmptyAdditionalCost(id = `ac-${Date.now()}`): AdditionalCost {
 
 export type IngredientUpdate = (id: string, field: keyof Ingredient, value: string) => void;
 
+const EMPTY_DRINK_PARAMS: CalculatorDrinkParams = {
+  drinkVolume: '',
+  drinkYield: '',
+  prepMethod: 'espresso',
+};
+
 export function useCostCalculatorState() {
-  const [itemName, setItemName] = useState(() => {
-    const s = loadFromStorage();
-    return s?.itemName ?? 'Ванильный латте';
-  });
-  const [foodCostPercent, setFoodCostPercent] = useState(() => loadFromStorage()?.foodCostPercent ?? '30');
-  const [pricingMode, setPricingMode] = useState<PricingMode>(() => loadFromStorage()?.pricingMode ?? 'auto');
-  const [salePrice, setSalePrice] = useState(() => loadFromStorage()?.salePrice ?? '');
-  const [_roundingMode, _setRoundingMode] = useState<RoundingMode>(() => loadFromStorage()?.roundingMode ?? 'none');
+  const [itemName, setItemName] = useState('Ванильный латте');
+  const [foodCostPercent, setFoodCostPercent] = useState('30');
+  const [pricingMode, setPricingMode] = useState<PricingMode>('auto');
+  const [salePrice, setSalePrice] = useState('');
+  const [_roundingMode, _setRoundingMode] = useState<RoundingMode>('none');
   function setRoundingMode(value: string) {
     _setRoundingMode(value as RoundingMode);
   }
   const roundingMode = _roundingMode;
-  const [customMarkupPercent, setCustomMarkupPercent] = useState(() => loadFromStorage()?.customMarkupPercent ?? '');
-  const [ingredients, setIngredients] = useState<Ingredient[]>(() => loadFromStorage()?.ingredients ?? demoIngredients);
-  const [additionalCosts, setAdditionalCosts] = useState<AdditionalCost[]>(() => loadFromStorage()?.additionalCosts ?? demoAdditionalCosts);
-  const [drinkParams, setDrinkParams] = useState<CalculatorDrinkParams>(() => loadFromStorage()?.drinkParams ?? {
-    drinkVolume: '',
-    drinkYield: '',
-    prepMethod: 'espresso',
-  });
+  const [customMarkupPercent, setCustomMarkupPercent] = useState('');
+  const [ingredients, setIngredients] = useState<Ingredient[]>(demoIngredients);
+  const [additionalCosts, setAdditionalCosts] = useState<AdditionalCost[]>(demoAdditionalCosts);
+  const [drinkParams, setDrinkParams] = useState<CalculatorDrinkParams>(EMPTY_DRINK_PARAMS);
   const [copyState, setCopyState] = useState<'idle' | 'copied' | 'failed'>('idle');
   const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null);
   const copyResetTimerRef = useRef<number | null>(null);
   const presetAppliedRef = useRef(false);
+  const restoredRef = useRef(false);
+
+  useEffect(() => {
+    if (!restoredRef.current) {
+      restoredRef.current = true;
+      const saved = loadFromStorage();
+      if (saved) {
+        if (saved.itemName !== undefined) setItemName(saved.itemName);
+        if (saved.foodCostPercent !== undefined) setFoodCostPercent(saved.foodCostPercent);
+        if (saved.pricingMode !== undefined) setPricingMode(saved.pricingMode);
+        if (saved.salePrice !== undefined) setSalePrice(saved.salePrice);
+        if (saved.roundingMode !== undefined) _setRoundingMode(saved.roundingMode);
+        if (saved.customMarkupPercent !== undefined) setCustomMarkupPercent(saved.customMarkupPercent);
+        if (saved.ingredients !== undefined) setIngredients(saved.ingredients);
+        if (saved.additionalCosts !== undefined) setAdditionalCosts(saved.additionalCosts);
+        if (saved.drinkParams !== undefined) setDrinkParams(saved.drinkParams);
+      }
+    }
+  }, []);
 
   useEffect(() => {
     saveToStorage({ itemName, foodCostPercent, pricingMode, salePrice, roundingMode: _roundingMode, customMarkupPercent, ingredients, additionalCosts, drinkParams });
@@ -252,7 +270,14 @@ export function useCostCalculatorState() {
   }
 
   function addIngredient() {
-    setIngredients((current) => [...current, createEmptyIngredient()]);
+    setIngredients((current) => {
+      if (current.length === 1) {
+        const only = current[0];
+        const isEmpty = !only.name.trim() && !only.packagePrice.trim() && !only.packageAmount.trim() && !only.recipeAmount.trim();
+        if (isEmpty) return current;
+      }
+      return [...current, createEmptyIngredient()];
+    });
   }
 
   function duplicateIngredient(id: string) {
@@ -274,7 +299,13 @@ export function useCostCalculatorState() {
   }
 
   function addAdditionalCost() {
-    setAdditionalCosts((current) => [...current, createEmptyAdditionalCost()]);
+    setAdditionalCosts((current) => {
+      if (current.length === 1) {
+        const only = current[0];
+        if (!only.name.trim() && !only.amount.trim()) return current;
+      }
+      return [...current, createEmptyAdditionalCost()];
+    });
   }
 
   function removeAdditionalCost(id: string) {

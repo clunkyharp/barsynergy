@@ -169,6 +169,23 @@ When the current email+Telegram setup becomes insufficient (e.g., need push noti
 4. Do NOT change the outbox pattern — the outbox is channel-agnostic
 5. The `process-queue.ts` script selects the correct dispatcher based on the channel value
 
+### Web Push (Content Notifications)
+
+Browser push notifications for published content use a separate outbox pattern:
+
+- **Models**: `WebPushSubscription`, `UserNotificationPreference`, `ContentNotificationOutbox` in `schema.prisma`
+- **Library**: `lib/notifications/web-push/`
+- **Retry**: `npm run notifications:content:retry`
+- **Service worker**: `public/sw.js`
+- **Trigger**: `maybeNotifyFirstPublication()` in `lib/notifications/web-push/publish-trigger.ts` — called from admin action files for articles, events, vacancies, courses, suppliers
+
+When adding a new content type with push notifications:
+
+1. Add the content type to `CONTENT_TYPE_TOPIC` in `publish-trigger.ts`
+2. Add the topic to `TOPICS` in `notification-settings.tsx`
+3. Inject `maybeNotifyFirstPublication()` in the admin create/update actions for the new type
+4. The outbox and queue are content-type-agnostic
+
 ---
 
 ## Scaling the Admin Panel

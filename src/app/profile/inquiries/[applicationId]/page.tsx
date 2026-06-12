@@ -44,11 +44,7 @@ export default async function InquiryDetailPage({ params }: InquiryDetailPagePro
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        eyebrow="Запрос поставщику"
-        description="Переписка по вашему запросу."
-        title={application.subject ?? 'Запрос поставщику'}
-      />
+      <PageHeader bare title={application.subject ?? 'Запрос поставщику'} />
 
       <Panel padding="md" tone="elevated">
         <div className="flex flex-wrap items-center justify-between gap-3">

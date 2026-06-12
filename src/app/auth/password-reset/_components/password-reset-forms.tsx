@@ -10,6 +10,7 @@ import { PasswordInput } from '@/components/ui/password-input';
 import { PasswordPairValidation } from '@/components/ui/password-pair-validation';
 import { SubmitButton } from '@/components/ui/submit-button';
 import { PublicFormValidation } from '@/components/public/public-form-validation';
+import { PASSWORD_HINT, PASSWORD_MIN_LENGTH } from '@/lib/auth/password-policy-constants';
 import {
   requestPasswordResetAction,
   resetPasswordAction,
@@ -25,6 +26,7 @@ const requestErrorMessages: Record<string, string> = {
 
 const confirmErrorMessages: Record<string, string> = {
   invalid: 'Неверный или устаревший токен. Попробуйте запросить восстановление пароля заново.',
+  'compromised-password': 'Этот пароль уже встречался в утечках. Выберите другую фразу или пароль.',
   failed: 'Не удалось выполнить действие прямо сейчас. Повторите попытку позже.'
 };
 
@@ -88,7 +90,7 @@ export function PasswordResetConfirmForm({ token }: { token: string }) {
         </div>
       ) : (
         <InlineAlert className="mb-4" tone="info">
-          Минимальная длина пароля — 8 символов.
+          {PASSWORD_HINT}
         </InlineAlert>
       )}
       <form action={formAction} className="auth-password-reset-confirm-form grid gap-3.5" data-public-validation="true" noValidate>
@@ -100,9 +102,9 @@ export function PasswordResetConfirmForm({ token }: { token: string }) {
             id="new-password"
             name="password"
             autoComplete="new-password"
-            placeholder="Минимум 8 символов"
+            placeholder={PASSWORD_HINT}
             required
-            minLength={8}
+            minLength={PASSWORD_MIN_LENGTH}
             maxLength={200}
           />
         </FormField>
@@ -113,7 +115,7 @@ export function PasswordResetConfirmForm({ token }: { token: string }) {
             autoComplete="off"
             placeholder="Повторите новый пароль"
             required
-            minLength={8}
+            minLength={PASSWORD_MIN_LENGTH}
             maxLength={200}
           />
         </FormField>

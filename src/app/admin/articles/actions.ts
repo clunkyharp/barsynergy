@@ -20,6 +20,7 @@ import { deleteContentDraft, updateContentStatus } from '@/lib/admin/content-lif
 import { revalidateArticlePublicPaths } from '@/lib/admin/public-content-revalidation';
 import { prisma } from '@/lib/db/prisma';
 import { withAdminAction } from '@/lib/server-action-wrappers';
+import { maybeNotifyFirstPublication } from '@/lib/notifications/web-push/publish-trigger';
 
 const ADMIN_ARTICLES_PATH = '/admin/articles';
 const ARTICLE_BODY_MAX_LENGTH = 100_000;
@@ -112,7 +113,7 @@ export async function createArticle(formData: FormData) {
         persist: (uniqueSlug) => prisma.$transaction(async (tx) => {
           const article = await tx.article.create({
             data: { title: parsed.title, slug: uniqueSlug, summary: parsed.summary, body: parsed.body, status: parsed.status, coverImageId, coverImageAlt: nullableString(parsed.coverImageAlt), categoryId: nullableString(parsed.categoryId), cityId: nullableString(parsed.cityId), authorName: nullableString(parsed.authorName), sourceLabel: nullableString(parsed.sourceLabel), sourceReferences: nullableString(parsed.sourceReferences), readingTimeMinutes: parsed.readingTimeMinutes, createdById: user.id, updatedById: user.id, ...initialPublicationDates(parsed.status) },
-            select: { id: true, slug: true }
+            select: { id: true, slug: true, title: true }
           });
 
           if (tagIds.length > 0) await tx.articleTag.createMany({ data: tagIds.map((tagId) => ({ articleId: article.id, tagId })), skipDuplicates: true });
@@ -120,6 +121,13 @@ export async function createArticle(formData: FormData) {
           return article;
         })
       });
+
+      await maybeNotifyFirstPublication(
+        'article',
+        ContentStatus.DRAFT,
+        parsed.status,
+        { id: createdArticle.id, title: createdArticle.title, slug: createdArticle.slug, publishedAt: null }
+      );
 
       revalidatePath(ADMIN_ARTICLES_PATH);
       revalidateArticlePublicPaths(createdArticle.slug);
@@ -153,7 +161,7 @@ export async function updateArticle(formData: FormData) {
 
       if (!slug) throw new Error('Article slug is required.');
 
-      const existingArticle = await prisma.article.findUniqueOrThrow({ where: { id: parsed.articleId }, select: { coverImageId: true, publishedAt: true, slug: true } });
+      const existingArticle = await prisma.article.findUniqueOrThrow({ where: { id: parsed.articleId }, select: { id: true, coverImageId: true, publishedAt: true, slug: true, title: true, status: true } });
       const previousCoverImageId = existingArticle.coverImageId;
 
       await Promise.all([assertActiveContentRelations({ entityName: 'Article', categoryId: parsed.categoryId, categoryType: CategoryType.ARTICLE, cityId: parsed.cityId }), assertActiveArticleTags(tagIds)]);
@@ -174,6 +182,8 @@ export async function updateArticle(formData: FormData) {
 
       if (previousCoverImageId !== coverImageId) await deleteUploadedFileIfUnused(previousCoverImageId);
 
+      await maybeNotifyFirstPublication('article', existingArticle.status, parsed.status, existingArticle);
+
       revalidatePath(ADMIN_ARTICLES_PATH);
       revalidatePath(`${ADMIN_ARTICLES_PATH}/${parsed.articleId}`);
       revalidateArticlePublicPaths(updatedArticle.slug, existingArticle.slug);
@@ -190,12 +200,14 @@ export async function updateArticleStatus(formData: FormData) {
     handler: async ({ user }) => {
       const parsed = statusFormSchema.parse({ articleId: getString(formData, 'articleId'), status: getString(formData, 'status') });
 
-      const article = await prisma.article.findUniqueOrThrow({ where: { id: parsed.articleId }, select: { slug: true } });
+      const existing = await prisma.article.findUniqueOrThrow({ where: { id: parsed.articleId }, select: { id: true, slug: true, title: true, publishedAt: true, status: true } });
 
       await updateContentStatus({ status: parsed.status, userId: user.id, findCurrent: (tx) => tx.article.findUniqueOrThrow({ where: { id: parsed.articleId }, select: { publishedAt: true } }), update: (tx, data) => tx.article.update({ where: { id: parsed.articleId }, data }) });
 
+      await maybeNotifyFirstPublication('article', existing.status, parsed.status, existing);
+
       revalidatePath(ADMIN_ARTICLES_PATH);
-      revalidateArticlePublicPaths(article.slug);
+      revalidateArticlePublicPaths(existing.slug);
       return { type: 'success', message: 'Статус статьи обновлён.' };
     }
   });

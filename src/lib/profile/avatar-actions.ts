@@ -6,14 +6,15 @@ import { FileVisibility, StorageDriver } from '@prisma/client';
 import { resolveServerActionError } from '@/lib/actions/server-action-errors';
 import { getCurrentUser } from '@/lib/auth/current-user';
 import { prisma } from '@/lib/db/prisma';
+import type { ProfileActionResult } from '@/lib/profile/profile-action-result';
 import { assertSameOriginServerAction } from '@/lib/security/server-action-origin';
 import { getStorageService } from '@/lib/storage/storage.service';
 import { isAllowedPublicImageUpload } from '@/lib/storage/file-signatures';
 
 const SETTINGS_PATH = '/profile/settings';
 
-export async function updateAvatar(formData: FormData) {
-  let result: { type: 'success' | 'error'; message: string };
+export async function updateAvatar(_prevState: ProfileActionResult, formData: FormData): Promise<ProfileActionResult> {
+  let result: Exclude<ProfileActionResult, null>;
   let pendingStorageKey: { fileKey: string; bucket?: string } | undefined;
 
   try {
@@ -124,9 +125,5 @@ export async function updateAvatar(formData: FormData) {
     };
   }
 
-  const url = new URL(SETTINGS_PATH, 'http://localhost');
-  url.searchParams.delete('success');
-  url.searchParams.delete('error');
-  url.searchParams.set(result.type, result.message);
-  redirect(`${url.pathname}${url.search}`);
+  return result;
 }

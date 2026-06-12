@@ -12,7 +12,8 @@ import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
 import { AdminStatusChip } from '@/components/ui/status-badge';
-import type { AdminContentSearchParams } from '@/lib/admin/content-utils';
+import { firstParam, type AdminContentSearchParams } from '@/lib/admin/content-utils';
+import { SkillSource } from '@prisma/client';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
 import { getSkillList } from '@/lib/admin/admin-queries';
 
@@ -28,7 +29,13 @@ export default async function AdminSkillsPage({ searchParams }: AdminSkillsPageP
   await requireAdminSectionAccess('skills');
 
   const params = (await searchParams) ?? {};
-  const skills = await getSkillList();
+  const sourceFilter = firstParam(params.source);
+  const isUserGeneratedFilter = sourceFilter === 'user-generated';
+  const skills = await getSkillList(
+    isUserGeneratedFilter
+      ? { source: SkillSource.USER_GENERATED }
+      : undefined
+  );
 
   return (
     <div className="space-y-8">
@@ -39,6 +46,15 @@ export default async function AdminSkillsPage({ searchParams }: AdminSkillsPageP
       />
 
       <AdminActionAlert params={params} />
+
+      <nav aria-label="Модерация навыков" className="flex flex-wrap gap-2">
+        <Button href="/admin/skills" size="sm" variant={isUserGeneratedFilter ? 'ghost' : 'secondary'}>
+          Все навыки
+        </Button>
+        <Button href="?source=user-generated" size="sm" variant={isUserGeneratedFilter ? 'secondary' : 'ghost'}>
+          На модерации
+        </Button>
+      </nav>
 
       <AdminCmsPanel title="Новый навык" description="Добавьте новый навык. Станет доступен в профилях специалистов.">
         <form action={createSkill} className="grid gap-4">
@@ -60,7 +76,11 @@ export default async function AdminSkillsPage({ searchParams }: AdminSkillsPageP
 
       <section className="grid gap-4">
         {skills.length === 0 ? (
-          <ContextualEmptyState context="Навыки" title="Навыков пока нет" description="Добавьте первый навык для профилей специалистов." />
+          <ContextualEmptyState
+            context="Навыки"
+            title={isUserGeneratedFilter ? 'Пользовательских навыков нет' : 'Навыков пока нет'}
+            description={isUserGeneratedFilter ? 'Новые навыки от пользователей появятся здесь после сохранения профиля.' : 'Добавьте первый навык для профилей специалистов.'}
+          />
         ) : (
           skills.map((skill) => (
             <AdminCmsInlineEditRecord
@@ -73,9 +93,17 @@ export default async function AdminSkillsPage({ searchParams }: AdminSkillsPageP
                   title={skill.name}
                   subtitle={skill.slug}
                   items={[
-                    { label: 'Порядок', value: skill.sortOrder }
+                    { label: 'Порядок', value: skill.sortOrder },
+                    { label: 'Источник', value: skill.source === SkillSource.USER_GENERATED ? 'Пользовательский' : 'Админский' }
                   ]}
-                  status={<AdminStatusChip variant={skill.isActive ? 'success' : 'neutral'}>{skill.isActive ? 'Активен' : 'Выключен'}</AdminStatusChip>}
+                  status={
+                    <div className="flex flex-wrap gap-2">
+                      {skill.source === SkillSource.USER_GENERATED ? (
+                        <AdminStatusChip variant="warning">На модерации</AdminStatusChip>
+                      ) : null}
+                      <AdminStatusChip variant={skill.isActive ? 'success' : 'neutral'}>{skill.isActive ? 'Активен' : 'Выключен'}</AdminStatusChip>
+                    </div>
+                  }
                 />
               }
             >

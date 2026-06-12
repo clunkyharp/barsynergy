@@ -1,13 +1,14 @@
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
-import { ArrowRight, BookOpen, BriefcaseBusiness, FileText, Heart, PartyPopper, Search, Settings } from 'lucide-react';
+import { ArrowRight, BookOpen, BriefcaseBusiness, PartyPopper, Settings } from 'lucide-react';
+import { AppLink } from '@/components/ui/app-link';
 import { Button } from '@/components/ui/button';
 import { InlineAlert } from '@/components/ui/inline-alert';
 import { MetaChip } from '@/components/ui/meta-chip';
 import { Panel } from '@/components/ui/panel';
 import { ProfileProgressRing } from '@/components/profile/profile-progress-ring';
 import { getCurrentUser } from '@/lib/auth/current-user';
-import { getFullUser } from '@/modules/profile/queries';
+import { getFullUser, getProfileDashboardStats } from '@/modules/profile/queries';
 import { buildPrivatePageMetadata } from '@/lib/public/metadata';
 import { displayFont } from '@/lib/fonts';
 
@@ -16,7 +17,7 @@ export const metadata: Metadata = buildPrivatePageMetadata({
   description: 'Закрытый кабинет специалиста BARSYNERGY.'
 });
 
-const COMPLETENESS_FIELDS = ['fullName', 'cityId', 'profession', 'phone', 'telegram', 'bio', 'website'] as const;
+const COMPLETENESS_FIELDS = ['fullName', 'cityId', 'profession', 'phone', 'telegram', 'bio'] as const;
 
 const COMPLETENESS_FIELD_LABELS: Record<typeof COMPLETENESS_FIELDS[number], string> = {
   fullName: 'имя',
@@ -24,8 +25,7 @@ const COMPLETENESS_FIELD_LABELS: Record<typeof COMPLETENESS_FIELDS[number], stri
   profession: 'профессию',
   phone: 'телефон',
   telegram: 'Telegram',
-  bio: 'описание',
-  website: 'сайт'
+  bio: 'описание'
 };
 
 function computeCompleteness(profile: {
@@ -35,7 +35,6 @@ function computeCompleteness(profile: {
   phone: string | null;
   telegram: string | null;
   bio: string | null;
-  website: string | null;
 }): { filled: number; total: number; percent: number; isEmpty: boolean; missingFields: string[] } {
   const missingFields = COMPLETENESS_FIELDS.filter((f) => {
     const value = profile[f];
@@ -65,6 +64,11 @@ function formatSalary(value: number | null): string | null {
   return value.toLocaleString('ru-RU');
 }
 
+function formatMissingFields(fields: string[]) {
+  if (fields.length === 0) return '';
+  return `Не хватает: ${fields.slice(0, 3).join(', ')}`;
+}
+
 type ProfileDashboardPageProps = {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 };
@@ -78,7 +82,10 @@ export default async function ProfileDashboardPage({ searchParams }: ProfileDash
     redirect('/auth/login?returnTo=/profile');
   }
 
-  const user = await getFullUser(currentUser.id);
+  const [user, dashboardStats] = await Promise.all([
+    getFullUser(currentUser.id),
+    getProfileDashboardStats(currentUser.id)
+  ]);
 
   if (!user) {
     redirect('/auth/login?returnTo=/profile');
@@ -91,11 +98,8 @@ export default async function ProfileDashboardPage({ searchParams }: ProfileDash
     profession: profile?.profession ?? null,
     phone: profile?.phone ?? null,
     telegram: profile?.telegram ?? null,
-    bio: profile?.bio ?? null,
-    website: profile?.website ?? null
+    bio: profile?.bio ?? null
   });
-
-  const initials = (profile?.fullName || user.email).slice(0, 2).toUpperCase();
 
   return (
     <div className="space-y-6">
@@ -136,10 +140,7 @@ export default async function ProfileDashboardPage({ searchParams }: ProfileDash
         </Panel>
       ) : null}
       <Panel padding="lg" tone="elevated">
-        <div className="grid grid-cols-[4rem_1fr_auto] items-start gap-4">
-          <span className="grid size-16 place-items-center rounded-full bg-[var(--accent-soft)] text-xl font-bold text-[var(--accent)]">
-            {initials}
-          </span>
+        <div className="grid gap-4 sm:grid-cols-[1fr_auto] sm:items-start">
           <div className="min-w-0 self-center">
             <h1 className="text-[22px] font-bold leading-[1.15] tracking-normal text-[var(--text)] md:text-[26px]">
               {profile?.fullName || user.email}
@@ -161,23 +162,37 @@ export default async function ProfileDashboardPage({ searchParams }: ProfileDash
         </div>
       </Panel>
 
-      <div className="flex flex-wrap items-center gap-3">
-        <Button className="rounded-[var(--radius-md)]" href="/profile/responses" size="sm" variant="secondary">
-          <FileText size={15} strokeWidth={1.8} />
-          Мои отклики
-        </Button>
-        <Button className="rounded-[var(--radius-md)]" href="/profile/saved-vacancies" size="sm" variant="secondary">
-          <Heart size={15} strokeWidth={1.8} />
-          Сохранённые
-        </Button>
-        <Button className="rounded-[var(--radius-md)]" href="/profile/settings" size="sm" variant="secondary">
-          <Settings size={15} strokeWidth={1.8} />
-          Настройки
-        </Button>
-        <Button className="rounded-[var(--radius-md)]" href="/vacancies" size="sm" variant="ghost">
-          <Search size={15} strokeWidth={1.8} />
-          Найти вакансии
-        </Button>
+      <div className="grid gap-3 md:grid-cols-3">
+        {[
+          {
+            href: '/profile/responses',
+            label: 'Активные отклики',
+            value: dashboardStats.activeResponseCount,
+            detail: 'На проверке или в работе'
+          },
+          {
+            href: '/profile/responses',
+            label: 'Непрочитанные',
+            value: dashboardStats.unreadMessageCount,
+            detail: 'Сообщения по диалогам'
+          },
+          {
+            href: '/profile/saved-vacancies',
+            label: 'Сохранённые вакансии',
+            value: dashboardStats.savedVacancyCount,
+            detail: 'Быстрый возврат к позициям'
+          }
+        ].map((item) => (
+          <AppLink
+            className="rounded-[var(--radius-lg)] border border-[var(--line)] bg-[var(--surface-elevated)] p-5 transition-colors hover:border-[var(--border-hover)] hover:bg-[var(--surface-wash)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
+            href={item.href}
+            key={item.href + item.label}
+          >
+            <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--muted)]">{item.label}</p>
+            <p className="mt-2 text-2xl font-semibold tabular-nums text-[var(--text)]">{item.value}</p>
+            <p className="mt-1 text-sm leading-6 text-[var(--muted)]">{item.detail}</p>
+          </AppLink>
+        ))}
       </div>
 
       {profile && !profile.isPublic && profile.jobSearchStatus && profile.jobSearchStatus !== 'NOT_LOOKING' ? (
@@ -214,7 +229,7 @@ export default async function ProfileDashboardPage({ searchParams }: ProfileDash
               </h2>
               {completeness.missingFields.length > 0 ? (
                 <p className="mt-1 text-sm leading-6 text-[var(--muted)]">
-                  Не хватает: {completeness.missingFields.slice(0, 3).join(', ')}.
+                  {formatMissingFields(completeness.missingFields)}
                 </p>
               ) : (
                 <p className="mt-1 text-sm leading-6 text-[var(--muted)]">
@@ -235,7 +250,6 @@ export default async function ProfileDashboardPage({ searchParams }: ProfileDash
       {profile?.jobSearchStatus && profile.jobSearchStatus !== 'NOT_LOOKING' && (
         (profile.desiredSalary !== null && profile.desiredSalary !== undefined)
         || profile.employmentTypes.length > 0
-        || profile.isPublic
       ) ? (
         <Panel padding="lg" tone="elevated">
           <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[var(--muted)]">Условия поиска</p>
@@ -256,12 +270,6 @@ export default async function ProfileDashboardPage({ searchParams }: ProfileDash
                 <dd className="font-semibold">
                   {profile.employmentTypes.map((et) => employmentTypeLabels[et]).join(', ')}
                 </dd>
-              </div>
-            ) : null}
-            {profile.isPublic ? (
-              <div className="flex items-baseline gap-2">
-                <dt className="text-[var(--muted)]">Видимость:</dt>
-                <dd className="font-semibold text-[var(--accent)]">Профиль открыт</dd>
               </div>
             ) : null}
           </dl>
@@ -343,42 +351,38 @@ export default async function ProfileDashboardPage({ searchParams }: ProfileDash
           </div>
         </Panel>
 
-        <Panel padding="lg" tone="elevated">
-          <h2 className="text-lg font-semibold tracking-normal">Контакты</h2>
-          <div className="mt-4 space-y-3 text-sm">
-            {profile?.phone && (
-              <div className="flex justify-between border-b border-[var(--line)] pb-2">
-                <span className="text-[var(--muted)]">Телефон</span>
-                <span className="font-medium">{profile.phone}</span>
-              </div>
-            )}
-            {profile?.telegram && (
-              <div className="flex justify-between border-b border-[var(--line)] pb-2">
-                <span className="text-[var(--muted)]">Telegram</span>
-                <a
-                  className="font-medium text-[var(--accent)] transition-colors hover:text-[var(--accent-strong)]"
-                  href={`https://t.me/${profile.telegram.replace('@', '')}`}
-                  rel="noopener noreferrer"
-                  target="_blank"
-                >
-                  {profile.telegram.startsWith('@') ? profile.telegram : `@${profile.telegram}`}
-                </a>
-              </div>
-            )}
-            {profile?.company && (
-              <div className="flex justify-between border-b border-[var(--line)] pb-2">
-                <span className="text-[var(--muted)]">Компания</span>
-                <span className="font-medium">{profile.company}</span>
-              </div>
-            )}
-            {profile?.website && (
-              <div className="flex justify-between border-b border-[var(--line)] pb-2">
-                <span className="text-[var(--muted)]">Сайт</span>
-                <span className="font-medium">{profile.website}</span>
-              </div>
-            )}
-          </div>
-        </Panel>
+        {profile?.phone || profile?.telegram || profile?.company ? (
+          <Panel padding="lg" tone="elevated">
+            <h2 className="text-lg font-semibold tracking-normal">Контакты</h2>
+            <div className="mt-4 space-y-3 text-sm">
+              {profile?.phone && (
+                <div className="flex justify-between border-b border-[var(--line)] pb-2">
+                  <span className="text-[var(--muted)]">Телефон</span>
+                  <span className="font-medium">{profile.phone}</span>
+                </div>
+              )}
+              {profile?.telegram && (
+                <div className="flex justify-between border-b border-[var(--line)] pb-2">
+                  <span className="text-[var(--muted)]">Telegram</span>
+                  <a
+                    className="font-medium text-[var(--accent)] transition-colors hover:text-[var(--accent-strong)]"
+                    href={`https://t.me/${profile.telegram.replace('@', '')}`}
+                    rel="noopener noreferrer"
+                    target="_blank"
+                  >
+                    {profile.telegram.startsWith('@') ? profile.telegram : `@${profile.telegram}`}
+                  </a>
+                </div>
+              )}
+              {profile?.company && (
+                <div className="flex justify-between border-b border-[var(--line)] pb-2">
+                  <span className="text-[var(--muted)]">Компания</span>
+                  <span className="font-medium">{profile.company}</span>
+                </div>
+              )}
+            </div>
+          </Panel>
+        ) : null}
       </div>
     </div>
   );

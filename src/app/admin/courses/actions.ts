@@ -20,6 +20,7 @@ import { deleteContentDraft, updateContentStatus } from '@/lib/admin/content-lif
 import { revalidateCoursePublicPaths } from '@/lib/admin/public-content-revalidation';
 import { prisma } from '@/lib/db/prisma';
 import { withAdminAction } from '@/lib/server-action-wrappers';
+import { maybeNotifyFirstPublication } from '@/lib/notifications/web-push/publish-trigger';
 
 const ADMIN_COURSES_PATH = '/admin/courses';
 
@@ -78,9 +79,16 @@ export async function createCourse(formData: FormData) {
         baseSlug: slug, exists: async (candidate) => Boolean(await prisma.course.findFirst({ where: { slug: candidate }, select: { id: true } })),
         persist: (uniqueSlug) => prisma.course.create({
           data: { title: parsed.title, slug: uniqueSlug, summary: parsed.summary, program: parsed.program, status: parsed.status, coverImageId, coverImageAlt: nullableString(parsed.coverImageAlt), categoryId: nullableString(parsed.categoryId), cityId: nullableString(parsed.cityId), format: nullableString(parsed.format), durationLabel: nullableString(parsed.durationLabel), level: nullableString(parsed.level), priceLabel: nullableString(parsed.priceLabel), instructorName: nullableString(parsed.instructorName), createdById: user.id, updatedById: user.id, ...initialPublicationDates(parsed.status) },
-          select: { slug: true }
+          select: { slug: true, id: true, title: true }
         })
       });
+
+      await maybeNotifyFirstPublication(
+        'course',
+        ContentStatus.DRAFT,
+        parsed.status,
+        { id: createdCourse.id, title: createdCourse.title, slug: createdCourse.slug, publishedAt: null }
+      );
 
       revalidatePath(ADMIN_COURSES_PATH);
       revalidateCoursePublicPaths(createdCourse.slug);
@@ -111,7 +119,7 @@ export async function updateCourse(formData: FormData) {
       const slug = slugify(parsed.slug ?? parsed.title);
       if (!slug) throw new Error('Course slug is required.');
 
-      const existingCourse = await prisma.course.findUniqueOrThrow({ where: { id: parsed.courseId }, select: { coverImageId: true, publishedAt: true, slug: true } });
+      const existingCourse = await prisma.course.findUniqueOrThrow({ where: { id: parsed.courseId }, select: { id: true, coverImageId: true, publishedAt: true, slug: true, title: true, status: true } });
       const previousCoverImageId = existingCourse.coverImageId;
 
       await assertActiveContentRelations({ entityName: 'Course', categoryId: parsed.categoryId, categoryType: CategoryType.COURSE, cityId: parsed.cityId });
@@ -128,6 +136,8 @@ export async function updateCourse(formData: FormData) {
 
       if (previousCoverImageId !== coverImageId) await deleteUploadedFileIfUnused(previousCoverImageId);
 
+      await maybeNotifyFirstPublication('course', existingCourse.status, parsed.status, existingCourse);
+
       revalidatePath(ADMIN_COURSES_PATH);
       revalidateCoursePublicPaths(updatedCourse.slug, existingCourse.slug);
       return { type: 'success', message: 'Курс обновлён.' };
@@ -143,12 +153,14 @@ export async function updateCourseStatus(formData: FormData) {
     handler: async ({ user }) => {
       const parsed = statusFormSchema.parse({ courseId: getString(formData, 'courseId'), status: getString(formData, 'status') });
 
-      const course = await prisma.course.findUniqueOrThrow({ where: { id: parsed.courseId }, select: { slug: true } });
+      const existing = await prisma.course.findUniqueOrThrow({ where: { id: parsed.courseId }, select: { id: true, slug: true, title: true, publishedAt: true, status: true } });
 
       await updateContentStatus({ status: parsed.status, userId: user.id, findCurrent: (tx) => tx.course.findUniqueOrThrow({ where: { id: parsed.courseId }, select: { publishedAt: true } }), update: (tx, data) => tx.course.update({ where: { id: parsed.courseId }, data }) });
 
+      await maybeNotifyFirstPublication('course', existing.status, parsed.status, existing);
+
       revalidatePath(ADMIN_COURSES_PATH);
-      revalidateCoursePublicPaths(course.slug);
+      revalidateCoursePublicPaths(existing.slug);
       return { type: 'success', message: 'Статус курса обновлён.' };
     }
   });

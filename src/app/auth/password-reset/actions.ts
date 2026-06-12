@@ -9,6 +9,7 @@ import { AuthRateLimitError, assertAuthAttemptAllowed } from '@/lib/auth/auth-ra
 import { hashPassword } from '@/lib/auth/password';
 import { PASSWORD_MIN_LENGTH } from '@/lib/auth/password-policy';
 import { assertSameOriginServerAction } from '@/lib/security/server-action-origin';
+import { CompromisedPasswordError, assertPasswordNotCompromised } from '@/lib/security/hibp';
 import { getEnv } from '@/lib/validation/env';
 import { sendPasswordResetEmail } from '@/lib/notifications/auth-email';
 
@@ -83,6 +84,8 @@ export async function resetPasswordAction(
   let resetSucceeded = false;
 
   try {
+    await assertPasswordNotCompromised(parsed.data.password);
+
     const tokenHash = createHash('sha256').update(parsed.data.token).digest('hex');
     const passwordHash = await hashPassword(parsed.data.password);
 
@@ -111,7 +114,11 @@ export async function resetPasswordAction(
     `;
 
     resetSucceeded = Boolean(result && result.length > 0);
-  } catch {
+  } catch (error) {
+    if (error instanceof CompromisedPasswordError) {
+      return { type: 'error', code: 'compromised-password' };
+    }
+
     return { type: 'error', code: 'failed' };
   }
 

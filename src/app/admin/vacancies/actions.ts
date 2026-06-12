@@ -21,6 +21,7 @@ import { revalidateVacancyPublicPaths } from '@/lib/admin/public-content-revalid
 import { prisma } from '@/lib/db/prisma';
 import { vacancyPositionValues } from '@/lib/vacancies/positions';
 import { withAdminAction } from '@/lib/server-action-wrappers';
+import { maybeNotifyFirstPublication } from '@/lib/notifications/web-push/publish-trigger';
 
 const ADMIN_VACANCIES_PATH = '/admin/vacancies';
 
@@ -130,9 +131,16 @@ export async function createVacancy(formData: FormData) {
               updatedById: user.id,
               ...initialPublicationDates(parsed.status)
             },
-            select: { slug: true }
+            select: { slug: true, id: true, title: true }
           })
       });
+
+      await maybeNotifyFirstPublication(
+        'vacancy',
+        ContentStatus.DRAFT,
+        parsed.status,
+        { id: createdVacancy.id, title: createdVacancy.title, slug: createdVacancy.slug, publishedAt: null }
+      );
 
       revalidatePath(ADMIN_VACANCIES_PATH);
       revalidateVacancyPublicPaths(createdVacancy.slug);
@@ -180,7 +188,7 @@ export async function updateVacancy(formData: FormData) {
 
       const existingVacancy = await prisma.vacancy.findUniqueOrThrow({
         where: { id: parsed.vacancyId },
-        select: { coverImageId: true, publishedAt: true, slug: true }
+        select: { id: true, coverImageId: true, publishedAt: true, slug: true, title: true, status: true }
       });
       const previousCoverImageId = existingVacancy.coverImageId;
 
@@ -240,6 +248,8 @@ export async function updateVacancy(formData: FormData) {
         await deleteUploadedFileIfUnused(previousCoverImageId);
       }
 
+      await maybeNotifyFirstPublication('vacancy', existingVacancy.status, parsed.status, existingVacancy);
+
       revalidatePath(ADMIN_VACANCIES_PATH);
       revalidateVacancyPublicPaths(updatedVacancy.slug, existingVacancy.slug);
       return { type: 'success', message: 'Вакансия обновлена.' };
@@ -258,9 +268,9 @@ export async function updateVacancyStatus(formData: FormData) {
         status: getString(formData, 'status')
       });
 
-      const vacancy = await prisma.vacancy.findUniqueOrThrow({
+      const existing = await prisma.vacancy.findUniqueOrThrow({
         where: { id: parsed.vacancyId },
-        select: { slug: true }
+        select: { id: true, slug: true, title: true, publishedAt: true, status: true }
       });
 
       await updateContentStatus({
@@ -278,8 +288,10 @@ export async function updateVacancyStatus(formData: FormData) {
           })
       });
 
+      await maybeNotifyFirstPublication('vacancy', existing.status, parsed.status, existing);
+
       revalidatePath(ADMIN_VACANCIES_PATH);
-      revalidateVacancyPublicPaths(vacancy.slug);
+      revalidateVacancyPublicPaths(existing.slug);
       return { type: 'success', message: 'Статус вакансии обновлён.' };
     }
   });

@@ -29,11 +29,7 @@ export default async function SavedVacanciesPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        eyebrow="Закладки"
-        description="Вакансии, которые вы сохранили для просмотра."
-        title="Избранное"
-      />
+      <PageHeader bare title="Избранное" />
 
       <div className="space-y-4">
         {savedVacancies.length === 0 ? (

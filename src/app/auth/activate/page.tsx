@@ -17,11 +17,13 @@ import {
   findActiveBusinessAccessInvite,
   parseBusinessAccessRequestPayload
 } from '@/lib/auth/business-access';
+import { PASSWORD_HINT, PASSWORD_MIN_LENGTH } from '@/lib/auth/password-policy-constants';
 import { buildPrivatePageMetadata } from '@/lib/public/metadata';
 
 const errorMessages: Record<string, string> = {
   invalid: 'Ссылка активации недействительна или уже использована.',
   mismatch: 'Пароль и подтверждение должны совпадать.',
+  'compromised-password': 'Этот пароль уже встречался в утечках. Выберите другую фразу или пароль.',
   blocked: 'Доступ временно заблокирован. Свяжитесь с командой BARSYNERGY.',
   failed: 'Не удалось завершить активацию прямо сейчас. Повторите попытку позже.'
 };
@@ -128,11 +130,11 @@ export default async function ActivateBusinessAccessPage({ searchParams }: Activ
                 <PublicFormValidation />
                 <PasswordPairValidation />
                 <input name="token" type="hidden" value={token} />
-                <FormField htmlFor="new-password" label="Пароль" hint="Минимум 8 символов. Лучше взять отдельный пароль для кабинета.">
-                  <Input id="new-password" name="password" type="password" minLength={8} autoComplete="new-password" placeholder="Минимум 8 символов" required />
+                <FormField htmlFor="new-password" label="Пароль" hint={PASSWORD_HINT}>
+                  <Input id="new-password" name="password" type="password" minLength={PASSWORD_MIN_LENGTH} autoComplete="new-password" placeholder={PASSWORD_HINT} required />
                 </FormField>
                 <FormField htmlFor="confirm-password" label="Повторите пароль">
-                  <Input id="confirm-password" name="confirmPassword" type="password" minLength={8} autoComplete="new-password" placeholder="Повторите пароль" required />
+                  <Input id="confirm-password" name="confirmPassword" type="password" minLength={PASSWORD_MIN_LENGTH} autoComplete="new-password" placeholder="Повторите пароль" required />
                 </FormField>
                 <ActionRow>
                   <SubmitButton className="rounded-[var(--radius-md)]" size="lg">

@@ -2,7 +2,6 @@ import type { Metadata } from 'next';
 import { notFound, redirect } from 'next/navigation';
 import { ApplicationType, ConversationSender, getUserApplication } from '@/modules/profile/queries';
 import { Button } from '@/components/ui/button';
-import { MetaChip } from '@/components/ui/meta-chip';
 import { PageHeader } from '@/components/ui/page-header';
 import { Panel } from '@/components/ui/panel';
 import { StatusBadge } from '@/components/ui/status-badge';
@@ -53,18 +52,11 @@ export default async function ResponseDetailPage({ params }: ResponseDetailPageP
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        eyebrow={applicationTypeLabels[application.type]}
-        description="Детальная информация по вашему отклику."
-        title={application.subject ?? applicationTypeLabels[application.type]}
-      />
+      <PageHeader bare title={application.subject ?? applicationTypeLabels[application.type]} />
 
       <Panel padding="md" tone="elevated">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <MetaChip variant="filter">
-              {applicationTypeLabels[application.type]}
-            </MetaChip>
             <StatusBadge variant={applicationStatusBadgeVariants[application.status]}>
               {applicationStatusLabels[application.status]}
             </StatusBadge>

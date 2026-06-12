@@ -46,14 +46,16 @@ test('Sprint A [5p] OpportunityListRow exposes an actionLabel prop wired to the 
 
 test('Sprint A [4] profile page collapses salary/employment/visibility into one panel', () => {
   const source = readSrc('src/app/profile/page.tsx');
+  const conditionsBlock = source.slice(source.indexOf('Условия поиска'), source.indexOf("profile?.profileSkills"));
 
-  assert.doesNotMatch(source, /md:grid-cols-3/, 'three-column salary/format/visibility grid must be gone');
+  assert.doesNotMatch(conditionsBlock, /md:grid-cols-3/, 'three-column salary/format/visibility grid must be gone');
   assert.match(source, /Условия поиска/, 'merged panel must use a single explicit heading');
   assert.match(
-    source,
-    /Желаемая зарплата[\s\S]*?Формат[\s\S]*?(Профиль|Видимость)/,
-    'three meta values must appear inside the same merged block'
+    conditionsBlock,
+    /Желаемая зарплата[\s\S]*?Формат/,
+    'salary and employment values must appear inside the same merged block'
   );
+  assert.doesNotMatch(conditionsBlock, /Видимость:/, 'visibility-only state must not make the search conditions panel appear');
 });
 
 test('Sprint A [8] article card uses 16:9 default and 21:9 featured aspect ratios', () => {

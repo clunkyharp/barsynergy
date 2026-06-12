@@ -1,6 +1,8 @@
 import { prisma } from '@/lib/db/prisma';
 import type { Prisma } from '@prisma/client';
-import { ApplicationStatus, BusinessAccountStatus, CategoryType, ContentStatus } from '@prisma/client';
+import { ApplicationStatus, BusinessAccountStatus, CategoryType, ContentStatus, SkillSource } from '@prisma/client';
+
+export { SkillSource };
 
 // ─── Dashboard queries ───────────────────────────────────────────────
 

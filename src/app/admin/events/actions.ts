@@ -20,6 +20,7 @@ import { deleteContentDraft, updateContentStatus } from '@/lib/admin/content-lif
 import { revalidateEventPublicPaths } from '@/lib/admin/public-content-revalidation';
 import { prisma } from '@/lib/db/prisma';
 import { withAdminAction } from '@/lib/server-action-wrappers';
+import { maybeNotifyFirstPublication } from '@/lib/notifications/web-push/publish-trigger';
 
 const ADMIN_EVENTS_PATH = '/admin/events';
 
@@ -89,9 +90,16 @@ export async function createEvent(formData: FormData) {
         baseSlug: slug, exists: async (candidate) => Boolean(await prisma.event.findFirst({ where: { slug: candidate }, select: { id: true } })),
         persist: (uniqueSlug) => prisma.event.create({
           data: { title: parsed.title, slug: uniqueSlug, summary: parsed.summary, status: parsed.status, coverImageId, coverImageAlt: nullableString(parsed.coverImageAlt), categoryId: nullableString(parsed.categoryId), cityId: nullableString(parsed.cityId), startsAt: parsed.startsAt, endsAt: parsed.endsAt ?? null, locationName: nullableString(parsed.locationName), address: nullableString(parsed.address), format: nullableString(parsed.format), capacity: parsed.capacity, registrationMode: nullableString(parsed.registrationMode), registrationUrl: nullableString(parsed.registrationUrl), createdById: user.id, updatedById: user.id, ...initialPublicationDates(parsed.status) },
-          select: { slug: true }
+          select: { slug: true, id: true, title: true }
         })
       });
+
+      await maybeNotifyFirstPublication(
+        'event',
+        ContentStatus.DRAFT,
+        parsed.status,
+        { id: createdEvent.id, title: createdEvent.title, slug: createdEvent.slug, publishedAt: null }
+      );
 
       revalidatePath(ADMIN_EVENTS_PATH);
       revalidateEventPublicPaths(createdEvent.slug);
@@ -124,7 +132,7 @@ export async function updateEvent(formData: FormData) {
       if (!slug) throw new Error('Event slug is required.');
       if (parsed.endsAt && parsed.endsAt < parsed.startsAt) throw new Error('Event end date cannot be before start date.');
 
-      const existingEvent = await prisma.event.findUniqueOrThrow({ where: { id: parsed.eventId }, select: { coverImageId: true, publishedAt: true, slug: true } });
+      const existingEvent = await prisma.event.findUniqueOrThrow({ where: { id: parsed.eventId }, select: { id: true, coverImageId: true, publishedAt: true, slug: true, title: true, status: true } });
       const previousCoverImageId = existingEvent.coverImageId;
 
       await assertActiveContentRelations({ entityName: 'Event', categoryId: parsed.categoryId, categoryType: CategoryType.EVENT, cityId: parsed.cityId });
@@ -141,6 +149,8 @@ export async function updateEvent(formData: FormData) {
 
       if (previousCoverImageId !== coverImageId) await deleteUploadedFileIfUnused(previousCoverImageId);
 
+      await maybeNotifyFirstPublication('event', existingEvent.status, parsed.status, existingEvent);
+
       revalidatePath(ADMIN_EVENTS_PATH);
       revalidateEventPublicPaths(updatedEvent.slug, existingEvent.slug);
       return { type: 'success', message: 'Событие обновлено.' };
@@ -156,12 +166,14 @@ export async function updateEventStatus(formData: FormData) {
     handler: async ({ user }) => {
       const parsed = statusFormSchema.parse({ eventId: getString(formData, 'eventId'), status: getString(formData, 'status') });
 
-      const event = await prisma.event.findUniqueOrThrow({ where: { id: parsed.eventId }, select: { slug: true } });
+      const existing = await prisma.event.findUniqueOrThrow({ where: { id: parsed.eventId }, select: { id: true, slug: true, title: true, publishedAt: true, status: true } });
 
       await updateContentStatus({ status: parsed.status, userId: user.id, findCurrent: (tx) => tx.event.findUniqueOrThrow({ where: { id: parsed.eventId }, select: { publishedAt: true } }), update: (tx, data) => tx.event.update({ where: { id: parsed.eventId }, data }) });
 
+      await maybeNotifyFirstPublication('event', existing.status, parsed.status, existing);
+
       revalidatePath(ADMIN_EVENTS_PATH);
-      revalidateEventPublicPaths(event.slug);
+      revalidateEventPublicPaths(existing.slug);
       return { type: 'success', message: 'Статус события обновлён.' };
     }
   });

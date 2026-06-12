@@ -6,7 +6,9 @@ import { updateJobSearch } from '@/lib/profile/job-search-actions';
 import { updateProfileSkills } from '@/lib/profile/skills-actions';
 import { updateWorkExperiences } from '@/lib/profile/work-experience-actions';
 import { changePassword } from '@/lib/profile/password-actions';
+import { AvatarCropper } from '@/components/profile/avatar-cropper';
 import { ExperienceEditor } from '@/components/profile/experience-editor';
+import { ProfileSectionForm } from '@/components/profile/profile-section-form';
 import { ProfileTabs } from '@/components/profile/profile-tabs';
 import { SettingsAlert } from '@/components/profile/settings-alert';
 import { SkillsSelector } from '@/components/profile/skills-selector';
@@ -21,12 +23,15 @@ import { Select } from '@/components/ui/select';
 import { SubmitButton } from '@/components/ui/submit-button';
 import { Textarea } from '@/components/ui/textarea';
 import { CheckboxField } from '@/components/ui/checkbox-field';
-import { FileUpload } from '@/components/ui/file-upload';
 import { getCurrentUser } from '@/lib/auth/current-user';
+import { PASSWORD_HINT, PASSWORD_MIN_LENGTH } from '@/lib/auth/password-policy-constants';
 import { getProfileAvatarUrl } from '@/lib/profile/avatar-url';
 import { buildPrivatePageMetadata } from '@/lib/public/metadata';
 import { firstParam } from '@/lib/admin/content-utils';
 import { getProfileSettingsData, EmploymentType, JobSearchStatus } from '@/modules/profile/queries';
+import { NotificationSettings } from '@/components/profile/notification-settings';
+import { getNotificationPreferences } from '@/lib/notifications/web-push/preferences';
+import { getActiveSubscriptions } from '@/lib/notifications/web-push/subscriptions';
 
 type ProfileSettingsPageProps = {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
@@ -34,7 +39,7 @@ type ProfileSettingsPageProps = {
 
 export const metadata: Metadata = buildPrivatePageMetadata({
   title: 'Настройки профиля',
-  description: 'Редактирование профиля и смена пароля в BARSYNERGY.'
+  description: 'Редактирование профиля, уведомления и смена пароля в BARSYNERGY.'
 });
 
 export default async function ProfileSettingsPage({ searchParams }: ProfileSettingsPageProps) {
@@ -48,7 +53,11 @@ export default async function ProfileSettingsPage({ searchParams }: ProfileSetti
   const success = firstParam(params.success);
   const error = firstParam(params.error);
 
-  const [user, cities, allSkills] = await getProfileSettingsData(currentUser.id);
+  const [[user, cities, allSkills], notificationPreferences, activeSubs] = await Promise.all([
+    getProfileSettingsData(currentUser.id),
+    getNotificationPreferences(currentUser.id),
+    getActiveSubscriptions(currentUser.id)
+  ]);
 
   if (!user) {
     redirect('/auth/login?returnTo=/profile/settings');
@@ -77,16 +86,13 @@ export default async function ProfileSettingsPage({ searchParams }: ProfileSetti
     { id: 'search', label: 'Статус поиска' },
     { id: 'skills', label: 'Навыки' },
     { id: 'experience', label: 'Опыт' },
+    { id: 'notifications', label: 'Уведомления' },
     { id: 'password', label: 'Пароль' }
   ] as const;
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        eyebrow="Аккаунт"
-        description="Редактирование профиля и настройки безопасности."
-        title="Настройки"
-      />
+      <PageHeader bare title="Настройки" />
 
       <SettingsAlert success={success} error={error} />
 
@@ -94,7 +100,7 @@ export default async function ProfileSettingsPage({ searchParams }: ProfileSetti
 
       <Panel className="max-w-2xl scroll-mt-6" id="avatar" padding="lg" tone="elevated">
         <h2 className="text-lg font-semibold tracking-normal">Аватар</h2>
-        <form action={updateAvatar} className="mt-5">
+        <ProfileSectionForm action={updateAvatar} className="mt-5 grid gap-4" sectionId="avatar">
           {avatarUrl ? (
             <div className="mb-4 flex items-center gap-4">
               <div className="h-16 w-16 overflow-hidden rounded-full border border-[var(--border-default)] bg-[var(--surface-muted)]">
@@ -106,17 +112,17 @@ export default async function ProfileSettingsPage({ searchParams }: ProfileSetti
               </div>
             </div>
           ) : null}
-          <FileUpload accept="image/*" name="avatar" title="Загрузить фото" description="JPEG, PNG до 5 MB. Квадратное фото." privacy="public" />
-          <div className="mt-4 flex items-center justify-between gap-3">
+          <AvatarCropper currentAvatarUrl={avatarUrl} />
+          <div className="flex items-center justify-between gap-3">
             <p className="text-sm text-[var(--muted)]">Рекомендуем квадратное фото не меньше 400×400 px.</p>
             <SubmitButton>Загрузить</SubmitButton>
           </div>
-        </form>
+        </ProfileSectionForm>
       </Panel>
 
       <Panel className="max-w-2xl scroll-mt-6" id="main" padding="lg" tone="elevated">
         <h2 className="text-lg font-semibold tracking-normal">Основное</h2>
-        <form action={updateBasicProfile} className="mt-5 grid gap-5">
+        <ProfileSectionForm action={updateBasicProfile} className="mt-5 grid gap-5" sectionId="main">
           <div className="grid gap-5 md:grid-cols-2">
             <FormField htmlFor="fullName" label="Полное имя">
               <Input id="fullName" name="fullName" required maxLength={120} placeholder="Иван Иванов" defaultValue={profile?.fullName ?? ''} />
@@ -143,9 +149,6 @@ export default async function ProfileSettingsPage({ searchParams }: ProfileSetti
             <FormField htmlFor="telegram" label="Telegram">
               <Input id="telegram" name="telegram" maxLength={80} placeholder="@username" defaultValue={profile?.telegram ?? ''} />
             </FormField>
-            <FormField htmlFor="website" label="Сайт">
-              <Input id="website" name="website" type="url" maxLength={240} placeholder="https://yoursite.ru" defaultValue={profile?.website ?? ''} />
-            </FormField>
           </div>
           <FormField htmlFor="bio" label="О себе">
             <Textarea id="bio" name="bio" maxLength={1000} rows={4} placeholder="Расскажите о себе…" defaultValue={profile?.bio ?? ''} />
@@ -154,12 +157,12 @@ export default async function ProfileSettingsPage({ searchParams }: ProfileSetti
             <p className="text-sm text-[var(--muted)]">После сохранения данные обновятся в профиле.</p>
             <SubmitButton>Сохранить профиль</SubmitButton>
           </div>
-        </form>
+        </ProfileSectionForm>
       </Panel>
 
       <Panel className="max-w-2xl scroll-mt-6" id="search" padding="lg" tone="elevated">
         <h2 className="text-lg font-semibold tracking-normal">Статус и условия поиска</h2>
-        <form action={updateJobSearch} className="mt-5 grid gap-5">
+        <ProfileSectionForm action={updateJobSearch} className="mt-5 grid gap-5" sectionId="search">
           <div className="grid gap-5 md:grid-cols-2">
             <FormField htmlFor="jobSearchStatus" label="Статус поиска">
               <Select id="jobSearchStatus" name="jobSearchStatus" defaultValue={profile?.jobSearchStatus ?? ''}>
@@ -198,26 +201,22 @@ export default async function ProfileSettingsPage({ searchParams }: ProfileSetti
             <p className="text-sm text-[var(--muted)]">Статус и условия поиска помогут работодателям понять ваши предпочтения.</p>
             <SubmitButton>Сохранить профиль</SubmitButton>
           </div>
-        </form>
+        </ProfileSectionForm>
       </Panel>
 
       <Panel className="max-w-2xl scroll-mt-6" id="skills" padding="lg" tone="elevated">
         <h2 className="text-lg font-semibold tracking-normal">Навыки</h2>
-        <form action={updateProfileSkills} className="mt-5">
+        <ProfileSectionForm action={updateProfileSkills} className="mt-5 grid gap-4" sectionId="skills">
           <fieldset>
             <legend className="mb-3 text-sm text-[var(--muted)]">Выберите свои навыки:</legend>
             <SkillsSelector allSkills={allSkills} selectedSkillIds={selectedSkillIds} />
           </fieldset>
-          <div className="mt-5 flex items-center justify-between gap-3 border-t border-[var(--line)] pt-5">
-            <p className="text-sm text-[var(--muted)]">Выбранные навыки будут видны работодателям.</p>
-            <SubmitButton>Сохранить навыки</SubmitButton>
-          </div>
-        </form>
+        </ProfileSectionForm>
       </Panel>
 
       <Panel className="max-w-2xl scroll-mt-6" id="experience" padding="lg" tone="elevated">
         <h2 className="text-lg font-semibold tracking-normal">Опыт работы</h2>
-        <form action={updateWorkExperiences} className="mt-5 grid gap-5">
+        <ProfileSectionForm action={updateWorkExperiences} className="mt-5 grid gap-5" sectionId="experience">
           <ExperienceEditor
             initial={(profile?.workExperiences ?? []).map((exp) => ({
               id: exp.id,
@@ -231,29 +230,39 @@ export default async function ProfileSettingsPage({ searchParams }: ProfileSetti
           <div className="flex items-center justify-end gap-3 border-t border-[var(--line)] pt-5">
             <SubmitButton>Сохранить опыт</SubmitButton>
           </div>
-        </form>
+        </ProfileSectionForm>
+      </Panel>
+
+      <Panel className="max-w-2xl scroll-mt-6" id="notifications" padding="lg" tone="elevated">
+        <h2 className="text-lg font-semibold tracking-normal">Уведомления</h2>
+        <div className="mt-5">
+          <NotificationSettings
+            initialPreferences={notificationPreferences}
+            subscriptionCount={activeSubs.length}
+          />
+        </div>
       </Panel>
 
       <Panel className="max-w-2xl scroll-mt-6" id="password" padding="lg" tone="elevated">
         <h2 className="text-lg font-semibold tracking-normal">Смена пароля</h2>
-        <form action={changePassword} className="mt-5 grid gap-5">
+        <ProfileSectionForm action={changePassword} className="mt-5 grid gap-5" sectionId="password">
           <PasswordPairValidation passwordName="newPassword" />
           <div className="grid gap-5 md:grid-cols-2">
             <FormField htmlFor="current-password" label="Текущий пароль">
               <PasswordInput id="current-password" name="currentPassword" required autoComplete="current-password" placeholder="Введите текущий пароль" maxLength={200} />
             </FormField>
             <FormField htmlFor="new-password" label="Новый пароль">
-              <PasswordInput id="new-password" name="newPassword" required autoComplete="new-password" placeholder="Минимум 6 символов" minLength={6} maxLength={200} />
+              <PasswordInput id="new-password" name="newPassword" required autoComplete="new-password" placeholder={PASSWORD_HINT} minLength={PASSWORD_MIN_LENGTH} maxLength={200} />
             </FormField>
             <FormField htmlFor="confirm-password" label="Подтвердите пароль">
-              <PasswordInput id="confirm-password" name="confirmPassword" required autoComplete="new-password" placeholder="Повторите новый пароль" minLength={6} maxLength={200} />
+              <PasswordInput id="confirm-password" name="confirmPassword" required autoComplete="new-password" placeholder="Повторите новый пароль" minLength={PASSWORD_MIN_LENGTH} maxLength={200} />
             </FormField>
           </div>
           <div className="flex items-center justify-between gap-3 border-t border-[var(--line)] pt-5">
-            <p className="text-sm text-[var(--muted)]">Минимум 6 символов.</p>
+            <p className="text-sm text-[var(--muted)]">{PASSWORD_HINT}</p>
             <SubmitButton>Сменить пароль</SubmitButton>
           </div>
-        </form>
+        </ProfileSectionForm>
       </Panel>
     </div>
   );

@@ -1,13 +1,16 @@
 import type { Metadata } from 'next';
 import { Mail } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { ConversationListTabs } from '@/components/messaging/conversation-list-tabs';
 import { PageHeader } from '@/components/ui/page-header';
 import { Panel } from '@/components/ui/panel';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { UnreadBadge } from '@/components/messaging/unread-badge';
 import { AppLink } from '@/components/ui/app-link';
 import { requireBusinessAccountAccess } from '@/lib/auth/require-business-account';
+import { firstParam } from '@/lib/admin/content-utils';
 import { getUnreadMessageCounts } from '@/lib/messaging/get-conversation';
+import { parseConversationStatusGroup } from '@/lib/messaging/conversation-status-groups';
 import { buildPrivatePageMetadata } from '@/lib/public/metadata';
 import {
   applicationStatusBadgeVariants,
@@ -22,21 +25,25 @@ export const metadata: Metadata = buildPrivatePageMetadata({
   description: 'Отклики кандидатов на вакансии компании.'
 });
 
-export default async function BusinessResponsesPage() {
-  const { businessAccount } = await requireBusinessAccountAccess();
+type BusinessResponsesPageProps = {
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+};
 
-  const responses = await getBusinessResponses(businessAccount.id);
+export default async function BusinessResponsesPage({ searchParams }: BusinessResponsesPageProps) {
+  const { businessAccount } = await requireBusinessAccountAccess();
+  const params = (await searchParams) ?? {};
+  const statusGroup = parseConversationStatusGroup(firstParam(params.statusGroup));
+
+  const responses = await getBusinessResponses(businessAccount.id, statusGroup);
 
   const responseIds = responses.map((r) => r.id);
   const unreadCounts = await getUnreadMessageCounts(responseIds, 'business');
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        eyebrow="Отклики кандидатов"
-        description="Список откликов специалистов на вакансии вашей компании."
-        title="Отклики"
-      />
+      <PageHeader bare title="Отклики" />
+
+      <ConversationListTabs value={statusGroup} />
 
       {responses.length === 0 ? (
         <Panel className="max-w-xl" padding="lg">
@@ -45,12 +52,18 @@ export default async function BusinessResponsesPage() {
               <Mail aria-hidden="true" size={20} strokeWidth={1.8} />
             </span>
             <div>
-              <h2 className="text-xl font-semibold leading-7 text-[var(--text)]">Откликов пока нет</h2>
+              <h2 className="text-xl font-semibold leading-7 text-[var(--text)]">
+                {statusGroup === 'active' ? 'Откликов пока нет' : 'В этом разделе пусто'}
+              </h2>
               <p className="mt-2 max-w-md text-sm leading-6 text-[var(--muted)]">
-                Когда кандидаты начнут откликаться на ваши вакансии, отклики появятся здесь.
+                {statusGroup === 'active'
+                  ? 'Когда кандидаты начнут откликаться на ваши вакансии, отклики появятся здесь.'
+                  : 'Переключите вкладку или вернитесь к активным откликам.'}
               </p>
             </div>
-            <Button href="/business/cabinet/requests">К заявкам</Button>
+            <Button href={statusGroup === 'active' ? '/business/cabinet/requests' : '/business/cabinet/responses'}>
+              {statusGroup === 'active' ? 'К заявкам' : 'Активные отклики'}
+            </Button>
           </div>
         </Panel>
       ) : (

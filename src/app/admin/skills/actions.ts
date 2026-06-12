@@ -1,6 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
+import { SkillSource } from '@prisma/client';
 import { z } from 'zod';
 import {
   getString,
@@ -76,6 +77,7 @@ export async function createSkill(formData: FormData) {
             data: {
               name: parsed.name,
               slug: uniqueSlug,
+              source: SkillSource.ADMIN,
               isActive: parsed.isActive,
               sortOrder: parsed.sortOrder
             }

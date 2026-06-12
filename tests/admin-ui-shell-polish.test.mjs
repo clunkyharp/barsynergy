@@ -31,7 +31,7 @@ test('admin list pages share status tabs and compact filters', () => {
   assert.doesNotMatch(applicationsSource, /htmlFor="status"/);
 });
 
-test('admin header and business sidebar expose the new identity blocks', () => {
+test('admin header keeps its identity block; business sidebar exposes only navigation', () => {
   const headerSource = readProjectFile('src/components/layout/admin-header.tsx');
   const businessSidebarSource = readProjectFile('src/components/layout/business-sidebar.tsx');
 
@@ -40,8 +40,6 @@ test('admin header and business sidebar expose the new identity blocks', () => {
   assert.match(headerSource, /На сайт/);
   assert.match(headerSource, /usePathname\(\)/);
 
-  assert.match(businessSidebarSource, /Заявок в работе: \{activeRequestCount\}/);
-  assert.match(businessSidebarSource, /Бизнес-кабинет/);
-  assert.match(businessSidebarSource, /variant="success">Активен/);
+  assert.doesNotMatch(businessSidebarSource, /companyName|activeRequestCount|Активен/, 'sidebar identity block must be removed');
   assert.match(businessSidebarSource, /aria-label="Разделы кабинета компании"/);
 });

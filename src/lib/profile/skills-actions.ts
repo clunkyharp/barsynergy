@@ -2,16 +2,49 @@
 
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
+import { SkillSource } from '@prisma/client';
 import { getArray } from '@/lib/admin/content-utils';
 import { resolveServerActionError } from '@/lib/actions/server-action-errors';
 import { getCurrentUser } from '@/lib/auth/current-user';
 import { prisma } from '@/lib/db/prisma';
+import type { ProfileActionResult } from '@/lib/profile/profile-action-result';
 import { assertSameOriginServerAction } from '@/lib/security/server-action-origin';
+import { slugify } from '@/lib/utils/slugify';
 
 const SETTINGS_PATH = '/profile/settings';
+const MAX_SKILLS = 20;
+const MAX_SKILL_LENGTH = 40;
+const USER_GENERATED_SORT_BUCKET = 100_000;
 
-export async function updateProfileSkills(formData: FormData) {
-  let result: { type: 'success' | 'error'; message: string };
+function normalizeSkillName(value: string) {
+  return value.trim().replace(/\s+/g, ' ');
+}
+
+function readSkillNames(formData: FormData) {
+  const seen = new Set<string>();
+  const names: string[] = [];
+
+  for (const value of getArray(formData, 'skillNames')) {
+    const name = normalizeSkillName(value);
+    const key = name.toLocaleLowerCase('ru-RU');
+
+    if (!name || name.length > MAX_SKILL_LENGTH || seen.has(key)) {
+      continue;
+    }
+
+    seen.add(key);
+    names.push(name);
+
+    if (names.length >= MAX_SKILLS) {
+      break;
+    }
+  }
+
+  return names;
+}
+
+export async function updateProfileSkills(_prevState: ProfileActionResult, formData: FormData): Promise<ProfileActionResult> {
+  let result: Exclude<ProfileActionResult, null>;
 
   try {
     await assertSameOriginServerAction();
@@ -27,20 +60,58 @@ export async function updateProfileSkills(formData: FormData) {
       throw new Error('profile not found');
     }
 
-    const skillIds = getArray(formData, 'skillIds');
+    const skillNames = readSkillNames(formData);
 
     await prisma.$transaction(async (tx) => {
       await tx.profileSkill.deleteMany({ where: { profileId: profile.id } });
 
-      if (skillIds.length > 0) {
-        const validSkills = await tx.skill.findMany({
-          where: { id: { in: skillIds }, isActive: true },
-          select: { id: true }
-        });
+      if (skillNames.length > 0) {
+        const slugs = skillNames.map((name) => slugify(name)).filter(Boolean);
+        const existingBySlug = new Map(
+          (await tx.skill.findMany({
+            where: { slug: { in: slugs } },
+            select: { id: true, slug: true, isActive: true, source: true }
+          })).map((s) => [s.slug, s])
+        );
+        const skillIds: string[] = [];
 
-        if (validSkills.length > 0) {
+        for (const name of skillNames) {
+          const slug = slugify(name);
+
+          if (!slug) {
+            continue;
+          }
+
+          const existing = existingBySlug.get(slug);
+
+          if (existing) {
+            // Reactivate only user-generated inactive skills; admin-deactivated stay as-is
+            if (!existing.isActive && existing.source === SkillSource.USER_GENERATED) {
+              await tx.skill.update({ where: { id: existing.id }, data: { isActive: true } });
+            }
+
+            skillIds.push(existing.id);
+          } else {
+            // Upsert handles concurrent requests creating the same slug (P2002-safe)
+            const upserted = await tx.skill.upsert({
+              where: { slug },
+              create: {
+                name,
+                slug,
+                source: SkillSource.USER_GENERATED,
+                isActive: true,
+                sortOrder: USER_GENERATED_SORT_BUCKET
+              },
+              update: {},
+              select: { id: true }
+            });
+            skillIds.push(upserted.id);
+          }
+        }
+
+        if (skillIds.length > 0) {
           await tx.profileSkill.createMany({
-            data: validSkills.map((s) => ({ profileId: profile.id, skillId: s.id }))
+            data: skillIds.map((skillId) => ({ profileId: profile.id, skillId }))
           });
         }
       }
@@ -62,9 +133,5 @@ export async function updateProfileSkills(formData: FormData) {
     };
   }
 
-  const url = new URL(SETTINGS_PATH, 'http://localhost');
-  url.searchParams.delete('success');
-  url.searchParams.delete('error');
-  url.searchParams.set(result.type, result.message);
-  redirect(`${url.pathname}${url.search}`);
+  return result;
 }
