@@ -270,14 +270,7 @@ export function useCostCalculatorState() {
   }
 
   function addIngredient() {
-    setIngredients((current) => {
-      if (current.length === 1) {
-        const only = current[0];
-        const isEmpty = !only.name.trim() && !only.packagePrice.trim() && !only.packageAmount.trim() && !only.recipeAmount.trim();
-        if (isEmpty) return current;
-      }
-      return [...current, createEmptyIngredient()];
-    });
+    setIngredients((current) => [...current, createEmptyIngredient()]);
   }
 
   function duplicateIngredient(id: string) {
@@ -299,13 +292,7 @@ export function useCostCalculatorState() {
   }
 
   function addAdditionalCost() {
-    setAdditionalCosts((current) => {
-      if (current.length === 1) {
-        const only = current[0];
-        if (!only.name.trim() && !only.amount.trim()) return current;
-      }
-      return [...current, createEmptyAdditionalCost()];
-    });
+    setAdditionalCosts((current) => [...current, createEmptyAdditionalCost()]);
   }
 
   function removeAdditionalCost(id: string) {

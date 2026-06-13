@@ -1,12 +1,9 @@
-import type { ReactNode } from 'react';
 import { CalendarDays, Search } from 'lucide-react';
-import { AppLink } from '@/components/ui/app-link';
 import { PublicBreadcrumbs } from '@/components/public/public-primitives';
 import { Button } from '@/components/ui/button';
 import { Select } from '@/components/ui/select';
 import { displayFont } from '@/lib/fonts';
 import type { PublicTaxonomyOption, PublicSelectOption } from '@/lib/public/filter-options';
-import { cn } from '@/lib/utils';
 
 export function EventsHeroSection() {
   return (
@@ -106,64 +103,6 @@ export function EventsSearchBar({ cities, formats, selectedQ, selectedCity, sele
     </section>
   );
 }
-
-type EventsQuickFiltersProps = {
-  categories: PublicTaxonomyOption[];
-  formats: PublicSelectOption[];
-  selectedPeriod?: string;
-  selectedFormat?: string;
-  selectedCategory?: string;
-};
-
-function PillLink({ href, active, children }: { href: string; active: boolean; children: ReactNode }) {
-  return (
-    <AppLink
-      className={cn(
-        'inline-flex items-center rounded-full border px-4 py-1.5 text-[13px] font-medium transition-colors whitespace-nowrap',
-        active
-          ? 'border-[var(--accent)] bg-[var(--accent)] font-semibold text-[var(--accent-contrast)]'
-          : 'border-[var(--border-default)] bg-transparent text-[var(--text)] hover:border-[var(--accent)] hover:text-[var(--accent)]'
-      )}
-      href={href}
-    >
-      {children}
-    </AppLink>
-  );
-}
-
-export function EventsQuickFilters({ categories, formats, selectedPeriod, selectedFormat, selectedCategory }: EventsQuickFiltersProps) {
-  const isAll = (!selectedPeriod || selectedPeriod === 'upcoming') && !selectedFormat && !selectedCategory;
-
-  const hasExtras = formats.length > 0 || categories.length > 0;
-
-  return (
-    <section className="background-zone background-zone-graphite border-b border-[var(--line)] py-3">
-      <div className="container">
-        <div className="-mx-4 overflow-x-auto px-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          <div className="flex flex-nowrap items-center gap-2 pb-0.5">
-            <PillLink active={isAll} href="/events">Все</PillLink>
-            <PillLink active={selectedPeriod === 'today'} href="/events?period=today">Сегодня</PillLink>
-            <PillLink active={selectedPeriod === 'this_week'} href="/events?period=this_week">На этой неделе</PillLink>
-            {hasExtras && (
-              <span aria-hidden="true" className="mx-1 h-4 w-px shrink-0 bg-[var(--line)]" />
-            )}
-            {formats.map((fmt) => (
-              <PillLink active={selectedFormat === fmt.value} href={`/events?format=${fmt.value}`} key={fmt.value}>
-                {fmt.label}
-              </PillLink>
-            ))}
-            {categories.map((cat) => (
-              <PillLink active={selectedCategory === cat.slug} href={`/events?category=${cat.slug}`} key={cat.id}>
-                {cat.name}
-              </PillLink>
-            ))}
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
 export function EventsCtaBanner() {
   return (
     <section className="background-zone background-zone-graphite border-b border-[var(--line)] py-12 md:py-16">

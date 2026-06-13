@@ -56,7 +56,7 @@ export function BusinessSolutionForm({ enabled, utm, cities, defaults = {}, dire
               Проверим данные и подготовим карточку
             </PublicDisplayTitle>
             <PublicBodyText className="mt-4 max-w-md" tone="inverse">
-              В форме не собираем оплату. Нужны только данные, по которым команда сможет связаться и уточнить карточку.
+              Укажите данные, по которым команда сможет связаться и уточнить карточку.
             </PublicBodyText>
 
             <div className="mt-6 flex flex-wrap gap-2">
@@ -68,21 +68,21 @@ export function BusinessSolutionForm({ enabled, utm, cities, defaults = {}, dire
             </div>
 
             <div className="mt-8 border-t border-white/10 pt-5">
-              <PublicEyebrow tone="inverse">Что написать</PublicEyebrow>
-              <ul className="mt-4 space-y-3 text-sm leading-6 text-white/85">
+              <PublicEyebrow tone="inverse">Данные для карточки</PublicEyebrow>
+              <ol className="mt-4 space-y-3 text-sm leading-6 text-white/85">
                 <li className="flex gap-3">
-                  <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--accent)]" />
-                  <span>Как называется заведение и в каком городе оно работает.</span>
+                  <span className="mt-0.5 text-xs font-semibold text-[var(--accent)]">1</span>
+                  <span>Название заведения и город.</span>
                 </li>
                 <li className="flex gap-3">
-                  <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--accent)]" />
-                  <span>К какому формату его отнести: кофейный бар, specialty, обжарочное или другое.</span>
+                  <span className="mt-0.5 text-xs font-semibold text-[var(--accent)]">2</span>
+                  <span>Формат: кофейный бар, specialty, обжарочное или другое.</span>
                 </li>
                 <li className="flex gap-3">
-                  <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--accent)]" />
-                  <span>Что важно показать в карточке: кухня, кофе, бар, события, сайт или соцсети.</span>
+                  <span className="mt-0.5 text-xs font-semibold text-[var(--accent)]">3</span>
+                  <span>Что показать в карточке: кухня, кофе, бар, события, сайт или соцсети.</span>
                 </li>
-              </ul>
+              </ol>
             </div>
           </div>
 

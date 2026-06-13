@@ -78,7 +78,7 @@ export function PublicPrelaunchSection({
             <li key={card.title}>
               <article className="group relative grid gap-4 rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--surface-card)] p-5 transition-colors hover:border-[var(--accent)]/35 md:grid-cols-[auto_minmax(0,1fr)_auto] md:items-start md:gap-6 md:p-6">
                 <span aria-hidden="true" className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[var(--accent)]/30 bg-[var(--surface-wash)] text-sm font-semibold tracking-[0.06em] text-[var(--accent)]">
-                  {String(idx + 1).padStart(2, '0')}
+                  {idx + 1}
                 </span>
                 <div className="min-w-0">
                   <h3 className="text-lg font-semibold leading-7 text-[var(--text)] md:text-xl md:leading-8">{card.title}</h3>

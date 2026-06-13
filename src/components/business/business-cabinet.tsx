@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { AlertTriangle, CheckCircle2, FileText } from 'lucide-react';
 import { ApplicationStatus, ApplicationType } from '@prisma/client';
 import { Button } from '@/components/ui/button';
+import { Eyebrow } from '@/components/ui/eyebrow';
 import { StatusBadge, type StatusBadgeVariant } from '@/components/ui/status-badge';
 import {
   applicationStatusBadgeVariants,
@@ -110,7 +111,7 @@ export function BusinessProfileSummary({
     <section className="rounded-[var(--radius-lg)] border border-[var(--line)] bg-[var(--surface-elevated)] p-5 shadow-[var(--shadow-panel)]">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="min-w-0">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Профиль компании</p>
+          <Eyebrow>Профиль компании</Eyebrow>
           <h2 className="mt-2 text-xl font-semibold leading-tight tracking-normal">{account.companyName}</h2>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--muted)]">
             {account.description || 'Добавьте короткое описание компании, чтобы команда быстрее понимала контекст заявок.'}
@@ -149,7 +150,7 @@ export function BusinessProfileSummary({
 export function RequestStatusRail({ className, items, title = 'Статус заявок' }: RequestStatusRailProps) {
   return (
     <aside className={cn('rounded-[var(--radius-lg)] border border-[var(--line)] bg-[var(--surface-elevated)] p-5', className)}>
-      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">{title}</p>
+      <Eyebrow>{title}</Eyebrow>
       <div className="mt-5 grid gap-3">
         {items.map((item) => (
           <div className="border-t border-[var(--line)] pt-3 first:border-t-0 first:pt-0" key={item.label}>
@@ -182,7 +183,7 @@ export function RequestLedger({
     <section className={cn('rounded-[var(--radius-lg)] border border-[var(--line)] bg-[var(--surface-elevated)]', className)}>
       <div className="flex flex-wrap items-start justify-between gap-3 border-b border-[var(--line)] px-5 py-4">
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Реестр заявок</p>
+          <Eyebrow>Реестр заявок</Eyebrow>
           <h2 className="mt-2 text-xl font-semibold">{title}</h2>
           <p className="mt-1 max-w-3xl text-sm leading-6 text-[var(--muted)]">{description}</p>
         </div>
@@ -200,7 +201,7 @@ export function RequestLedger({
               className="grid gap-3 px-5 py-4 lg:grid-cols-[3rem_minmax(0,1fr)_auto] lg:items-start"
               key={application.id}
             >
-              <div className="font-mono text-xs tabular-nums text-[var(--muted)]">#{String(index + 1).padStart(2, '0')}</div>
+              <div className="font-mono text-xs tabular-nums text-[var(--muted)]">#{index + 1}</div>
               <div className="min-w-0">
                 <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--muted)]">{applicationTypeLabels[application.type]}</p>
                 <h3 className="mt-1 text-base font-semibold leading-6">{application.subject ?? applicationTypeLabels[application.type]}</h3>
@@ -249,13 +250,13 @@ export function NextActionPanel({
 }: NextActionPanelProps) {
   return (
     <aside className={cn('rounded-[var(--radius-lg)] border border-[var(--line)] bg-[var(--surface-elevated)] p-5', className)}>
-      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">{title}</p>
+      <Eyebrow>{title}</Eyebrow>
       <p className="mt-2 text-sm leading-6 text-[var(--muted)]">{description}</p>
       {items.length > 0 ? (
         <div className="mt-5 grid gap-3">
           {items.map((item, index) => (
             <div className="grid grid-cols-[2rem_minmax(0,1fr)] gap-3 border-t border-[var(--line)] pt-3 first:border-t-0 first:pt-0" key={item.label}>
-              <span className="font-mono text-xs tabular-nums text-[var(--muted)]">{String(index + 1).padStart(2, '0')}</span>
+              <span className="font-mono text-xs tabular-nums text-[var(--muted)]">{index + 1}</span>
               <div>
                 <div className="flex flex-wrap items-center gap-2">
                   <p className="text-sm font-semibold">{item.label}</p>

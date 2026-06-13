@@ -4,7 +4,7 @@ import { CategoryType } from '@/modules/content/shared/types';
 import { EventAgendaSection } from '@/components/public/platform-ui';
 import { PageHero } from '@/components/public/page-hero';
 import { PublicPrelaunchSection } from '@/components/public/public-prelaunch-section';
-import { EventsSearchBar, EventsQuickFilters, EventsCtaBanner } from '@/components/public/events-page-header';
+import { EventsSearchBar, EventsCtaBanner } from '@/components/public/events-page-header';
 import { JsonLd } from '@/components/seo/json-ld';
 import { stripPublicApplicationResultParams } from '@/lib/applications/public-form-helpers';
 import { getPublishedEvents, hasActivePublicContentParams, type PublicContentSearchParams } from '@/lib/public/content';
@@ -67,14 +67,6 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
         selectedCity={selectedCity}
         selectedFormat={selectedFormat}
         selectedQ={selectedQ}
-      />
-
-      <EventsQuickFilters
-        categories={categories}
-        formats={filterOptions.formats}
-        selectedCategory={selectedCategory}
-        selectedFormat={selectedFormat}
-        selectedPeriod={selectedPeriod}
       />
 
       {isPrelaunchEmpty ? (
