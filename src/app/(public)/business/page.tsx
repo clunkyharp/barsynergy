@@ -34,38 +34,38 @@ const processSteps = [
   {
     label: 'Шаг 2',
     title: 'Уточним карточку',
-    description: 'Проверим данные, категорию, описание, фото и контактную информацию перед публикацией.'
+    description: 'Свяжемся, чтобы уточнить описание, фото и контакты.'
   },
   {
     label: 'Шаг 3',
     title: 'Разместим в каталоге',
-    description: 'После согласования заведению появится понятная карточка для гостей, партнёров и команды платформы.'
+    description: 'После согласования карточка появляется в каталоге.'
   }
 ] as const;
 
 const benefits: { label: string; title: string; description: string; icon: SectionIconType }[] = [
   {
     label: 'Каталог',
-    title: 'Видимость в профильной среде',
-    description: 'Карточка помогает гостям, поставщикам, кандидатам и партнёрам быстрее найти ваше заведение.',
+    title: 'Вас находят те, кому нужно',
+    description: 'Гости, бариста, поставщики и партнёры — все, кто работает в кофейном сегменте региона.',
     icon: 'building'
   },
   {
     label: 'Контекст',
-    title: 'Локальный контекст',
-    description: 'Карточка находится рядом с вакансиями, событиями, поставщиками и образовательными форматами региона.',
+    title: 'Рядом с индустрией',
+    description: 'В одном каталоге с вакансиями, событиями и поставщиками. Не среди всего подряд.',
     icon: 'location'
   },
   {
     label: 'Проверка',
-    title: 'Аккуратная карточка',
-    description: 'Перед публикацией уточняем описание, формат, город, контакты и ссылки, чтобы посетитель быстро понял, куда обратиться.',
+    title: 'Карточку собираем вместе',
+    description: 'Перед публикацией редакция уточняет описание, контакты и ссылки. Без сюрпризов.',
     icon: 'star'
   },
   {
     label: 'Контакт',
-    title: 'Понятный первый контакт',
-    description: 'Гость, кандидат или партнёр быстро видит ссылку, город и формат заведения и понимает, куда писать дальше.',
+    title: 'Сразу понятно, куда писать',
+    description: 'Город, формат, ссылка, контакт — в одной карточке.',
     icon: 'contact'
   }
 ];
@@ -93,9 +93,9 @@ export default async function BusinessPage({ searchParams }: BusinessPageProps) 
       <PageHero
         breadcrumbs={[{ label: 'Каталог заведений' }]}
         eyebrow="Каталог заведений"
-        title="Разместите заведение в каталоге"
-        subtitle="Добавляем кофейные бары, кофейни, обжарочные и близкие форматы в профильный каталог BARSYNERGY."
-        tone="light-editorial"
+        title="Добавить заведение в каталог"
+        subtitle="Кофейные бары, кофейни, обжарочные и смежные форматы — в каталоге BARSYNERGY."
+        tone="graphite"
         density="compact"
         actions={[
           { label: 'Посмотреть каталог', href: '/suppliers', kind: 'secondary' }
@@ -152,9 +152,9 @@ export default async function BusinessPage({ searchParams }: BusinessPageProps) 
           <div className="min-w-0 xl:self-start">
             <div className="min-w-0">
               <PublicEyebrow>Польза</PublicEyebrow>
-              <PublicDisplayTitle className="mt-4 max-w-[13ch]">Что получает заведение</PublicDisplayTitle>
+              <PublicDisplayTitle className="mt-4 max-w-[13ch]">Что получите</PublicDisplayTitle>
               <PublicBodyText className="mt-5 max-w-md" size="md" tone="default">
-                Каталог нужен не для рекламы «обо всём», а для аккуратной отраслевой навигации по местам и командам региона.
+                Каталог собирает кофейный сегмент региона: кто и где работает. Без рекламы «для всех».
               </PublicBodyText>
               <Button className="mt-7 rounded-[var(--radius-md)]" href="#business-request" size="lg">
                 Перейти к форме

@@ -72,14 +72,12 @@ test('public listing pages share headers, filters and pagination primitives', ()
   assert.doesNotMatch(articlesSource, /canonicalArticleSearchParams/);
   assert.doesNotMatch(articlesSource, /redirect\(/);
 
-  assert.match(vacanciesSource, /<EditorialPublicPage/);
+  assert.match(vacanciesSource, /<PageHero/);
   assert.doesNotMatch(vacanciesSource, /<PublicDisplayTitle/);
 
-  assert.match(eventsSource, /EventsHeroSection/);
+  assert.match(eventsSource, /<PageHero/);
   assert.match(eventsSource, /EventsSearchBar/);
-  assert.match(eventsSource, /EventsQuickFilters/);
   assert.match(eventsSource, /<EventAgendaSection content=\{content\} \/>/);
-  assert.match(eventsSource, /EventsCtaBanner/);
   assert.doesNotMatch(eventsSource, /<PublicDisplayTitle/);
   assert.doesNotMatch(eventsSource, /<EditorialPublicPage/);
 
@@ -92,6 +90,47 @@ test('public listing pages share headers, filters and pagination primitives', ()
   assert.match(educationSource, /content\.items\.slice\(0, FEATURED_COUNT\)/);
 });
 
+test('public catalog and listing pages use the same graphite hero tone', () => {
+  const pagePaths = [
+    'src/app/(public)/vacancies/page.tsx',
+    'src/app/(public)/suppliers/page.tsx',
+    'src/app/(public)/events/page.tsx',
+    'src/app/(public)/education/page.tsx',
+    'src/app/(public)/articles/page.tsx',
+    'src/app/(public)/partners/page.tsx',
+    'src/app/(public)/consulting/page.tsx',
+    'src/app/(public)/general-sponsors/page.tsx',
+    'src/app/(public)/contacts/page.tsx',
+    'src/app/(public)/business/page.tsx',
+    'src/app/(public)/search/page.tsx'
+  ];
+
+  for (const pagePath of pagePaths) {
+    assert.match(readProjectFile(pagePath), /<PageHero[\s\S]*tone="graphite"/, pagePath);
+  }
+});
+
+test('hero action modals share the numbered step primitive', () => {
+  const actionFiles = [
+    'src/app/(public)/vacancies/vacancies-hero-actions.tsx',
+    'src/app/(public)/suppliers/suppliers-hero-actions.tsx',
+    'src/app/(public)/events/events-hero-actions.tsx'
+  ];
+
+  for (const filePath of actionFiles) {
+    const source = readProjectFile(filePath);
+    assert.match(source, /NumberedHeroStep/, filePath);
+    assert.doesNotMatch(source, /rounded-full bg-\[var\(--accent\)\]/, filePath);
+  }
+});
+
+test('published content list sections do not expose the deprecated rowVariant API', () => {
+  const sectionSource = readProjectFile('src/components/public/published-content-section.tsx');
+
+  assert.doesNotMatch(sectionSource, /rowVariant/);
+  assert.doesNotMatch(sectionSource, /export function PublishedContentSection\(/);
+});
+
 test('vacancy and supplier rows use an HH-like public card contract', () => {
   const opportunityRowSource = readProjectFile('src/components/public/published-content-row-opportunity.tsx');
   const directoryRowSource = readProjectFile('src/components/public/published-content-row-directory.tsx');
@@ -101,7 +140,7 @@ test('vacancy and supplier rows use an HH-like public card contract', () => {
 
   assert.match(opportunityRowSource, /function opportunityActions/);
   assert.match(opportunityRowSource, /function vacancyLead/);
-  assert.match(directoryRowSource, /function supplierLead/);
+  assert.match(directoryRowSource, /function directoryLead/);
   assert.match(directoryRowSource, /Связаться/);
   assert.match(directoryRowSource, /Профиль/);
   assert.doesNotMatch(opportunityRowSource, /label: 'Откликнуться'/);
@@ -114,6 +153,29 @@ test('vacancy and supplier rows use an HH-like public card contract', () => {
   assert.match(sidebarVariantSource, /whitespace-nowrap/);
   assert.match(toolbarVariantSource, /toolbar-search-row/);
   assert.doesNotMatch(sidebarVariantSource, />Показать</);
+});
+
+test('public listing accent hierarchy uses shared markers, tracking tokens and stable lead numbers', () => {
+  const opportunityRowSource = readProjectFile('src/components/public/published-content-row-opportunity.tsx');
+  const directoryRowSource = readProjectFile('src/components/public/published-content-row-directory.tsx');
+  const articleCardSource = readProjectFile('src/components/public/article-grid-card.tsx');
+  const publicUiSource = readProjectFile('src/components/public/public-prelaunch-section.tsx');
+  const tokensSource = readProjectFile('src/app/styles/tokens.css');
+
+  assert.match(tokensSource, /--tracking-eyebrow-md: 0\.16em;/);
+  assert.match(tokensSource, /--tracking-eyebrow-sm: 0\.08em;/);
+  assert.match(tokensSource, /--tracking-marker: 0\.12em;/);
+
+  assert.match(opportunityRowSource, /tabular-nums text-\[1\.35rem\] font-semibold text-\[var\(--accent\)\]/);
+  assert.match(directoryRowSource, /tabular-nums text-\[1\.35rem\] font-semibold text-\[var\(--accent\)\]/);
+  assert.match(`${opportunityRowSource}\n${directoryRowSource}`, /AvatarFallback/);
+  assert.match(`${opportunityRowSource}\n${directoryRowSource}\n${articleCardSource}`, /HighlightChip/);
+  assert.doesNotMatch(`${opportunityRowSource}\n${directoryRowSource}`, /BadgeCheck/);
+  assert.doesNotMatch(`${opportunityRowSource}\n${directoryRowSource}`, /bg-\[var\(--warning-bg\)\].*tracking-\[0\.12em\]/);
+  assert.match(`${opportunityRowSource}\n${directoryRowSource}`, /tracking-\[var\(--tracking-eyebrow-sm\)\]/);
+  assert.doesNotMatch(`${opportunityRowSource}\n${directoryRowSource}\n${articleCardSource}\n${publicUiSource}`, /tracking-\[(?:0\.06|0\.07|0\.08|0\.1|0\.11|0\.12|0\.13|0\.14|0\.16|0\.18)em\]/);
+  assert.match(directoryRowSource, /const priority = \['Город', 'Категория', 'Опыт', 'Формат', 'Сертификаты'\]/);
+  assert.doesNotMatch(directoryRowSource, /\.slice\(0, 3\)/);
 });
 
 test('public visible copy avoids internal vague labels', () => {

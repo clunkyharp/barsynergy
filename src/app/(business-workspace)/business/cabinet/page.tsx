@@ -8,6 +8,7 @@ import {
 } from '@/components/business/business-cabinet';
 import { Button } from '@/components/ui/button';
 import { PageHeader } from '@/components/ui/page-header';
+import { Panel } from '@/components/ui/panel';
 import type { AdminContentSearchParams } from '@/lib/admin/content-utils';
 import { requireBusinessAccountAccess } from '@/lib/auth/require-business-account';
 import { buildPrivatePageMetadata } from '@/lib/public/metadata';
@@ -16,6 +17,8 @@ import { getBusinessDashboardData } from '@/modules/business/queries';
 type BusinessDashboardPageProps = {
   searchParams?: Promise<AdminContentSearchParams>;
 };
+
+const PROFILE_READY_ACTION_GRACE_MS = 7 * 24 * 60 * 60 * 1000;
 
 export const metadata: Metadata = buildPrivatePageMetadata({
   title: 'Кабинет компании',
@@ -38,14 +41,17 @@ export default async function BusinessDashboardPage({ searchParams }: BusinessDa
     businessAccount.cityId ? null : 'город',
     businessAccount.description ? null : 'описание компании'
   ].filter((field): field is string => Boolean(field));
+  const profileReadyActionVisible =
+    missingProfileFields.length > 0 ||
+    Date.now() - businessAccount.updatedAt.getTime() <= PROFILE_READY_ACTION_GRACE_MS;
 
   return (
     <div className="space-y-8">
-      <PageHeader bare eyebrow="Компания" title={businessAccount.companyName} />
+      <PageHeader eyebrow="Компания" title={businessAccount.companyName} />
       <AdminActionAlert params={params} />
 
       {isWelcome ? (
-        <section className="rounded-[var(--radius-lg)] border border-[var(--line)] bg-[var(--surface-elevated)] p-5 shadow-[var(--shadow-panel)]">
+        <Panel padding="md" tone="elevated">
           <div className="flex items-start gap-4">
             <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[var(--accent-soft)]">
               <PartyPopper aria-hidden className="text-[var(--accent)]" size={22} strokeWidth={1.5} />
@@ -78,10 +84,10 @@ export default async function BusinessDashboardPage({ searchParams }: BusinessDa
               </div>
             </div>
           </div>
-        </section>
+        </Panel>
       ) : null}
 
-      <div className="grid gap-3 rounded-[var(--radius-lg)] border border-[var(--line)] bg-[var(--surface-elevated)] px-5 py-4 md:grid-cols-4 lg:grid-cols-[repeat(4,minmax(0,1fr))_auto] md:items-center">
+      <Panel className="grid gap-3 md:grid-cols-4 lg:grid-cols-[repeat(4,minmax(0,1fr))_auto] md:items-center" padding="md" tone="elevated">
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--muted)]">Всего заявок</p>
           <p className="mt-1 text-xl font-semibold text-[var(--text)]">{requestCount}</p>
@@ -104,7 +110,7 @@ export default async function BusinessDashboardPage({ searchParams }: BusinessDa
             <ArrowRight size={15} strokeWidth={1.8} />
           </Button>
         </div>
-      </div>
+      </Panel>
 
       <section className="grid gap-5 xl:grid-cols-[minmax(0,1.1fr)_minmax(300px,0.45fr)]">
         <div id="business-profile">
@@ -118,12 +124,16 @@ export default async function BusinessDashboardPage({ searchParams }: BusinessDa
                 : 'Профиль заполнен. Можно работать с новыми заявками и проверять ответы команды.'
             }
             items={[
-              {
-                label: 'Проверить профиль',
-                detail: missingProfileFields.length > 0 ? 'Дозаполните поля перед новой заявкой.' : 'Данные компании готовы для новых заявок.',
-                href: '/business/cabinet/settings',
-                status: missingProfileFields.length > 0 ? 'нужно' : 'готово'
-              },
+              ...(profileReadyActionVisible
+                ? [
+                    {
+                      label: 'Проверить профиль',
+                      detail: missingProfileFields.length > 0 ? 'Дозаполните поля перед новой заявкой.' : 'Данные компании готовы для новых заявок.',
+                      href: '/business/cabinet/settings',
+                      status: missingProfileFields.length > 0 ? 'нужно' : 'готово'
+                    }
+                  ]
+                : []),
               {
                 label: 'Создать заявку',
                 detail: 'Вакансия, поставщик, партнёрство, обучение или сертификат.',
@@ -140,9 +150,9 @@ export default async function BusinessDashboardPage({ searchParams }: BusinessDa
             primaryAction={{ href: '/business/cabinet/requests', label: 'Открыть журнал заявок' }}
           />
           {closedRequestCount > 0 ? (
-            <div className="rounded-[var(--radius-lg)] border border-[var(--line)] bg-[var(--surface-elevated)] p-5 text-sm leading-6 text-[var(--muted)]">
+            <Panel className="text-sm leading-6 text-[var(--muted)]" padding="md" tone="elevated">
               Закрытых заявок: <span className="font-semibold text-[var(--text)]">{closedRequestCount}</span>. Архив и завершённые записи доступны в журнале.
-            </div>
+            </Panel>
           ) : null}
         </div>
       </section>

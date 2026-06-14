@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
+import { requestProfileSettingsSectionOpen } from '@/components/profile/profile-settings-section';
 
 type Section = {
   id: string;
@@ -58,6 +59,7 @@ export function ProfileTabs({ sections }: { sections: Section[] }) {
           )}
           href={`#${s.id}`}
           key={s.id}
+          onClick={() => requestProfileSettingsSectionOpen(s.id)}
         >
           {s.label}
         </a>

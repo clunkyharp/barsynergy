@@ -19,6 +19,7 @@ test('education page uses the shared prelaunch section instead of a plain empty 
   assert.match(source, /Интенсивы и мастер-классы/);
   assert.match(source, /Корпоративное обучение/);
   assert.match(source, /Онлайн и долгие программы/);
-  assert.match(source, /label: 'Предложить программу'/);
+  assert.match(source, /badges=\{\['Раздел уже принимает заявки', 'Подходит для открытых и корпоративных форматов'\]\}/);
+  assert.match(source, /description="Добавьте программу, если она помогает специалистам или командам заведений развивать навыки в барной индустрии\."/);
   assert.doesNotMatch(source, /Конкретные программы с датами и записью скоро появятся/);
 });

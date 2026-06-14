@@ -97,7 +97,7 @@ export function ConsultingRequestForm({ enabled, utm, cities, defaults = {}, dir
           </div>
 
           <div className="relative p-5 md:p-6">
-            <FormSection title="Контакт">
+            <FormSection title="Контактные данные">
               <div className="grid items-start gap-4 md:grid-cols-2">
                 <FormField htmlFor="consultingContactName" label="Контактное лицо">
                   <Input
@@ -123,9 +123,9 @@ export function ConsultingRequestForm({ enabled, utm, cities, defaults = {}, dir
                   ))}
                 </Select>
               </FormField>
-              <ContactChannelFieldset className="md:col-span-2" emailId="consultingEmail" phoneId="consultingPhone" telegramId="consultingTelegram" />
             </div>
             </FormSection>
+            <ContactChannelFieldset emailId="consultingEmail" phoneId="consultingPhone" telegramId="consultingTelegram" />
             <FormSection title="О бизнесе">
             <div className="grid gap-4 md:grid-cols-2">
               <FormField htmlFor="consultingBusinessType" label="Тип бизнеса">

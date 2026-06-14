@@ -43,7 +43,6 @@ export default async function SuppliersPage({ searchParams }: SuppliersPageProps
     getPublicCityFilterOptions(),
     getPublicCategoryOptions(CategoryType.SUPPLIER)
   ]);
-  const supplierContactHref = '/contacts?topic=supplier#contact-form';
   const isEmpty = content.total === 0;
   const hasActiveFilters = hasActivePublicContentParams(contentParams, ['q', 'category', 'city', 'verified']);
   const isPrelaunchEmpty = isEmpty && !hasActiveFilters;
@@ -54,15 +53,12 @@ export default async function SuppliersPage({ searchParams }: SuppliersPageProps
         title="Поставщики"
         subtitle="Проверенные поставщики кофе, оборудования, упаковки и продуктов для вашего бизнеса."
         media={{ kind: 'image' as const, src: '/images/suppliers-hero.jpg', alt: 'Кофейные пачки, зерно и аксессуары для кофейного бизнеса' }}
+        tone="graphite"
       >
         <SuppliersHeroActions />
       </PageHero>
       {isPrelaunchEmpty ? (
         <PublicPrelaunchSection
-          actions={[
-            { href: supplierContactHref, label: 'Добавить свою компанию' },
-            { href: supplierContactHref, label: 'Связаться с нами', variant: 'secondary' }
-          ]}
           badges={['Каталог уже принимает заявки', 'Подходит для поставок, сервиса и оборудования']}
           cards={[
             {

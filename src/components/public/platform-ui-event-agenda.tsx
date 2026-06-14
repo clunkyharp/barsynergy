@@ -75,8 +75,8 @@ function FeaturedDateBlock({ dateIso }: { dateIso?: string }) {
   return (
     <div className="shrink-0 text-center">
       <span className={`${displayFont.className} block text-[3.2rem] font-bold leading-none text-[var(--accent)] md:text-[4rem]`}>{day}</span>
-      <span className="mt-1 block text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">{month}</span>
-      <span className="mt-0.5 block text-[11px] font-semibold uppercase tracking-[0.1em] text-[var(--muted)]">{weekday}</span>
+      <span className="mt-1 block text-[11px] font-semibold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--muted)]">{month}</span>
+      <span className="mt-0.5 block text-[11px] font-semibold uppercase tracking-[var(--tracking-eyebrow-sm)] text-[var(--muted)]">{weekday}</span>
     </div>
   );
 }
@@ -89,8 +89,8 @@ function CompactDateBlock({ dateIso }: { dateIso?: string }) {
   return (
     <div className="shrink-0 text-left">
       <span className={`${displayFont.className} block text-[1.6rem] font-bold leading-none text-[var(--accent)]`}>{day}</span>
-      <span className="mt-0.5 block text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--muted)]">{month}</span>
-      <span className="block text-[10px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">{weekday}</span>
+      <span className="mt-0.5 block text-[10px] font-semibold uppercase tracking-[var(--tracking-marker)] text-[var(--muted)]">{month}</span>
+      <span className="block text-[10px] font-semibold uppercase tracking-[var(--tracking-eyebrow-sm)] text-[var(--muted)]">{weekday}</span>
     </div>
   );
 }
@@ -109,7 +109,7 @@ function FeaturedEventCard({ item }: { item: PublishedContentItem }) {
             <FeaturedDateBlock dateIso={item.dateIso} />
             <div className="min-w-0">
               <span
-                className="inline-flex items-center rounded-[var(--radius-sm)] px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.14em]"
+                className="inline-flex items-center rounded-[var(--radius-sm)] px-2.5 py-1 text-[10px] font-bold uppercase tracking-[var(--tracking-eyebrow-md)]"
                 style={{ backgroundColor: catStyle.bg, color: catStyle.text }}
               >
                 {item.label ?? 'Событие'}
@@ -200,7 +200,7 @@ function CompactEventCard({ item }: { item: PublishedContentItem }) {
 
       <div className="flex flex-1 flex-col gap-2 p-3">
         <span
-          className="inline-flex w-fit items-center rounded-[var(--radius-sm)] px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.12em]"
+          className="inline-flex w-fit items-center rounded-[var(--radius-sm)] px-2 py-0.5 text-[10px] font-bold uppercase tracking-[var(--tracking-marker)]"
           style={{ backgroundColor: catStyle.bg, color: catStyle.text }}
         >
           {item.label ?? 'Событие'}
@@ -317,7 +317,7 @@ export function EventAgendaSection({ content }: { content: PublishedContentList 
                 <div className="mt-4">
                   <AppLink
                     className="inline-flex items-center gap-1 text-sm font-semibold text-[var(--accent)] transition-colors hover:text-[var(--accent-strong)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
-                    href="/contacts?topic=event#contact-form"
+                    href="/contacts?topic=partnership#contact-form"
                   >
                     Хотите провести своё? <ArrowUpRight size={14} strokeWidth={1.8} />
                   </AppLink>

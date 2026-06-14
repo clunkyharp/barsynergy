@@ -32,19 +32,19 @@ export function ArticleDetailBody({
         <div className="grid gap-8 xl:grid-cols-[1fr_minmax(18rem,0.38fr)] xl:gap-12">
           <div className="min-w-0">
             {hasBody ? (
-              <div className="mx-auto max-w-[70ch]">
+              <div className="max-w-[70ch]">
                 <ArticleBodyContent markdown={body!} />
               </div>
             ) : (
               <p className="text-sm leading-7 text-[var(--muted)]">
-                Основная информация собрана в кратком описании и метках материала.
+                Основная информация собрана в кратком виде.
               </p>
             )}
 
             {sourceReferences ? (
               <Panel className="mt-12 border-[var(--border-default)] bg-[var(--surface-wash-strong)]" padding="lg">
-                <h2 className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">
-                  Источники и дополнительное чтение
+                <h2 className="text-[11px] font-semibold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--accent)]">
+                  Источники и дополнительные данные 
                 </h2>
                 <div className="article-body mt-5">
                   <ArticleBodyContent markdown={sourceReferences} />

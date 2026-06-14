@@ -5,7 +5,7 @@ import { displayFont } from '@/lib/fonts';
 import type { PublishedContentItem } from '@/lib/public/content';
 
 function defaultLabel(item: PublishedContentItem) {
-  return <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--accent)]">{item.label ?? 'Материал'}</p>;
+  return <p className="text-[11px] font-semibold uppercase tracking-[var(--tracking-eyebrow-sm)] text-[var(--accent)]">{item.label ?? 'Материал'}</p>;
 }
 
 function defaultMeta(item: PublishedContentItem) {

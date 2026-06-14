@@ -206,6 +206,9 @@
   --radius-lg: 0.8rem;
   --radius-xl: 1rem;
   --radius-pill: 999px;
+  --tracking-eyebrow-md: 0.16em;
+  --tracking-eyebrow-sm: 0.08em;
+  --tracking-marker: 0.12em;
   --shadow-none: none;
   --shadow-card: 0 12px 28px rgb(28 28 30 / 0.05);
   --shadow-panel: 0 28px 64px rgb(28 28 30 / 0.08);

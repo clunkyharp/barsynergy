@@ -48,11 +48,11 @@ export function PublicFeaturedContent({
           <div className="flex flex-col gap-4 p-4 md:gap-5 md:p-7">
             <div>
               <div className="flex flex-wrap items-center gap-2">
-                <span className="rounded-[var(--radius-sm)] border border-[var(--accent)]/22 bg-[var(--accent-soft)] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--accent)]">
+                <span className="rounded-[var(--radius-sm)] border border-[var(--accent)]/22 bg-[var(--accent-soft)] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--accent)]">
                   {eyebrow}
                 </span>
                 {item.label ? (
-                  <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">
+                  <span className="text-[11px] font-semibold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--muted)]">
                     {item.label}
                   </span>
                 ) : null}

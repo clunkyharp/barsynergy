@@ -1,6 +1,7 @@
 'use client';
 
 import { useActionState } from 'react';
+import { PublicFormValidation } from '@/components/public/public-form-validation';
 import { FormField } from '@/components/ui/form-field';
 import { InlineAlert } from '@/components/ui/inline-alert';
 import { Input } from '@/components/ui/input';
@@ -29,7 +30,8 @@ export function AdminLoginForm() {
           {errorMessages[errorCode] ?? errorMessages.failed}
         </InlineAlert>
       ) : null}
-      <form action={formAction} className="grid gap-4" noValidate>
+      <form action={formAction} className="grid gap-4" data-public-validation="true" noValidate>
+        <PublicFormValidation />
         <input name="surface" type="hidden" value="admin" />
         <FormField htmlFor="email" label="Почта" labelClassName={authLabelClassName} required={false}>
           <Input id="email" name="email" type="email" autoComplete="email" required />

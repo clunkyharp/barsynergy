@@ -68,7 +68,7 @@ export function AdditionalCostsEditor({
         </div>
       ) : (
         <div className="mt-3 overflow-hidden rounded-[var(--radius-md)] border border-[var(--line)]">
-          <div className="hidden gap-3 border-b border-[var(--line)] px-4 py-2.5 text-[10px] font-semibold uppercase tracking-[0.11em] text-[var(--muted)] md:flex md:px-5">
+          <div className="hidden gap-3 border-b border-[var(--line)] px-4 py-2.5 text-[10px] font-semibold uppercase tracking-[var(--tracking-eyebrow-sm)] text-[var(--muted)] md:flex md:px-5">
             <span className="min-w-0 flex-1">Статья расхода</span>
             <span className="w-[140px]">Сумма на порцию</span>
             <span className="w-8" />

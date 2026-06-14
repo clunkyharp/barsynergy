@@ -4,6 +4,7 @@ import { deleteCourseDraft, updateCourse, updateCourseStatus } from '@/app/admin
 import { AdminCmsActions, AdminCmsAdvancedSection, AdminCmsForm, AdminCmsGrid, AdminCmsSection, AdminCmsSummary } from '@/components/admin/admin-cms-form';
 import { AdminContentVisibilityPanel, CoverImageField } from '@/components/admin/content-admin-controls';
 import { Button } from '@/components/ui/button';
+import { ConfirmSubmitButton } from '@/components/ui/confirm-submit-button';
 import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
@@ -170,9 +171,15 @@ export default async function AdminEditCoursePage({ params }: AdminEditCoursePag
       {course.status === ContentStatus.DRAFT ? (
         <form action={deleteCourseDraft}>
           <input name="courseId" type="hidden" value={course.id} />
-          <Button type="submit" variant="ghost">
+          <ConfirmSubmitButton
+            confirmActionLabel="Удалить"
+            confirmText="Это действие нельзя отменить."
+            confirmTitle="Удалить черновик?"
+            type="submit"
+            variant="ghost"
+          >
             Удалить черновик
-          </Button>
+          </ConfirmSubmitButton>
         </form>
       ) : null}
     </div>

@@ -81,7 +81,7 @@ export default async function EventDetailPage({ params, searchParams }: EventDet
             ? { href: '/events', label: 'Смотреть другие события' }
             : event.externalUrl
               ? { href: event.externalUrl, label: event.externalUrlLabel ?? 'Записаться', external: true }
-              : { href: '/contacts?topic=event#contact-form', label: 'Записаться' }
+              : { href: '/contacts#contact-form', label: 'Записаться' }
         }
         secondaryLink={{ href: '/events', label: 'Вернуться в афишу' }}
         sections={event.sections}

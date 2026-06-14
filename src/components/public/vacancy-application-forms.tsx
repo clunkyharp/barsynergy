@@ -59,7 +59,7 @@ export function VacancyResponseDialog({
           Напишите команде BARSYNERGY — мы передадим вашу кандидатуру работодателю.
         </p>
         <div className="flex flex-wrap gap-3">
-          <Button className="rounded-[var(--radius-md)]" href="/contacts?topic=vacancy#contact-form" size="lg">
+          <Button className="rounded-[var(--radius-md)]" href="/contacts#contact-form" size="lg">
             Написать команде
           </Button>
           <Button className="rounded-[var(--radius-md)]" href={`mailto:${SUPPORT_EMAIL}`} size="lg" variant="secondary">

@@ -52,7 +52,7 @@ export function EditorialFeatured({ card }: { card: HomepageLiveCard }) {
       <span aria-hidden="true" className="editorial-featured-gradient absolute inset-0" />
 
       <span className="editorial-featured-content absolute inset-0 flex flex-col justify-end p-5 md:p-8 lg:p-10">
-        <span className="mb-1.5 block text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--accent)] md:mb-2">
+        <span className="mb-1.5 block text-[11px] font-semibold uppercase tracking-[var(--tracking-marker)] text-[var(--accent)] md:mb-2">
           {card.eyebrow}
         </span>
 
@@ -151,7 +151,7 @@ export function HomeEventsStrip({ event }: { event: HomepageLiveCard }) {
             className="home-event-card block rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--surface-card)] p-4 text-[var(--text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] md:p-5"
             href={event.href}
           >
-            <span className="block text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--accent)]">{event.eyebrow}</span>
+            <span className="block text-[11px] font-semibold uppercase tracking-[var(--tracking-eyebrow-sm)] text-[var(--accent)]">{event.eyebrow}</span>
             <span className={`${displayFont.className} mt-3 block text-[1.35rem] font-semibold leading-none text-[var(--text)] md:mt-4 md:text-[1.7rem]`}>{event.title}</span>
             <span className="mt-2 block text-sm leading-6 text-[var(--muted)] md:mt-3">{event.summary}</span>
             <span className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-[var(--accent)] md:mt-5">

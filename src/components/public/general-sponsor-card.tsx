@@ -158,9 +158,9 @@ function SponsorLogoMark({ priority = false, sponsor }: GeneralSponsorCardProps)
       data-logo-fallback="sponsor"
     >
       <span className="grid gap-2">
-        <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">Генеральный спонсор</span>
+        <span className="text-[10px] font-semibold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--muted)]">Генеральный спонсор</span>
         <span className="text-base font-semibold leading-6 text-[var(--text)] md:text-lg">Без логотипа</span>
-        <span className="general-sponsor-status-label text-[11px] font-semibold uppercase tracking-[0.12em]">{sponsor.status}</span>
+        <span className="general-sponsor-status-label text-[11px] font-semibold uppercase tracking-[var(--tracking-marker)]">{sponsor.status}</span>
       </span>
     </div>
   );
@@ -252,7 +252,7 @@ export function GeneralSponsorCard({ priority = false, sponsor, variant = 'full'
           </div>
 
           <div>
-            <p className="general-sponsor-status-label text-[10px] font-semibold uppercase tracking-[0.18em]">{sponsor.status}</p>
+            <p className="general-sponsor-status-label text-[10px] font-semibold uppercase tracking-[var(--tracking-eyebrow-md)]">{sponsor.status}</p>
             <p className="mt-2 text-[13px] leading-[1.55] text-[var(--muted)]">{sponsor.shortDescription}</p>
             {sponsor.brands.length > 0 ? (
               <div className="mt-3 flex flex-wrap gap-1.5">
@@ -281,7 +281,7 @@ export function GeneralSponsorCard({ priority = false, sponsor, variant = 'full'
 
           <div className="mt-5 grid gap-5 border-y border-[var(--line)] py-4 md:mt-7 lg:grid-cols-[minmax(0,0.88fr)_minmax(0,1fr)]">
             <section>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">Чем полезны заведению</p>
+              <p className="text-[11px] font-semibold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--muted)]">Чем полезны заведению</p>
               <ul className="mt-3 grid gap-2 md:mt-4 md:gap-3">
                 {venueItems.map((item) => (
                   <li className="grid grid-cols-[0.7rem_minmax(0,1fr)] gap-3 text-sm leading-6 text-[var(--text)]" key={item}>
@@ -292,11 +292,11 @@ export function GeneralSponsorCard({ priority = false, sponsor, variant = 'full'
               </ul>
             </section>
             <section className="border-t border-[var(--line)] pt-4 lg:border-t-0 lg:border-l lg:pl-5 lg:pt-0">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">Продукты и бренды</p>
+              <p className="text-[11px] font-semibold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--muted)]">Продукты и бренды</p>
               <div className="mt-4 flex flex-wrap gap-2">
                 {[...sponsor.supplyGroups, ...sponsor.brands].slice(0, 10).map((item, index) => (
                   <span
-                    className="general-sponsor-chip rounded-[var(--radius-sm)] border border-[var(--border-default)] bg-transparent px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.1em] text-[var(--text)]"
+                    className="general-sponsor-chip rounded-[var(--radius-sm)] border border-[var(--border-default)] bg-transparent px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[var(--tracking-eyebrow-sm)] text-[var(--text)]"
                     key={`${item}-${index}`}
                   >
                     {item}

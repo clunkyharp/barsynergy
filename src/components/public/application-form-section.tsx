@@ -3,7 +3,7 @@ import { PublicFormValidation } from '@/components/public/public-form-validation
 import { RequestDisclosure } from '@/components/public/request-disclosure';
 import { Button } from '@/components/ui/button';
 import { EditorialShell } from '@/components/ui/editorial-shell';
-import { FormField } from '@/components/ui/form-field';
+import { FormField, FormSection } from '@/components/ui/form-field';
 import { InlineAlert } from '@/components/ui/inline-alert';
 import { Input } from '@/components/ui/input';
 import type { ApplicationCityOption } from '@/lib/applications/form-options';
@@ -85,26 +85,24 @@ export function ContactChannelFieldset({
     telegram?: string;
   };
 }) {
-  const hintId = `${emailId}-contact-channel-hint`;
-
   return (
-    <fieldset aria-describedby={hintId} className={cn('contact-channel-fieldset grid gap-4 md:grid-cols-3', className)}>
-      <legend className="field-label">
-        Способ связи <span aria-hidden="true" className="text-[var(--accent)]">*</span>
-      </legend>
-      <p className="field-hint md:col-span-3" id={hintId}>
-        Укажите email, телефон или Telegram.
-      </p>
-      <FormField htmlFor={emailId} label="Email">
-        <Input autoComplete="email" defaultValue={defaults?.email ?? ''} id={emailId} name="email" placeholder="name@example.com" spellCheck={false} type="email" maxLength={180} />
-      </FormField>
-      <FormField htmlFor={phoneId} label="Телефон">
-        <Input autoComplete="tel" defaultValue={defaults?.phone ?? ''} id={phoneId} name="phone" inputMode="tel" placeholder="+7 999 123 45 67" maxLength={80} />
-      </FormField>
-      <FormField htmlFor={telegramId} label="Telegram">
-        <Input autoComplete="off" defaultValue={defaults?.telegram ?? ''} id={telegramId} name="telegram" placeholder="@username" spellCheck={false} maxLength={80} />
-      </FormField>
-    </fieldset>
+    <FormSection
+      className={className}
+      title="Способ связи"
+      description="Укажите email, телефон или Telegram."
+    >
+      <div className="grid gap-4 md:grid-cols-3">
+        <FormField htmlFor={emailId} label="Email">
+          <Input autoComplete="email" defaultValue={defaults?.email ?? ''} id={emailId} name="email" placeholder="name@example.com" spellCheck={false} type="email" maxLength={180} />
+        </FormField>
+        <FormField htmlFor={phoneId} label="Телефон">
+          <Input autoComplete="tel" defaultValue={defaults?.phone ?? ''} id={phoneId} name="phone" inputMode="tel" placeholder="+7 999 123 45 67" maxLength={80} />
+        </FormField>
+        <FormField htmlFor={telegramId} label="Telegram">
+          <Input autoComplete="off" defaultValue={defaults?.telegram ?? ''} id={telegramId} name="telegram" placeholder="@username" spellCheck={false} maxLength={80} />
+        </FormField>
+      </div>
+    </FormSection>
   );
 }
 

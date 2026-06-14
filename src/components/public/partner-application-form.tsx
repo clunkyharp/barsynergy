@@ -12,7 +12,7 @@ import {
 import type { PublicApplicationResult } from '@/lib/applications/public-form-helpers';
 import { PublicBodyText, PublicDisplayTitle, PublicEyebrow } from '@/components/public/public-primitives';
 import { ConsentField } from '@/components/ui/consent-field';
-import { FormField } from '@/components/ui/form-field';
+import { FormField, FormSection } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
 import { InlineLink } from '@/components/ui/inline-link';
 import { MetaChip } from '@/components/ui/meta-chip';
@@ -89,14 +89,18 @@ export function PartnerApplicationForm({ enabled, utm, cities, defaults = {}, ac
           </div>
 
           <div className="relative p-5 md:p-6">
+            <FormSection title="Контактные данные">
+              <div className="grid gap-4 md:grid-cols-2">
+                <FormField htmlFor="partnerCompanyName" label="Компания">
+                  <Input id="partnerCompanyName" name="companyName" required maxLength={180} minLength={2} placeholder="Например, Coffee Point" />
+                </FormField>
+                <FormField htmlFor="partnerContactName" label="Контактное лицо">
+                  <Input id="partnerContactName" name="contactName" required maxLength={160} minLength={2} placeholder="Иван Иванов" />
+                </FormField>
+              </div>
+            </FormSection>
+            <ContactChannelFieldset emailId="partnerEmail" phoneId="partnerPhone" telegramId="partnerTelegram" />
             <div className="grid gap-4 md:grid-cols-2">
-              <FormField htmlFor="partnerCompanyName" label="Компания">
-                <Input id="partnerCompanyName" name="companyName" required maxLength={180} minLength={2} placeholder="Например, Coffee Point" />
-              </FormField>
-              <FormField htmlFor="partnerContactName" label="Контактное лицо">
-                <Input id="partnerContactName" name="contactName" required maxLength={160} minLength={2} placeholder="Иван Иванов" />
-              </FormField>
-              <ContactChannelFieldset className="md:col-span-2" emailId="partnerEmail" phoneId="partnerPhone" telegramId="partnerTelegram" />
               <FormField htmlFor="partnerCityId" label="Город">
                 <Select id="partnerCityId" name="cityId" defaultValue="">
                   <option value="">Не указан</option>

@@ -17,7 +17,7 @@ export default async function BusinessSettingsPage() {
 
   return (
     <div className="space-y-8">
-      <PageHeader bare title="Настройки компании" />
+      <PageHeader title="Настройки компании" />
       <BusinessProfileSheet account={businessAccount} action={updateBusinessProfile} cities={cities} />
     </div>
   );

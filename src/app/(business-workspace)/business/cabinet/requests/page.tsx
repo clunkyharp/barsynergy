@@ -50,7 +50,7 @@ export default async function BusinessRequestsPage({ searchParams }: BusinessReq
 
   return (
     <div className="space-y-8">
-      <PageHeader bare title="Заявки компании" />
+      <PageHeader title="Заявки компании" />
       <AdminActionAlert params={params} />
       <section className="grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
         <div id="new-request" className="scroll-mt-24">

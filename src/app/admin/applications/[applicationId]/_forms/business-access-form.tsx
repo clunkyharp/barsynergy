@@ -1,6 +1,6 @@
 import { prepareBusinessAccessAction } from '@/app/admin/applications/actions';
 import { HiddenRedirect } from '@/components/admin/content-admin-controls';
-import { Button } from '@/components/ui/button';
+import { ConfirmSubmitButton } from '@/components/ui/confirm-submit-button';
 import { Card } from '@/components/ui/card';
 import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
@@ -48,9 +48,16 @@ export function BusinessAccessForm({ application, canPrepareInvite, isAccessActi
       <form action={prepareBusinessAccessAction} className="mt-4 grid gap-4">
         <HiddenRedirect value={currentPath} />
         <input name="applicationId" type="hidden" value={application.id} />
-        <Button type="submit" variant="secondary" disabled={!canPrepareInvite}>
+        <ConfirmSubmitButton
+          confirmActionLabel={application.businessAccount ? 'Пересоздать' : 'Подготовить'}
+          confirmText={application.businessAccount ? 'Предыдущая ссылка активации перестанет работать.' : 'Будет создана одноразовая ссылка для владельца бизнеса.'}
+          confirmTitle={application.businessAccount ? 'Пересоздать ссылку активации?' : 'Подготовить доступ?'}
+          disabled={!canPrepareInvite}
+          type="submit"
+          variant="secondary"
+        >
           {application.businessAccount ? 'Пересоздать ссылку активации' : 'Подготовить доступ и получить ссылку'}
-        </Button>
+        </ConfirmSubmitButton>
       </form>
 
       {activationPreview?.activationUrl ? (

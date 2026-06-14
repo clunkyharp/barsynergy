@@ -4,6 +4,7 @@ import { deleteVacancyDraft, updateVacancy, updateVacancyStatus } from '@/app/ad
 import { AdminCmsActions, AdminCmsAdvancedSection, AdminCmsForm, AdminCmsGrid, AdminCmsSection, AdminCmsSummary } from '@/components/admin/admin-cms-form';
 import { AdminContentVisibilityPanel, CoverImageField, HiddenRedirect } from '@/components/admin/content-admin-controls';
 import { Button } from '@/components/ui/button';
+import { ConfirmSubmitButton } from '@/components/ui/confirm-submit-button';
 import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
@@ -176,6 +177,15 @@ export default async function AdminVacancyEditPage({ params }: AdminVacancyEditP
             <FormField htmlFor="vacancy-contactMode" label="Контакт" hint="Например: форма на сайте, Telegram HR, телефон управляющего.">
               <Input id="vacancy-contactMode" name="contactMode" maxLength={120} defaultValue={vacancy.contactMode ?? ''} />
             </FormField>
+            <FormField htmlFor="vacancy-contactTelegram" label="Telegram для связи">
+              <Input id="vacancy-contactTelegram" name="contactTelegram" maxLength={120} defaultValue={vacancy.contactTelegram ?? ''} placeholder="@username или t.me/..." />
+            </FormField>
+            <FormField htmlFor="vacancy-contactPhone" label="Телефон">
+              <Input id="vacancy-contactPhone" name="contactPhone" maxLength={30} defaultValue={vacancy.contactPhone ?? ''} placeholder="+7 ..." type="tel" />
+            </FormField>
+            <FormField htmlFor="vacancy-contactEmail" label="Email">
+              <Input id="vacancy-contactEmail" name="contactEmail" maxLength={254} defaultValue={vacancy.contactEmail ?? ''} placeholder="hr@example.com" type="email" />
+            </FormField>
             <div className="rounded-[var(--radius-md)] border border-[var(--line)] bg-[var(--surface-muted)] p-4 text-sm leading-6 text-[var(--muted)]">
               Формат: {getAdminOptionLabel(vacancyEmploymentTypeOptions, vacancy.employmentType)} · опыт: {getAdminOptionLabel(vacancyExperienceOptions, vacancy.experienceLabel)}
             </div>
@@ -207,9 +217,15 @@ export default async function AdminVacancyEditPage({ params }: AdminVacancyEditP
       {vacancy.status === ContentStatus.DRAFT ? (
         <form action={deleteVacancyDraft}>
           <input name="vacancyId" type="hidden" value={vacancy.id} />
-          <Button type="submit" variant="ghost">
+          <ConfirmSubmitButton
+            confirmActionLabel="Удалить"
+            confirmText="Это действие нельзя отменить."
+            confirmTitle="Удалить черновик?"
+            type="submit"
+            variant="ghost"
+          >
             Удалить черновик
-          </Button>
+          </ConfirmSubmitButton>
         </form>
       ) : null}
     </div>

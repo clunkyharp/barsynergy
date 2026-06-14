@@ -49,7 +49,7 @@ export function PlatformActionCard({
         </div>
 
         <div className="min-w-0 rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--surface-wash)] p-4">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Шаги</p>
+          <p className="text-[11px] font-semibold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--muted)]">Шаги</p>
           <ol className="mt-4 grid gap-0">
             {steps.map((step, index) => (
               <li className="grid min-h-[3.7rem] grid-cols-[2rem_minmax(0,1fr)] gap-3" key={step}>
@@ -123,13 +123,13 @@ export function PlatformFormatCard({
           <div className="mt-5 grid gap-3">
             {audience ? (
               <div>
-                <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">Для кого</p>
+                <p className="text-[11px] font-semibold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--muted)]">Для кого</p>
                 <p className="mt-1 text-sm leading-6 text-[var(--text)]">{audience}</p>
               </div>
             ) : null}
             {outcome ? (
               <div>
-                <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">Что даёт</p>
+                <p className="text-[11px] font-semibold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--muted)]">Что даёт</p>
                 <p className="mt-1 text-sm leading-6 text-[var(--text)]">{outcome}</p>
               </div>
             ) : null}
@@ -148,10 +148,10 @@ export function PlatformFormatCard({
         ) : null}
         {action ? (
           <CardActionRow className="mt-5 pt-4">
-            <span className="rounded-[var(--radius-sm)] border border-[var(--accent)]/20 bg-[var(--accent-soft)] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--accent)]">
+            <span className="rounded-[var(--radius-sm)] border border-[var(--accent)]/20 bg-[var(--accent-soft)] px-3 py-1 text-[10px] font-semibold uppercase tracking-[var(--tracking-marker)] text-[var(--accent)]">
               {status ?? 'Заявки принимаются'}
             </span>
-            <Button className="px-0 text-[11px] tracking-[0.14em]" href={action.href} size="sm" variant={action.variant ?? 'link'}>
+            <Button className="px-0 text-[11px] tracking-[var(--tracking-eyebrow-md)]" href={action.href} size="sm" variant={action.variant ?? 'link'}>
               {action.label}
               <ArrowUpRight size={14} />
             </Button>

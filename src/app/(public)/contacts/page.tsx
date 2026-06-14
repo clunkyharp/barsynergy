@@ -78,7 +78,7 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
         eyebrow="Контакты"
         title="Контакты"
         subtitle="Отвечаем в течение рабочего дня. Выберите тему — форма подстроится."
-        tone="light-editorial"
+        tone="graphite"
         density="compact"
       />
       <ContactApplicationForm

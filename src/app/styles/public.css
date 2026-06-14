@@ -204,6 +204,15 @@
   text-wrap: balance;
 }
 
+/* ── Home Hero ── */
+
+.home-hero-gradient {
+  background:
+    linear-gradient(90deg, rgba(18, 14, 12, 0.98), rgba(18, 14, 12, 0.83) 43%, rgba(18, 14, 12, 0.32) 74%, rgba(18, 14, 12, 0.14)),
+    linear-gradient(0deg, rgba(18, 14, 12, 0.68), rgba(18, 14, 12, 0.08) 54%),
+    radial-gradient(circle at 18% 34%, rgba(200, 132, 42, 0.16), transparent 24rem);
+}
+
 /* ── Editorial Current Section ── */
 
 .editorial-current-section {
@@ -763,16 +772,6 @@
     border-color var(--motion-duration-base) var(--motion-ease-standard),
     background var(--motion-duration-base) var(--motion-ease-standard),
     box-shadow var(--motion-duration-base) var(--motion-ease-standard);
-}
-
-@media (max-width: 767px) {
-  .public-list-row-shell:first-child {
-    padding-block-start: 0;
-  }
-
-  .public-list-row-shell:last-child {
-    padding-block-end: 0;
-  }
 }
 
 @media (min-width: 768px) {

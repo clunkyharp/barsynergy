@@ -53,7 +53,7 @@ export function CalculatorResultRail({
       >
         {/* Dark accent header */}
         <div className="bg-[var(--editorial-dark-surface-muted)] px-5 py-4" data-theme="dark">
-          <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-[var(--editorial-dark-label)]">
+          <p className="text-[10px] font-bold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--editorial-dark-label)]">
             {resultState === 'error' ? 'Проверьте данные' : canShowSalePrice ? 'Итоговый расчёт' : 'Новый расчёт'}
           </p>
           <div className="mt-2 flex items-baseline gap-3">
@@ -94,7 +94,7 @@ export function CalculatorResultRail({
           {/* Donut breakdown */}
           {totalCost > 0 && (
             <div className="mt-4 border-t border-[var(--line)] pt-4">
-              <h3 className="text-xs font-bold uppercase tracking-[0.1em] text-[var(--muted)]">Структура затрат</h3>
+              <h3 className="text-xs font-bold uppercase tracking-[var(--tracking-eyebrow-sm)] text-[var(--muted)]">Структура затрат</h3>
               <div className="mt-3">
                 <CostBreakdown breakdown={breakdown} />
               </div>

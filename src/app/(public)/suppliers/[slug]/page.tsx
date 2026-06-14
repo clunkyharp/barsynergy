@@ -81,7 +81,6 @@ export default async function SupplierDetailPage({ params, searchParams }: Suppl
       <SupplierDetailHero
         cityName={supplier.cityName}
         companyName={supplier.companyName}
-        contactHref="#supplier-contact-rail"
         contactLabel={contactLabel}
         externalUrl={supplier.externalUrl}
         externalUrlLabel={supplier.externalUrlLabel}
@@ -89,7 +88,6 @@ export default async function SupplierDetailPage({ params, searchParams }: Suppl
         isVerified={isVerified}
         label={supplier.label}
         serviceArea={serviceArea}
-        showContactCta={showUserActions}
         summary={supplier.summary}
         title={supplier.title}
       />

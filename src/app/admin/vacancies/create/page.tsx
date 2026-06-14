@@ -125,6 +125,15 @@ export default async function AdminVacanciesCreatePage() {
             <FormField htmlFor="vacancy-contactMode" label="Контакт" hint="Например: форма на сайте, Telegram HR, телефон управляющего.">
               <Input id="vacancy-contactMode" name="contactMode" maxLength={120} />
             </FormField>
+            <FormField htmlFor="vacancy-contactTelegram" label="Telegram для связи">
+              <Input id="vacancy-contactTelegram" name="contactTelegram" maxLength={120} placeholder="@username или t.me/..." />
+            </FormField>
+            <FormField htmlFor="vacancy-contactPhone" label="Телефон">
+              <Input id="vacancy-contactPhone" name="contactPhone" maxLength={30} placeholder="+7 ..." type="tel" />
+            </FormField>
+            <FormField htmlFor="vacancy-contactEmail" label="Email">
+              <Input id="vacancy-contactEmail" name="contactEmail" maxLength={254} placeholder="hr@example.com" type="email" />
+            </FormField>
           </AdminCmsGrid>
         </AdminCmsSection>
 

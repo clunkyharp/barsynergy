@@ -169,7 +169,7 @@ export function FilterChip({
   className?: string;
 }) {
   const chipClassName = cn(
-    'inline-flex min-h-10 max-w-full items-center gap-2 rounded-[var(--radius-sm)] border px-4 text-[11px] font-semibold uppercase tracking-[0.1em] transition-colors',
+    'inline-flex min-h-10 max-w-full items-center gap-2 rounded-[var(--radius-sm)] border px-4 text-[11px] font-semibold uppercase tracking-[var(--tracking-eyebrow-sm)] transition-colors',
     selected
       ? 'border-[var(--accent)] bg-[var(--accent)] text-[var(--accent-contrast)]'
       : 'border-[var(--border-default)] bg-[var(--surface-wash)] text-[var(--text)] hover:border-[var(--accent)]/28 hover:text-[var(--accent)]',

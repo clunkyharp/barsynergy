@@ -87,7 +87,7 @@ export function IngredientEditor({
         <div className="mt-4 overflow-hidden rounded-[var(--radius-md)] border border-[var(--line)] bg-transparent">
           <div
             className={cn(
-              'hidden gap-2 border-b border-[var(--line)] px-4 py-2.5 text-[10px] font-semibold uppercase tracking-[0.11em] text-[var(--muted)] md:px-5 lg:grid',
+              'hidden gap-2 border-b border-[var(--line)] px-4 py-2.5 text-[10px] font-semibold uppercase tracking-[var(--tracking-eyebrow-sm)] text-[var(--muted)] md:px-5 lg:grid',
               ingredientDesktopGridClassName,
             )}
           >

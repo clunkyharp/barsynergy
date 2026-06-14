@@ -72,7 +72,7 @@ export function PublicRelatedContentSection({
               key={item.id}
               style={{ position: 'relative' }}
             >
-              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">
+              <p className="text-[11px] font-semibold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--muted)]">
                 {index + 1}
               </p>
 

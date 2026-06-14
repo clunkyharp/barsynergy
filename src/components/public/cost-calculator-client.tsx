@@ -272,7 +272,7 @@ function CalculatorMobileResultStrip({ summary }: { summary: CalculatorSummary }
 function CalculatorFormulaHelp() {
   return (
     <details className="mt-8 text-xs leading-5 text-[var(--muted)]">
-      <summary className="calculator-formula-help-summary flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--accent)] [&::-webkit-details-marker]:hidden">
+      <summary className="calculator-formula-help-summary flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 text-[11px] font-semibold uppercase tracking-[var(--tracking-marker)] text-[var(--accent)] [&::-webkit-details-marker]:hidden">
         Как считается
         <span className="calculator-formula-help-icon" aria-hidden="true">+</span>
       </summary>

@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
-import { Briefcase, Calendar, GraduationCap, Handshake, Package, Wrench } from 'lucide-react';
+import { Briefcase, Calendar, GraduationCap, Handshake, LayoutGrid, Package, Wrench } from 'lucide-react';
 import { AppLink } from '@/components/ui/app-link';
 import { PageHero } from '@/components/public/page-hero';
 import { JsonLd } from '@/components/seo/json-ld';
@@ -66,7 +66,12 @@ export default function AboutPage() {
   const insideMedia = (
     <aside className="w-full max-w-sm rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--surface-card)] p-5 shadow-[var(--shadow-card)] md:p-8">
       <div className="flex items-center gap-3">
-        <Image alt="" aria-hidden="true" height={56} priority src="/icons/platform/platform-core.png" width={56} />
+        <span
+          aria-hidden="true"
+          className="flex size-14 shrink-0 items-center justify-center rounded-[var(--radius-md)] bg-[var(--accent-soft)] text-[var(--accent)]"
+        >
+          <LayoutGrid size={28} strokeWidth={1.8} />
+        </span>
         <div>
           <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--muted)]">Что внутри</p>
           <h2 className="mt-1 text-2xl font-semibold leading-7 text-[var(--text)]">Платформа для рабочих задач</h2>
@@ -162,7 +167,7 @@ export default function AboutPage() {
                   <Button className="h-12 rounded-[var(--radius-md)] px-7" href="/contacts?topic=other#contact-form" size="lg">
                     Связаться с командой
                   </Button>
-                  <AppLink className="inline-flex items-center gap-1.5 font-medium text-white/70 hover:text-white transition-colors" href="/contacts?topic=event#contact-form">
+                  <AppLink className="inline-flex items-center gap-1.5 font-medium text-white/70 hover:text-white transition-colors" href="/contacts?topic=partnership#contact-form">
                     Предложить событие
                   </AppLink>
                   <span className="text-white/30" aria-hidden="true">·</span>

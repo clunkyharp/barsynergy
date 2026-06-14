@@ -45,13 +45,13 @@ export function ArticleDetailHero({
         />
 
         {label ? (
-          <span className="mt-5 inline-flex items-center rounded-[var(--radius-sm)] bg-[var(--accent)] px-3 py-1 text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--accent-contrast)]">
+          <span className="mt-5 inline-flex items-center rounded-[var(--radius-sm)] bg-[var(--accent)] px-3 py-1 text-[11px] font-bold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--accent-contrast)]">
             {label}
           </span>
         ) : null}
 
         <h1
-          className={`${displayFont.className} mt-4 max-w-[20ch] text-pretty text-[clamp(2rem,4vw,3.75rem)] font-semibold leading-[1.02] tracking-normal text-[var(--text)] [overflow-wrap:normal] [text-wrap:pretty] [word-break:normal] max-[480px]:max-w-full max-[480px]:text-[clamp(1.6rem,6.5vw,2rem)]`}
+          className={`${displayFont.className} mt-4 max-w-[20ch] text-pretty text-[clamp(2rem,4vw,3.75rem)] font-semibold leading-[1.20] text-balance tracking-normal text-[var(--text)] [overflow-wrap:normal] [text-wrap:pretty] [word-break:normal] max-[480px]:max-w-full max-[480px]:text-[clamp(1.6rem,6.5vw,2rem)]`}
         >
           {title}
         </h1>

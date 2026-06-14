@@ -53,7 +53,7 @@ export function BusinessRequestForm({ cities, action }: BusinessRequestFormProps
         ].map((item) => (
           <span
             aria-current={step === item.value ? 'step' : undefined}
-            className="rounded-[var(--radius-sm)] border border-[var(--border-default)] bg-[var(--surface-wash)] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--muted)] aria-current:border-[var(--accent)]/35 aria-current:bg-[var(--accent-soft)] aria-current:text-[var(--accent)]"
+            className="rounded-[var(--radius-sm)] border border-[var(--border-default)] bg-[var(--surface-wash)] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[var(--tracking-marker)] text-[var(--muted)] aria-current:border-[var(--accent)]/35 aria-current:bg-[var(--accent-soft)] aria-current:text-[var(--accent)]"
             key={item.value}
           >
             {item.label}: {item.text}

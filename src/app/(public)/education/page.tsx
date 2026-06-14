@@ -159,16 +159,14 @@ export default async function EducationPage({ searchParams }: EducationPageProps
             countLabel="Все программы"
             emptyDescription="Список пока пуст. Можно сразу написать, какое обучение вам нужно."
             emptyActions={[
-              { href: '/contacts?topic=education-program#contact-form', label: 'Предложить программу' },
-              { href: '/contacts?topic=education-launch#contact-form', label: 'Написать о запуске', variant: 'secondary' },
-              { href: '/contacts', label: 'Связаться с командой', variant: 'secondary' }
+              { href: '/contacts', label: 'Связаться с командой' }
             ]}
             emptyTitle="Программ пока нет"
             excludedItemIds={excludedIds}
             rowActionLabel="Записаться"
             sectionId="education-list"
             secondaryEmptyActions={[
-              { href: '/contacts?topic=education-program#contact-form', label: 'Написать' }
+              { href: '/contacts#contact-form', label: 'Написать' }
             ]}
             secondaryEmptyDescription="Напишите нам, если нужен другой формат."
             secondaryEmptyTitle="Больше программ скоро"
@@ -179,10 +177,6 @@ export default async function EducationPage({ searchParams }: EducationPageProps
 
       {isPrelaunchEmpty ? (
         <PublicPrelaunchSection
-          actions={[
-            { href: '/contacts?topic=education-program#contact-form', label: 'Предложить программу' },
-            { href: '/contacts?topic=education-launch#contact-form', label: 'Связаться с нами', variant: 'secondary' }
-          ]}
           badges={['Раздел уже принимает заявки', 'Подходит для открытых и корпоративных форматов']}
           cards={[
             {

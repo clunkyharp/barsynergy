@@ -25,7 +25,7 @@ export default async function PasswordResetConfirmPage({ searchParams }: Passwor
     return (
       <AuthSplitLayout>
         <div className="text-center">
-          <h1 className="text-[28px] font-bold leading-[1.18] tracking-normal text-[var(--text)]">
+          <h1 className="text-[28px] font-bold leading-[1.20] text-balance tracking-normal text-[var(--text)]">
             Неверная ссылка
           </h1>
           <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
@@ -41,7 +41,7 @@ export default async function PasswordResetConfirmPage({ searchParams }: Passwor
 
   return (
     <AuthSplitLayout>
-      <h1 className="text-[28px] font-bold leading-[1.18] tracking-normal text-[var(--text)]">
+      <h1 className="text-[28px] font-bold leading-[1.20] text-balance tracking-normal text-[var(--text)]">
         Новый пароль
       </h1>
       <p className="mt-2 text-sm leading-6 text-[var(--muted)]">

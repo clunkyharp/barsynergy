@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Mail } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ConversationListTabs } from '@/components/messaging/conversation-list-tabs';
+import { EmptyState } from '@/components/ui/empty-state';
 import { PageHeader } from '@/components/ui/page-header';
 import { Panel } from '@/components/ui/panel';
 import { StatusBadge } from '@/components/ui/status-badge';
@@ -10,6 +11,7 @@ import { AppLink } from '@/components/ui/app-link';
 import { requireBusinessAccountAccess } from '@/lib/auth/require-business-account';
 import { firstParam } from '@/lib/admin/content-utils';
 import { getUnreadMessageCounts } from '@/lib/messaging/get-conversation';
+import { sortConversationsByUnread } from '@/lib/messaging/sort-conversations-by-unread';
 import { parseConversationStatusGroup } from '@/lib/messaging/conversation-status-groups';
 import { buildPrivatePageMetadata } from '@/lib/public/metadata';
 import {
@@ -38,37 +40,29 @@ export default async function BusinessResponsesPage({ searchParams }: BusinessRe
 
   const responseIds = responses.map((r) => r.id);
   const unreadCounts = await getUnreadMessageCounts(responseIds, 'business');
+  const sortedResponses = sortConversationsByUnread(responses, unreadCounts);
 
   return (
     <div className="space-y-6">
-      <PageHeader bare title="Отклики" />
+      <PageHeader title="Отклики" />
 
       <ConversationListTabs value={statusGroup} />
 
       {responses.length === 0 ? (
-        <Panel className="max-w-xl" padding="lg">
-          <div className="flex flex-col items-start gap-4">
-            <span className="inline-flex h-11 w-11 items-center justify-center rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--accent-soft)] text-[var(--accent)]">
-              <Mail aria-hidden="true" size={20} strokeWidth={1.8} />
-            </span>
-            <div>
-              <h2 className="text-xl font-semibold leading-7 text-[var(--text)]">
-                {statusGroup === 'active' ? 'Откликов пока нет' : 'В этом разделе пусто'}
-              </h2>
-              <p className="mt-2 max-w-md text-sm leading-6 text-[var(--muted)]">
-                {statusGroup === 'active'
-                  ? 'Когда кандидаты начнут откликаться на ваши вакансии, отклики появятся здесь.'
-                  : 'Переключите вкладку или вернитесь к активным откликам.'}
-              </p>
-            </div>
-            <Button href={statusGroup === 'active' ? '/business/cabinet/requests' : '/business/cabinet/responses'}>
-              {statusGroup === 'active' ? 'К заявкам' : 'Активные отклики'}
-            </Button>
-          </div>
-        </Panel>
+        <EmptyState
+          icon={Mail}
+          title={statusGroup === 'active' ? 'Откликов пока нет' : 'В этом разделе пусто'}
+          description={statusGroup === 'active'
+            ? 'Когда кандидаты начнут откликаться на ваши вакансии, отклики появятся здесь.'
+            : 'Переключите вкладку или вернитесь к активным откликам.'}
+          actions={[{
+            label: statusGroup === 'active' ? 'К заявкам' : 'Активные отклики',
+            href: statusGroup === 'active' ? '/business/cabinet/requests' : '/business/cabinet/responses'
+          }]}
+        />
       ) : (
         <div className="space-y-4">
-          {responses.map((response) => (
+          {sortedResponses.map((response) => (
             <Panel key={response.id} className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between" padding="md" tone="elevated">
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">

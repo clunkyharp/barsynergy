@@ -17,14 +17,15 @@ test('homepage featured card keeps metadata only in the top badge row', () => {
   const featuredCardEnd = source.indexOf('export function EditorialSupportCard');
   const featuredCardSource = source.slice(featuredCardStart, featuredCardEnd);
 
-  assert.match(source, /function getVisibleFeaturedMeta\(card: HomepageLiveCard\)/);
-  assert.match(source, /const hiddenMeta = new Set\(\['Открытый доступ', card\.eyebrow\]\.map\(normalizedMetaKey\)\)/);
-  assert.match(source, /seenMeta\.has\(key\)/);
-  assert.match(featuredCardSource, /const visibleMeta = getVisibleFeaturedMeta\(card\)/);
+  assert.match(source, /function extractReadingTime\(meta: string\[\]\): string \| undefined/);
+  assert.match(source, /function buildFeaturedFooterMeta\(card: HomepageLiveCard\): string/);
+  assert.match(source, /const kindLabels: Record<string, string>/);
+  assert.match(source, /function supportMetaText\(card: HomepageLiveCard\)/);
+  assert.match(featuredCardSource, /const footerMeta = buildFeaturedFooterMeta\(card\)/);
   assert.match(featuredCardSource, /editorial-featured/);
-  assert.match(featuredCardSource, /editorial-featured-chips/);
   assert.match(featuredCardSource, /editorial-featured-footer/);
   assert.match(featuredCardSource, /editorial-featured-cta/);
+  assert.match(featuredCardSource, /\{footerMeta\}/);
   assert.doesNotMatch(featuredCardSource, /const footerMeta = compactMeta\(card\)/);
   assert.doesNotMatch(featuredCardSource, /featured-now-footnote/);
   assert.doesNotMatch(featuredCardSource, /justify-between/);
@@ -47,14 +48,15 @@ test('homepage hero explains the product with one primary action and no search',
   assert.match(heroSource, /accentFont\.className/);
   assert.match(heroSource, /BARSYNERGY/);
   assert.match(heroSource, /max-w-\[58rem\]/);
-  assert.match(heroSource, /leading-\[1\.04\]/);
+  assert.match(heroSource, /leading-\[1\.20\]/);
   assert.doesNotMatch(heroSource, /max-w-\[19ch\]/);
   assert.doesNotMatch(heroSource, /leading-\[0\.98\]/);
-  assert.match(heroSource, /Обучение, вакансии, поставщики, события и инструменты/);
-  assert.match(heroSource, /Платформа для кофейных баров СКФО/);
+  assert.match(heroSource, /обучение, вакансии, поставщики, события и инструменты/);
+  assert.match(heroSource, /Платформа кофейной индустрии СКФО/);
   assert.doesNotMatch(heroSource, /Платформа, которая объединяет/);
   assert.match(heroSource, /Смотреть вакансии/);
-  assert.match(heroSource, /Найти обучение/);
+  assert.match(heroSource, /Создать профиль/);
+  assert.match(heroSource, /Запросить бизнес-доступ/);
   assert.doesNotMatch(heroSource, /home-hero-search/);
   assert.doesNotMatch(heroSource, /action="\/search"/);
   assert.doesNotMatch(heroSource, /Глобальный поиск по платформе/);
@@ -72,9 +74,9 @@ test('homepage hero explains the product with one primary action and no search',
 test('homepage stats animate once when the stats row enters the viewport', () => {
   const statsSource = readProjectFile('src/components/public/homepage-hero.tsx');
 
-  assert.match(statsSource, /statItems = \[/);
+  assert.match(statsSource, /const allItems = \[/);
   assert.match(statsSource, /\.filter\(\(item\) => item\.value > 0\)/);
-  assert.match(statsSource, /if \(statItems\.length === 0\) \{/);
+  assert.match(statsSource, /if \(statItems\.length < 2\) \{/);
   assert.doesNotMatch(statsSource, /IntersectionObserver/);
   assert.doesNotMatch(statsSource, /requestAnimationFrame/);
   assert.doesNotMatch(statsSource, /setDisplayValues/);
@@ -109,12 +111,12 @@ test('homepage mobile rules keep the first screen and scannable cards phone-nati
   const menuSource = readProjectFile('src/components/layout/mobile-site-menu.tsx');
   const css = readGlobalStyles();
 
-  assert.match(heroSource, /min-h-\[100svh\]/);
-  assert.match(heroSource, /mt-8 flex flex-col gap-3 sm:flex-row/);
-  assert.match(source, /background-zone background-zone-ivory border-b border-\[var\(--line\)\] py-12 md:py-16/);
-  assert.match(source, /grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 md:gap-4/);
-  assert.match(source, /home-section-card group relative flex min-h-\[140px\]/);
-  assert.match(source, /inline-flex h-11 w-11 items-center justify-center rounded-\[var\(--radius-sm\)\] bg-\[var\(--accent\)\] text-white/);
+  assert.match(heroSource, /max-md:items-start md:items-center/);
+  assert.match(heroSource, /md:min-h-\[720px\] lg:min-h-\[760px\]/);
+  assert.match(heroSource, /mt-auto flex flex-col gap-2 pt-4 sm:flex-row sm:flex-wrap/);
+  assert.match(source, /editorial-current-section scroll-mt-28 border-b border-white\/8 py-12 md:py-20/);
+  assert.match(source, /editorial-current-support-row grid grid-cols-1 gap-4 sm:grid-cols-3 md:gap-5/);
+  assert.match(source, /grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3/);
   assert.match(headerSource, /min-h-\[56px\]/);
   assert.match(headerSource, /xl:min-h-\[64px\]/);
   assert.match(menuSource, /fixed inset-0/);
@@ -129,8 +131,9 @@ test('homepage mobile rules keep the first screen and scannable cards phone-nati
 test('homepage section badges and inline icons use the filled square accent treatment', () => {
   const source = readProjectFile('src/components/public/homepage-client.tsx');
 
-  assert.match(source, /rounded-\[var\(--radius-sm\)\] bg-\[var\(--accent\)\] text-white/);
-  assert.match(source, /<tool\.icon size=\{18\} strokeWidth=\{1\.5\} \/>/);
+  assert.match(source, /<EditorialSupportCard/);
+  assert.match(source, /actionLabel=\{card\.actionLabel\}/);
+  assert.match(source, /label=\{card\.eyebrow\}/);
   assert.doesNotMatch(source, /rounded-full bg-\[var\(--accent-soft\)\] text-\[var\(--accent\)\]/);
 });
 

@@ -16,7 +16,6 @@ import { ConsentField } from '@/components/ui/consent-field';
 import { FormField, FormSection } from '@/components/ui/form-field';
 import { InlineLink } from '@/components/ui/inline-link';
 import { Input } from '@/components/ui/input';
-import { MetaChip } from '@/components/ui/meta-chip';
 import { Select } from '@/components/ui/select';
 import { SubmitButton } from '@/components/ui/submit-button';
 import { Textarea } from '@/components/ui/textarea';
@@ -59,14 +58,6 @@ export function BusinessSolutionForm({ enabled, utm, cities, defaults = {}, dire
               Укажите данные, по которым команда сможет связаться и уточнить карточку.
             </PublicBodyText>
 
-            <div className="mt-6 flex flex-wrap gap-2">
-              {businessVenueTypeOptions.map((option) => (
-                <MetaChip className="px-3 py-2 text-white/80" key={option.value} variant="inverse">
-                  {option.label}
-                </MetaChip>
-              ))}
-            </div>
-
             <div className="mt-8 border-t border-white/10 pt-5">
               <PublicEyebrow tone="inverse">Данные для карточки</PublicEyebrow>
               <ol className="mt-4 space-y-3 text-sm leading-6 text-white/85">
@@ -87,7 +78,7 @@ export function BusinessSolutionForm({ enabled, utm, cities, defaults = {}, dire
           </div>
 
           <div className="relative p-5 md:p-6">
-            <FormSection title="Контакт">
+            <FormSection title="Контактные данные">
               <div className="grid gap-4 md:grid-cols-2">
                 <FormField htmlFor="businessProjectName" label="Название заведения">
                   <Input
@@ -113,9 +104,9 @@ export function BusinessSolutionForm({ enabled, utm, cities, defaults = {}, dire
                     required
                   />
                 </FormField>
-                <ContactChannelFieldset className="md:col-span-2" emailId="businessEmail" phoneId="businessPhone" telegramId="businessTelegram" />
               </div>
             </FormSection>
+            <ContactChannelFieldset emailId="businessEmail" phoneId="businessPhone" telegramId="businessTelegram" />
             <FormSection title="О заведении">
               <div className="grid gap-4 md:grid-cols-2">
                 <FormField htmlFor="businessCityId" label="Город">

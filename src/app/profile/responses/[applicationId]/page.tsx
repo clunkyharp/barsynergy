@@ -52,7 +52,7 @@ export default async function ResponseDetailPage({ params }: ResponseDetailPageP
 
   return (
     <div className="space-y-6">
-      <PageHeader bare title={application.subject ?? applicationTypeLabels[application.type]} />
+      <PageHeader title={application.subject ?? applicationTypeLabels[application.type]} />
 
       <Panel padding="md" tone="elevated">
         <div className="flex flex-wrap items-center justify-between gap-3">

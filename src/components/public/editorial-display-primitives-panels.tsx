@@ -140,14 +140,14 @@ export function ProgramFormatMatrix({ items, className, ...props }: PrimitiveShe
                   <div className="flex flex-col rounded-[var(--radius-sm)] border border-[var(--border-subtle)] bg-[var(--surface-card-muted)] px-3 py-2.5">
                     <span className="flex items-center gap-2">
                       <User size={14} strokeWidth={1.8} className="shrink-0 text-[var(--accent)]" />
-                      <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">Для кого</span>
+                      <span className="text-[11px] font-semibold uppercase tracking-[var(--tracking-eyebrow-sm)] text-[var(--muted)]">Для кого</span>
                     </span>
                     <p className="mt-1 flex-1 text-[13px] leading-5 text-[var(--text)]">{item.audience}</p>
                   </div>
                   <div className="flex flex-col rounded-[var(--radius-sm)] border border-[var(--border-subtle)] bg-[var(--surface-card-muted)] px-3 py-2.5">
                     <span className="flex items-center gap-2">
                       <Check size={14} strokeWidth={1.8} className="shrink-0 text-[var(--accent)]" />
-                      <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">Что получите</span>
+                      <span className="text-[11px] font-semibold uppercase tracking-[var(--tracking-eyebrow-sm)] text-[var(--muted)]">Что получите</span>
                     </span>
                     <p className="mt-1 flex-1 text-[13px] leading-5 text-[var(--text)]">{item.result}</p>
                   </div>

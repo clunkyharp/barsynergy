@@ -41,7 +41,7 @@ export default async function AdminLoginPage() {
         </header>
 
         <main className="rounded-[var(--radius-lg)] border border-[var(--border-subtle)] bg-[var(--surface-muted)] p-6 shadow-[var(--shadow-panel)] md:p-8">
-          <h1 className="text-[30px] font-bold leading-[1.18] tracking-normal text-[var(--text)]">Вход для команды</h1>
+          <h1 className="text-[30px] font-bold leading-[1.20] text-balance tracking-normal text-[var(--text)]">Вход для команды</h1>
           <p className="mt-3 text-base leading-7 text-[var(--muted)]">
             Для редакции и администраторов BARSYNERGY.
           </p>

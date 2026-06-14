@@ -161,7 +161,7 @@ export function RoleTaskCard({
 
         {quickLinks?.length ? (
           <div className="mt-4">
-            <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--muted)]">Быстрые переходы</p>
+            <p className="text-[10px] font-bold uppercase tracking-[var(--tracking-marker)] text-[var(--muted)]">Быстрые переходы</p>
             <div className="mt-2 flex flex-wrap gap-2">
               {quickLinks.map((link) => (
                 <Link
@@ -179,7 +179,7 @@ export function RoleTaskCard({
 
         {meta ? (
           <div className="mt-4">
-            {metaLabel ? <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--muted)]">{metaLabel}</p> : null}
+            {metaLabel ? <p className="text-[10px] font-bold uppercase tracking-[var(--tracking-marker)] text-[var(--muted)]">{metaLabel}</p> : null}
             <p
               className={cn(
                 'public-card-meta mt-1 w-fit',
@@ -246,7 +246,7 @@ export function FeatureCard({
             <dl className="mt-3 grid gap-2">
               {details.map((detail, index) => (
                 <div className="grid grid-cols-[5rem_minmax(0,1fr)] gap-3 rounded-[var(--radius-sm)] border border-[var(--border-subtle)] bg-[var(--surface-card-muted)] px-3 py-2.5" key={index}>
-                  <dt className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">{detail.label}</dt>
+                  <dt className="text-[11px] font-semibold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--muted)]">{detail.label}</dt>
                   <dd className="text-sm leading-6 text-[var(--text)]">{detail.value}</dd>
                 </div>
               ))}
@@ -296,7 +296,7 @@ export function FeatureCard({
         <dl className="mt-4 grid gap-2">
           {details.map((detail, index) => (
             <div className="grid grid-cols-[5rem_minmax(0,1fr)] gap-3 rounded-[var(--radius-sm)] border border-[var(--border-subtle)] bg-[var(--surface-card-muted)] px-3 py-2.5" key={index}>
-              <dt className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">{detail.label}</dt>
+              <dt className="text-[11px] font-semibold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--muted)]">{detail.label}</dt>
               <dd className="text-sm leading-6 text-[var(--text)]">{detail.value}</dd>
             </div>
           ))}

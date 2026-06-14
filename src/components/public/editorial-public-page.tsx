@@ -203,7 +203,7 @@ export function EditorialPublicPage({
                       className="public-card-shell min-w-[9rem] px-3 py-2"
                       key={`${metric.value}-${metric.label}`}
                     >
-                      <dt className="text-[11px] font-semibold uppercase tracking-[0.13em] text-[var(--muted)]">{metric.label}</dt>
+                      <dt className="text-[11px] font-semibold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--muted)]">{metric.label}</dt>
                       <dd className="mt-1 text-lg font-semibold leading-6 text-[var(--text)]">{metric.value}</dd>
                     </div>
                   ))}
@@ -218,7 +218,7 @@ export function EditorialPublicPage({
                     className="public-card-shell flex min-h-[12rem] flex-col p-4"
                     key={`${row.label}-${row.title}`}
                   >
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--accent)]">{row.label}</p>
+                    <p className="text-[11px] font-semibold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--accent)]">{row.label}</p>
                     <h2 className="mt-4 text-lg font-semibold leading-7 text-[var(--text)]">{row.title}</h2>
                     <PublicBodyText className="mt-2 max-w-3xl" size="sm">
                       {row.description}

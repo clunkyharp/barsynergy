@@ -14,7 +14,7 @@ import type { PublicApplicationResult } from '@/lib/applications/public-form-hel
 import { AppLink } from '@/components/ui/app-link';
 import { Button } from '@/components/ui/button';
 import { ConsentField } from '@/components/ui/consent-field';
-import { FormField } from '@/components/ui/form-field';
+import { FormField, FormSection } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
 import { InlineLink } from '@/components/ui/inline-link';
 import { Select } from '@/components/ui/select';
@@ -119,11 +119,13 @@ export function EducationApplicationForms({ enabled, utm, cities, defaults = {},
               description="Укажите тему, город и что нужно разобрать на занятии."
             />
             <div className="relative p-5 md:p-6">
-              <div className="grid gap-4">
+              <FormSection title="Контактные данные">
                 <FormField htmlFor="courseName" label="Имя">
                   <Input id="courseName" name="name" required maxLength={160} minLength={2} placeholder="Иван Иванов" />
                 </FormField>
-                <ContactChannelFieldset emailId="courseEmail" phoneId="coursePhone" telegramId="courseTelegram" />
+              </FormSection>
+              <ContactChannelFieldset emailId="courseEmail" phoneId="coursePhone" telegramId="courseTelegram" />
+              <div className="grid gap-4">
                 <div className="grid gap-4 sm:grid-cols-2">
                   <FormField htmlFor="courseCityId" label="Город">
                     <Select id="courseCityId" name="cityId" defaultValue="">
@@ -166,14 +168,18 @@ export function EducationApplicationForms({ enabled, utm, cities, defaults = {},
               description="Опишите команду, задачу, город и желаемые сроки."
             />
             <div className="relative p-5 md:p-6">
+              <FormSection title="Контактные данные">
+                <div className="grid gap-4 md:grid-cols-2">
+                  <FormField htmlFor="trainingCompanyName" label="Компания">
+                    <Input id="trainingCompanyName" name="companyName" required maxLength={180} minLength={2} placeholder="Например, Coffee Point" />
+                  </FormField>
+                  <FormField htmlFor="trainingContactName" label="Контактное лицо">
+                    <Input id="trainingContactName" name="contactName" required maxLength={160} minLength={2} placeholder="Иван Иванов" />
+                  </FormField>
+                </div>
+              </FormSection>
+              <ContactChannelFieldset emailId="trainingEmail" phoneId="trainingPhone" telegramId="trainingTelegram" />
               <div className="grid gap-4">
-                <FormField htmlFor="trainingCompanyName" label="Компания">
-                  <Input id="trainingCompanyName" name="companyName" required maxLength={180} minLength={2} placeholder="Например, Coffee Point" />
-                </FormField>
-                <FormField htmlFor="trainingContactName" label="Контактное лицо">
-                  <Input id="trainingContactName" name="contactName" required maxLength={160} minLength={2} placeholder="Иван Иванов" />
-                </FormField>
-                <ContactChannelFieldset emailId="trainingEmail" phoneId="trainingPhone" telegramId="trainingTelegram" />
                 <div className="grid gap-4 sm:grid-cols-2">
                   <FormField htmlFor="trainingCityId" label="Город">
                     <Select id="trainingCityId" name="cityId" defaultValue="">
@@ -225,14 +231,18 @@ export function EducationApplicationForms({ enabled, utm, cities, defaults = {},
               description="Укажите получателя, сумму или формат и контакт для связи."
             />
             <div className="relative p-5 md:p-6">
+              <FormSection title="Контактные данные">
+                <div className="grid gap-4 md:grid-cols-2">
+                  <FormField htmlFor="certificateCustomerName" label="Ваше имя">
+                    <Input id="certificateCustomerName" name="name" required maxLength={160} minLength={2} placeholder="Иван Иванов" />
+                  </FormField>
+                  <FormField htmlFor="recipientName" label="Получатель сертификата">
+                    <Input id="recipientName" name="recipientName" required maxLength={160} minLength={2} placeholder="Мария Петрова" />
+                  </FormField>
+                </div>
+              </FormSection>
+              <ContactChannelFieldset emailId="certificateEmail" phoneId="certificatePhone" telegramId="certificateTelegram" />
               <div className="grid gap-4 md:grid-cols-2">
-                <FormField htmlFor="certificateCustomerName" label="Ваше имя">
-                  <Input id="certificateCustomerName" name="name" required maxLength={160} minLength={2} placeholder="Иван Иванов" />
-                </FormField>
-                <FormField htmlFor="recipientName" label="Получатель сертификата">
-                  <Input id="recipientName" name="recipientName" required maxLength={160} minLength={2} placeholder="Мария Петрова" />
-                </FormField>
-                <ContactChannelFieldset className="md:col-span-2" emailId="certificateEmail" phoneId="certificatePhone" telegramId="certificateTelegram" />
                 <FormField htmlFor="certificateCityId" label="Город">
                   <Select id="certificateCityId" name="cityId" defaultValue="">
                     <option value="">Не указан</option>

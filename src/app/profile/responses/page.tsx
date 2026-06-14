@@ -5,6 +5,7 @@ import type { Prisma } from '@/modules/admin/queries';
 import { AppLink } from '@/components/ui/app-link';
 import { Button } from '@/components/ui/button';
 import { ConversationListTabs } from '@/components/messaging/conversation-list-tabs';
+import { EmptyState } from '@/components/ui/empty-state';
 import { Input } from '@/components/ui/input';
 import { PageHeader } from '@/components/ui/page-header';
 import { Panel } from '@/components/ui/panel';
@@ -17,6 +18,7 @@ import {
 import { firstParam } from '@/lib/admin/content-utils';
 import { getCurrentUser } from '@/lib/auth/current-user';
 import { getUnreadMessageCounts } from '@/lib/messaging/get-conversation';
+import { sortConversationsByUnread } from '@/lib/messaging/sort-conversations-by-unread';
 import { getConversationStatusFilter, parseConversationStatusGroup } from '@/lib/messaging/conversation-status-groups';
 import { buildPrivatePageMetadata } from '@/lib/public/metadata';
 import {
@@ -65,6 +67,7 @@ export default async function ProfileResponsesPage({ searchParams }: ProfileResp
 
   const responseIds = responses.map((r) => r.id);
   const unreadCounts = await getUnreadMessageCounts(responseIds, 'user');
+  const sortedResponses = sortConversationsByUnread(responses, unreadCounts);
 
   const totalPages = Math.ceil(totalCount / PAGE_SIZE);
 
@@ -85,7 +88,7 @@ export default async function ProfileResponsesPage({ searchParams }: ProfileResp
 
   return (
     <div className="space-y-6">
-      <PageHeader bare title="Мои отклики" />
+      <PageHeader title="Мои отклики" />
 
       <ConversationListTabs value={statusGroup} />
 
@@ -103,31 +106,20 @@ export default async function ProfileResponsesPage({ searchParams }: ProfileResp
 
       <div className="space-y-4">
         {responses.length === 0 ? (
-          <Panel className="max-w-xl" padding="lg">
-            <div className="flex flex-col items-start gap-4">
-              <span className="inline-flex h-11 w-11 items-center justify-center rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--accent-soft)] text-[var(--accent)]">
-                <Mail aria-hidden="true" size={20} strokeWidth={1.8} />
-              </span>
-              <div>
-                <h2 className="text-xl font-semibold leading-7 text-[var(--text)]">
-                  {q || statusGroup !== 'active' ? 'Ничего не найдено' : 'Откликов пока нет'}
-                </h2>
-                <p className="mt-2 max-w-md text-sm leading-6 text-[var(--muted)]">
-                  {q || statusGroup !== 'active'
-                    ? 'Попробуйте изменить параметры поиска.'
-                    : 'Найдите вакансию, войдите в аккаунт и откликнитесь — отклики появятся здесь. Отклики, отправленные без входа, могут не отображаться в истории.'}
-                </p>
-              </div>
-              {q || statusGroup !== 'active' ? (
-                <Button href="/profile/responses" variant="secondary">Сбросить фильтры</Button>
-              ) : (
-                <Button href="/vacancies">Смотреть вакансии →</Button>
-              )}
-            </div>
-          </Panel>
+          <EmptyState
+            icon={Mail}
+            title={q || statusGroup !== 'active' ? 'Ничего не найдено' : 'Откликов пока нет'}
+            description={q || statusGroup !== 'active'
+              ? 'Попробуйте изменить параметры поиска.'
+              : 'Отклики на вакансии появятся здесь после отправки из аккаунта.'}
+            actions={[{
+              label: q || statusGroup !== 'active' ? 'Сбросить фильтры' : 'Смотреть вакансии →',
+              href: q || statusGroup !== 'active' ? '/profile/responses' : '/vacancies'
+            }]}
+          />
         ) : (
           <>
-            {responses.map((response) => (
+            {sortedResponses.map((response) => (
               <Panel className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between" key={response.id} padding="md" tone="elevated">
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">

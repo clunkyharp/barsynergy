@@ -21,7 +21,9 @@ test('shared public contact fields include concrete placeholder examples', () =>
 test('auth and public request forms use example placeholders for key free-text fields', () => {
   const sources = [
     'src/app/auth/login/page.tsx',
+    'src/app/auth/login/_components/login-form.tsx',
     'src/app/auth/password-reset/page.tsx',
+    'src/app/auth/password-reset/_components/password-reset-forms.tsx',
     'src/components/public/contact-application-form.tsx',
     'src/components/public/vacancy-application-forms.tsx',
     'src/components/public/education-application-forms.tsx',

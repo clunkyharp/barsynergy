@@ -8,3 +8,7 @@
 @import "./styles/ui-primitives.css" layer(ui-primitives);
 @import "./styles/public.css" layer(public);
 @import "./styles/admin.css" layer(admin);
+
+@utility line-eight {
+  line-height: 1.20;
+}

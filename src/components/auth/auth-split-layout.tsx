@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import type { ReactNode } from 'react';
-import { ArrowUpRight, BookOpen, BriefcaseBusiness, GraduationCap, PackageCheck } from 'lucide-react';
+import { ArrowLeft, ArrowUpRight, BookOpen, BriefcaseBusiness, GraduationCap, PackageCheck } from 'lucide-react';
 import { AppLink } from '@/components/ui/app-link';
 
 type AuthSplitLayoutProps = {
@@ -16,7 +16,7 @@ const highlights = [
 
 export function AuthSplitLayout({ children }: AuthSplitLayoutProps) {
   return (
-    <div className="flex min-h-screen">
+    <div className="auth-login-screen flex min-h-screen">
       {/* Left — dark brand panel */}
       <aside className="hidden w-[480px] shrink-0 flex-col justify-between bg-[var(--editorial-dark-surface)] p-10 xl:flex" data-theme="dark">
         <div>
@@ -64,7 +64,7 @@ export function AuthSplitLayout({ children }: AuthSplitLayoutProps) {
             <AppLink href="/">
               <Image
                 alt="BARSYNERGY"
-                className="h-auto w-[160px] theme-logo-light"
+                className="h-auto w-[176px] theme-logo-light md:w-[198px]"
                 height={31}
                 priority
                 src="/brand/barsynergy-lockup.svg"
@@ -72,12 +72,16 @@ export function AuthSplitLayout({ children }: AuthSplitLayoutProps) {
               />
               <Image
                 alt="BARSYNERGY"
-                className="h-auto w-[160px] theme-logo-dark"
+                className="h-auto w-[176px] theme-logo-dark md:w-[198px]"
                 height={31}
                 priority
                 src="/brand/barsynergy-lockup-light.svg"
                 width={360}
               />
+            </AppLink>
+            <AppLink className="mt-3 inline-flex items-center gap-2 text-sm font-semibold text-[var(--accent)]" href="/">
+              <ArrowLeft aria-hidden size={15} strokeWidth={1.8} />
+              Вернуться на сайт
             </AppLink>
           </div>
           {children}

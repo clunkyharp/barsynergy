@@ -182,7 +182,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         eyebrow="Поиск"
         title="Поиск по платформе"
         subtitle="Ищите вакансии, поставщиков, материалы, обучение, события и партнёров одним запросом."
-        tone="light-editorial"
+        tone="graphite"
         density="compact"
         bottom={hasQuery ? { kind: 'stats' as const, items: [{ value: String(totalResults), label: 'результатов' }] } : undefined}
       />
@@ -217,25 +217,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
               Найти
             </Button>
           </form>
-          <div className="mt-3 flex flex-wrap gap-2">
-            {suggestionChips.map((chip) => {
-              const isActive = q.toLowerCase() === chip.toLowerCase();
-              return (
-                <Link
-                  className={[
-                    'inline-flex min-h-9 items-center rounded-[var(--radius-pill)] border px-3.5 text-sm font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]',
-                    isActive
-                      ? 'border-[var(--accent)] bg-[var(--accent-soft)] text-[var(--accent)]'
-                      : 'border-[var(--line)] bg-[var(--surface)] text-[var(--muted)] hover:border-[var(--accent)] hover:text-[var(--accent)]',
-                  ].join(' ')}
-                  href={`/search?q=${encodeURIComponent(chip)}`}
-                  key={chip}
-                >
-                  {chip}
-                </Link>
-              );
-            })}
-          </div>
+
         </div>
       </section>
 

@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 import { AppLink } from '@/components/ui/app-link';
 import { Button } from '@/components/ui/button';
 import { ConversationListTabs } from '@/components/messaging/conversation-list-tabs';
+import { EmptyState } from '@/components/ui/empty-state';
 import { PageHeader } from '@/components/ui/page-header';
 import { Panel } from '@/components/ui/panel';
 import { StatusBadge } from '@/components/ui/status-badge';
@@ -14,6 +15,7 @@ import {
 } from '@/lib/admin/application-utils';
 import { getCurrentUser } from '@/lib/auth/current-user';
 import { getUnreadMessageCounts } from '@/lib/messaging/get-conversation';
+import { sortConversationsByUnread } from '@/lib/messaging/sort-conversations-by-unread';
 import { parseConversationStatusGroup } from '@/lib/messaging/conversation-status-groups';
 import { buildPrivatePageMetadata } from '@/lib/public/metadata';
 import {
@@ -50,6 +52,7 @@ export default async function ProfileInquiriesPage({ searchParams }: ProfileInqu
   const [inquiries, totalCount] = await getUserInquiries(user.id, statusGroup, sort, page, PAGE_SIZE);
   const inquiryIds = inquiries.map((i) => i.id);
   const unreadCounts = await getUnreadMessageCounts(inquiryIds, 'user');
+  const sortedInquiries = sortConversationsByUnread(inquiries, unreadCounts);
   const totalPages = Math.ceil(totalCount / PAGE_SIZE);
 
   function filterHref(overrides: Record<string, string | undefined>) {
@@ -68,7 +71,7 @@ export default async function ProfileInquiriesPage({ searchParams }: ProfileInqu
 
   return (
     <div className="space-y-6">
-      <PageHeader bare title="Запросы поставщикам" />
+      <PageHeader title="Запросы поставщикам" />
 
       <ConversationListTabs value={statusGroup} />
 
@@ -80,29 +83,20 @@ export default async function ProfileInquiriesPage({ searchParams }: ProfileInqu
 
       <div className="space-y-4">
         {inquiries.length === 0 ? (
-          <Panel className="max-w-xl" padding="lg">
-            <div className="flex flex-col items-start gap-4">
-              <span className="inline-flex h-11 w-11 items-center justify-center rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--accent-soft)] text-[var(--accent)]">
-                <MessageSquare aria-hidden="true" size={20} strokeWidth={1.8} />
-              </span>
-              <div>
-                <h2 className="text-xl font-semibold leading-7 text-[var(--text)]">
-                  {statusGroup === 'active' ? 'Запросов пока нет' : 'В этом разделе пусто'}
-                </h2>
-                <p className="mt-2 max-w-md text-sm leading-6 text-[var(--muted)]">
-                  {statusGroup === 'active'
-                    ? 'Найдите поставщика в каталоге и отправьте запрос — переписка появится здесь.'
-                    : 'Переключите вкладку или сбросьте фильтры.'}
-                </p>
-              </div>
-              <Button href={statusGroup === 'active' ? '/suppliers' : '/profile/inquiries'}>
-                {statusGroup === 'active' ? 'Смотреть поставщиков' : 'Сбросить фильтры'}
-              </Button>
-            </div>
-          </Panel>
+          <EmptyState
+            icon={MessageSquare}
+            title={statusGroup === 'active' ? 'Запросов пока нет' : 'В этом разделе пусто'}
+            description={statusGroup === 'active'
+              ? 'Найдите поставщика в каталоге и отправьте запрос — переписка появится здесь.'
+              : 'Переключите вкладку или сбросьте фильтры.'}
+            actions={[{
+              label: statusGroup === 'active' ? 'Смотреть поставщиков' : 'Сбросить фильтры',
+              href: statusGroup === 'active' ? '/suppliers' : '/profile/inquiries'
+            }]}
+          />
         ) : (
           <>
-            {inquiries.map((inquiry) => (
+            {sortedInquiries.map((inquiry) => (
               <Panel className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between" key={inquiry.id} padding="md" tone="elevated">
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">

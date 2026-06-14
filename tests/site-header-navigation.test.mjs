@@ -34,7 +34,7 @@ test('public desktop header navigation is readable and keeps overlap guards', ()
   assert.match(typesSource, /export const desktopMoreNavItems = getNavItems\(\['\/articles', '\/tools\/cost-calculator', '\/consulting', '\/partners', '\/general-sponsors', '\/contacts'\]\)/);
   assert.match(source, /xl:inline-flex/);
   assert.doesNotMatch(source, /href="\/vacancies#vacancy-form"/);
-  assert.match(source, /href="\/contacts\?topic=vacancy#contact-form"/);
+  assert.match(source, /href="\/contacts#contact-form"/);
 });
 
 test('public desktop more menu opens by click and closes predictably', () => {
@@ -63,8 +63,8 @@ test('main public pages expose consistent breadcrumbs in their hero sections', (
   assert.match(editorialSource, /<PublicBreadcrumbs current=\{breadcrumbLabel \?\? eyebrow\}/);
 
   const standalonePages = [
-    ['src/app/(public)/general-sponsors/page.tsx', /<PublicBreadcrumbs current="Спонсорство"/],
-    ['src/app/(public)/about/page.tsx', /<PublicBreadcrumbs current="О проекте"/]
+    ['src/app/(public)/general-sponsors/page.tsx', /<PageHero[\s\S]*breadcrumbs=\{\[\{ label: 'Спонсорство' \}\]\}/],
+    ['src/app/(public)/about/page.tsx', /<PageHero[\s\S]*breadcrumbs=\{\[\{ label: 'О проекте' \}\]\}/]
   ];
 
   for (const [file, pattern] of standalonePages) {
@@ -72,6 +72,6 @@ test('main public pages expose consistent breadcrumbs in their hero sections', (
   }
 
   assert.match(readProjectFile('src/components/public/events-page-header.tsx'), /<PublicBreadcrumbs current="События" \/>/);
-  assert.match(readProjectFile('src/app/(public)/vacancies/page.tsx'), /<EditorialPublicPage[\s\S]*eyebrow="Вакансии"[\s\S]*path="\/vacancies"/);
-  assert.match(readProjectFile('src/app/(public)/tools/cost-calculator/page.tsx'), /breadcrumbLabel="Калькулятор себестоимости"/);
+  assert.match(readProjectFile('src/app/(public)/vacancies/page.tsx'), /<PageHero[\s\S]*title="Вакансии"/);
+  assert.match(readProjectFile('src/app/(public)/tools/cost-calculator/page.tsx'), /<PageHero[\s\S]*breadcrumbs=\{\[/);
 });

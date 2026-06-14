@@ -35,7 +35,7 @@ test('dark gray zones and public cards use the derived Miro neutrals instead of 
     css.indexOf(':root[data-theme="dark"] .background-zone-social {')
   );
 
-  assert.match(css, /:root\[data-theme="dark"\] \.background-zone-gray \{\n\s+--zone-surface: linear-gradient\(180deg, #14161b, #1b1f26\);/);
+  assert.match(css, /:root\[data-theme="dark"\] \.background-zone-gray \{\n\s+--zone-surface: linear-gradient\(180deg, rgb\(18 20 25 \/ 0\.96\), rgb\(24 26 31 \/ 0\.94\)\);/);
   assert.match(css, /:root\[data-theme="dark"\] \.public-card-shell \{/);
   assert.match(css, /background: var\(--surface-card\);/);
   assert.doesNotMatch(darkGrayBlock, /#11100e/);

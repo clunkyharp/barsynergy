@@ -1,7 +1,7 @@
 import type { ApplicationStatus as AppStatus } from '@prisma/client';
 import { updateApplicationProcessing } from '@/app/admin/applications/actions';
 import { HiddenRedirect } from '@/components/admin/content-admin-controls';
-import { Button } from '@/components/ui/button';
+import { ConfirmSubmitButton } from '@/components/ui/confirm-submit-button';
 import { Card } from '@/components/ui/card';
 import { FormField } from '@/components/ui/form-field';
 import { Select } from '@/components/ui/select';
@@ -47,7 +47,14 @@ export function ProcessingForm({ application, availableStatuses, forwardedInfo, 
         <FormField htmlFor="internalNotes" label="Внутренняя заметка">
           <Textarea className="min-h-40" defaultValue={application.internalNotes ?? ''} id="internalNotes" maxLength={4000} name="internalNotes" />
         </FormField>
-        <Button type="submit">Сохранить обработку</Button>
+        <ConfirmSubmitButton
+          confirmActionLabel="Сохранить"
+          confirmText="Статус и заметки будут обновлены. Некоторые изменения статуса необратимы."
+          confirmTitle="Сохранить обработку?"
+          type="submit"
+        >
+          Сохранить обработку
+        </ConfirmSubmitButton>
       </form>
     </Card>
   );

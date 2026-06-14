@@ -4,6 +4,7 @@ import { deleteSupplierDraft, updateSupplier, updateSupplierStatus } from '@/app
 import { AdminCmsActions, AdminCmsAdvancedSection, AdminCmsForm, AdminCmsGrid, AdminCmsSection, AdminCmsSummary } from '@/components/admin/admin-cms-form';
 import { AdminContentVisibilityPanel, CoverImageField, HiddenRedirect } from '@/components/admin/content-admin-controls';
 import { Button } from '@/components/ui/button';
+import { ConfirmSubmitButton } from '@/components/ui/confirm-submit-button';
 import { CheckboxField } from '@/components/ui/checkbox-field';
 import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
@@ -161,9 +162,15 @@ export default async function AdminSupplierEditPage({ params }: AdminSupplierEdi
       {supplier.status === ContentStatus.DRAFT ? (
         <form action={deleteSupplierDraft}>
           <input name="supplierId" type="hidden" value={supplier.id} />
-          <Button type="submit" variant="ghost">
+          <ConfirmSubmitButton
+            confirmActionLabel="Удалить"
+            confirmText="Это действие нельзя отменить."
+            confirmTitle="Удалить черновик?"
+            type="submit"
+            variant="ghost"
+          >
             Удалить черновик
-          </Button>
+          </ConfirmSubmitButton>
         </form>
       ) : null}
     </div>

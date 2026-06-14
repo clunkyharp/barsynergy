@@ -32,7 +32,7 @@ export function MarkupPricing({
 
       <div className="mt-4 grid gap-4 md:grid-cols-2">
         <div className="space-y-3">
-          <label className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-[var(--muted)]">
+          <label className="block text-[11px] font-semibold uppercase tracking-[var(--tracking-eyebrow-sm)] text-[var(--muted)]">
             Наценка
           </label>
           <div className="grid grid-cols-3 gap-2">
@@ -51,7 +51,7 @@ export function MarkupPricing({
         </div>
 
         <div className="space-y-3">
-          <label className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-[var(--muted)]">
+          <label className="block text-[11px] font-semibold uppercase tracking-[var(--tracking-eyebrow-sm)] text-[var(--muted)]">
             Округление цены
           </label>
           <Select
@@ -88,7 +88,7 @@ function MetricPill({
 }) {
   return (
     <div className="rounded-[var(--radius-sm)] border border-[var(--border-default)] bg-[var(--surface-wash)] px-3 py-2.5 text-center">
-      <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[var(--muted)]">{label}</p>
+      <p className="text-[10px] font-semibold uppercase tracking-[var(--tracking-eyebrow-sm)] text-[var(--muted)]">{label}</p>
       <p className="mt-1 text-base font-bold tabular-nums text-[var(--text)]">{value}</p>
     </div>
   );

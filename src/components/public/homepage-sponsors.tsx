@@ -10,7 +10,7 @@ export function HomeSponsorLogoStrip({ sponsors }: { sponsors: HomepageData['gen
         <div className="mx-auto max-w-[860px]">
           <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-4">
             <span className="h-px bg-[rgba(168,124,56,0.38)]" aria-hidden="true" />
-            <h2 className={`${accentFont.className} text-center text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--accent)]`} id="home-sponsors-title">
+            <h2 className={`${accentFont.className} text-center text-[10px] font-bold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--accent)]`} id="home-sponsors-title">
               Генеральные спонсоры сезона
             </h2>
             <span className="h-px bg-[rgba(168,124,56,0.38)]" aria-hidden="true" />

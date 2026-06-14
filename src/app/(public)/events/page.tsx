@@ -1,14 +1,14 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
-import { CategoryType } from '@/modules/content/shared/types';
 import { EventAgendaSection } from '@/components/public/platform-ui';
 import { PageHero } from '@/components/public/page-hero';
 import { PublicPrelaunchSection } from '@/components/public/public-prelaunch-section';
-import { EventsSearchBar, EventsCtaBanner } from '@/components/public/events-page-header';
+import { EventsSearchBar } from '@/components/public/events-page-header';
+import { EventsHeroActions } from '@/app/(public)/events/events-hero-actions';
 import { JsonLd } from '@/components/seo/json-ld';
 import { stripPublicApplicationResultParams } from '@/lib/applications/public-form-helpers';
 import { getPublishedEvents, hasActivePublicContentParams, type PublicContentSearchParams } from '@/lib/public/content';
-import { getEventFilterOptions, getPublicCategoryOptions, getPublicCityFilterOptions } from '@/lib/public/filter-options';
+import { getEventFilterOptions, getPublicCityFilterOptions } from '@/lib/public/filter-options';
 import { buildPublicPageMetadata } from '@/lib/public/metadata';
 import { buildStaticPageBreadcrumbJsonLd } from '@/lib/public/structured-data';
 
@@ -33,17 +33,15 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
   const selectedPeriod = firstParam(contentParams.period);
   const selectedCity = firstParam(contentParams.city);
   const selectedFormat = firstParam(contentParams.format);
-  const selectedCategory = firstParam(contentParams.category);
   const selectedQ = firstParam(contentParams.q);
 
   const eventListParams: PublicContentSearchParams = selectedPeriod
     ? contentParams
     : { ...contentParams, period: 'upcoming' };
 
-  const [content, filterCities, categories, filterOptions] = await Promise.all([
+  const [content, filterCities, filterOptions] = await Promise.all([
     getPublishedEvents(eventListParams),
     getPublicCityFilterOptions(),
-    getPublicCategoryOptions(CategoryType.EVENT),
     getEventFilterOptions()
   ]);
 
@@ -59,7 +57,9 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
         title="События"
         subtitle="Каппинги, чемпионаты, лекции, мастер-классы и встречи кофейного сообщества."
         tone="graphite"
-      />
+      >
+        <EventsHeroActions />
+      </PageHero>
 
       <EventsSearchBar
         cities={filterCities}
@@ -71,10 +71,6 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
 
       {isPrelaunchEmpty ? (
         <PublicPrelaunchSection
-          actions={[
-            { href: '/contacts?topic=event#contact-form', label: 'Добавить событие' },
-            { href: '/contacts', label: 'Связаться с нами', variant: 'secondary' }
-          ]}
           badges={['Афиша уже принимает заявки', 'Подходит для любых форматов']}
           cards={[
             {
@@ -108,7 +104,6 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
         </Suspense>
       )}
 
-      <EventsCtaBanner />
     </>
   );
 }

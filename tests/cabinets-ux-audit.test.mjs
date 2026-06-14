@@ -56,6 +56,33 @@ test('business cabinet overview links profile editing to settings instead of ren
   assert.match(sidebarSource, /Настройки/);
 });
 
+test('business next-action profile check has done state and seven-day auto-hide rule', () => {
+  const pageSource = readProjectFile('src/app/(business-workspace)/business/cabinet/page.tsx');
+  const componentSource = readProjectFile('src/components/business/business-cabinet.tsx');
+
+  assert.match(pageSource, /PROFILE_READY_ACTION_GRACE_MS = 7 \* 24 \* 60 \* 60 \* 1000/);
+  assert.match(pageSource, /profileReadyActionVisible/);
+  assert.match(pageSource, /Date\.now\(\) - businessAccount\.updatedAt\.getTime\(\) <= PROFILE_READY_ACTION_GRACE_MS/);
+  assert.match(pageSource, /\.\.\.\(profileReadyActionVisible/);
+  assert.match(pageSource, /status: missingProfileFields\.length > 0 \? 'нужно' : 'готово'/);
+  assert.match(componentSource, /item\.status === 'готово'/);
+  assert.match(componentSource, /CheckCircle2/);
+});
+
+test('business dashboard uses panel primitive for local dashboard surfaces', () => {
+  const pageSource = readProjectFile('src/app/(business-workspace)/business/cabinet/page.tsx');
+  const componentSource = readProjectFile('src/components/business/business-cabinet.tsx');
+
+  assert.match(pageSource, /import \{ Panel \} from '@\/components\/ui\/panel'/);
+  assert.match(pageSource, /<Panel padding="md" tone="elevated">/);
+  assert.match(pageSource, /<Panel className="grid gap-3 md:grid-cols-4/);
+  assert.match(pageSource, /<Panel className="text-sm leading-6 text-\[var\(--muted\)\]" padding="md" tone="elevated">/);
+  assert.doesNotMatch(pageSource, /rounded-\[var\(--radius-lg\)\] border border-\[var\(--line\)\] bg-\[var\(--surface-elevated\)\]/);
+  assert.match(componentSource, /import \{ Eyebrow \} from '@\/components\/ui\/eyebrow'/);
+  assert.match(componentSource, /<Eyebrow>Профиль компании<\/Eyebrow>/);
+  assert.match(componentSource, /<Eyebrow>Реестр заявок<\/Eyebrow>/);
+});
+
 test('business request creation has a stable anchor target', () => {
   const requestsSource = readProjectFile('src/app/(business-workspace)/business/cabinet/requests/page.tsx');
 
@@ -132,6 +159,28 @@ test('conversation lists use active closed archive tabs instead of enum status d
   assert.match(businessResponsesSource, /getBusinessResponses\(businessAccount\.id, statusGroup\)/);
   assert.match(profileQueriesSource, /status: getConversationStatusFilter\(statusGroup\)/);
   assert.match(businessQueriesSource, /status: getConversationStatusFilter\(statusGroup/);
+});
+
+test('conversation lists promote unread items and profile response empty copy is not alarming', () => {
+  const sortSource = readProjectFile('src/lib/messaging/sort-conversations-by-unread.ts');
+  const profileResponsesSource = readProjectFile('src/app/profile/responses/page.tsx');
+  const profileInquiriesSource = readProjectFile('src/app/profile/inquiries/page.tsx');
+  const businessResponsesSource = readProjectFile('src/app/(business-workspace)/business/cabinet/responses/page.tsx');
+
+  assert.match(sortSource, /sortConversationsByUnread/);
+  assert.match(sortSource, /Number\(b\.unreadCount > 0\) - Number\(a\.unreadCount > 0\)/);
+  assert.match(sortSource, /return a\.index - b\.index/);
+
+  for (const source of [profileResponsesSource, profileInquiriesSource, businessResponsesSource]) {
+    assert.match(source, /sortConversationsByUnread/);
+    assert.match(source, /getUnreadMessageCounts/);
+  }
+
+  assert.match(profileResponsesSource, /sortedResponses\.map/);
+  assert.match(profileInquiriesSource, /sortedInquiries\.map/);
+  assert.match(businessResponsesSource, /sortedResponses\.map/);
+  assert.match(profileResponsesSource, /Отклики на вакансии появятся здесь после отправки из аккаунта/);
+  assert.doesNotMatch(profileResponsesSource, /отправленные без входа/);
 });
 
 test('admin skills page exposes moderation view for user generated skills', () => {
@@ -212,6 +261,8 @@ test('profile avatar upload uses client cropper before server action upload', ()
 test('profile settings forms save inline without redirecting away from drafts', () => {
   const settingsSource = readProjectFile('src/app/profile/settings/page.tsx');
   const formSource = readProjectFile('src/components/profile/profile-section-form.tsx');
+  const sectionSource = readProjectFile('src/components/profile/profile-settings-section.tsx');
+  const disclosureSource = readProjectFile('src/components/ui/disclosure-panel.tsx');
   const actionSources = [
     readProjectFile('src/lib/profile/basic-profile-actions.ts'),
     readProjectFile('src/lib/profile/job-search-actions.ts'),
@@ -228,16 +279,40 @@ test('profile settings forms save inline without redirecting away from drafts', 
   assert.match(settingsSource, /sectionId="experience"/);
   assert.match(settingsSource, /sectionId="avatar"/);
   assert.match(settingsSource, /sectionId="password"/);
+  assert.match(settingsSource, /ProfileSettingsSection/);
+  assert.match(settingsSource, /id="avatar" title="Аватар"/);
+  assert.match(settingsSource, /id="password" title="Смена пароля"/);
+  assert.doesNotMatch(settingsSource, /<Panel className="max-w-2xl scroll-mt-6"/);
   assert.doesNotMatch(settingsSource, /<form action=\{update/);
   assert.doesNotMatch(settingsSource, /<form action=\{changePassword\}/);
 
+  assert.match(sectionSource, /DisclosurePanel/);
+  assert.match(sectionSource, /STORAGE_KEY = 'profile-section-open'/);
+  assert.match(sectionSource, /OPEN_SECTION_EVENT = 'profile-settings-open-section'/);
+  assert.match(sectionSource, /window\.localStorage/);
+  assert.match(sectionSource, /writeOpenSection\(id, nextOpen\)/);
+  assert.match(sectionSource, /requestProfileSettingsSectionOpen/);
+  assert.match(sectionSource, /window\.location\.hash === `#\$\{id\}`/);
+  assert.match(sectionSource, /window\.addEventListener\('hashchange', openFromHash\)/);
+  assert.match(sectionSource, /window\.addEventListener\(OPEN_SECTION_EVENT, openFromEvent\)/);
+  assert.match(disclosureSource, /<details/);
+  assert.match(disclosureSource, /<summary/);
+  assert.match(disclosureSource, /Открыть/);
+  assert.match(disclosureSource, /Свернуть/);
+
+  assert.match(settingsSource, /<ProfileTabs sections=\{\[\.\.\.sections\]\}/);
+  assert.match(readProjectFile('src/components/profile/profile-tabs.tsx'), /onClick=\{\(\) => requestProfileSettingsSectionOpen\(s\.id\)\}/);
+
   assert.match(formSource, /useActionState/);
+  assert.match(formSource, /FieldSuccess/);
   assert.match(formSource, /DRAFT_TTL_MS = 24 \* 60 \* 60 \* 1000/);
   assert.match(formSource, /DRAFT_KEY_PREFIX = 'profile-draft-'/);
   assert.match(formSource, /window\.localStorage/);
   assert.match(formSource, /InlineAlert/);
   assert.match(formSource, /Сохранено/);
   assert.match(formSource, /removeItem\(draftKey\)/);
+  assert.match(formSource, /result\?\.type === 'error'/);
+  assert.match(formSource, /requestProfileSettingsSectionOpen\(sectionId\)/);
 
   for (const source of actionSources) {
     assert.match(source, /_prevState: ProfileActionResult/);
@@ -266,4 +341,161 @@ test('public business and about pages avoid unsupported anti-proof stats', () =>
 
   assert.doesNotMatch(aboutSource, /единый сайт/);
   assert.match(aboutSource, /редакция постепенно приводит разделы к одному понятному формату/);
+});
+
+test('S3 cabinet action controls meet touch and hidden-profile UX requirements', () => {
+  const profileSource = readProjectFile('src/app/profile/page.tsx');
+  const businessSource = readProjectFile('src/app/(business-workspace)/business/cabinet/page.tsx');
+  const homepageSource = readProjectFile('src/components/public/homepage-client.tsx');
+  const alertSource = readProjectFile('src/components/profile/profile-visibility-alert.tsx');
+  const jobSearchActionSource = readProjectFile('src/lib/profile/job-search-actions.ts');
+
+  assert.doesNotMatch(profileSource, /href="\/profile\/settings" size="sm"/);
+  assert.match(profileSource, /href="\/profile\/settings" size="md" variant="primary"/);
+  assert.match(profileSource, /href="\/profile\/settings" size="md" variant="secondary"/);
+  assert.match(profileSource, /flex flex-col gap-4 md:flex-row md:items-center/);
+  assert.match(profileSource, /ProfileVisibilityAlert action=\{openProfileVisibilityAction\}/);
+
+  assert.match(alertSource, /useActionState/);
+  assert.match(alertSource, /Открыть профиль/);
+  assert.match(alertSource, /size="md"/);
+  assert.match(alertSource, /grid gap-3 sm:grid-cols-\[minmax\(0,1fr\)_auto\]/);
+
+  assert.match(jobSearchActionSource, /openProfileVisibilityAction/);
+  assert.match(jobSearchActionSource, /assertSameOriginServerAction/);
+  assert.match(jobSearchActionSource, /userId: user\.id/);
+  assert.match(jobSearchActionSource, /jobSearchStatus: \{ not: JobSearchStatus\.NOT_LOOKING \}/);
+  assert.match(jobSearchActionSource, /data: \{ isPublic: true \}/);
+
+  assert.doesNotMatch(businessSource, /Создать заявку[\s\S]{0,120}size="sm"/);
+  assert.match(businessSource, /href="\/business\/cabinet\/requests#new-request" size="md" variant="primary"/);
+
+  assert.match(homepageSource, /className="min-h-11 px-2 text-sm tracking-normal" href="\/search" variant="link"/);
+});
+
+test('S4 public copy removes generic phrasing and duplicate live-card framing', () => {
+  const heroSource = readProjectFile('src/components/public/homepage-hero.tsx');
+  const homepageSource = readProjectFile('src/components/public/homepage-client.tsx');
+  const businessSource = readProjectFile('src/app/(public)/business/page.tsx');
+  const loginSource = readProjectFile('src/app/auth/login/page.tsx');
+  const registerSource = readProjectFile('src/app/auth/register/page.tsx');
+  const profileSource = readProjectFile('src/app/profile/page.tsx');
+  const contactFormSource = readProjectFile('src/components/public/contact-application-form.tsx');
+  const businessFormSource = readProjectFile('src/components/public/business-solution-form.tsx');
+
+  assert.match(heroSource, /Платформа кофейной индустрии СКФО/);
+  assert.match(heroSource, /обучение, вакансии, поставщики, события и инструменты/);
+  assert.match(heroSource, /Каталог заведений и рабочий кабинет для команды/);
+  assert.doesNotMatch(heroSource, /Платформа для кофейных баров СКФО|всё в одном месте|Открыть путь к заявкам/);
+
+  assert.match(homepageSource, /Что нового/);
+  assert.match(homepageSource, /Разделы для работы/);
+  assert.doesNotMatch(homepageSource, /Свежие карточки|Живые карточки из вакансий/);
+  assert.doesNotMatch(homepageSource, /Свежее на платформе/);
+  assert.doesNotMatch(homepageSource, /всё в одном месте/);
+
+  assert.match(businessSource, /Заметность для гостей, кандидатов и партнёров/);
+  assert.doesNotMatch(businessSource, /Видимость в профильной среде/);
+
+  assert.match(loginSource, /Войдите как специалист или представитель компании/);
+  assert.match(registerSource, /доступ к заявкам, каталогу и журналу/);
+  assert.doesNotMatch(registerSource, /Я владею заведением или представляю бренд/);
+
+  assert.match(profileSource, /Добавьте ещё:/);
+  assert.match(profileSource, /Полный профиль чаще попадает в подборки работодателей/);
+  assert.doesNotMatch(profileSource, /Не хватает:|Заполненный профиль помогает/);
+
+  assert.match(contactFormSource, /title="Опишите задачу — ответим на ваш контакт"/);
+  assert.match(contactFormSource, /note="Отвечаем в течение рабочего дня\."/);
+  assert.doesNotMatch(contactFormSource, /title="Напишите нам"|После отправки ответим/);
+
+  assert.match(businessFormSource, /Укажите данные, по которым команда сможет связаться и уточнить карточку/);
+  assert.match(businessFormSource, /Данные для карточки/);
+  assert.doesNotMatch(businessFormSource, /В форме не собираем оплату|Что написать/);
+});
+
+test('contact form topic labels and detail hints live in constants', () => {
+  const formSource = readProjectFile('src/components/public/contact-application-form.tsx');
+  const constantsSource = readProjectFile('src/components/public/contact-application-form-constants.ts');
+
+  assert.match(constantsSource, /contactMessageLabels/);
+  assert.match(constantsSource, /contactTopicDetailTitles/);
+  assert.match(constantsSource, /contactTopicDetailHints/);
+  assert.match(constantsSource, /contactTopicDetailValues/);
+  assert.match(constantsSource, /getContactMessageLabel/);
+  assert.match(constantsSource, /shouldShowContactTopicDetails/);
+  assert.match(constantsSource, /getContactTopicDetailsTitle/);
+  assert.match(constantsSource, /getContactTopicDetailsHint/);
+
+  assert.match(formSource, /getContactMessageLabel\(topic\)/);
+  assert.match(formSource, /shouldShowContactTopicDetails\(topic\)/);
+  assert.match(formSource, /getContactTopicDetailsTitle\(topic\)/);
+  assert.match(formSource, /getContactTopicDetailsHint\(topic\)/);
+  assert.doesNotMatch(formSource, /topic === 'vacancy-placement'[\s\S]{0,700}\? 'Описание вакансии'/);
+  assert.doesNotMatch(formSource, /\]\.includes\(topic\)/);
+});
+
+test('S4 measurement contract exposes provider-neutral UX hooks', () => {
+  const measurementSource = readProjectFile('docs/ux-audit-measurement.md');
+  const profileFormSource = readProjectFile('src/components/profile/profile-section-form.tsx');
+  const profilePageSource = readProjectFile('src/app/profile/page.tsx');
+  const supplierFormSource = readProjectFile('src/components/public/supplier-application-form.tsx');
+
+  assert.match(measurementSource, /profile_settings_first_save/);
+  assert.match(measurementSource, /profile_completion_viewed/);
+  assert.match(measurementSource, /supplier_application_started/);
+  assert.match(measurementSource, /supplier_application_submitted/);
+  assert.match(measurementSource, /T до первого save = profile_settings_first_save_completed\.timestamp - profile_settings_first_save_started\.timestamp/);
+  assert.match(measurementSource, /% заполненных профилей = count\(profile_completion_viewed where data-ux-value = 100\) \/ count\(profile_completion_viewed\) \* 100/);
+  assert.match(measurementSource, /% drop при заявке поставщику = \(supplier_application_started - supplier_application_submitted\) \/ supplier_application_started \* 100/);
+  assert.match(measurementSource, /No analytics provider is wired/);
+
+  assert.match(profileFormSource, /data-ux-event="profile_settings_first_save"/);
+  assert.match(profileFormSource, /data-ux-section=\{sectionId\}/);
+  assert.match(profileFormSource, /data-ux-result=\{result\?\.type \?\? 'idle'\}/);
+
+  assert.match(profilePageSource, /data-ux-metric="profile_completion_viewed"/);
+  assert.match(profilePageSource, /data-ux-value=\{completeness\.percent\}/);
+
+  assert.match(supplierFormSource, /data-ux-event="supplier_application_started"/);
+  assert.match(supplierFormSource, /data-ux-success-event=\{result\?\.type === 'success' \? 'supplier_application_submitted' : undefined\}/);
+  assert.match(supplierFormSource, /data-ux-result=\{result\?\.type \?\? 'idle'\}/);
+});
+
+test('notification settings distinguish missing subscription from browser-denied permission', () => {
+  const source = readProjectFile('src/components/profile/notification-settings.tsx');
+
+  assert.match(source, /notificationPermission/);
+  assert.match(source, /Notification\.permission/);
+  assert.match(source, /Notification\.requestPermission\(\)/);
+  assert.match(source, /notificationsBlocked = notificationPermission === 'denied'/);
+  assert.match(source, /Браузер заблокировал уведомления для сайта/);
+  assert.match(source, /Разрешение заблокировано/);
+  assert.match(source, /disabled=\{notificationsBlocked\}/);
+  assert.match(source, /Что будет доступно после разрешения/);
+  assert.match(source, /Настройки тем можно менять после того, как браузер снова разрешит уведомления/);
+});
+
+test('profile KPI tiles use AppLink and homepage fresh block has a distinct angle', () => {
+  const profileSource = readProjectFile('src/app/profile/page.tsx');
+  const homepageSource = readProjectFile('src/components/public/homepage-client.tsx');
+
+  assert.match(profileSource, /import \{ AppLink \} from '@\/components\/ui\/app-link'/);
+  assert.match(profileSource, /<AppLink[\s\S]*href=\{item\.href\}/);
+  assert.doesNotMatch(profileSource, /<a[\s\S]{0,200}dashboardStats\.activeResponseCount/);
+
+  assert.match(homepageSource, /Актуальное/);
+  assert.match(homepageSource, /Разделы для работы/);
+  assert.match(homepageSource, /fallbackMeta="Рабочий раздел"/);
+  assert.doesNotMatch(homepageSource, /Свежее на платформе/);
+});
+
+test('homepage hero gradient uses stylesheet class instead of inline background', () => {
+  const heroSource = readProjectFile('src/components/public/homepage-hero.tsx');
+  const publicCssSource = readProjectFile('src/app/styles/public.css');
+
+  assert.match(heroSource, /className="home-hero-gradient absolute inset-0 z-\[1\]"/);
+  assert.doesNotMatch(heroSource, /style=\{\{[\s\S]*background:/);
+  assert.match(publicCssSource, /\.home-hero-gradient/);
+  assert.match(publicCssSource, /radial-gradient\(circle at 18% 34%/);
 });

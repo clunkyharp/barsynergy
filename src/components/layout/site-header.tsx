@@ -218,7 +218,7 @@ export function SiteHeader({ user, logoutAction }: SiteHeaderProps) {
                   'hidden min-h-10 shrink-0 items-center justify-center whitespace-nowrap rounded-[var(--radius-sm)] border-[1.5px] border-[var(--accent)] bg-[var(--accent-soft)] px-3 text-[11px] font-bold uppercase tracking-[0.1em] text-[var(--accent)] transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] hover:bg-[var(--accent)] hover:text-[var(--accent-contrast)] motion-reduce:transition-none xl:inline-flex xl:px-4',
                   focusClassName
                 )}
-                href="/contacts?topic=vacancy#contact-form"
+                href="/contacts#contact-form"
               >
                 Разместить вакансию
               </AppLink>

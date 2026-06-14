@@ -63,17 +63,12 @@ export default async function RegisterPage({ searchParams }: RegisterPageProps) 
             </Button>
           </div>
           <p className="mt-10 text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Бизнес-доступ</p>
-          <h1 className="auth-register-title display-tight mt-8 max-w-[15ch] text-[clamp(2rem,9vw,2.375rem)] font-semibold tracking-normal md:text-[52px]">
+          <h1 className="auth-register-title display-tight mt-8 max-w-[15ch] text-[clamp(2rem,9vw,2.375rem)] font-semibold leading-[1.20] text-balance tracking-normal md:text-[52px]">
             Заявка на бизнес-доступ
           </h1>
           <p className="mt-4 max-w-md text-base leading-7 text-[var(--muted)]">
-            Для заведений, брендов, поставщиков и партнёров, которым нужен рабочий кабинет в BARSYNERGY.
+            Для заведений, брендов, поставщиков и партнёров, которым нужен доступ к заявкам, каталогу и журналу.
           </p>
-          <div className="mt-6 grid gap-2">
-            <span className="rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--surface-wash)] px-4 py-3 text-sm font-semibold text-[var(--text)]">
-              Я владею заведением или представляю бренд
-            </span>
-          </div>
           {!showSuccess ? (
             <div className="mt-8 border-t border-black/10 pt-5">
               <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Что указать</p>

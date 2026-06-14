@@ -16,6 +16,7 @@ import { Panel } from '@/components/ui/panel';
 import { Select } from '@/components/ui/select';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { SubmitButton } from '@/components/ui/submit-button';
+import { ConfirmSubmitButtonWithPending } from '@/components/ui/confirm-submit-button-with-pending';
 import { ConfirmSubmitButton } from '@/components/ui/confirm-submit-button';
 import { Textarea } from '@/components/ui/textarea';
 import {
@@ -158,7 +159,7 @@ export default async function BusinessRequestDetailPage({ params, searchParams }
 
   return (
     <div className="space-y-8">
-      <PageHeader bare title={application.subject ?? applicationTypeLabels[application.type]} />
+      <PageHeader title={application.subject ?? applicationTypeLabels[application.type]} />
       <AdminActionAlert params={query} />
       <div className="grid gap-6 xl:grid-cols-[1fr_0.75fr]">
         <Panel padding="md" tone="elevated">
@@ -239,9 +240,14 @@ export default async function BusinessRequestDetailPage({ params, searchParams }
               <>
                 <form action={submitBusinessDraftApplication}>
                   <input name="applicationId" type="hidden" value={application.id} />
-                  <SubmitButton className="w-full">
+                  <ConfirmSubmitButtonWithPending
+                    className="w-full"
+                    confirmActionLabel="Отправить"
+                    confirmText="После отправки редактирование заявки будет недоступно."
+                    confirmTitle="Отправить на проверку?"
+                  >
                     Отправить на проверку
-                  </SubmitButton>
+                  </ConfirmSubmitButtonWithPending>
                 </form>
                 <form action={archiveBusinessDraftApplication}>
                   <input name="applicationId" type="hidden" value={application.id} />

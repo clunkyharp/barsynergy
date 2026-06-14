@@ -131,7 +131,7 @@ export function VacancyResponseForm({
         ) : null}
         {selectedVacancy ? (
           <EditorialShell className="mb-5 border-[var(--line)] bg-[var(--surface-wash)] p-4 shadow-none">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Вы откликаетесь на</p>
+            <p className="text-[11px] font-semibold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--muted)]">Вы откликаетесь на</p>
             <p className="mt-2 text-base font-semibold leading-7 text-[var(--text)]">
               {selectedVacancy.title} / {selectedVacancy.companyName}
               {selectedVacancy.cityName ? ` / ${selectedVacancy.cityName}` : ''}
@@ -170,8 +170,8 @@ export function VacancyResponseForm({
                 </Select>
               </FormField>
             </div>
-            <ContactChannelFieldset defaults={{ email: profile?.email, phone: profile?.phone, telegram: profile?.telegram }} emailId="responseEmail" phoneId="responsePhone" telegramId="responseTelegram" />
           </FormSection>
+          <ContactChannelFieldset defaults={{ email: profile?.email, phone: profile?.phone, telegram: profile?.telegram }} emailId="responseEmail" phoneId="responsePhone" telegramId="responseTelegram" />
 
           <FormSection title="Опыт" description="Коротко опишите текущую роль и что важно сказать работодателю.">
             <FormField htmlFor="roleSummary" label="Опыт и текущая роль">
@@ -244,14 +244,18 @@ export function VacancySubmissionForm({
         description="Оставьте роль, условия и контакт. Если понадобится, детали уточним отдельно."
       />
       <div className="relative p-5 md:p-6">
+        <FormSection title="Контактные данные">
+          <div className="grid gap-4 md:grid-cols-2">
+            <FormField htmlFor="companyName" label="Компания">
+              <Input id="companyName" name="companyName" required maxLength={180} minLength={2} placeholder="Например, Coffee Point" />
+            </FormField>
+            <FormField htmlFor="contactName" label="Контактное лицо">
+              <Input id="contactName" name="contactName" required maxLength={160} minLength={2} placeholder="Иван Иванов" />
+            </FormField>
+          </div>
+        </FormSection>
+        <ContactChannelFieldset emailId="submissionEmail" phoneId="submissionPhone" telegramId="submissionTelegram" />
         <div className="grid gap-4">
-          <FormField htmlFor="companyName" label="Компания">
-            <Input id="companyName" name="companyName" required maxLength={180} minLength={2} placeholder="Например, Coffee Point" />
-          </FormField>
-          <FormField htmlFor="contactName" label="Контактное лицо">
-            <Input id="contactName" name="contactName" required maxLength={160} minLength={2} placeholder="Иван Иванов" />
-          </FormField>
-          <ContactChannelFieldset emailId="submissionEmail" phoneId="submissionPhone" telegramId="submissionTelegram" />
           <div className="grid gap-4 sm:grid-cols-2">
             <FormField htmlFor="submissionCityId" label="Город">
               <Select id="submissionCityId" name="cityId" defaultValue="">

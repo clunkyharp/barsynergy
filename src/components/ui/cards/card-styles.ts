@@ -15,7 +15,7 @@ export function rootCardClass(className?: string, opts?: CardStyleOptions) {
 }
 
 export function cardEyebrowClass() {
-  return 'text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]';
+  return 'text-[11px] font-semibold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--accent)]';
 }
 
 export function cardTitleClass(density: 'comfortable' | 'compact' = 'comfortable') {

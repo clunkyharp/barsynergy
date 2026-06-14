@@ -46,7 +46,7 @@ export default async function BusinessResponseDetailPage({ params }: BusinessRes
 
   return (
     <div className="space-y-6">
-      <PageHeader bare title={application.name || 'Отклик'} />
+      <PageHeader title={application.name || 'Отклик'} />
 
       <Panel padding="lg" tone="elevated">
         <div className="flex flex-wrap items-center justify-between gap-3">

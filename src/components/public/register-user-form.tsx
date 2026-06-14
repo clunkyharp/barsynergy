@@ -25,9 +25,14 @@ const errorMessages: Record<string, string> = {
 };
 
 export function RegisterUserForm({
-  action
+  action,
+  defaults
 }: {
   action: (prevState: RegisterUserActionResult, formData: FormData) => Promise<RegisterUserActionResult>;
+  defaults?: {
+    fullName?: string;
+    email?: string;
+  };
 }) {
   const [result, formAction] = useActionState<RegisterUserActionResult, FormData>(action, null);
   const [turnstileToken, setTurnstileToken] = useState('');
@@ -55,6 +60,7 @@ export function RegisterUserForm({
           name="fullName"
           type="text"
           autoComplete="name"
+          defaultValue={defaults?.fullName ?? ''}
           placeholder="Иван Иванов"
           required
           minLength={1}
@@ -67,6 +73,7 @@ export function RegisterUserForm({
           name="email"
           type="email"
           autoComplete="email"
+          defaultValue={defaults?.email ?? ''}
           placeholder="you@example.com"
           required
         />

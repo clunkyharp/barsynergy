@@ -3,6 +3,7 @@ import { updateBusinessUserAccess } from '@/app/admin/users/actions';
 import { AdminActionAlert, HiddenRedirect } from '@/components/admin/content-admin-controls';
 import { AdminPageIntro } from '@/components/admin/admin-page-intro';
 import { Button } from '@/components/ui/button';
+import { ConfirmSubmitButton } from '@/components/ui/confirm-submit-button';
 import { Card } from '@/components/ui/card';
 import {
   AdminActionMenu,
@@ -296,9 +297,16 @@ export default async function AdminUsersPage({ searchParams }: AdminUsersPagePro
                         <HiddenRedirect value={currentPath} />
                         <input name="userId" type="hidden" value={user.id} />
                         <input name="status" type="hidden" value="active" />
-                        <Button className="w-full" type="submit" variant="secondary">
+                        <ConfirmSubmitButton
+                          className="w-full"
+                          confirmActionLabel="Разблокировать"
+                          confirmText="Владелец сможет войти в бизнес-кабинет."
+                          confirmTitle="Разблокировать бизнес-доступ?"
+                          type="submit"
+                          variant="secondary"
+                        >
                           Разблокировать
-                        </Button>
+                        </ConfirmSubmitButton>
                       </form>
                     ) : null}
                     {!isBlockedAccess ? (

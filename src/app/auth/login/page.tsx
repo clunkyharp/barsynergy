@@ -48,11 +48,11 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
           </div>
         </div>
       ) : null}
-      <h1 className="text-[28px] font-bold leading-[1.18] tracking-normal text-[var(--text)]">
+      <h1 className="text-[28px] font-bold leading-[1.20] text-balance tracking-normal text-[var(--text)]">
         Вход в кабинет
       </h1>
       <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
-        Для заведений и специалистов BARSYNERGY.
+        Войдите как специалист или представитель компании.
       </p>
       <div className="mt-5 w-full">
         {topSuccess ? (
@@ -60,7 +60,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
             {topSuccess}
           </InlineAlert>
         ) : null}
-        <LoginForm returnTo={returnTo} role={firstParam(params.role)} />
+        <LoginForm returnTo={returnTo} />
       </div>
     </AuthSplitLayout>
   );

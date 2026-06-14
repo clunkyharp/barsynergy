@@ -148,7 +148,7 @@ export function ArticleGridSection({
                       aria-label="Вид сеткой"
                       aria-pressed={view === 'grid'}
                       className={cn(
-                        'rounded-md p-1.5 transition-colors duration-[var(--motion-duration-fast)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2',
+                        'rounded-[var(--radius-md)] p-1.5 transition-colors duration-[var(--motion-duration-fast)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2',
                         view === 'grid'
                           ? 'text-[var(--accent)]'
                           : 'text-[var(--muted)] hover:text-[var(--text-secondary)]'
@@ -162,7 +162,7 @@ export function ArticleGridSection({
                       aria-label="Вид списком"
                       aria-pressed={view === 'list'}
                       className={cn(
-                        'rounded-md p-1.5 transition-colors duration-[var(--motion-duration-fast)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2',
+                        'rounded-[var(--radius-md)] p-1.5 transition-colors duration-[var(--motion-duration-fast)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2',
                         view === 'list'
                           ? 'text-[var(--accent)]'
                           : 'text-[var(--muted)] hover:text-[var(--text-secondary)]'

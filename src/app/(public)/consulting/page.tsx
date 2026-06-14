@@ -280,7 +280,7 @@ export default async function ConsultingPage({ searchParams }: ConsultingPagePro
         eyebrow="Консалтинг"
         title="Экспертная помощь для кофейных баров и заведений"
         subtitle="Разбираем запуск, меню, команду, себестоимость, поставщиков и операционные процессы."
-        tone="light-editorial"
+        tone="graphite"
         actions={[
           { label: 'Описать задачу', href: '#consulting-request', kind: 'primary' },
           { label: 'Рассчитать себестоимость', href: '/tools/cost-calculator', kind: 'secondary' }

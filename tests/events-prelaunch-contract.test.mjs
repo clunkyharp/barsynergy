@@ -19,7 +19,7 @@ test('events page uses the same prelaunch section pattern as suppliers for true 
   assert.match(source, /Каппинги и дегустации/);
   assert.match(source, /Чемпионаты и конкурсы/);
   assert.match(source, /Лекции и мастер-классы/);
-  assert.match(source, /label: 'Добавить событие'/);
-  assert.match(source, /label: 'Связаться с нами', variant: 'secondary'/);
+  assert.match(source, /badges=\{\['Афиша уже принимает заявки', 'Подходит для любых форматов'\]\}/);
+  assert.match(source, /description="Добавьте мероприятие, если оно открыто для профессионального сообщества и связано с барной или кофейной культурой\."/);
   assert.doesNotMatch(source, /Первые события готовятся к публикации/);
 });

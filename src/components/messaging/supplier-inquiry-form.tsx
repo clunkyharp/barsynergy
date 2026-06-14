@@ -124,7 +124,7 @@ export function SupplierInquiryForm({
                 </div>
               ) : null}
 
-              <FormSection title="Контакт" description="Укажите имя и любой удобный канал связи.">
+              <FormSection title="Контактные данные" description="Укажите имя и любой удобный канал связи.">
                 <FormField htmlFor="inquiryContactName" label="Ваше имя">
                   <Input
                     defaultValue={profile?.fullName ?? ''}
@@ -136,13 +136,13 @@ export function SupplierInquiryForm({
                     required
                   />
                 </FormField>
-                <ContactChannelFieldset
-                  defaults={{ email: profile?.email, phone: profile?.phone }}
-                  emailId="inquiryEmail"
-                  phoneId="inquiryPhone"
-                  telegramId="inquiryTelegram"
-                />
               </FormSection>
+              <ContactChannelFieldset
+                defaults={{ email: profile?.email, phone: profile?.phone }}
+                emailId="inquiryEmail"
+                phoneId="inquiryPhone"
+                telegramId="inquiryTelegram"
+              />
 
               <FormSection title="Запрос" description="Что нужно от поставщика и в каком объёме.">
                 <FormField htmlFor="inquiryProductCategory" label="Категория продукции">

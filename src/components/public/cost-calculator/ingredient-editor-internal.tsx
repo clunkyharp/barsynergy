@@ -46,7 +46,7 @@ function UnitField({
 
   return (
     <div className={cn('space-y-1.5', className)}>
-      <label className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-[var(--muted)]" htmlFor={id}>
+      <label className="block text-[11px] font-semibold uppercase tracking-[var(--tracking-eyebrow-sm)] text-[var(--muted)]" htmlFor={id}>
         {label}
       </label>
       <div className="grid grid-cols-[minmax(0,1fr)_84px] gap-2 lg:grid-cols-[minmax(60px,1fr)_64px]">
@@ -130,7 +130,7 @@ function MobileIngredientCard({
   return (
     <div className="calculator-mobile-ingredient-card grid grid-cols-2 gap-3 rounded-[var(--radius-md)] border border-[var(--border-default)] bg-transparent p-3 lg:hidden">
       <div className="col-span-2 flex items-start justify-between gap-3">
-        <span className="text-[13px] font-bold uppercase tracking-[0.12em] text-[var(--accent)]">
+        <span className="text-[13px] font-bold uppercase tracking-[var(--tracking-marker)] text-[var(--accent)]">
           № {index + 1}
         </span>
         <span className="text-[17px] font-bold leading-none tabular-nums text-[var(--text)]">

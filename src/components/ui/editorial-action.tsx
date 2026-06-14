@@ -11,7 +11,7 @@ export function EditorialAction({ className, tone = 'default', ...props }: Edito
   return (
     <AppLink
       className={cn(
-        'editorial-link inline-flex min-h-11 items-center justify-center gap-2 rounded-[var(--radius-pill)] border px-5 py-2.5 text-sm font-semibold uppercase tracking-[0.08em] transition',
+        'editorial-link inline-flex min-h-11 items-center justify-center gap-2 rounded-[var(--radius-pill)] border px-5 py-2.5 text-sm font-semibold uppercase tracking-[var(--tracking-eyebrow-sm)] transition',
         tone === 'default' && 'border-[var(--border-default)] text-[var(--text)]',
         tone === 'inverse' && 'border-[var(--border-inverse)] text-white',
         className

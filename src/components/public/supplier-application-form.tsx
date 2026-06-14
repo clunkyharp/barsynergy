@@ -12,7 +12,7 @@ import {
 } from '@/components/public/application-form-section';
 import type { PublicApplicationResult } from '@/lib/applications/public-form-helpers';
 import { ConsentField } from '@/components/ui/consent-field';
-import { FormField } from '@/components/ui/form-field';
+import { FormField, FormSection } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
 import { InlineLink } from '@/components/ui/inline-link';
 import { Select } from '@/components/ui/select';
@@ -40,7 +40,14 @@ export function SupplierApplicationForm({ enabled, utm, cities, action }: Omit<P
       introVariant="compact"
       result={result ?? undefined}
     >
-      <form action={formAction} className="editorial-form-shell public-form-shell" ref={formRef}>
+      <form
+        action={formAction}
+        className="editorial-form-shell public-form-shell"
+        data-ux-event="supplier_application_started"
+        data-ux-result={result?.type ?? 'idle'}
+        data-ux-success-event={result?.type === 'success' ? 'supplier_application_submitted' : undefined}
+        ref={formRef}
+      >
         <HiddenUtmFields utm={utm} />
         <HoneypotField id="supplier-application-website" />
         <PublicFormShellHeader
@@ -49,14 +56,18 @@ export function SupplierApplicationForm({ enabled, utm, cities, action }: Omit<P
           description="Категория, продукты или услуги, условия заказа и контакт."
         />
         <div className="relative p-5 md:p-6">
+          <FormSection title="Контактные данные">
+            <div className="grid gap-4 md:grid-cols-2">
+              <FormField htmlFor="supplierCompanyName" label="Компания">
+                <Input id="supplierCompanyName" name="companyName" required maxLength={180} minLength={2} placeholder="Например, Roaster Lab" />
+              </FormField>
+              <FormField htmlFor="supplierContactName" label="Контактное лицо">
+                <Input id="supplierContactName" name="contactName" required maxLength={160} minLength={2} placeholder="Иван Иванов" />
+              </FormField>
+            </div>
+          </FormSection>
+          <ContactChannelFieldset emailId="supplierEmail" phoneId="supplierPhone" telegramId="supplierTelegram" />
           <div className="grid gap-4 md:grid-cols-2">
-            <FormField htmlFor="supplierCompanyName" label="Компания">
-              <Input id="supplierCompanyName" name="companyName" required maxLength={180} minLength={2} placeholder="Например, Roaster Lab" />
-            </FormField>
-            <FormField htmlFor="supplierContactName" label="Контактное лицо">
-              <Input id="supplierContactName" name="contactName" required maxLength={160} minLength={2} placeholder="Иван Иванов" />
-            </FormField>
-            <ContactChannelFieldset className="md:col-span-2" emailId="supplierEmail" phoneId="supplierPhone" telegramId="supplierTelegram" />
             <FormField htmlFor="supplierCityId" label="Город">
               <Select id="supplierCityId" name="cityId" defaultValue="">
                 <option value="">Не указан</option>

@@ -70,8 +70,8 @@ export function PublicFiltersStackedVariant({
       <Panel className={cn('public-filter-search-panel', searchSurfaceClass)} padding={panelPadding}>
         {isDirectoryTone ? (
           <div className="mb-2 flex items-center justify-between gap-3">
-            <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Поиск в каталоге</span>
-            <span className="hidden text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)] sm:inline">
+            <span className="text-[10px] font-semibold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--muted)]">Поиск в каталоге</span>
+            <span className="hidden text-[10px] font-semibold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--accent)] sm:inline">
               Каталог поставщиков
             </span>
           </div>
@@ -95,7 +95,7 @@ export function PublicFiltersStackedVariant({
             <div className="flex shrink-0 items-center gap-2">
               {hasActiveFilters ? (
                 <button
-                  className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--accent)] transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] hover:text-[var(--accent-strong)] motion-reduce:transition-none"
+                  className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--accent)] transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] hover:text-[var(--accent-strong)] motion-reduce:transition-none"
                   onClick={onClearAll}
                   type="button"
                 >
@@ -108,7 +108,7 @@ export function PublicFiltersStackedVariant({
                   aria-controls={filterPanelId}
                   aria-expanded={showFilters}
                   className={cn(
-                    'inline-flex min-h-11 items-center gap-2 rounded-[var(--radius-md)] border border-[var(--border-default)] px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--text)] transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] hover:border-[var(--accent)]/35 motion-reduce:transition-none md:hidden',
+                    'inline-flex min-h-11 items-center gap-2 rounded-[var(--radius-md)] border border-[var(--border-default)] px-3 py-2 text-[11px] font-semibold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--text)] transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] hover:border-[var(--accent)]/35 motion-reduce:transition-none md:hidden',
                     isDirectoryTone && 'rounded-[var(--radius-sm)] border-[var(--accent)]/22 bg-[var(--surface-wash)]'
                   )}
                   onClick={onToggleFilters}
@@ -154,7 +154,7 @@ export function PublicFiltersStackedVariant({
           </div>
 
           {isPending ? (
-            <p className="mt-4 text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">Обновляем список…</p>
+            <p className="mt-4 text-[11px] font-semibold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--muted)]">Обновляем список…</p>
           ) : null}
         </Panel>
       ) : null}

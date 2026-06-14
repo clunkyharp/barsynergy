@@ -62,7 +62,7 @@ export default async function CourseDetailPage({ params }: CourseDetailPageProps
         imageUrl={course.imageUrl}
         label={course.label}
         meta={course.meta}
-        primaryLink={{ href: `/contacts?topic=education-program&topicTitle=${encodeURIComponent(course.title)}#contact-form`, label: 'Записаться на программу' }}
+        primaryLink={{ href: `/contacts#contact-form`, label: 'Записаться на программу' }}
         secondaryLink={{ href: '/education', label: 'Вернуться в каталог' }}
         sections={course.sections}
         summary={course.summary}

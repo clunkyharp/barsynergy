@@ -1,4 +1,3 @@
-import { Buffer } from 'node:buffer';
 import { randomBytes } from 'node:crypto';
 import { URL } from 'node:url';
 
@@ -10,7 +9,6 @@ const prisma = new PrismaClient({
 });
 
 const SALT_ROUNDS = 12;
-const MIN_PASSWORD_LENGTH = 12;
 const LOCAL_DATABASE_HOSTS = new Set(['localhost', '127.0.0.1', '::1', 'postgres']);
 
 const ACCOUNTS = [

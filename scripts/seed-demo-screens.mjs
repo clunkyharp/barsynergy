@@ -999,6 +999,8 @@ async function main() {
         salaryLabel: 'от 70 000 ₽ + бонус',
         experienceLabel: 'от 1 года',
         contactMode: 'Telegram и телефон',
+        contactTelegram: '@aster_hr_demo',
+        contactPhone: '+7 962 120-44-10',
         description: [
           'Aster Roasters — кофейня в центре Махачкалы с упором на specialty-зерно собственного обжара. Ежедневный поток — около 120 чашек. Меню строится вокруг эспрессо-линейки и сезонного фильтра.',
           '## Что вы будете делать',
@@ -1025,6 +1027,8 @@ async function main() {
         salaryLabel: 'от 70 000 ₽ + бонус',
         experienceLabel: 'от 1 года',
         contactMode: 'Telegram и телефон',
+        contactTelegram: '@aster_hr_demo',
+        contactPhone: '+7 962 120-44-10',
         description: [
           'Aster Roasters — кофейня в центре Махачкалы с упором на specialty-зерно собственного обжара. Ежедневный поток — около 120 чашек. Меню строится вокруг эспрессо-линейки и сезонного фильтра.',
           '## Что вы будете делать',
@@ -1054,6 +1058,8 @@ async function main() {
         salaryLabel: '85 000 – 110 000 ₽',
         experienceLabel: 'от 2 лет',
         contactMode: 'Email и Telegram',
+        contactTelegram: '@atelier12_demo',
+        contactEmail: 'hr@atelier12.example',
         description: [
           'Atelier 12 — вечерний бар в Каспийске с авторской коктейльной картой и фокусом на сервис. Открылись год назад, сейчас масштабируем команду и запускаем сезонное меню.',
           '## Что вы будете делать',
@@ -1080,6 +1086,8 @@ async function main() {
         salaryLabel: '85 000 – 110 000 ₽',
         experienceLabel: 'от 2 лет',
         contactMode: 'Email и Telegram',
+        contactTelegram: '@atelier12_demo',
+        contactEmail: 'hr@atelier12.example',
         description: [
           'Atelier 12 — вечерний бар в Каспийске с авторской коктейльной картой и фокусом на сервис. Открылись год назад, сейчас масштабируем команду и запускаем сезонное меню.',
           '## Что вы будете делать',

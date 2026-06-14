@@ -156,7 +156,7 @@ export function PublicFiltersSelectField({
       {activeValue ? (
         <button
           aria-label={`Сбросить фильтр: ${label}`}
-          className="inline-flex min-h-9 items-center gap-1.5 justify-self-start rounded-[var(--radius-sm)] border border-[var(--border-default)] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--muted)] transition-colors hover:border-[var(--accent)]/35 hover:text-[var(--text)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] motion-reduce:transition-none"
+          className="inline-flex min-h-9 items-center gap-1.5 justify-self-start rounded-[var(--radius-sm)] border border-[var(--border-default)] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[var(--tracking-marker)] text-[var(--muted)] transition-colors hover:border-[var(--accent)]/35 hover:text-[var(--text)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] motion-reduce:transition-none"
           onClick={() => onClear(name)}
           type="button"
         >
@@ -201,7 +201,7 @@ export function PublicFiltersMultiSelectField({
       {activeValues.length > 0 ? (
         <button
           aria-label={`Сбросить фильтр: ${label}`}
-          className="inline-flex min-h-9 items-center gap-1.5 justify-self-start rounded-[var(--radius-sm)] border border-[var(--border-default)] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--muted)] transition-colors hover:border-[var(--accent)]/35 hover:text-[var(--text)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] motion-reduce:transition-none"
+          className="inline-flex min-h-9 items-center gap-1.5 justify-self-start rounded-[var(--radius-sm)] border border-[var(--border-default)] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[var(--tracking-marker)] text-[var(--muted)] transition-colors hover:border-[var(--accent)]/35 hover:text-[var(--text)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] motion-reduce:transition-none"
           onClick={() => onClear(_name)}
           type="button"
         >
@@ -223,7 +223,7 @@ export function PublicFiltersResetButton({
   return (
     <button
       className={cn(
-        'inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--accent)] transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] hover:text-[var(--accent-strong)] motion-reduce:transition-none',
+        'inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--accent)] transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] hover:text-[var(--accent-strong)] motion-reduce:transition-none',
         className
       )}
       onClick={onClick}

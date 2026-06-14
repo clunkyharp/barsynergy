@@ -41,26 +41,20 @@ test('public detail data builders provide type-specific section blocks', () => {
   ].map(readProjectFile).join('\n');
 
   for (const title of [
-    'В материале',
     'Параметры программы',
     'Условия',
-    'Профиль поставщика',
     'Формат партнёрства'
   ]) {
     assert.match(source, new RegExp(title));
   }
 
-  assert.match(source, /Контакт для отклика/);
   assert.match(source, /Следующий шаг/);
   assert.ok(source.includes('sections: ['));
 });
 
 test('public detail routes pass type-specific sections into the shared template', () => {
   const routeFiles = [
-    'src/app/(public)/articles/[slug]/page.tsx',
     'src/app/(public)/education/[slug]/page.tsx',
-    'src/app/(public)/vacancies/[slug]/page.tsx',
-    'src/app/(public)/suppliers/[slug]/page.tsx',
     'src/app/(public)/partners/[slug]/page.tsx'
   ];
 

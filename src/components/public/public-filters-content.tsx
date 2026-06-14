@@ -272,7 +272,7 @@ export function PublicFiltersContent({
           )}
           key={`${item.label}-${item.value}`}
         >
-          <span className="font-semibold uppercase tracking-[0.12em] text-[var(--muted)]">{item.label}</span>
+          <span className="font-semibold uppercase tracking-[var(--tracking-marker)] text-[var(--muted)]">{item.label}</span>
           <span className="break-words text-[var(--text)]">{item.value}</span>
         </span>
       ))}

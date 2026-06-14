@@ -49,13 +49,15 @@ test('profile responses list queries by userId', () => {
   const listSource = readProjectFile('src/app/profile/responses/page.tsx');
 
   assert.match(listSource, /userId: user\.id/);
-  assert.match(listSource, /where:.*userId/);
+  assert.match(listSource, /const where: Prisma\.ApplicationWhereInput = \{/);
+  assert.match(listSource, /getUserResponses\(where, sort, page, PAGE_SIZE\)/);
 });
 
-test('profile responses empty state mentions guest response limitation', () => {
+test('profile responses empty state uses plain signed-in account copy', () => {
   const listSource = readProjectFile('src/app/profile/responses/page.tsx');
 
-  assert.match(listSource, /отправленные без входа/);
+  assert.match(listSource, /Отклики на вакансии появятся здесь после отправки из аккаунта/);
+  assert.doesNotMatch(listSource, /отправленные без входа/);
 });
 
 test('account menu has role-based items (USER path)', () => {

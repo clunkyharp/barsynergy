@@ -1,10 +1,12 @@
 import type { Metadata } from 'next';
+import { cookies } from 'next/headers';
 import { BookOpen, BriefcaseBusiness, Check, CheckCircle, Mail, PackageCheck } from 'lucide-react';
 import { AuthSplitLayout } from '@/components/auth/auth-split-layout';
 import { AppLink } from '@/components/ui/app-link';
 import { Button } from '@/components/ui/button';
 import { RegisterUserForm } from '@/components/public/register-user-form';
 import { registerUserAction } from '@/app/auth/register/actions';
+import { getRegisterUserFlash } from '@/lib/auth/register-user-flash';
 import { buildPrivatePageMetadata } from '@/lib/public/metadata';
 import { displayFont } from '@/lib/fonts';
 import { cn } from '@/lib/utils';
@@ -150,7 +152,9 @@ function RegisterSuccessOnboarding() {
 
 export default async function RegisterUserPage({ searchParams }: RegisterUserPageProps) {
   const params = (await searchParams) ?? {};
+  const storedDefaults = getRegisterUserFlash(await cookies());
   const success = firstParam(params.success);
+  const error = firstParam(params.error);
   const isSuccess = success === 'registered';
 
   return (
@@ -159,14 +163,23 @@ export default async function RegisterUserPage({ searchParams }: RegisterUserPag
         <RegisterSuccessOnboarding />
       ) : (
         <>
-          <h1 className="text-[28px] font-bold leading-[1.18] tracking-normal text-[var(--text)]">
+          <h1 className="text-[28px] font-bold leading-[1.20] text-balance tracking-normal text-[var(--text)]">
             Регистрация участника
           </h1>
           <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
             Для специалистов бара, барменов и всех, кто работает в индустрии
           </p>
           <div className="mt-5 w-full">
-            <RegisterUserForm action={registerUserAction} />
+            {error === 'account-check' ? (
+              <div className="mb-4 rounded-[var(--radius-md)] border border-[var(--accent)]/30 bg-[var(--accent-soft)] p-4 text-sm leading-6 text-[var(--text)]">
+                Письмо для подтверждения отправлено повторно, если регистрация уже начиналась.
+                <span className="mt-2 flex flex-wrap gap-3">
+                  <AppLink className="font-semibold text-[var(--accent)]" href="/auth/login">Попробовать вход</AppLink>
+                  <AppLink className="font-semibold text-[var(--accent)]" href="/auth/password-reset">Восстановить доступ</AppLink>
+                </span>
+              </div>
+            ) : null}
+            <RegisterUserForm action={registerUserAction} defaults={storedDefaults ?? undefined} />
             <p className="mt-5 text-center text-sm text-[var(--muted)]">
               Уже есть аккаунт?{' '}
               <AppLink className="font-semibold text-[var(--accent)] transition-colors hover:text-[var(--accent-strong)]" href="/auth/login">

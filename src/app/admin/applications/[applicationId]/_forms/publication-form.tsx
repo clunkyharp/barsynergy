@@ -2,6 +2,7 @@ import type { ApplicationType as AppType } from '@prisma/client';
 import { createVacancyDraftFromApplication, publishContentFromApplication } from '@/app/admin/applications/actions';
 import { HiddenRedirect } from '@/components/admin/content-admin-controls';
 import { Button } from '@/components/ui/button';
+import { ConfirmSubmitButton } from '@/components/ui/confirm-submit-button';
 import { Card } from '@/components/ui/card';
 
 type PublicationFormProps = {
@@ -35,12 +36,28 @@ export function VacancyPublicationForm({ application, canPublish, currentPath }:
             <HiddenRedirect value={currentPath} />
             <input name="applicationId" type="hidden" value={application.id} />
             <input name="target" type="hidden" value="vacancy" />
-            <Button type="submit" disabled={!canPublish}>Опубликовать вакансию</Button>
+            <ConfirmSubmitButton
+              confirmActionLabel="Опубликовать"
+              confirmText="Вакансия станет доступна на публичной странице."
+              confirmTitle="Опубликовать вакансию на сайте?"
+              disabled={!canPublish}
+              type="submit"
+            >
+              Опубликовать вакансию
+            </ConfirmSubmitButton>
           </form>
           <form action={createVacancyDraftFromApplication} className="grid gap-4">
             <HiddenRedirect value={currentPath} />
             <input name="applicationId" type="hidden" value={application.id} />
-            <Button type="submit" variant="secondary">Создать черновик вакансии</Button>
+            <ConfirmSubmitButton
+              confirmActionLabel="Создать"
+              confirmText="Черновик появится в списке вакансий."
+              confirmTitle="Создать черновик вакансии?"
+              type="submit"
+              variant="secondary"
+            >
+              Создать черновик вакансии
+            </ConfirmSubmitButton>
           </form>
         </div>
       )}
@@ -63,7 +80,15 @@ export function SupplierPublicationForm({ application, canPublish, currentPath }
           <HiddenRedirect value={currentPath} />
           <input name="applicationId" type="hidden" value={application.id} />
           <input name="target" type="hidden" value="supplier" />
-          <Button type="submit" disabled={!canPublish}>Опубликовать поставщика</Button>
+          <ConfirmSubmitButton
+            confirmActionLabel="Опубликовать"
+            confirmText="Поставщик станет доступен на публичной странице."
+            confirmTitle="Опубликовать поставщика на сайте?"
+            disabled={!canPublish}
+            type="submit"
+          >
+            Опубликовать поставщика
+          </ConfirmSubmitButton>
         </form>
       )}
     </Card>
@@ -85,7 +110,15 @@ export function PartnerPublicationForm({ application, canPublish, currentPath }:
           <HiddenRedirect value={currentPath} />
           <input name="applicationId" type="hidden" value={application.id} />
           <input name="target" type="hidden" value="partner" />
-          <Button type="submit" disabled={!canPublish}>Опубликовать партнёра</Button>
+          <ConfirmSubmitButton
+            confirmActionLabel="Опубликовать"
+            confirmText="Партнёр станет доступен на публичной странице."
+            confirmTitle="Опубликовать партнёра на сайте?"
+            disabled={!canPublish}
+            type="submit"
+          >
+            Опубликовать партнёра
+          </ConfirmSubmitButton>
         </form>
       )}
     </Card>

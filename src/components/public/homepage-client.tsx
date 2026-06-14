@@ -62,15 +62,12 @@ export function HomepageClient({ data }: HomepageClientProps) {
         <div className="container">
           <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
             <div>
-              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--muted)]">Свежие карточки</p>
+              <p className="text-[10px] font-semibold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--muted)]">Что нового</p>
               <h2 className={`${displayFont.className} mt-2 text-[2rem] font-semibold leading-none text-[var(--text)] md:text-[2.6rem]`}>
-                Свежее на платформе
+                Разделы для работы
               </h2>
-              <p className="mt-3 max-w-2xl text-sm leading-7 text-[var(--muted)]">
-                Живые карточки из вакансий, поставщиков, событий, обучения и материалов без промежуточного меню-раздела.
-              </p>
             </div>
-            <Button className="px-0 text-sm tracking-normal" href="/search" variant="link">
+            <Button className="min-h-11 px-2 text-sm tracking-normal" href="/search" variant="link">
               Открыть поиск
               <ArrowUpRight size={16} />
             </Button>
@@ -80,7 +77,7 @@ export function HomepageClient({ data }: HomepageClientProps) {
               <EditorialSupportCard
                 actionLabel={card.actionLabel}
                 card={card}
-                fallbackMeta="Раздел платформы"
+                fallbackMeta="Рабочий раздел"
                 key={`${card.kind}-${card.href}-${index}`}
                 label={card.eyebrow}
               />
@@ -100,12 +97,12 @@ export function HomepageClient({ data }: HomepageClientProps) {
               {data.ctaBlock?.title ?? 'Присоединяйтесь к платформе барной индустрии СКФО'}
             </h2>
             <p className="mt-3 max-w-prose text-sm leading-7 text-[var(--editorial-dark-muted)]">
-              {data.ctaBlock?.description ?? 'Обучение, вакансии, поставщики и инструменты — всё в одном месте для специалистов и заведений Северного Кавказа.'}
+              {data.ctaBlock?.description ?? 'Обучение, вакансии, поставщики и инструменты для специалистов и заведений Северного Кавказа.'}
             </p>
           </div>
           <div className="mt-6 flex flex-col items-start gap-3 md:mt-0 md:items-stretch">
             {data.ctaBlock?.helperText ? (
-              <p className="max-w-[18rem] text-xs font-semibold uppercase tracking-[0.14em] text-[var(--editorial-dark-muted)]">
+              <p className="max-w-[18rem] text-xs font-semibold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--editorial-dark-muted)]">
                 {data.ctaBlock.helperText}
               </p>
             ) : null}

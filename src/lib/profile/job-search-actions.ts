@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
+import { JobSearchStatus } from '@prisma/client';
 import { z } from 'zod';
 import { getString, getArray, optionalString } from '@/lib/admin/content-utils';
 import { resolveServerActionError } from '@/lib/actions/server-action-errors';
@@ -71,6 +72,53 @@ export async function updateJobSearch(_prevState: ProfileActionResult, formData:
         zodMessage: 'Не удалось сохранить статус поиска.',
         known: [],
         fallbackMessage: 'Не удалось сохранить статус поиска. Попробуйте позже.'
+      })
+    };
+  }
+
+  return result;
+}
+
+export async function openProfileVisibilityAction(_prevState: ProfileActionResult): Promise<ProfileActionResult> {
+  let result: Exclude<ProfileActionResult, null>;
+
+  try {
+    await assertSameOriginServerAction();
+    const user = await getCurrentUser();
+
+    if (!user) {
+      redirect('/auth/login');
+    }
+
+    const updated = await prisma.profile.updateMany({
+      where: {
+        userId: user.id,
+        jobSearchStatus: { not: JobSearchStatus.NOT_LOOKING }
+      },
+      data: { isPublic: true }
+    });
+
+    if (updated.count === 0) {
+      throw new Error('profile cannot be opened');
+    }
+
+    revalidatePath('/profile');
+    revalidatePath(SETTINGS_PATH);
+    result = { type: 'success', message: 'Профиль открыт для работодателей.' };
+  } catch (error) {
+    result = {
+      type: 'error',
+      message: resolveServerActionError({
+        action: 'profile:open-visibility',
+        error,
+        zodMessage: 'Не удалось открыть профиль.',
+        known: [
+          {
+            matches: (e: Error) => e.message === 'profile cannot be opened',
+            message: 'Сначала укажите, что вы ищете работу или готовы к предложениям.'
+          }
+        ],
+        fallbackMessage: 'Не удалось открыть профиль. Попробуйте позже.'
       })
     };
   }

@@ -13,7 +13,7 @@ function readProjectFile(path) {
 test('homepage hero exposes audience routing and a no-data fallback strip', () => {
   const source = readProjectFile('src/components/public/homepage-hero.tsx');
 
-  assert.match(source, /Выберите свой маршрут/);
+  assert.match(source, /Выберите свою роль/);
   assert.match(source, /Я специалист/);
   assert.match(source, /Смотреть вакансии/);
   assert.match(source, /Создать профиль/);

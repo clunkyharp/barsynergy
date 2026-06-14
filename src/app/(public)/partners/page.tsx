@@ -130,7 +130,7 @@ export default function PartnersPage() {
         eyebrow="Партнёры"
         title="Партнёрство для брендов, школ и заведений"
         subtitle="Партнёры участвуют форматами, экспертами, продуктом и контентом. Спонсоры финансируют проект, а поставщики размещают рабочие контакты в каталоге. Опишите задачу: событие, обучение, материал, каталог или спецпроект."
-        tone="light-editorial"
+        tone="graphite"
         actions={[
           { label: 'Описать партнёрскую задачу', href: getPartnerContactHref(), kind: 'primary' },
           { label: 'Смотреть спонсорство', href: '/general-sponsors', kind: 'secondary' }

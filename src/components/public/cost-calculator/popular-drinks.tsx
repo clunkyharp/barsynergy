@@ -39,15 +39,15 @@ export function PopularDrinks() {
             {/* 3 metrics in one row */}
             <dl className="mt-3 grid grid-cols-3 gap-3 border-t border-[var(--line)] pt-3">
               <div>
-                <dt className="text-[10px] font-semibold uppercase tracking-[0.07em] text-[var(--muted)]">Себест.</dt>
+                <dt className="text-[10px] font-semibold uppercase tracking-[var(--tracking-eyebrow-sm)] text-[var(--muted)]">Себест.</dt>
                 <dd className="mt-1 text-[13px] font-bold tabular-nums text-[var(--text)]">{drink.costEstimate}</dd>
               </div>
               <div>
-                <dt className="text-[10px] font-semibold uppercase tracking-[0.07em] text-[var(--muted)]">Цена</dt>
+                <dt className="text-[10px] font-semibold uppercase tracking-[var(--tracking-eyebrow-sm)] text-[var(--muted)]">Цена</dt>
                 <dd className="mt-1 text-[13px] font-bold tabular-nums text-[var(--text)]">{drink.priceRange}</dd>
               </div>
               <div>
-                <dt className="text-[10px] font-semibold uppercase tracking-[0.07em] text-[var(--muted)]">Food cost</dt>
+                <dt className="text-[10px] font-semibold uppercase tracking-[var(--tracking-eyebrow-sm)] text-[var(--muted)]">Food cost</dt>
                 <dd className="mt-1 text-[13px] font-bold tabular-nums text-[var(--accent)]">{drink.foodCostRange}</dd>
               </div>
             </dl>

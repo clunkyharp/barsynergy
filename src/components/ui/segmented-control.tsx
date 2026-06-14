@@ -46,7 +46,7 @@ export function SegmentedControl<T extends string>({
             type="button"
           >
             {item.eyebrow ? (
-              <p className={cn('text-[11px] font-semibold uppercase tracking-[0.14em]', selected ? 'choice-card-muted' : 'text-[var(--muted)]')}>
+              <p className={cn('text-[11px] font-semibold uppercase tracking-[var(--tracking-eyebrow-md)]', selected ? 'choice-card-muted' : 'text-[var(--muted)]')}>
                 {item.eyebrow}
               </p>
             ) : null}

@@ -25,21 +25,6 @@ export const contactMethods: {
 
 export const contactTopicOptions = [
   {
-    value: 'vacancy-placement',
-    label: 'Хочу разместить вакансию',
-    description: 'Для размещения роли, поиска сотрудника и получения откликов.'
-  },
-  {
-    value: 'education-program',
-    label: 'Интересует обучение',
-    description: 'Для команды, темы занятия или заявки на программу.'
-  },
-  {
-    value: 'education-launch',
-    label: 'Хочу предложить программу обучения',
-    description: 'Для анонса курса, приглашения на интенсив или предложения по формату.'
-  },
-  {
     value: 'partnership',
     label: 'Хочу стать партнёром',
     description: 'Для совместного проекта, размещения, обучения или материала.'
@@ -53,11 +38,6 @@ export const contactTopicOptions = [
     value: 'bug-report',
     label: 'Что-то сломалось',
     description: 'Для технической ошибки, проблемы с формой или некорректной страницей.'
-  },
-  {
-    value: 'event',
-    label: 'Предложить событие',
-    description: 'Для участия, добавления события или новой встречи.'
   },
   {
     value: 'consulting',
@@ -77,3 +57,53 @@ export const contactTopicOptions = [
 ] as const;
 
 export type ContactTopicValue = (typeof contactTopicOptions)[number]['value'];
+export type ContactTopicSelection = ContactTopicValue | '';
+
+export const contactTopicDetailValues: readonly ContactTopicValue[] = [
+  'partnership',
+  'sponsorship',
+  'consulting',
+  'article-topic'
+] satisfies ContactTopicValue[];
+
+const contactMessageLabels: Partial<Record<ContactTopicValue, string>> = {
+  'article-topic': 'О чём должен быть материал',
+  'bug-report': 'Что сломалось',
+  consulting: 'Опишите задачу для консультации',
+  partnership: 'Какой формат партнёрства хотите обсудить',
+  sponsorship: 'Какие условия спонсорства нужны'
+};
+
+const contactTopicDetailTitles: Partial<Record<ContactTopicValue, string>> = {
+  'article-topic': 'Детали материала',
+  consulting: 'Детали задачи',
+  partnership: 'Детали сотрудничества',
+  sponsorship: 'Детали сотрудничества'
+};
+
+const contactTopicDetailHints: Partial<Record<ContactTopicValue, string>> = {
+  'article-topic': 'Добавили поля: тема и формат материала.',
+  consulting: 'Добавили поля: компания и направление консультации.',
+  partnership: 'Добавили поля: формат и сайт или соцсеть.',
+  sponsorship: 'Добавили поля: формат и сайт или соцсеть.'
+};
+
+function isContactTopicValue(topic: ContactTopicSelection): topic is ContactTopicValue {
+  return topic !== '';
+}
+
+export function getContactMessageLabel(topic: ContactTopicSelection) {
+  return isContactTopicValue(topic) ? (contactMessageLabels[topic] ?? 'Сообщение') : 'Сообщение';
+}
+
+export function shouldShowContactTopicDetails(topic: ContactTopicSelection) {
+  return isContactTopicValue(topic) && contactTopicDetailValues.includes(topic);
+}
+
+export function getContactTopicDetailsTitle(topic: ContactTopicSelection) {
+  return isContactTopicValue(topic) ? (contactTopicDetailTitles[topic] ?? 'Детали по теме') : 'Детали по теме';
+}
+
+export function getContactTopicDetailsHint(topic: ContactTopicSelection) {
+  return isContactTopicValue(topic) ? (contactTopicDetailHints[topic] ?? '') : '';
+}

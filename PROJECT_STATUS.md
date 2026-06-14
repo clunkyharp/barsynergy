@@ -1,6 +1,6 @@
 # BARSYNERGY Project Status
 
-Last updated: 2026-06-12 (Cabinets UX audit remediation — P0/P1/S1/S2/S3 packages)
+Last updated: 2026-06-13 (Cabinets UX audit remediation — P0/P1/S1/S2/S3/S4 packages)
 
 ## Cabinets UX Audit Remediation (2026-06-12)
 
@@ -19,24 +19,37 @@ Applied in this batch:
 - P0-4 — `/business` and `/about` anti-proof copy now avoids unsupported facts, fake counters and manual-review claims where no authoritative metric source is wired;
 - S2 skills — `SkillsSelector` converted from preset checkboxes to tag-input with autocomplete, custom skill creation and `Skill.source = USER_GENERATED`;
 - S2 skills moderation — `/admin/skills` now has a user-generated source filter and marks custom skills as `На модерации`;
+- S2 settings accordion — profile settings sections now use persisted native `<details>` panels with `localStorage: profile-section-open`, reducing the seven-section scroll wall without changing form actions;
+- S2 settings accordion follow-up — profile settings now uses the shared `DisclosurePanel`; tabs and URL hashes open collapsed sections, inline action errors reopen their section, and successful saves render through `FieldSuccess`;
+- S2 notifications empty-state — notification settings now distinguish an unsubscribed browser from browser-denied notification permission and show a separate recovery state;
+- S2 next action panel — business profile check now keeps the `готово` state briefly, then auto-hides after a 7-day grace period when the company profile remains complete;
+- S2 design-system polish — local business dashboard welcome/KPI/archive surfaces now use the shared `Panel` primitive instead of one-off border/background shells, and business cabinet eyebrow labels now use the shared `Eyebrow` primitive;
+- S2 design-system follow-up — the homepage hero overlay gradient now lives in `public.css` as `home-hero-gradient` instead of inline JSX background style;
+- DS-7/UX-10 polish — profile KPI tiles are covered as `AppLink` surfaces, and the homepage secondary live block now has a distinct `Разделы для работы` angle instead of duplicating `Актуальное`;
+- S1 conversation follow-up — profile/business conversation lists now promote unread items within the current page, and profile responses empty-state copy no longer warns about guest responses;
 - S1/S2 conversation tabs — profile/business response and request lists now use `Активные / Закрытые / Архив` tabs backed by shared status groups instead of 7-status dropdowns;
 - S3 password policy — register/reset/activate/profile password-setting flows now share 10-character minimum copy and run HIBP Pwned Passwords k-anonymity checks before hashing;
+- S3 accessibility polish — profile and business cabinet action CTAs now use 44px targets, the profile progress panel stacks before `md`, and hidden active profiles can be opened from an inline one-click CTA;
+- S4 copy cleanup — homepage hero/live section, business catalog copy, auth login/register, profile completion, contact form and business catalog form now use simpler literal Russian copy without duplicate «карточки» framing or generic SaaS phrases;
+- S4 metrics — `docs/ux-audit-measurement.md` now defines provider-neutral formulas and DOM hooks for time to first profile save, profile completion before/after and supplier application drop-off without enabling analytics;
+- UX-8 contact form refactor — topic-specific message labels, detail titles and hints now live in `contact-application-form-constants.ts` instead of JSX ternary ladders;
 - S1 avatar cropper — profile avatar upload now uses a client cropper with circular preview and exports 512×512 JPEG before the existing `updateAvatar` action;
 - source-level regression tests added in `tests/cabinets-ux-audit.test.mjs`.
 
 Validation snapshot for this batch:
 
-- `node --test tests/cabinets-ux-audit.test.mjs` passes (12/12);
+- `node --test tests/cabinets-ux-audit.test.mjs` passes (22/22);
+- `node --test tests/cabinets-ux-audit.test.mjs tests/vacancy-response-contract.test.mjs tests/homepage-live-grid-contract.test.mjs` passes (32/32);
 - `git diff --check` passes;
-- `npm run lint` is currently blocked by unrelated untracked `scripts/reset-local-accounts.mjs` unused variables (`Buffer`, `MIN_PASSWORD_LENGTH`);
+- `npm run lint` passes;
 - targeted ESLint for the latest touched files passes;
 - `./node_modules/.bin/prisma validate` passes;
 - `npm run typecheck` passes.
+- `npm test` still fails in broad, unrelated historical source-contract suites outside this UX-audit batch, including admin/auth/calculator/public-page contracts; targeted UX-audit validation above is green.
 
 Remaining from the 2026-06-12 audit:
 
-- S3 remaining profile/business accessibility polish;
-- S4 measurement/retrospective work.
+- Analytics provider integration, event storage, dashboards and target windows remain out of scope until an owner/legal/product decision is made.
 
 ## Architecture Audit Remediation (2026-06-11)
 

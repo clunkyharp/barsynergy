@@ -2,8 +2,10 @@
 
 import type { ReactNode } from 'react';
 import { useActionState, useEffect, useRef, useState } from 'react';
+import { FieldSuccess } from '@/components/ui/form-field';
 import { InlineAlert } from '@/components/ui/inline-alert';
 import type { ProfileActionResult } from '@/lib/profile/profile-action-result';
+import { requestProfileSettingsSectionOpen } from '@/components/profile/profile-settings-section';
 
 const DRAFT_TTL_MS = 24 * 60 * 60 * 1000;
 const DRAFT_KEY_PREFIX = 'profile-draft-';
@@ -152,12 +154,31 @@ export function ProfileSectionForm({ action, children, className, noValidate = t
     setSavedAt(new Intl.DateTimeFormat('ru-RU', { hour: '2-digit', minute: '2-digit' }).format(new Date()));
   }, [draftKey, result]);
 
+  useEffect(() => {
+    if (result?.type === 'error') {
+      requestProfileSettingsSectionOpen(sectionId);
+    }
+  }, [result, sectionId]);
+
   return (
-    <form ref={formRef} action={formAction} className={className} noValidate={noValidate}>
+    <form
+      ref={formRef}
+      action={formAction}
+      className={className}
+      data-ux-event="profile_settings_first_save"
+      data-ux-result={result?.type ?? 'idle'}
+      data-ux-section={sectionId}
+      noValidate={noValidate}
+    >
       {children}
-      {result ? (
-        <InlineAlert tone={result.type === 'error' ? 'error' : 'success'}>
-          {result.type === 'success' && savedAt ? `${result.message} · Сохранено ${savedAt}` : result.message}
+      {result?.type === 'success' ? (
+        <FieldSuccess data-ux-event-result={result.type}>
+          {savedAt ? `${result.message} · Сохранено ${savedAt}` : result.message}
+        </FieldSuccess>
+      ) : null}
+      {result?.type === 'error' ? (
+        <InlineAlert data-ux-event-result={result.type} tone="error">
+          {result.message}
         </InlineAlert>
       ) : null}
     </form>

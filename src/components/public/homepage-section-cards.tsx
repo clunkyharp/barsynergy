@@ -71,7 +71,7 @@ export function HomeSectionCards() {
                 <Link className="home-section-card group relative min-h-[140px] rounded-[var(--radius-lg)] border border-[var(--border-strong)] bg-[var(--surface-card)] p-5 text-[var(--text)] shadow-[var(--shadow-card)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)]" href={card.href} key={card.title}>
                   <span className="flex items-start justify-between gap-4">
                     <SectionIcon size={40} type={card.icon} />
-                    <span className="rounded-[var(--radius-sm)] border border-[var(--border-default)] px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--muted)]">
+                    <span className="rounded-[var(--radius-sm)] border border-[var(--border-default)] px-2 py-1 text-[10px] font-semibold uppercase tracking-[var(--tracking-marker)] text-[var(--muted)]">
                       {card.status}
                     </span>
                   </span>

@@ -4,6 +4,10 @@ import './globals.css';
 import { SiteFooterServer } from '@/components/layout/site-footer-server';
 import { SiteHeaderServer } from '@/components/layout/site-header-server';
 import { logoutAction } from '@/app/auth/login/actions';
+import { submitEducationLead } from '@/app/(public)/education/actions';
+import { submitEventLead } from '@/app/(public)/events/actions';
+import { submitSupplierLead } from '@/app/(public)/suppliers/actions';
+import { submitVacancyLead } from '@/app/(public)/vacancies/actions';
 import { ViewportReveal } from '@/components/public/viewport-reveal';
 import { ScrollToTopButton } from '@/components/layout/scroll-to-top-button';
 import { JsonLd } from '@/components/seo/json-ld';
@@ -61,7 +65,14 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
           <div className="site-shell overflow-x-clip">
             <SiteHeaderServer logoutAction={logoutAction} />
             <main className="site-main flex-1 overflow-x-hidden w-full max-w-full">{children}</main>
-            <SiteFooterServer />
+            <SiteFooterServer
+              leadActions={{
+                submitEducationLead,
+                submitEventLead,
+                submitSupplierLead,
+                submitVacancyLead
+              }}
+            />
             <ViewportReveal />
             <ScrollToTopButton />
           </div>

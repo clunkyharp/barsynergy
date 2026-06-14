@@ -238,9 +238,6 @@ export function PublishedContentSectionDirectory(props: PublishedContentSectionP
   );
 }
 
-/**
- * @deprecated Use PublishedContentSectionDefault, PublishedContentSectionOpportunity, or PublishedContentSectionDirectory instead.
- */
 export function PublishedContentSectionCourse(props: PublishedContentSectionProps) {
   return (
     <PublishedContentSectionLayout
@@ -254,21 +251,4 @@ export function PublishedContentSectionCourse(props: PublishedContentSectionProp
       )}
     />
   );
-}
-
-/**
- * @deprecated Use PublishedContentSectionDefault, PublishedContentSectionOpportunity, PublishedContentSectionDirectory, or PublishedContentSectionCourse instead.
- */
-export function PublishedContentSection(props: PublishedContentSectionProps & { rowVariant?: 'default' | 'opportunity' | 'directory' }) {
-  const variant = props.rowVariant ?? 'default';
-
-  if (variant === 'opportunity') {
-    return <PublishedContentSectionOpportunity {...props} />;
-  }
-
-  if (variant === 'directory') {
-    return <PublishedContentSectionDirectory {...props} />;
-  }
-
-  return <PublishedContentSectionDefault {...props} />;
 }

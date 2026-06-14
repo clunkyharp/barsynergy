@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { ContentStatus } from '@/modules/admin/queries';
 import { Button } from '@/components/ui/button';
+import { ConfirmSubmitButton } from '@/components/ui/confirm-submit-button';
 import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
@@ -90,9 +91,16 @@ export function DeleteButton({ action, id }: { action: HomepageFormAction; id: s
   return (
     <>
       <input name="id" type="hidden" value={id} />
-      <Button formAction={action} type="submit" variant="secondary">
+      <ConfirmSubmitButton
+        confirmActionLabel="Удалить"
+        confirmText="Это действие нельзя отменить."
+        confirmTitle="Удалить черновик?"
+        formAction={action}
+        type="submit"
+        variant="secondary"
+      >
         Удалить черновик
-      </Button>
+      </ConfirmSubmitButton>
     </>
   );
 }

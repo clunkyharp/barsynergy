@@ -17,5 +17,5 @@ test('public form validation does not show required-field errors on first blur',
   assert.match(source, /form\.dataset\.publicValidationSubmitted = 'true';/);
   assert.match(source, /function hasSubmittedAttempt\(\)/);
   assert.match(source, /if \(!hasSubmittedAttempt\(\) && !event\.target\.dataset\.publicValidationActive\) \{\s*return;\s*\}/);
-  assert.match(source, /function validateForm\(\) \{\s*const valid = validatePublicForm\(formElement\);/);
+  assert.match(source, /function validateForm\(\) \{\s*return validatePublicForm\(formElement\);/);
 });

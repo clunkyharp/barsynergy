@@ -3,11 +3,12 @@ import { redirect } from 'next/navigation';
 import { ArrowRight, BookOpen, BriefcaseBusiness, PartyPopper, Settings } from 'lucide-react';
 import { AppLink } from '@/components/ui/app-link';
 import { Button } from '@/components/ui/button';
-import { InlineAlert } from '@/components/ui/inline-alert';
 import { MetaChip } from '@/components/ui/meta-chip';
 import { Panel } from '@/components/ui/panel';
 import { ProfileProgressRing } from '@/components/profile/profile-progress-ring';
+import { ProfileVisibilityAlert } from '@/components/profile/profile-visibility-alert';
 import { getCurrentUser } from '@/lib/auth/current-user';
+import { openProfileVisibilityAction } from '@/lib/profile/job-search-actions';
 import { getFullUser, getProfileDashboardStats } from '@/modules/profile/queries';
 import { buildPrivatePageMetadata } from '@/lib/public/metadata';
 import { displayFont } from '@/lib/fonts';
@@ -66,7 +67,7 @@ function formatSalary(value: number | null): string | null {
 
 function formatMissingFields(fields: string[]) {
   if (fields.length === 0) return '';
-  return `Не хватает: ${fields.slice(0, 3).join(', ')}`;
+  return `Добавьте ещё: ${fields.slice(0, 3).join(', ')}`;
 }
 
 type ProfileDashboardPageProps = {
@@ -102,7 +103,7 @@ export default async function ProfileDashboardPage({ searchParams }: ProfileDash
   });
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" data-ux-metric="profile_completion_viewed" data-ux-value={completeness.percent}>
       {isWelcome ? (
         <Panel padding="lg" tone="elevated">
           <div className="flex items-start gap-4">
@@ -142,7 +143,7 @@ export default async function ProfileDashboardPage({ searchParams }: ProfileDash
       <Panel padding="lg" tone="elevated">
         <div className="grid gap-4 sm:grid-cols-[1fr_auto] sm:items-start">
           <div className="min-w-0 self-center">
-            <h1 className="text-[22px] font-bold leading-[1.15] tracking-normal text-[var(--text)] md:text-[26px]">
+            <h1 className="text-[22px] font-bold leading-[1.20] text-balance tracking-normal text-[var(--text)] md:text-[26px]">
               {profile?.fullName || user.email}
             </h1>
             <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-[var(--muted)]">
@@ -155,7 +156,7 @@ export default async function ProfileDashboardPage({ searchParams }: ProfileDash
               </MetaChip>
             ) : null}
           </div>
-          <Button className="shrink-0 rounded-[var(--radius-md)] self-start" href="/profile/settings" size="sm" variant="primary">
+          <Button className="shrink-0 rounded-[var(--radius-md)] self-start" href="/profile/settings" size="md" variant="primary">
             Редактировать
             <ArrowRight aria-hidden size={15} strokeWidth={1.8} />
           </Button>
@@ -196,13 +197,7 @@ export default async function ProfileDashboardPage({ searchParams }: ProfileDash
       </div>
 
       {profile && !profile.isPublic && profile.jobSearchStatus && profile.jobSearchStatus !== 'NOT_LOOKING' ? (
-        <InlineAlert tone="warning">
-          Профиль скрыт от работодателей. Чтобы вас могли найти, откройте профиль в{' '}
-          <a className="font-semibold underline underline-offset-2 hover:text-[var(--warning-strong)]" href="/profile/settings">
-            настройках
-          </a>
-          .
-        </InlineAlert>
+        <ProfileVisibilityAlert action={openProfileVisibilityAction} />
       ) : null}
 
       {completeness.isEmpty ? (
@@ -214,14 +209,14 @@ export default async function ProfileDashboardPage({ searchParams }: ProfileDash
                 Добавьте имя, профессию, город и контакты — так работодателям будет проще вас найти, а отклики будут заполняться автоматически.
               </p>
             </div>
-            <Button className="shrink-0 rounded-[var(--radius-md)]" href="/profile/settings" size="sm" variant="secondary">
+            <Button className="shrink-0 rounded-[var(--radius-md)]" href="/profile/settings" size="md" variant="secondary">
               Заполнить профиль
             </Button>
           </div>
         </Panel>
       ) : completeness.percent < 100 ? (
         <Panel padding="lg" tone="elevated">
-          <div className="flex items-center gap-4">
+          <div className="flex flex-col gap-4 md:flex-row md:items-center">
             <ProfileProgressRing percent={completeness.percent} />
             <div className="min-w-0">
               <h2 className="text-base font-semibold tracking-normal text-[var(--text)]">
@@ -237,9 +232,9 @@ export default async function ProfileDashboardPage({ searchParams }: ProfileDash
                 </p>
               )}
               <p className="mt-2 text-xs leading-5 text-[var(--muted)]">
-                Заполненный профиль помогает работодателям быстрее понять ваш опыт и принять решение.
+                Полный профиль чаще попадает в подборки работодателей.
               </p>
-              <Button className="mt-2 rounded-[var(--radius-md)]" href="/profile/settings" size="sm" variant="secondary">
+              <Button className="mt-3 rounded-[var(--radius-md)]" href="/profile/settings" size="md" variant="secondary">
                 Дозаполнить профиль
               </Button>
             </div>

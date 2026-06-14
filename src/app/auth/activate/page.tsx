@@ -80,7 +80,7 @@ export default async function ActivateBusinessAccessPage({ searchParams }: Activ
           <span className="mt-6 grid size-14 place-items-center rounded-[var(--radius-pill)] border border-[var(--accent)]/35 bg-[var(--accent-soft)] text-[var(--accent)]">
             <ShieldCheck aria-hidden size={26} strokeWidth={1.7} />
           </span>
-          <h1 className="display-tight mt-4 text-[40px] font-semibold tracking-normal md:text-[54px]">Завершить подключение</h1>
+          <h1 className="display-tight mt-4 text-[40px] font-semibold leading-[1.20] text-balance tracking-normal md:text-[54px]">Завершить подключение</h1>
           <p className="mt-4 max-w-md text-base leading-7 text-[var(--muted)]">
             Установите пароль для первого входа в кабинет компании. Ссылка действует недолго и открывается один раз.
           </p>

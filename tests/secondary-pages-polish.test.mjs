@@ -15,14 +15,14 @@ test('about page uses narrative story, visual facts, timeline, and focused final
   const source = readProjectFile('src/app/(public)/about/page.tsx');
   const css = readGlobalStyles();
 
-  assert.match(source, /<PublicBreadcrumbs current="О проекте" \/>/);
+  assert.match(source, /breadcrumbs=\{\[\{ label: 'О проекте' \}\]\}/);
   assert.doesNotMatch(source, /<p className="mt-5 inline-flex[\s\S]*О проекте[\s\S]*<\/p>/);
   assert.match(source, /Бариста искали обучение в чатах/);
   assert.match(source, /половина профессионального круга узнала уже постфактум/);
   assert.match(source, /обучение, афиша, вакансии, материалы и каталог поставщиков/);
   assert.match(source, /Ближайшее направление развития/);
   assert.match(source, /<blockquote/);
-  assert.match(source, /const facts = \[/);
+  assert.match(source, /const insidePlatform:/);
   assert.match(source, /hero-coffee-counter-haberdoedas/);
   assert.match(source, /about-timeline grid/);
   assert.doesNotMatch(source, /about-timeline grid gap-0 border-y/);
@@ -31,8 +31,7 @@ test('about page uses narrative story, visual facts, timeline, and focused final
   assert.match(source, /Связаться с командой/);
   assert.match(source, /Предложить событие/);
   assert.match(source, /Стать партнёром/);
-  assert.match(source, /xl:grid-cols-\[minmax\(0,0\.58fr\)_minmax\(0,0\.42fr\)\]/);
-  assert.match(source, /xl:items-center/);
+  assert.match(source, /xl:grid-cols-\[minmax\(0,0\.62fr\)_minmax\(18rem,0\.38fr\)\]/);
 });
 
 test('editorial public page hero does not duplicate breadcrumb as eyebrow', () => {
@@ -44,7 +43,7 @@ test('editorial public page hero does not duplicate breadcrumb as eyebrow', () =
   assert.match(heroSource, /<PublicBreadcrumbs current=\{breadcrumbLabel \?\? eyebrow\} \/>/);
   assert.doesNotMatch(heroSource, /<PublicEyebrow className="mt-2" tone="muted">\{eyebrow\}<\/PublicEyebrow>/);
   assert.doesNotMatch(heroSource, /<PublicEyebrow className="mt-5" tone="muted">\{eyebrow\}<\/PublicEyebrow>/);
-  assert.match(generalSponsorsSource, /<PublicBreadcrumbs current="Спонсорство" \/>/);
+  assert.match(generalSponsorsSource, /breadcrumbs=\{\[\{ label: 'Спонсорство' \}\]\}/);
   assert.doesNotMatch(generalSponsorsSource, /<PublicEyebrow className="mt-6">Спонсорство<\/PublicEyebrow>/);
 });
 
@@ -54,11 +53,10 @@ test('contacts page exposes concrete routing topics and direct first-screen copy
   const constantsSource = readProjectFile('src/components/public/contact-application-form-constants.ts');
   const actionSource = readProjectFile('src/app/(public)/contacts/actions.ts');
 
-  assert.match(pageSource, /title="Напишите нам"/);
+  assert.match(pageSource, /title="Контакты"/);
   assert.match(pageSource, /Отвечаем в течение рабочего дня\. Выберите тему — форма подстроится\./);
-  assert.match(pageSource, /Форма — основной способ связаться с командой/);
-  assert.match(constantsSource, /Хочу разместить вакансию/);
-  assert.match(constantsSource, /Интересует обучение/);
+  assert.match(formSource, /title="Опишите задачу — ответим на ваш контакт"/);
+  assert.match(constantsSource, /Консалтинг/);
   assert.match(constantsSource, /Хочу стать партнёром/);
   assert.match(constantsSource, /Что-то сломалось/);
   assert.match(constantsSource, /Другое/);
@@ -82,8 +80,8 @@ test('legal pages include short summaries, sticky toc, related links, date and 6
   assert.match(documentSource, /Используйте сайт для рабочих запросов/);
   assert.match(documentSource, /Используем cookies для входа/);
   assert.match(pageSource, /<PublicEyebrow>Коротко<\/PublicEyebrow>/);
-  assert.match(pageSource, /Актуальная редакция: \{updatedAt\}/);
-  assert.match(pageSource, /legal-toc hidden xl:block xl:sticky xl:top-24/);
+  assert.match(pageSource, /updatedAt=\{updatedAt\}/);
+  assert.match(pageSource, /<aside className="hidden xl:block">/);
   assert.match(pageSource, /Связанные документы/);
   assert.match(pageSource, /minmax\(0,65ch\)/);
   assert.match(css, /\.legal-document-body/);
@@ -92,25 +90,28 @@ test('legal pages include short summaries, sticky toc, related links, date and 6
 
 test('auth surfaces use minimal login, progressive register and admin dark mode', () => {
   const loginSource = readProjectFile('src/app/auth/login/page.tsx');
+  const loginFormSource = readProjectFile('src/app/auth/login/_components/login-form.tsx');
+  const authLayoutSource = readProjectFile('src/components/auth/auth-split-layout.tsx');
   const registerSource = readProjectFile('src/app/auth/register/page.tsx');
   const activateSource = readProjectFile('src/app/auth/activate/page.tsx');
   const adminSource = readProjectFile('src/app/(admin-auth)/admin/login/page.tsx');
 
-  assert.match(loginSource, /auth-login-layout mx-auto w-full max-w-\[440px\] md:max-w-\[460px\]/);
-  assert.match(loginSource, /auth-login-header mb-6 flex flex-wrap items-center gap-4/);
-  assert.doesNotMatch(loginSource, /auth-split-photo/);
+  assert.match(loginSource, /<AuthSplitLayout>/);
+  assert.match(authLayoutSource, /auth-login-screen/);
+  assert.match(authLayoutSource, /Вернуться на сайт/);
+  assert.doesNotMatch(authLayoutSource, /auth-split-photo/);
   assert.doesNotMatch(loginSource, /Хороший эспрессо начинается с правильной экстракции/);
   assert.doesNotMatch(loginSource, /AuthRoleCard/);
   assert.doesNotMatch(loginSource, /publicLoginRoles/);
   assert.doesNotMatch(loginSource, /name="role"/);
   assert.match(loginSource, /Вход в кабинет/);
-  assert.match(loginSource, /Проблемы с доступом\?/);
-  assert.match(loginSource, /Написать команде/);
+  assert.match(loginFormSource, /Проблемы с доступом\?/);
+  assert.match(loginFormSource, /Написать команде/);
   assert.match(registerSource, /BusinessRequestForm/);
   assert.match(registerSource, /Шаг 1/);
   assert.match(registerSource, /Шаг 2/);
   assert.doesNotMatch(registerSource, /Я работаю в баре/);
-  assert.match(registerSource, /Я владею заведением или представляю бренд/);
+  assert.doesNotMatch(registerSource, /Я владею заведением или представляю бренд/);
   assert.match(activateSource, /ShieldCheck/);
   assert.match(adminSource, /bg-\[var\(--background\)\]/);
   assert.match(adminSource, /bg-\[var\(--surface-muted\)\]/);

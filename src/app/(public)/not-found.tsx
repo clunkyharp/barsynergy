@@ -14,7 +14,7 @@ export default function PublicNotFound() {
         <span className="inline-flex h-14 w-14 items-center justify-center rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--surface-wash)] text-[var(--muted)]">
           <SearchX size={24} strokeWidth={1.6} />
         </span>
-        <h1 className="mt-6 text-[clamp(1.75rem,3vw,2.5rem)] font-semibold leading-tight text-[var(--text)]">
+        <h1 className="mt-6 text-[clamp(1.75rem,3vw,2.5rem)] font-semibold leading-[1.20] text-balance text-[var(--text)]">
           Страница не найдена
         </h1>
         <p className="mt-3 max-w-md text-center text-sm leading-6 text-[var(--muted)]">

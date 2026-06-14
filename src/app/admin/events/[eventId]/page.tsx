@@ -4,6 +4,7 @@ import { deleteEventDraft, updateEvent, updateEventStatus } from '@/app/admin/ev
 import { AdminCmsActions, AdminCmsAdvancedSection, AdminCmsForm, AdminCmsGrid, AdminCmsSection, AdminCmsSummary } from '@/components/admin/admin-cms-form';
 import { AdminContentVisibilityPanel, CoverImageField, HiddenRedirect } from '@/components/admin/content-admin-controls';
 import { Button } from '@/components/ui/button';
+import { ConfirmSubmitButton } from '@/components/ui/confirm-submit-button';
 import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
@@ -209,9 +210,15 @@ export default async function AdminEventEditPage({ params }: AdminEventEditPageP
       {event.status === ContentStatus.DRAFT ? (
         <form action={deleteEventDraft}>
           <input name="eventId" type="hidden" value={event.id} />
-          <Button type="submit" variant="ghost">
+          <ConfirmSubmitButton
+            confirmActionLabel="Удалить"
+            confirmText="Это действие нельзя отменить."
+            confirmTitle="Удалить черновик?"
+            type="submit"
+            variant="ghost"
+          >
             Удалить черновик
-          </Button>
+          </ConfirmSubmitButton>
         </form>
       ) : null}
     </div>

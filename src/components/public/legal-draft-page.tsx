@@ -78,7 +78,7 @@ export function LegalDraftPage({ document }: LegalDraftPageProps) {
       <section className="editorial-grid py-10 md:py-14">
         <div className="container grid gap-8 xl:grid-cols-[15rem_minmax(0,65ch)] xl:items-start xl:justify-center">
           <aside className="hidden xl:block">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--accent)]">Оглавление</p>
+            <p className="text-[11px] font-semibold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--accent)]">Оглавление</p>
             <nav aria-label="Оглавление документа" className="mt-4 grid gap-1">
               {sections.map((section, index) => (
                 <a
@@ -91,7 +91,7 @@ export function LegalDraftPage({ document }: LegalDraftPageProps) {
                 </a>
               ))}
               <div className="mt-4 border-t border-[var(--line)] pt-4">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--accent)]">Связанные документы</p>
+                <p className="text-[11px] font-semibold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--accent)]">Связанные документы</p>
                 <div className="mt-3 grid gap-1">
                   {relatedDocuments.map((item) => (
                     <InlineLink href={item.href} key={item.href}>

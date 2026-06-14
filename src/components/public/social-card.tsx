@@ -59,7 +59,7 @@ export function SocialLinkCard({
       <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1 bg-[var(--platform-accent)]" />
       <span className="flex items-start justify-between gap-4">
         <span className="min-w-0">
-          <span className="block text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">{typeLabel}</span>
+          <span className="block text-[10px] font-semibold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--muted)]">{typeLabel}</span>
           <span className="mt-1 block text-sm font-semibold leading-5 text-[var(--text)]">{serviceName}</span>
         </span>
         <span className="grid size-11 shrink-0 place-items-center rounded-[var(--radius-md)] border border-[color-mix(in_srgb,var(--platform-accent)_24%,var(--border-default))] bg-[color-mix(in_srgb,var(--platform-accent)_9%,var(--surface-wash))] p-2.5">
@@ -71,7 +71,7 @@ export function SocialLinkCard({
       </span>
       <span className="mt-3 block text-sm leading-6 text-[var(--muted)]">{description}</span>
       {helperText ? (
-        <span className="mt-4 block border-t border-[var(--line)] pt-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">
+        <span className="mt-4 block border-t border-[var(--line)] pt-3 text-[11px] font-semibold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--muted)]">
           {helperText}
         </span>
       ) : null}

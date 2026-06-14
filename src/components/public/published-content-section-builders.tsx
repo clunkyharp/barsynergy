@@ -61,7 +61,7 @@ export function renderOpportunityChip(entry: PublishedContentMetaGroup) {
       )}
       key={`${entry.label ?? 'meta'}-${entry.value}`}
     >
-      {entry.label ? <span className="font-semibold uppercase tracking-[0.12em] text-[var(--muted)]">{entry.label}</span> : null}
+      {entry.label ? <span className="font-semibold uppercase tracking-[var(--tracking-marker)] text-[var(--muted)]">{entry.label}</span> : null}
       <span className="break-words">{entry.value}</span>
     </span>
   );

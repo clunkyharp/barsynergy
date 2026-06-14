@@ -42,6 +42,7 @@ export function NotificationSettings({ initialPreferences, subscriptionCount }: 
   const [swReady, setSwReady] = useState(false);
   const [subscribed, setSubscribed] = useState(false);
   const [subscribing, setSubscribing] = useState(false);
+  const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>('default');
   const [preferences, setPreferences] = useState<Record<string, boolean>>(() => {
     const map: Record<string, boolean> = {};
     for (const p of initialPreferences) {
@@ -66,6 +67,7 @@ export function NotificationSettings({ initialPreferences, subscriptionCount }: 
       return;
     }
     setIsSupported(true);
+    setNotificationPermission(Notification.permission);
 
     navigator.serviceWorker.register('/sw.js').then((reg) => {
       setSwReady(true);
@@ -82,6 +84,14 @@ export function NotificationSettings({ initialPreferences, subscriptionCount }: 
     setSubscribing(true);
 
     try {
+      const permission = Notification.permission === 'granted' ? 'granted' : await Notification.requestPermission();
+      setNotificationPermission(permission);
+
+      if (permission !== 'granted') {
+        showToast({ id: 'push-sub', title: 'Браузер не разрешил уведомления', tone: 'error' });
+        return;
+      }
+
       const registration = await navigator.serviceWorker.ready;
       let sub = await registration.pushManager.getSubscription();
 
@@ -188,6 +198,8 @@ export function NotificationSettings({ initialPreferences, subscriptionCount }: 
     );
   }
 
+  const notificationsBlocked = notificationPermission === 'denied';
+
   return (
     <div className="space-y-6">
       <div className="flex items-start justify-between gap-4">
@@ -196,23 +208,27 @@ export function NotificationSettings({ initialPreferences, subscriptionCount }: 
           <p className="mt-1 text-xs leading-5 text-[var(--muted)]">
             {subscribed
               ? `Подписка активна. Устройств: ${localSubCount}.`
+              : notificationsBlocked
+                ? 'Браузер заблокировал уведомления для сайта. Разрешите уведомления в настройках браузера, затем вернитесь к подключению.'
               : 'Получайте уведомления о новых вакансиях, обучении, событиях и материалах в браузере — даже когда сайт закрыт. Подписка работает только в этом браузере; отключить можно в любой момент.'}
           </p>
         </div>
         {subscribed ? (
-            <Button variant="destructive" size="sm" onClick={handleUnsubscribe}>
+            <Button variant="destructive" size="md" onClick={handleUnsubscribe}>
             Отключить
           </Button>
         ) : (
-          <Button size="sm" onClick={handleSubscribe} loading={subscribing || !swReady} loadingText="Подключаем…">
-            Включить уведомления
+          <Button disabled={notificationsBlocked} size="md" onClick={handleSubscribe} loading={subscribing || !swReady} loadingText="Подключаем…">
+            {notificationsBlocked ? 'Разрешение заблокировано' : 'Включить уведомления'}
           </Button>
         )}
       </div>
 
       {!subscribed ? (
         <div className="border-t border-[var(--line)] pt-4">
-          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--muted)]">О чём будем уведомлять</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--muted)]">
+            {notificationsBlocked ? 'Что будет доступно после разрешения' : 'О чём будем уведомлять'}
+          </p>
           <ul className="mt-3 grid gap-2 sm:grid-cols-2">
             {TOPICS.map((t) => (
               <li key={t.topic} className="rounded-[var(--radius-md)] border border-[var(--line)] bg-[var(--surface-wash)] px-3 py-2">
@@ -222,7 +238,9 @@ export function NotificationSettings({ initialPreferences, subscriptionCount }: 
             ))}
           </ul>
           <p className="mt-3 text-xs leading-5 text-[var(--muted)]">
-            После подписки можно отключить отдельные темы.
+            {notificationsBlocked
+              ? 'Настройки тем можно менять после того, как браузер снова разрешит уведомления.'
+              : 'После подписки можно отключить отдельные темы.'}
           </p>
         </div>
       ) : (
@@ -239,7 +257,7 @@ export function NotificationSettings({ initialPreferences, subscriptionCount }: 
             />
           ))}
           <div className="flex justify-end pt-2">
-            <Button size="sm" onClick={handleSavePreferences}>
+            <Button size="md" onClick={handleSavePreferences}>
               Сохранить настройки
             </Button>
           </div>

@@ -96,9 +96,16 @@ export function AdminContentVisibilityPanel({
               status={ContentStatus.PUBLISHED}
               updateStatusAction={updateStatusAction}
             >
-              <Button className="min-h-9 px-3 py-1.5 text-xs" size="sm" type="submit">
+              <ConfirmSubmitButton
+                className="min-h-9 px-3 py-1.5 text-xs"
+                confirmActionLabel="Опубликовать"
+                confirmText="Запись станет доступна на публичной странице."
+                confirmTitle="Опубликовать на сайте?"
+                size="sm"
+                type="submit"
+              >
                 Опубликовать
-              </Button>
+              </ConfirmSubmitButton>
             </AdminContentStatusForm>
           )}
           {isArchived ? (
@@ -109,9 +116,17 @@ export function AdminContentVisibilityPanel({
               status={ContentStatus.DRAFT}
               updateStatusAction={updateStatusAction}
             >
-              <Button className="min-h-9 px-3 py-1.5 text-xs" size="sm" type="submit" variant="ghost">
+              <ConfirmSubmitButton
+                className="min-h-9 px-3 py-1.5 text-xs"
+                confirmActionLabel="Вернуть в черновик"
+                confirmText="Запись пропадёт с публичной страницы, если была опубликована."
+                confirmTitle="Вернуть запись в черновик?"
+                size="sm"
+                type="submit"
+                variant="ghost"
+              >
                 Вернуть в черновик
-              </Button>
+              </ConfirmSubmitButton>
             </AdminContentStatusForm>
           ) : null}
         </AdminActionRow>
@@ -146,9 +161,15 @@ export function AdminContentRowActions({
           status={ContentStatus.PUBLISHED}
           updateStatusAction={updateStatusAction}
         >
-          <Button className="min-h-9 px-3 py-1.5 text-xs" type="submit">
+          <ConfirmSubmitButton
+            className="min-h-9 px-3 py-1.5 text-xs"
+            confirmActionLabel="Опубликовать"
+            confirmText="Запись станет доступна на публичной странице."
+            confirmTitle="Опубликовать на сайте?"
+            type="submit"
+          >
             Опубликовать
-          </Button>
+          </ConfirmSubmitButton>
         </AdminContentStatusForm>
       ) : (
         <AdminContentStatusForm
@@ -186,7 +207,13 @@ export function AdminContentRowActions({
               <HiddenRedirect value={currentPath} />
               <input name={idName} type="hidden" value={idValue} />
               <input name="status" type="hidden" value={ContentStatus.DRAFT} />
-              <AdminActionMenuButton>Восстановить</AdminActionMenuButton>
+              <AdminActionMenuButton
+                confirmActionLabel="Восстановить"
+                confirmText="Запись вернётся в черновики."
+                confirmTitle="Восстановить запись?"
+              >
+                Восстановить
+              </AdminActionMenuButton>
             </form>
           ) : null}
           {canArchive ? (

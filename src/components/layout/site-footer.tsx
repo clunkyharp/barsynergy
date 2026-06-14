@@ -9,17 +9,21 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { AppLink } from '@/components/ui/app-link';
 import { displayFont } from '@/lib/fonts';
+import { openLeadModal } from '@/lib/public/lead-modal-bus';
+import { LeadModalRoot, type LeadModalActions } from '@/components/public/lead-modal-providers';
 
 type SiteFooterProps = {
   userRole?: string | null;
+  leadActions: LeadModalActions;
 };
 
 type FooterCtaConfig = {
   eyebrow: string;
   title: string;
   description: string;
-  primaryHref: string;
+  primaryHref?: string;
   primaryLabel: string;
+  primaryAction?: () => void;
   secondaryHref: string;
   secondaryLabel: string;
 };
@@ -63,7 +67,7 @@ function FooterNavSection({ heading, children }: { heading: string; children: Re
   );
 }
 
-export function SiteFooter({ userRole }: SiteFooterProps = {}) {
+export function SiteFooter({ userRole, leadActions }: SiteFooterProps) {
   const pathname = usePathname();
   const isWorkspacePath =
     pathname?.startsWith('/admin') || pathname?.startsWith('/business/cabinet') || pathname?.startsWith('/auth') || pathname?.startsWith('/profile');
@@ -80,8 +84,8 @@ export function SiteFooter({ userRole }: SiteFooterProps = {}) {
         eyebrow: 'Для работодателей',
         title: 'Нужно разместить вакансию для команды?',
         description: 'Оставьте заявку, чтобы команда помогла собрать вакансию и показать её профильной аудитории BARSYNERGY.',
-        primaryHref: '/contacts?topic=vacancy#contact-form',
         primaryLabel: 'Разместить вакансию',
+        primaryAction: () => openLeadModal('vacancy'),
         secondaryHref: '/business',
         secondaryLabel: 'Каталог для компаний'
       };
@@ -104,8 +108,8 @@ export function SiteFooter({ userRole }: SiteFooterProps = {}) {
         eyebrow: 'Для организаторов',
         title: 'Есть событие для барного сообщества?',
         description: 'Расскажите о формате, дате и площадке. Подскажем, как лучше опубликовать анонс на BARSYNERGY.',
-        primaryHref: '/contacts?topic=event#contact-form',
         primaryLabel: 'Предложить событие',
+        primaryAction: () => openLeadModal('event'),
         secondaryHref: '/contacts?topic=partnership#contact-form',
         secondaryLabel: 'Обсудить партнёрство'
       };
@@ -116,9 +120,9 @@ export function SiteFooter({ userRole }: SiteFooterProps = {}) {
         eyebrow: 'Для команд и школ',
         title: 'Нужна программа обучения или запуск курса?',
         description: 'Оставьте короткую задачу: обучение команды, интенсив, программа для бренда или запуск нового формата.',
-        primaryHref: '/contacts?topic=education-program#contact-form',
         primaryLabel: 'Описать задачу обучения',
-        secondaryHref: '/contacts?topic=education-launch#contact-form',
+        primaryAction: () => openLeadModal('education'),
+        secondaryHref: '/contacts?topic=partnership#contact-form',
         secondaryLabel: 'Предложить программу'
       };
     }
@@ -160,7 +164,7 @@ export function SiteFooter({ userRole }: SiteFooterProps = {}) {
   ] as const;
   const businessLinks = [
     { href: businessHref, label: businessLinkLabel },
-    { href: '/contacts?topic=vacancy#contact-form', label: 'Разместить вакансию' },
+    { href: '/contacts?topic=partnership#contact-form', label: 'Разместить вакансию' },
     { href: '/partners', label: 'Партнёры' },
     { href: '/consulting', label: 'Консалтинг' },
     { href: '/general-sponsors', label: 'Спонсорство' }
@@ -176,7 +180,9 @@ export function SiteFooter({ userRole }: SiteFooterProps = {}) {
   }
 
   return (
-    <footer>
+    <>
+      <LeadModalRoot {...leadActions} />
+      <footer>
       {footerCtaConfig ? (
         <section className="border-t border-[var(--editorial-dark-border)] bg-[var(--editorial-dark-surface)] px-0 pb-0 pt-6 text-[var(--editorial-dark-text)] sm:pt-8" data-theme="dark">
           <div className="container">
@@ -197,9 +203,15 @@ export function SiteFooter({ userRole }: SiteFooterProps = {}) {
                 </p>
               </div>
               <div className="mt-6 flex flex-col gap-3 sm:flex-row lg:mt-0 lg:justify-self-end">
-                <Button href={footerCtaConfig.primaryHref} size="lg">
-                  {footerCtaConfig.primaryLabel}
-                </Button>
+                {footerCtaConfig.primaryAction ? (
+                  <Button onClick={footerCtaConfig.primaryAction} size="lg" type="button">
+                    {footerCtaConfig.primaryLabel}
+                  </Button>
+                ) : footerCtaConfig.primaryHref ? (
+                  <Button href={footerCtaConfig.primaryHref} size="lg">
+                    {footerCtaConfig.primaryLabel}
+                  </Button>
+                ) : null}
                 <Button href={footerCtaConfig.secondaryHref} size="lg" variant="inverse">
                   {footerCtaConfig.secondaryLabel}
                 </Button>
@@ -222,7 +234,7 @@ export function SiteFooter({ userRole }: SiteFooterProps = {}) {
               Платформа для барной индустрии
             </p>
             <p className="mt-4 max-w-md text-sm leading-7 text-[var(--editorial-dark-muted)] sm:text-[1rem]">
-              BARSYNERGY собирает обучение, события, вакансии, поставщиков и партнёрские форматы для специалистов и заведений Северного Кавказа.
+              BARSYNERGY — платформа для размещения и поиска актуальной информации о предстоящих мастер-классах, событиях, вакансиях, поставщиках и возможности сотрудничества с платформой в качестве спонсора.
             </p>
             <div className="mt-7 flex flex-wrap items-center gap-4 text-sm">
               <AppLink
@@ -275,5 +287,6 @@ export function SiteFooter({ userRole }: SiteFooterProps = {}) {
         </div>
       </div>
     </footer>
+    </>
   );
 }

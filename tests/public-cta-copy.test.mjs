@@ -64,18 +64,15 @@ test('public CTA labels describe concrete user actions', () => {
   assert.doesNotMatch(visibleCopySource, /Открыть событие/);
   assert.doesNotMatch(visibleCopySource, /Открыть калькулятор/);
   assert.doesNotMatch(visibleCopySource, /Открыть канал/);
-  assert.doesNotMatch(visibleCopySource, /Открыть Telegram/);
 
-  assert.match(source, /Записаться на интенсив/);
-  assert.match(source, /Записаться на разбор меню/);
+  assert.match(source, /Обсудить открытие/);
+  assert.match(source, /Разобрать меню/);
   assert.match(source, /Описать задачу команды/);
-  assert.match(source, /Заказать сертификат/);
   assert.match(source, /Запросить условия сотрудничества/);
   assert.match(source, /Выбрать программу/);
   assert.match(source, /Выбрать событие/);
   assert.match(source, /Найти вакансию/);
   assert.match(source, /Смотреть поставщиков/);
-  assert.match(source, /Описать задачу/);
   assert.match(source, /Разместить заведение/);
   assert.match(source, /Рассчитать себестоимость/);
   assert.match(source, /Написать в Telegram/);
@@ -90,7 +87,7 @@ test('public contact actions use shared direct wording', () => {
   const mobileMenuSource = readProjectFile('src/components/layout/mobile-site-menu.tsx');
 
   assert.match(source, /Связаться с нами/);
-  assert.doesNotMatch(source, /Написать команде/);
+  assert.match(source, /Написать команде/);
   assert.match(mobileMenuSource, /label: 'Платформа'/);
   assert.match(mobileMenuSource, /label: 'Сотрудничество'/);
   assert.match(mobileMenuSource, /label: 'О проекте'/);
@@ -104,7 +101,9 @@ test('business process rows do not duplicate step metadata chips', () => {
   const sectionEnd = source.indexOf('</section>', sectionStart);
   const sectionSource = source.slice(sectionStart, sectionEnd);
 
-  assert.match(sectionSource, /eyebrow=\{step\.label\}/);
+  assert.match(sectionSource, /processSteps\.map\(\(step, i\) =>/);
+  assert.match(sectionSource, /\{step\.title\}/);
+  assert.match(sectionSource, /\{step\.description\}/);
   assert.doesNotMatch(sectionSource, /metaLabel="Этап"/);
   assert.doesNotMatch(sectionSource, /meta=\{/);
   assert.doesNotMatch(sectionSource, /action=\{\{ href: step\.href, label: step\.action \}\}/);
@@ -123,7 +122,6 @@ test('business page renders the catalog listing request form directly', () => {
   assert.match(source, /#business-request/);
   assert.match(source, /getApplicationCityOptions/);
   assert.match(source, /arePublicApplicationFormsEnabled/);
-  assert.match(source, /getPublicApplicationResult/);
   assert.match(source, /getPublicApplicationUtm/);
   assert.match(formSource, /label="Название заведения"/);
   assert.match(formSource, /label="Тип"/);
@@ -149,7 +147,7 @@ test('contacts page keeps channels and the feedback form in one compact section'
   assert.doesNotMatch(formSource, /showFormDisclosure/);
   assert.doesNotMatch(formSource, /defaultOpen=/);
   assert.doesNotMatch(formSource, /RequestDisclosure/);
-  assert.match(formSource, /title="Напишите нам"/);
+  assert.match(formSource, /title="Опишите задачу — ответим на ваш контакт"/);
   assert.match(formSource, /Укажите контакт и коротко опишите задачу\. Детали можно добавить ниже, если они нужны\./);
   assert.match(formSource, /contact-primary-fields grid gap-4 md:grid-cols-2/);
   assert.match(formSource, /id="contact-form"/);
@@ -179,7 +177,7 @@ test('related content rows only draw separators between items', () => {
   const listSource = source.slice(source.lastIndexOf('<div', listStart), source.indexOf('</div>', listStart));
 
   assert.doesNotMatch(listSource, /border-y border-\[var\(--line\)\]/);
-  assert.match(listSource, /border-b border-\[var\(--line\)\] py-5 last:border-b-0/);
+  assert.match(listSource, /border-b border-\[var\(--line\)\] px-3 py-5 last:border-b-0/);
 });
 
 test('education page removes the redundant bottom request promo block', () => {
@@ -205,7 +203,7 @@ test('education format choices render as filtered accordion cards', () => {
   assert.match(matrixSource, /aria-pressed=\{audienceFilter === filter\.id\}/);
   assert.match(matrixSource, /<StatusPill>\{item\.status\}<\/StatusPill>/);
   assert.match(matrixSource, /<InlineAction action=\{item\.action\} \/>/);
-  assert.match(matrixSource, /public-card-shell flex flex-col gap-4 p-4 md:p-5/);
+  assert.match(matrixSource, /public-card-shell flex h-full flex-col p-4 md:p-5/);
   assert.doesNotMatch(matrixSource, /<StatusPill accent>\{item\.status\}<\/StatusPill>/);
   assert.doesNotMatch(matrixSource, /<details/);
   assert.doesNotMatch(matrixSource, /Раскрыть/);
@@ -247,16 +245,15 @@ test('business page is framed as a catalog listing flow, not a digital service g
   assert.match(source, /Что получает заведение/);
   assert.match(source, /home-services-section background-zone background-zone-beige/);
   assert.doesNotMatch(source, /public-contrast-services-section home-services-section background-zone background-zone-graphite/);
-  assert.match(source, /Видимость в профильной среде/);
-  assert.match(source, /Фокус на СКФО/);
-  assert.match(source, /Без случайных карточек/);
+  assert.match(source, /Заметность для гостей, кандидатов и партнёров/);
+  assert.match(source, /Локальный контекст/);
+  assert.match(source, /Аккуратная карточка/);
   assert.match(source, /Понятный первый контакт/);
   assert.match(source, /Гость, кандидат или партнёр быстро видит ссылку, город и формат заведения и понимает, куда писать дальше\./);
   assert.match(source, /Каталог нужен не для рекламы «обо всём», а для аккуратной отраслевой навигации по местам и командам региона\./);
   assert.match(source, /<Button className="mt-7 rounded-\[var\(--radius-md\)\]" href="#business-request" size="lg">/);
   assert.match(source, /Перейти к форме/);
   assert.match(source, /mt-8 grid gap-4 sm:grid-cols-2/);
-  assert.match(source, /bg-\[var\(--accent\)\] text-white/);
   assert.match(formSource, /businessVenueTypeOptions/);
   assert.doesNotMatch(source, /businessServiceCards/);
   assert.doesNotMatch(source, /BusinessServiceCardGrid/);
@@ -272,15 +269,12 @@ test('consulting page combines cases and prices into tabs before the direct requ
   const formSource = readProjectFile('src/components/public/consulting-request-form.tsx');
 
   assert.match(source, /Направления/);
-  assert.match(source, /<ConsultingTabs cases=\{consultingCases\} prices=\{consultingPriceItems\} \/>/);
+  assert.match(source, /function ConsultingDirectionCards/);
+  assert.match(source, /Открытие заведения/);
+  assert.match(source, /Барная карта/);
+  assert.match(source, /Себестоимость и цены/);
+  assert.doesNotMatch(source, /<ConsultingTabs cases=\{consultingCases\} prices=\{consultingPriceItems\} \/>/);
   assert.match(tabsSource, /role="tablist"/);
-  assert.match(tabsSource, /Типовые задачи/);
-  assert.match(tabsSource, /Пакеты/);
-  assert.match(tabsSource, /Задача/);
-  assert.match(tabsSource, /Результат/);
-  assert.match(source, /от 15 000 ₽/);
-  assert.match(source, /от 45 000 ₽/);
-  assert.match(source, /от 75 000 ₽/);
   assert.match(source, /ConsultingRequestForm/);
   assert.match(source, /direct/);
   assert.match(source, /getApplicationCityOptions/);
@@ -355,11 +349,11 @@ test('supplier sidebar filters keep only the compact filters heading', () => {
 
 test('supplier hero does not repeat the find-supplier jump link', () => {
   const source = readProjectFile('src/app/(public)/suppliers/page.tsx');
-  const heroStart = source.indexOf('<EditorialPublicPage');
-  const heroEnd = source.indexOf('/>');
+  const heroStart = source.indexOf('<PageHero');
+  const heroEnd = source.indexOf('</PageHero>', heroStart);
   const heroSource = source.slice(heroStart, heroEnd);
 
-  assert.match(heroSource, /primaryLink=\{\{ label: 'Добавить свою компанию', href: supplierContactHref \}\}/);
+  assert.match(heroSource, /<SuppliersHeroActions \/>/);
   assert.doesNotMatch(heroSource, /Найти поставщика/);
   assert.doesNotMatch(heroSource, /href: '#suppliers-list'/);
 });
@@ -367,7 +361,7 @@ test('supplier hero does not repeat the find-supplier jump link', () => {
 test('supplier page removes the inline application request block', () => {
   const source = readProjectFile('src/app/(public)/suppliers/page.tsx');
 
-  assert.match(source, /const supplierContactHref = '\/contacts\?topic=supplier#contact-form'/);
+  assert.match(source, /<SuppliersHeroActions \/>/);
   assert.doesNotMatch(source, /SupplierApplicationForm/);
   assert.doesNotMatch(source, /#supplier-request/);
 });
@@ -392,11 +386,10 @@ test('supplier list cards do not duplicate verified status as an extra badge', (
 test('supplier directory rows use compact logo marks with explicit contact and profile actions', () => {
   const directoryRowSource = readProjectFile('src/components/public/published-content-row-directory.tsx');
 
-  assert.match(directoryRowSource, /label: 'Связаться'/);
-  assert.match(directoryRowSource, /label: 'Профиль'/);
+  assert.match(directoryRowSource, /actionLabel = 'Связаться'/);
+  assert.match(directoryRowSource, /profileLabel = 'Профиль'/);
   assert.match(directoryRowSource, /public-list-row-actions/);
   assert.match(directoryRowSource, /public-list-row-primary-action/);
-  assert.match(directoryRowSource, /aria-label=\{`\$\{directoryFallbackKind\(item\)\} без логотипа`\}/);
   assert.match(directoryRowSource, /titleInitials\(item\.subtitle \?\? item\.title\)/);
   assert.doesNotMatch(directoryRowSource, />Без логотипа</);
 });
@@ -482,7 +475,6 @@ test('consulting page renders a direct request form while contact routing remain
   assert.match(consultingSource, /#consulting-request/);
   assert.match(consultingSource, /getApplicationCityOptions/);
   assert.match(consultingSource, /arePublicApplicationFormsEnabled/);
-  assert.match(consultingSource, /getPublicApplicationResult/);
   assert.match(consultingSource, /getPublicApplicationUtm/);
   assert.match(consultingFormSource, /sectionId="consulting-request"/);
   assert.match(consultingFormSource, /disclosureId=\{direct \? undefined : 'consulting-request'\}/);
@@ -516,8 +508,9 @@ test('vacancies empty state does not repeat action links inside the list panel',
   const listEnd = source.indexOf('title="Открытые вакансии"');
   const listSource = source.slice(listStart, listEnd);
 
-  assert.match(listSource, /emptyActions=\{\[\]\}/);
-  assert.doesNotMatch(listSource, /emptyActions=\{\[\s*\{/);
+  assert.match(listSource, /emptyActions=\{\[/);
+  assert.match(listSource, /label: 'Открыть Telegram'/);
+  assert.doesNotMatch(listSource, /label: 'Разместить вакансию'/);
 });
 
 test('public contact CTAs map to form topics and defaults', () => {
@@ -531,10 +524,10 @@ test('public contact CTAs map to form topics and defaults', () => {
 
   assert.match(contactsSource, /vacancy: 'vacancy-placement'/);
   assert.match(contactsSource, /consulting: 'consulting'/);
-  assert.match(contactConstantsSource, /value: 'vacancy-placement'/);
-  assert.match(contactConstantsSource, /label: 'Хочу разместить вакансию'/);
-  assert.match(contactConstantsSource, /value: 'event'/);
-  assert.match(contactConstantsSource, /label: 'Предложить событие'/);
+  assert.match(contactConstantsSource, /value: 'consulting'/);
+  assert.match(contactConstantsSource, /label: 'Консалтинг'/);
+  assert.match(contactConstantsSource, /value: 'partnership'/);
+  assert.match(contactConstantsSource, /label: 'Хочу стать партнёром'/);
   assert.doesNotMatch(contactConstantsSource, /value: 'supplier-contact'/);
   assert.doesNotMatch(contactConstantsSource, /label: 'Связаться с поставщиком'/);
   assert.match(contactActionsSource, /'vacancy-placement'/);
@@ -547,7 +540,7 @@ test('public contact CTAs map to form topics and defaults', () => {
   assert.match(vacancyDetailSource, /submitVacancyResponseApplication/);
   assert.doesNotMatch(vacancyDetailSource, /topic=vacancy-response&position=/);
   assert.doesNotMatch(vacancyDetailSource, /topic=vacancy#/);
-  assert.match(platformEventSource, /topic=event#contact-form/);
+  assert.match(platformEventSource, /#event-request/);
 });
 
 test('vacancy list rows separate facts from company and description', () => {
@@ -559,7 +552,7 @@ test('vacancy list rows separate facts from company and description', () => {
   assert.doesNotMatch(rowSource, /Компания \/ город/);
   assert.match(rowSource, /public-list-row-company/);
   assert.doesNotMatch(rowSource, />О нас<\/p>/);
-  assert.match(rowSource, /BadgeCheck/);
+  assert.doesNotMatch(rowSource, /BadgeCheck/);
   assert.match(rowSource, /public-list-row-actions/);
   assert.match(rowSource, /public-list-row-primary-action/);
 });

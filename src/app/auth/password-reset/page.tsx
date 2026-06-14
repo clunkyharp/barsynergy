@@ -11,7 +11,7 @@ export const metadata: Metadata = buildPrivatePageMetadata({
 export default function PasswordResetPage() {
   return (
     <AuthSplitLayout>
-      <h1 className="text-[28px] font-bold leading-[1.18] tracking-normal text-[var(--text)]">
+      <h1 className="text-[28px] font-bold leading-[1.20] text-balance tracking-normal text-[var(--text)]">
         Восстановление пароля
       </h1>
       <p className="mt-2 text-sm leading-6 text-[var(--muted)]">

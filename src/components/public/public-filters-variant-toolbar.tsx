@@ -123,7 +123,7 @@ export function PublicFiltersToolbarVariant({
             ) : null}
             <div className="flex items-center gap-3">
               {isPending ? (
-                <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">
+                <span className="text-[11px] font-semibold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--muted)]">
                   Обновляем…
                 </span>
               ) : null}

@@ -34,7 +34,7 @@ test('vacancies and suppliers expose sort controls and sticky filter summary', (
 
   assert.match(filtersSource, /PublicFiltersActiveChip/);
   assert.match(filtersSource, /activeSummaryCountLabel \?\? title/);
-  assert.match(sectionSource, /xl:sticky xl:top-24 xl:self-start/);
+  assert.match(sectionSource, /<aside className="public-catalog-sidebar min-w-0">/);
   assert.match(sectionSource, /showSidebarTitle \? \(/, 'visible catalog title must stay outside the sidebar/list grid');
   assert.match(sectionSource, /public-catalog-layout container grid/, 'catalog sidebar and list must share one explicit layout grid');
   assert.match(sectionSource, /xl:items-start/, 'catalog sidebar and list must align from the top edge');

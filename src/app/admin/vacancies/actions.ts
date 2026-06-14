@@ -40,6 +40,9 @@ const vacancyFormSchema = z.object({
   salaryLabel: z.string().trim().max(120).optional(),
   experienceLabel: z.string().trim().max(120).optional(),
   contactMode: z.string().trim().max(120).optional(),
+  contactTelegram: z.string().trim().max(120).optional(),
+  contactPhone: z.string().trim().max(30).optional(),
+  contactEmail: z.string().trim().max(254).optional(),
   businessAccountId: z.string().trim().optional()
 });
 
@@ -76,6 +79,9 @@ export async function createVacancy(formData: FormData) {
         salaryLabel: optionalString(getString(formData, 'salaryLabel')),
         experienceLabel: optionalString(getString(formData, 'experienceLabel')),
         contactMode: optionalString(getString(formData, 'contactMode')),
+        contactTelegram: optionalString(getString(formData, 'contactTelegram')),
+        contactPhone: optionalString(getString(formData, 'contactPhone')),
+        contactEmail: optionalString(getString(formData, 'contactEmail')),
         businessAccountId: optionalString(getString(formData, 'businessAccountId'))
       });
       const slug = slugify(parsed.slug ?? parsed.title);
@@ -126,6 +132,9 @@ export async function createVacancy(formData: FormData) {
               salaryLabel: nullableString(parsed.salaryLabel),
               experienceLabel: nullableString(parsed.experienceLabel),
               contactMode: nullableString(parsed.contactMode),
+              contactTelegram: nullableString(parsed.contactTelegram),
+              contactPhone: nullableString(parsed.contactPhone),
+              contactEmail: nullableString(parsed.contactEmail),
               businessAccountId: nullableString(parsed.businessAccountId),
               createdById: user.id,
               updatedById: user.id,
@@ -178,6 +187,9 @@ export async function updateVacancy(formData: FormData) {
           salaryLabel: optionalString(getString(formData, 'salaryLabel')),
           experienceLabel: optionalString(getString(formData, 'experienceLabel')),
           contactMode: optionalString(getString(formData, 'contactMode')),
+          contactTelegram: optionalString(getString(formData, 'contactTelegram')),
+          contactPhone: optionalString(getString(formData, 'contactPhone')),
+          contactEmail: optionalString(getString(formData, 'contactEmail')),
           businessAccountId: optionalString(getString(formData, 'businessAccountId'))
         });
       const slug = slugify(parsed.slug ?? parsed.title);
@@ -236,6 +248,9 @@ export async function updateVacancy(formData: FormData) {
               salaryLabel: nullableString(parsed.salaryLabel),
               experienceLabel: nullableString(parsed.experienceLabel),
               contactMode: nullableString(parsed.contactMode),
+              contactTelegram: nullableString(parsed.contactTelegram),
+              contactPhone: nullableString(parsed.contactPhone),
+              contactEmail: nullableString(parsed.contactEmail),
               businessAccountId: nullableString(parsed.businessAccountId),
               updatedById: user.id,
               ...statusTransitionDates(parsed.status, existingVacancy.publishedAt)

@@ -13,9 +13,8 @@ import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
 import { AdminStatusChip } from '@/components/ui/status-badge';
 import { firstParam, type AdminContentSearchParams } from '@/lib/admin/content-utils';
-import { SkillSource } from '@prisma/client';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
-import { getSkillList } from '@/lib/admin/admin-queries';
+import { getSkillList, SkillSource } from '@/lib/admin/admin-queries';
 
 export const dynamic = 'force-dynamic';
 

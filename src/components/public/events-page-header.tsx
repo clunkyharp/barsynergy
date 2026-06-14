@@ -1,4 +1,4 @@
-import { CalendarDays, Search } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { PublicBreadcrumbs } from '@/components/public/public-primitives';
 import { Button } from '@/components/ui/button';
 import { Select } from '@/components/ui/select';
@@ -22,7 +22,7 @@ export function EventsHeroSection() {
       <div className="container">
         <div className="flex min-h-[360px] max-w-xl flex-col pt-4 pb-10 md:min-h-[400px] md:pt-4 md:pb-14">
           <PublicBreadcrumbs current="События" />
-          <h1 className={`${displayFont.className} mt-3 text-[clamp(2.4rem,5.5vw,4.2rem)] font-semibold leading-none text-[var(--text)]`}>
+          <h1 className={`${displayFont.className} mt-3 text-[clamp(2.4rem,5.5vw,4.2rem)] font-semibold leading-[1.20] text-balance text-[var(--text)]`}>
             События
           </h1>
           <p className="mt-4 text-[15px] leading-7 text-[var(--muted)]">
@@ -103,28 +103,4 @@ export function EventsSearchBar({ cities, formats, selectedQ, selectedCity, sele
     </section>
   );
 }
-export function EventsCtaBanner() {
-  return (
-    <section className="background-zone background-zone-graphite border-b border-[var(--line)] py-12 md:py-16">
-      <div className="container">
-        <div className="flex flex-col items-center gap-4 text-center sm:flex-row sm:text-left">
-          <div className="grid h-12 w-12 shrink-0 place-items-center rounded-[var(--radius-md)] bg-[var(--accent-soft)] text-[var(--accent)]">
-            <CalendarDays size={24} strokeWidth={1.5} />
-          </div>
-          <div className="min-w-0 flex-1">
-            <h2 className={`${displayFont.className} text-[1.3rem] font-semibold leading-tight text-[var(--text)] md:text-[1.5rem]`}>
-              Хотите добавить событие?
-            </h2>
-            <p className="mt-1 text-[14px] leading-6 text-[var(--muted)]">
-              Расскажите кофейному сообществу о вашем мероприятии.
-            </p>
-          </div>
-          <Button className="shrink-0 gap-2 whitespace-nowrap" href="/contacts?topic=event#contact-form">
-            Добавить событие
-            <CalendarDays size={16} strokeWidth={1.8} />
-          </Button>
-        </div>
-      </div>
-    </section>
-  );
-}
+

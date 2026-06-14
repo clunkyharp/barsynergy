@@ -1,6 +1,7 @@
 'use server';
 
 import { redirect } from 'next/navigation';
+import { cookies } from 'next/headers';
 import { ApplicationStatus, ApplicationType, UserRole, UserStatus } from '@prisma/client';
 import { Prisma } from '@prisma/client';
 import { z } from 'zod';
@@ -16,6 +17,7 @@ import { getEnv } from '@/lib/validation/env';
 import { assertSameOriginServerAction } from '@/lib/security/server-action-origin';
 import { assertTurnstilePassed } from '@/lib/security/turnstile';
 import { CompromisedPasswordError, assertPasswordNotCompromised } from '@/lib/security/hibp';
+import { setRegisterUserFlashCookie } from '@/lib/auth/register-user-flash';
 
 const businessRequestSchema = z.object({
   companyName: z.string().trim().min(2).max(160),
@@ -82,7 +84,9 @@ async function sendUserVerificationEmail(input: { email: string; userId: string 
   sendVerificationEmail({ to: input.email, verificationUrl }).catch(() => {});
 }
 
-async function handleExistingUserRegistration(email: string): Promise<RegisterUserActionResult> {
+async function redirectForExistingUserRegistration(email: string, fullName?: string): Promise<RegisterUserActionResult> {
+  setRegisterUserFlashCookie(await cookies(), { email, fullName });
+
   const existingUser = await prisma.user.findUnique({
     where: { email },
     select: { id: true, status: true, emailVerifiedAt: true }
@@ -192,14 +196,19 @@ export async function registerUserAction(
   await assertSameOriginServerAction();
 
   await assertTurnstilePassed(getString(formData, 'turnstileToken'));
+  const flash = {
+    fullName: getString(formData, 'fullName'),
+    email: getString(formData, 'email')
+  };
 
   const parsed = registerUserSchema.safeParse({
-    fullName: getString(formData, 'fullName'), email: getString(formData, 'email'),
+    fullName: flash.fullName, email: flash.email,
     password: getString(formData, 'password'), confirmPassword: getString(formData, 'confirmPassword'),
     consent: getString(formData, 'consent')
   });
 
   if (!parsed.success) {
+    setRegisterUserFlashCookie(await cookies(), flash);
     return { type: 'error', code: 'invalid' };
   }
 
@@ -214,7 +223,7 @@ export async function registerUserAction(
     });
 
     if (existingUser) {
-      return handleExistingUserRegistration(registerRequest.email);
+      return redirectForExistingUserRegistration(registerRequest.email, registerRequest.fullName);
     }
 
     const passwordHash = await hashPassword(registerRequest.password);
@@ -229,7 +238,7 @@ export async function registerUserAction(
     if (error instanceof AuthRateLimitError) return { type: 'error', code: 'rate-limited' };
     if (error instanceof CompromisedPasswordError) return { type: 'error', code: 'compromised-password' };
     if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
-      return handleExistingUserRegistration(registerRequest.email);
+      return redirectForExistingUserRegistration(registerRequest.email, registerRequest.fullName);
     }
     return { type: 'error', code: resolveRegisterErrorCode(error) };
   }

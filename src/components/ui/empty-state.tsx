@@ -62,7 +62,7 @@ export function ContextualEmptyState({
 
   return (
     <Card className="border-l-[3px] border-l-[var(--accent)] p-5">
-      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">{context}</p>
+      <p className="text-[11px] font-semibold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--accent)]">{context}</p>
       <div className="mt-3 grid gap-3 sm:grid-cols-[1fr_auto] sm:items-end">
         <div>
           <h2 className="text-lg font-semibold">{title}</h2>

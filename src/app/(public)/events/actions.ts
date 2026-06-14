@@ -6,6 +6,7 @@ import { buildApplicationPayload } from '@/lib/applications/application-payloads
 import {
   assertActiveCity,
   baseContactSchema,
+  formatPublicApplicationActionError,
   getString,
   nullableString,
   optionalString,
@@ -14,6 +15,80 @@ import {
   utmSchema
 } from '@/lib/applications/public-form-helpers';
 import { submitPublicApplicationAction } from '@/lib/applications/submit-public-application-action';
+import { assertSameOriginServerAction } from '@/lib/security/server-action-origin';
+import { assertPublicApplicationFormsEnabled, assertPublicApplicationSubmissionAllowed, hasHoneypotValue } from '@/lib/applications/public-submission-guards';
+import { assertTurnstilePassed } from '@/lib/security/turnstile';
+import { createPublicApplication } from '@/lib/applications/create-public-application';
+
+type EventLeadActionResult = { type: 'success'; message: string } | { type: 'error'; message: string } | null;
+
+const eventLeadSchema = z.object({
+  companyName: z.string().trim().min(2, 'Укажите название компании или имя').max(180),
+  city: z.string().trim().max(120).optional(),
+  eventTitle: z.string().trim().min(2, 'Укажите название события').max(180),
+  contact: z.string().trim().min(2, 'Укажите контакт для связи').max(200),
+  comment: z.string().trim().max(4000).optional(),
+  consent: z.literal('accepted')
+});
+
+export async function submitEventLead(
+  _prevState: EventLeadActionResult,
+  formData: FormData
+): Promise<EventLeadActionResult> {
+  try {
+    await assertSameOriginServerAction();
+    assertPublicApplicationFormsEnabled();
+
+    if (hasHoneypotValue(getString(formData, 'website'))) {
+      return { type: 'success', message: 'Заявка на событие отправлена. Команда BARSYNERGY свяжется с вами.' };
+    }
+
+    const turnstileToken = getString(formData, 'turnstileToken');
+    if (turnstileToken) {
+      await assertTurnstilePassed(turnstileToken);
+    }
+    await assertPublicApplicationSubmissionAllowed(ApplicationType.EVENT_APPLICATION);
+
+    const parsed = eventLeadSchema.parse({
+      companyName: getString(formData, 'companyName'),
+      city: optionalString(getString(formData, 'city')),
+      eventTitle: getString(formData, 'eventTitle'),
+      contact: getString(formData, 'contact'),
+      comment: optionalString(getString(formData, 'comment')),
+      consent: getString(formData, 'consent')
+    });
+
+    const cityPart = parsed.city ? ` (${parsed.city})` : '';
+    const subject = `Событие: ${parsed.eventTitle}${cityPart} — ${parsed.companyName}`;
+    const message = [
+      `Компания: ${parsed.companyName}`,
+      parsed.city ? `Город: ${parsed.city}` : null,
+      `Событие: ${parsed.eventTitle}`,
+      `Контакт: ${parsed.contact}`,
+      parsed.comment ? `Комментарий: ${parsed.comment}` : null
+    ]
+      .filter(Boolean)
+      .join('\n');
+
+    await createPublicApplication({
+      type: ApplicationType.EVENT_APPLICATION,
+      subject,
+      message,
+      name: parsed.companyName,
+      consentText: PERSONAL_DATA_CONSENT_TEXT
+    });
+
+    return {
+      type: 'success',
+      message: 'Заявка на событие отправлена. Команда BARSYNERGY свяжется с вами.'
+    };
+  } catch (error) {
+    if (error instanceof Error) {
+      return { type: 'error', message: formatPublicApplicationActionError(error) };
+    }
+    return { type: 'error', message: 'Не удалось отправить заявку. Попробуйте ещё раз.' };
+  }
+}
 
 const eventApplicationSchema = baseContactSchema
   .merge(utmSchema)

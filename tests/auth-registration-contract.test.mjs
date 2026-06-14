@@ -17,10 +17,10 @@ test('login page delegates CTAs to LoginForm component', () => {
   assert.match(formSource, /Зарегистрироваться как участник/);
   assert.match(formSource, /href="\/auth\/register"/);
   assert.match(formSource, /Запросить бизнес-доступ/);
-  assert.match(formSource, /role="tablist"/);
-  assert.match(formSource, /Я специалист/);
-  assert.match(formSource, /Я представляю компанию/);
-  assert.match(formSource, /name="role"/);
+  assert.doesNotMatch(formSource, /role="tablist"/);
+  assert.doesNotMatch(formSource, /Я специалист/);
+  assert.doesNotMatch(formSource, /Я представляю компанию/);
+  assert.doesNotMatch(formSource, /name="role"/);
   assert.doesNotMatch(formSource, /Подать заявку на подключение/);
 });
 

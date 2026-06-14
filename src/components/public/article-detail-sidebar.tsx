@@ -18,7 +18,7 @@ function ArticleTocBlock({ toc }: { toc: TocItem[] }) {
 
   return (
     <Panel padding="lg">
-      <h2 className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">
+      <h2 className="text-[11px] font-semibold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--accent)]">
         В материале
       </h2>
       <nav className="mt-4">
@@ -75,13 +75,13 @@ function ArticleDetailBlock({
 
   return (
     <Panel padding="lg">
-      <h2 className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">
+      <h2 className="text-[11px] font-semibold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--accent)]">
         Детали
       </h2>
       <dl className="mt-4 grid gap-3">
         {rows.map((row) => (
           <div className="border-b border-[var(--line)] pb-3 last:border-b-0 last:pb-0" key={row.label}>
-            <dt className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">
+            <dt className="text-[11px] font-semibold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--muted)]">
               {row.label}
             </dt>
             <dd className="mt-1.5 text-sm leading-6 text-[var(--text)]">{row.value}</dd>
@@ -97,7 +97,7 @@ function ArticleTagsBlock({ tags }: { tags: string[] }) {
 
   return (
     <Panel padding="lg">
-      <h2 className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">
+      <h2 className="text-[11px] font-semibold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--accent)]">
         Темы
       </h2>
       <div className="mt-4 flex flex-wrap gap-1.5">
@@ -117,7 +117,7 @@ function ArticleTagsBlock({ tags }: { tags: string[] }) {
 function ArticleCtaBlock() {
   return (
     <Panel padding="lg">
-      <h2 className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">
+      <h2 className="text-[11px] font-semibold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--accent)]">
         Калькулятор себестоимости
       </h2>
       <p className="mt-3 text-sm leading-6 text-[var(--muted)]">

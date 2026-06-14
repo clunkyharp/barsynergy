@@ -55,7 +55,7 @@ export function DocumentHeader({
         {/* Mobile collapsible TOC */}
         <div className="border-t border-[var(--line)] lg:hidden">
           <button
-            className="flex w-full items-center justify-between py-3 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--accent)]"
+            className="flex w-full items-center justify-between py-3 text-xs font-semibold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--accent)]"
             onClick={() => setTocOpen(!tocOpen)}
             type="button"
           >
@@ -83,7 +83,7 @@ export function DocumentHeader({
               ))}
               {relatedDocuments.length > 0 ? (
                 <div className="mt-2 border-t border-[var(--line)] pt-3">
-                  <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--accent)]">Связанные документы</p>
+                  <p className="mb-2 text-[11px] font-semibold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--accent)]">Связанные документы</p>
                   {relatedDocuments.map((doc) => (
                     <InlineLink href={doc.href} key={doc.href}>
                       {doc.label}

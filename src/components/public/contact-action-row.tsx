@@ -66,7 +66,7 @@ function ServiceMarker({
   serviceName
 }: Pick<ContactActionRowProps, 'icon' | 'iconAlt' | 'iconSrc' | 'serviceName'>) {
   return (
-    <span className="grid size-9 shrink-0 place-items-center rounded-[var(--radius-sm)] border border-[color-mix(in_srgb,var(--contact-accent)_24%,var(--border-default))] bg-[color-mix(in_srgb,var(--contact-accent)_9%,var(--surface-wash))] p-2 text-[10px] font-semibold uppercase tracking-[0.08em] text-[var(--contact-accent)] sm:size-10 sm:text-[11px]">
+    <span className="grid size-9 shrink-0 place-items-center rounded-[var(--radius-sm)] border border-[color-mix(in_srgb,var(--contact-accent)_24%,var(--border-default))] bg-[color-mix(in_srgb,var(--contact-accent)_9%,var(--surface-wash))] p-2 text-[10px] font-semibold uppercase tracking-[var(--tracking-eyebrow-sm)] text-[var(--contact-accent)] sm:size-10 sm:text-[11px]">
       {iconSrc ? (
         <Image alt={iconAlt} aria-hidden={iconAlt ? undefined : true} className="h-full w-full object-contain opacity-95" height={64} src={iconSrc} width={64} />
       ) : Icon ? (
@@ -111,7 +111,7 @@ export function ContactActionRow({
         )}
       >
         <span className="min-w-0">
-          <span className="block text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">{typeLabel}</span>
+          <span className="block text-[10px] font-semibold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--muted)]">{typeLabel}</span>
           <span className="mt-0.5 block text-sm font-semibold leading-5 text-[var(--text)]">{serviceName}</span>
         </span>
         {descriptor ? (

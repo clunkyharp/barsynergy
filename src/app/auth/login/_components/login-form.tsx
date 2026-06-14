@@ -1,8 +1,8 @@
 'use client';
 
 import { useActionState } from 'react';
-import { cn } from '@/lib/utils';
 import { AppLink } from '@/components/ui/app-link';
+import { PublicFormValidation } from '@/components/public/public-form-validation';
 import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
 import { InlineAlert } from '@/components/ui/inline-alert';
@@ -20,61 +20,16 @@ const errorMessages: Record<string, string> = {
   'rate-limited': 'Слишком много попыток входа. Повторите позже.'
 };
 
-const loginRoleOptions = [
-  {
-    value: 'participant',
-    label: 'Я специалист',
-    href: '/auth/login?role=participant',
-    description: 'Профиль, вакансии и отклики'
-  },
-  {
-    value: 'business',
-    label: 'Я представляю компанию',
-    href: '/auth/login?role=business',
-    description: 'Кабинет компании и заявки'
-  }
-] as const;
-
-export function LoginForm({ returnTo, role }: { returnTo?: string; role?: string }) {
+export function LoginForm({ returnTo }: { returnTo?: string }) {
   const [result, formAction] = useActionState<LoginActionResult, FormData>(loginAction, null);
   const errorCode = result?.type === 'error' ? result.code : null;
   const isRoleMismatch = errorCode === 'role-mismatch';
-  const selectedRole = role === 'business' ? 'business' : 'participant';
 
   return (
-    <form action={formAction} className="auth-login-form grid gap-3.5" noValidate>
+    <form action={formAction} className="auth-login-form grid gap-3.5" data-public-validation="true" noValidate>
+      <PublicFormValidation />
       <input name="surface" type="hidden" value="public" />
       {returnTo ? <input name="returnTo" type="hidden" value={returnTo} /> : null}
-      <input name="role" type="hidden" value={selectedRole} />
-      <div className="grid gap-2">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--muted)]">
-          Выберите кабинет
-        </p>
-        <div className="grid gap-2 sm:grid-cols-2" role="tablist" aria-label="Тип входа">
-          {loginRoleOptions.map((option) => {
-            const href = returnTo ? `${option.href}&returnTo=${encodeURIComponent(returnTo)}` : option.href;
-            const isActive = selectedRole === option.value;
-
-            return (
-              <AppLink
-                aria-selected={isActive}
-                className={cn(
-                  'rounded-[var(--radius-md)] border px-3 py-3 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]',
-                  isActive
-                    ? 'border-[var(--accent)] bg-[var(--accent-soft)] text-[var(--text)]'
-                    : 'border-[var(--border-default)] bg-[var(--surface-elevated)] text-[var(--text)] hover:border-[var(--accent)]/35 hover:bg-[var(--surface-wash)]'
-                )}
-                href={href}
-                key={option.value}
-                role="tab"
-              >
-                <span className="block text-sm font-semibold leading-5">{option.label}</span>
-                <span className="mt-1 block text-xs leading-5 text-[var(--muted)]">{option.description}</span>
-              </AppLink>
-            );
-          })}
-        </div>
-      </div>
       {errorCode ? (
         <InlineAlert className="mb-1 flex items-start gap-2" tone={isRoleMismatch ? 'warning' : 'error'}>
           {!isRoleMismatch ? <span aria-hidden="true" className="font-bold">✕</span> : null}

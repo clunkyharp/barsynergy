@@ -51,7 +51,7 @@ export function CourseListRow({
         href={`${basePath}/${item.slug}`}
       >
         <div className="min-w-0">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--accent)]">{item.label ?? 'Программа'}</p>
+          <p className="text-[11px] font-semibold uppercase tracking-[var(--tracking-eyebrow-sm)] text-[var(--accent)]">{item.label ?? 'Программа'}</p>
           {item.imageUrl ? (
             <div className="mt-4 hidden md:block">
               <div

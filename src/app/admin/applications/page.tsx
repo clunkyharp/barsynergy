@@ -3,6 +3,7 @@ import { publishContentFromApplication } from '@/app/admin/applications/actions'
 import { AdminActionAlert, AdminFilterBar, AdminPagination, AdminStatusTabs, HiddenRedirect } from '@/components/admin/content-admin-controls';
 import { AdminPageIntro } from '@/components/admin/admin-page-intro';
 import { Button } from '@/components/ui/button';
+import { ConfirmSubmitButton } from '@/components/ui/confirm-submit-button';
 import {
   DataTable,
   DataTableActionRow,
@@ -396,9 +397,15 @@ export default async function AdminApplicationsPage({ searchParams }: AdminAppli
                               <HiddenRedirect value={currentPath} />
                               <input name="applicationId" type="hidden" value={application.id} />
                               <input name="target" type="hidden" value={publicationTarget} />
-                              <Button className="min-h-9 px-3 py-1.5 text-xs" type="submit">
+                              <ConfirmSubmitButton
+                                className="min-h-9 px-3 py-1.5 text-xs"
+                                confirmActionLabel="Опубликовать"
+                                confirmText="Запись станет доступна на публичной странице."
+                                confirmTitle="Опубликовать на сайте?"
+                                type="submit"
+                              >
                                 Опубликовать
-                              </Button>
+                              </ConfirmSubmitButton>
                             </form>
                           ) : null}
                           <Button className="min-h-9 px-3 py-1.5 text-xs" href={`/admin/applications/${application.id}`} variant="secondary">

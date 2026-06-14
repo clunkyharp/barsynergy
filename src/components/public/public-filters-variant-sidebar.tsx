@@ -112,10 +112,10 @@ export function PublicFiltersSidebarVariant({
         {hasActiveFilters ? (
           <div className="mt-4 border-t border-[var(--line)] pt-4">
             <div className="flex items-center justify-between gap-3">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--muted)]">
+              <p className="text-[11px] font-semibold uppercase tracking-[var(--tracking-marker)] text-[var(--muted)]">
                 {activeSummaryCountLabel ?? title}
               </p>
-              <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--accent)]">
+              <span className="text-[11px] font-semibold uppercase tracking-[var(--tracking-marker)] text-[var(--accent)]">
                 {activeFilters.length}
               </span>
             </div>
@@ -143,7 +143,7 @@ export function PublicFiltersSidebarVariant({
           <div className="mt-4 flex flex-wrap items-center gap-3 border-t border-[var(--line)] pt-4">
             {hasActiveFilters ? (
               <button
-                className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-[var(--radius-sm)] border border-[var(--border-default)] bg-[var(--surface-wash)] px-4 py-2.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--text)] transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] hover:border-[var(--accent)]/35 hover:text-[var(--accent)] motion-reduce:transition-none"
+                className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-[var(--radius-sm)] border border-[var(--border-default)] bg-[var(--surface-wash)] px-4 py-2.5 text-[11px] font-semibold uppercase tracking-[var(--tracking-marker)] text-[var(--text)] transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] hover:border-[var(--accent)]/35 hover:text-[var(--accent)] motion-reduce:transition-none"
                 onClick={onClearAll}
                 type="button"
               >
@@ -152,7 +152,7 @@ export function PublicFiltersSidebarVariant({
               </button>
             ) : null}
             {isPending ? (
-              <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">Обновляем список…</p>
+              <p className="text-[11px] font-semibold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--muted)]">Обновляем список…</p>
             ) : null}
           </div>
         ) : null}

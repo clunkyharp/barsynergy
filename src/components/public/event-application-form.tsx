@@ -12,7 +12,7 @@ import {
 } from '@/components/public/application-form-section';
 import type { PublicApplicationResult } from '@/lib/applications/public-form-helpers';
 import { ConsentField } from '@/components/ui/consent-field';
-import { FormField } from '@/components/ui/form-field';
+import { FormField, FormSection } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
 import { InlineLink } from '@/components/ui/inline-link';
 import { Select } from '@/components/ui/select';
@@ -46,14 +46,18 @@ export function EventApplicationForm({ enabled, utm, cities, defaults = {}, acti
           description={hasEventContext ? 'Оставьте контакт и короткий комментарий по участию.' : 'Укажите тему, город, дату, площадку и контакт организатора.'}
         />
         <div className="relative p-5 md:p-6">
+          <FormSection title="Контактные данные">
+            <div className="grid gap-4 md:grid-cols-2">
+              <FormField htmlFor="eventName" label="Имя">
+                <Input id="eventName" name="name" required maxLength={160} minLength={2} placeholder="Иван Иванов" />
+              </FormField>
+              <FormField htmlFor="eventTitle" label="Событие или тема">
+                <Input id="eventTitle" name="eventTitle" defaultValue={defaults.eventTitle} required maxLength={180} minLength={2} placeholder="Например, гостевая смена" />
+              </FormField>
+            </div>
+          </FormSection>
+          <ContactChannelFieldset emailId="eventEmail" phoneId="eventPhone" telegramId="eventTelegram" />
           <div className="grid gap-4 md:grid-cols-2">
-            <FormField htmlFor="eventName" label="Имя">
-              <Input id="eventName" name="name" required maxLength={160} minLength={2} placeholder="Иван Иванов" />
-            </FormField>
-            <FormField htmlFor="eventTitle" label="Событие или тема">
-              <Input id="eventTitle" name="eventTitle" defaultValue={defaults.eventTitle} required maxLength={180} minLength={2} placeholder="Например, гостевая смена" />
-            </FormField>
-            <ContactChannelFieldset className="md:col-span-2" emailId="eventEmail" phoneId="eventPhone" telegramId="eventTelegram" />
             <FormField htmlFor="eventCityId" label="Город">
               <Select id="eventCityId" name="cityId" defaultValue="">
                 <option value="">Не указан</option>

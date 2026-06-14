@@ -569,6 +569,9 @@ model Vacancy {
   salaryLabel       String?
   experienceLabel   String?
   contactMode       String?
+  contactTelegram   String?
+  contactPhone      String?
+  contactEmail      String?
   description       String
   createdAt         DateTime      @default(now())
   updatedAt         DateTime      @updatedAt

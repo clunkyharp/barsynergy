@@ -519,7 +519,7 @@
 
 .admin-cms-form .form-section,
 .admin-cms-panel .form-section {
-  border-top-color: var(--admin-hairline);
+  border-top: 0;
 }
 
 .admin-cms-form .form-section-header,

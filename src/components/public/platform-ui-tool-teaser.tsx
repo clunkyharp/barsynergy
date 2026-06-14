@@ -41,7 +41,7 @@ export function ToolTeaser({ teaser }: { teaser: ToolTeaserContent }) {
               </PublicBodyText>
             </div>
             <div className="home-tool-teaser-rail min-w-0">
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--editorial-dark-muted)]">{teaser.cardEyebrow}</p>
+              <p className="text-xs font-semibold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--editorial-dark-muted)]">{teaser.cardEyebrow}</p>
               <p className="mt-3 max-w-sm text-base leading-7 text-[var(--editorial-dark-text)]">{teaser.cardTitle}</p>
               <Button className="mt-5 w-full rounded-[var(--radius-md)] px-6" href={teaser.actionHref}>
                 {teaser.actionLabel}

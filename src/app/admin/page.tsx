@@ -227,7 +227,7 @@ export default async function AdminPage() {
       <Panel className="grid gap-4 md:grid-cols-[1fr_auto] md:items-end" padding="lg" tone="elevated">
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">BARSYNERGY / админка</p>
-          <h1 className="mt-3 text-[2rem] font-semibold leading-tight tracking-normal md:text-[2.6rem]">
+          <h1 className="mt-3 text-[2rem] font-semibold leading-[1.20] text-balance tracking-normal md:text-[2.6rem]">
             Рабочая очередь
           </h1>
           <p className="mt-3 max-w-2xl text-sm leading-6 text-[var(--muted)]">
