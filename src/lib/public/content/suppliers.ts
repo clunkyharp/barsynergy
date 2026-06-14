@@ -47,7 +47,7 @@ export async function getPublishedSupplierDetail(slug: string): Promise<PublicCo
     updatedAtIso: supplier.updatedAt.toISOString(),
     body: cleanPublicDetailText(supplier.description),
     label: supplier.category?.name,
-    meta: compact([supplier.city?.name, supplier.companyName, supplier.isVerified ? 'Проверенный поставщик' : undefined]),
+    meta: compact([supplier.city?.name, supplier.companyName]),
     imageUrl: detailImage(supplier.coverImage, supplier.coverImageAlt, supplier.title),
     companyName: supplier.companyName,
     cityName: supplier.city?.name,
@@ -57,7 +57,7 @@ export async function getPublishedSupplierDetail(slug: string): Promise<PublicCo
       supplier.city?.name ? `Город: ${supplier.city.name}` : undefined,
       supplier.serviceArea ? `География: ${supplier.serviceArea}` : undefined,
       supplier.contactLabel ? `Контакты: ${supplier.contactLabel}` : undefined,
-      supplier.isVerified ? 'Статус: проверен BARSYNERGY' : 'Статус: контакт для уточнения',
+      supplier.isVerified ? 'Статус: проверен BARSYNERGY' : undefined,
       'Условия: уточняйте у компании'
     ])),
     isVerified: supplier.isVerified,
@@ -172,7 +172,7 @@ export async function getPublishedSuppliers(params: PublicContentSearchParams = 
         kind: 'supplier',
         label: supplier.category?.name,
         subtitle: supplier.companyName,
-        meta: [supplier.city?.name, supplier.companyName, supplier.isVerified ? 'Проверен' : undefined, supplier.serviceArea].filter(Boolean) as string[],
+        meta: [supplier.city?.name, supplier.companyName, supplier.serviceArea].filter(Boolean) as string[],
         metaGroups: [
           supplier.category?.name ? { label: 'Категория', value: supplier.category.name } : undefined,
           supplier.city?.name ? { label: 'Город', value: supplier.city.name } : undefined,
@@ -180,9 +180,7 @@ export async function getPublishedSuppliers(params: PublicContentSearchParams = 
           { label: 'Условия', value: 'по запросу' },
           { label: 'Связь', value: supplier.contactLabel ?? 'через BARSYNERGY' },
           { label: 'Продукты / услуги', value: compactLabel(supplier.summary) },
-          supplier.isVerified ? undefined : { value: 'Контакт для уточнения' }
         ].filter(Boolean) as PublishedContentMetaGroup[],
-        statusLabel: supplier.isVerified ? 'Проверен' : 'Контакт для уточнения',
         updatedLabel: formatUpdatedLabel(supplier.publishedAt ?? supplier.createdAt),
         imageUrl: publicImageUrl(supplier.coverImage),
         websiteUrl: externalUrl

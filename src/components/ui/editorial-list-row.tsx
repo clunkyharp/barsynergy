@@ -1,5 +1,6 @@
 import type { HTMLAttributes, ReactNode } from 'react';
 import { ArrowUpRight, BadgeCheck } from 'lucide-react';
+import { VERIFIED_SUPPLIER_ARIA } from '@/lib/public/content/trust-labels';
 import { AppLink } from '@/components/ui/app-link';
 import { Button, type ButtonVariant } from '@/components/ui/button';
 import { displayFont } from '@/lib/fonts';
@@ -26,6 +27,7 @@ type EditorialListRowProps = HTMLAttributes<HTMLElement> & {
   href?: string;
   actionLabel?: string;
   variant?: 'default' | 'opportunity' | 'directory';
+  verified?: boolean;
 };
 
 export function EditorialListRow({
@@ -44,6 +46,7 @@ export function EditorialListRow({
   href,
   actionLabel = 'Открыть',
   variant = 'default',
+  verified = false,
   ...props
 }: EditorialListRowProps) {
   const Component = as;
@@ -101,7 +104,9 @@ export function EditorialListRow({
             {subtitle ? (
               <div className="flex min-w-0 flex-wrap items-center gap-2 text-[1.05rem] font-semibold leading-7 text-[var(--text)]">
                 <span className="min-w-0 break-words">{subtitle}</span>
-                <BadgeCheck aria-label="Проверено" className="shrink-0 text-[var(--accent)]" size={18} strokeWidth={2.2} />
+                {verified ? (
+                  <BadgeCheck aria-label={VERIFIED_SUPPLIER_ARIA} size={18} strokeWidth={1.8} className="shrink-0 text-[var(--accent)]" />
+                ) : null}
               </div>
             ) : null}
             <div className={cn('text-[15px] leading-7 text-[var(--muted)]', subtitle ? 'mt-3' : '')}>{description}</div>

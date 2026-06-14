@@ -15,6 +15,7 @@ type VacancyDetailHeroProps = {
   experienceLabel?: string;
   positionLabel?: string;
   image?: PublicContentImage;
+  isVerified?: boolean;
 };
 
 export function VacancyDetailHero({
@@ -28,6 +29,7 @@ export function VacancyDetailHero({
   experienceLabel,
   positionLabel,
   image,
+  isVerified,
 }: VacancyDetailHeroProps) {
   return (
     <section className="background-zone background-zone-graphite relative overflow-hidden border-b border-[var(--line)] py-7 md:py-9">
@@ -43,20 +45,29 @@ export function VacancyDetailHero({
         <div className="mt-6 grid gap-8 lg:grid-cols-[1fr_auto] lg:items-start">
           <div className="min-w-0">
             {label ? (
-              <span className="inline-flex items-center rounded-[var(--radius-sm)] bg-[var(--accent)] px-3 py-1 text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--accent-contrast)]">
+              <span className="inline-flex items-center rounded-[var(--radius-sm)] bg-[var(--accent)] px-3 py-1 text-[11px] font-bold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--accent-contrast)]">
                 {label}
               </span>
             ) : null}
 
             <h1
-              className={`${displayFont.className} mt-3 max-w-[22ch] text-pretty text-[clamp(1.8rem,3.2vw,3rem)] font-semibold leading-[1.05] tracking-normal text-[var(--text)] [overflow-wrap:normal] [text-wrap:pretty] [word-break:normal] max-[480px]:max-w-full`}
+              className={`${displayFont.className} mt-3 max-w-[22ch] text-pretty text-[clamp(1.8rem,3.2vw,3rem)] font-semibold leading-[1.20] text-balance tracking-normal text-[var(--text)] [overflow-wrap:normal] [text-wrap:pretty] [word-break:normal] max-[480px]:max-w-full`}
             >
               {title}
             </h1>
 
             {companyName || positionLabel ? (
               <p className="mt-2 text-base leading-6 text-[var(--muted)]">
-                {companyName ? <span className="font-medium text-[var(--text)]">{companyName}</span> : null}
+                {companyName ? (
+                  <>
+                    {isVerified ? (
+                      <span className="mr-2 inline-flex items-center gap-1.5 rounded-[var(--radius-sm)] border border-[var(--accent)]/40 bg-[var(--accent-soft)] px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-[var(--tracking-marker)] text-[var(--accent)]">
+                        Компания подтверждена
+                      </span>
+                    ) : null}
+                    <span className="font-medium text-[var(--text)]">{companyName}</span>
+                  </>
+                ) : null}
                 {companyName && positionLabel ? <span className="mx-2 text-[var(--muted)]">·</span> : null}
                 {positionLabel ? <span>{positionLabel}</span> : null}
                 {cityName ? <span className="ml-2 text-[var(--muted)]">— {cityName}</span> : null}
@@ -65,7 +76,7 @@ export function VacancyDetailHero({
 
             {salaryLabel ? (
               <div className="mt-4">
-                <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--muted)]">Зарплата</p>
+                <p className="text-[11px] font-bold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--muted)]">Зарплата</p>
                 <p className={`${displayFont.className} mt-1 text-[clamp(1.5rem,2.5vw,2.2rem)] font-semibold leading-none text-[var(--accent)]`}>
                   {salaryLabel}
                 </p>

@@ -1,5 +1,8 @@
 import { BadgeCheck, ExternalLink, MapPin } from 'lucide-react';
+import { VERIFIED_SUPPLIER_ARIA } from '@/lib/public/content/trust-labels';
+import { AvatarFallback } from '@/components/ui/avatar-fallback';
 import { Button } from '@/components/ui/button';
+import { HighlightChip } from '@/components/ui/highlight-chip';
 import { cn } from '@/lib/utils';
 import type { CardAction, CardMedia, CardDensity } from './card-types';
 
@@ -49,12 +52,7 @@ function MediaBlock({ media, label, logoFallback }: { media: CardMedia; label: s
         aria-label={`${logoFallback ?? label} без логотипа`}
         className="flex h-12 w-20 items-center justify-center overflow-hidden rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--surface-wash)]"
       >
-        <span
-          aria-hidden="true"
-          className="grid size-9 place-items-center rounded-full bg-[var(--accent-soft)] text-sm font-semibold uppercase tracking-[0.06em] text-[var(--accent)]"
-        >
-          {media.initials ?? logoFallback?.slice(0, 2) ?? label.slice(0, 2)}
-        </span>
+        <AvatarFallback initials={media.initials ?? logoFallback?.slice(0, 2) ?? label.slice(0, 2)} size="sm" />
       </div>
     );
   }
@@ -85,11 +83,11 @@ export function DirectoryCard({
   leadAccent = false,
   subtitle,
   description,
+  verified,
   media = { kind: 'none' },
   meta,
   actions,
   websiteUrl,
-  verified,
   density = 'comfortable',
   className
 }: DirectoryCardProps) {
@@ -105,13 +103,11 @@ export function DirectoryCard({
       <div className="grid min-w-0 gap-6">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="inline-flex items-center rounded-[var(--radius-pill)] border border-[var(--accent)]/25 bg-[var(--accent-soft)] px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--accent)]">
+            <span className="inline-flex items-center rounded-[var(--radius-pill)] border border-[var(--accent)]/25 bg-[var(--accent-soft)] px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-[var(--tracking-eyebrow-sm)] text-[var(--accent)]">
               {label}
             </span>
             {statusLabel ? (
-              <span className="inline-flex items-center rounded-[var(--radius-pill)] border border-[var(--warning-border)] bg-[var(--warning-bg)] px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-[0.08em] text-[var(--warning-text)]">
-                {statusLabel}
-              </span>
+              <HighlightChip variant="fresh">{statusLabel}</HighlightChip>
             ) : null}
             {labelMeta ? (
               <span className="inline-flex items-center gap-1 rounded-[var(--radius-pill)] border border-[var(--border-subtle)] bg-[var(--surface-wash)] px-2.5 py-0.5 text-[11px] font-medium text-[var(--muted)]">
@@ -131,12 +127,12 @@ export function DirectoryCard({
           {lead ? (
             <div className={cn('leading-snug', isCompact ? 'mt-2' : 'mt-3')}>
               {leadLabel ? (
-                <span className="block text-[11px] font-medium uppercase tracking-[0.06em] text-[var(--muted)]">
+                <span className="block text-[11px] font-medium uppercase tracking-[var(--tracking-eyebrow-sm)] text-[var(--muted)]">
                   {leadLabel}
                 </span>
               ) : null}
               <span className={cn(
-                'font-bold',
+                'tabular-nums font-semibold',
                 isCompact ? 'text-[1.15rem] md:text-[1.3rem]' : 'text-[1.25rem] md:text-[1.45rem]',
                 leadAccent ? 'text-[var(--accent)]' : 'text-[var(--text)]'
               )}>
@@ -149,7 +145,7 @@ export function DirectoryCard({
             <div className="mt-4 flex flex-wrap gap-2">
               {meta.slice(0, 3).map((item) => (
                 <span
-                  className="inline-flex items-center rounded-[var(--radius-full)] border border-[var(--border-subtle)] bg-[var(--surface-wash)] px-2.5 py-1 text-[11px] font-medium text-[var(--muted)]"
+                  className="inline-flex items-center rounded-[var(--radius-pill)] border border-[var(--border-subtle)] bg-[var(--surface-wash)] px-2.5 py-1 text-[11px] font-medium text-[var(--muted)]"
                   key={`${item.label}-${item.value}`}
                 >
                   {item.label ? `${item.label}: ${item.value}` : item.value}
@@ -169,7 +165,7 @@ export function DirectoryCard({
                   <div className="flex min-w-0 flex-wrap items-center gap-2 text-[1.05rem] font-semibold leading-7 text-[var(--text)]">
                     <span className="min-w-0 break-words">{subtitle}</span>
                     {verified ? (
-                      <BadgeCheck aria-label="Проверено" className="shrink-0 text-[var(--accent)]" size={18} strokeWidth={2.2} />
+                      <BadgeCheck aria-label={VERIFIED_SUPPLIER_ARIA} size={14} strokeWidth={1.8} className="shrink-0 text-[var(--accent)]" />
                     ) : null}
                     {websiteUrl ? (
                       <a

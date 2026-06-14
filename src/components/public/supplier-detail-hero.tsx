@@ -15,8 +15,6 @@ type SupplierDetailHeroProps = {
   isVerified: boolean;
   externalUrl?: string;
   externalUrlLabel?: string;
-  contactHref: string;
-  showContactCta?: boolean;
 };
 
 export function SupplierDetailHero({
@@ -31,8 +29,6 @@ export function SupplierDetailHero({
   isVerified,
   externalUrl,
   externalUrlLabel,
-  contactHref,
-  showContactCta = true,
 }: SupplierDetailHeroProps) {
   return (
     <section className="background-zone background-zone-graphite relative overflow-hidden border-b border-[var(--line)] py-7 md:py-9">
@@ -48,18 +44,14 @@ export function SupplierDetailHero({
         <div className="mt-6 grid gap-8 lg:grid-cols-[1fr_auto] lg:items-start">
           <div className="min-w-0">
             {isVerified ? (
-              <span className="inline-flex items-center gap-1.5 rounded-[var(--radius-sm)] border border-[var(--accent)]/40 bg-[var(--accent-soft)] px-3 py-1 text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--accent)]">
+              <span className="inline-flex items-center gap-1.5 rounded-[var(--radius-sm)] border border-[var(--accent)]/40 bg-[var(--accent-soft)] px-3 py-1 text-[11px] font-bold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--accent)]">
                 <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-[var(--accent)]" />
                 Проверенный поставщик
               </span>
-            ) : (
-              <span className="inline-flex items-center gap-1.5 rounded-[var(--radius-sm)] border border-[var(--border-subtle)] bg-[var(--surface-wash)] px-3 py-1 text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--muted)]">
-                Контакт для уточнения
-              </span>
-            )}
+            ) : null}
 
             <h1
-              className={`${displayFont.className} mt-4 max-w-[22ch] text-pretty text-[clamp(1.8rem,3.2vw,3rem)] font-semibold leading-[1.05] tracking-normal text-[var(--text)] [overflow-wrap:normal] [text-wrap:pretty] [word-break:normal] max-[480px]:max-w-full`}
+              className={`${displayFont.className} mt-4 max-w-[22ch] text-pretty text-[clamp(1.8rem,3.2vw,3rem)] font-semibold leading-[1.20] text-balance tracking-normal text-[var(--text)] [overflow-wrap:normal] [text-wrap:pretty] [word-break:normal] max-[480px]:max-w-full`}
             >
               {title}
             </h1>
@@ -88,25 +80,17 @@ export function SupplierDetailHero({
               </p>
             ) : null}
 
-            {showContactCta ? (
+            {externalUrl ? (
               <div className="mt-6 flex flex-wrap items-center gap-3">
                 <a
-                  className="inline-flex min-h-11 items-center justify-center gap-2 rounded-[var(--radius-sm)] bg-[var(--accent)] px-6 text-sm font-semibold text-[var(--accent-contrast)] transition-colors hover:bg-[var(--accent-strong)]"
-                  href={contactHref}
-                >
-                  Связаться с поставщиком
-                </a>
-                {externalUrl ? (
-                  <a
-                    className="inline-flex min-h-11 items-center justify-center gap-2 rounded-[var(--radius-sm)] border border-[var(--border-default)] bg-transparent px-5 text-sm font-semibold text-[var(--text)] transition-colors hover:bg-[var(--surface-wash)]"
-                    href={externalUrl}
-                    rel="noreferrer noopener"
-                    target="_blank"
+                  className="inline-flex min-h-11 items-center justify-center gap-2 rounded-[var(--radius-sm)] border border-[var(--border-default)] bg-transparent px-5 text-sm font-semibold text-[var(--text)] transition-colors hover:bg-[var(--surface-wash)]"
+                  href={externalUrl}
+                  rel="noreferrer noopener"
+                  target="_blank"
                 >
                   {externalUrlLabel ?? 'Сайт компании'}
                 </a>
-              ) : null}
-            </div>
+              </div>
             ) : null}
           </div>
 

@@ -1,6 +1,7 @@
 import { ArrowRight, Star } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { AppLink } from '@/components/ui/app-link';
+import { HighlightChip } from '@/components/ui/highlight-chip';
 import { displayFont } from '@/lib/fonts';
 import type { PublishedContentItem } from '@/lib/public/content';
 import { cn } from '@/lib/utils';
@@ -82,10 +83,10 @@ export function ArticleFeaturedCard({
       <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-black/92 via-black/50 to-black/20" />
       <div className="relative flex w-full flex-col justify-between p-6 sm:p-8">
         <div>
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-[var(--accent)] px-3 py-1 text-[11px] font-extrabold uppercase tracking-[0.12em] text-black">
+          <HighlightChip variant="editor">
             <Star fill="currentColor" size={10} />
             Выбор редакции
-          </span>
+          </HighlightChip>
         </div>
         <div className="mt-auto">
           <h2
@@ -155,9 +156,9 @@ export function ArticleCard({
           style={{ backgroundImage: `url("${imageUrl}")` }}
         />
         {item.label ? (
-          <span className="absolute left-3 top-3 rounded-sm bg-black/70 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.14em] text-white backdrop-blur-sm">
+          <HighlightChip className="absolute left-3 top-3" surface="image">
             {item.label}
-          </span>
+          </HighlightChip>
         ) : null}
       </div>
       <div className="flex flex-1 flex-col p-4 sm:p-5">
@@ -241,13 +242,13 @@ export function ArticleListItem({
           ) : null}
           {readingTime ? (
             <>
-              {item.authorName ? <span>·</span> : null}
+              {item.authorName ? <span className="text-[var(--line)]">·</span> : null}
               <span>{readingTime}</span>
             </>
           ) : null}
           {item.label ? (
             <>
-              {(item.authorName || readingTime) ? <span>·</span> : null}
+              {(item.authorName || readingTime) ? <span className="text-[var(--line)]">·</span> : null}
               <span>{item.label}</span>
             </>
           ) : null}

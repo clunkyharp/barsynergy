@@ -119,6 +119,7 @@ export default async function VacancyDetailPage({ params, searchParams }: Vacanc
           employmentTypeLabel={employmentTypeLabel}
           experienceLabel={experienceLabel}
           image={vacancy.imageUrl}
+          isVerified={vacancy.isVerified}
           label={vacancy.label}
           positionLabel={positionLabel}
           salaryLabel={salaryLabel}
@@ -148,7 +149,7 @@ export default async function VacancyDetailPage({ params, searchParams }: Vacanc
             ) : null
           }
           body={vacancy.body}
-          facts={vacancy.facts}
+          contactDirect={vacancy.contactDirect}
         />
         {showUserActions && (
           <VacancyMobileStickyBar

@@ -2,6 +2,7 @@ import { ArrowUpRight } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { AppLink } from '@/components/ui/app-link';
 import { Button } from '@/components/ui/button';
+import { HighlightChip } from '@/components/ui/highlight-chip';
 import { cn } from '@/lib/utils';
 import type { CardAction, CardMediaImage, CardTone } from './card-types';
 import { cardEyebrowClass, cardFooterClass, cardMetaClass, cardMinHeightClass, cardSummaryClass, cardTitleClass, rootCardClass } from './card-styles';
@@ -52,19 +53,16 @@ export function EditorialCard({
             style={{ backgroundImage: `url("${media.src}")` }}
           />
           {isFeatured ? (
-            <span className="absolute left-3 top-3 rounded-[var(--radius-sm)] bg-[var(--accent)] px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.14em] text-black">
+            <HighlightChip className="absolute left-3 top-3" variant="editor">
               Рекомендуем
-            </span>
+            </HighlightChip>
           ) : null}
           {tags && tags.length > 0 ? (
             <span className="absolute left-3 top-3 flex flex-wrap gap-1.5">
               {tags.map((tag) => (
-                <span
-                  className="rounded-sm bg-black/70 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.14em] text-white backdrop-blur-sm"
-                  key={tag}
-                >
+                <HighlightChip key={tag} surface="image">
                   {tag}
-                </span>
+                </HighlightChip>
               ))}
             </span>
           ) : null}

@@ -29,6 +29,7 @@ export type PublishedContentItem = {
   websiteUrl?: string;
   isNew?: boolean;
   authorName?: string;
+  isVerified?: boolean;
 };
 
 export type PublishedContentList = {

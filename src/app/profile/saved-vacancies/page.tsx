@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { Bookmark, BookmarkX, Search } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { ConfirmSubmitButton } from '@/components/ui/confirm-submit-button';
 import { EmptyState } from '@/components/ui/empty-state';
 import { MetaChip } from '@/components/ui/meta-chip';
 import { PageHeader } from '@/components/ui/page-header';
@@ -29,7 +29,7 @@ export default async function SavedVacanciesPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader bare title="Избранное" />
+      <PageHeader title="Избранное" />
 
       <div className="space-y-4">
         {savedVacancies.length === 0 ? (
@@ -57,12 +57,20 @@ export default async function SavedVacanciesPage() {
                     {v.employmentType && <MetaChip variant="filter">{getAdminOptionLabel(vacancyEmploymentTypeOptions, v.employmentType)}</MetaChip>}
                   </div>
                 </div>
-                <form action={async (formData) => { await removeSavedVacancyAction(formData); }}>
+                <form action={removeSavedVacancyAction}>
                   <input name="savedVacancyId" type="hidden" value={sv.id} />
-                  <Button className="rounded-[var(--radius-md)]" size="sm" type="submit" variant="secondary">
+                  <ConfirmSubmitButton
+                    className="rounded-[var(--radius-md)]"
+                    confirmActionLabel="Убрать"
+                    confirmText="Вакансия исчезнет из списка сохранённых."
+                    confirmTitle="Убрать из сохранённых?"
+                    size="sm"
+                    type="submit"
+                    variant="secondary"
+                  >
                     <BookmarkX size={14} strokeWidth={1.8} />
                     Убрать
-                  </Button>
+                  </ConfirmSubmitButton>
                 </form>
               </Panel>
             );

@@ -1,4 +1,4 @@
-import { ContentStatus, type Prisma } from '@prisma/client';
+import { BusinessAccountStatus, ContentStatus, type Prisma } from '@prisma/client';
 import { prisma } from '@/lib/db/prisma';
 import {
   vacancyEmploymentTypeOptions,
@@ -51,6 +51,10 @@ function getVacancyOrderBy(sort?: string): Prisma.VacancyOrderByWithRelationInpu
     return [{ companyName: 'asc' }, { publishedAt: 'desc' }, { createdAt: 'desc' }];
   }
 
+  if (sort === 'verified') {
+    return [{ businessAccountId: 'desc' }, { publishedAt: 'desc' }, { createdAt: 'desc' }, { sortOrder: 'asc' }];
+  }
+
   return [{ sortOrder: 'asc' }, { publishedAt: 'desc' }, { createdAt: 'desc' }];
 }
 
@@ -63,6 +67,7 @@ export async function getPublishedVacancies(params: PublicContentSearchParams = 
   const categoryValues = optionalParams(params, 'category');
   const cityValues = optionalParams(params, 'city');
   const employmentTypeValues = optionalParams(params, 'employmentType');
+  const verified = optionalParam(params, 'verified');
 
   const andConditions: Prisma.VacancyWhereInput[] = [];
 
@@ -79,6 +84,19 @@ export async function getPublishedVacancies(params: PublicContentSearchParams = 
   if (employmentTypeValues) {
     andConditions.push({
       OR: employmentTypeValues.map((v) => ({ employmentType: { equals: v, mode: 'insensitive' as const } }))
+    });
+  }
+  if (verified === 'true') {
+    andConditions.push({
+      businessAccountId: { not: null },
+      businessAccount: { status: BusinessAccountStatus.ACTIVE }
+    });
+  } else if (verified === 'false') {
+    andConditions.push({
+      OR: [
+        { businessAccountId: null },
+        { businessAccount: { status: { not: BusinessAccountStatus.ACTIVE } } }
+      ]
     });
   }
 
@@ -126,7 +144,8 @@ export async function getPublishedVacancies(params: PublicContentSearchParams = 
         include: {
           category: { select: { name: true } },
           city: { select: { name: true } },
-          coverImage: { select: { fileKey: true, bucket: true, visibility: true } }
+          coverImage: { select: { fileKey: true, bucket: true, visibility: true } },
+          businessAccount: { select: { status: true } }
         }
       })
   );
@@ -165,10 +184,15 @@ export async function getPublishedVacancies(params: PublicContentSearchParams = 
         statusLabel: 'Открыта',
         updatedLabel: formatUpdatedLabel(createdOrPublished),
         imageUrl: publicImageUrl(vacancy.coverImage),
-        isNew
+        isNew,
+        isVerified: vacancy.businessAccount?.status === BusinessAccountStatus.ACTIVE
       };
     })
   });
+}
+
+function stripApplySection(md: string): string {
+  return md.replace(/^##\s*Как откликнуться[\s\S]*?(?=^##|$)/m, '').trim();
 }
 
 export async function getPublishedVacancyDetail(slug: string) {
@@ -177,20 +201,27 @@ export async function getPublishedVacancyDetail(slug: string) {
     include: {
       category: { select: { name: true } },
       city: { select: { name: true } },
-      coverImage: { select: { fileKey: true, bucket: true, visibility: true } }
+      coverImage: { select: { fileKey: true, bucket: true, visibility: true } },
+      businessAccount: { select: { status: true } }
     }
   });
 
   if (!vacancy) return null;
 
+  const contactTelegram = vacancy.contactTelegram?.trim() || undefined;
+  const contactPhone = vacancy.contactPhone?.trim() || undefined;
+  const contactEmail = vacancy.contactEmail?.trim() || undefined;
+  const hasDirectContact = Boolean(contactTelegram || contactPhone || contactEmail);
+
   return {
     id: vacancy.id,
+    isVerified: vacancy.businessAccount?.status === BusinessAccountStatus.ACTIVE,
     title: vacancy.title,
     slug: vacancy.slug,
     summary: cleanPublicDetailText(vacancy.summary),
     publishedAtIso: vacancy.publishedAt?.toISOString() ?? vacancy.createdAt.toISOString(),
     updatedAtIso: vacancy.updatedAt.toISOString(),
-    body: vacancy.description ? cleanPublicDetailText(vacancy.description) : vacancy.description,
+    body: vacancy.description ? stripApplySection(cleanPublicDetailText(vacancy.description)) : vacancy.description,
     label: vacancy.category?.name,
     meta: compact([
       vacancy.city?.name,
@@ -201,6 +232,9 @@ export async function getPublishedVacancyDetail(slug: string) {
     imageUrl: detailImage(vacancy.coverImage, vacancy.coverImageAlt, vacancy.title),
     companyName: vacancy.companyName,
     cityName: vacancy.city?.name,
+    contactDirect: hasDirectContact
+      ? { telegram: contactTelegram, phone: contactPhone, email: contactEmail }
+      : undefined,
     facts: compact([
       `Компания: ${vacancy.companyName}`,
       `Позиция: ${vacancy.position}`,
@@ -208,7 +242,6 @@ export async function getPublishedVacancyDetail(slug: string) {
       vacancy.salaryLabel ? `Зарплата: ${vacancy.salaryLabel}` : undefined,
       vacancy.employmentType ? `График: ${getAdminOptionLabel(vacancyEmploymentTypeOptions, vacancy.employmentType)}` : undefined,
       vacancy.experienceLabel ? `Опыт: ${getAdminOptionLabel(vacancyExperienceOptions, vacancy.experienceLabel)}` : undefined,
-      vacancy.contactMode ? `Контакт: ${vacancy.contactMode}` : undefined,
       formatDate(vacancy.publishedAt ?? vacancy.createdAt) ? `Обновлено: ${formatDate(vacancy.publishedAt ?? vacancy.createdAt)}` : undefined
     ]).map((entry) => {
       const [label, ...rest] = entry.split(': ');

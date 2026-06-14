@@ -1,5 +1,8 @@
 import { ArrowUpRight, BadgeCheck } from 'lucide-react';
+import { VERIFIED_COMPANY_ARIA } from '@/lib/public/content/trust-labels';
+import { AvatarFallback } from '@/components/ui/avatar-fallback';
 import { Button } from '@/components/ui/button';
+import { HighlightChip } from '@/components/ui/highlight-chip';
 import { cn } from '@/lib/utils';
 import type { PublishedContentItem, PublishedContentMetaGroup } from '@/lib/public/content';
 import {
@@ -13,7 +16,7 @@ function opportunityLabel(item: PublishedContentItem) {
   const city = item.metaGroups?.find((entry) => entry.label === 'Город')?.value;
   return (
     <div className="flex flex-wrap items-center gap-2.5">
-      <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--accent)]">{item.label ?? 'Вакансия'}</span>
+      <span className="text-[11px] font-semibold uppercase tracking-[var(--tracking-eyebrow-sm)] text-[var(--accent)]">{item.label ?? 'Вакансия'}</span>
       {city ? <span className="text-[11px] font-medium text-[var(--muted)]">{city}</span> : null}
     </div>
   );
@@ -35,7 +38,7 @@ function opportunityMeta(item: PublishedContentItem) {
 
 function vacancyLead(item: PublishedContentItem) {
   const value = metaGroupValue(item, 'Оплата') ?? 'по договорённости';
-  return <span className="text-[1.35rem] font-bold text-[var(--text)]">{value}</span>;
+  return <span className="tabular-nums text-[1.35rem] font-semibold text-[var(--accent)]">{value}</span>;
 }
 
 function opportunityDescription(item: PublishedContentItem) {
@@ -68,11 +71,7 @@ export function OpportunityListRow({
     </div>
   ) : (
     <div className="hidden sm:block">
-      <div className="grid size-[52px] place-items-center rounded-full bg-[var(--accent-soft)] md:size-14">
-        <span className="text-base font-bold text-[var(--accent)]">
-          {titleInitials(item.subtitle ?? item.title)}
-        </span>
-      </div>
+      <AvatarFallback initials={titleInitials(item.subtitle ?? item.title)} />
     </div>
   );
 
@@ -84,9 +83,7 @@ export function OpportunityListRow({
             <div>{opportunityLabel(item)}</div>
             <div>{opportunityLabelMeta(item)}</div>
             {item.isNew ? (
-              <span className="inline-flex items-center rounded-full bg-[var(--warning-bg)] px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--warning-text)]">
-                Новая
-              </span>
+              <HighlightChip variant="fresh">Новая</HighlightChip>
             ) : null}
           </div>
           <h3 className="public-list-row-title mt-3 text-balance text-[1.35rem] font-bold leading-[1.15] text-[var(--text)] md:text-[1.55rem]">
@@ -95,7 +92,7 @@ export function OpportunityListRow({
           <div className="public-list-row-lead mt-3 text-[1.25rem] font-semibold leading-8 text-[var(--text)] md:text-[1.45rem]">
             {vacancyLead(item)}
           </div>
-          <div className="public-list-row-meta mt-4">{opportunityMeta(item)}</div>
+          <div className="public-list-row-meta mt-5 sm:mt-4">{opportunityMeta(item)}</div>
         </div>
         <div className="public-list-row-company min-w-0">
           <div className="grid gap-3 sm:grid-cols-[4rem_minmax(0,1fr)] sm:items-start">
@@ -104,7 +101,9 @@ export function OpportunityListRow({
               {item.subtitle ? (
                 <div className="flex min-w-0 flex-wrap items-center gap-2 text-[1.05rem] font-semibold leading-7 text-[var(--text)]">
                   <span className="min-w-0 break-words">{item.subtitle}</span>
-                  <BadgeCheck aria-label="Проверено" className="shrink-0 text-[var(--accent)]" size={18} strokeWidth={2.2} />
+                  {item.isVerified ? (
+                    <BadgeCheck aria-label={VERIFIED_COMPANY_ARIA} size={18} strokeWidth={1.8} className="shrink-0 text-[var(--accent)]" />
+                  ) : null}
                 </div>
               ) : null}
               <div className={cn('text-[15px] leading-7 text-[var(--muted)]', item.subtitle ? 'mt-3' : '')}>

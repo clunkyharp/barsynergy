@@ -26,6 +26,7 @@ export const metadata: Metadata = buildPublicPageMetadata({
 
 const vacancySortOptions = [
   { value: 'recent', label: 'Сначала новые' },
+  { value: 'verified', label: 'Сначала от проверенных компаний' },
   { value: 'company', label: 'По названию компании' }
 ] as const;
 
@@ -54,6 +55,7 @@ export default async function VacanciesPage({ searchParams }: VacanciesPageProps
         title="Вакансии"
         subtitle="Работа для бариста, обжарщиков, управляющих и специалистов кофейной индустрии."
         media={{ kind: 'image' as const, src: '/images/vacancies-hero.jpg', alt: 'Бариста за приготовлением кофе с latte art' }}
+        tone="graphite"
       >
         <VacanciesHeroActions />
       </PageHero>
@@ -61,8 +63,7 @@ export default async function VacanciesPage({ searchParams }: VacanciesPageProps
         basePath="/vacancies"
         content={content}
         emptyActions={[
-          { href: 'https://t.me/barsynergy', label: 'Открыть Telegram' },
-          { href: '/vacancies/new', label: 'Разместить вакансию', variant: 'secondary' as const }
+          { href: 'https://t.me/barsynergy', label: 'Открыть Telegram' }
         ]}
         emptyDescription="Открытых вакансий сейчас нет. Подпишитесь на Telegram — публикуем вакансии там первыми."
         emptyTitle="Вакансий пока нет"
@@ -78,6 +79,7 @@ export default async function VacanciesPage({ searchParams }: VacanciesPageProps
             embedded
             extraFilters={[
               { name: 'employmentType', label: 'Все форматы', mode: 'multiple', options: filterOptions.employmentTypes },
+              { name: 'verified', label: 'Статус', allLabel: 'Любой', options: [{ value: 'true', label: 'Проверенные компании' }] },
               { name: 'sort', label: 'Сортировка', allLabel: 'По умолчанию', options: [...vacancySortOptions] }
             ]}
             placeholder="Должность, компания или город"

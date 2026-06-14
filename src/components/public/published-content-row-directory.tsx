@@ -1,9 +1,12 @@
-import { ArrowUpRight } from 'lucide-react';
+import { ArrowUpRight, BadgeCheck } from 'lucide-react';
+import { VERIFIED_SUPPLIER_ARIA } from '@/lib/public/content/trust-labels';
 import { AppLink } from '@/components/ui/app-link';
+import { AvatarFallback } from '@/components/ui/avatar-fallback';
 import { Button } from '@/components/ui/button';
+import { HighlightChip } from '@/components/ui/highlight-chip';
 import { MetaChip } from '@/components/ui/meta-chip';
 import { cn } from '@/lib/utils';
-import type { PublishedContentItem } from '@/lib/public/content';
+import type { PublishedContentItem, PublishedContentMetaGroup } from '@/lib/public/content';
 import {
   detailHref,
   metaGroupValue,
@@ -12,7 +15,7 @@ import {
 
 function directoryLead(item: PublishedContentItem) {
   const value = metaGroupValue(item, 'Продукты / услуги') ?? metaGroupValue(item, 'География') ?? item.label ?? 'Поставки для заведений';
-  return <span className="text-[1.35rem] font-bold text-[var(--text)]">{value}</span>;
+  return <span className="tabular-nums text-[1.35rem] font-semibold text-[var(--accent)]">{value}</span>;
 }
 
 function directoryDescription(item: PublishedContentItem) {
@@ -23,9 +26,26 @@ function directoryDescription(item: PublishedContentItem) {
 }
 
 function directoryMeta(item: PublishedContentItem) {
-  const compactEntries = item.metaGroups
-    ?.filter((entry) => !['Продукты / услуги', 'География'].includes(entry.label ?? ''))
-    .slice(0, 3);
+  const priority = ['Категория', 'Опыт', 'Формат', 'Сертификаты'];
+  const usedLabels = new Set<string>();
+  const entries = item.metaGroups?.filter((entry) => !['Продукты / услуги', 'География'].includes(entry.label ?? '')) ?? [];
+  const compactEntries: PublishedContentMetaGroup[] = [];
+
+  for (const label of priority) {
+    const entry = entries.find((candidate) => candidate.label === label);
+    if (entry) {
+      compactEntries.push(entry);
+      usedLabels.add(label);
+    }
+  }
+
+  for (const entry of entries) {
+    if (compactEntries.length >= 3) break;
+    if (!entry.label || usedLabels.has(entry.label)) continue;
+    compactEntries.push(entry);
+  }
+
+  compactEntries.splice(3);
   if (!compactEntries?.length) return null;
   return (
     <div className="flex flex-wrap gap-2">
@@ -54,11 +74,7 @@ export function DirectoryListRow({
       <span aria-hidden="true" className="h-full w-full bg-cover bg-center" style={{ backgroundImage: `url("${item.imageUrl}")` }} />
     </div>
   ) : (
-    <div className="grid size-12 place-items-center rounded-[var(--radius-md)] bg-[var(--accent-soft)] sm:size-14 md:size-16">
-      <span className="text-sm font-bold text-[var(--accent)]">
-        {titleInitials(item.subtitle ?? item.title)}
-      </span>
-    </div>
+    <AvatarFallback initials={titleInitials(item.subtitle ?? item.title)} />
   );
 
   return (
@@ -66,14 +82,12 @@ export function DirectoryListRow({
       <div className="grid min-w-0 gap-6">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2.5">
-            <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--accent)]">{item.label ?? 'Поставщик'}</span>
+            <span className="text-[11px] font-semibold uppercase tracking-[var(--tracking-eyebrow-sm)] text-[var(--accent)]">{item.label ?? 'Поставщик'}</span>
             {item.updatedLabel ? (
               <span className="text-[11px] font-medium text-[var(--muted)]">{item.updatedLabel}</span>
             ) : null}
             {item.statusLabel ? (
-              <span className="inline-flex items-center rounded-full bg-[var(--warning-bg)] px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--warning-text)]">
-                {item.statusLabel}
-              </span>
+              <HighlightChip variant="fresh">{item.statusLabel}</HighlightChip>
             ) : null}
           </div>
           <h3 className="public-list-row-title mt-3 text-balance text-[1.35rem] font-bold leading-[1.15] text-[var(--text)] md:text-[1.55rem]">
@@ -89,8 +103,11 @@ export function DirectoryListRow({
             {media}
             <div className="min-w-0">
               {item.subtitle ? (
-                <div className="text-[1.05rem] font-semibold leading-7 text-[var(--text)]">
+                <div className="flex min-w-0 flex-wrap items-center gap-2 text-[1.05rem] font-semibold leading-7 text-[var(--text)]">
                   <span className="min-w-0 break-words">{item.subtitle}</span>
+                  {item.isVerified ? (
+                    <BadgeCheck aria-label={VERIFIED_SUPPLIER_ARIA} size={18} strokeWidth={1.8} className="shrink-0 text-[var(--accent)]" />
+                  ) : null}
                 </div>
               ) : null}
               <div className={cn('text-[15px] leading-7 text-[var(--muted)]', item.subtitle ? 'mt-3' : '')}>
