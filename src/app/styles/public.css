@@ -31,6 +31,25 @@
   border-color: var(--card-border-selected);
 }
 
+.newsletter-modal-backdrop {
+  background: color-mix(in oklab, var(--background) 48%, transparent);
+  backdrop-filter: blur(2px);
+}
+
+.newsletter-modal-backdrop::before {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  content: '';
+  background: radial-gradient(circle at center,
+    transparent 0% 18%,
+    color-mix(in oklab, var(--accent) 18%, transparent) 18.4% 18.8%,
+    transparent 19.2% 34%,
+    color-mix(in oklab, var(--accent) 12%, transparent) 34.4% 34.8%,
+    transparent 35.2%
+  );
+}
+
 .public-route-label {
   display: inline-flex;
   min-height: 2rem;

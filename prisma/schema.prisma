@@ -199,6 +199,7 @@ model User {
   conversationMessages    ConversationMessage[]
   webPushSubscriptions    WebPushSubscription[]
   notificationPreferences UserNotificationPreference[]
+  emailSubscriptions      EmailSubscription[]
 
   @@index([role])
   @@index([status])
@@ -1037,6 +1038,27 @@ model UserNotificationPreference {
   @@unique([userId, topic])
   @@index([userId])
   @@map("UserNotificationPreference")
+}
+
+model EmailSubscription {
+  id               String              @id @default(cuid())
+  email            String              @unique
+  userId           String?
+  topics           NotificationTopic[]
+  confirmTokenHash String              @unique
+  unsubTokenHash   String              @unique
+  confirmedAt      DateTime?
+  unsubscribedAt   DateTime?
+  consentText      String
+  consentVersion   String?
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([confirmedAt])
+  @@index([unsubscribedAt])
 }
 
 model ContentNotificationOutbox {

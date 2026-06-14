@@ -24,6 +24,7 @@ type DialogProps = {
   closeOnOutsideClick?: boolean;
   description?: ReactNode;
   footer?: ReactNode;
+  hideHeader?: boolean;
   initialFocusRef?: RefObject<HTMLElement | null>;
   onOpenChange: (open: boolean) => void;
   open: boolean;
@@ -47,6 +48,7 @@ export function Dialog({
   closeOnOutsideClick = true,
   description,
   footer,
+  hideHeader = false,
   initialFocusRef,
   onOpenChange,
   open,
@@ -142,28 +144,35 @@ export function Dialog({
         tabIndex={-1}
         {...props}
       >
-        <div className="flex items-start justify-between gap-4">
-          <div className="min-w-0">
-            <h2 className={cn('font-semibold text-[var(--text)]', size === 'confirm' ? 'text-lg leading-6' : 'text-base leading-6')} id={titleId}>
-              {title}
-            </h2>
-            {description ? (
-              <div className="mt-2 text-sm leading-[22px] text-[var(--muted)]" id={descriptionId}>
-                {description}
-              </div>
+        {hideHeader ? (
+          <>
+            {title ? <h2 className="sr-only" id={titleId}>{title}</h2> : null}
+            {description ? <div className="sr-only" id={descriptionId}>{description}</div> : null}
+          </>
+        ) : (
+          <div className="flex items-start justify-between gap-4">
+            <div className="min-w-0">
+              <h2 className={cn('font-semibold text-[var(--text)]', size === 'confirm' ? 'text-lg leading-6' : 'text-base leading-6')} id={titleId}>
+                {title}
+              </h2>
+              {description ? (
+                <div className="mt-2 text-sm leading-[22px] text-[var(--muted)]" id={descriptionId}>
+                  {description}
+                </div>
+              ) : null}
+            </div>
+            {showCloseButton ? (
+              <button
+                aria-label={closeLabel}
+                className="inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-[var(--radius-sm)] border border-[var(--line)] text-lg leading-none text-[var(--muted)] transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] hover:border-[var(--border-strong)] hover:text-[var(--text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-1 motion-reduce:transition-none"
+                onClick={closeDialog}
+                type="button"
+              >
+                <span aria-hidden="true">&times;</span>
+              </button>
             ) : null}
           </div>
-          {showCloseButton ? (
-            <button
-              aria-label={closeLabel}
-              className="inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-[var(--radius-sm)] border border-[var(--line)] text-lg leading-none text-[var(--muted)] transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] hover:border-[var(--border-strong)] hover:text-[var(--text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-1 motion-reduce:transition-none"
-              onClick={closeDialog}
-              type="button"
-            >
-              <span aria-hidden="true">&times;</span>
-            </button>
-          ) : null}
-        </div>
+        )}
         {children ? <div className={cn(size === 'confirm' ? 'mt-4 text-sm leading-[22px] text-[var(--muted)]' : 'mt-5')}>{children}</div> : null}
         {footer ? <div className={cn('mt-5 flex gap-2', size === 'confirm' ? 'flex-row justify-end' : 'flex-col-reverse sm:flex-row sm:justify-end')}>{footer}</div> : null}
       </div>

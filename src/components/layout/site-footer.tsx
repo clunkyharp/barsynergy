@@ -11,9 +11,13 @@ import { AppLink } from '@/components/ui/app-link';
 import { displayFont } from '@/lib/fonts';
 import { openLeadModal } from '@/lib/public/lead-modal-bus';
 import { LeadModalRoot, type LeadModalActions } from '@/components/public/lead-modal-providers';
+import { NewsletterModalRoot } from '@/components/public/newsletter-modal';
+import { NewsletterModalTrigger } from '@/components/public/newsletter-modal/newsletter-modal-trigger';
 
 type SiteFooterProps = {
   userRole?: string | null;
+  userEmail?: string | null;
+  newsletterDisabled?: boolean;
   leadActions: LeadModalActions;
 };
 
@@ -67,7 +71,7 @@ function FooterNavSection({ heading, children }: { heading: string; children: Re
   );
 }
 
-export function SiteFooter({ userRole, leadActions }: SiteFooterProps) {
+export function SiteFooter({ userRole, userEmail, newsletterDisabled = false, leadActions }: SiteFooterProps) {
   const pathname = usePathname();
   const isWorkspacePath =
     pathname?.startsWith('/admin') || pathname?.startsWith('/business/cabinet') || pathname?.startsWith('/auth') || pathname?.startsWith('/profile');
@@ -182,6 +186,8 @@ export function SiteFooter({ userRole, leadActions }: SiteFooterProps) {
   return (
     <>
       <LeadModalRoot {...leadActions} />
+      <NewsletterModalRoot subscribed={newsletterDisabled} userEmail={userEmail} />
+      <NewsletterModalTrigger disabled={newsletterDisabled} />
       <footer>
       {footerCtaConfig ? (
         <section className="border-t border-[var(--editorial-dark-border)] bg-[var(--editorial-dark-surface)] px-0 pb-0 pt-6 text-[var(--editorial-dark-text)] sm:pt-8" data-theme="dark">
