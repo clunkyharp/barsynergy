@@ -2,6 +2,11 @@
   box-sizing: border-box;
 }
 
+:root {
+  --default-transition-duration: var(--motion-duration-fast);
+  --default-transition-timing-function: var(--motion-ease-standard);
+}
+
 html {
   scroll-behavior: smooth;
   scroll-padding-top: 76px;
@@ -287,8 +292,8 @@ footer {
 
 .site-main [data-reveal-state] {
   transition:
-    opacity 400ms ease,
-    transform 400ms ease;
+    opacity var(--motion-duration-panel) var(--motion-ease-standard),
+    transform var(--motion-duration-panel) var(--motion-ease-standard);
   transition-delay: var(--reveal-delay, 0ms);
 }
 
@@ -1026,7 +1031,7 @@ footer {
   color: var(--accent);
   text-decoration: underline;
   text-underline-offset: 2px;
-  transition: color var(--motion-duration-fast) ease;
+  transition: color var(--motion-duration-fast) var(--motion-ease-standard);
 }
 
 .article-body a:hover {

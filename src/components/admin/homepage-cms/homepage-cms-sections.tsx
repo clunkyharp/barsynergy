@@ -17,9 +17,9 @@ export function HeroSection({ heroes, activeSection, saveAction }: { heroes: Her
   return (
     <HomepageSectionEditor
       defaultOpen={activeSection === 'homepage-hero'}
-      description="Если опубликованного hero нет, публичная главная использует минимальный fallback."
+      description="Если активной записи нет, главная страница показывает резервный вариант."
       id="homepage-hero"
-      title="Hero"
+      title="Главный экран"
     >
       {heroes.length > 0 ? (
         heroes.map((hero) => (
@@ -47,7 +47,7 @@ export function HeroSection({ heroes, activeSection, saveAction }: { heroes: Her
           </AdminCmsInlineEditRecord>
         ))
       ) : (
-        <NewRecordEditor action={saveAction} title="Создать hero" description="Добавьте первый hero-блок для главной страницы.">
+        <NewRecordEditor action={saveAction} title="Создать запись главного экрана" description="Добавьте первую запись главного экрана сайта.">
           <SectionRedirect sectionId="homepage-hero" />
           <HeroFields uid="new" />
           <SubmitRow />
@@ -107,7 +107,7 @@ export function CtaSection({ ctaBlocks, activeSection, saveAction }: { ctaBlocks
   return (
     <HomepageSectionEditor
       defaultOpen={activeSection === 'homepage-positioning'}
-      description="Короткое объяснение проекта и нижний CTA главной страницы."
+      description="Короткое описание проекта и кнопки действия внизу главной."
       id="homepage-positioning"
       title="Короткое позиционирование"
     >
@@ -138,7 +138,7 @@ export function CtaSection({ ctaBlocks, activeSection, saveAction }: { ctaBlocks
           </AdminCmsInlineEditRecord>
         ))
       ) : (
-        <NewRecordEditor action={saveAction} title="Создать CTA" description="Добавьте короткий блок с объяснением проекта и переходами.">
+        <NewRecordEditor action={saveAction} title="Создать блок призыва к действию" description="Добавьте короткий блок с объяснением проекта и переходами.">
           <SectionRedirect sectionId="homepage-positioning" />
           <CtaFields uid="new" />
           <SubmitRow />

@@ -545,7 +545,7 @@ form[data-public-validation="true"] .grid-cols-2 .form-field {
 }
 
 .form-topic-details {
-    animation: form-section-reveal 180ms ease-out;
+    animation: form-section-reveal 180ms var(--motion-ease-standard);
 }
 
 .form-topic-details-panel {

@@ -1,4 +1,5 @@
 import { CategoryType, ContentStatus, type Prisma } from '@/modules/admin/queries';
+import { BadgeCheck, TriangleAlert } from 'lucide-react';
 import { deleteSupplierDraft, updateSupplierStatus } from '@/app/admin/suppliers/actions';
 import {
   AdminActionAlert,
@@ -46,8 +47,7 @@ const ADMIN_SUPPLIERS_PATH = '/admin/suppliers';
 
 const dateFormatter = new Intl.DateTimeFormat('ru-RU', {
   day: '2-digit',
-  month: '2-digit',
-  year: 'numeric'
+  month: '2-digit'
 });
 
 type AdminSuppliersPageProps = {
@@ -164,12 +164,12 @@ export default async function AdminSuppliersPage({ searchParams }: AdminSupplier
         </div>
 
         <AdminTableFrame>
-          <AdminTable minWidth={1040}>
+          <AdminTable minWidth={920}>
             <AdminTableHead>
               <tr>
                 <AdminTableHeaderCell>Поставщик</AdminTableHeaderCell>
                 <AdminTableHeaderCell>Компания</AdminTableHeaderCell>
-                <AdminTableHeaderCell>Город</AdminTableHeaderCell>
+                <AdminTableHeaderCell>География</AdminTableHeaderCell>
                 <AdminTableHeaderCell>Статус</AdminTableHeaderCell>
                 <AdminTableHeaderCell>Обновлено</AdminTableHeaderCell>
                 <AdminTableActionsHeaderCell>Действия</AdminTableActionsHeaderCell>
@@ -187,29 +187,35 @@ export default async function AdminSuppliersPage({ searchParams }: AdminSupplier
                 suppliers.map((supplier) => (
                   <AdminTableRow key={supplier.id}>
                     <AdminTableCell className="max-w-[320px]" label="Поставщик">
-                      <AdminTableClamp className="font-semibold">{supplier.title}</AdminTableClamp>
-                      <div className="mt-1 truncate text-xs text-[var(--muted)]">/{supplier.slug}</div>
+                      <AdminTableClamp className="font-semibold" title={`/${supplier.slug}`}>
+                        {supplier.title}
+                      </AdminTableClamp>
                       <div className="mt-1 text-xs text-[var(--muted)]">{supplier.category?.name ?? 'Без категории'}</div>
-                      {supplier.coverImage?.originalName ? (
-                        <div className="mt-1 text-xs text-[var(--muted)]">Обложка: {supplier.coverImage.originalName}</div>
-                      ) : null}
                     </AdminTableCell>
-                    <AdminTableCell className="text-[var(--muted)]" label="Компания">
-                      <div>{supplier.companyName}</div>
-                      <div className="mt-1">
-                        <StatusBadge variant={supplier.isVerified ? 'success' : 'warning'}>
-                          {supplier.isVerified ? 'Проверен' : 'Не проверен'}
-                        </StatusBadge>
+                    <AdminTableCell label="Компания">
+                      <span className="inline-flex max-w-full items-center gap-1.5">
+                        <span className="truncate">{supplier.companyName}</span>
+                        {supplier.isVerified ? (
+                          <BadgeCheck aria-label="Проверен" className="shrink-0 text-[var(--success-text)]" size={14} strokeWidth={1.8} />
+                        ) : (
+                          <TriangleAlert aria-label="Не проверен" className="shrink-0 text-[var(--warning-text)]" size={14} strokeWidth={1.8} />
+                        )}
+                      </span>
+                    </AdminTableCell>
+                    <AdminTableCell label="География">
+                      <div className={supplier.city?.name ? 'text-[var(--text)]' : 'font-medium text-[var(--warning-text)]'}>
+                        {supplier.city?.name ?? 'Без города'}
                       </div>
-                      {supplier.serviceArea ? <div className="mt-1 text-xs">{supplier.serviceArea}</div> : null}
+                      {supplier.serviceArea ? <div className="mt-1 text-xs text-[var(--muted)]">{supplier.serviceArea}</div> : null}
                     </AdminTableCell>
-                    <AdminTableCell className="text-[var(--muted)]" label="Город">{supplier.city?.name ?? <span className="text-[var(--muted)]">Без города</span>}</AdminTableCell>
                     <AdminTableCell label="Статус">
                       <StatusBadge variant={contentStatusBadgeVariants[supplier.status]}>{contentStatusLabels[supplier.status]}</StatusBadge>
                     </AdminTableCell>
                     <AdminTableCell className="text-[var(--muted)]" label="Обновлено">
-                      <div>{dateFormatter.format(supplier.updatedAt)}</div>
-                      {supplier.updatedBy?.email ? <div className="mt-1 text-xs">{supplier.updatedBy.email}</div> : null}
+                      <div className="max-w-[12rem] truncate">
+                        {dateFormatter.format(supplier.updatedAt)}
+                        {supplier.updatedBy?.email ? ` · ${formatAdminActor(supplier.updatedBy.email)}` : ''}
+                      </div>
                     </AdminTableCell>
                     <AdminTableActionsCell>
                       <AdminContentRowActions
@@ -241,4 +247,8 @@ export default async function AdminSuppliersPage({ searchParams }: AdminSupplier
       </section>
     </div>
   );
+}
+
+function formatAdminActor(email: string) {
+  return email.split('@')[0] || email;
 }

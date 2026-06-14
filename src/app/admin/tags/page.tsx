@@ -1,7 +1,6 @@
 import { CategoryType } from '@/modules/admin/queries';
 import { createTag, updateTag } from '@/app/admin/tags/actions';
 import {
-  AdminCmsAdvancedSection,
   AdminCmsCompactRecordSummary,
   AdminCmsInlineEditRecord,
   AdminCmsPanel
@@ -78,11 +77,14 @@ export default async function AdminTagsPage({ searchParams }: AdminTagsPageProps
             </FormField>
             <Button type="submit">Создать</Button>
           </div>
-          <AdminCmsAdvancedSection title="Описание" description="Необязательное пояснение для редакции и будущих подборок.">
-            <FormField htmlFor="tag-description" label="Описание">
-              <Textarea id="tag-description" name="description" maxLength={500} rows={3} />
-            </FormField>
-          </AdminCmsAdvancedSection>
+          <FormField
+            className="lg:col-span-full"
+            htmlFor="tag-description"
+            label="Описание"
+            hint="Необязательное пояснение для редакции и будущих подборок."
+          >
+            <Textarea id="tag-description" name="description" maxLength={500} rows={3} />
+          </FormField>
         </form>
       </AdminCmsPanel>
 
@@ -139,15 +141,14 @@ export default async function AdminTagsPage({ searchParams }: AdminTagsPageProps
               <Button type="submit" variant="secondary">
                 Сохранить
               </Button>
-              <AdminCmsAdvancedSection
+              <FormField
                 className="lg:col-span-full"
-                title="Описание"
-                description="Необязательное пояснение для редакции и будущих подборок."
+                htmlFor={`tag-description-${tag.id}`}
+                label="Описание"
+                hint="Необязательное пояснение для редакции и будущих подборок."
               >
-                <FormField htmlFor={`tag-description-${tag.id}`} label="Описание">
-                  <Textarea id={`tag-description-${tag.id}`} name="description" maxLength={500} defaultValue={tag.description ?? ''} rows={3} />
-                </FormField>
-              </AdminCmsAdvancedSection>
+                <Textarea id={`tag-description-${tag.id}`} name="description" maxLength={500} defaultValue={tag.description ?? ''} rows={3} />
+              </FormField>
             </AdminCmsInlineEditRecord>
           ))
         )}

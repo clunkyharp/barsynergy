@@ -15,10 +15,9 @@ function readProjectFile(path) {
 // Storage: pure functions (parseNewsletterModalState, getCooldownUntil)
 // ---------------------------------------------------------------------------
 
-const storageCode = readProjectFile('src/components/public/newsletter-modal/newsletter-modal-storage.ts');
+readProjectFile('src/components/public/newsletter-modal/newsletter-modal-storage.ts');
 
 // Extract pure functions by constructing them from source
-/* eslint-disable */
 const DISMISS_COOLDOWN_ONE_MS = 30 * 24 * 60 * 60 * 1000;
 const DISMISS_COOLDOWN_TWO_MS = 180 * 24 * 60 * 60 * 1000;
 const REMIND_LATER_COOLDOWN_MS = 7 * 24 * 60 * 60 * 1000;
@@ -50,8 +49,6 @@ function getCooldownUntil(state) {
         : 0;
   return Math.max(remindLaterTime, shownTime + dismissCooldown);
 }
-/* eslint-enable */
-
 test('parseNewsletterModalState: null input returns defaults', () => {
   const state = parseNewsletterModalState(null);
   assert.equal(state.dismissCount, 0);
@@ -189,8 +186,7 @@ test('getCooldownUntil: empty state returns 0', () => {
 // Tokens: createEmailSubscriptionToken, hashEmailSubscriptionToken
 // ---------------------------------------------------------------------------
 
-const tokensCode = readProjectFile('src/lib/notifications/email-subscription/tokens.ts');
-/* eslint-disable */
+readProjectFile('src/lib/notifications/email-subscription/tokens.ts');
 import { randomBytes } from 'node:crypto';
 
 function hashEmailSubscriptionToken(token) {
@@ -204,8 +200,6 @@ function createEmailSubscriptionToken() {
     tokenHash: hashEmailSubscriptionToken(rawToken)
   };
 }
-/* eslint-enable */
-
 test('hashEmailSubscriptionToken: deterministic output', () => {
   const hash1 = hashEmailSubscriptionToken('test-token-123');
   const hash2 = hashEmailSubscriptionToken('test-token-123');

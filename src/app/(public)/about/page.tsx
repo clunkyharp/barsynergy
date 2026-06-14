@@ -64,7 +64,7 @@ function SectionTitle({
 
 export default function AboutPage() {
   const insideMedia = (
-    <aside className="w-full max-w-sm rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--surface-card)] p-5 shadow-[var(--shadow-card)] md:p-8">
+    <aside className="mx-auto w-full max-w-sm rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--surface-card)] p-5 shadow-[var(--shadow-card)] md:p-8 xl:mx-0">
       <div className="flex items-center gap-3">
         <span
           aria-hidden="true"
@@ -163,7 +163,7 @@ export default function AboutPage() {
                 <p className="mt-6 max-w-3xl text-base leading-8 text-[var(--editorial-dark-muted)] md:text-lg md:leading-9">
                   Напишите команде. Мы уточним задачу и подскажем, какой раздел или формат подходит для первого шага.
                 </p>
-                <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
+                <div className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-3 xl:justify-start">
                   <Button className="h-12 rounded-[var(--radius-md)] px-7" href="/contacts?topic=other#contact-form" size="lg">
                     Связаться с командой
                   </Button>

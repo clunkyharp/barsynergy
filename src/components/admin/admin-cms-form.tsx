@@ -137,7 +137,7 @@ export function AdminCmsCompactRecordSummary({ items, status, subtitle, title }:
           </div>
         ))}
       </dl>
-      {status ? <div className="flex justify-start lg:justify-end">{status}</div> : null}
+      {status ? <div className="flex items-center justify-start lg:justify-end">{status}</div> : null}
     </div>
   );
 }

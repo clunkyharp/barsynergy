@@ -62,7 +62,7 @@ export default async function AdminHomepagePage({ searchParams }: { searchParams
 
       <HomepageSectionEditor
         defaultOpen={activeSection === 'homepage-navigation'}
-        description="Эти блоки ведут в основные разделы сайта и сейчас не имеют отдельной CMS-формы."
+        description="Эти блоки ведут в основные разделы сайта. Отдельной формы редактирования пока нет — структура задана в коде."
         id="homepage-navigation"
         title="Навигационные блоки"
       >
@@ -74,7 +74,7 @@ export default async function AdminHomepagePage({ searchParams }: { searchParams
             <span className="rounded-[var(--radius-sm)] border border-[var(--line)] px-3 py-2">Переходы в разделы: статический список</span>
             <span className="rounded-[var(--radius-sm)] border border-[var(--line)] px-3 py-2">Актуальные материалы: опубликованные записи</span>
             <span className="rounded-[var(--radius-sm)] border border-[var(--line)] px-3 py-2">Публичная главная: без изменения</span>
-            <span className="rounded-[var(--radius-sm)] border border-[var(--line)] px-3 py-2">CMS-форма: не добавлена</span>
+            <span className="rounded-[var(--radius-sm)] border border-[var(--line)] px-3 py-2">Форма редактирования: не добавлена</span>
           </div>
         </ExternalSectionPanel>
       </HomepageSectionEditor>

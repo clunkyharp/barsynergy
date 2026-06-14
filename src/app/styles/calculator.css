@@ -230,7 +230,7 @@
     color: var(--accent);
     font-size: 0.9rem;
     line-height: 1;
-    transition: transform 160ms ease;
+    transition: transform var(--motion-duration-fast) var(--motion-ease-standard);
 }
 
 .calculator-formula-help[open] .calculator-formula-help-icon {

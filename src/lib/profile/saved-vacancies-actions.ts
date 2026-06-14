@@ -8,7 +8,7 @@ import { getCurrentUser } from '@/lib/auth/current-user';
 import { assertSameOriginServerAction } from '@/lib/security/server-action-origin';
 import { resolveServerActionError } from '@/lib/actions/server-action-errors';
 
-export async function removeSavedVacancyAction(formData: FormData): Promise<{ type: 'success' | 'error'; message: string }> {
+export async function removeSavedVacancyAction(formData: FormData): Promise<void> {
   try {
     await assertSameOriginServerAction();
     const user = await getCurrentUser();
@@ -20,7 +20,7 @@ export async function removeSavedVacancyAction(formData: FormData): Promise<{ ty
     const savedVacancyId = formData.get('savedVacancyId') as string;
 
     if (!savedVacancyId) {
-      return { type: 'error', message: 'Не указан ID избранной вакансии.' };
+      return;
     }
 
     const existing = await prisma.savedVacancy.findUnique({
@@ -29,7 +29,7 @@ export async function removeSavedVacancyAction(formData: FormData): Promise<{ ty
     });
 
     if (!existing) {
-      return { type: 'error', message: 'Вакансия не найдена в избранном.' };
+      return;
     }
 
     await prisma.savedVacancy.delete({
@@ -37,10 +37,8 @@ export async function removeSavedVacancyAction(formData: FormData): Promise<{ ty
     });
 
     revalidatePath('/profile/saved-vacancies');
-    return { type: 'success', message: 'Вакансия удалена из избранного.' };
   } catch (error) {
     console.error('Failed to remove saved vacancy:', error);
-    return { type: 'error', message: 'Не удалось удалить вакансию из избранного. Попробуйте позже.' };
   }
 }
 

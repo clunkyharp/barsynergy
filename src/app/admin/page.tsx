@@ -11,7 +11,6 @@ import {
   applicationStatusLabels,
   applicationTypeLabels
 } from '@/lib/admin/application-utils';
-import { contentStatusBadgeVariants, contentStatusLabels } from '@/lib/admin/content-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
 import { canAccessAdminSection } from '@/lib/auth/permissions';
 import { cn } from '@/lib/utils';
@@ -187,35 +186,35 @@ export default async function AdminPage() {
     {
       area: 'Курсы',
       href: '/admin/courses',
-      note: `Опубликовано: ${publishedCourses}`,
-      status: publishedCourses > 0 ? 'есть публикации' : 'нет публикаций',
-      variant: publishedCourses > 0 ? 'success' : 'warning'
+      note: `${publishedCourses} опубл.`,
+      status: publishedCourses > 0 ? 'публичная лента' : 'нет публикаций',
+      variant: publishedCourses > 0 ? 'success' : 'neutral'
     },
     {
       area: 'Партнёры',
       href: '/admin/partners',
-      note: `Опубликовано: ${publishedPartners}`,
-      status: publishedPartners > 0 ? 'есть публикации' : 'нет публикаций',
-      variant: publishedPartners > 0 ? 'success' : 'warning'
+      note: `${publishedPartners} опубл.`,
+      status: publishedPartners > 0 ? 'публичная лента' : 'нет публикаций',
+      variant: publishedPartners > 0 ? 'success' : 'neutral'
     },
     {
       area: 'Статьи',
       href: '/admin/articles',
-      note: `Опубликовано: ${publishedArticles}, архив: ${archivedArticles}`,
-      status: publishedArticles === 0 && archivedArticles > 0 ? 'только архив' : 'публичная лента',
-      variant: publishedArticles === 0 && archivedArticles > 0 ? 'warning' : 'success'
+      note: `${publishedArticles} опубл.${archivedArticles > 0 ? ` · архив ${archivedArticles}` : ''}`,
+      status: publishedArticles > 0 ? 'публичная лента' : archivedArticles > 0 ? 'только архив' : 'нет публикаций',
+      variant: publishedArticles > 0 ? 'success' : archivedArticles > 0 ? 'warning' : 'neutral'
     },
     {
       area: 'Поставщики',
       href: publishedSuppliersWithoutCity > 0 ? '/admin/suppliers?filter=no-city' : '/admin/suppliers',
-      note: `Опубликовано: ${publishedSuppliers}`,
-      status: publishedSuppliersWithoutCity > 0 ? 'есть записи без города' : 'города заполнены',
-      variant: publishedSuppliersWithoutCity > 0 ? 'warning' : 'success'
+      note: `${publishedSuppliers} опубл.`,
+      status: publishedSuppliersWithoutCity > 0 ? 'есть записи без города' : publishedSuppliers > 0 ? 'города заполнены' : 'нет публикаций',
+      variant: publishedSuppliersWithoutCity > 0 ? 'warning' : publishedSuppliers > 0 ? 'success' : 'neutral'
     },
     {
       area: 'Справочники',
       href: taxonomyHref,
-      note: `Категории: ${activeCategories}, города: ${activeCities}, теги: ${activeTags}`,
+      note: `${activeCategories}/${activeCities}/${activeTags}`,
       status: activeCategories > 0 && activeCities > 0 && activeTags > 0 ? 'база заполнена' : 'есть пустые разделы',
       variant: activeCategories > 0 && activeCities > 0 && activeTags > 0 ? 'success' : 'warning'
     }
@@ -279,7 +278,7 @@ export default async function AdminPage() {
         <AdminWorkQueue className="xl:col-span-8" items={queueItems} />
         <PublishingStatusRail className="xl:col-span-4" items={publishingRailItems} />
         <ContentHealthTable className="xl:col-span-12" rows={contentHealthRows} />
-        <ModerationActionLane className="xl:col-span-5" applications={prioritizedApplications} />
+        <ModerationActionLane className="xl:col-span-12" applications={prioritizedApplications} />
       </section>
     </div>
   );
@@ -340,70 +339,66 @@ function AdminWorkQueue({ className, items }: { className?: string; items: Queue
 
 function ContentHealthTable({ className, rows }: { className?: string; rows: HealthRow[] }) {
   return (
-    <Card className={cn('p-5', className)}>
-      <div className="flex flex-col gap-3 border-b border-[var(--line)] pb-4 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Контроль контента</p>
-          <h2 className="mt-2 text-lg font-semibold">Состояние разделов</h2>
-        </div>
+    <Card className={cn('overflow-hidden', className)}>
+      <div className="flex flex-col gap-3 border-b border-[var(--line)] px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Контроль контента</p>
         <StatusBadge variant={rows.some((row) => row.variant !== 'success') ? 'warning' : 'success'}>
           {rows.some((row) => row.variant !== 'success') ? 'нужна проверка' : 'в норме'}
         </StatusBadge>
       </div>
-      <div className="mt-4 grid gap-3 [grid-template-columns:repeat(auto-fit,minmax(23rem,1fr))]">
+      <ul className="divide-y divide-[var(--line)]">
         {rows.map((row) => (
-          <div className="flex h-full flex-col rounded-[var(--radius-md)] border border-[var(--line)] bg-[var(--surface-muted)] p-4" key={row.area}>
-            <div className="flex flex-col gap-2">
-              <p className="font-semibold">{row.area}</p>
-              <StatusBadge className="max-w-full self-start whitespace-normal break-words text-left leading-5" variant={row.variant}>
-                {row.status}
-              </StatusBadge>
-            </div>
-            <p className="mt-3 text-sm leading-6 text-[var(--muted)]">{row.note}</p>
+          <li key={row.area}>
             {row.href ? (
-              <Button className="mt-auto min-h-9 w-full px-3 py-1.5 pt-4 text-xs" href={row.href} variant="secondary">
-                Перейти
-              </Button>
+              <AppLink
+                className="grid gap-2 px-5 py-3 text-sm transition hover:bg-[var(--surface-muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--focus-ring)] sm:grid-cols-[minmax(7rem,1fr)_minmax(12rem,1.4fr)_auto_auto] sm:items-center sm:gap-4"
+                href={row.href}
+              >
+                <HealthRowContent row={row} />
+              </AppLink>
             ) : (
-              <span className="mt-auto inline-flex pt-4 text-xs font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">нет доступа</span>
+              <div className="grid gap-2 px-5 py-3 text-sm opacity-60 sm:grid-cols-[minmax(7rem,1fr)_minmax(12rem,1.4fr)_auto_auto] sm:items-center sm:gap-4">
+                <HealthRowContent row={row} />
+              </div>
             )}
-          </div>
+          </li>
         ))}
-      </div>
+      </ul>
     </Card>
   );
 }
 
 function PublishingStatusRail({ className, items }: { className?: string; items: PublishingRailItem[] }) {
   return (
-    <Card className={cn('p-5', className)}>
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Статус разделов</p>
-          <h2 className="mt-2 text-lg font-semibold">Публикация</h2>
-        </div>
+    <Card className={cn('overflow-hidden', className)}>
+      <div className="flex items-center justify-between gap-4 border-b border-[var(--line)] px-5 py-4">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Статус разделов</p>
         <StatusBadge variant={items.some((item) => item.draft > 0) ? 'pending' : 'success'}>
           {items.some((item) => item.draft > 0) ? 'есть черновики' : 'чисто'}
         </StatusBadge>
       </div>
-      <div className="mt-5 divide-y divide-[var(--line)]">
+      <div className="divide-y divide-[var(--line)]">
         {items.map((item) => (
           <AppLink
-            className="grid gap-3 py-3 transition hover:text-[var(--accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)]"
+            className="grid gap-2 px-5 py-3 text-sm transition hover:bg-[var(--surface-muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--focus-ring)]"
             href={item.href}
             key={item.label}
           >
             <div className="flex items-center justify-between gap-3">
               <span className="font-semibold text-[var(--text)]">{item.label}</span>
-              <span className="text-sm text-[var(--muted)]">{item.extra ?? ' '}</span>
+              {item.extra ? <span className="text-xs text-[var(--muted)]">{item.extra}</span> : null}
             </div>
-            <div className="grid grid-cols-2 gap-2 text-sm">
-              <MetricPill label={contentStatusLabels[ContentStatus.DRAFT]} value={item.draft} variant={contentStatusBadgeVariants[ContentStatus.DRAFT]} />
-              <MetricPill
-                label={contentStatusLabels[ContentStatus.PUBLISHED]}
-                value={item.published}
-                variant={contentStatusBadgeVariants[ContentStatus.PUBLISHED]}
-              />
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-[var(--muted)]">
+              <span className={cn(item.draft > 0 ? 'font-semibold text-[var(--warning-text)]' : 'text-[var(--muted)]')}>
+                {item.draft} {pluralizeRu(item.draft, ['черновик', 'черновика', 'черновиков'])}
+              </span>
+              <span aria-hidden="true">·</span>
+              <span className="text-[var(--text)]">
+                {item.published} {pluralizeRu(item.published, ['опубликован', 'опубликовано', 'опубликовано'])}
+              </span>
+              <span aria-hidden="true" className="ml-auto text-[var(--muted)]">
+                →
+              </span>
             </div>
           </AppLink>
         ))}
@@ -414,45 +409,67 @@ function PublishingStatusRail({ className, items }: { className?: string; items:
 
 function ModerationActionLane({ applications, className }: { applications: DashboardApplication[]; className?: string }) {
   return (
-    <Card className={cn('p-5', className)}>
-      <div className="flex flex-col gap-3 border-b border-[var(--line)] pb-4 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Модерация</p>
-          <h2 className="mt-2 text-lg font-semibold">Последние заявки</h2>
-        </div>
+    <Card className={cn('overflow-hidden', className)}>
+      <div className="flex flex-col gap-3 border-b border-[var(--line)] px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Модерация</p>
         <Button className="min-h-9 px-3 py-1.5 text-xs" href="/admin/applications" variant="secondary">
           Вся очередь
         </Button>
       </div>
-      <div className="mt-4 grid gap-3">
+      <div className="divide-y divide-[var(--line)]">
         {applications.length > 0 ? (
           applications.map((application) => (
-            <div className="border-b border-[var(--line)] pb-3 last:border-0 last:pb-0" key={application.id}>
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <span className="text-xs font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">
-                  {applicationTypeLabels[application.type]} / {dateFormatter.format(application.createdAt)}
-                </span>
-                <StatusBadge variant={applicationStatusBadgeVariants[application.status]}>
-                  {applicationStatusLabels[application.status]}
-                </StatusBadge>
-              </div>
-              <div className="mt-2 grid gap-3 sm:grid-cols-[1fr_auto] sm:items-center">
-                <p className="text-sm font-semibold leading-6">
-                  {application.subject?.trim() || application.name?.trim() || 'Заявка без названия'}
-                </p>
-                <Button className="min-h-9 px-3 py-1.5 text-xs" href={`/admin/applications/${application.id}`} variant="ghost">
-                  Открыть
-                </Button>
-              </div>
-            </div>
+            <AppLink
+              className="grid gap-2 px-5 py-3 text-sm transition hover:bg-[var(--surface-muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--focus-ring)] lg:grid-cols-[23rem_10rem_minmax(0,1fr)_1rem] lg:items-center lg:gap-4"
+              href={`/admin/applications/${application.id}`}
+              key={application.id}
+            >
+              <span className="text-xs font-semibold uppercase tracking-[0.08em] text-[var(--muted)] lg:whitespace-nowrap">
+                {applicationTypeLabels[application.type]} · {dateFormatter.format(application.createdAt)}
+              </span>
+              <StatusBadge className="w-fit self-start lg:self-center" variant={applicationStatusBadgeVariants[application.status]}>
+                {applicationStatusLabels[application.status]}
+              </StatusBadge>
+              <span className="min-w-0 font-semibold leading-6 text-[var(--text)]">
+                {application.subject?.trim() || application.name?.trim() || 'Заявка без названия'}
+              </span>
+              <span aria-hidden="true" className="hidden text-[var(--muted)] lg:block">
+                →
+              </span>
+            </AppLink>
           ))
         ) : (
-          <Panel className="text-sm leading-6 text-[var(--muted)]" padding="sm">
+          <Panel className="m-5 text-sm leading-6 text-[var(--muted)]" padding="sm">
             Очередь модерации пуста.
           </Panel>
         )}
       </div>
     </Card>
+  );
+}
+
+function HealthRowContent({ row }: { row: HealthRow }) {
+  return (
+    <>
+      <span className="font-semibold text-[var(--text)]">{row.area}</span>
+      <span className="flex items-center gap-2 text-[var(--muted)]">
+        <span
+          aria-hidden="true"
+          className={cn(
+            'h-2 w-2 shrink-0 rounded-full',
+            row.variant === 'success' && 'bg-[var(--success-text)]',
+            row.variant === 'warning' && 'bg-[var(--warning-text)]',
+            row.variant === 'danger' && 'bg-[var(--danger-text)]',
+            row.variant !== 'success' && row.variant !== 'warning' && row.variant !== 'danger' && 'bg-[var(--muted)]'
+          )}
+        />
+        <span>{row.status}</span>
+      </span>
+      <span className="text-[var(--muted)] sm:text-right">{row.note}</span>
+      <span aria-hidden="true" className="hidden text-[var(--muted)] sm:block">
+        →
+      </span>
+    </>
   );
 }
 
@@ -482,28 +499,13 @@ function SectionHeader({
   );
 }
 
-function MetricPill({
-  label,
-  value,
-  variant
-}: {
-  label: string;
-  value: number;
-  variant: StatusBadgeVariant;
-}) {
-  return (
-    <span className="grid rounded-[var(--radius-md)] border border-[var(--line)] px-3 py-2">
-      <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">{label}</span>
-      <span className="mt-1 flex items-center justify-between gap-2">
-        <span className="text-lg font-semibold text-[var(--text)]">{value}</span>
-        {value > 0 ? (
-          <StatusBadge className="px-2 py-0.5 text-[10px]" variant={variant}>
-            есть
-          </StatusBadge>
-        ) : (
-          <span className="text-xs text-[var(--muted)]">—</span>
-        )}
-      </span>
-    </span>
-  );
+function pluralizeRu(value: number, forms: [string, string, string]) {
+  const absValue = Math.abs(value);
+  const mod10 = absValue % 10;
+  const mod100 = absValue % 100;
+
+  if (mod10 === 1 && mod100 !== 11) return forms[0];
+  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return forms[1];
+
+  return forms[2];
 }

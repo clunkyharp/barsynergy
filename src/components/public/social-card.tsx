@@ -77,7 +77,7 @@ export function SocialLinkCard({
       ) : null}
       <span className="mt-auto inline-flex items-center gap-2 pt-5 text-sm font-semibold text-[var(--platform-accent)]">
         {actionLabel}
-        <ArrowUpRight className="transition-transform group-hover:translate-x-1" size={16} strokeWidth={1.8} />
+        <ArrowUpRight className="transition-transform duration-[var(--motion-duration-base)] ease-[var(--motion-ease-move)] group-hover:translate-x-1 motion-reduce:transition-none" size={16} strokeWidth={1.8} />
       </span>
     </a>
   );

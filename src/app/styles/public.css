@@ -1015,22 +1015,22 @@
 }
 
 .dialog-panel[data-size="confirm"] {
-  width: 235px;
-  min-height: 200px;
-  border-color: #ded2c2;
-  background: #ffffff;
-  padding: 24px;
+  width: 100%;
+  max-width: min(420px, 92vw);
+  border-color: var(--border-strong);
+  background: var(--surface);
+  padding: 20px;
   box-shadow: none;
 }
 
 .dialog-panel[data-size="confirm"] h2 {
-  color: #171513;
+  color: var(--text);
   font-size: 18px;
   line-height: 24px;
 }
 
 .dialog-panel[data-size="confirm"] [id$="-description"] {
-  color: #6d6258;
+  color: var(--muted);
   font-size: 14px;
   line-height: 22px;
 }

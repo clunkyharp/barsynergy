@@ -12,3 +12,21 @@
 @utility line-eight {
   line-height: 1.20;
 }
+
+.dialog-panel[data-tone="success"] {
+  border-color: color-mix(in oklab, var(--success) 35%, transparent);
+  background-image: radial-gradient(ellipse at 50% 0%, color-mix(in oklab, var(--success) 8%, transparent), transparent 70%);
+}
+
+.dialog-panel[data-tone="error"] {
+  border-color: color-mix(in oklab, var(--danger) 35%, transparent);
+  background-image: radial-gradient(ellipse at 50% 0%, color-mix(in oklab, var(--danger) 8%, transparent), transparent 70%);
+}
+
+@utility gpu {
+  will-change: transform;
+}
+
+@theme {
+  --animate-spin: spin 900ms linear infinite;
+}

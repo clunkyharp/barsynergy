@@ -46,7 +46,7 @@ export function EditorialFeatured({ card }: { card: HomepageLiveCard }) {
     >
       <span
         aria-hidden="true"
-        className="editorial-featured-media absolute inset-0 bg-cover bg-center transition-transform duration-[var(--motion-duration-media)] ease-[var(--motion-ease-move)] group-hover:scale-[1.015] motion-reduce:transition-none"
+        className="gpu editorial-featured-media absolute inset-0 bg-cover bg-center transition-transform duration-[var(--motion-duration-media)] ease-[var(--motion-ease-move)] group-hover:scale-[1.015] motion-reduce:transition-none"
         style={card.imageUrl ? { backgroundImage: `url("${card.imageUrl}")` } : undefined}
       />
       <span aria-hidden="true" className="editorial-featured-gradient absolute inset-0" />
@@ -103,7 +103,7 @@ export function EditorialSupportCard({
         {imageUrl ? (
           <span
             aria-hidden="true"
-            className="absolute inset-0 bg-cover bg-center transition-transform duration-[var(--motion-duration-media)] ease-[var(--motion-ease-move)] group-hover:scale-[1.04] motion-reduce:transition-none"
+            className="gpu absolute inset-0 bg-cover bg-center transition-transform duration-[var(--motion-duration-media)] ease-[var(--motion-ease-move)] group-hover:scale-[1.04] motion-reduce:transition-none"
             style={{ backgroundImage: `url("${imageUrl}")` }}
           />
         ) : (

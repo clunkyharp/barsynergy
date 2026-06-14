@@ -60,7 +60,7 @@ export function AuthSplitLayout({ children }: AuthSplitLayoutProps) {
       {/* Right — form column */}
       <main className="flex flex-1 items-center justify-center bg-[var(--background)] px-5 py-8 md:px-8">
         <div className="w-full max-w-[420px]">
-          <div className="mb-6 xl:hidden">
+          <div className="mb-6 flex flex-wrap items-center justify-between gap-x-4 gap-y-2 xl:hidden">
             <AppLink href="/">
               <Image
                 alt="BARSYNERGY"
@@ -79,7 +79,7 @@ export function AuthSplitLayout({ children }: AuthSplitLayoutProps) {
                 width={360}
               />
             </AppLink>
-            <AppLink className="mt-3 inline-flex items-center gap-2 text-sm font-semibold text-[var(--accent)]" href="/">
+            <AppLink className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--accent)]" href="/">
               <ArrowLeft aria-hidden size={15} strokeWidth={1.8} />
               Вернуться на сайт
             </AppLink>

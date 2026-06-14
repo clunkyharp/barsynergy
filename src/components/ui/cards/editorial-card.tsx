@@ -49,7 +49,7 @@ export function EditorialCard({
         <div className={imageClass}>
           <div
             aria-hidden="true"
-            className="absolute inset-0 bg-cover bg-center transition-transform duration-500 ease-out group-hover:scale-[1.04] motion-reduce:transition-none"
+            className="gpu absolute inset-0 bg-cover bg-center transition-transform duration-[var(--motion-duration-media)] ease-[var(--motion-ease-move)] group-hover:scale-[1.04] motion-reduce:transition-none"
             style={{ backgroundImage: `url("${media.src}")` }}
           />
           {isFeatured ? (

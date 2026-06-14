@@ -77,7 +77,7 @@ export function ArticleFeaturedCard({
     >
       <div
         aria-hidden="true"
-        className="absolute inset-0 bg-cover bg-center transition-transform duration-700 ease-out group-hover:scale-[1.02] motion-reduce:transition-none"
+        className="gpu absolute inset-0 bg-cover bg-center transition-transform duration-[var(--motion-duration-media)] ease-[var(--motion-ease-move)] group-hover:scale-[1.02] motion-reduce:transition-none"
         style={{ backgroundImage: `url("${imageUrl}")` }}
       />
       <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-black/92 via-black/50 to-black/20" />
@@ -152,7 +152,7 @@ export function ArticleCard({
       <div className="relative aspect-[16/9] w-full overflow-hidden">
         <div
           aria-hidden="true"
-          className="absolute inset-0 bg-cover bg-center transition-transform duration-500 ease-out group-hover:scale-[1.04] motion-reduce:transition-none"
+          className="gpu absolute inset-0 bg-cover bg-center transition-transform duration-[var(--motion-duration-media)] ease-[var(--motion-ease-move)] group-hover:scale-[1.04] motion-reduce:transition-none"
           style={{ backgroundImage: `url("${imageUrl}")` }}
         />
         {item.label ? (

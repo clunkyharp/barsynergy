@@ -1,5 +1,6 @@
 import { PublicBodyText, PublicDisplayTitle, PublicEyebrow } from '@/components/public/public-primitives';
 import { PublicFormValidation } from '@/components/public/public-form-validation';
+import { PublicFormResultDialog } from '@/components/public/public-form-result-dialog';
 import { RequestDisclosure } from '@/components/public/request-disclosure';
 import { Button } from '@/components/ui/button';
 import { EditorialShell } from '@/components/ui/editorial-shell';
@@ -259,7 +260,7 @@ export function PublicApplicationSection({
               {title}
             </PublicDisplayTitle>
             <PublicBodyText className="mt-3 max-w-2xl">{description}</PublicBodyText>
-            {result ? <PublicSubmissionFeedback className="mt-5" result={result} /> : null}
+            <PublicFormResultDialog result={result} />
           </div>
 
           {!enabled ? (
@@ -292,7 +293,7 @@ export function PublicApplicationSection({
               {title}
             </PublicDisplayTitle>
             <PublicBodyText className="mt-3 max-w-md text-sm leading-6">{description}</PublicBodyText>
-            {result ? <PublicSubmissionFeedback className="mt-5" result={result} /> : null}
+            <PublicFormResultDialog result={result} />
           </EditorialShell>
         </div>
 

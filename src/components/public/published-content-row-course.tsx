@@ -56,7 +56,7 @@ export function CourseListRow({
             <div className="mt-4 hidden md:block">
               <div
                 aria-hidden="true"
-                className="aspect-[4/3] overflow-hidden rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-cover bg-center transition-transform duration-[var(--motion-duration-media)] ease-[var(--motion-ease-move)] group-hover:scale-[1.02] motion-reduce:transition-none"
+                className="gpu aspect-[4/3] overflow-hidden rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-cover bg-center transition-transform duration-[var(--motion-duration-media)] ease-[var(--motion-ease-move)] group-hover:scale-[1.02] motion-reduce:transition-none"
                 style={{ backgroundImage: `url("${item.imageUrl}")` }}
               />
             </div>

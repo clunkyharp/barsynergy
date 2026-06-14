@@ -1,7 +1,6 @@
 import { CategoryType } from '@/modules/admin/queries';
 import { createCategory, updateCategory } from '@/app/admin/taxonomy/actions';
 import {
-  AdminCmsAdvancedSection,
   AdminCmsCompactRecordSummary,
   AdminCmsInlineEditRecord,
   AdminCmsPanel
@@ -78,11 +77,14 @@ export default async function AdminCategoriesPage({ searchParams }: AdminCategor
             </FormField>
             <Button type="submit">Создать</Button>
           </div>
-          <AdminCmsAdvancedSection title="Описание" description="Необязательное пояснение для внутренних сценариев и будущих публичных выводов.">
-            <FormField htmlFor="category-description" label="Описание">
-              <Textarea id="category-description" name="description" maxLength={500} rows={3} />
-            </FormField>
-          </AdminCmsAdvancedSection>
+          <FormField
+            className="lg:col-span-full"
+            htmlFor="category-description"
+            label="Описание"
+            hint="Необязательное пояснение для внутренних сценариев и будущих публичных выводов."
+          >
+            <Textarea id="category-description" name="description" maxLength={500} rows={3} />
+          </FormField>
         </form>
       </AdminCmsPanel>
 
@@ -138,15 +140,14 @@ export default async function AdminCategoriesPage({ searchParams }: AdminCategor
               <Button type="submit" variant="secondary">
                 Сохранить
               </Button>
-              <AdminCmsAdvancedSection
+              <FormField
                 className="lg:col-span-full"
-                title="Описание"
-                description="Необязательное пояснение для внутренних сценариев и будущих публичных выводов."
+                htmlFor={`category-description-${category.id}`}
+                label="Описание"
+                hint="Необязательное пояснение для внутренних сценариев и будущих публичных выводов."
               >
-                <FormField htmlFor={`category-description-${category.id}`} label="Описание">
-                  <Textarea id={`category-description-${category.id}`} name="description" maxLength={500} defaultValue={category.description ?? ''} rows={3} />
-                </FormField>
-              </AdminCmsAdvancedSection>
+                <Textarea id={`category-description-${category.id}`} name="description" maxLength={500} defaultValue={category.description ?? ''} rows={3} />
+              </FormField>
             </AdminCmsInlineEditRecord>
           ))
         )}

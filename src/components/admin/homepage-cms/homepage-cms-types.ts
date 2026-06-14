@@ -23,9 +23,9 @@ export const sectionMeta: Array<{
   title: string;
   externalStatus?: { details: string; label: string; variant: 'neutral' | 'success' | 'warning' | 'danger' | 'pending' };
 }> = [
-  { description: 'Первый экран главной страницы.', id: 'homepage-hero', title: 'Hero' },
+  { description: 'Первый экран главной страницы.', id: 'homepage-hero', title: 'Главный экран' },
   { description: 'Карточки для ролей на главной.', id: 'homepage-audience', title: 'Карточки аудитории' },
-  { description: 'Короткий текст о проекте и CTA внизу главной.', id: 'homepage-positioning', title: 'Короткое позиционирование' },
+  { description: 'Короткий текст о проекте и кнопки действия внизу главной.', id: 'homepage-positioning', title: 'Короткое позиционирование' },
   { description: 'Переходы в основные разделы сайта.', id: 'homepage-navigation', title: 'Навигационные блоки', externalStatus: { details: 'Статический блок', label: 'Правится в коде', variant: 'neutral' } },
   { description: 'Публичные каналы сообщества и ссылки.', id: 'homepage-social', title: 'Соцсети' },
   { description: 'Профили генеральных спонсоров, которые попадают на главную.', id: 'homepage-general-sponsors', title: 'Генеральные спонсоры' },

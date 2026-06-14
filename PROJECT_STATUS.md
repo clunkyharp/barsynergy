@@ -1,6 +1,33 @@
 # BARSYNERGY Project Status
 
-Last updated: 2026-06-13 (Cabinets UX audit remediation — P0/P1/S1/S2/S3/S4 packages)
+Last updated: 2026-06-14 (Newsletter modal MVP — email double opt-in)
+
+## Newsletter Modal MVP (2026-06-14)
+
+Applied in this batch:
+
+- email-only newsletter subscription model added with selected `NotificationTopic[]`, hashed confirm/unsubscribe tokens, optional `userId`, consent text, confirmation and unsubscribe timestamps;
+- double opt-in flow added through `/newsletter/confirm/[token]`, with one-click unsubscribe route at `/newsletter/unsubscribe/[token]`;
+- public newsletter modal added with topic checkboxes, email field for guests, hidden email for authenticated users, consent checkbox and in-modal success state;
+- anti-annoy trigger added on public footer mount: 30s time-on-site or 50% scroll, no workspace/auth/profile/business-cabinet pages, no `?application=*` pages, one show per session, 7-day remind-later, 30/180-day dismiss cooldown and hard opt-out after 3 dismissals;
+- authenticated users with an existing email subscription are excluded from the trigger server-side;
+- SMTP confirmation email reuses the existing SMTP env contract; no new provider or dependency was added.
+
+Validation snapshot:
+
+- `node --test tests/newsletter-modal-contract.test.mjs` passes (5/5);
+- `./node_modules/.bin/prisma validate` passes;
+- `npm run prisma:generate` passes;
+- `npm run lint` passes;
+- `npm run typecheck` currently fails on pre-existing unrelated `src/app/profile/saved-vacancies/page.tsx` action return typing (`Promise<{ type; message }>` passed to a form action expecting `Promise<void>`). Newsletter-specific source checks are green.
+- HTTP smoke for `http://localhost:3001/legal/privacy` returns 200 from the existing dev server; visual browser smoke was not completed because the in-app Browser was unavailable and Playwright Chromium launch is blocked by the local macOS sandbox (`MachPortRendezvousServer` permission error).
+
+Out of scope:
+
+- weekly digest scheduler and email template generation;
+- analytics provider integration beyond temporary `console.info` events;
+- web-push integration and profile settings for email/push channels;
+- CTA A/B tests.
 
 ## Cabinets UX Audit Remediation (2026-06-12)
 

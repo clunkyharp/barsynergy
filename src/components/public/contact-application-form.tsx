@@ -7,7 +7,6 @@ import {
   HoneypotField,
   PublicFormShellFooter,
   PublicFormShellHeader,
-  PublicSubmissionFeedback,
   type PublicApplicationFormProps
 } from '@/components/public/application-form-section';
 import { Button } from '@/components/ui/button';
@@ -17,6 +16,7 @@ import { FormField, FormSection } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
 import { InlineLink } from '@/components/ui/inline-link';
 import { Select } from '@/components/ui/select';
+import { SubmissionResultDialog } from '@/components/ui/submission-result-dialog';
 import { SubmitButton } from '@/components/ui/submit-button';
 import { Textarea } from '@/components/ui/textarea';
 import { SUPPORT_EMAIL } from '@/lib/contact-info';
@@ -163,13 +163,10 @@ export function ContactApplicationForm({ enabled, utm, cities, defaultTopic, def
             Отправить сообщение
           </SubmitButton>
         </PublicFormShellFooter>
-        {result ? (
-          <PublicSubmissionFeedback
-            className="mt-4"
-            result={result}
-            title={result.type === 'error' ? 'Не удалось отправить сообщение' : 'Заявка отправлена'}
-          />
-        ) : null}
+        <SubmissionResultDialog
+          result={result}
+          errorTitle="Не удалось отправить сообщение"
+        />
       </div>
     </form>
   ) : (

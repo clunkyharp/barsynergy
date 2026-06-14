@@ -35,7 +35,7 @@ type DialogProps = {
 } & Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'title'>;
 
 const dialogSizes: Record<DialogSize, string> = {
-  confirm: 'max-w-[min(235px,90vw)]',
+  confirm: 'max-w-[min(400px,90vw)]',
   sm: 'max-w-[min(24rem,90vw)]',
   md: 'max-w-[min(32rem,90vw)]',
   lg: 'max-w-[min(42rem,90vw)]'
@@ -133,8 +133,8 @@ export function Dialog({
         aria-labelledby={titleId}
         aria-modal="true"
         className={cn(
-          'dialog-panel w-full rounded-[var(--radius-xl)] border border-[var(--line)] bg-[var(--surface)] p-6 text-left text-[var(--text)] shadow-[var(--shadow-overlay)] motion-reduce:transition-none',
-          size === 'confirm' && 'border-[var(--border-strong)] bg-[var(--surface)] shadow-none',
+          'dialog-panel w-full overflow-hidden rounded-[var(--radius-xl)] border border-[var(--line)] bg-[var(--surface)] text-left text-[var(--text)] shadow-[var(--shadow-overlay)] motion-reduce:transition-none',
+          size === 'confirm' ? 'border-[var(--border-strong)] bg-[var(--surface)] shadow-none p-5' : 'p-6',
           dialogSizes[size],
           className
         )}

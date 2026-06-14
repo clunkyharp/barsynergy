@@ -98,7 +98,7 @@ export function ArticleSearchField({ currentQuery = '' }: { currentQuery?: strin
   return (
     <form className="flex w-full items-center gap-1" onSubmit={handleSubmit}>
       <div
-        className="min-w-0 flex-1 transition-[max-width,opacity,transform,visibility] duration-[var(--motion-duration-base)] ease-[var(--motion-ease-standard)] motion-reduce:transition-none"
+        className="min-w-0 flex-1 transition-[max-width,opacity,transform] duration-[var(--motion-duration-base)] ease-[var(--motion-ease-standard)] motion-reduce:transition-none"
         style={{
           maxWidth: isActive ? 200 : 0,
           opacity: isActive ? 1 : 0,
