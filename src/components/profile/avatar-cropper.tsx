@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState, type ChangeEvent, type SyntheticEvent } from 'react';
+import { useCallback, useEffect, useRef, useState, type ChangeEvent } from 'react';
 import { ImageUp, RotateCcw, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -80,7 +80,7 @@ export function AvatarCropper({ currentAvatarUrl }: AvatarCropperProps) {
     drawAvatarCrop({ canvas, image, size: PREVIEW_SIZE, zoom });
   }, [sourceUrl, zoom]);
 
-  function resetSource() {
+  const resetSource = useCallback(() => {
     if (sourceUrl) URL.revokeObjectURL(sourceUrl);
     setSourceUrl(null);
     setZoom(1);
@@ -89,7 +89,27 @@ export function AvatarCropper({ currentAvatarUrl }: AvatarCropperProps) {
     if (sourceInputRef.current) {
       sourceInputRef.current.value = '';
     }
-  }
+  }, [sourceUrl]);
+
+  useEffect(() => {
+    if (!sourceUrl) return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') {
+        resetSource();
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [resetSource, sourceUrl]);
 
   function handleSourceChange(event: ChangeEvent<HTMLInputElement>) {
     const file = event.currentTarget.files?.[0];
@@ -102,18 +122,22 @@ export function AvatarCropper({ currentAvatarUrl }: AvatarCropperProps) {
     }
 
     if (sourceUrl) URL.revokeObjectURL(sourceUrl);
-    setSourceUrl(URL.createObjectURL(file));
+    const url = URL.createObjectURL(file);
+    const image = new Image();
+    image.onload = () => {
+      imageRef.current = image;
+      const canvas = previewCanvasRef.current;
+      if (canvas) {
+        drawAvatarCrop({ canvas, image, size: PREVIEW_SIZE, zoom: 1 });
+      }
+    };
+    image.onerror = () => {
+      setError('Не удалось прочитать изображение. Попробуйте другой файл.');
+    };
+    image.src = url;
+    setSourceUrl(url);
     setZoom(1);
     setError('');
-  }
-
-  function handleImageLoad(event: SyntheticEvent<HTMLImageElement>) {
-    imageRef.current = event.currentTarget;
-    const canvas = previewCanvasRef.current;
-
-    if (canvas) {
-      drawAvatarCrop({ canvas, image: event.currentTarget, size: PREVIEW_SIZE, zoom });
-    }
   }
 
   async function confirmCrop() {
@@ -180,55 +204,67 @@ export function AvatarCropper({ currentAvatarUrl }: AvatarCropperProps) {
       {error ? <p className="text-sm text-[var(--danger-text)]">{error}</p> : null}
 
       {sourceUrl ? (
-        <div className="fixed inset-0 z-50 grid place-items-center bg-black/65 px-4 py-6" role="dialog" aria-modal="true" aria-label="Обрезка аватара">
-          <div className="w-full max-w-md rounded-[var(--radius-lg)] border border-[var(--line)] bg-[var(--surface-elevated)] p-5 shadow-[var(--shadow-panel)]">
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <h3 className="text-lg font-semibold">Обрезка аватара</h3>
-                <p className="mt-1 text-sm leading-6 text-[var(--muted)]">Круг показывает, как фото будет выглядеть в профиле.</p>
+        <div
+          aria-label="Обрезка аватара"
+          aria-modal="true"
+          className="fixed inset-0 z-50 overflow-y-auto bg-black/65"
+          onClick={(event) => {
+            if (event.target === event.currentTarget) resetSource();
+          }}
+          role="dialog"
+        >
+          <div className="grid min-h-full place-items-center px-4 py-6">
+            <div
+              className="w-full max-w-md rounded-[var(--radius-lg)] border border-[var(--line)] bg-[var(--surface-elevated)] p-5 shadow-[var(--shadow-panel)]"
+              onClick={(event) => event.stopPropagation()}
+            >
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <h3 className="text-lg font-semibold">Обрезка аватара</h3>
+                  <p className="mt-1 text-sm leading-6 text-[var(--muted)]">Круг показывает, как фото будет выглядеть в профиле.</p>
+                </div>
+                <button
+                  aria-label="Закрыть"
+                  className="rounded-[var(--radius-sm)] p-2 text-[var(--muted)] hover:bg-[var(--surface-muted)] hover:text-[var(--text)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
+                  onClick={resetSource}
+                  type="button"
+                >
+                  <X aria-hidden size={18} strokeWidth={1.8} />
+                </button>
               </div>
-              <button
-                aria-label="Закрыть"
-                className="rounded-[var(--radius-sm)] p-2 text-[var(--muted)] hover:bg-[var(--surface-muted)] hover:text-[var(--text)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
-                onClick={resetSource}
-                type="button"
-              >
-                <X aria-hidden size={18} strokeWidth={1.8} />
-              </button>
-            </div>
 
-            <div className="mt-5 grid place-items-center">
-              <div className="overflow-hidden rounded-full border border-[var(--border-strong)] bg-[var(--surface-muted)]">
-                <canvas ref={previewCanvasRef} className="block h-64 w-64" />
+              <div className="mt-5 grid place-items-center">
+                <div className="overflow-hidden rounded-full border border-[var(--border-strong)] bg-[var(--surface-muted)]">
+                  <canvas ref={previewCanvasRef} className="block h-64 w-64" />
+                </div>
               </div>
-              <img alt="" className="hidden" onLoad={handleImageLoad} src={sourceUrl} />
-            </div>
 
-            <label className="mt-5 block text-sm font-semibold text-[var(--text)]" htmlFor="avatar-zoom">
-              Масштаб
-            </label>
-            <input
-              className="mt-2 w-full accent-[var(--accent)]"
-              id="avatar-zoom"
-              max={MAX_ZOOM}
-              min={MIN_ZOOM}
-              onChange={(event) => setZoom(Number(event.currentTarget.value))}
-              step="0.05"
-              type="range"
-              value={zoom}
-            />
+              <label className="mt-5 block text-sm font-semibold text-[var(--text)]" htmlFor="avatar-zoom">
+                Масштаб
+              </label>
+              <input
+                className="mt-2 w-full accent-[var(--accent)]"
+                id="avatar-zoom"
+                max={MAX_ZOOM}
+                min={MIN_ZOOM}
+                onChange={(event) => setZoom(Number(event.currentTarget.value))}
+                step="0.05"
+                type="range"
+                value={zoom}
+              />
 
-            <div className="mt-5 flex flex-wrap justify-end gap-2">
-              <Button onClick={() => setZoom(1)} type="button" variant="ghost">
-                <RotateCcw aria-hidden size={16} strokeWidth={1.8} />
-                Сбросить
-              </Button>
-              <Button onClick={resetSource} type="button" variant="secondary">
-                Отмена
-              </Button>
-              <Button onClick={() => void confirmCrop()} type="button">
-                Сохранить обрезку
-              </Button>
+              <div className="mt-5 flex flex-wrap justify-end gap-2">
+                <Button onClick={() => setZoom(1)} type="button" variant="ghost">
+                  <RotateCcw aria-hidden size={16} strokeWidth={1.8} />
+                  Сбросить
+                </Button>
+                <Button onClick={resetSource} type="button" variant="secondary">
+                  Отмена
+                </Button>
+                <Button onClick={() => void confirmCrop()} type="button">
+                  Сохранить обрезку
+                </Button>
+              </div>
             </div>
           </div>
         </div>

@@ -19,6 +19,7 @@ export function HeroSection({ heroes, activeSection, saveAction }: { heroes: Her
       defaultOpen={activeSection === 'homepage-hero'}
       description="Если активной записи нет, главная страница показывает резервный вариант."
       id="homepage-hero"
+      records={heroes}
       title="Главный экран"
     >
       {heroes.length > 0 ? (
@@ -63,6 +64,7 @@ export function AudienceSection({ cards, activeSection, saveAction, deleteAction
       defaultOpen={activeSection === 'homepage-audience'}
       description="Эти записи используются в первом экране и в блоке «Для кого»."
       id="homepage-audience"
+      records={cards}
       title="Карточки аудитории"
     >
       <NewRecordEditor action={saveAction} title="Новая карточка аудитории" description="Создайте компактную карточку для роли или сценария.">
@@ -109,6 +111,7 @@ export function CtaSection({ ctaBlocks, activeSection, saveAction }: { ctaBlocks
       defaultOpen={activeSection === 'homepage-positioning'}
       description="Короткое описание проекта и кнопки действия внизу главной."
       id="homepage-positioning"
+      records={ctaBlocks}
       title="Короткое позиционирование"
     >
       {ctaBlocks.length > 0 ? (
@@ -154,6 +157,7 @@ export function SocialSection({ socialBlocks, activeSection, saveAction, deleteA
       defaultOpen={activeSection === 'homepage-social'}
       description="Публичные блоки с площадками и ссылками сообщества."
       id="homepage-social"
+      records={socialBlocks}
       title="Соцсети"
     >
       <NewRecordEditor action={saveAction} title="Новая соцсеть" description="Добавьте канал сообщества или обновите ссылку на площадку.">
@@ -201,6 +205,7 @@ export function CalculatorSection({ teasers, activeSection, saveAction }: { teas
       defaultOpen={activeSection === 'homepage-calculator'}
       description="Блок главной страницы, который ведёт к калькулятору себестоимости."
       id="homepage-calculator"
+      records={teasers}
       title="Тизер калькулятора"
     >
       {teasers.length > 0 ? (

@@ -19,6 +19,7 @@ const CONTENT_TOPIC_MAP: ContentTopicMap = {
   vacancy: 'VACANCIES',
   course: 'COURSES',
   supplier: 'SUPPLIERS',
+  master: 'MASTERS',
 };
 
 function getTopic(contentType: string): string | null {

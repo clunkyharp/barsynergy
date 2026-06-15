@@ -1,5 +1,6 @@
 import type { JsonLdValue } from '@/components/seo/json-ld';
 import type { PublicContentDetail } from '@/modules/content/shared/detail-helpers';
+import type { PublicMasterDetail } from '@/lib/public/content/masters';
 import { getEnv } from '@/lib/validation/env';
 
 const siteName = 'BARSYNERGY';
@@ -187,6 +188,51 @@ export function buildPublicContentJsonLd({
     url: detail.externalUrl ?? url,
     image,
     sameAs: detail.externalUrl,
+    mainEntityOfPage: url
+  };
+}
+
+export function buildMasterJsonLd(detail: PublicMasterDetail, path: string): JsonLdValue {
+  const url = absoluteUrl(path);
+  const image = imageUrl(detail);
+  const displayName = detail.companyName ?? factValue(detail, 'Профиль') ?? detail.title;
+
+  if (detail.entityType === 'BUSINESS') {
+    return {
+      '@context': 'https://schema.org',
+      '@type': 'LocalBusiness',
+      name: displayName,
+      description: detail.summary,
+      url,
+      image,
+      address: detail.cityName
+        ? {
+            '@type': 'PostalAddress',
+            addressLocality: detail.cityName,
+            addressCountry: 'RU'
+          }
+        : undefined,
+      areaServed: detail.serviceArea,
+      priceRange: detail.rateLabel,
+      mainEntityOfPage: url
+    };
+  }
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Person',
+    name: displayName,
+    description: detail.summary,
+    url,
+    image,
+    jobTitle: detail.label ?? 'Мастер',
+    knowsAbout: detail.specializations,
+    workLocation: detail.cityName
+      ? {
+          '@type': 'Place',
+          name: detail.cityName
+        }
+      : undefined,
     mainEntityOfPage: url
   };
 }

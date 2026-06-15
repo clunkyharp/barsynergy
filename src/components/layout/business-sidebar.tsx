@@ -1,7 +1,7 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-import { Building2, FileText, Settings, Users } from 'lucide-react';
+import { Building2, FileText, Settings, Users, Wrench } from 'lucide-react';
 import { AppLink } from '@/components/ui/app-link';
 import { Panel } from '@/components/ui/panel';
 import { SubmitButton } from '@/components/ui/submit-button';
@@ -14,6 +14,7 @@ type BusinessSidebarProps = {
 const links = [
   { href: '/business/cabinet', label: 'Обзор', icon: Building2 },
   { href: '/business/cabinet/requests', label: 'Заявки', icon: FileText },
+  { href: '/business/cabinet/masters', label: 'Услуги мастеров', icon: Wrench },
   { href: '/business/cabinet/responses', label: 'Отклики', icon: Users },
   { href: '/business/cabinet/settings', label: 'Настройки', icon: Settings }
 ];

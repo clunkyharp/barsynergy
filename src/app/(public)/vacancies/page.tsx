@@ -4,15 +4,18 @@ import { PageHero } from '@/components/public/page-hero';
 import { PublishedContentSectionOpportunity } from '@/components/public/published-content-section';
 import { PublicFilters } from '@/components/public/public-filters';
 import { VacanciesHeroActions } from '@/app/(public)/vacancies/vacancies-hero-actions';
+import { VacanciesViewTabs } from '@/app/(public)/vacancies/vacancies-view-tabs';
 import {
   stripPublicApplicationResultParams
 } from '@/lib/applications/public-form-helpers';
 import {
   getPublishedVacancies,
+  getPublishedSpecialists,
   type PublicContentSearchParams
 } from '@/lib/public/content';
-import { getPublicCategoryOptions, getPublicCityFilterOptions, getVacancyFilterOptions } from '@/lib/public/filter-options';
+import { getPublicCategoryOptions, getPublicCityFilterOptions, getVacancyFilterOptions, getSpecialistFilterOptions } from '@/lib/public/filter-options';
 import { buildPublicPageMetadata } from '@/lib/public/metadata';
+import { SpecialistListSection } from './specialist-list-section';
 
 type VacanciesPageProps = {
   searchParams?: Promise<PublicContentSearchParams>;
@@ -20,7 +23,7 @@ type VacanciesPageProps = {
 
 export const metadata: Metadata = buildPublicPageMetadata({
   title: 'Вакансии',
-  description: 'Вакансии для баров, кофеен и команд Северного Кавказа.',
+  description: 'Работа для бариста, управляющих и специалистов кофейной индустрии.',
   path: '/vacancies'
 });
 
@@ -40,6 +43,34 @@ function getVacancySortLabel(sort?: string) {
 
 export default async function VacanciesPage({ searchParams }: VacanciesPageProps) {
   const params = (await searchParams) ?? {};
+  const view = firstParam(params.view) ?? 'vacancies';
+
+  if (view === 'specialists') {
+    const contentParams = stripPublicApplicationResultParams(params);
+    const [content, filterOptions] = await Promise.all([
+      getPublishedSpecialists(contentParams),
+      getSpecialistFilterOptions(),
+    ]);
+
+    return (
+      <>
+        <PageHero
+          title="Специалисты"
+          subtitle="Резюме и услуги специалистов барной индустрии."
+          tone="graphite"
+        >
+          <VacanciesViewTabs />
+          <VacanciesHeroActions />
+        </PageHero>
+        <SpecialistListSection
+          content={content}
+          filterOptions={filterOptions}
+          params={contentParams}
+        />
+      </>
+    );
+  }
+
   const contentParams = stripPublicApplicationResultParams(params);
   const selectedSort = firstParam(contentParams.sort);
   const [content, categories, cities, filterOptions] = await Promise.all([
@@ -54,9 +85,9 @@ export default async function VacanciesPage({ searchParams }: VacanciesPageProps
       <PageHero
         title="Вакансии"
         subtitle="Работа для бариста, обжарщиков, управляющих и специалистов кофейной индустрии."
-        media={{ kind: 'image' as const, src: '/images/vacancies-hero.jpg', alt: 'Бариста за приготовлением кофе с latte art' }}
         tone="graphite"
       >
+        <VacanciesViewTabs />
         <VacanciesHeroActions />
       </PageHero>
       <PublishedContentSectionOpportunity

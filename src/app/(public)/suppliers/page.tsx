@@ -52,7 +52,6 @@ export default async function SuppliersPage({ searchParams }: SuppliersPageProps
       <PageHero
         title="Поставщики"
         subtitle="Проверенные поставщики кофе, оборудования, упаковки и продуктов для вашего бизнеса."
-        media={{ kind: 'image' as const, src: '/images/suppliers-hero.jpg', alt: 'Кофейные пачки, зерно и аксессуары для кофейного бизнеса' }}
         tone="graphite"
       >
         <SuppliersHeroActions />

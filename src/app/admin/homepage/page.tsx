@@ -1,8 +1,7 @@
 import { AdminActionAlert } from '@/components/admin/content-admin-controls';
 import { AdminPageIntro } from '@/components/admin/admin-page-intro';
-import { AdminCmsPanel } from '@/components/admin/admin-cms-form';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
-import { ADMIN_GENERAL_SPONSORS_PATH, sectionMeta } from '@/components/admin/homepage-cms/homepage-cms-types';
+import { ADMIN_GENERAL_SPONSORS_PATH } from '@/components/admin/homepage-cms/homepage-cms-types';
 import { RecordStatus, formatDate, getActiveHomepageSection } from '@/components/admin/homepage-cms/homepage-cms-utils';
 import { HomepageSectionEditor, ExternalSectionPanel } from '@/components/admin/homepage-cms/homepage-cms-section-layout';
 import { AdminCmsCompactRecordSummary } from '@/components/admin/admin-cms-form';
@@ -29,7 +28,7 @@ export default async function AdminHomepagePage({ searchParams }: { searchParams
   const cmsData = await getHomepageCmsData();
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <AdminPageIntro
         description="Каждая секция редактируется отдельно. На сайте видны только опубликованные записи; черновики, проверка и архив скрыты."
         eyebrow="Админка / Главная"
@@ -38,28 +37,16 @@ export default async function AdminHomepagePage({ searchParams }: { searchParams
 
       <AdminActionAlert params={params} />
 
-      <AdminCmsPanel title="Секции главной" description="Каждая секция редактируется отдельно. На сайте видны только опубликованные записи.">
-        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-          {sectionMeta.map((section) => (
-            <div className="rounded-[var(--radius-md)] border border-[var(--line)] bg-[var(--surface)] px-4 py-3" key={section.id}>
-              <p className="text-sm font-semibold">{section.title}</p>
-              <p className="mt-1 text-xs leading-5 text-[var(--muted)]">{section.description}</p>
-              {section.externalStatus ? (
-                <p className="mt-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">
-                  {section.externalStatus.label}
-                </p>
-              ) : null}
-            </div>
-          ))}
-        </div>
-      </AdminCmsPanel>
-
+      <h2 className="text-sm font-semibold uppercase tracking-[0.12em] text-[var(--muted)]">Контент главной</h2>
       <HeroSection heroes={cmsData.heroes} activeSection={activeSection} saveAction={saveHomepageHero} />
 
       <AudienceSection cards={cmsData.audienceCards} activeSection={activeSection} saveAction={saveHomepageAudienceCard} deleteAction={deleteHomepageAudienceCard} />
 
       <CtaSection ctaBlocks={cmsData.ctaBlocks} activeSection={activeSection} saveAction={saveHomepageCtaBlock} />
 
+      <CalculatorSection teasers={cmsData.calculatorTeasers} activeSection={activeSection} saveAction={saveHomepageCalculatorTeaser} />
+
+      <h2 className="pt-2 text-sm font-semibold uppercase tracking-[0.12em] text-[var(--muted)]">Внешние блоки и каналы</h2>
       <HomepageSectionEditor
         defaultOpen={activeSection === 'homepage-navigation'}
         description="Эти блоки ведут в основные разделы сайта. Отдельной формы редактирования пока нет — структура задана в коде."
@@ -114,8 +101,6 @@ export default async function AdminHomepagePage({ searchParams }: { searchParams
           )}
         </ExternalSectionPanel>
       </HomepageSectionEditor>
-
-      <CalculatorSection teasers={cmsData.calculatorTeasers} activeSection={activeSection} saveAction={saveHomepageCalculatorTeaser} />
     </div>
   );
 }

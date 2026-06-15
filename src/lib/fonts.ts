@@ -1,5 +1,4 @@
-import localFont from 'next/font/local';
-import { Manrope } from 'next/font/google';
+import { Manrope, Unbounded } from 'next/font/google';
 
 export const bodyFont = Manrope({
   subsets: ['latin', 'cyrillic'],
@@ -7,26 +6,11 @@ export const bodyFont = Manrope({
   display: 'swap'
 });
 
-export const displayFont = localFont({
-  src: [
-    {
-      path: '../../public/fonts/lebowski-regular.woff2',
-      weight: '400',
-      style: 'normal'
-    },
-    {
-      path: '../../public/fonts/lebowski-regular.woff',
-      weight: '400',
-      style: 'normal'
-    },
-    {
-      path: '../../public/fonts/lebowski-regular.ttf',
-      weight: '400',
-      style: 'normal'
-    }
-  ],
+export const displayFont = Unbounded({
+  subsets: ['latin', 'cyrillic'],
+  weight: ['600', '700', '800'],
   display: 'swap',
-  variable: '--font-lebowski'
+  variable: '--font-display'
 });
 
 export const accentFont = Manrope({

@@ -31,7 +31,7 @@ const MOBILE_MENU_CONTENT_TOP_CLASS = 'pt-[72px] sm:pt-[76px]';
 const navGroups = [
   {
     label: 'Платформа',
-    hrefs: ['/events', '/education', '/vacancies', '/suppliers', '/articles', '/tools/cost-calculator', '/consulting']
+    hrefs: ['/events', '/education', '/vacancies', '/vacancies?view=specialists', '/masters', '/suppliers', '/articles', '/tools/cost-calculator', '/consulting']
   },
   {
     label: 'Сотрудничество',

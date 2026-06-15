@@ -17,6 +17,8 @@ export const guestNavItems = [
   { label: 'События', href: '/events' },
   { label: 'Материалы', href: '/articles' },
   { label: 'Вакансии', href: '/vacancies' },
+  { label: 'Специалисты', href: '/vacancies?view=specialists' },
+  { label: 'Мастера', href: '/masters' },
   { label: 'Поставщики', href: '/suppliers' },
   { label: 'Калькулятор', href: '/tools/cost-calculator' },
   { label: 'Для бизнеса', href: '/business' },
@@ -33,8 +35,8 @@ function getNavItems(hrefs: string[]) {
     .filter((item): item is (typeof guestNavItems)[number] => Boolean(item));
 }
 
-export const desktopPrimaryNavItems = getNavItems(['/education', '/events', '/vacancies', '/suppliers', '/business', '/about']);
-export const desktopMoreNavItems = getNavItems(['/articles', '/tools/cost-calculator', '/consulting', '/partners', '/general-sponsors', '/contacts']);
+export const desktopPrimaryNavItems = getNavItems(['/education', '/events', '/vacancies', '/suppliers', '/masters', '/about']);
+export const desktopMoreNavItems = getNavItems(['/articles', '/tools/cost-calculator', '/business', '/consulting', '/partners', '/general-sponsors', '/contacts']);
 
 export function isWorkspacePath(pathname: string | null) {
   return Boolean(pathname?.startsWith('/admin') || pathname?.startsWith('/business/cabinet') || pathname?.startsWith('/auth'));

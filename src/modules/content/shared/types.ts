@@ -1,1 +1,1 @@
-export { CategoryType, ContentStatus, FileVisibility } from '@prisma/client';
+export { CategoryType, ContentStatus, FileVisibility, MasterEntityType } from '@prisma/client';

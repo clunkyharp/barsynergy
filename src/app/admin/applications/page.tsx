@@ -59,7 +59,7 @@ const quickStatusFilters = [
   { label: 'Завершены', status: ApplicationStatus.COMPLETED }
 ] as const;
 
-type ApplicationPublicationTarget = 'partner' | 'supplier' | 'vacancy';
+type ApplicationPublicationTarget = 'master' | 'partner' | 'supplier' | 'vacancy';
 
 type AdminApplicationsPageProps = {
   searchParams?: Promise<AdminContentSearchParams>;
@@ -71,6 +71,7 @@ function applicationActionLabel(application: {
   vacancy: { title: string; slug: string } | null;
   supplier: { title: string; slug: string } | null;
   partner: { title: string; slug: string } | null;
+  master: { title: string; slug: string } | null;
   resumeFileId: string | null;
   consentAcceptedAt: Date | null;
 }) {
@@ -106,6 +107,10 @@ function applicationActionLabel(application: {
     return 'Опубликовать партнёра';
   }
 
+  if (application.type === ApplicationType.MASTER_SUBMISSION && application.status === ApplicationStatus.APPROVED && !application.master) {
+    return 'Опубликовать мастера';
+  }
+
   if (!application.consentAcceptedAt && application.type !== ApplicationType.CONTACT_MESSAGE) {
     return 'Проверить согласие';
   }
@@ -116,6 +121,7 @@ function applicationActionLabel(application: {
 function applicationPublicationTarget(application: {
   consentAcceptedAt: Date | null;
   partner: { title: string; slug: string } | null;
+  master: { title: string; slug: string } | null;
   status: ApplicationStatus;
   supplier: { title: string; slug: string } | null;
   type: ApplicationType;
@@ -135,6 +141,10 @@ function applicationPublicationTarget(application: {
 
   if (application.type === ApplicationType.PARTNER_APPLICATION && !application.partner) {
     return 'partner';
+  }
+
+  if (application.type === ApplicationType.MASTER_SUBMISSION && !application.master) {
+    return 'master';
   }
 
   return null;
@@ -259,6 +269,16 @@ export default async function AdminApplicationsPage({ searchParams }: AdminAppli
             label: 'Заявки поставщиков'
           },
           {
+            current: selectedType === ApplicationType.MASTER_INQUIRY,
+            href: hrefWithoutType(ApplicationType.MASTER_INQUIRY),
+            label: 'Запросы мастерам'
+          },
+          {
+            current: selectedType === ApplicationType.MASTER_SUBMISSION,
+            href: hrefWithoutType(ApplicationType.MASTER_SUBMISSION),
+            label: 'Анкеты мастеров'
+          },
+          {
             current: selectedType === ApplicationType.PARTNER_APPLICATION,
             href: hrefWithoutType(ApplicationType.PARTNER_APPLICATION),
             label: 'Партнёры'
@@ -364,6 +384,12 @@ export default async function AdminApplicationsPage({ searchParams }: AdminAppli
                           <div className="mt-1 text-xs">
                             <DataTableClamp>Партнёр: {application.partner.title}</DataTableClamp>
                             <DataTableClamp className="mt-1 text-[var(--muted)]">/{application.partner.slug}</DataTableClamp>
+                          </div>
+                        ) : null}
+                        {application.master ? (
+                          <div className="mt-1 text-xs">
+                            <DataTableClamp>Мастер: {application.master.title}</DataTableClamp>
+                            <DataTableClamp className="mt-1 text-[var(--muted)]">/{application.master.slug}</DataTableClamp>
                           </div>
                         ) : null}
                       </DataTableCell>

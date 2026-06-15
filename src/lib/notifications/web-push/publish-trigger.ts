@@ -15,6 +15,7 @@ const CONTENT_TYPE_TOPIC: Record<string, string> = {
   vacancy: 'VACANCIES',
   course: 'COURSES',
   supplier: 'SUPPLIERS',
+  master: 'MASTERS',
 };
 
 /**

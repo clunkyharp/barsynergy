@@ -117,6 +117,33 @@ const supplierInquiryPayloadSchema = z.object({
   contactEmail: optionalString
 });
 
+const masterInquiryPayloadSchema = z.object({
+  source: payloadSource,
+  masterTitle: optionalString,
+  serviceType: optionalString,
+  projectDetails: optionalString,
+  contactName: optionalString,
+  contactPhone: optionalString,
+  contactEmail: optionalString
+});
+
+const masterSubmissionPayloadSchema = z.object({
+  source: payloadSource,
+  entityType: z.enum(['INDIVIDUAL', 'BUSINESS']),
+  fullName: nullableString,
+  companyName: nullableString,
+  title: optionalString,
+  serviceArea: nullableString,
+  specializations: z.array(z.string().trim().min(1)).optional()
+});
+
+const resumeInvitationPayloadSchema = z.object({
+  source: payloadSource,
+  profileId: optionalString,
+  vacancyId: optionalString,
+  message: optionalString
+});
+
 export const applicationPayloadSchemas = {
   [ApplicationType.BUSINESS_ACCOUNT_REQUEST]: businessAccountRequestPayloadSchema,
   [ApplicationType.COURSE_APPLICATION]: courseApplicationPayloadSchema,
@@ -130,7 +157,10 @@ export const applicationPayloadSchemas = {
   [ApplicationType.CONTACT_MESSAGE]: contactMessagePayloadSchema,
   [ApplicationType.CORPORATE_TRAINING_APPLICATION]: corporateTrainingPayloadSchema,
   [ApplicationType.CERTIFICATE_ORDER]: certificateOrderPayloadSchema,
-  [ApplicationType.SUPPLIER_INQUIRY]: supplierInquiryPayloadSchema
+  [ApplicationType.SUPPLIER_INQUIRY]: supplierInquiryPayloadSchema,
+  [ApplicationType.MASTER_INQUIRY]: masterInquiryPayloadSchema,
+  [ApplicationType.MASTER_SUBMISSION]: masterSubmissionPayloadSchema,
+  [ApplicationType.RESUME_INVITATION]: resumeInvitationPayloadSchema
 } satisfies Record<ApplicationType, z.ZodType>;
 
 export type ApplicationPayloadByType = {
@@ -147,6 +177,9 @@ export type ApplicationPayloadByType = {
   [ApplicationType.CORPORATE_TRAINING_APPLICATION]: z.infer<typeof corporateTrainingPayloadSchema>;
   [ApplicationType.CERTIFICATE_ORDER]: z.infer<typeof certificateOrderPayloadSchema>;
   [ApplicationType.SUPPLIER_INQUIRY]: z.infer<typeof supplierInquiryPayloadSchema>;
+  [ApplicationType.MASTER_INQUIRY]: z.infer<typeof masterInquiryPayloadSchema>;
+  [ApplicationType.MASTER_SUBMISSION]: z.infer<typeof masterSubmissionPayloadSchema>;
+  [ApplicationType.RESUME_INVITATION]: z.infer<typeof resumeInvitationPayloadSchema>;
 };
 
 export function parseApplicationPayload<TType extends ApplicationType>(
@@ -232,6 +265,27 @@ const applicationPayloadLabels: Partial<Record<ApplicationType, Record<string, s
   },
   [ApplicationType.EVENT_APPLICATION]: {
     eventTitle: 'Событие'
+  },
+  [ApplicationType.MASTER_INQUIRY]: {
+    masterTitle: 'Мастер',
+    serviceType: 'Услуга',
+    projectDetails: 'Задача',
+    contactName: 'Контактное лицо',
+    contactPhone: 'Телефон',
+    contactEmail: 'Email'
+  },
+  [ApplicationType.MASTER_SUBMISSION]: {
+    entityType: 'Тип профиля',
+    fullName: 'Имя мастера',
+    companyName: 'Компания',
+    title: 'Название профиля',
+    serviceArea: 'География',
+    specializations: 'Специализации'
+  },
+  [ApplicationType.RESUME_INVITATION]: {
+    profileId: 'Профиль',
+    vacancyId: 'Вакансия',
+    message: 'Сообщение'
   }
 };
 

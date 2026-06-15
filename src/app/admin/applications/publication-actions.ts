@@ -26,7 +26,7 @@ const vacancyDraftFormSchema = z.object({
 
 const publicationFormSchema = z.object({
   applicationId: z.string().trim().min(1),
-  target: z.enum(['vacancy', 'supplier', 'partner'])
+  target: z.enum(['vacancy', 'supplier', 'partner', 'master'])
 });
 
 export async function createVacancyDraftFromApplication(formData: FormData) {
@@ -85,7 +85,9 @@ export async function publishContentFromApplication(formData: FormData) {
         ? `Вакансия опубликована: ${publication.title}.`
         : publication.target === 'supplier'
           ? `Поставщик опубликован: ${publication.title}.`
-          : `Партнёр опубликован: ${publication.title}.`;
+          : publication.target === 'master'
+            ? `Мастер опубликован: ${publication.title}.`
+            : `Партнёр опубликован: ${publication.title}.`;
     result = { type: 'success', message };
   } catch (error) {
     result = getApplicationActionErrorResult(error);

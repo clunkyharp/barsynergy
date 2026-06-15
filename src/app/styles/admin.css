@@ -1517,7 +1517,7 @@
   background: var(--surface-wash);
 }
 
-.markdown-editor-link-bar form {
+.markdown-editor-link-controls {
   display: flex;
   gap: 6px;
   align-items: center;

@@ -52,6 +52,7 @@ enum CategoryType {
   VACANCY  @map("vacancy")
   SUPPLIER @map("supplier")
   PARTNER  @map("partner")
+  MASTER   @map("master")
   SERVICE  @map("service")
   GENERAL  @map("general")
 }
@@ -73,6 +74,11 @@ enum ContentStatus {
   ARCHIVED  @map("archived")
 }
 
+enum MasterEntityType {
+  INDIVIDUAL @map("individual")
+  BUSINESS   @map("business")
+}
+
 enum ApplicationType {
   BUSINESS_ACCOUNT_REQUEST       @map("business_account_request")
   COURSE_APPLICATION             @map("course_application")
@@ -80,6 +86,8 @@ enum ApplicationType {
   VACANCY_SUBMISSION             @map("vacancy_submission")
   VACANCY_RESPONSE               @map("vacancy_response")
   SUPPLIER_SUBMISSION            @map("supplier_submission")
+  MASTER_INQUIRY                 @map("master_inquiry")
+  MASTER_SUBMISSION              @map("master_submission")
   PARTNER_APPLICATION            @map("partner_application")
   BUSINESS_SOLUTION              @map("business_solution")
   CONSULTING_REQUEST             @map("consulting_request")
@@ -87,6 +95,7 @@ enum ApplicationType {
   CORPORATE_TRAINING_APPLICATION @map("corporate_training_application")
   CERTIFICATE_ORDER              @map("certificate_order")
   SUPPLIER_INQUIRY               @map("supplier_inquiry")
+  RESUME_INVITATION              @map("resume_invitation")
 }
 
 enum ApplicationStatus {
@@ -104,11 +113,13 @@ enum ApplicationStatus {
 }
 
 enum NotificationTopic {
-  EVENTS    @map("events")
-  ARTICLES  @map("articles")
-  VACANCIES @map("vacancies")
-  COURSES   @map("courses")
-  SUPPLIERS @map("suppliers")
+  EVENTS      @map("events")
+  ARTICLES    @map("articles")
+  VACANCIES   @map("vacancies")
+  COURSES     @map("courses")
+  SUPPLIERS   @map("suppliers")
+  MASTERS     @map("masters")
+  SPECIALISTS @map("specialists")
 
   @@map("NotificationTopic")
 }
@@ -189,6 +200,8 @@ model User {
   updatedVacancies        Vacancy[]                    @relation("VacancyUpdatedBy")
   createdSuppliers        Supplier[]                   @relation("SupplierCreatedBy")
   updatedSuppliers        Supplier[]                   @relation("SupplierUpdatedBy")
+  createdMasters          Master[]                     @relation("MasterCreatedBy")
+  updatedMasters          Master[]                     @relation("MasterUpdatedBy")
   createdPartners         Partner[]                    @relation("PartnerCreatedBy")
   updatedPartners         Partner[]                    @relation("PartnerUpdatedBy")
   createdGeneralSponsors  GeneralSponsor[]             @relation("GeneralSponsorCreatedBy")
@@ -237,6 +250,9 @@ model Profile {
   employmentTypes  EmploymentType[]
   skills           String[]
   isPublic         Boolean          @default(false)
+  publicHandle     String?          @unique
+  headline         String?
+  publishedAt      DateTime?
   createdAt        DateTime         @default(now())
   updatedAt        DateTime         @updatedAt
 
@@ -245,9 +261,10 @@ model Profile {
   avatarFile     UploadedFile?     @relation("ProfileAvatarFile", fields: [avatarFileId], references: [id], onDelete: SetNull)
   workExperiences WorkExperience[]
   profileSkills   ProfileSkill[]
+  applications    Application[]    @relation("ApplicationProfile")
 
   @@index([cityId])
-  @@index([isPublic, jobSearchStatus])
+  @@index([isPublic, jobSearchStatus, publishedAt])
 }
 
 model WorkExperience {
@@ -328,6 +345,7 @@ model BusinessAccount {
   city         City?         @relation(fields: [cityId], references: [id], onDelete: SetNull)
   applications Application[]
   vacancies    Vacancy[]
+  masters      Master[]
 
   @@index([status, createdAt])
   @@index([cityId, status])
@@ -351,6 +369,7 @@ model City {
   courses          Course[]
   vacancies        Vacancy[]
   suppliers        Supplier[]
+  masters          Master[]
   generalSponsors  GeneralSponsor[]
   applications     Application[]
 
@@ -373,6 +392,7 @@ model Category {
   courses   Course[]
   vacancies Vacancy[]
   suppliers Supplier[]
+  masters   Master[]
   partners  Partner[]
 
   @@unique([slug, type])
@@ -414,6 +434,7 @@ model UploadedFile {
   courseCoverImages         Course[]         @relation("CourseCoverImage")
   vacancyCoverImages        Vacancy[]        @relation("VacancyCoverImage")
   supplierCoverImages       Supplier[]       @relation("SupplierCoverImage")
+  masterCoverImages         Master[]         @relation("MasterCoverImage")
   partnerCoverImages        Partner[]        @relation("PartnerCoverImage")
   generalSponsorLogoImages  GeneralSponsor[] @relation("GeneralSponsorLogoImage")
   generalSponsorCoverImages GeneralSponsor[] @relation("GeneralSponsorCoverImage")
@@ -631,6 +652,54 @@ model Supplier {
   @@index([sortOrder])
 }
 
+model Master {
+  id                String           @id @default(cuid())
+  title             String
+  slug              String           @unique
+  summary           String
+  status            ContentStatus    @default(DRAFT)
+  coverImageId      String?
+  coverImageAlt     String?
+  cityId            String?
+  categoryId        String?
+  businessAccountId String?
+  sortOrder         Int              @default(0)
+  publishedAt       DateTime?
+  archivedAt        DateTime?
+  createdById       String?
+  updatedById       String?
+  entityType        MasterEntityType @default(INDIVIDUAL)
+  fullName          String?
+  companyName       String?
+  description       String
+  contactLabel      String?
+  contactTelegram   String?
+  contactPhone      String?
+  contactEmail      String?
+  specializations   String[]
+  experienceYears   Int?
+  rateLabel         String?
+  isVerified        Boolean          @default(false)
+  serviceArea       String?
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+
+  coverImage      UploadedFile?    @relation("MasterCoverImage", fields: [coverImageId], references: [id], onDelete: SetNull)
+  city            City?            @relation(fields: [cityId], references: [id], onDelete: SetNull)
+  category        Category?        @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  businessAccount BusinessAccount? @relation(fields: [businessAccountId], references: [id], onDelete: SetNull)
+  createdBy       User?            @relation("MasterCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  updatedBy       User?            @relation("MasterUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
+  applications    Application[]
+
+  @@index([status, publishedAt])
+  @@index([cityId, status])
+  @@index([categoryId, status])
+  @@index([businessAccountId])
+  @@index([isVerified, status])
+  @@index([sortOrder])
+}
+
 model Partner {
   id            String        @id @default(cuid())
   title         String
@@ -830,6 +899,8 @@ model Application {
   vacancyId         String?
   businessAccountId String?
   supplierId        String?
+  masterId          String?
+  profileId         String?
   partnerId         String?
   resumeFileId      String?
   payload           Json?
@@ -853,6 +924,8 @@ model Application {
   vacancy               Vacancy?                  @relation(fields: [vacancyId], references: [id], onDelete: SetNull)
   businessAccount       BusinessAccount?          @relation(fields: [businessAccountId], references: [id], onDelete: SetNull)
   supplier              Supplier?                 @relation(fields: [supplierId], references: [id], onDelete: SetNull)
+  master                Master?                   @relation(fields: [masterId], references: [id], onDelete: SetNull)
+  profile               Profile?                  @relation("ApplicationProfile", fields: [profileId], references: [id], onDelete: SetNull)
   partner               Partner?                  @relation(fields: [partnerId], references: [id], onDelete: SetNull)
   resumeFile            UploadedFile?             @relation("ApplicationResumeFile", fields: [resumeFileId], references: [id], onDelete: SetNull)
   forwardedBy           User?                     @relation("ApplicationForwardedBy", fields: [forwardedById], references: [id], onDelete: SetNull)
@@ -866,6 +939,8 @@ model Application {
   @@index([vacancyId, status])
   @@index([businessAccountId, status])
   @@index([supplierId, status])
+  @@index([masterId, status])
+  @@index([profileId, status])
   @@index([partnerId, status])
   @@index([userId, status])
   @@index([email])

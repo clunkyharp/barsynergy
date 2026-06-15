@@ -21,7 +21,6 @@ import { SubmitButton } from '@/components/ui/submit-button';
 import { Textarea } from '@/components/ui/textarea';
 import { SUPPORT_EMAIL } from '@/lib/contact-info';
 import {
-  contactMethods,
   contactTopicOptions,
   getContactMessageHint,
   getContactMessageLabel,
@@ -32,7 +31,7 @@ import {
   type ContactTopicValue
 } from './contact-application-form-constants';
 
-export { contactMethods, contactTopicOptions, type ContactTopicValue } from './contact-application-form-constants';
+export { contactTopicOptions, type ContactTopicValue } from './contact-application-form-constants';
 
 export function ContactApplicationForm({ enabled, utm, cities, defaultTopic, defaults = {}, action }: Omit<PublicApplicationFormProps, 'result'> & { action: (prevState: PublicApplicationResult | null, formData: FormData) => Promise<PublicApplicationResult> }) {
   const [result, formAction] = useActionState(action, null);
@@ -61,7 +60,7 @@ export function ContactApplicationForm({ enabled, utm, cities, defaultTopic, def
         headingLevel="h2"
       />
       <div className="relative p-5 md:p-6">
-        <div className="grid gap-6">
+        <div className="grid gap-4">
           <FormSection title="Основное">
             <div className="contact-primary-fields grid gap-4 md:grid-cols-2">
               <FormField htmlFor="contactName" label="Имя">
@@ -185,45 +184,5 @@ export function ContactApplicationForm({ enabled, utm, cities, defaultTopic, def
     </EditorialShell>
   );
 
-  return (
-    <section className="relative scroll-mt-36 overflow-visible border-b border-[var(--line)] bg-[var(--surface)] py-8 md:scroll-mt-44 md:py-10" id="applications">
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_24%,var(--accent-soft),transparent_18%),radial-gradient(circle_at_78%_22%,var(--surface-muted),transparent_20%)]"
-      />
-      <div className="container relative">
-        <article className="mx-auto grid max-w-3xl gap-5">
-          <div className="min-w-0 scroll-mt-36 md:scroll-mt-44" id="contact-form">
-            {form}
-          </div>
-          <div className="rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--surface-wash)] p-4 md:p-5">
-            <p className="text-[11px] font-semibold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--accent)]">Прямой контакт</p>
-            <div className="mt-3 grid gap-2 sm:grid-cols-2">
-              {contactMethods.map((method) => (
-                <a
-                  className="contact-method-link group grid grid-cols-[2.625rem_minmax(0,1fr)_auto] items-center gap-3 rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[color-mix(in_oklab,var(--surface)_82%,transparent)] p-3 text-left transition-colors duration-[var(--motion-duration-base)] ease-[var(--motion-ease-standard)] hover:border-[var(--border-strong)] hover:bg-[var(--surface-wash)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--field-focus-ring)] focus-visible:ring-inset motion-reduce:transition-none"
-                  href={method.href}
-                  key={method.mark}
-                >
-                  <span
-                    aria-hidden="true"
-                    className="contact-method-mark grid size-10 place-items-center rounded-[var(--radius-sm)] border border-[var(--border-default)] bg-[var(--surface-card-muted)] text-[11px] font-bold tracking-[var(--tracking-eyebrow-sm)] text-[var(--text)]"
-                  >
-                    {method.mark}
-                  </span>
-                  <span className="grid min-w-0 gap-0.5">
-                    <strong className="truncate text-sm font-semibold leading-5 text-[var(--text)]">{method.name}</strong>
-                    <span className="truncate text-xs leading-5 text-[var(--muted)]">{method.value}</span>
-                  </span>
-                  <span className="text-xs font-semibold text-[var(--accent)] transition-colors group-hover:text-[var(--accent-strong)]">
-                    {method.actionLabel}
-                  </span>
-                </a>
-              ))}
-            </div>
-          </div>
-        </article>
-      </div>
-    </section>
-  );
+  return form;
 }

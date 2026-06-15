@@ -1,6 +1,5 @@
 import type { ReactNode } from 'react';
 import { ContentStatus } from '@/modules/admin/queries';
-import { Button } from '@/components/ui/button';
 import { ConfirmSubmitButton } from '@/components/ui/confirm-submit-button';
 import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
@@ -23,6 +22,7 @@ import {
   type HomepageSectionId,
   type StatusValue
 } from './homepage-cms-types';
+import { HomepageSaveButton } from './homepage-save-button';
 
 const dateFormatter = new Intl.DateTimeFormat('ru-RU', {
   day: '2-digit',
@@ -71,17 +71,16 @@ export function RecordStatus({ record }: { record: { status: ContentStatus } }) 
 
 export function PriorityField({ defaultValue = 0, id }: { defaultValue?: number; id: string }) {
   return (
-    <FormField label="Порядок" htmlFor={id}>
-      <Input id={id} name="priority" min={0} max={100000} type="number" defaultValue={defaultValue} />
+    <FormField label="Порядок" htmlFor={id} hint="Меньше = выше.">
+      <Input id={id} name="priority" min={0} max={100} type="number" defaultValue={defaultValue} />
     </FormField>
   );
 }
 
-export function SubmitRow({ children, record }: { children?: ReactNode; record?: { status: ContentStatus } }) {
+export function SubmitRow({ children }: { children?: ReactNode; record?: { status: ContentStatus } }) {
   return (
     <AdminCmsActions>
-      <Button type="submit">Сохранить секцию</Button>
-      {record ? <RecordStatus record={record} /> : null}
+      <HomepageSaveButton />
       {children}
     </AdminCmsActions>
   );
@@ -146,25 +145,11 @@ export function prioritySummary(records: StatusValue[]) {
 }
 
 export function SectionStats({ records }: { records: StatusValue[] }) {
-  const lastUpdated = records.reduce<Date | null>((latest, record) => {
-    if (!latest || record.updatedAt > latest) {
-      return record.updatedAt;
-    }
-
-    return latest;
-  }, null);
-
   return (
     <div className="flex flex-wrap items-center gap-2">
       <StatusBadge showDot={records.length > 0} variant={sectionBadgeVariant(records)}>
         {recordStateSummary(records)}
       </StatusBadge>
-      <span className="rounded-[var(--radius-sm)] border border-[var(--line)] px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">
-        {prioritySummary(records)}
-      </span>
-      <span className="rounded-[var(--radius-sm)] border border-[var(--line)] px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">
-        Обновлено: {formatDate(lastUpdated)}
-      </span>
     </div>
   );
 }

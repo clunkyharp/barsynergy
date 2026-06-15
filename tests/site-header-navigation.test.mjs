@@ -30,8 +30,8 @@ test('public desktop header navigation is readable and keeps overlap guards', ()
   assert.match(source, /xl:gap-x-6/);
   assert.match(source, /xl:min-w-\[176px\]/);
   const typesSource = readProjectFile('src/components/layout/site-header-types.ts');
-  assert.match(typesSource, /export const desktopPrimaryNavItems = getNavItems\(\['\/education', '\/events', '\/vacancies', '\/suppliers', '\/business', '\/about'\]\)/);
-  assert.match(typesSource, /export const desktopMoreNavItems = getNavItems\(\['\/articles', '\/tools\/cost-calculator', '\/consulting', '\/partners', '\/general-sponsors', '\/contacts'\]\)/);
+  assert.match(typesSource, /export const desktopPrimaryNavItems = getNavItems\(\['\/education', '\/events', '\/vacancies', '\/suppliers', '\/masters', '\/about'\]\)/);
+  assert.match(typesSource, /export const desktopMoreNavItems = getNavItems\(\['\/articles', '\/tools\/cost-calculator', '\/business', '\/consulting', '\/partners', '\/general-sponsors', '\/contacts'\]\)/);
   assert.match(source, /xl:inline-flex/);
   assert.doesNotMatch(source, /href="\/vacancies#vacancy-form"/);
   assert.match(source, /href="\/contacts#contact-form"/);

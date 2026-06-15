@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import type { CSSProperties } from 'react';
+import type { CSSProperties, MouseEventHandler } from 'react';
 import { ArrowUpRight, type LucideIcon } from 'lucide-react';
 import { getChannelAccentVar, type ChannelAccentTone } from '@/components/public/channel-accent';
 import { AppLink } from '@/components/ui/app-link';
@@ -16,6 +16,7 @@ type ContactActionRowProps = {
   iconAlt?: string;
   className?: string;
   layout?: 'row' | 'card';
+  onClick?: MouseEventHandler<HTMLButtonElement>;
   tone?: ChannelAccentTone;
   wrapDescriptor?: boolean;
 };
@@ -87,13 +88,14 @@ export function ContactActionRow({
   iconAlt,
   iconSrc,
   layout = 'row',
+  onClick,
   serviceName,
   tone,
   typeLabel,
   wrapDescriptor = false
 }: ContactActionRowProps) {
   const isExternal = href?.startsWith('http');
-  const isActionable = Boolean(href);
+  const isActionable = Boolean(href || onClick);
   const isCard = layout === 'card';
   const accent = getChannelAccentVar(inferTone({ href, serviceName, tone, typeLabel }));
   const style = { '--contact-accent': accent } as CSSProperties;
@@ -147,6 +149,14 @@ export function ContactActionRow({
       'hover:border-[color-mix(in_srgb,var(--contact-accent)_34%,var(--border-default))] hover:bg-[var(--surface-wash-strong)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)]',
     className
   );
+
+  if (onClick) {
+    return (
+      <button className={rowClassName + ' w-full text-left'} onClick={onClick} style={style} type="button">
+        {content}
+      </button>
+    );
+  }
 
   if (!href) {
     return (

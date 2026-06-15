@@ -280,8 +280,8 @@
 }
 
 .public-form-shell .form-section {
-    margin-top: 26px;
-    padding-top: 26px;
+    margin-top: 0;
+    padding-top: 0;
 }
 
 .public-form-shell .form-section:first-child {
@@ -290,7 +290,7 @@
 }
 
 .public-form-shell .form-section-header {
-    margin-bottom: 16px;
+    margin-bottom: 8px;
 }
 
 .public-form-shell .form-section-title {
@@ -308,7 +308,7 @@
 }
 
 .public-form-shell .form-section-body {
-    gap: 16px;
+    gap: 12px;
 }
 
 .field-message-slot {
@@ -565,6 +565,10 @@ form[data-public-validation="true"] .grid-cols-2 .form-field {
         opacity: 1;
         transform: translateY(0);
     }
+}
+
+.animate-form-section-reveal {
+    animation: form-section-reveal 180ms var(--motion-ease-standard);
 }
 
 .form-details-panel[open] {

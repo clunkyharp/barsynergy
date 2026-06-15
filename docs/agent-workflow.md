@@ -174,10 +174,12 @@ Every meaningful batch closes with:
 
 Future development must start from:
 
-1. `docs/project-plan.md`;
-2. `docs/agent-workflow.md`;
-3. `docs/phase-plan.md`;
-4. `PROJECT_STATUS.md`;
-5. phase-specific docs or mini-specs;
-6. `docs/kanban-sync.md`;
-7. current git status.
+1. `$project-code-map`, or `.agents/skills/project-code-map/SKILL.md` if the skill is not loaded;
+2. `docs/agent-project-map.md`;
+3. `docs/project-plan.md`;
+4. `docs/agent-workflow.md`;
+5. `docs/phase-plan.md`;
+6. `PROJECT_STATUS.md`;
+7. phase-specific docs or mini-specs;
+8. `docs/kanban-sync.md`;
+9. current git status.

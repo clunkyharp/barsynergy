@@ -22,6 +22,7 @@ type ApplicationInfoProps = {
     vacancy: { id: string; title: string; slug: string; companyName: string } | null;
     supplier: { id: string; title: string; slug: string; companyName: string } | null;
     partner: { id: string; title: string; slug: string; companyName: string } | null;
+    master: { id: string; title: string; slug: string; fullName: string | null; companyName: string | null } | null;
     resumeFile: { originalName: string; mimeType: string; size: number } | null;
     businessAccount: {
       id: string; companyName: string; status: string;
@@ -120,6 +121,12 @@ export function ApplicationInfo({ application }: ApplicationInfoProps) {
             <p className="text-[var(--muted)]">{application.partner.companyName} / {application.partner.slug}</p>
             <Button className="w-fit" href={`/admin/partners/${application.partner.id}`} size="sm" variant="secondary">Открыть партнёра</Button>
           </div>
+        ) : application.master ? (
+          <div className="mt-4 grid gap-3 text-sm">
+            <p className="font-medium text-[var(--text)]">{application.master.title}</p>
+            <p className="text-[var(--muted)]">{application.master.fullName ?? application.master.companyName ?? 'Имя не указано'} / {application.master.slug}</p>
+            <Button className="w-fit" href={`/admin/masters/${application.master.id}`} size="sm" variant="secondary">Открыть мастера</Button>
+          </div>
         ) : application.businessAccount ? (
           <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
             <div><dt className="font-semibold">Компания</dt><dd className="mt-1 text-[var(--muted)]">{application.businessAccount.companyName}</dd></div>
@@ -128,7 +135,7 @@ export function ApplicationInfo({ application }: ApplicationInfoProps) {
             <div><dt className="font-semibold">Статус аккаунта</dt><dd className="mt-1 text-[var(--muted)]">{userStatusLabels[application.businessAccount.owner.status]}</dd></div>
           </dl>
         ) : (
-          <p className="mt-3 text-sm text-[var(--muted)]">Связанная вакансия, поставщик, партнёр, компания или кабинет не найдены.</p>
+          <p className="mt-3 text-sm text-[var(--muted)]">Связанная вакансия, поставщик, мастер, партнёр, компания или кабинет не найдены.</p>
         )}
       </Card>
 

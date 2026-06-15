@@ -18,7 +18,8 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   Tags,
-  Users
+  Users,
+  Wrench
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { usePathname } from 'next/navigation';
@@ -32,6 +33,7 @@ const adminLinks: { icon: LucideIcon; label: string; href: string; section: Admi
   { icon: CalendarDays, label: 'События', href: '/admin/events', section: 'events', available: true },
   { icon: GraduationCap, label: 'Курсы', href: '/admin/courses', section: 'courses', available: true },
   { icon: BriefcaseBusiness, label: 'Вакансии', href: '/admin/vacancies', section: 'vacancies', available: true },
+  { icon: Wrench, label: 'Мастера', href: '/admin/masters', section: 'masters', available: true },
   { icon: Package, label: 'Поставщики', href: '/admin/suppliers', section: 'suppliers', available: true },
   { icon: Handshake, label: 'Партнёры', href: '/admin/partners', section: 'partners', available: true },
   { icon: BadgePercent, label: 'Генеральные спонсоры', href: '/admin/general-sponsors', section: 'generalSponsors', available: true },
@@ -48,7 +50,7 @@ const adminSidebarGroups: { title: string; sections: AdminSection[] }[] = [
   { title: 'Работа', sections: ['dashboard'] },
   {
     title: 'Контент',
-    sections: ['articles', 'events', 'courses', 'vacancies', 'suppliers', 'partners', 'generalSponsors', 'homepage']
+    sections: ['articles', 'events', 'courses', 'vacancies', 'masters', 'suppliers', 'partners', 'generalSponsors', 'homepage']
   },
   { title: 'Заявки', sections: ['applications'] },
   { title: 'Бизнес', sections: ['users'] },

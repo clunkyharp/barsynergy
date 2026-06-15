@@ -185,6 +185,7 @@ function getContentUrl(contentType: string, slug: string): string {
     vacancy: '/vacancies',
     course: '/education',
     supplier: '/suppliers',
+    master: '/masters',
   };
   const base = routes[contentType] || '/';
   return `${base}/${slug}`;
@@ -197,6 +198,7 @@ function getTopicLabel(topic: string): string {
     VACANCIES: 'Новая вакансия',
     COURSES: 'Новый курс',
     SUPPLIERS: 'Новый поставщик',
+    MASTERS: 'Новый мастер',
   };
   return labels[topic] || 'Новая публикация';
 }

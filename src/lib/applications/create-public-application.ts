@@ -23,6 +23,7 @@ export type CreatePublicApplicationInput = {
   cityName?: string | null;
   vacancyId?: string | null;
   supplierId?: string | null;
+  masterId?: string | null;
   resumeFileId?: string | null;
   payload?: Prisma.InputJsonValue;
   consentText: string;
@@ -59,6 +60,7 @@ export async function createPublicApplication(input: CreatePublicApplicationInpu
         cityId: input.cityId ?? null,
         vacancyId: input.vacancyId ?? null,
         supplierId: input.supplierId ?? null,
+        masterId: input.masterId ?? null,
         resumeFileId: input.resumeFileId ?? null,
         payload: input.payload,
         consentAcceptedAt: new Date(),

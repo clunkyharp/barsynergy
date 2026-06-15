@@ -1,12 +1,13 @@
 'use client';
 
 import { useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { HeroActions } from '@/components/public/hero-actions';
 import { InfoModal } from '@/components/public/modals/info-modal';
 import { NumberedHeroStep } from '@/components/public/numbered-hero-step';
 import { openLeadModal } from '@/lib/public/lead-modal-bus';
 
-const steps = [
+const vacancySteps = [
   {
     title: 'Вы отправляете вакансию',
     description: 'Заполните форму с описанием позиции, требованиями и контактом.'
@@ -26,7 +27,26 @@ const steps = [
 ] as const;
 
 export function VacanciesHeroActions() {
+  const searchParams = useSearchParams();
+  const view = searchParams.get('view') ?? 'vacancies';
   const [infoOpen, setInfoOpen] = useState(false);
+
+  if (view === 'specialists') {
+    return (
+      <div className="flex flex-wrap gap-3">
+        <HeroActions
+          primaryLabel="Опубликовать резюме"
+          secondaryLabel="Предложить услуги"
+          onPrimaryClick={() => {
+            window.location.href = '/profile/settings#publish';
+          }}
+          onSecondaryClick={() => {
+            window.location.href = '/specialists/svc/new';
+          }}
+        />
+      </div>
+    );
+  }
 
   return (
     <>
@@ -48,7 +68,7 @@ export function VacanciesHeroActions() {
         }}
       >
         <div className="flex flex-col gap-5">
-          {steps.map((step, index) => (
+          {vacancySteps.map((step, index) => (
             <NumberedHeroStep
               description={step.description}
               key={step.title}

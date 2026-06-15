@@ -5,6 +5,7 @@ export {
   CategoryType,
   ContentStatus,
   ConversationSender,
+  MasterEntityType,
   UserRole,
   UserStatus,
 } from '@prisma/client';

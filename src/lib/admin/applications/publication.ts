@@ -1,5 +1,6 @@
 import { ApplicationStatus } from '@prisma/client';
 import {
+  getMasterPublicationFieldsFromApplication,
   getPartnerPublicationFieldsFromApplication,
   getSupplierPublicationFieldsFromApplication,
   getVacancyPublicationFieldsFromApplication
@@ -11,7 +12,7 @@ import {
 import { persistWithUniqueSlugRetry, slugify } from '@/lib/admin/content-utils';
 import { prisma } from '@/lib/db/prisma';
 
-export type ApplicationPublicationTarget = 'vacancy' | 'supplier' | 'partner';
+export type ApplicationPublicationTarget = 'vacancy' | 'supplier' | 'partner' | 'master';
 
 export async function createVacancyDraftFromApplicationId({
   applicationId,
@@ -101,6 +102,7 @@ export async function publishContentFromApplicationId({
         vacancyId: true,
         supplierId: true,
         partnerId: true,
+        masterId: true,
         cityId: true,
         message: true,
         name: true,
@@ -205,6 +207,52 @@ export async function publishContentFromApplicationId({
       });
 
       return { target, title: supplier.title };
+    }
+
+    if (target === 'master') {
+      const fields = getMasterPublicationFieldsFromApplication(application);
+      const slug = slugify(fields.title);
+
+      if (!slug) {
+        throw new Error('master publication requires slug');
+      }
+
+      const master = await persistWithUniqueSlugRetry({
+        baseSlug: slug,
+        exists: async (candidate) =>
+          Boolean(
+            await tx.master.findFirst({
+              where: { slug: candidate },
+              select: { id: true }
+            })
+          ),
+        persist: (uniqueSlug) =>
+          tx.master.create({
+            data: {
+              ...fields,
+              slug: uniqueSlug,
+              publishedAt: now,
+              archivedAt: null,
+              createdById: userId,
+              updatedById: userId
+            },
+            select: { id: true, title: true, slug: true }
+          })
+      });
+
+      await tx.application.update({
+        where: { id: applicationId },
+        data: {
+          masterId: master.id,
+          status: ApplicationStatus.APPROVED,
+          internalNotes: appendApplicationInternalNote(
+            application.internalNotes,
+            `Опубликован мастер: ${master.title} (${master.slug}).`
+          )
+        }
+      });
+
+      return { target, title: master.title };
     }
 
     const fields = getPartnerPublicationFieldsFromApplication(application);

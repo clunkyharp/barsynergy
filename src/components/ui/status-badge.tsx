@@ -49,7 +49,7 @@ export function AdminStatusChip({ children, className, variant = 'neutral', show
       data-component="admin-status-badge"
       {...props}
     >
-      {showDot ? <span aria-hidden="true" className={cn('h-1.5 w-1.5 rounded-full', styles.dot)} /> : null}
+      {showDot ? <span aria-hidden="true" className={cn('inline-block size-1.5 shrink-0 rounded-full', styles.dot)} /> : null}
       <span>{children}</span>
     </span>
   );

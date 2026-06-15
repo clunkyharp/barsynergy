@@ -18,6 +18,7 @@ test('public pages use route-specific metadata helper paths', () => {
     ['src/app/(public)/events/page.tsx', '/events'],
     ['src/app/(public)/education/page.tsx', '/education'],
     ['src/app/(public)/vacancies/page.tsx', '/vacancies'],
+    ['src/app/(public)/masters/page.tsx', '/masters'],
     ['src/app/(public)/suppliers/page.tsx', '/suppliers'],
     ['src/app/(public)/partners/page.tsx', '/partners'],
     ['src/app/(public)/general-sponsors/page.tsx', '/general-sponsors'],
@@ -65,7 +66,7 @@ test('sitemap includes static routes and published detail route sources only', (
   assert.match(source, /ContentStatus\.PUBLISHED/);
   assert.doesNotMatch(source, /lastModified:\s*new Date\(/);
 
-  for (const basePath of ['/articles', '/events', '/education', '/vacancies', '/suppliers', '/partners']) {
+  for (const basePath of ['/articles', '/events', '/education', '/vacancies', '/masters', '/suppliers', '/partners']) {
     assert.match(source, new RegExp(`basePath: '${basePath}'`));
   }
 

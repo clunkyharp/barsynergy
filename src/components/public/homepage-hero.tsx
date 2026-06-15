@@ -162,7 +162,7 @@ export function HomeHeroRouter({ stats }: { stats: HomepageData["stats"] }) {
         className="home-hero-gradient absolute inset-0 z-[1]"
       />
       <div className="container relative z-[2] py-16 md:py-32">
-        <div className="max-w-[58rem]">
+        <div className="max-w-[96rem]">
           <PublicEyebrow
             className={`${accentFont.className} tracking-[var(--tracking-eyebrow-md)]`}
             tone="inverse"
@@ -170,10 +170,10 @@ export function HomeHeroRouter({ stats }: { stats: HomepageData["stats"] }) {
             BARSYNERGY / Кофейная индустрия СКФО
           </PublicEyebrow>
           <h1
-            className={`${displayFont.className} mt-4 max-w-[44rem] text-[clamp(2.8rem,5vw,4.8rem)] font-semibold leading-[1.20] text-balance text-[var(--editorial-dark-text)] max-[640px]:max-w-[15ch] max-[640px]:text-[clamp(2.25rem,9.6vw,2.55rem)]`}
+            className={`${displayFont.className} mt-4 max-w-[18ch] text-[clamp(2.6rem,4.6vw,5.4rem)] font-normal leading-[0.96] text-balance text-[var(--editorial-dark-text)] max-[640px]:max-w-[13ch] max-[640px]:text-[clamp(2.2rem,9vw,3.2rem)]`}
             id="home-hero-title"
           >
-            Платформа кофейной индустрии СКФО
+            Платформа, которая объединяет людей индустрии кофе и бара
           </h1>
           <p className="mt-5 max-w-2xl text-[15px] leading-7 text-[var(--editorial-dark-muted)] md:text-base">
             обучение, вакансии, поставщики, события и инструменты для бариста,

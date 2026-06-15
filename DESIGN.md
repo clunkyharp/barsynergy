@@ -69,12 +69,12 @@ Avoid:
 Runtime fonts:
 
 - body: `Manrope`
-- display: `Cormorant Garamond`
+- display: `Gothic №60`
 - accent: `Manrope`
 
 Rules:
 
-- `Cormorant Garamond` is for large public H1/H2 editorial headings.
+- `Gothic №60` is for large public H1/H2 editorial headings.
 - `Manrope` is the default body, control, form, table, menu, calculator and product/workspace font.
 - The accent role is limited to short labels and brand-adjacent text; it should not replace body copy.
 - Russian helper labels and long Russian copy must stay on `Manrope`, not on the display font.

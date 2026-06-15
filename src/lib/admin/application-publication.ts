@@ -1,4 +1,4 @@
-import { ApplicationStatus, ApplicationType, ContentStatus, type Prisma } from '@prisma/client';
+import { ApplicationStatus, ApplicationType, ContentStatus, MasterEntityType, type Prisma } from '@prisma/client';
 import { normalizeExternalUrlInput } from '../validation/external-url.ts';
 import { getVacancyDraftFieldsFromApplication } from './vacancy-application-drafts.ts';
 import { parseApplicationPayload } from '../applications/application-payloads.ts';
@@ -16,6 +16,7 @@ type PublishableApplication = {
   vacancyId: string | null;
   supplierId: string | null;
   partnerId: string | null;
+  masterId?: string | null;
   cityId: string | null;
   message: string | null;
   name: string | null;
@@ -24,6 +25,7 @@ type PublishableApplication = {
   telegram: string | null;
   consentAcceptedAt: Date | null;
   payload: Prisma.JsonValue | null;
+  businessAccountId?: string | null;
 };
 
 function compactText(value?: string | null) {
@@ -142,5 +144,51 @@ export function getPartnerPublicationFieldsFromApplication(application: Publisha
     websiteUrl,
     partnerType,
     isFeatured: false
+  };
+}
+
+export function getMasterPublicationFieldsFromApplication(application: PublishableApplication) {
+  assertApplicationCanPublish(application);
+
+  if (application.type !== ApplicationType.MASTER_SUBMISSION) {
+    throw new Error('master publication requires master submission application');
+  }
+
+  if (application.masterId) {
+    throw new Error('master publication already exists for application');
+  }
+
+  const payload = parseApplicationPayload(ApplicationType.MASTER_SUBMISSION, application.payload);
+  const entityType = payload.entityType === MasterEntityType.BUSINESS ? MasterEntityType.BUSINESS : MasterEntityType.INDIVIDUAL;
+  const fullName = entityType === MasterEntityType.INDIVIDUAL
+    ? requiredApplicationText(payload.fullName, 'master publication requires full name')
+    : null;
+  const companyName = entityType === MasterEntityType.BUSINESS
+    ? requiredApplicationText(payload.companyName, 'master publication requires company name')
+    : null;
+  const title = requiredApplicationText(payload.title ?? companyName ?? fullName, 'master publication requires title');
+  const description = requiredApplicationText(application.message, 'master publication requires description');
+  const specializations = (payload.specializations ?? []).slice(0, 20);
+
+  return {
+    title,
+    summary: firstSummary(payload.title, payload.serviceArea, description),
+    description,
+    status: ContentStatus.PUBLISHED,
+    cityId: application.cityId,
+    categoryId: null,
+    businessAccountId: application.businessAccountId,
+    entityType,
+    fullName,
+    companyName,
+    contactLabel: null,
+    contactTelegram: application.telegram,
+    contactPhone: application.phone,
+    contactEmail: application.email,
+    specializations,
+    experienceYears: null,
+    rateLabel: null,
+    isVerified: false,
+    serviceArea: payload.serviceArea ?? null
   };
 }

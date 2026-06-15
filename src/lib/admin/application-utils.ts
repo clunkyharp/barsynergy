@@ -26,13 +26,16 @@ export const applicationTypeValues = [
   ApplicationType.VACANCY_SUBMISSION,
   ApplicationType.VACANCY_RESPONSE,
   ApplicationType.SUPPLIER_SUBMISSION,
+  ApplicationType.MASTER_INQUIRY,
+  ApplicationType.MASTER_SUBMISSION,
   ApplicationType.PARTNER_APPLICATION,
   ApplicationType.BUSINESS_SOLUTION,
   ApplicationType.CONSULTING_REQUEST,
   ApplicationType.CONTACT_MESSAGE,
   ApplicationType.CORPORATE_TRAINING_APPLICATION,
   ApplicationType.CERTIFICATE_ORDER,
-  ApplicationType.SUPPLIER_INQUIRY
+  ApplicationType.SUPPLIER_INQUIRY,
+  ApplicationType.RESUME_INVITATION
 ] as const;
 
 export const applicationStatusValues = [
@@ -56,13 +59,16 @@ export const applicationTypeLabels: Record<ApplicationType, string> = {
   [ApplicationType.VACANCY_SUBMISSION]: 'Размещение вакансии',
   [ApplicationType.VACANCY_RESPONSE]: 'Отклик на вакансию',
   [ApplicationType.SUPPLIER_SUBMISSION]: 'Заявка поставщика',
+  [ApplicationType.MASTER_INQUIRY]: 'Запрос мастеру',
+  [ApplicationType.MASTER_SUBMISSION]: 'Заявка мастера',
   [ApplicationType.PARTNER_APPLICATION]: 'Партнёрская заявка',
   [ApplicationType.BUSINESS_SOLUTION]: 'Бизнес-решение',
   [ApplicationType.CONSULTING_REQUEST]: 'Консалтинг',
   [ApplicationType.CONTACT_MESSAGE]: 'Контактное сообщение',
   [ApplicationType.CORPORATE_TRAINING_APPLICATION]: 'Корпоративное обучение',
   [ApplicationType.CERTIFICATE_ORDER]: 'Заказ сертификата',
-  [ApplicationType.SUPPLIER_INQUIRY]: 'Запрос поставщику'
+  [ApplicationType.SUPPLIER_INQUIRY]: 'Запрос поставщику',
+  [ApplicationType.RESUME_INVITATION]: 'Приглашение по резюме'
 };
 
 export const applicationStatusLabels: Record<ApplicationStatus, string> = {

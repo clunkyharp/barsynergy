@@ -20,7 +20,7 @@ export type PublishedContentItem = {
   label?: string;
   meta: string[];
   imageUrl?: string;
-  kind?: 'default' | 'vacancy' | 'supplier' | 'partner';
+  kind?: 'default' | 'vacancy' | 'supplier' | 'master' | 'partner';
   subtitle?: string;
   dateIso?: string;
   metaGroups?: PublishedContentMetaGroup[];
@@ -44,7 +44,7 @@ export type PublishedContentList = {
 
 export function hasActivePublicContentParams(
   params: PublicContentSearchParams,
-  keys: readonly string[] = ['q', 'category', 'city', 'format', 'level', 'period', 'partnerType', 'featured', 'verified', 'employmentType']
+  keys: readonly string[] = ['q', 'category', 'city', 'format', 'level', 'period', 'partnerType', 'featured', 'verified', 'employmentType', 'entityType', 'specialization', 'experience']
 ) {
   return keys.some((key) => {
     const value = params[key];

@@ -6,6 +6,9 @@ import {
   BusinessAccountStatus,
   CategoryType,
   ContentStatus,
+  EmploymentType,
+  JobSearchStatus,
+  MasterEntityType,
   PrismaClient,
   UserRole,
   UserStatus
@@ -55,14 +58,30 @@ async function main() {
     data: { isActive: false }
   });
 
-  const [makhachkala, kaspiysk, derbent, barsCategory, coffeeCategory, ingredientCategory, equipmentCategory] = await Promise.all([
+  const [
+    makhachkala,
+    kaspiysk,
+    derbent,
+    barsCategory,
+    coffeeCategory,
+    ingredientCategory,
+    equipmentCategory,
+    masterConsultingCategory,
+    masterTechnicalCategory,
+    eventCategory,
+    courseCategory
+  ] = await Promise.all([
     upsertCity({ name: 'Махачкала', slug: 'makhachkala', region: 'Республика Дагестан', sortOrder: 1 }),
     upsertCity({ name: 'Каспийск', slug: 'kaspiysk', region: 'Республика Дагестан', sortOrder: 2 }),
     upsertCity({ name: 'Дербент', slug: 'derbent', region: 'Республика Дагестан', sortOrder: 3 }),
     upsertCategory({ name: 'Бары', slug: 'bars', type: CategoryType.VACANCY, sortOrder: 1 }),
     upsertCategory({ name: 'Кофейни', slug: 'coffee-shops', type: CategoryType.VACANCY, sortOrder: 2 }),
     upsertCategory({ name: 'Ингредиенты', slug: 'ingredients', type: CategoryType.SUPPLIER, sortOrder: 1 }),
-    upsertCategory({ name: 'Оборудование', slug: 'equipment', type: CategoryType.SUPPLIER, sortOrder: 2 })
+    upsertCategory({ name: 'Оборудование', slug: 'equipment', type: CategoryType.SUPPLIER, sortOrder: 2 }),
+    upsertCategory({ name: 'Настройка бара', slug: 'bar-setup', type: CategoryType.MASTER, sortOrder: 1 }),
+    upsertCategory({ name: 'Сервис оборудования', slug: 'equipment-service', type: CategoryType.MASTER, sortOrder: 2 }),
+    upsertCategory({ name: 'События индустрии', slug: 'industry-events', type: CategoryType.EVENT, sortOrder: 1 }),
+    upsertCategory({ name: 'Практическое обучение', slug: 'practical-training', type: CategoryType.COURSE, sortOrder: 1 })
   ]);
 
   const demoBusinessUsers = await Promise.all([
@@ -97,6 +116,59 @@ async function main() {
   ]);
 
   const [atelierUser, lineaUser] = demoBusinessUsers;
+
+  const demoProfileUsers = await Promise.all([
+    prisma.user.upsert({
+      where: { email: 'demo-profile-amir@barsynergy.local' },
+      update: {
+        passwordHash,
+        role: UserRole.USER,
+        status: UserStatus.ACTIVE,
+        emailVerifiedAt: new Date()
+      },
+      create: {
+        email: 'demo-profile-amir@barsynergy.local',
+        passwordHash,
+        role: UserRole.USER,
+        status: UserStatus.ACTIVE,
+        emailVerifiedAt: new Date()
+      }
+    }),
+    prisma.user.upsert({
+      where: { email: 'demo-profile-elena@barsynergy.local' },
+      update: {
+        passwordHash,
+        role: UserRole.USER,
+        status: UserStatus.ACTIVE,
+        emailVerifiedAt: new Date()
+      },
+      create: {
+        email: 'demo-profile-elena@barsynergy.local',
+        passwordHash,
+        role: UserRole.USER,
+        status: UserStatus.ACTIVE,
+        emailVerifiedAt: new Date()
+      }
+    }),
+    prisma.user.upsert({
+      where: { email: 'demo-profile-nikita@barsynergy.local' },
+      update: {
+        passwordHash,
+        role: UserRole.USER,
+        status: UserStatus.ACTIVE,
+        emailVerifiedAt: new Date()
+      },
+      create: {
+        email: 'demo-profile-nikita@barsynergy.local',
+        passwordHash,
+        role: UserRole.USER,
+        status: UserStatus.ACTIVE,
+        emailVerifiedAt: new Date()
+      }
+    })
+  ]);
+
+  const [amirUser, elenaUser, nikitaUser] = demoProfileUsers;
 
   const [atelierBusiness, lineaBusiness] = await Promise.all([
     prisma.businessAccount.upsert({
@@ -903,7 +975,7 @@ async function main() {
     })
   ]);
 
-  const [articleOne, articleTwo, eventOne, eventTwo] = await Promise.all([
+  const [articleOne, articleTwo, eventOne, eventTwo, courseOne, eventThree] = await Promise.all([
     prisma.article.upsert({
       where: { slug: 'demo-weekly-editorial-roundup' },
       update: {
@@ -978,6 +1050,92 @@ async function main() {
         address: 'Каспийск, улица Ленина, 44',
         format: 'offline',
         status: ContentStatus.DRAFT
+      }
+    }),
+    prisma.course.upsert({
+      where: { slug: 'demo-bar-service-basics-course' },
+      update: {
+        title: 'Тестовое обучение: сервис за баром',
+        summary: 'Короткая практическая программа для барменов и бариста: гостевой сценарий, скорость смены и базовая коммуникация.',
+        program: [
+          '## Что разберём',
+          'Настройка гостевого сценария от приветствия до повторного заказа.',
+          'Работа с базовыми возражениями без сложных скриптов.',
+          'Организация станции перед пиковыми часами.',
+          '## Практика',
+          'Участники собирают чек-лист смены и отрабатывают короткие диалоги с гостем.'
+        ].join('\n\n'),
+        status: ContentStatus.PUBLISHED,
+        publishedAt: daysAgo(1),
+        categoryId: courseCategory.id,
+        cityId: makhachkala.id,
+        format: 'intensive',
+        durationLabel: '2 дня',
+        level: 'beginner',
+        priceLabel: 'Тестовая запись',
+        instructorName: 'Команда BARSYNERGY',
+        sortOrder: 1
+      },
+      create: {
+        slug: 'demo-bar-service-basics-course',
+        title: 'Тестовое обучение: сервис за баром',
+        summary: 'Короткая практическая программа для барменов и бариста: гостевой сценарий, скорость смены и базовая коммуникация.',
+        program: [
+          '## Что разберём',
+          'Настройка гостевого сценария от приветствия до повторного заказа.',
+          'Работа с базовыми возражениями без сложных скриптов.',
+          'Организация станции перед пиковыми часами.',
+          '## Практика',
+          'Участники собирают чек-лист смены и отрабатывают короткие диалоги с гостем.'
+        ].join('\n\n'),
+        status: ContentStatus.PUBLISHED,
+        publishedAt: daysAgo(1),
+        categoryId: courseCategory.id,
+        cityId: makhachkala.id,
+        format: 'intensive',
+        durationLabel: '2 дня',
+        level: 'beginner',
+        priceLabel: 'Тестовая запись',
+        instructorName: 'Команда BARSYNERGY',
+        sortOrder: 1
+      }
+    }),
+    prisma.event.upsert({
+      where: { slug: 'demo-bar-community-meetup' },
+      update: {
+        title: 'Тестовое событие: встреча барного сообщества',
+        summary: 'Открытая встреча для команд заведений: короткие доклады, обмен контактами и разбор локальных задач индустрии.',
+        startsAt: daysAgo(-14),
+        endsAt: daysAgo(-14 - 0.125),
+        locationName: 'BARSYNERGY Hub',
+        address: 'Махачкала, проспект Петра I, 25',
+        format: 'offline',
+        capacity: 40,
+        registrationMode: 'open',
+        registrationUrl: 'https://barsynergy.example/events/demo-bar-community-meetup',
+        status: ContentStatus.PUBLISHED,
+        publishedAt: daysAgo(1),
+        categoryId: eventCategory.id,
+        cityId: makhachkala.id,
+        sortOrder: 1
+      },
+      create: {
+        slug: 'demo-bar-community-meetup',
+        title: 'Тестовое событие: встреча барного сообщества',
+        summary: 'Открытая встреча для команд заведений: короткие доклады, обмен контактами и разбор локальных задач индустрии.',
+        startsAt: daysAgo(-14),
+        endsAt: daysAgo(-14 - 0.125),
+        locationName: 'BARSYNERGY Hub',
+        address: 'Махачкала, проспект Петра I, 25',
+        format: 'offline',
+        capacity: 40,
+        registrationMode: 'open',
+        registrationUrl: 'https://barsynergy.example/events/demo-bar-community-meetup',
+        status: ContentStatus.PUBLISHED,
+        publishedAt: daysAgo(1),
+        categoryId: eventCategory.id,
+        cityId: makhachkala.id,
+        sortOrder: 1
       }
     })
   ]);
@@ -1344,6 +1502,534 @@ async function main() {
     })
   ]);
 
+  const [masterOne, masterTwo] = await Promise.all([
+    prisma.master.upsert({
+      where: { slug: 'amina-service-lab-demo' },
+      update: {
+        title: 'Амина Расулова — запуск бара и сервис',
+        summary: 'Помогает заведениям настроить барную станцию, карту напитков и базовый сервис команды перед открытием.',
+        status: ContentStatus.PUBLISHED,
+        publishedAt: daysAgo(2),
+        archivedAt: null,
+        cityId: makhachkala.id,
+        categoryId: masterConsultingCategory.id,
+        entityType: MasterEntityType.INDIVIDUAL,
+        fullName: 'Амина Расулова',
+        companyName: null,
+        description: [
+          'Работаю с барами, кофейнями и ресторанами на этапе запуска или перезапуска. Помогаю собрать рабочую станцию, описать процессы смены, настроить гостевой сценарий и подготовить команду к первым неделям работы.',
+          '## Что делаю',
+          'Аудит барной зоны, базовая карта напитков, чек-листы открытия и закрытия смены, обучение команды простому и стабильному сервису.',
+          '## Формат',
+          'Выезд в заведение, короткий разбор онлайн или сопровождение запуска в течение нескольких смен.'
+        ].join('\n\n'),
+        contactLabel: '@amina_service_lab',
+        contactTelegram: '@amina_service_lab',
+        contactPhone: '+7 928 610-14-20',
+        contactEmail: 'amina.master@example.com',
+        specializations: ['bar-setup', 'team-training', 'service-audit'],
+        experienceYears: 8,
+        rateLabel: 'От 15 000 ₽ за выезд',
+        isVerified: true,
+        serviceArea: 'Махачкала, Каспийск, Дербент'
+      },
+      create: {
+        slug: 'amina-service-lab-demo',
+        title: 'Амина Расулова — запуск бара и сервис',
+        summary: 'Помогает заведениям настроить барную станцию, карту напитков и базовый сервис команды перед открытием.',
+        status: ContentStatus.PUBLISHED,
+        publishedAt: daysAgo(2),
+        cityId: makhachkala.id,
+        categoryId: masterConsultingCategory.id,
+        entityType: MasterEntityType.INDIVIDUAL,
+        fullName: 'Амина Расулова',
+        description: [
+          'Работаю с барами, кофейнями и ресторанами на этапе запуска или перезапуска. Помогаю собрать рабочую станцию, описать процессы смены, настроить гостевой сценарий и подготовить команду к первым неделям работы.',
+          '## Что делаю',
+          'Аудит барной зоны, базовая карта напитков, чек-листы открытия и закрытия смены, обучение команды простому и стабильному сервису.',
+          '## Формат',
+          'Выезд в заведение, короткий разбор онлайн или сопровождение запуска в течение нескольких смен.'
+        ].join('\n\n'),
+        contactLabel: '@amina_service_lab',
+        contactTelegram: '@amina_service_lab',
+        contactPhone: '+7 928 610-14-20',
+        contactEmail: 'amina.master@example.com',
+        specializations: ['bar-setup', 'team-training', 'service-audit'],
+        experienceYears: 8,
+        rateLabel: 'От 15 000 ₽ за выезд',
+        isVerified: true,
+        serviceArea: 'Махачкала, Каспийск, Дербент'
+      }
+    }),
+    prisma.master.upsert({
+      where: { slug: 'linea-service-equipment-master-demo' },
+      update: {
+        title: 'Linea Service — сервис кофейного оборудования',
+        summary: 'Бизнес-команда для подбора, установки и регулярного обслуживания кофейного и барного оборудования.',
+        status: ContentStatus.PUBLISHED,
+        publishedAt: daysAgo(3),
+        archivedAt: null,
+        cityId: kaspiysk.id,
+        categoryId: masterTechnicalCategory.id,
+        businessAccountId: lineaBusiness.id,
+        entityType: MasterEntityType.BUSINESS,
+        fullName: null,
+        companyName: 'Linea Service',
+        description: [
+          'Команда Linea Service помогает кофейням и барам запускать оборудование без лишнего простоя: подбираем модель под поток, ставим на место, настраиваем и берём на регулярное обслуживание.',
+          '## Услуги',
+          'Диагностика эспрессо-машин, настройка кофемолок, плановое ТО, запуск оборудования после покупки, консультация по размещению станции.',
+          '## География',
+          'Работаем по Каспийску и Махачкале, выезд в соседние города обсуждается отдельно.'
+        ].join('\n\n'),
+        contactLabel: '@linea_service / +7 928 145-45-10',
+        contactTelegram: '@linea_service',
+        contactPhone: '+7 928 145-45-10',
+        contactEmail: 'service@linea-service.example',
+        specializations: ['equipment-service', 'coffee-machine-setup', 'preventive-maintenance'],
+        experienceYears: 6,
+        rateLabel: 'Диагностика от 5 000 ₽',
+        isVerified: true,
+        serviceArea: 'Каспийск, Махачкала и ближайшие районы'
+      },
+      create: {
+        slug: 'linea-service-equipment-master-demo',
+        title: 'Linea Service — сервис кофейного оборудования',
+        summary: 'Бизнес-команда для подбора, установки и регулярного обслуживания кофейного и барного оборудования.',
+        status: ContentStatus.PUBLISHED,
+        publishedAt: daysAgo(3),
+        cityId: kaspiysk.id,
+        categoryId: masterTechnicalCategory.id,
+        businessAccountId: lineaBusiness.id,
+        entityType: MasterEntityType.BUSINESS,
+        companyName: 'Linea Service',
+        description: [
+          'Команда Linea Service помогает кофейням и барам запускать оборудование без лишнего простоя: подбираем модель под поток, ставим на место, настраиваем и берём на регулярное обслуживание.',
+          '## Услуги',
+          'Диагностика эспрессо-машин, настройка кофемолок, плановое ТО, запуск оборудования после покупки, консультация по размещению станции.',
+          '## География',
+          'Работаем по Каспийску и Махачкале, выезд в соседние города обсуждается отдельно.'
+        ].join('\n\n'),
+        contactLabel: '@linea_service / +7 928 145-45-10',
+        contactTelegram: '@linea_service',
+        contactPhone: '+7 928 145-45-10',
+        contactEmail: 'service@linea-service.example',
+        specializations: ['equipment-service', 'coffee-machine-setup', 'preventive-maintenance'],
+        experienceYears: 6,
+        rateLabel: 'Диагностика от 5 000 ₽',
+        isVerified: true,
+        serviceArea: 'Каспийск, Махачкала и ближайшие районы'
+      }
+    })
+  ]);
+
+  const [masterThree, masterFour, masterFive, masterSix, masterSeven, amirProfile, elenaProfile, nikitaProfile] = await Promise.all([
+    prisma.master.upsert({
+      where: { slug: 'timur-cocktail-consultant-demo' },
+      update: {
+        title: 'Тимур Керимов — коктейльный консультант',
+        summary: 'Разработка коктейльных карт, обучение барменов, аудит бара и подбор оборудования для вечерних проектов.',
+        status: ContentStatus.PUBLISHED,
+        publishedAt: daysAgo(4),
+        archivedAt: null,
+        cityId: kaspiysk.id,
+        categoryId: masterConsultingCategory.id,
+        entityType: MasterEntityType.INDIVIDUAL,
+        fullName: 'Тимур Керимов',
+        companyName: null,
+        description: [
+          'Работаю с барами и ресторанами, которым нужна сильная коктейльная карта и стабильный сервис в вечерние часы. Помогаю собрать меню, подобрать оборудование, обучить команду и выстроить процессы закупки.',
+          '## Услуги',
+          'Разработка коктейльной карты под концепцию заведения. Аудит бара: ассортимент, оборудование, себестоимость позиций. Обучение команды: техника приготовления, презентация, работа с гостем в вечернем формате. Подбор стекла, льда и расходников.',
+          '## Формат',
+          'Выезд в заведение, онлайн-консультация или полное сопровождение в течение месяца после запуска.'
+        ].join('\n\n'),
+        contactLabel: '@timur_cocktail',
+        contactTelegram: '@timur_cocktail',
+        contactPhone: '+7 928 700-31-40',
+        contactEmail: 'timur.master@example.com',
+        specializations: ['bar-setup', 'menu-development', 'team-training'],
+        experienceYears: 10,
+        rateLabel: 'От 20 000 ₽ за проект',
+        isVerified: true,
+        serviceArea: 'Каспийск, Махачкала, Дербент'
+      },
+      create: {
+        slug: 'timur-cocktail-consultant-demo',
+        title: 'Тимур Керимов — коктейльный консультант',
+        summary: 'Разработка коктейльных карт, обучение барменов, аудит бара и подбор оборудования для вечерних проектов.',
+        status: ContentStatus.PUBLISHED,
+        publishedAt: daysAgo(4),
+        cityId: kaspiysk.id,
+        categoryId: masterConsultingCategory.id,
+        entityType: MasterEntityType.INDIVIDUAL,
+        fullName: 'Тимур Керимов',
+        description: [
+          'Работаю с барами и ресторанами, которым нужна сильная коктейльная карта и стабильный сервис в вечерние часы. Помогаю собрать меню, подобрать оборудование, обучить команду и выстроить процессы закупки.',
+          '## Услуги',
+          'Разработка коктейльной карты под концепцию заведения. Аудит бара: ассортимент, оборудование, себестоимость позиций. Обучение команды: техника приготовления, презентация, работа с гостем в вечернем формате. Подбор стекла, льда и расходников.',
+          '## Формат',
+          'Выезд в заведение, онлайн-консультация или полное сопровождение в течение месяца после запуска.'
+        ].join('\n\n'),
+        contactLabel: '@timur_cocktail',
+        contactTelegram: '@timur_cocktail',
+        contactPhone: '+7 928 700-31-40',
+        contactEmail: 'timur.master@example.com',
+        specializations: ['bar-setup', 'menu-development', 'team-training'],
+        experienceYears: 10,
+        rateLabel: 'От 20 000 ₽ за проект',
+        isVerified: true,
+        serviceArea: 'Каспийск, Махачкала, Дербент'
+      }
+    }),
+    prisma.master.upsert({
+      where: { slug: 'elena-coffee-trainer-demo' },
+      update: {
+        title: 'Елена Попова — обучение и сервис кофейного оборудования',
+        summary: 'Коуч-бариста с фокусом на экстракцию, грайндеры и стабильность вкуса для кофеен, переходящих на specialty.',
+        status: ContentStatus.PUBLISHED,
+        publishedAt: daysAgo(5),
+        archivedAt: null,
+        cityId: derbent.id,
+        categoryId: masterTechnicalCategory.id,
+        entityType: MasterEntityType.INDIVIDUAL,
+        fullName: 'Елена Попова',
+        companyName: null,
+        description: [
+          'Помогаю кофейням настраивать экстракцию, выбирать грайндеры и обучать команду так, чтобы вкус был стабильным от смены к смене.',
+          '## Услуги',
+          'Настройка помола и экстракции для нового зерна. Обучение команды: латте-арт, калибровка грайндера, сенсорика. Аудит кофейной станции: оборудование, вода, workflow. Помощь в выборе оборудования при переходе на specialty.',
+          '## Формат',
+          'Выезд в кофейню на 1–3 дня, онлайн-сопровождение после визита.'
+        ].join('\n\n'),
+        contactLabel: '@elena_coffee_trainer',
+        contactTelegram: '@elena_coffee_trainer',
+        contactPhone: '+7 928 811-25-60',
+        contactEmail: 'elena.master@example.com',
+        specializations: ['equipment-service', 'coffee-training', 'bar-setup'],
+        experienceYears: 5,
+        rateLabel: 'От 10 000 ₽ за выездной день',
+        isVerified: true,
+        serviceArea: 'Дербент, Махачкала'
+      },
+      create: {
+        slug: 'elena-coffee-trainer-demo',
+        title: 'Елена Попова — обучение и сервис кофейного оборудования',
+        summary: 'Коуч-бариста с фокусом на экстракцию, грайндеры и стабильность вкуса для кофеен, переходящих на specialty.',
+        status: ContentStatus.PUBLISHED,
+        publishedAt: daysAgo(5),
+        cityId: derbent.id,
+        categoryId: masterTechnicalCategory.id,
+        entityType: MasterEntityType.INDIVIDUAL,
+        fullName: 'Елена Попова',
+        description: [
+          'Помогаю кофейням настраивать экстракцию, выбирать грайндеры и обучать команду так, чтобы вкус был стабильным от смены к смене.',
+          '## Услуги',
+          'Настройка помола и экстракции для нового зерна. Обучение команды: латте-арт, калибровка грайндера, сенсорика. Аудит кофейной станции: оборудование, вода, workflow. Помощь в выборе оборудования при переходе на specialty.',
+          '## Формат',
+          'Выезд в кофейню на 1–3 дня, онлайн-сопровождение после визита.'
+        ].join('\n\n'),
+        contactLabel: '@elena_coffee_trainer',
+        contactTelegram: '@elena_coffee_trainer',
+        contactPhone: '+7 928 811-25-60',
+        contactEmail: 'elena.master@example.com',
+        specializations: ['equipment-service', 'coffee-training', 'bar-setup'],
+        experienceYears: 5,
+        rateLabel: 'От 10 000 ₽ за выездной день',
+        isVerified: true,
+        serviceArea: 'Дербент, Махачкала'
+      }
+    }),
+    prisma.master.upsert({
+      where: { slug: 'ibragim-bar-consultant-demo' },
+      update: {
+        title: 'Ибрагим Магомедов — шеф-бармен и запуск проектов',
+        summary: 'Полное сопровождение бара от концепции до открытия: меню, оборудование, команда, себестоимость.',
+        status: ContentStatus.PUBLISHED,
+        publishedAt: daysAgo(6),
+        archivedAt: null,
+        cityId: makhachkala.id,
+        categoryId: masterConsultingCategory.id,
+        entityType: MasterEntityType.INDIVIDUAL,
+        fullName: 'Ибрагим Магомедов',
+        companyName: null,
+        description: [
+          'С 2014 года работаю в барной индустрии: от линейного бармена до управляющего сетью. Сейчас сопровождаю запуски и помогаю заведениям выходить на операционную стабильность.',
+          '## Услуги',
+          'Полный запуск бара: концепция, оборудование, планировка, меню. Аудит себестоимости и поиск точек роста. Сборка и обучение команды под формат заведения. Операционное сопровождение первые 2–3 месяца работы.',
+          '## Формат',
+          'Выездной или гибридный — под ключ для запусков и точечный аудит для работающих заведений.'
+        ].join('\n\n'),
+        contactLabel: '@ibragim_bar',
+        contactTelegram: '@ibragim_bar',
+        contactPhone: '+7 928 922-37-80',
+        contactEmail: 'ibragim.master@example.com',
+        specializations: ['bar-setup', 'team-training', 'service-audit'],
+        experienceYears: 12,
+        rateLabel: 'По запросу',
+        isVerified: true,
+        serviceArea: 'Махачкала, Каспийск, Дербент и СКФО'
+      },
+      create: {
+        slug: 'ibragim-bar-consultant-demo',
+        title: 'Ибрагим Магомедов — шеф-бармен и запуск проектов',
+        summary: 'Полное сопровождение бара от концепции до открытия: меню, оборудование, команда, себестоимость.',
+        status: ContentStatus.PUBLISHED,
+        publishedAt: daysAgo(6),
+        cityId: makhachkala.id,
+        categoryId: masterConsultingCategory.id,
+        entityType: MasterEntityType.INDIVIDUAL,
+        fullName: 'Ибрагим Магомедов',
+        description: [
+          'С 2014 года работаю в барной индустрии: от линейного бармена до управляющего сетью. Сейчас сопровождаю запуски и помогаю заведениям выходить на операционную стабильность.',
+          '## Услуги',
+          'Полный запуск бара: концепция, оборудование, планировка, меню. Аудит себестоимости и поиск точек роста. Сборка и обучение команды под формат заведения. Операционное сопровождение первые 2–3 месяца работы.',
+          '## Формат',
+          'Выездной или гибридный — под ключ для запусков и точечный аудит для работающих заведений.'
+        ].join('\n\n'),
+        contactLabel: '@ibragim_bar',
+        contactTelegram: '@ibragim_bar',
+        contactPhone: '+7 928 922-37-80',
+        contactEmail: 'ibragim.master@example.com',
+        specializations: ['bar-setup', 'team-training', 'service-audit'],
+        experienceYears: 12,
+        rateLabel: 'По запросу',
+        isVerified: true,
+        serviceArea: 'Махачкала, Каспийск, Дербент и СКФО'
+      }
+    }),
+    prisma.master.upsert({
+      where: { slug: 'aster-training-master-demo' },
+      update: {
+        title: 'Aster Roasters — обучение и консалтинг для кофеен',
+        summary: 'Корпоративное обучение команд, настройка эспрессо-линейки, калибровка оборудования для заведений любого формата.',
+        status: ContentStatus.PUBLISHED,
+        publishedAt: daysAgo(7),
+        archivedAt: null,
+        cityId: makhachkala.id,
+        categoryId: masterTechnicalCategory.id,
+        entityType: MasterEntityType.BUSINESS,
+        fullName: null,
+        companyName: 'Aster Roasters',
+        description: [
+          'Обучаем команды кофеен и баров работе со спешелти-зерном: от теории обжарки до ежедневной калибровки грайндера. Работаем с заведениями любого масштаба.',
+          '## Услуги',
+          'Корпоративное обучение: от вводного курса для новичков до продвинутого сенсорного тренинга. Аудит эспрессо-линейки: настройка помола, экстракции, температуры воды. Помощь в выборе зерна и создании сезонного меню.',
+          '## География',
+          'Махачкала, Каспийск, выезд по СКФО.'
+        ].join('\n\n'),
+        contactLabel: '@aster_training',
+        contactTelegram: '@aster_training',
+        contactPhone: '+7 962 120-44-11',
+        contactEmail: 'training@aster-roasters.example',
+        specializations: ['coffee-training', 'equipment-service', 'bar-setup'],
+        experienceYears: 4,
+        rateLabel: 'От 25 000 ₽ за выездное обучение',
+        isVerified: true,
+        serviceArea: 'Махачкала, Каспийск, СКФО'
+      },
+      create: {
+        slug: 'aster-training-master-demo',
+        title: 'Aster Roasters — обучение и консалтинг для кофеен',
+        summary: 'Корпоративное обучение команд, настройка эспрессо-линейки, калибровка оборудования для заведений любого формата.',
+        status: ContentStatus.PUBLISHED,
+        publishedAt: daysAgo(7),
+        cityId: makhachkala.id,
+        categoryId: masterTechnicalCategory.id,
+        entityType: MasterEntityType.BUSINESS,
+        companyName: 'Aster Roasters',
+        description: [
+          'Обучаем команды кофеен и баров работе со спешелти-зерном: от теории обжарки до ежедневной калибровки грайндера. Работаем с заведениями любого масштаба.',
+          '## Услуги',
+          'Корпоративное обучение: от вводного курса для новичков до продвинутого сенсорного тренинга. Аудит эспрессо-линейки: настройка помола, экстракции, температуры воды. Помощь в выборе зерна и создании сезонного меню.',
+          '## География',
+          'Махачкала, Каспийск, выезд по СКФО.'
+        ].join('\n\n'),
+        contactLabel: '@aster_training',
+        contactTelegram: '@aster_training',
+        contactPhone: '+7 962 120-44-11',
+        contactEmail: 'training@aster-roasters.example',
+        specializations: ['coffee-training', 'equipment-service', 'bar-setup'],
+        experienceYears: 4,
+        rateLabel: 'От 25 000 ₽ за выездное обучение',
+        isVerified: true,
+        serviceArea: 'Махачкала, Каспийск, СКФО'
+      }
+    }),
+    prisma.master.upsert({
+      where: { slug: 'atelier-launch-consulting-demo' },
+      update: {
+        title: 'Atelier 12 — консалтинг по запуску баров и ресторанов',
+        summary: 'Команда Atelier 12 помогает новым проектам пройти путь от концепции до открытия: планировка, меню, подбор команды.',
+        status: ContentStatus.PUBLISHED,
+        publishedAt: daysAgo(3),
+        archivedAt: null,
+        cityId: kaspiysk.id,
+        categoryId: masterConsultingCategory.id,
+        businessAccountId: atelierBusiness.id,
+        entityType: MasterEntityType.BUSINESS,
+        fullName: null,
+        companyName: 'Atelier 12',
+        description: [
+          'Мы в Atelier 12 прошли собственный путь запуска и теперь помогаем другим проектам не повторять типичные ошибки. Консультируем по планировке, оборудованию, меню и операционным процессам.',
+          '## Услуги',
+          'Консалтинг на этапе планирования: формат, локация, бюджет. Разработка меню и технологических карт. Помощь в подборе и обучении команды. Операционный аудит после запуска: что улучшить в первые месяцы.',
+          '## География',
+          'Каспийск, Махачкала, онлайн по запросу.'
+        ].join('\n\n'),
+        contactLabel: '@atelier12_consult',
+        contactTelegram: '@atelier12_consult',
+        contactPhone: '+7 962 401-12-13',
+        contactEmail: 'consult@atelier12.example',
+        specializations: ['bar-setup', 'menu-development', 'service-audit'],
+        experienceYears: 3,
+        rateLabel: 'От 30 000 ₽ за консультацию',
+        isVerified: true,
+        serviceArea: 'Каспийск, Махачкала'
+      },
+      create: {
+        slug: 'atelier-launch-consulting-demo',
+        title: 'Atelier 12 — консалтинг по запуску баров и ресторанов',
+        summary: 'Команда Atelier 12 помогает новым проектам пройти путь от концепции до открытия: планировка, меню, подбор команды.',
+        status: ContentStatus.PUBLISHED,
+        publishedAt: daysAgo(3),
+        cityId: kaspiysk.id,
+        categoryId: masterConsultingCategory.id,
+        businessAccountId: atelierBusiness.id,
+        entityType: MasterEntityType.BUSINESS,
+        companyName: 'Atelier 12',
+        description: [
+          'Мы в Atelier 12 прошли собственный путь запуска и теперь помогаем другим проектам не повторять типичные ошибки. Консультируем по планировке, оборудованию, меню и операционным процессам.',
+          '## Услуги',
+          'Консалтинг на этапе планирования: формат, локация, бюджет. Разработка меню и технологических карт. Помощь в подборе и обучении команды. Операционный аудит после запуска: что улучшить в первые месяцы.',
+          '## География',
+          'Каспийск, Махачкала, онлайн по запросу.'
+        ].join('\n\n'),
+        contactLabel: '@atelier12_consult',
+        contactTelegram: '@atelier12_consult',
+        contactPhone: '+7 962 401-12-13',
+        contactEmail: 'consult@atelier12.example',
+        specializations: ['bar-setup', 'menu-development', 'service-audit'],
+        experienceYears: 3,
+        rateLabel: 'От 30 000 ₽ за консультацию',
+        isVerified: true,
+        serviceArea: 'Каспийск, Махачкала'
+      }
+    }),
+    prisma.profile.upsert({
+      where: { userId: amirUser.id },
+      update: {
+        fullName: 'Амир Омаров',
+        profession: 'Бармен-универсал',
+        cityId: makhachkala.id,
+        headline: 'Работаю в форматах от классического бара до спешелти-кофейни',
+        bio: 'Опыт более 6 лет: начинал в сетевой кофейне, дорос до бар-менеджера вечернего проекта. Работал с разными форматами — от high-volume кофейни до авторского коктейльного бара. Ищу проект, где смогу совмещать управление сменой и работу за баром.',
+        phone: '+7 928 500-11-22',
+        telegram: '@amir_omarov',
+        skills: ['Барное дело', 'Кофе', 'Коктейли', 'Управление сменой', 'Работа с кассой'],
+        jobSearchStatus: JobSearchStatus.ACTIVE,
+        desiredSalary: 85000,
+        employmentTypes: [EmploymentType.FULL_TIME],
+        isPublic: true,
+        publicHandle: 'amir-omarov',
+        publishedAt: daysAgo(1)
+      },
+      create: {
+        userId: amirUser.id,
+        fullName: 'Амир Омаров',
+        profession: 'Бармен-универсал',
+        cityId: makhachkala.id,
+        headline: 'Работаю в форматах от классического бара до спешелти-кофейни',
+        bio: 'Опыт более 6 лет: начинал в сетевой кофейне, дорос до бар-менеджера вечернего проекта. Работал с разными форматами — от high-volume кофейни до авторского коктейльного бара. Ищу проект, где смогу совмещать управление сменой и работу за баром.',
+        phone: '+7 928 500-11-22',
+        telegram: '@amir_omarov',
+        skills: ['Барное дело', 'Кофе', 'Коктейли', 'Управление сменой', 'Работа с кассой'],
+        jobSearchStatus: JobSearchStatus.ACTIVE,
+        desiredSalary: 85000,
+        employmentTypes: [EmploymentType.FULL_TIME],
+        isPublic: true,
+        publicHandle: 'amir-omarov',
+        publishedAt: daysAgo(1)
+      }
+    }),
+    prisma.profile.upsert({
+      where: { userId: elenaUser.id },
+      update: {
+        fullName: 'Елена Соколова',
+        profession: 'Бариста',
+        cityId: kaspiysk.id,
+        headline: 'Specialty-бариста с опытом работы в высоком потоке',
+        bio: 'Три года работаю в спешелти-кофейне с потоком до 150 чашек в день. Настраиваю экстракцию, обучаю стажёров, веду гостевую зону. Участвовала в двух региональных каппинг-чемпионатах.',
+        phone: '+7 928 733-44-55',
+        telegram: '@elena_sokolova',
+        skills: ['Эспрессо', 'Латте-арт', 'Фильтр-кофе', 'Сенсорика', 'Работа с гостем'],
+        jobSearchStatus: JobSearchStatus.ACTIVE,
+        desiredSalary: 65000,
+        desiredSalaryMax: 80000,
+        employmentTypes: [EmploymentType.FULL_TIME, EmploymentType.PART_TIME],
+        isPublic: true,
+        publicHandle: 'elena-sokolova',
+        publishedAt: daysAgo(2)
+      },
+      create: {
+        userId: elenaUser.id,
+        fullName: 'Елена Соколова',
+        profession: 'Бариста',
+        cityId: kaspiysk.id,
+        headline: 'Specialty-бариста с опытом работы в высоком потоке',
+        bio: 'Три года работаю в спешелти-кофейне с потоком до 150 чашек в день. Настраиваю экстракцию, обучаю стажёров, веду гостевую зону. Участвовала в двух региональных каппинг-чемпионатах.',
+        phone: '+7 928 733-44-55',
+        telegram: '@elena_sokolova',
+        skills: ['Эспрессо', 'Латте-арт', 'Фильтр-кофе', 'Сенсорика', 'Работа с гостем'],
+        jobSearchStatus: JobSearchStatus.ACTIVE,
+        desiredSalary: 65000,
+        desiredSalaryMax: 80000,
+        employmentTypes: [EmploymentType.FULL_TIME, EmploymentType.PART_TIME],
+        isPublic: true,
+        publicHandle: 'elena-sokolova',
+        publishedAt: daysAgo(2)
+      }
+    }),
+    prisma.profile.upsert({
+      where: { userId: nikitaUser.id },
+      update: {
+        fullName: 'Никита Власов',
+        profession: 'Шеф-бармен / Управляющий',
+        cityId: derbent.id,
+        headline: 'Управляю барной сменой и разрабатываю коктейльные карты',
+        bio: 'Управляющий с опытом запуска двух баров. Составляю команду, разрабатываю меню, контролирую себестоимость и качество сервиса. Ищу проект в Дагестане с возможностью участвовать в развитии заведения.',
+        phone: '+7 928 611-88-99',
+        telegram: '@nikita_vlasov',
+        skills: ['Управление командой', 'Коктейльная карта', 'Себестоимость', 'Запуск проектов', 'Барное оборудование'],
+        jobSearchStatus: JobSearchStatus.ACTIVE,
+        desiredSalary: 100000,
+        desiredSalaryMax: 130000,
+        employmentTypes: [EmploymentType.FULL_TIME],
+        isPublic: true,
+        publicHandle: 'nikita-vlasov',
+        publishedAt: daysAgo(3)
+      },
+      create: {
+        userId: nikitaUser.id,
+        fullName: 'Никита Власов',
+        profession: 'Шеф-бармен / Управляющий',
+        cityId: derbent.id,
+        headline: 'Управляю барной сменой и разрабатываю коктейльные карты',
+        bio: 'Управляющий с опытом запуска двух баров. Составляю команду, разрабатываю меню, контролирую себестоимость и качество сервиса. Ищу проект в Дагестане с возможностью участвовать в развитии заведения.',
+        phone: '+7 928 611-88-99',
+        telegram: '@nikita_vlasov',
+        skills: ['Управление командой', 'Коктейльная карта', 'Себестоимость', 'Запуск проектов', 'Барное оборудование'],
+        jobSearchStatus: JobSearchStatus.ACTIVE,
+        desiredSalary: 100000,
+        desiredSalaryMax: 130000,
+        employmentTypes: [EmploymentType.FULL_TIME],
+        isPublic: true,
+        publicHandle: 'nikita-vlasov',
+        publishedAt: daysAgo(3)
+      }
+    })
+  ]);
+
   await Promise.all([
     prisma.application.upsert({
       where: { id: 'demo-application-vacancy-response' },
@@ -1477,9 +2163,12 @@ async function main() {
   console.log(`Cities: ${makhachkala.name}, ${kaspiysk.name}, ${derbent.name}`);
   console.log(`Vacancies: ${vacancyOne.title}, ${vacancyTwo.title}, ${vacancyThree.title}, ${vacancyFour.title}`);
   console.log(`Suppliers: ${supplierOne.companyName}, ${supplierTwo.companyName}, ${supplierThree.companyName}, ${supplierFour.companyName}`);
+  console.log(`Masters: ${masterOne.title}, ${masterTwo.title}, ${masterThree.title}, ${masterFour.title}, ${masterFive.title}, ${masterSix.title}, ${masterSeven.title}`);
+  console.log(`Public profiles: ${amirProfile.fullName}, ${elenaProfile.fullName}, ${nikitaProfile.fullName}`);
   console.log(`Published test articles: ${starterArticles.map((article) => article.slug).join(', ')}`);
   console.log(`New editorial articles: ${newArticles.map((article) => article.slug).join(', ')}`);
   console.log(`Draft content: ${articleOne.slug}, ${articleTwo.slug}, ${eventOne.slug}, ${eventTwo.slug}`);
+  console.log(`Published demo education/event: ${courseOne.slug}, ${eventThree.slug}`);
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {

@@ -238,6 +238,23 @@ export function PublishedContentSectionDirectory(props: PublishedContentSectionP
   );
 }
 
+export function PublishedContentSectionMaster(props: PublishedContentSectionProps) {
+  return (
+    <PublishedContentSectionLayout
+      {...props}
+      listClassName="grid gap-3 md:flex md:flex-col md:gap-4"
+      renderRow={(item) => (
+        <DirectoryListRow
+          actionLabel={props.rowActionLabel ?? 'Смотреть профиль'}
+          basePath={props.basePath}
+          item={item}
+          profileLabel="Подробнее"
+        />
+      )}
+    />
+  );
+}
+
 export function PublishedContentSectionCourse(props: PublishedContentSectionProps) {
   return (
     <PublishedContentSectionLayout

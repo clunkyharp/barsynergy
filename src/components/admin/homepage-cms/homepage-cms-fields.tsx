@@ -2,6 +2,7 @@ import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { AdminCmsGrid } from '@/components/admin/admin-cms-form';
+import { ImagePickerField } from '@/components/admin/image-picker-field';
 import { PUBLICATION_STATUS_HINT } from '@/lib/admin/content-ui';
 import {
   type AudienceValues,
@@ -30,7 +31,7 @@ export function HeroFields({ hero, uid }: { hero?: HeroValues; uid: string }) {
       <FormField label="Описание" htmlFor={`hero-description-${uid}`}>
         <Textarea id={`hero-description-${uid}`} name="description" required minLength={10} maxLength={700} defaultValue={hero?.description ?? ''} />
       </FormField>
-      <FormField label="Сигналы запуска, по одному на строку: Значение | подпись" htmlFor={`hero-signals-${uid}`}>
+      <FormField label="Сигналы запуска" htmlFor={`hero-signals-${uid}`} hint="По одной строке: Значение | подпись.">
         <Textarea id={`hero-signals-${uid}`} name="signalsText" maxLength={2000} defaultValue={hero?.signalsText ?? ''} />
       </FormField>
     </>
@@ -52,7 +53,7 @@ export function AudienceFields({ card, uid }: { card?: AudienceValues; uid: stri
       <FormField label="Описание" htmlFor={`audience-description-${uid}`}>
         <Textarea id={`audience-description-${uid}`} name="description" required minLength={10} maxLength={700} defaultValue={card?.description ?? ''} />
       </FormField>
-      <AdminCmsGrid columns="two">
+      <AdminCmsGrid columns="three">
         <FormField label="Ссылка" htmlFor={`audience-href-${uid}`}>
           <Input id={`audience-href-${uid}`} name="href" required maxLength={500} placeholder="/education" defaultValue={card?.href ?? ''} />
         </FormField>
@@ -62,10 +63,16 @@ export function AudienceFields({ card, uid }: { card?: AudienceValues; uid: stri
         <FormField label="Короткое подтверждение" htmlFor={`audience-proof-${uid}`}>
           <Input id={`audience-proof-${uid}`} name="proof" maxLength={240} defaultValue={card?.proof ?? ''} />
         </FormField>
-        <FormField label="Путь к изображению из public" htmlFor={`audience-imagePath-${uid}`}>
-          <Input id={`audience-imagePath-${uid}`} name="imagePath" maxLength={500} placeholder="/images/home/example.jpg" defaultValue={card?.imagePath ?? ''} />
-        </FormField>
-        <FormField label="Иконка" htmlFor={`audience-iconKey-${uid}`}>
+      </AdminCmsGrid>
+      <AdminCmsGrid columns="two">
+        <ImagePickerField
+          defaultValue={card?.imagePath}
+          id={`audience-imagePath-${uid}`}
+          label="Изображение"
+          name="imagePath"
+          placeholder="/images/home/example.jpg"
+        />
+        <FormField label="Иконка" htmlFor={`audience-iconKey-${uid}`} hint="Имя из lucide-react.">
           <Input id={`audience-iconKey-${uid}`} name="iconKey" maxLength={80} placeholder="users, store, star" defaultValue={card?.iconKey ?? ''} />
         </FormField>
       </AdminCmsGrid>
@@ -103,9 +110,13 @@ export function SocialFields({ social, uid }: { social?: SocialValues; uid: stri
         <FormField label="Подпись" htmlFor={`social-helperText-${uid}`}>
           <Input id={`social-helperText-${uid}`} name="helperText" maxLength={160} defaultValue={social?.helperText ?? ''} />
         </FormField>
-        <FormField label="Логотип из public" htmlFor={`social-logoPath-${uid}`}>
-          <Input id={`social-logoPath-${uid}`} name="logoPath" maxLength={500} placeholder="/images/social/logo.png" defaultValue={social?.logoPath ?? ''} />
-        </FormField>
+        <ImagePickerField
+          defaultValue={social?.logoPath}
+          id={`social-logoPath-${uid}`}
+          label="Логотип"
+          name="logoPath"
+          placeholder="/images/social/logo.png"
+        />
         <FormField label="Вариант" htmlFor={`social-variant-${uid}`}>
           <Input id={`social-variant-${uid}`} name="variant" maxLength={80} placeholder="telegram, whatsapp, instagram" defaultValue={social?.variant ?? ''} />
         </FormField>
@@ -139,10 +150,10 @@ export function CtaFields({ cta, uid }: { cta?: CtaValues; uid: string }) {
         <FormField label="Основная ссылка" htmlFor={`cta-primaryHref-${uid}`}>
           <Input id={`cta-primaryHref-${uid}`} name="primaryHref" required maxLength={500} defaultValue={cta?.primaryHref ?? ''} />
         </FormField>
-        <FormField label="Вторичная ссылка" htmlFor={`cta-secondaryLabel-${uid}`}>
+        <FormField label="Текст вторичной кнопки" htmlFor={`cta-secondaryLabel-${uid}`}>
           <Input id={`cta-secondaryLabel-${uid}`} name="secondaryLabel" maxLength={120} defaultValue={cta?.secondaryLabel ?? ''} />
         </FormField>
-        <FormField label="URL вторичной ссылки" htmlFor={`cta-secondaryHref-${uid}`}>
+        <FormField label="Ссылка вторичной кнопки" htmlFor={`cta-secondaryHref-${uid}`}>
           <Input id={`cta-secondaryHref-${uid}`} name="secondaryHref" maxLength={500} defaultValue={cta?.secondaryHref ?? ''} />
         </FormField>
       </AdminCmsGrid>
@@ -176,7 +187,7 @@ export function CalculatorFields({ teaser, uid }: { teaser?: CalculatorValues; u
       <FormField label="Описание" htmlFor={`calculator-description-${uid}`}>
         <Textarea id={`calculator-description-${uid}`} name="description" required minLength={10} maxLength={700} defaultValue={teaser?.description ?? ''} />
       </FormField>
-      <FormField label="Шаги, по одному на строку" htmlFor={`calculator-steps-${uid}`}>
+      <FormField label="Шаги" htmlFor={`calculator-steps-${uid}`} hint="По одной строке.">
         <Textarea id={`calculator-steps-${uid}`} name="stepsText" maxLength={1200} defaultValue={teaser?.stepsText ?? ''} />
       </FormField>
       <AdminCmsGrid columns="two">

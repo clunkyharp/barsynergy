@@ -10,6 +10,7 @@ export const DEFAULT_NEWSLETTER_TOPICS = ['VACANCIES', 'SUPPLIERS', 'EVENTS'] as
 export const newsletterTopicOptions = [
   { value: 'VACANCIES', label: 'Вакансии' },
   { value: 'SUPPLIERS', label: 'Поставщики и оборудование' },
+  { value: 'MASTERS', label: 'Мастера и услуги' },
   { value: 'EVENTS', label: 'События и каппинги' },
   { value: 'COURSES', label: 'Обучение' },
   { value: 'ARTICLES', label: 'Материалы редакции' }
@@ -18,6 +19,7 @@ export const newsletterTopicOptions = [
 const newsletterTopicValues = newsletterTopicOptions.map((topic) => topic.value) as [
   'VACANCIES',
   'SUPPLIERS',
+  'MASTERS',
   'EVENTS',
   'COURSES',
   'ARTICLES'

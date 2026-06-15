@@ -1,4 +1,5 @@
 import { revalidatePath } from 'next/cache';
+import { revalidateHomepageCache } from '@/lib/public/home';
 
 type DetailRevalidationInput = {
   detailBasePath: string;
@@ -44,6 +45,7 @@ function revalidatePublicContentPaths({
   }
 
   if (revalidateHome) {
+    revalidateHomepageCache();
     revalidatePath('/');
   }
 }
@@ -88,6 +90,15 @@ export function revalidateSupplierPublicPaths(currentSlug?: string | null, previ
   revalidatePublicContentPaths({
     listingPath: '/suppliers',
     detailBasePath: '/suppliers',
+    currentSlug,
+    previousSlug
+  });
+}
+
+export function revalidateMasterPublicPaths(currentSlug?: string | null, previousSlug?: string | null) {
+  revalidatePublicContentPaths({
+    listingPath: '/masters',
+    detailBasePath: '/masters',
     currentSlug,
     previousSlug
   });

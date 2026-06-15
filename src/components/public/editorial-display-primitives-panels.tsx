@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState, type ReactNode } from 'react';
+import { useMemo, useState, type CSSProperties, type ReactNode } from 'react';
 import { ArrowUpRight, Check, User } from 'lucide-react';
 import { SectionIcon, type SectionIconType } from '@/components/public/section-icon';
 import { AppLink } from '@/components/ui/app-link';
@@ -173,30 +173,55 @@ export function ProgramFormatMatrix({ items, className, ...props }: PrimitiveShe
   );
 }
 
+const PARTNER_FORMAT_PRESETS: { icon: SectionIconType; accent: string }[] = [
+  { icon: 'events',    accent: 'var(--channel-telegram)' },
+  { icon: 'education', accent: 'var(--accent)' },
+  { icon: 'articles',  accent: 'var(--channel-instagram)' },
+  { icon: 'building',  accent: 'var(--channel-whatsapp)' },
+  { icon: 'handshake', accent: 'var(--channel-email)' }
+];
+
 export function PartnerFormatTable({ items, className, ...props }: PrimitiveShellProps & { items: PartnerFormatTableItem[] }) {
-  const sectionIcons: SectionIconType[] = ['events', 'articles', 'coffee', 'building', 'handshake'];
   return (
     <PrimitiveShell className={className} {...props}>
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {items.map((item, index) => {
-          const iconType = sectionIcons[index % sectionIcons.length] ?? 'handshake';
+          const preset = PARTNER_FORMAT_PRESETS[index % PARTNER_FORMAT_PRESETS.length] ?? PARTNER_FORMAT_PRESETS[0];
+          const style = { '--format-accent': preset.accent } as CSSProperties;
           return (
-            <article className="public-card-shell flex h-full min-h-[21rem] flex-col p-4 md:p-5" key={index}>
-              <div className="flex items-start justify-between gap-4">
-                <MetaText>Партнёрский формат</MetaText>
-                <SectionIcon size={40} type={iconType} />
+            <article
+              className="group/format-card relative flex h-full flex-col overflow-hidden rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--surface)] p-4 transition-[border-color,box-shadow,background-color] duration-[var(--motion-duration-base)] ease-[var(--motion-ease-standard)] hover:border-[color-mix(in_srgb,var(--format-accent)_45%,var(--border-default))] hover:shadow-[var(--shadow-card)] motion-reduce:transition-none md:p-5"
+              key={index}
+              style={style}
+            >
+              <span
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-[var(--format-accent)] opacity-80"
+              />
+              <div className="flex items-start gap-3">
+                <span className="grid size-11 shrink-0 place-items-center rounded-[var(--radius-md)] bg-[color-mix(in_srgb,var(--format-accent)_14%,var(--surface-wash))] p-2">
+                  <SectionIcon size={28} type={preset.icon} />
+                </span>
+                <h3 className={`${displayFont.className} self-center text-[1.6rem] font-semibold leading-[1.05] text-[var(--text)] md:text-[1.8rem]`}>
+                  {item.format}
+                </h3>
               </div>
-              <h3 className={`${displayFont.className} mt-4 text-[1.65rem] font-semibold leading-none text-[var(--text)] md:text-[2rem]`}>
-                {item.format}
-              </h3>
-              <div className="mt-5 min-w-0">
-                <FactList compact items={[
-                  { label: 'Кому подходит', value: item.fit },
-                  { label: 'Что нужно', value: item.partnerProvides },
-                  { label: 'Следующий шаг', value: item.nextStep }
-                ]} />
-              </div>
-              {item.action ? (<div className="mt-auto pt-5"><InlineAction action={item.action} /></div>) : null}
+              <p className="mt-4 text-[15px] leading-6 text-[var(--text)]">{item.fit}</p>
+              <dl className="mt-4 grid gap-2 text-sm leading-6">
+                <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-2">
+                  <dt className="text-[var(--muted)]">Что нужно:</dt>
+                  <dd className="text-[var(--text)]">{item.partnerProvides}</dd>
+                </div>
+                <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-2">
+                  <dt className="text-[var(--muted)]">Шаг:</dt>
+                  <dd className="font-medium text-[color-mix(in_srgb,var(--format-accent)_70%,var(--text))]">{item.nextStep}</dd>
+                </div>
+              </dl>
+              {item.action ? (
+                <div className="mt-auto pt-5">
+                  <InlineAction action={item.action} />
+                </div>
+              ) : null}
             </article>
           );
         })}

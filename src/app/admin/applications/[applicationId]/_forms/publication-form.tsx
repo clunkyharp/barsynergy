@@ -12,9 +12,11 @@ type PublicationFormProps = {
     vacancyId: string | null;
     supplierId: string | null;
     partnerId: string | null;
+    masterId: string | null;
     vacancy?: { id: string; title: string } | null;
     supplier?: { id: string; title: string } | null;
     partner?: { id: string; title: string } | null;
+    master?: { id: string; title: string } | null;
   };
   canPublish: boolean;
   currentPath: string;
@@ -118,6 +120,36 @@ export function PartnerPublicationForm({ application, canPublish, currentPath }:
             type="submit"
           >
             Опубликовать партнёра
+          </ConfirmSubmitButton>
+        </form>
+      )}
+    </Card>
+  );
+}
+
+export function MasterPublicationForm({ application, canPublish, currentPath }: PublicationFormProps) {
+  return (
+    <Card className="p-5">
+      <h2 className="text-lg font-semibold">Мастер из заявки</h2>
+      {application.masterId ? (
+        <div className="mt-4 grid gap-4 text-sm">
+          <p className="text-[var(--muted)]">Мастер уже связан с заявкой: {application.master?.title ?? application.masterId}.</p>
+          <Button href="/admin/masters" variant="secondary">Открыть мастеров</Button>
+        </div>
+      ) : (
+        <form action={publishContentFromApplication} className="mt-4 grid gap-4">
+          {!canPublish ? <p className="text-sm text-[var(--muted)]">Для публикации нужен рабочий статус заявки и зафиксированное согласие.</p> : null}
+          <HiddenRedirect value={currentPath} />
+          <input name="applicationId" type="hidden" value={application.id} />
+          <input name="target" type="hidden" value="master" />
+          <ConfirmSubmitButton
+            confirmActionLabel="Опубликовать"
+            confirmText="Мастер станет доступен на публичной странице."
+            confirmTitle="Опубликовать мастера на сайте?"
+            disabled={!canPublish}
+            type="submit"
+          >
+            Опубликовать мастера
           </ConfirmSubmitButton>
         </form>
       )}

@@ -19,4 +19,9 @@ export {
 } from './content/vacancies';
 export type { VacancyApplicationFormOptions } from './content/vacancies';
 export { getPublishedSuppliers, getPublishedSupplierDetail } from './content/suppliers';
+export { getPublishedMasters, getPublishedMasterDetail, getPublishedMasterInquiryTarget } from './content/masters';
+export type { PublicMasterDetail } from './content/masters';
+export { getPublishedResumes, getPublishedResumeDetail } from './content/resumes';
+export { getPublishedSpecialists } from './content/specialists';
+export type { SpecialistCardItem, SpecialistListResult, SpecialistMode } from './content/specialists';
 export { getPublishedPartners, getPublishedPartnerDetail } from './content/partners';

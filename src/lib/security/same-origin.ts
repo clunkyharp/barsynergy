@@ -3,6 +3,7 @@ type SameOriginInput = {
   origin?: string | null;
   referer?: string | null;
   appUrl?: string | null;
+  allowedOrigins?: string[];
 };
 
 function normalizeOrigin(value: string) {
@@ -25,10 +26,17 @@ function normalizeOrigin(value: string) {
   }
 }
 
-function getAllowedOrigins(requestUrl: string, appUrl?: string | null) {
+function getAllowedOrigins(requestUrl: string, appUrl?: string | null, allowedOriginValues: string[] = []) {
   const origins = new Set<string>();
   const requestOrigin = normalizeOrigin(requestUrl);
   const appOrigin = appUrl ? normalizeOrigin(appUrl) : null;
+
+  for (const value of allowedOriginValues) {
+    const origin = normalizeOrigin(value);
+    if (origin) {
+      origins.add(origin);
+    }
+  }
 
   if (appOrigin) {
     origins.add(appOrigin);
@@ -57,7 +65,7 @@ function isLocalDevelopmentOrigin(origin: string) {
 }
 
 export function isSameOriginRequest(input: SameOriginInput) {
-  const allowedOrigins = getAllowedOrigins(input.requestUrl, input.appUrl);
+  const allowedOrigins = getAllowedOrigins(input.requestUrl, input.appUrl, input.allowedOrigins);
 
   if (allowedOrigins.size === 0) {
     return false;

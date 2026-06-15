@@ -1,25 +1,58 @@
-import { SUPPORT_EMAIL } from '@/lib/contact-info';
+import { SUPPORT_EMAIL, SUPPORT_INSTAGRAM, SUPPORT_TELEGRAM, SUPPORT_WHATSAPP } from '@/lib/contact-info';
+import type { ChannelAccentTone } from '@/components/public/channel-accent';
 
-export const contactMethods: {
+export type ContactMethod = {
   mark: string;
   name: string;
   value: string;
   href: string;
   actionLabel: string;
-}[] = [
+  tone: ChannelAccentTone;
+  descriptor: string;
+  helper: string;
+  logoPath?: string;
+};
+
+export const contactMethods: ContactMethod[] = [
   {
     mark: 'EM',
-    name: 'Основная почта',
+    name: 'Почта',
     value: SUPPORT_EMAIL,
     href: `mailto:${SUPPORT_EMAIL}`,
-    actionLabel: 'Написать'
+    actionLabel: 'Написать',
+    tone: 'email',
+    descriptor: 'Для деловой переписки, договоров и счетов. Прикладывайте файлы и презентации.',
+    helper: 'Ответ — до 4 рабочих часов'
   },
   {
     mark: 'TG',
     name: 'Telegram',
-    value: '@barsynergy',
+    value: SUPPORT_TELEGRAM,
     href: 'https://t.me/barsynergy',
-    actionLabel: 'Открыть'
+    actionLabel: 'Открыть чат',
+    tone: 'telegram',
+    descriptor: 'Быстрый ответ по короткому вопросу. Голосовые, документы и ссылки.',
+    helper: 'Обычно до 1 рабочего часа'
+  },
+  {
+    mark: 'WA',
+    name: 'WhatsApp',
+    value: SUPPORT_WHATSAPP,
+    href: `https://wa.me/${SUPPORT_WHATSAPP.replace(/[^\d]/g, '')}`,
+    actionLabel: 'Написать',
+    tone: 'whatsapp',
+    descriptor: 'Если удобнее голосом или для звонка. Скиньте номер — перезвоним.',
+    helper: 'Звонок по договорённости'
+  },
+  {
+    mark: 'IG',
+    name: 'Instagram',
+    value: SUPPORT_INSTAGRAM,
+    href: 'https://instagram.com/barsynergy',
+    actionLabel: 'Открыть профиль',
+    tone: 'instagram',
+    descriptor: 'Свежие материалы, события и анонсы. Личные сообщения смотрим раз в день.',
+    helper: 'Ответ — в течение дня'
   }
 ];
 

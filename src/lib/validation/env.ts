@@ -22,6 +22,7 @@ const envSchema = z
   .object({
     NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
     APP_URL: z.string().url().default('http://localhost:3000'),
+    SERVER_ACTION_ALLOWED_ORIGINS: optionalString,
     DATABASE_URL: optionalString,
     SESSION_SECRET: z.preprocess(emptyToUndefined, z.string().min(16).optional()),
     THROTTLE_SECRET: z.preprocess(emptyToUndefined, z.string().min(16).optional()),

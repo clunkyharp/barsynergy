@@ -34,6 +34,20 @@ const homeSectionCards: {
     icon: 'vacancies'
   },
   {
+    title: 'Специалисты',
+    description: 'Бариста, управляющие и технологи: анкеты профессионалов для работы в СКФО.',
+    href: '/vacancies?view=specialists',
+    status: 'Каталог',
+    icon: 'user'
+  },
+  {
+    title: 'Мастера',
+    description: 'Специалисты и сервисные команды для запуска, настройки и поддержки барных процессов.',
+    href: '/masters',
+    status: 'Каталог',
+    icon: 'user'
+  },
+  {
     title: 'Материалы',
     description: 'Экстракция, обжарка, себестоимость напитка, работа с зерном: читать и применять сразу.',
     href: '/articles',

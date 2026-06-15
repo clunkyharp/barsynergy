@@ -29,6 +29,7 @@ const categoryTypeLabels: Record<CategoryType, string> = {
   [CategoryType.VACANCY]: 'Вакансии',
   [CategoryType.SUPPLIER]: 'Поставщики',
   [CategoryType.PARTNER]: 'Партнёры',
+  [CategoryType.MASTER]: 'Мастера',
   [CategoryType.SERVICE]: 'Услуги',
   [CategoryType.GENERAL]: 'Общее'
 };

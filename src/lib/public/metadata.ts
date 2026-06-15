@@ -24,6 +24,23 @@ type MissingContentMetadataInput = {
   description: string;
 };
 
+export const mastersPageMetadata = {
+  title: 'Мастера',
+  description: 'Каталог частных мастеров и сервисных команд для баров, кофеен и ресторанов: запуск, обучение, аудит сервиса и обслуживание оборудования.',
+  path: '/masters'
+} satisfies PublicPageMetadataInput;
+
+export const specialistsPageMetadata = {
+  title: 'Специалисты',
+  description: 'Найдите специалистов барной индустрии: резюме и услуги для баров, кофеен и ресторанов в Северо-Кавказском регионе.',
+  path: '/vacancies?view=specialists'
+} satisfies PublicPageMetadataInput;
+
+export const resumeDetailMetadata = (name: string) => ({
+  title: `${name} — резюме`,
+  description: `Профиль специалиста барной индустрии: ${name}.`,
+});
+
 function compactDescription(value: string) {
   return value.replace(/\s+/g, ' ').trim().slice(0, 300);
 }

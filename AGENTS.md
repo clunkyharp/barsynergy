@@ -22,18 +22,23 @@ Primary stack:
 
 ## Start Here
 
+At the start of every new session in this repository, first use `$project-code-map` if the skill is available. If the skill is not loaded in the current client, read `.agents/skills/project-code-map/SKILL.md` manually, then read `docs/agent-project-map.md` before broad source exploration.
+
 Before meaningful project work, read the smallest relevant set of docs:
 
-1. `README.md`
-2. `docs/project-plan.md`
-3. `docs/agent-workflow.md`
-4. `docs/phase-plan.md`
-5. `PROJECT_STATUS.md`
-6. `docs/kanban-sync.md`
-7. phase-specific or task-specific docs under `docs/`
-8. current `git status --short --branch`
+1. `docs/agent-project-map.md`
+2. `README.md`
+3. `docs/project-plan.md`
+4. `docs/agent-workflow.md`
+5. `docs/phase-plan.md`
+6. `PROJECT_STATUS.md`
+7. `docs/kanban-sync.md`
+8. phase-specific or task-specific docs under `docs/`
+9. current `git status --short --branch`
 
 Use `docs/project-plan.md` as the canonical product plan and `docs/phase-plan.md` as the implementation roadmap.
+Use `docs/agent-project-map.md` to find the smallest relevant code surface before opening broad folders.
+If the map is missing, stale for the task area, or not discoverable from a new session, stop implementation and fix the onboarding/map setup first.
 
 **Core engineering references (read before implementation):**
 - `docs/engineering-standards.md` — component limits, CSS rules, TypeScript rules, form rules

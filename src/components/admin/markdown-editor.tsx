@@ -269,9 +269,8 @@ export function MarkdownEditor({ className, defaultValue, maxLength, name, onCha
     setLinkInputVisible((v) => !v);
   }, []);
 
-  const handleLinkSubmit = useCallback(
-    (e: React.FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
+  const handleLinkApply = useCallback(
+    () => {
       const url = linkInputRef.current?.value.trim();
       if (!url) {
         setLinkInputVisible(false);
@@ -284,6 +283,22 @@ export function MarkdownEditor({ className, defaultValue, maxLength, name, onCha
       setLinkInputVisible(false);
     },
     [value, apply],
+  );
+
+  const handleLinkInputKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        setLinkInputVisible(false);
+        return;
+      }
+
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        handleLinkApply();
+      }
+    },
+    [handleLinkApply],
   );
 
   const handleUndo = useCallback((e?: { preventDefault(): void }) => {
@@ -462,18 +477,18 @@ export function MarkdownEditor({ className, defaultValue, maxLength, name, onCha
 
       {linkInputVisible && (
         <div className="markdown-editor-link-bar">
-          <form onSubmit={handleLinkSubmit}>
+          <div className="markdown-editor-link-controls">
             <input
               ref={linkInputRef}
               type="text"
               inputMode="url"
               className="markdown-editor-link-input"
               placeholder="https://example.com"
-              onKeyDown={(e) => { if (e.key === 'Escape') setLinkInputVisible(false); }}
+              onKeyDown={handleLinkInputKeyDown}
             />
-            <button type="submit" className="markdown-editor-link-apply">Вставить</button>
+            <button type="button" className="markdown-editor-link-apply" onClick={handleLinkApply}>Вставить</button>
             <button type="button" className="markdown-editor-link-cancel" onClick={() => setLinkInputVisible(false)}>×</button>
-          </form>
+          </div>
         </div>
       )}
 

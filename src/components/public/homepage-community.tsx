@@ -36,12 +36,8 @@ export function CommunityChannelRows({ channels }: { channels: HomepageSocialBlo
           return (
             <SocialLinkCard
               actionLabel={channel.actionLabel}
-              description={channel.description}
-              helperText={channel.helperText}
               href={channel.href}
               key={channel.id}
-              logoSrc={channel.logoPath}
-              serviceName={details.platformLabel}
               title={channel.title}
               typeLabel={details.typeLabel}
               variant={channel.variant}

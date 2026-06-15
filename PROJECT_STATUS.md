@@ -1,6 +1,62 @@
 # BARSYNERGY Project Status
 
-Last updated: 2026-06-14 (Newsletter modal MVP — email double opt-in)
+Last updated: 2026-06-15 (Specialists unified feed MVP)
+
+## Specialists Unified Feed (2026-06-15)
+
+Applied in this batch:
+
+- Profile model extended with `publicHandle`, `headline`, `publishedAt` fields; `ApplicationType.RESUME_INVITATION`, `NotificationTopic.SPECIALISTS` added; migration `20260615120100_profile_public_handle_published_at` applied;
+- public `/vacancies?view=specialists` unified feed added (Resume + Master merge) with mode tabs, specialist cards, filters (mode/city/category/employmentType/jobSearchStatus/sort);
+- `/specialists` → `/vacancies?view=specialists` redirect added; detail pages at `/specialists/cv/[handle]` (resume) and `/specialists/svc/[slug]` (master) with SSR;
+- server lib: `getPublishedResumes`, `getPublishedSpecialists` (merge + sort), `getSpecialistFilterOptions`, `specialistsPageMetadata`;
+- publish flow: `setProfilePublic` action with pre-flight validation (fullName, profession, city, employmentTypes, status) and handle uniqueness check;
+- master submission: public form at `/specialists/svc/new` creating `MASTER_SUBMISSION` application; admin approves via existing `publishContentFromApplicationId('master')`;
+- admin `/admin/masters` CRUD added with entity type toggle, status/city/category/verification filters;
+- business cabinet `/business/cabinet/masters` CRUD added with business-account ownership scoping;
+- navigation footer, mobile menu, sitemap (published master slugs + profile handles), homepage section card updated;
+- seed data: 5 masters (3 INDIVIDUAL + 2 BUSINESS), 3 public profiles with skills/employmentTypes;
+- `tests/specialists.test.mjs` — 6 tests (redirect, detail pages, unified feed, sitemap, 200/404).
+
+Validation snapshot:
+
+- `./node_modules/.bin/prisma validate` passes;
+- `npm run prisma:generate` passes;
+- `npm run lint` passes;
+- `npm run typecheck` passes;
+- `node tests/specialists.test.mjs` — 6/6 pass;
+- pre-existing errors in `application-publication.ts` and `master-actions.ts` (unrelated).
+
+Verification gaps:
+
+- browser smoke for `/vacancies?view=specialists`, `/specialists/cv/[handle]`, `/specialists/svc/[slug]` was not run;
+- MASTER_INQUIRY and RESUME_INVITATION application forms are schema-ready but public UI forms not created;
+- production `STMP` not configured — application notifications not tested.
+
+## Masters Catalog MVP (2026-06-15)
+
+Applied in this batch:
+
+- `Master` content model, enum values, application relation and migration `20260615120000_add_masters` added;
+- public `/masters` list/detail pages added with filters, submission form, inquiry form and Person/LocalBusiness JSON-LD;
+- admin `/admin/masters` CRUD added with type switch for individual/business masters and application inbox publication for `MASTER_SUBMISSION`;
+- business cabinet `/business/cabinet/masters` added for business-owned master service drafts with server-side account ownership;
+- navigation, footer, sitemap, notification topics, seed data and payload tests updated for masters.
+
+Validation snapshot:
+
+- `./node_modules/.bin/prisma validate` passes;
+- `npm run prisma:generate` passes;
+- `./node_modules/.bin/prisma migrate status` reports the local DB is up to date;
+- `npm run lint` passes;
+- `npm run typecheck` passes;
+- targeted tests pass: `tests/application-payloads.test.mjs`, `tests/seo-metadata-sitemap.test.mjs`, `tests/site-header-navigation.test.mjs`;
+- broad `npm test` still fails on 25 pre-existing source-contract tests outside the masters batch.
+
+Verification gaps:
+
+- `npm run prisma:migrate:dev -- --name add_masters` is blocked by an older shadow-DB migration ordering issue involving `AuthNotification`; `migrate deploy`/`migrate status` are green locally;
+- browser smoke for `/masters`, `/admin/masters` and `/business/cabinet/masters` was not run in this batch.
 
 ## Newsletter Modal MVP (2026-06-14)
 

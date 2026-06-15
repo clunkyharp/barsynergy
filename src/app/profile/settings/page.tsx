@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { updateAvatar } from '@/lib/profile/avatar-actions';
 import { updateBasicProfile } from '@/lib/profile/basic-profile-actions';
-import { updateJobSearch } from '@/lib/profile/job-search-actions';
+import { updateJobSearch, setProfilePublic } from '@/lib/profile/job-search-actions';
 import { updateProfileSkills } from '@/lib/profile/skills-actions';
 import { updateWorkExperiences } from '@/lib/profile/work-experience-actions';
 import { changePassword } from '@/lib/profile/password-actions';
@@ -86,6 +86,7 @@ export default async function ProfileSettingsPage({ searchParams }: ProfileSetti
     { id: 'search', label: 'Статус поиска' },
     { id: 'skills', label: 'Навыки' },
     { id: 'experience', label: 'Опыт' },
+    { id: 'publish', label: 'Публикация' },
     { id: 'notifications', label: 'Уведомления' },
     { id: 'password', label: 'Пароль' }
   ] as const;
@@ -197,6 +198,49 @@ export default async function ProfileSettingsPage({ searchParams }: ProfileSetti
           <div className="flex items-center justify-between gap-3 border-t border-[var(--line)] pt-5">
             <p className="text-sm text-[var(--muted)]">Статус и условия поиска помогут работодателям понять ваши предпочтения.</p>
             <SubmitButton>Сохранить профиль</SubmitButton>
+          </div>
+        </ProfileSectionForm>
+      </ProfileSettingsSection>
+
+      <ProfileSettingsSection description="Публикация резюме в каталоге специалистов." id="publish" title="Публикация резюме">
+        <ProfileSectionForm action={setProfilePublic} className="grid gap-5" sectionId="publish">
+          <div className="flex items-start gap-3">
+            <input
+              defaultChecked={profile?.isPublic ?? false}
+              id="publish-toggle"
+              name="publish"
+              type="checkbox"
+              className="mt-1 size-4 shrink-0 accent-[var(--accent)]"
+            />
+            <div>
+              <label className="text-sm font-semibold text-[var(--text)]" htmlFor="publish-toggle">Опубликовать резюме в каталоге</label>
+              <p className="mt-0.5 text-xs text-[var(--muted)]">
+                После публикации резюме будет доступно по адресу:
+                {profile?.publicHandle && profile?.isPublic ? (
+                  <span className="ml-1 font-mono text-[var(--accent)]">barsynergy.app/specialists/cv/{profile.publicHandle}</span>
+                ) : null}
+              </p>
+            </div>
+          </div>
+
+          <FormField htmlFor="publish-handle" label="Публичный адрес">
+            <input
+              className="w-full rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--surface-field)] px-3 py-2 text-sm text-[var(--text)] placeholder:text-[var(--muted)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+              defaultValue={profile?.publicHandle ?? ''}
+              id="publish-handle"
+              name="handle"
+              placeholder="Автоматически из имени"
+              maxLength={60}
+              pattern="[a-z0-9-]+"
+            />
+            <p className="mt-1 text-xs text-[var(--muted)]">Только латиница, цифры и дефисы. Оставьте пустым для автогенерации.</p>
+          </FormField>
+
+          <div className="flex items-center justify-between gap-3 border-t border-[var(--line)] pt-5">
+            <p className="text-sm text-[var(--muted)]">
+              Для публикации нужно заполнить ФИО, профессию, город и формат занятости.
+            </p>
+            <SubmitButton>Сохранить</SubmitButton>
           </div>
         </ProfileSectionForm>
       </ProfileSettingsSection>

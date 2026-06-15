@@ -1,6 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
+import { revalidateHomepageCache } from '@/lib/public/home';
 import { ContentStatus } from '@prisma/client';
 import { z } from 'zod';
 import {
@@ -118,6 +119,7 @@ function normalizeHomepageLink(value: string) {
 }
 
 function revalidateHomepagePaths() {
+  revalidateHomepageCache();
   revalidatePath(ADMIN_HOMEPAGE_PATH);
   revalidatePath('/');
 }

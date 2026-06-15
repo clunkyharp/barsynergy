@@ -8,7 +8,7 @@ import { setNotificationPreferences } from './preferences';
 
 const topicPrefSchema = z.object({
   topics: z.array(z.object({
-    topic: z.enum(['EVENTS', 'ARTICLES', 'VACANCIES', 'COURSES', 'SUPPLIERS']),
+    topic: z.enum(['EVENTS', 'ARTICLES', 'VACANCIES', 'COURSES', 'SUPPLIERS', 'MASTERS']),
     enabled: z.coerce.boolean(),
   })).max(10),
 });

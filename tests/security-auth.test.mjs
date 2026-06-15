@@ -56,6 +56,18 @@ test('same-origin check accepts Origin matching APP_URL and local request URL fa
   );
 });
 
+test('same-origin check accepts explicitly allowed tunnel origins', () => {
+  assert.equal(
+    isSameOriginRequest({
+      requestUrl: 'https://demo.ngrok-free.app/auth/login',
+      appUrl: 'http://localhost:3000',
+      origin: 'https://demo.ngrok-free.app',
+      allowedOrigins: ['https://demo.ngrok-free.app']
+    }),
+    true
+  );
+});
+
 test('same-origin check rejects request URL origin when APP_URL is production origin', () => {
   assert.equal(
     isSameOriginRequest({

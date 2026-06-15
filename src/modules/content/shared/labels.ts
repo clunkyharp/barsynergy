@@ -1,4 +1,4 @@
-import { ApplicationStatus, ApplicationType } from '@prisma/client';
+import { ApplicationStatus, ApplicationType, EmploymentType, JobSearchStatus } from '@prisma/client';
 
 export const eventFormatOptions = [
   { value: 'offline', label: 'Офлайн' },
@@ -84,13 +84,16 @@ export const applicationTypeLabels: Record<ApplicationType, string> = {
   [ApplicationType.VACANCY_SUBMISSION]: 'Размещение вакансии',
   [ApplicationType.VACANCY_RESPONSE]: 'Отклик на вакансию',
   [ApplicationType.SUPPLIER_SUBMISSION]: 'Заявка поставщика',
+  [ApplicationType.MASTER_INQUIRY]: 'Запрос мастеру',
+  [ApplicationType.MASTER_SUBMISSION]: 'Заявка мастера',
   [ApplicationType.PARTNER_APPLICATION]: 'Партнёрская заявка',
   [ApplicationType.BUSINESS_SOLUTION]: 'Бизнес-решение',
   [ApplicationType.CONSULTING_REQUEST]: 'Консалтинг',
   [ApplicationType.CONTACT_MESSAGE]: 'Контактное сообщение',
   [ApplicationType.CORPORATE_TRAINING_APPLICATION]: 'Корпоративное обучение',
   [ApplicationType.CERTIFICATE_ORDER]: 'Заказ сертификата',
-  [ApplicationType.SUPPLIER_INQUIRY]: 'Запрос поставщику'
+  [ApplicationType.SUPPLIER_INQUIRY]: 'Запрос поставщику',
+  [ApplicationType.RESUME_INVITATION]: 'Приглашение по резюме'
 };
 
 export const applicationStatusLabels: Record<ApplicationStatus, string> = {
@@ -105,6 +108,19 @@ export const applicationStatusLabels: Record<ApplicationStatus, string> = {
   [ApplicationStatus.REJECTED]: 'Отклонена',
   [ApplicationStatus.COMPLETED]: 'Завершена',
   [ApplicationStatus.ARCHIVED]: 'Архив'
+};
+
+export const jobSearchStatusLabels: Record<JobSearchStatus, string> = {
+  [JobSearchStatus.ACTIVE]: 'Активно ищу',
+  [JobSearchStatus.OPEN]: 'Открыт к предложениям',
+  [JobSearchStatus.NOT_LOOKING]: 'Не ищу'
+};
+
+export const employmentTypeLabels: Record<EmploymentType, string> = {
+  [EmploymentType.FULL_TIME]: 'Полная занятость',
+  [EmploymentType.PART_TIME]: 'Частичная занятость',
+  [EmploymentType.FREELANCE]: 'Фриланс',
+  [EmploymentType.REMOTE]: 'Удалённая работа'
 };
 
 export const applicationStatusBadgeVariants: Record<ApplicationStatus, 'neutral' | 'success' | 'warning' | 'danger' | 'pending'> = {

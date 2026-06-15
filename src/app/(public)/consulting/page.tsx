@@ -291,7 +291,7 @@ export default async function ConsultingPage({ searchParams }: ConsultingPagePro
         <div className="container grid gap-8 xl:grid-cols-[minmax(16rem,0.58fr)_minmax(0,1.42fr)]">
           <div className="xl:self-center">
             <PublicEyebrow>Эксперты</PublicEyebrow>
-            <PublicDisplayTitle className="mt-4 max-w-sm">Подбор эксперта</PublicDisplayTitle>
+            <PublicDisplayTitle className="mt-4 max-w-md" size="compact">Подбор эксперта</PublicDisplayTitle>
             <PublicBodyText className="mt-5 max-w-md" size="md">
               Напишите, что происходит сейчас и где нужна помощь. Мы уточним детали и подберём специалиста под задачу.
             </PublicBodyText>

@@ -107,6 +107,18 @@ export function SiteFooter({ userRole, userEmail, newsletterDisabled = false, le
       };
     }
 
+    if (pathname.startsWith('/masters')) {
+      return {
+        eyebrow: 'Для мастеров',
+        title: 'Покажите услугу профильной аудитории',
+        description: 'Добавьте специалиста или услугу компании в каталог мастеров, чтобы команды баров могли быстро найти помощь.',
+        primaryHref: '/masters#master-submission',
+        primaryLabel: 'Стать мастером',
+        secondaryHref: businessHref,
+        secondaryLabel: businessLinkLabel
+      };
+    }
+
     if (pathname.startsWith('/events')) {
       return {
         eyebrow: 'Для организаторов',
@@ -163,6 +175,8 @@ export function SiteFooter({ userRole, userEmail, newsletterDisabled = false, le
     { href: '/education', label: 'Обучение' },
     { href: '/events', label: 'События' },
     { href: '/vacancies', label: 'Вакансии' },
+    { href: '/vacancies?view=specialists', label: 'Специалисты' },
+    { href: '/masters', label: 'Мастера' },
     { href: '/suppliers', label: 'Поставщики' },
     { href: '/tools/cost-calculator', label: 'Калькулятор' }
   ] as const;

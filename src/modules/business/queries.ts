@@ -149,6 +149,63 @@ export async function getBusinessRequestsPage(
   return { cities, totalCount, applications };
 }
 
+export async function getBusinessMastersPage(businessAccountId: string) {
+  const [cities, masters] = await Promise.all([
+    getActiveCities(),
+    prisma.master.findMany({
+      where: { businessAccountId },
+      orderBy: [{ updatedAt: 'desc' }],
+      select: {
+        id: true,
+        title: true,
+        slug: true,
+        status: true,
+        summary: true,
+        city: { select: { name: true } },
+        isVerified: true,
+        entityType: true,
+        publishedAt: true,
+        updatedAt: true
+      }
+    })
+  ]);
+
+  return { cities, masters };
+}
+
+export type MasterFormData = Awaited<ReturnType<typeof getBusinessMasterById>>;
+
+export async function getBusinessMasterById(masterId: string, businessAccountId: string) {
+  return prisma.master.findFirst({
+    where: { id: masterId, businessAccountId },
+    select: {
+      id: true,
+      title: true,
+      slug: true,
+      summary: true,
+      description: true,
+      status: true,
+      entityType: true,
+      fullName: true,
+      companyName: true,
+      cityId: true,
+      city: { select: { name: true } },
+      specializations: true,
+      experienceYears: true,
+      rateLabel: true,
+      contactLabel: true,
+      contactTelegram: true,
+      contactPhone: true,
+      contactEmail: true,
+      serviceArea: true,
+      isVerified: true,
+      publishedAt: true,
+      updatedAt: true,
+      createdAt: true
+    }
+  });
+}
+
 export async function getBusinessRequestDetail(businessAccountId: string, applicationId: string) {
   const [cities, application] = await Promise.all([
     getActiveCities(),

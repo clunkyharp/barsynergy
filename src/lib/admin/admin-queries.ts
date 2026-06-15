@@ -88,6 +88,7 @@ export async function getApplicationById(id: string) {
       vacancy: { select: { id: true, title: true, slug: true, companyName: true } },
       supplier: { select: { id: true, title: true, slug: true, companyName: true } },
       partner: { select: { id: true, title: true, slug: true, companyName: true } },
+      master: { select: { id: true, title: true, slug: true, fullName: true, companyName: true } },
       businessAccount: { select: { companyName: true, id: true, status: true, owner: { select: { email: true, id: true, status: true } } } },
       resumeFile: { select: { originalName: true, fileKey: true, bucket: true, storageDriver: true, mimeType: true, size: true } },
       user: { select: { email: true, role: true, status: true } },
@@ -129,6 +130,7 @@ export async function getApplicationList(
         vacancy: { select: { title: true, slug: true } },
         supplier: { select: { title: true, slug: true } },
         partner: { select: { title: true, slug: true } },
+        master: { select: { title: true, slug: true } },
         resumeFileId: true,
         consentAcceptedAt: true,
         payload: true,
@@ -350,6 +352,49 @@ export async function getSupplierList(
   ]);
 }
 
+// ─── Master queries ──────────────────────────────────────────────────
+
+export async function getMasterById(id: string) {
+  return prisma.master.findUnique({
+    where: { id },
+    include: {
+      coverImage: { select: { originalName: true } }
+    }
+  });
+}
+
+export async function getMasterList(
+  where: Prisma.MasterWhereInput,
+  skip: number,
+  take: number
+) {
+  return Promise.all([
+    prisma.master.findMany({
+      where,
+      orderBy: [{ createdAt: 'desc' }],
+      skip,
+      take,
+      select: {
+        id: true,
+        title: true,
+        slug: true,
+        status: true,
+        updatedAt: true,
+        entityType: true,
+        fullName: true,
+        companyName: true,
+        serviceArea: true,
+        isVerified: true,
+        city: { select: { name: true } },
+        category: { select: { name: true } },
+        businessAccount: { select: { companyName: true } },
+        updatedBy: { select: { email: true } }
+      }
+    }),
+    prisma.master.count({ where })
+  ]);
+}
+
 // ─── Partner queries ─────────────────────────────────────────────────
 
 export async function getPartnerById(id: string) {
@@ -538,6 +583,14 @@ export async function getVacancyStatusCounts(where: Prisma.VacancyWhereInput) {
 
 export async function getSupplierStatusCounts(where: Prisma.SupplierWhereInput) {
   return prisma.supplier.groupBy({
+    by: ['status'],
+    where,
+    _count: { id: true }
+  });
+}
+
+export async function getMasterStatusCounts(where: Prisma.MasterWhereInput) {
+  return prisma.master.groupBy({
     by: ['status'],
     where,
     _count: { id: true }

@@ -19,6 +19,7 @@ const TOPICS: TopicDef[] = [
   { topic: 'VACANCIES', label: 'Вакансии', description: 'Новые предложения работы' },
   { topic: 'COURSES', label: 'Курсы', description: 'Новые образовательные программы' },
   { topic: 'SUPPLIERS', label: 'Поставщики', description: 'Новые поставщики и партнёры' },
+  { topic: 'MASTERS', label: 'Мастера', description: 'Новые мастера и сервисные услуги' },
 ];
 
 const PUBLIC_KEY = typeof process !== 'undefined'

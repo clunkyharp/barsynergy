@@ -86,6 +86,8 @@
   --surface-inverse: #1c1c1e;
   --surface-inverse-card: #252833;
   --paper: var(--surface-elevated);
+  --spotlight-footer-bg: #d6d8d1;
+  --spotlight-footer-text: #1c1c1e;
   --text: #1c1c1e;
   --muted: #555a6a;
   --line: rgb(28 28 30 / 0.1);
@@ -260,6 +262,8 @@
   --surface-inverse: #f7f8fa;
   --surface-inverse-card: #ffffff;
   --paper: var(--surface-elevated);
+  --spotlight-footer-bg: #d6d8d1;
+  --spotlight-footer-text: #1c1c1e;
   --text: #f5f7fb;
   --muted: #a5a8b5;
   --line: rgb(224 226 232 / 0.12);

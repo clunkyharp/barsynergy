@@ -44,11 +44,12 @@
       "supportRose": { "value": "#fde0f0", "type": "color" },
       "supportAqua": { "value": "#c3faf5", "type": "color" },
       "supportPeach": { "value": "#ffe6cd", "type": "color" },
-      "supportLilac": { "value": "#f5f3ff", "type": "color" }
+      "supportLilac": { "value": "#f5f3ff", "type": "color" },
+      "spotlightBg": { "value": "#d6d8d1", "type": "color" }
     },
     "font": {
       "body": { "value": "Manrope", "type": "fontFamily" },
-      "display": { "value": "Cormorant Garamond", "type": "fontFamily" },
+      "display": { "value": "Gothic №60", "type": "fontFamily" },
       "accent": { "value": "Manrope", "type": "fontFamily" }
     }
   },
@@ -74,7 +75,9 @@
       "supportRose": { "value": "{reference.color.supportRose}", "type": "color" },
       "supportAqua": { "value": "{reference.color.supportAqua}", "type": "color" },
       "supportPeach": { "value": "{reference.color.supportPeach}", "type": "color" },
-      "supportLilac": { "value": "{reference.color.supportLilac}", "type": "color" }
+      "supportLilac": { "value": "{reference.color.supportLilac}", "type": "color" },
+      "spotlightFooterBg": { "value": "{reference.color.spotlightBg}", "type": "color" },
+      "spotlightFooterText": { "value": "{reference.color.ink}", "type": "color" }
     }
   }
 }

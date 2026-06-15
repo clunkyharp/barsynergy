@@ -74,7 +74,8 @@ export function SiteHeader({ user, logoutAction }: SiteHeaderProps) {
   }
 
   const businessHref = user?.role === 'BUSINESS' ? '/business/cabinet' : '/business';
-  const effectiveDesktopPrimaryNavItems = desktopPrimaryNavItems.map((item) =>
+  const effectiveDesktopPrimaryNavItems = desktopPrimaryNavItems;
+  const effectiveDesktopMoreNavItems = desktopMoreNavItems.map((item) =>
     item.href === '/business' ? { ...item, href: businessHref } : item
   );
   const effectiveGuestNavItems = guestNavItems.map((item) =>
@@ -180,7 +181,7 @@ export function SiteHeader({ user, logoutAction }: SiteHeaderProps) {
                   <ChevronDown aria-hidden="true" className="transition-transform duration-[var(--motion-duration-base)] ease-[var(--motion-ease-standard)] group-open:rotate-180 motion-reduce:transition-none" size={14} strokeWidth={1.8} />
                 </summary>
                 <div className="absolute right-0 top-[calc(100%+0.35rem)] z-20 grid min-w-[12rem] gap-1 rounded-[var(--radius-md)] border border-[var(--card-border)] bg-[var(--surface-elevated)] p-2 shadow-[var(--shadow-panel)]">
-                  {desktopMoreNavItems.map((item) => {
+                  {effectiveDesktopMoreNavItems.map((item) => {
                     const isActive = pathname ? isActiveItem(pathname, item.href) : false;
 
                     return (

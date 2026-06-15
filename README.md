@@ -137,6 +137,7 @@ The VPS deploys from `prod`; keep that branch clean from agent memory, generated
 - [Design system status](docs/design-system-status.md)
 - [Design system component matrix](docs/design-system-component-matrix.md)
 - [Final design consistency audit](docs/design-system-consistency-audit-final-2026-04-29.md)
+- [Agent project map](docs/agent-project-map.md)
 - [Project status](PROJECT_STATUS.md)
 - [Project plan](docs/project-plan.md)
 - [AI agent workflow](docs/agent-workflow.md)

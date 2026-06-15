@@ -1,10 +1,12 @@
-import { CategoryType, ContentStatus } from '@prisma/client';
+import { CategoryType, ContentStatus, MasterEntityType } from '@prisma/client';
 import { prisma } from '@/lib/db/prisma';
 import {
   courseFormatOptions,
   courseLevelOptions,
+  employmentTypeLabels,
   eventFormatOptions,
   getOptionLabel as getAdminOptionLabel,
+  jobSearchStatusLabels,
   partnerTypeOptions,
   vacancyEmploymentTypeOptions
 } from '@/modules/content/shared/labels';
@@ -116,5 +118,76 @@ export async function getPartnerFilterOptions() {
     partnerTypes: uniqueTextOptions(partners.map((partner) => partner.partnerType), (value) =>
       getAdminOptionLabel(partnerTypeOptions, value, value)
     )
+  };
+}
+
+const masterSpecializationLabels: Record<string, string> = {
+  'bar-setup': 'Настройка бара',
+  'team-training': 'Обучение команды',
+  'service-audit': 'Аудит сервиса',
+  'equipment-service': 'Сервис оборудования',
+  'coffee-machine-setup': 'Настройка кофемашин',
+  'preventive-maintenance': 'Плановое обслуживание'
+};
+
+export async function getMasterFilterOptions() {
+  const masters = await prisma.master.findMany({
+    where: { status: ContentStatus.PUBLISHED },
+    select: { specializations: true }
+  });
+
+  return {
+    entityTypes: [
+      { value: MasterEntityType.INDIVIDUAL, label: 'Частные мастера' },
+      { value: MasterEntityType.BUSINESS, label: 'Компании' }
+    ],
+    specializations: uniqueTextOptions(
+      masters.flatMap((master) => master.specializations),
+      (value) => masterSpecializationLabels[value] ?? value
+    ),
+    experienceBuckets: [
+      { value: '0-2', label: 'До 2 лет' },
+      { value: '3-5', label: '3–5 лет' },
+      { value: '6-plus', label: '6+ лет' }
+    ],
+    verified: [
+      { value: 'true', label: 'Проверенные мастера' }
+    ]
+  };
+}
+
+export async function getSpecialistFilterOptions() {
+  const [cities, masterCategories, seekingProfessions] = await Promise.all([
+    getPublicCityFilterOptions(),
+    getPublicCategoryOptions(CategoryType.MASTER),
+    prisma.profile.findMany({
+      where: { isPublic: true, publicHandle: { not: null }, profession: { not: null } },
+      distinct: ['profession'],
+      select: { profession: true }
+    }),
+  ]);
+
+  return {
+    mode: [
+      { value: 'seeking', label: 'Ищу работу' },
+      { value: 'offering', label: 'Предлагаю услуги' },
+    ],
+    cities,
+    categories: masterCategories.map((c) => ({ value: c.slug, label: c.name })),
+    professions: uniqueTextOptions(seekingProfessions.map((p) => p.profession)),
+    employmentTypes: Object.entries(employmentTypeLabels).map(([value, label]) => ({ value, label })),
+    jobSearchStatuses: Object.entries(jobSearchStatusLabels).map(([value, label]) => ({ value, label })),
+    entityTypes: [
+      { value: 'individual', label: 'Частные специалисты' },
+      { value: 'business', label: 'Компании' },
+    ],
+    verified: [
+      { value: 'true', label: 'Проверенные' },
+    ],
+    sortOptions: [
+      { value: 'recent', label: 'Новые' },
+      { value: 'verified', label: 'По верификации' },
+      { value: 'experience', label: 'Опытные' },
+    ],
   };
 }

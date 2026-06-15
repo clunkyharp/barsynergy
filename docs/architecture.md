@@ -92,7 +92,7 @@ Actions are passed as `action={myAction}` props or called via `useActionState`. 
 ## Content Types
 
 The system has these content types (each has a `ContentStatus` lifecycle):
-- Article, Event, Course, Vacancy, Supplier, Partner
+- Article, Event, Course, Vacancy, Supplier, Master, Partner
 
 ### Checklist: Adding a New Content Type
 

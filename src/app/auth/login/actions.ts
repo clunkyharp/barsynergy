@@ -64,11 +64,10 @@ export async function loginAction(_prevState: LoginActionResult, formData: FormD
     return { type: 'error', code: 'invalid' };
   }
 
-  await assertSameOriginServerAction();
-
   let successRedirectTo: string | null = null;
 
   try {
+    await assertSameOriginServerAction();
     await assertAuthAttemptAllowed({ action: 'login', email: parsed.data.email });
 
     const user = await prisma.user.findUnique({

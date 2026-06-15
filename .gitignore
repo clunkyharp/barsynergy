@@ -23,7 +23,11 @@ yarn-error.log*
 .vscode
 .lazyweb/
 .codex/
-.agents/
+.agents/*
+!.agents/skills/
+.agents/skills/*
+!.agents/skills/project-code-map/
+!.agents/skills/project-code-map/**
 .mempalace/
 .codegraph/
 qa/

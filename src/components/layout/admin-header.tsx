@@ -17,6 +17,7 @@ const adminHeaderSections = [
   { title: 'События', test: (pathname: string) => pathname.startsWith('/admin/events') },
   { title: 'Курсы', test: (pathname: string) => pathname.startsWith('/admin/courses') },
   { title: 'Вакансии', test: (pathname: string) => pathname.startsWith('/admin/vacancies') },
+  { title: 'Мастера', test: (pathname: string) => pathname.startsWith('/admin/masters') },
   { title: 'Поставщики', test: (pathname: string) => pathname.startsWith('/admin/suppliers') },
   { title: 'Партнёры', test: (pathname: string) => pathname.startsWith('/admin/partners') },
   { title: 'Генспонсоры', test: (pathname: string) => pathname.startsWith('/admin/general-sponsors') },

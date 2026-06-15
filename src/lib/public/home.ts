@@ -11,7 +11,7 @@ import { getPublishedGeneralSponsors, type GeneralSponsor } from '@/lib/public/g
 import { ContentStatus } from '@prisma/client';
 import { prisma } from '@/lib/db/prisma';
 
-const HOMEPAGE_CACHE_TTL_MS = 30_000;
+const HOMEPAGE_CACHE_TTL_MS = 300_000;
 
 type SharedListItem = Awaited<ReturnType<typeof getPublishedArticles>>['items'][number];
 
