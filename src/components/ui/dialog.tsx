@@ -113,7 +113,7 @@ export function Dialog({
     <div
       {...overlayProps}
       className={cn(
-        'dialog-overlay fixed inset-0 z-[calc(var(--z-overlay)+10)] grid place-items-center overflow-y-auto bg-black/35 px-4 py-6 backdrop-blur-sm motion-reduce:transition-none',
+        'dialog-overlay fixed inset-0 z-[calc(var(--z-overlay)+10)] overflow-y-auto bg-black/35 backdrop-blur-sm motion-reduce:transition-none',
         overlayProps?.className
       )}
       onMouseDown={(event) => {
@@ -128,12 +128,13 @@ export function Dialog({
         }
       }}
     >
+      <div className="flex min-h-full items-center justify-center px-4 py-6">
       <div
         aria-describedby={description ? descriptionId : undefined}
         aria-labelledby={titleId}
         aria-modal="true"
         className={cn(
-          'dialog-panel w-full overflow-hidden rounded-[var(--radius-xl)] border border-[var(--line)] bg-[var(--surface)] text-left text-[var(--text)] shadow-[var(--shadow-overlay)] motion-reduce:transition-none',
+          'dialog-panel w-full rounded-[var(--radius-xl)] border border-[var(--line)] bg-[var(--surface)] text-left text-[var(--text)] shadow-[var(--shadow-overlay)] motion-reduce:transition-none',
           size === 'confirm' ? 'border-[var(--border-strong)] bg-[var(--surface)] shadow-none p-5' : 'p-6',
           dialogSizes[size],
           className
@@ -175,6 +176,7 @@ export function Dialog({
         )}
         {children ? <div className={cn(size === 'confirm' ? 'mt-4 text-sm leading-[22px] text-[var(--muted)]' : 'mt-5')}>{children}</div> : null}
         {footer ? <div className={cn('mt-5 flex gap-2', size === 'confirm' ? 'flex-row justify-end' : 'flex-col-reverse sm:flex-row sm:justify-end')}>{footer}</div> : null}
+      </div>
       </div>
     </div>,
     document.body

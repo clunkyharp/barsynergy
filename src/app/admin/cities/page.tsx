@@ -73,7 +73,7 @@ export default async function AdminCitiesPage({ searchParams }: AdminCitiesPageP
                     { label: 'Регион', value: city.region || 'Не указан' },
                     { label: 'Порядок', value: city.sortOrder }
                   ]}
-                  status={<AdminStatusChip variant={city.isActive ? 'success' : 'neutral'}>{city.isActive ? 'Активен' : 'Выключен'}</AdminStatusChip>}
+                  status={<AdminStatusChip tone="subtle" variant={city.isActive ? 'success' : 'neutral'}>{city.isActive ? 'Активен' : 'Выключен'}</AdminStatusChip>}
                 />
               }
             >

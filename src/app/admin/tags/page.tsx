@@ -108,7 +108,7 @@ export default async function AdminTagsPage({ searchParams }: AdminTagsPageProps
                     { label: 'Статей', value: tag._count.articleTags },
                     { label: 'Описание', value: tag.description ? 'Заполнено' : 'Не указано' }
                   ]}
-                  status={<AdminStatusChip variant={tag.isActive ? 'success' : 'neutral'}>{tag.isActive ? 'Активен' : 'Выключен'}</AdminStatusChip>}
+                  status={<AdminStatusChip tone="subtle" variant={tag.isActive ? 'success' : 'neutral'}>{tag.isActive ? 'Активен' : 'Выключен'}</AdminStatusChip>}
                 />
               }
             >

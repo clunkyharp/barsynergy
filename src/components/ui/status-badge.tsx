@@ -3,6 +3,10 @@ import { cn } from '@/lib/utils';
 
 export type StatusBadgeVariant = 'success' | 'warning' | 'danger' | 'neutral' | 'pending';
 
+export type StatusBadgeTone = 'solid' | 'subtle';
+
+const subtleChip = 'border-[var(--border-default)] bg-[var(--surface-card-muted)] text-[var(--text)]';
+
 const variants: Record<StatusBadgeVariant, { chip: string; dot: string }> = {
   success: {
     chip: 'border-[var(--success-border)] bg-[var(--success-bg)] text-[var(--success-text)]',
@@ -29,18 +33,17 @@ const variants: Record<StatusBadgeVariant, { chip: string; dot: string }> = {
 type StatusBadgeProps = HTMLAttributes<HTMLSpanElement> & {
   variant?: StatusBadgeVariant;
   showDot?: boolean;
+  tone?: StatusBadgeTone;
 };
 
-export function AdminStatusChip({ children, className, variant = 'neutral', showDot = true, ...props }: StatusBadgeProps) {
+export function AdminStatusChip({ children, className, variant = 'neutral', showDot = true, tone = 'solid', ...props }: StatusBadgeProps) {
   const styles = variants[variant];
-  const isSolidVariant = variant === 'success' || variant === 'danger';
 
   return (
     <span
       className={cn(
         'inline-flex min-h-8 items-center gap-1.5 whitespace-nowrap rounded-[var(--radius-pill)] border px-2.5 py-1.5 text-[11px] font-semibold leading-[14px] tracking-[0]',
-        isSolidVariant && 'shadow-none',
-        styles.chip,
+        tone === 'subtle' ? subtleChip : styles.chip,
         className
       )}
       data-component="admin-status-badge"

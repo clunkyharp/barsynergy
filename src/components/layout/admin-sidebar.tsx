@@ -125,8 +125,11 @@ export function AdminSidebar({ collapsed, onCollapsedChange, newApplicationsCoun
                         <Icon aria-hidden="true" className="admin-sidebar-link-icon" size={18} strokeWidth={2.1} />
                         <span className="admin-sidebar-link-label">{item.label}</span>
                         {item.section === 'applications' && newApplicationsCount > 0 ? (
-                          <span className="ml-auto inline-flex min-h-5 min-w-5 items-center justify-center rounded-full bg-[var(--accent)] px-1.5 text-[11px] font-bold leading-none text-[var(--accent-contrast)]">
-                            {newApplicationsCount}
+                          <span
+                            aria-label={`Новых заявок: ${newApplicationsCount}`}
+                            className="admin-sidebar-count-badge inline-flex items-center justify-center rounded-full bg-[var(--accent)] font-bold leading-none text-[var(--accent-contrast)]"
+                          >
+                            {newApplicationsCount > 9 ? '9+' : newApplicationsCount}
                           </span>
                         ) : null}
                       </NavLink>

@@ -100,7 +100,7 @@ export default async function AdminSkillsPage({ searchParams }: AdminSkillsPageP
                       {skill.source === SkillSource.USER_GENERATED ? (
                         <AdminStatusChip variant="warning">На модерации</AdminStatusChip>
                       ) : null}
-                      <AdminStatusChip variant={skill.isActive ? 'success' : 'neutral'}>{skill.isActive ? 'Активен' : 'Выключен'}</AdminStatusChip>
+                      <AdminStatusChip tone="subtle" variant={skill.isActive ? 'success' : 'neutral'}>{skill.isActive ? 'Активен' : 'Выключен'}</AdminStatusChip>
                     </div>
                   }
                 />

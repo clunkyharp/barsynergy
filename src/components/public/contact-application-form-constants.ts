@@ -74,6 +74,23 @@ const contactMessageLabels: Partial<Record<ContactTopicValue, string>> = {
   sponsorship: 'Какие условия спонсорства нужны'
 };
 
+const contactMessagePlaceholders: Partial<Record<ContactTopicValue, string>> = {
+  partnership: 'Например: совместный сезон с локальной обжаркой, нужна площадка и совместный анонс.',
+  sponsorship: 'Например: бренд воды хочет войти в сезон событий, бюджет до 300 тыс, интересуют интеграции и амбассадорство.',
+  consulting: 'Например: запускаем кофейню в Пятигорске, команда 6 человек, нужна помощь с меню и сервисом.',
+  'article-topic': 'Например: история локального бара, готов герой, предлагаем интервью на 40 минут.',
+  'bug-report': 'Например: при отправке формы вакансий ошибка 500, шаги воспроизведения, браузер, ссылка.',
+  other: 'Опишите запрос: что нужно, к какому сроку, бюджет и ограничения.'
+};
+
+const contactMessageHints: Partial<Record<ContactTopicValue, string>> = {
+  sponsorship: 'Укажите бренд, цели интеграции и бюджетный ориентир.',
+  partnership: 'Опишите формат, ожидания и сроки запуска.',
+  consulting: 'Чем точнее задача и сроки, тем быстрее предложим формат работы.',
+  'article-topic': 'Назовите тему, героя и желаемый формат материала.',
+  'bug-report': 'Опишите шаги, ожидаемое и фактическое поведение, браузер.'
+};
+
 const contactTopicDetailTitles: Partial<Record<ContactTopicValue, string>> = {
   'article-topic': 'Детали материала',
   consulting: 'Детали задачи',
@@ -106,4 +123,16 @@ export function getContactTopicDetailsTitle(topic: ContactTopicSelection) {
 
 export function getContactTopicDetailsHint(topic: ContactTopicSelection) {
   return isContactTopicValue(topic) ? (contactTopicDetailHints[topic] ?? '') : '';
+}
+
+export function getContactMessagePlaceholder(topic: ContactTopicSelection) {
+  return isContactTopicValue(topic)
+    ? (contactMessagePlaceholders[topic] ?? 'Опишите запрос подробнее.')
+    : 'Опишите запрос подробнее.';
+}
+
+export function getContactMessageHint(topic: ContactTopicSelection) {
+  return isContactTopicValue(topic)
+    ? (contactMessageHints[topic] ?? 'Чем конкретнее задача, тем быстрее мы поймём, что предложить дальше.')
+    : 'Чем конкретнее задача, тем быстрее мы поймём, что предложить дальше.';
 }

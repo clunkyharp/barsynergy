@@ -23,7 +23,9 @@ import { SUPPORT_EMAIL } from '@/lib/contact-info';
 import {
   contactMethods,
   contactTopicOptions,
+  getContactMessageHint,
   getContactMessageLabel,
+  getContactMessagePlaceholder,
   getContactTopicDetailsHint,
   getContactTopicDetailsTitle,
   shouldShowContactTopicDetails,
@@ -42,6 +44,8 @@ export function ContactApplicationForm({ enabled, utm, cities, defaultTopic, def
     [topic]
   );
   const messageLabel = getContactMessageLabel(topic);
+  const messagePlaceholder = getContactMessagePlaceholder(topic);
+  const messageHint = getContactMessageHint(topic);
   const showTopicDetails = shouldShowContactTopicDetails(topic);
   const topicDetailsTitle = getContactTopicDetailsTitle(topic);
   const topicDetailsHint = getContactTopicDetailsHint(topic);
@@ -146,10 +150,10 @@ export function ContactApplicationForm({ enabled, utm, cities, defaultTopic, def
           <FormSection title="Сообщение">
             <FormField
               htmlFor="contactMessage"
-              hint="Чем конкретнее задача, тем быстрее мы поймём, что предложить дальше."
+              hint={messageHint}
               label={messageLabel}
             >
-              <Textarea id="contactMessage" name="message" required className="min-h-40" maxLength={4000} placeholder="Например: нужна программа для команды из 6 человек в июле, город Пятигорск, интересует сервис и работа с меню." />
+              <Textarea id="contactMessage" name="message" required className="min-h-40" maxLength={4000} placeholder={messagePlaceholder} />
             </FormField>
           </FormSection>
 

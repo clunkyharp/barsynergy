@@ -107,7 +107,7 @@ export default async function AdminCategoriesPage({ searchParams }: AdminCategor
                     { label: 'Порядок', value: category.sortOrder },
                     { label: 'Описание', value: category.description ? 'Заполнено' : 'Не указано' }
                   ]}
-                  status={<AdminStatusChip variant={category.isActive ? 'success' : 'neutral'}>{category.isActive ? 'Активна' : 'Выключена'}</AdminStatusChip>}
+                  status={<AdminStatusChip tone="subtle" variant={category.isActive ? 'success' : 'neutral'}>{category.isActive ? 'Активна' : 'Выключена'}</AdminStatusChip>}
                 />
               }
             >

@@ -305,6 +305,7 @@
 }
 
 .admin-nav-link {
+  position: relative;
   display: flex;
   min-width: 0;
   min-height: 34px;
@@ -317,6 +318,27 @@
   background: transparent;
   line-height: 18px;
   touch-action: manipulation;
+}
+
+.admin-sidebar-count-badge {
+  margin-left: auto;
+  min-width: 20px;
+  min-height: 20px;
+  padding: 0 6px;
+  font-size: 11px;
+}
+
+.admin-sidebar-shell[data-sidebar-state="collapsed"] .admin-sidebar-count-badge {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  margin-left: 0;
+  min-width: 14px;
+  min-height: 14px;
+  padding: 0 3px;
+  font-size: 9px;
+  line-height: 1;
+  pointer-events: none;
 }
 
 .admin-sidebar-shell .admin-nav-link {
