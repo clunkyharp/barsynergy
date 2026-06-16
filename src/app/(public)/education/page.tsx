@@ -26,8 +26,8 @@ type EducationPageProps = {
 };
 
 export const metadata: Metadata = buildPublicPageMetadata({
-  title: 'Обучение',
-  description: 'Обучение для бариста, управляющих и команд кофейных баров.',
+  title: 'Обучение бариста и команд кофеен в СКФО',
+  description: 'Курсы, мастер-классы и практические программы для бариста, управляющих и команд кофеен в Махачкале, Дагестане и СКФО.',
   path: '/education'
 });
 

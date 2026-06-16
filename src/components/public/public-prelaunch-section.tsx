@@ -41,8 +41,8 @@ export function PublicPrelaunchSection({
   id
 }: PublicPrelaunchSectionProps) {
   return (
-    <section className="background-zone background-zone-gray border-b border-[var(--line)] py-8 md:py-14" id={id}>
-      <div className="container grid gap-8 md:gap-10 xl:grid-cols-[minmax(18rem,0.9fr)_minmax(0,1.1fr)] xl:gap-12">
+    <section className="background-zone background-zone-gray border-b border-[var(--line)] py-6 md:py-10" id={id}>
+      <div className="container grid gap-6 md:gap-8 xl:grid-cols-[minmax(18rem,0.9fr)_minmax(0,1.1fr)] xl:gap-10">
         <div className="xl:self-start">
           <PublicEyebrow>{eyebrow}</PublicEyebrow>
           <PublicDisplayTitle className="mt-4 max-w-[13ch]">{title}</PublicDisplayTitle>
@@ -76,7 +76,7 @@ export function PublicPrelaunchSection({
         <ol className="grid gap-3">
           {cards.map((card, idx) => (
             <li key={card.title}>
-              <article className="group relative grid gap-4 rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--surface-card)] p-5 transition-colors hover:border-[var(--accent)]/35 md:grid-cols-[auto_minmax(0,1fr)_auto] md:items-start md:gap-6 md:p-6">
+              <article className="group relative grid gap-3 rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--surface-card)] p-4 transition-colors hover:border-[var(--accent)]/35 md:grid-cols-[auto_minmax(0,1fr)_auto] md:items-start md:gap-5 md:p-5">
                 <span aria-hidden="true" className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[var(--accent)]/30 bg-[var(--surface-wash)] text-sm font-semibold tracking-[var(--tracking-eyebrow-sm)] text-[var(--accent)] tabular-nums">
                   {idx + 1}
                 </span>

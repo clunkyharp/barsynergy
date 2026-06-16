@@ -63,6 +63,9 @@ export default async function SupplierDetailPage({ params, searchParams }: Suppl
   const isVerified = supplier.isVerified ?? false;
   const serviceArea = supplier.facts.find((f) => f.label === 'География')?.value;
   const contactLabel = supplier.facts.find((f) => f.label === 'Контакты')?.value;
+  const contactTelegram = supplier.contactTelegram;
+  const contactPhone = supplier.contactPhone;
+  const contactWhatsapp = supplier.contactWhatsapp;
 
   const showUserActions = !currentUser || currentUser.role === 'USER';
 
@@ -82,6 +85,9 @@ export default async function SupplierDetailPage({ params, searchParams }: Suppl
         cityName={supplier.cityName}
         companyName={supplier.companyName}
         contactLabel={contactLabel}
+        contactTelegram={contactTelegram}
+        contactPhone={contactPhone}
+        contactWhatsapp={contactWhatsapp}
         externalUrl={supplier.externalUrl}
         externalUrlLabel={supplier.externalUrlLabel}
         image={supplier.imageUrl}

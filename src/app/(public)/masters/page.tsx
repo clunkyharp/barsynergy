@@ -12,7 +12,9 @@ import { getApplicationCityOptions } from '@/lib/applications/form-options';
 import { getPublicApplicationUtm, stripPublicApplicationResultParams } from '@/lib/applications/public-form-helpers';
 import { getPublishedMasters, hasActivePublicContentParams, type PublicContentSearchParams } from '@/lib/public/content';
 import { getMasterFilterOptions, getPublicCategoryOptions, getPublicCityFilterOptions } from '@/lib/public/filter-options';
+import { JsonLd } from '@/components/seo/json-ld';
 import { buildPublicPageMetadata } from '@/lib/public/metadata';
+import { buildStaticPageBreadcrumbJsonLd } from '@/lib/public/structured-data';
 import { getEnv } from '@/lib/validation/env';
 
 type MastersPageProps = {
@@ -20,8 +22,8 @@ type MastersPageProps = {
 };
 
 export const metadata: Metadata = buildPublicPageMetadata({
-  title: 'Мастера',
-  description: 'Частные специалисты и сервисные команды для запуска, обучения, аудита и обслуживания оборудования.',
+  title: 'Мастера и сервисные команды для кофеен СКФО',
+  description: 'Частные специалисты и сервисные команды для запуска кофеен, обучения команд, аудита сервиса и обслуживания оборудования в Махачкале и СКФО.',
   path: '/masters'
 });
 
@@ -58,6 +60,7 @@ export default async function MastersPage({ searchParams }: MastersPageProps) {
 
   return (
     <>
+      <JsonLd data={buildStaticPageBreadcrumbJsonLd('/masters', 'Мастера')} />
       <PageHero
         title="Мастера"
         subtitle="Частные специалисты и сервисные команды для запуска, обучения, аудита и обслуживания оборудования."

@@ -26,6 +26,44 @@ test('verify-email resend persists email verification tokens through Prisma mode
   assert.doesNotMatch(source, /INSERT INTO "UserEmailVerificationToken"/);
 });
 
+test('verify-email token consumption returns status before redirecting', () => {
+  const source = readProjectFile('src/lib/auth/email-verification.ts');
+  const actionFile = readProjectFile('src/app/auth/verify-email/actions.ts');
+  const actionSource = actionFile.slice(
+    actionFile.indexOf('export async function verifyUserEmailAction'),
+    actionFile.indexOf('async function resendUserVerificationEmail')
+  );
+
+  assert.match(source, /export async function verifyUserEmailToken/);
+  assert.match(source, /return result && result\.length > 0 \? 'verified' : 'invalid'/);
+  assert.match(source, /\$\{'active'\}::"UserStatus"/);
+  assert.match(source, /\$\{'pending'\}::"UserStatus"/);
+  assert.match(actionFile, /import \{ verifyUserEmailToken \} from '@\/lib\/auth\/email-verification'/);
+  assert.match(actionSource, /if \(result === 'verified'\)[\s\S]*redirectWithAuthResult\('\/auth\/login'/);
+  assert.doesNotMatch(actionSource, /try \{/);
+});
+
+test('verify-email server action file exports only guarded actions', () => {
+  const source = readProjectFile('src/app/auth/verify-email/actions.ts');
+  const actionSource = source.slice(
+    source.indexOf('export async function verifyUserEmailAction')
+  );
+
+  assert.doesNotMatch(source, /export async function verifyUserEmailToken/);
+  assert.match(actionSource, /await assertSameOriginServerAction\(\)/);
+});
+
+test('verify-email resend redirects outside the mailer try/catch path', () => {
+  const source = readProjectFile('src/app/auth/verify-email/actions.ts');
+  const actionSource = source.slice(source.indexOf('export async function resendUserVerificationAction'));
+
+  assert.match(source, /async function resendUserVerificationEmail/);
+  assert.match(source, /return 'verification-resent'/);
+  assert.match(actionSource, /const result = await resendUserVerificationEmail\(email\)/);
+  assert.match(actionSource, /if \(result === 'verification-resent'\)[\s\S]*redirectWithAuthResult\('\/auth\/verify-email'/);
+  assert.doesNotMatch(actionSource, /try \{/);
+});
+
 test('password reset flow uses the current Prisma token model name', () => {
   const source = readProjectFile('src/app/auth/password-reset/actions.ts');
 

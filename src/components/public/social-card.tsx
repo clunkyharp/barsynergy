@@ -38,11 +38,12 @@ export function SocialLinkCard({
         <div className="relative h-full w-full overflow-hidden rounded-[18px]">
           <Image
             alt=""
-            className="object-cover"
+            className="object-cover brightness-[0.7] saturate-[0.6]"
             fill
             sizes="(min-width: 1024px) 32rem, (min-width: 640px) 24rem, 100vw"
             src={backgroundSrc}
           />
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[var(--editorial-dark-surface)] via-[var(--editorial-dark-surface)]/40 to-transparent" />
         </div>
       }
       title={title}

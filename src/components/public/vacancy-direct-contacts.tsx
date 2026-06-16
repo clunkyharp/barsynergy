@@ -4,6 +4,7 @@ type VacancyDirectContactsProps = {
   telegram?: string;
   phone?: string;
   email?: string;
+  whatsapp?: string;
 };
 
 function normalizeTelegram(value: string): { type: 'link'; href: string; label: string } | null {
@@ -43,12 +44,22 @@ function normalizeEmail(value: string): { href: string; label: string } | null {
   return { href: `mailto:${v}`, label: v };
 }
 
-export function VacancyDirectContacts({ telegram, phone, email }: VacancyDirectContactsProps) {
+function normalizeWhatsapp(value: string): { href: string; label: string } | null {
+  const digits = value.replace(/\D/g, '');
+  if (digits.length < 7) return null;
+  return { href: `https://wa.me/${digits}`, label: `WhatsApp ${value.trim()}` };
+}
+
+export function VacancyDirectContacts({ telegram, phone, email, whatsapp }: VacancyDirectContactsProps) {
   const links: { href: string; label: string }[] = [];
 
   if (telegram) {
     const t = normalizeTelegram(telegram);
     if (t) links.push(t);
+  }
+  if (whatsapp) {
+    const w = normalizeWhatsapp(whatsapp);
+    if (w) links.push(w);
   }
   if (phone) {
     const p = normalizePhone(phone);

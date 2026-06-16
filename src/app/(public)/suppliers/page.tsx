@@ -8,15 +8,17 @@ import { SuppliersHeroActions } from '@/app/(public)/suppliers/suppliers-hero-ac
 import { stripPublicApplicationResultParams } from '@/lib/applications/public-form-helpers';
 import { getPublishedSuppliers, hasActivePublicContentParams, type PublicContentSearchParams } from '@/lib/public/content';
 import { getPublicCategoryOptions, getPublicCityFilterOptions } from '@/lib/public/filter-options';
+import { JsonLd } from '@/components/seo/json-ld';
 import { buildPublicPageMetadata } from '@/lib/public/metadata';
+import { buildStaticPageBreadcrumbJsonLd } from '@/lib/public/structured-data';
 
 type SuppliersPageProps = {
   searchParams?: Promise<PublicContentSearchParams>;
 };
 
 export const metadata: Metadata = buildPublicPageMetadata({
-  title: 'Поставщики',
-  description: 'Каталог поставщиков, оборудования, сервисов и контактов для заведений.',
+  title: 'Поставщики кофе и оборудования для кофеен СКФО',
+  description: 'Каталог проверенных поставщиков кофе, какао, сиропов, оборудования и расходников для кофеен и баров Махачкалы, Дагестана и СКФО.',
   path: '/suppliers'
 });
 
@@ -49,6 +51,7 @@ export default async function SuppliersPage({ searchParams }: SuppliersPageProps
 
   return (
     <>
+      <JsonLd data={buildStaticPageBreadcrumbJsonLd('/suppliers', 'Поставщики')} />
       <PageHero
         title="Поставщики"
         subtitle="Проверенные поставщики кофе, оборудования, упаковки и продуктов для вашего бизнеса."
@@ -125,6 +128,22 @@ export default async function SuppliersPage({ searchParams }: SuppliersPageProps
           title="Каталог"
         />
       )}
+      <section className="background-zone background-zone-graphite border-b border-[var(--line)] py-10 md:py-14">
+        <div className="container prose prose-invert max-w-3xl">
+          <h2>Поставщики кофе и расходников для кофеен СКФО</h2>
+          <p>
+            Каталог BARSYNERGY объединяет проверенных поставщиков кофе, какао, сиропов, молочной продукции, упаковки, оборудования и сервисных услуг
+            для кофеен, баров и ресторанов Махачкалы, Дагестана и Северо-Кавказского региона.
+          </p>
+          <p>
+            Каждая компания в каталоге содержит описание направлений, города работы и контакты для прямой связи. Вы можете найти
+            поставщика по категории, городу или ключевому слову.
+          </p>
+          <p>
+            Если ваша компания поставляет продукты, оборудование или сервис для заведений — добавьте профиль в каталог бесплатно.
+          </p>
+        </div>
+      </section>
     </>
   );
 }

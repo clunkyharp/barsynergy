@@ -100,7 +100,7 @@ export function RegisterUserForm({
           maxLength={200}
         />
       </FormField>
-      <ConsentField value="on">
+      <ConsentField>
         <span>
           Согласен с <InlineLink href="/legal/privacy">политикой обработки персональных данных</InlineLink> и{' '}
           <InlineLink href="/legal/personal-data-consent">правилами платформы</InlineLink>.

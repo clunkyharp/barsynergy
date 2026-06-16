@@ -52,16 +52,67 @@ export function buildSiteJsonLd(): JsonLdValue[] {
       '@type': 'Organization',
       name: siteName,
       url,
-      logo: absoluteUrl('/brand/barsynergy-lockup.svg')
+      logo: absoluteUrl('/brand/barsynergy-lockup.svg'),
+      sameAs: [
+        'https://t.me/barsynergy',
+        'https://www.instagram.com/barsynergy'
+      ]
     },
     {
       '@context': 'https://schema.org',
       '@type': 'WebSite',
       name: siteName,
       url,
-      inLanguage: language
+      inLanguage: language,
+      potentialAction: {
+        '@type': 'SearchAction',
+        target: {
+          '@type': 'EntryPoint',
+          urlTemplate: `${url}/search?q={search_term_string}`
+        },
+        'query-input': 'required name=search_term_string'
+      }
     }
   ];
+}
+
+export function buildFaqPageJsonLd(
+  items: ReadonlyArray<{ question: string; answer: string }>
+): JsonLdValue {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: items.map((item) => ({
+      '@type': 'Question',
+      name: item.question,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: item.answer
+      }
+    }))
+  };
+}
+
+export function buildWebApplicationJsonLd(input: {
+  name: string;
+  description: string;
+  path: string;
+}): JsonLdValue {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'WebApplication',
+    name: input.name,
+    description: input.description,
+    url: absoluteUrl(input.path),
+    applicationCategory: 'BusinessApplication',
+    operatingSystem: 'All',
+    offers: {
+      '@type': 'Offer',
+      price: '0',
+      priceCurrency: 'RUB'
+    },
+    inLanguage: language
+  };
 }
 
 export function buildBreadcrumbJsonLd(items: BreadcrumbItem[]): JsonLdValue {

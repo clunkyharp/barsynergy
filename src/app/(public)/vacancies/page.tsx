@@ -14,7 +14,9 @@ import {
   type PublicContentSearchParams
 } from '@/lib/public/content';
 import { getPublicCategoryOptions, getPublicCityFilterOptions, getVacancyFilterOptions, getSpecialistFilterOptions } from '@/lib/public/filter-options';
+import { JsonLd } from '@/components/seo/json-ld';
 import { buildPublicPageMetadata } from '@/lib/public/metadata';
+import { buildStaticPageBreadcrumbJsonLd } from '@/lib/public/structured-data';
 import { SpecialistListSection } from './specialist-list-section';
 
 type VacanciesPageProps = {
@@ -22,8 +24,8 @@ type VacanciesPageProps = {
 };
 
 export const metadata: Metadata = buildPublicPageMetadata({
-  title: 'Вакансии',
-  description: 'Работа для бариста, управляющих и специалистов кофейной индустрии.',
+  title: 'Вакансии бариста и специалистов кофейной индустрии в СКФО',
+  description: 'Открытые вакансии для бариста, обжарщиков, управляющих и специалистов кофеен в Махачкале, Дагестане и СКФО. Проверенные работодатели, актуальные позиции.',
   path: '/vacancies'
 });
 
@@ -54,6 +56,7 @@ export default async function VacanciesPage({ searchParams }: VacanciesPageProps
 
     return (
       <>
+        <JsonLd data={buildStaticPageBreadcrumbJsonLd('/vacancies', 'Вакансии')} />
         <PageHero
           title="Специалисты"
           subtitle="Резюме и услуги специалистов барной индустрии."
@@ -82,6 +85,7 @@ export default async function VacanciesPage({ searchParams }: VacanciesPageProps
 
   return (
     <>
+      <JsonLd data={buildStaticPageBreadcrumbJsonLd('/vacancies', 'Вакансии')} />
       <PageHero
         title="Вакансии"
         subtitle="Работа для бариста, обжарщиков, управляющих и специалистов кофейной индустрии."
@@ -94,6 +98,7 @@ export default async function VacanciesPage({ searchParams }: VacanciesPageProps
         basePath="/vacancies"
         content={content}
         emptyActions={[
+          { href: '/specialists/svc/new', label: 'Создать профиль', variant: 'primary' },
           { href: 'https://t.me/barsynergy', label: 'Открыть Telegram' }
         ]}
         emptyDescription="Открытых вакансий сейчас нет. Подпишитесь на Telegram — публикуем вакансии там первыми."
@@ -122,6 +127,23 @@ export default async function VacanciesPage({ searchParams }: VacanciesPageProps
         rowActionLabel="Открыть вакансию"
         sortLabel={getVacancySortLabel(selectedSort)}
       />
+      <section className="background-zone background-zone-graphite border-b border-[var(--line)] py-10 md:py-14">
+        <div className="container prose prose-invert max-w-3xl">
+          <h2>Вакансии кофейной индустрии в СКФО</h2>
+          <p>
+            BARSYNERGY собирает актуальные вакансии для бариста, обжарщиков, управляющих кофеен, технологов и других специалистов барной индустрии
+            Северо-Кавказского федерального округа. Раздел охватывает позиции в Махачкале, Грозном, Владикавказе, Нальчике и других городах региона.
+          </p>
+          <p>
+            Здесь публикуются предложения от проверенных работодателей: кофейных сетей, независимых кофеен, обжарщиков, поставщиков оборудования
+            и сервисных компаний. Каждая вакансия содержит описание позиции, формат занятости и контакты для связи.
+          </p>
+          <p>
+            Если вы ищете работу бариста в Махачкале, позицию управляющего кофейни в Дагестане или вакансию обжарщика в СКФО — подпишитесь
+            на обновления раздела или добавьте своё резюме в каталог специалистов.
+          </p>
+        </div>
+      </section>
     </>
   );
 }

@@ -29,15 +29,15 @@ const themeInitScript = `
 export const metadata: Metadata = {
   metadataBase: new URL(env.APP_URL),
   title: {
-    default: 'BARSYNERGY: барная индустрия СКФО',
+    default: 'BARSYNERGY — кофейная индустрия СКФО: вакансии, поставщики, обучение',
     template: '%s | BARSYNERGY'
   },
   description:
-    'Платформа для барной индустрии СКФО: обучение, события, статьи, вакансии, поставщики и партнёрские запросы.',
+    'Платформа для кофейной и барной индустрии Северного Кавказа: вакансии бариста, каталог поставщиков, обучение, события и инструменты для кофеен.',
   openGraph: {
-    title: 'BARSYNERGY',
+    title: 'BARSYNERGY — кофейная индустрия СКФО',
     description:
-      'Обучение, события, вакансии и рабочие контакты для барной индустрии СКФО.',
+      'Вакансии, поставщики, обучение, события и инструменты для кофейной индустрии Махачкалы, Дагестана и СКФО.',
     url: env.APP_URL,
     siteName: 'BARSYNERGY',
     images: [{ url: '/og-preview.svg', width: 1200, height: 630 }],

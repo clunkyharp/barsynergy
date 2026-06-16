@@ -62,8 +62,17 @@ export default async function AdminSuppliersCreatePage() {
             <FormField htmlFor="supplier-websiteUrl" label="Сайт">
               <Input id="supplier-websiteUrl" name="websiteUrl" maxLength={240} type="url" />
             </FormField>
-            <FormField htmlFor="supplier-contactLabel" label="Контакт" hint="Коротко: имя, телефон, Telegram или email. Если контактов несколько, разделяйте точкой с запятой.">
+            <FormField htmlFor="supplier-contactLabel" label="Контакт (имя)" hint="Имя контактного лица. Если несколько, разделяйте точкой с запятой.">
               <Textarea id="supplier-contactLabel" name="contactLabel" maxLength={160} className="min-h-24" />
+            </FormField>
+            <FormField htmlFor="supplier-contactTelegram" label="Telegram">
+              <Input id="supplier-contactTelegram" name="contactTelegram" maxLength={120} placeholder="@username или t.me/..." />
+            </FormField>
+            <FormField htmlFor="supplier-contactPhone" label="Телефон">
+              <Input id="supplier-contactPhone" name="contactPhone" type="tel" maxLength={60} />
+            </FormField>
+            <FormField htmlFor="supplier-contactWhatsapp" label="WhatsApp" hint="Если совпадает с телефоном, можно не заполнять — будет использован телефон.">
+              <Input id="supplier-contactWhatsapp" name="contactWhatsapp" type="tel" maxLength={60} placeholder="+7 ..." />
             </FormField>
             <CheckboxField name="isVerified" value="true">
               Поставщик проверен

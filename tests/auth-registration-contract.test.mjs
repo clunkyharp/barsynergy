@@ -167,11 +167,15 @@ test('auth route files exist for all expected public auth paths', () => {
   const registerPage = readProjectFile('src/app/auth/register/page.tsx');
   const registerUserPage = readProjectFile('src/app/auth/register/user/page.tsx');
   const activatePage = readProjectFile('src/app/auth/activate/page.tsx');
+  const verifyEmailPage = readProjectFile('src/app/auth/verify-email/page.tsx');
 
   assert.match(loginPage, /LoginForm/);
   assert.match(registerPage, /Заявка на бизнес-доступ/);
   assert.match(registerUserPage, /Регистрация участника/);
   assert.match(activatePage, /Завершить подключение/);
+  assert.match(verifyEmailPage, /@\/lib\/auth\/email-verification/);
+  assert.match(verifyEmailPage, /\/auth\/login\?success=verified/);
+  assert.match(verifyEmailPage, /Подтверждение email/);
 });
 
 test('header shows login link for guest and account menu for authenticated user', () => {

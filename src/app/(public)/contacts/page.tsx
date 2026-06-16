@@ -98,8 +98,8 @@ const alternativeRoutes = [
 ] as const;
 
 export const metadata: Metadata = buildPublicPageMetadata({
-  title: 'Контакты',
-  description: 'Связь с командой BARSYNERGY по обучению, событиям, партнёрствам, вакансиям, поставщикам и материалам.',
+  title: 'Контакты BARSYNERGY — связаться с командой',
+  description: 'Напишите команде BARSYNERGY: вопросы по обучению, событиям, партнёрствам, вакансиям, поставщикам и публикациям кофейной индустрии СКФО.',
   path: '/contacts'
 });
 

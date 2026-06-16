@@ -18,7 +18,7 @@ const formSchema = z.object({
   phone: z.string().min(5).optional(),
   telegram: z.string().optional(),
   message: z.string().min(20).max(3000),
-  consent: z.string().refine((val) => val === 'on', { message: 'Необходимо согласие на обработку персональных данных' }),
+  consent: z.literal('accepted', { message: 'Необходимо согласие на обработку персональных данных' }),
   turnstileToken: z.string().optional(),
 });
 

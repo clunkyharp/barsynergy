@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import type { PublicContentImage } from '@/modules/content/shared/detail-helpers';
 import { PublicBreadcrumbs } from '@/components/public/public-primitives';
+import { VacancyDirectContacts } from '@/components/public/vacancy-direct-contacts';
 import { displayFont } from '@/lib/fonts';
 
 type SupplierDetailHeroProps = {
@@ -11,6 +12,9 @@ type SupplierDetailHeroProps = {
   cityName?: string;
   serviceArea?: string;
   contactLabel?: string;
+  contactTelegram?: string;
+  contactPhone?: string;
+  contactWhatsapp?: string;
   image?: PublicContentImage;
   isVerified: boolean;
   externalUrl?: string;
@@ -25,11 +29,15 @@ export function SupplierDetailHero({
   cityName,
   serviceArea,
   contactLabel,
+  contactTelegram,
+  contactPhone,
+  contactWhatsapp,
   image,
   isVerified,
   externalUrl,
   externalUrlLabel,
 }: SupplierDetailHeroProps) {
+  const hasStructuredContacts = contactTelegram || contactPhone || contactWhatsapp;
   return (
     <section className="background-zone background-zone-graphite relative overflow-hidden border-b border-[var(--line)] py-7 md:py-9">
       <div className="container">
@@ -72,6 +80,16 @@ export function SupplierDetailHero({
               <p className="mt-3 text-sm leading-6 text-[var(--muted)]">
                 Контакт: <span className="text-[var(--text)]">{contactLabel}</span>
               </p>
+            ) : null}
+
+            {hasStructuredContacts ? (
+              <div className="mt-4">
+                <VacancyDirectContacts
+                  telegram={contactTelegram}
+                  phone={contactPhone}
+                  whatsapp={contactWhatsapp}
+                />
+              </div>
             ) : null}
 
             {summary ? (

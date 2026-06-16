@@ -22,7 +22,13 @@ import {
   type PublicContentSearchParams
 } from './shared';
 
-export async function getPublishedSupplierDetail(slug: string): Promise<PublicContentDetail | null> {
+type SupplierDetail = PublicContentDetail & {
+  contactTelegram?: string;
+  contactPhone?: string;
+  contactWhatsapp?: string;
+};
+
+export async function getPublishedSupplierDetail(slug: string): Promise<SupplierDetail | null> {
   const supplier = await prisma.supplier.findFirst({
     where: { slug, status: ContentStatus.PUBLISHED },
     include: {
@@ -63,6 +69,9 @@ export async function getPublishedSupplierDetail(slug: string): Promise<PublicCo
     isVerified: supplier.isVerified,
     externalUrl,
     externalUrlLabel: externalUrl ? 'Сайт компании' : undefined,
+    contactTelegram: supplier.contactTelegram ?? undefined,
+    contactPhone: supplier.contactPhone ?? undefined,
+    contactWhatsapp: supplier.contactWhatsapp ?? undefined,
   };
 }
 

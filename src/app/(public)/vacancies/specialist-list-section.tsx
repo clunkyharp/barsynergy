@@ -112,7 +112,17 @@ export function SpecialistListSection({
                       Сбросить фильтры
                       <ArrowUpRight size={14} />
                     </Button>
-                  ) : null}
+                  ) : (
+                    <div className="flex flex-wrap items-center gap-3">
+                      <Button href="/specialists/svc/new" variant="primary">
+                        Опубликовать резюме
+                      </Button>
+                      <Button href="https://t.me/barsynergy" variant="link">
+                        Следить в Telegram
+                        <ArrowUpRight size={14} />
+                      </Button>
+                    </div>
+                  )}
                 </div>
               </Panel>
             ) : (

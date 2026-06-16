@@ -1,0 +1,4 @@
+interface:
+  display_name: "Project Code Map"
+  short_description: "Navigate repository code quickly"
+  default_prompt: "Use $project-code-map before changing this repository."

@@ -2,12 +2,14 @@
 
 import { redirect } from 'next/navigation';
 import { createHash, randomBytes } from 'node:crypto';
-import { UserStatus } from '@prisma/client';
 import { prisma } from '@/lib/db/prisma';
 import { getString } from '@/lib/admin/content-utils';
 import { AuthRateLimitError, assertAuthAttemptAllowed } from '@/lib/auth/auth-rate-limit';
+import { verifyUserEmailToken } from '@/lib/auth/email-verification';
 import { assertSameOriginServerAction } from '@/lib/security/server-action-origin';
 import { getEnv } from '@/lib/validation/env';
+
+type ResendVerificationResult = 'verification-resent' | 'invalid' | 'rate-limited' | 'failed';
 
 function authResultPath(path: string, result: { type: 'success' | 'error'; code: string }) {
   const url = new URL(path, 'http://localhost');
@@ -23,56 +25,21 @@ export async function verifyUserEmailAction(formData: FormData) {
   await assertSameOriginServerAction();
 
   const token = getString(formData, 'token');
+  const result = await verifyUserEmailToken(token);
 
-  if (!token) {
+  if (result === 'verified') {
+    redirectWithAuthResult('/auth/login', { type: 'success', code: 'verified' });
+  }
+
+  if (result === 'invalid') {
     redirectWithAuthResult('/auth/verify-email', { type: 'error', code: 'invalid' });
   }
 
-  try {
-    const tokenHash = createHash('sha256').update(token).digest('hex');
-
-    const result = await prisma.$queryRaw<{ id: string }[]>`
-      WITH deleted AS (
-        DELETE FROM "UserEmailVerificationToken"
-        WHERE "tokenHash" = ${tokenHash}
-          AND "expiresAt" > NOW()
-          AND "usedAt" IS NULL
-        RETURNING "userId"
-      ),
-      activated AS (
-        UPDATE "User"
-        SET "emailVerifiedAt" = NOW(), "status" = ${UserStatus.ACTIVE}, "updatedAt" = NOW()
-        FROM deleted
-        WHERE "User"."id" = deleted."userId"
-          AND "User"."status" = ${UserStatus.PENDING}
-        RETURNING "User"."id"
-      ),
-      cleaned AS (
-        DELETE FROM "UserEmailVerificationToken"
-        WHERE "userId" IN (SELECT "id" FROM activated)
-          AND "usedAt" IS NULL
-      )
-      SELECT "id" FROM activated
-    `;
-
-    if (!result || result.length === 0) {
-      redirectWithAuthResult('/auth/verify-email', { type: 'error', code: 'invalid' });
-    }
-
-    redirectWithAuthResult('/auth/login', { type: 'success', code: 'verified' });
-  } catch {
-    redirectWithAuthResult('/auth/verify-email', { type: 'error', code: 'failed' });
-  }
+  redirectWithAuthResult('/auth/verify-email', { type: 'error', code: 'failed' });
 }
 
-export async function resendUserVerificationAction(formData: FormData) {
-  await assertSameOriginServerAction();
-
-  const email = getString(formData, 'email').trim().toLowerCase();
-
-  if (!email) {
-    redirectWithAuthResult('/auth/verify-email', { type: 'error', code: 'invalid' });
-  }
+async function resendUserVerificationEmail(email: string): Promise<ResendVerificationResult> {
+  if (!email) return 'invalid';
 
   try {
     await assertAuthAttemptAllowed({ action: 'verify-email', email });
@@ -83,7 +50,7 @@ export async function resendUserVerificationAction(formData: FormData) {
     });
 
     if (!user || user.status !== 'PENDING') {
-      redirectWithAuthResult('/auth/verify-email', { type: 'success', code: 'verification-resent' });
+      return 'verification-resent';
     }
 
     const rawToken = randomBytes(32).toString('hex');
@@ -114,11 +81,24 @@ export async function resendUserVerificationAction(formData: FormData) {
     const { sendVerificationEmail } = await import('@/lib/notifications/auth-email');
     sendVerificationEmail({ to: email, verificationUrl }).catch(() => {});
 
-    redirectWithAuthResult('/auth/verify-email', { type: 'success', code: 'verification-resent' });
+    return 'verification-resent';
   } catch (error) {
     if (error instanceof AuthRateLimitError) {
-      redirectWithAuthResult('/auth/verify-email', { type: 'error', code: 'rate-limited' });
+      return 'rate-limited';
     }
-    redirectWithAuthResult('/auth/verify-email', { type: 'error', code: 'failed' });
+    return 'failed';
   }
+}
+
+export async function resendUserVerificationAction(formData: FormData) {
+  await assertSameOriginServerAction();
+
+  const email = getString(formData, 'email').trim().toLowerCase();
+  const result = await resendUserVerificationEmail(email);
+
+  if (result === 'verification-resent') {
+    redirectWithAuthResult('/auth/verify-email', { type: 'success', code: 'verification-resent' });
+  }
+
+  redirectWithAuthResult('/auth/verify-email', { type: 'error', code: result });
 }

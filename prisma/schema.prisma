@@ -632,9 +632,12 @@ model Supplier {
   companyName   String
   description   String
   websiteUrl    String?
-  contactLabel  String?
-  isVerified    Boolean       @default(false)
-  serviceArea   String?
+  contactLabel     String?
+  contactPhone     String?
+  contactTelegram  String?
+  contactWhatsapp  String?
+  isVerified       Boolean       @default(false)
+  serviceArea      String?
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
 

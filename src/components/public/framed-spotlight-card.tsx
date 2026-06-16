@@ -52,9 +52,9 @@ export function FramedSpotlightCard({
         {media}
       </div>
 
-      <div className="flex flex-col items-start gap-4 rounded-[20px] bg-[var(--spotlight-footer-bg)] p-5 text-[var(--spotlight-footer-text)]">
+      <div className="flex flex-col items-start gap-4 rounded-[20px] bg-[var(--editorial-dark-surface-muted)] p-5 text-[var(--editorial-dark-text)]">
         {eyebrow ? (
-            <span className="block text-[10px] font-semibold uppercase tracking-[var(--tracking-eyebrow-md)] text-[color-mix(in_srgb,var(--spotlight-footer-text)_60%,transparent)]">
+            <span className="block text-[10px] font-semibold uppercase tracking-[var(--tracking-eyebrow-md)] text-[color-mix(in_srgb,var(--editorial-dark-text)_50%,transparent)]">
             {eyebrow}
           </span>
         ) : null}

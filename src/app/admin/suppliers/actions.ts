@@ -37,6 +37,9 @@ const supplierFormSchema = z.object({
   companyName: z.string().trim().min(2).max(180),
   websiteUrl: z.string().trim().max(240).optional(),
   contactLabel: z.string().trim().max(160).optional(),
+  contactPhone: z.string().trim().max(60).optional(),
+  contactTelegram: z.string().trim().max(120).optional(),
+  contactWhatsapp: z.string().trim().max(60).optional(),
   isVerified: z.boolean().default(false),
   serviceArea: z.string().trim().max(180).optional()
 });
@@ -67,6 +70,9 @@ export async function createSupplier(formData: FormData) {
         categoryId: optionalString(getString(formData, 'categoryId')), cityId: optionalString(getString(formData, 'cityId')),
         companyName: getString(formData, 'companyName'), websiteUrl: optionalString(getString(formData, 'websiteUrl')),
         contactLabel: optionalString(getString(formData, 'contactLabel')),
+        contactPhone: optionalString(getString(formData, 'contactPhone')),
+        contactTelegram: optionalString(getString(formData, 'contactTelegram')),
+        contactWhatsapp: optionalString(getString(formData, 'contactWhatsapp')),
         isVerified: getString(formData, 'isVerified') === 'true', serviceArea: optionalString(getString(formData, 'serviceArea'))
       });
       const websiteUrl = normalizeExternalUrlInput(parsed.websiteUrl);
@@ -80,7 +86,7 @@ export async function createSupplier(formData: FormData) {
       const createdSupplier = await persistWithUniqueSlugRetry({
         baseSlug: slug, exists: async (candidate) => Boolean(await prisma.supplier.findFirst({ where: { slug: candidate }, select: { id: true } })),
         persist: (uniqueSlug) => prisma.supplier.create({
-          data: { title: parsed.companyName, slug: uniqueSlug, summary: parsed.summary, description: parsed.description, status: parsed.status, coverImageId, coverImageAlt: nullableString(parsed.coverImageAlt), categoryId: nullableString(parsed.categoryId), cityId: nullableString(parsed.cityId), companyName: parsed.companyName, websiteUrl: nullableString(websiteUrl), contactLabel: nullableString(parsed.contactLabel), isVerified: parsed.isVerified, serviceArea: nullableString(parsed.serviceArea), createdById: user.id, updatedById: user.id, ...initialPublicationDates(parsed.status) },
+          data: { title: parsed.companyName, slug: uniqueSlug, summary: parsed.summary, description: parsed.description, status: parsed.status, coverImageId, coverImageAlt: nullableString(parsed.coverImageAlt), categoryId: nullableString(parsed.categoryId), cityId: nullableString(parsed.cityId), companyName: parsed.companyName, websiteUrl: nullableString(websiteUrl), contactLabel: nullableString(parsed.contactLabel), contactPhone: nullableString(parsed.contactPhone), contactTelegram: nullableString(parsed.contactTelegram), contactWhatsapp: nullableString(parsed.contactWhatsapp), isVerified: parsed.isVerified, serviceArea: nullableString(parsed.serviceArea), createdById: user.id, updatedById: user.id, ...initialPublicationDates(parsed.status) },
           select: { slug: true, id: true, title: true }
         })
       });
@@ -117,6 +123,9 @@ export async function updateSupplier(formData: FormData) {
         categoryId: optionalString(getString(formData, 'categoryId')), cityId: optionalString(getString(formData, 'cityId')),
         companyName, websiteUrl: optionalString(getString(formData, 'websiteUrl')),
         contactLabel: optionalString(getString(formData, 'contactLabel')),
+        contactPhone: optionalString(getString(formData, 'contactPhone')),
+        contactTelegram: optionalString(getString(formData, 'contactTelegram')),
+        contactWhatsapp: optionalString(getString(formData, 'contactWhatsapp')),
         isVerified: getString(formData, 'isVerified') === 'true', serviceArea: optionalString(getString(formData, 'serviceArea'))
       });
       const websiteUrl = normalizeExternalUrlInput(parsed.websiteUrl);
@@ -133,7 +142,7 @@ export async function updateSupplier(formData: FormData) {
       const updatedSupplier = await persistWithUniqueSlugRetry({
         baseSlug: slug, exists: async (candidate) => Boolean(await prisma.supplier.findFirst({ where: { slug: candidate, id: { not: parsed.supplierId } }, select: { id: true } })),
         persist: (uniqueSlug) => prisma.supplier.update({
-          where: { id: parsed.supplierId }, data: { title: parsed.companyName, slug: uniqueSlug, summary: parsed.summary, description: parsed.description, status: parsed.status, coverImageId, coverImageAlt: nullableString(parsed.coverImageAlt), categoryId: nullableString(parsed.categoryId), cityId: nullableString(parsed.cityId), companyName: parsed.companyName, websiteUrl: nullableString(websiteUrl), contactLabel: nullableString(parsed.contactLabel), isVerified: parsed.isVerified, serviceArea: nullableString(parsed.serviceArea), updatedById: user.id, ...statusTransitionDates(parsed.status, existingSupplier.publishedAt) },
+          where: { id: parsed.supplierId }, data: { title: parsed.companyName, slug: uniqueSlug, summary: parsed.summary, description: parsed.description, status: parsed.status, coverImageId, coverImageAlt: nullableString(parsed.coverImageAlt), categoryId: nullableString(parsed.categoryId), cityId: nullableString(parsed.cityId), companyName: parsed.companyName, websiteUrl: nullableString(websiteUrl), contactLabel: nullableString(parsed.contactLabel), contactPhone: nullableString(parsed.contactPhone), contactTelegram: nullableString(parsed.contactTelegram), contactWhatsapp: nullableString(parsed.contactWhatsapp), isVerified: parsed.isVerified, serviceArea: nullableString(parsed.serviceArea), updatedById: user.id, ...statusTransitionDates(parsed.status, existingSupplier.publishedAt) },
           select: { slug: true }
         })
       });

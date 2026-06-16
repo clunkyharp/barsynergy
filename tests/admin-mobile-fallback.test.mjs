@@ -19,7 +19,8 @@ test('admin layout exposes a sub-desktop unsupported state and hides the work ar
   const shellFrameSource = readFileSync(adminShellFramePath, 'utf8');
 
   assert.match(shellFrameSource, /admin-layout-grid hidden min-h-screen lg:grid/);
-  assert.match(shellFrameSource, /useState\(\s*\(\) => typeof window !== 'undefined' && window\.localStorage\.getItem\(sidebarStorageKey\) === 'true'/);
+  assert.match(shellFrameSource, /useState\(false\)/);
+  assert.match(shellFrameSource, /useEffect\(\(\) => \{/);
   assert.match(shellFrameSource, /data-sidebar-state=\{isCollapsed \? 'collapsed' : 'expanded'\}/);
   assert.match(shellFrameSource, /<AdminHeader email=\{email\} logoutAction=\{logoutAction\} role=\{role\} \/>/);
 });
