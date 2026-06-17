@@ -100,8 +100,8 @@ export async function updateApplicationProcessing(formData: FormData) {
 }
 
 export async function deleteApplication(formData: FormData) {
-  const redirectTo = getApplicationActionRedirect(formData);
   let result: AdminApplicationActionResult;
+  let deleted = false;
 
   try {
     await assertSameOriginServerAction();
@@ -109,6 +109,7 @@ export async function deleteApplication(formData: FormData) {
     const applicationId = getString(formData, 'applicationId');
 
     await deleteApplicationById(applicationId);
+    deleted = true;
 
     revalidatePath(ADMIN_APPLICATIONS_PATH);
     result = { type: 'success', message: 'Заявка удалена.' };
@@ -116,5 +117,8 @@ export async function deleteApplication(formData: FormData) {
     result = getApplicationActionErrorResult(error);
   }
 
+  // After a successful delete the detail page no longer exists, so always
+  // return to the applications list. On error keep the user on the detail page.
+  const redirectTo = deleted ? ADMIN_APPLICATIONS_PATH : getApplicationActionRedirect(formData);
   redirectWithApplicationActionResult(redirectTo, result);
 }
