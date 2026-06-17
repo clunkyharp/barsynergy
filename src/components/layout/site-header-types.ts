@@ -11,7 +11,32 @@ export type SiteHeaderProps = {
   logoutAction?: () => Promise<void>;
 };
 
-export const guestNavItems = [
+export type NavItem = {
+  label: string;
+  href: string;
+};
+
+export type NavGroup = {
+  label: string;
+  items: NavItem[];
+};
+
+export const navGroups = [
+  {
+    label: 'Платформа',
+    hrefs: ['/education', '/events', '/vacancies', '/vacancies?view=specialists', '/masters', '/suppliers', '/articles', '/tools/cost-calculator']
+  },
+  {
+    label: 'Сотрудничество',
+    hrefs: ['/business', '/partners', '/general-sponsors', '/consulting']
+  },
+  {
+    label: 'О проекте',
+    hrefs: ['/about', '/contacts']
+  }
+] as const;
+
+export const guestNavItems: NavItem[] = [
   { label: 'О проекте', href: '/about' },
   { label: 'Обучение', href: '/education' },
   { label: 'События', href: '/events' },
@@ -27,16 +52,30 @@ export const guestNavItems = [
   { label: 'Спонсорство', href: '/general-sponsors' },
   { label: 'Контакты', href: '/contacts' },
   { label: 'Войти', href: '/auth/login' }
-] as const;
+];
 
 function getNavItems(hrefs: string[]) {
   return hrefs
     .map((href) => guestNavItems.find((item) => item.href === href))
-    .filter((item): item is (typeof guestNavItems)[number] => Boolean(item));
+    .filter((item): item is NavItem => Boolean(item));
 }
 
-export const desktopPrimaryNavItems = getNavItems(['/education', '/events', '/vacancies', '/suppliers', '/masters', '/about']);
-export const desktopMoreNavItems = getNavItems(['/articles', '/tools/cost-calculator', '/business', '/consulting', '/partners', '/general-sponsors', '/contacts']);
+export const desktopPrimaryNavItems = getNavItems(['/education', '/events', '/vacancies', '/suppliers', '/masters', '/articles']);
+
+export const desktopMoreGroups: NavGroup[] = [
+  {
+    label: 'Инструменты',
+    items: getNavItems(['/vacancies?view=specialists', '/tools/cost-calculator'])
+  },
+  {
+    label: 'Сотрудничество',
+    items: getNavItems(['/business', '/partners', '/general-sponsors', '/consulting'])
+  },
+  {
+    label: 'О проекте',
+    items: getNavItems(['/about', '/contacts'])
+  }
+];
 
 export function isWorkspacePath(pathname: string | null) {
   return Boolean(pathname?.startsWith('/admin') || pathname?.startsWith('/business/cabinet') || pathname?.startsWith('/auth'));

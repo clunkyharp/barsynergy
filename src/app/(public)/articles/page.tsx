@@ -32,6 +32,7 @@ export default async function ArticlesPage({ searchParams }: ArticlesPageProps) 
     <>
       <JsonLd data={buildStaticPageBreadcrumbJsonLd('/articles', 'Материалы')} />
       <PageHero
+        breadcrumbs={[{ href: '/', label: 'Главная' }, { label: 'Материалы' }]}
         title="Материалы"
         subtitle="Редакционные материалы, интервью, обзоры и практические разборы для кофейной индустрии."
         tone="graphite"

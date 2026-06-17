@@ -162,7 +162,7 @@ export function PageHero(props: PageHeroProps | PageHeroLegacyProps) {
   const isCompact = density === 'compact';
 
   const heroClasses = cn(
-    'relative isolate overflow-hidden border-b border-[var(--line)] pt-6 md:pt-8',
+    'relative isolate overflow-hidden border-b border-[var(--line)] pt-6 md:pt-8 max-sm:pt-14',
     isDark && 'bg-[var(--editorial-dark-surface)] text-[var(--editorial-dark-text)]',
     isGraphite && 'background-zone background-zone-graphite',
     !isDark && !isGraphite && 'background-zone background-zone-hero',

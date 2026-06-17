@@ -233,6 +233,13 @@ function normalizePublicActionLabel(label: string) {
   return replacements[trimmedLabel] ?? trimmedLabel;
 }
 
+function hasLikelyGarbageTitle(title: string): boolean {
+  const trimmed = title.trim();
+  if (trimmed.length < 5) return true;
+  if (trimmed.length > 15 && !trimmed.includes(' ')) return true;
+  return false;
+}
+
 function toHomepageCard(
   item: SharedListItem | undefined,
   kind: HomepageCardKind,
@@ -240,7 +247,7 @@ function toHomepageCard(
   actionLabel: string,
   eyebrow: string
 ): HomepageLiveCard {
-  if (!item) {
+  if (!item || hasLikelyGarbageTitle(item.title)) {
     return {
       kind,
       ...fallbackCards[kind]

@@ -55,6 +55,7 @@ export default async function MastersPage({ searchParams }: MastersPageProps) {
     <>
       <JsonLd data={buildStaticPageBreadcrumbJsonLd('/masters', 'Мастера')} />
       <PageHero
+        breadcrumbs={[{ href: '/', label: 'Главная' }, { label: 'Мастера' }]}
         title="Мастера"
         subtitle="Частные специалисты и сервисные команды для запуска, обучения, аудита и обслуживания оборудования."
         tone="graphite"

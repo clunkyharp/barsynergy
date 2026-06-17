@@ -38,6 +38,7 @@ function EducationHero() {
     <>
       <JsonLd data={buildStaticPageBreadcrumbJsonLd('/education', 'Обучение')} />
       <PageHero
+        breadcrumbs={[{ href: '/', label: 'Главная' }, { label: 'Обучение' }]}
         title="Обучение"
         subtitle="Курсы, мастер-классы и практические программы для специалистов кофейной индустрии."
         tone="graphite"
@@ -165,6 +166,7 @@ export default async function EducationPage({ searchParams }: EducationPageProps
             excludedItemIds={excludedIds}
             rowActionLabel="Записаться"
             sectionId="education-list"
+            subscribeTopic="COURSES"
             secondaryEmptyActions={[
               { href: '/contacts#contact-form', label: 'Написать' }
             ]}

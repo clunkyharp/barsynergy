@@ -10,6 +10,7 @@ import { DefaultListRow } from './published-content-row-default';
 import { DirectoryListRow } from './published-content-row-directory';
 import { OpportunityListRow } from './published-content-row-opportunity';
 import { CourseListRow } from './published-content-row-course';
+import { ContentSubscribeForm } from '@/components/public/content-subscribe-form';
 import {
   pageHref,
   buildEmptyActions,
@@ -52,6 +53,7 @@ type PublishedContentSectionProps = {
   sortLabel?: string;
   rowActionLabel?: string;
   showSidebarTitle?: boolean;
+  subscribeTopic?: string;
 };
 
 function PublishedContentSectionLayout({
@@ -73,6 +75,7 @@ function PublishedContentSectionLayout({
   listAction,
   sortLabel,
   showSidebarTitle = true,
+  subscribeTopic,
   renderRow,
   listClassName
 }: PublishedContentSectionProps & { renderRow: (item: PublishedContentList['items'][number]) => ReactNode; listClassName?: string }) {
@@ -120,8 +123,10 @@ function PublishedContentSectionLayout({
         </div>
       ) : null}
       <div className="public-catalog-layout container grid gap-6 md:gap-8 xl:grid-cols-[minmax(16rem,0.48fr)_minmax(0,1.52fr)] xl:items-start xl:gap-8">
-        <aside className="public-catalog-sidebar min-w-0">
-          {filters}
+        <aside className="public-catalog-sidebar min-w-0 xl:self-stretch">
+          <div className="xl:sticky xl:top-24 xl:max-h-[calc(100dvh-8rem)] xl:overflow-y-auto">
+            {filters}
+          </div>
         </aside>
 
         {content.items.length === 0 ? (
@@ -130,7 +135,11 @@ function PublishedContentSectionLayout({
             description={noResultsDescription}
             eyebrow={listLabel}
             title={noResultsTitle}
-          />
+          >
+            {subscribeTopic && !hasActiveFilters ? (
+              <ContentSubscribeForm topic={subscribeTopic} />
+            ) : null}
+          </PublicEmptyState>
         ) : visibleItems.length === 0 ? (
           <PublicEmptyState
             actions={secondaryEmptyActions}

@@ -8,6 +8,7 @@ import { AppLink } from '@/components/ui/app-link';
 import { focusFirstElement, trapFocusInContainer } from '@/components/ui/focus-trap';
 import { displayFont } from '@/lib/fonts';
 import { cn } from '@/lib/utils';
+import { navGroups } from '@/components/layout/site-header-types';
 
 type MobileSiteMenuProps = {
   isOpen: boolean;
@@ -27,21 +28,6 @@ type MobileSiteMenuProps = {
 
 const MENU_TOGGLE_SIZE_CLASS = 'h-11 w-11';
 const MOBILE_MENU_CONTENT_TOP_CLASS = 'pt-[72px] sm:pt-[76px]';
-
-const navGroups = [
-  {
-    label: 'Платформа',
-    hrefs: ['/events', '/education', '/vacancies', '/vacancies?view=specialists', '/masters', '/suppliers', '/articles', '/tools/cost-calculator', '/consulting']
-  },
-  {
-    label: 'Сотрудничество',
-    hrefs: ['/business', '/partners']
-  },
-  {
-    label: 'О проекте',
-    hrefs: ['/about', '/contacts']
-  }
-];
 
 function getGroupNavItems(navItems: MobileSiteMenuProps['navItems']) {
   return navGroups.map((group) => ({

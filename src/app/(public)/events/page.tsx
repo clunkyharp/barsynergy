@@ -6,6 +6,7 @@ import { PageInfoSection } from '@/components/public/page-info-section';
 import { PublicPrelaunchSection } from '@/components/public/public-prelaunch-section';
 import { EventsSearchBar } from '@/components/public/events-page-header';
 import { EventsHeroActions } from '@/app/(public)/events/events-hero-actions';
+import { ContentSubscribeForm } from '@/components/public/content-subscribe-form';
 import { JsonLd } from '@/components/seo/json-ld';
 import { stripPublicApplicationResultParams } from '@/lib/applications/public-form-helpers';
 import { getPublishedEvents, hasActivePublicContentParams, type PublicContentSearchParams } from '@/lib/public/content';
@@ -55,6 +56,7 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
       <JsonLd data={buildStaticPageBreadcrumbJsonLd('/events', 'События')} />
 
       <PageHero
+        breadcrumbs={[{ href: '/', label: 'Главная' }, { label: 'События' }]}
         title="События"
         subtitle="Каппинги, чемпионаты, лекции, мастер-классы и встречи кофейного сообщества."
         tone="graphite"
@@ -71,26 +73,34 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
       />
 
       {isPrelaunchEmpty ? (
-        <PublicPrelaunchSection
-          badges={['Афиша уже принимает заявки', 'Подходит для любых форматов']}
-          cards={[
-            {
-              title: 'Каппинги и дегустации',
-              description: 'Открытые дегустации кофе, чая, крепких напитков для профессиональной аудитории.'
-            },
-            {
-              title: 'Чемпионаты и конкурсы',
-              description: 'Соревнования для бариста, обжарщиков и специалистов индустрии.'
-            },
-            {
-              title: 'Лекции и мастер-классы',
-              description: 'Образовательные встречи, тренинги и практические занятия.'
-            }
-          ]}
-          description="Добавьте мероприятие, если оно открыто для профессионального сообщества и связано с барной или кофейной культурой."
-          eyebrow="Афиша"
-          title="Какие события можно добавить"
-        />
+        <>
+          <PublicPrelaunchSection
+            badges={['Афиша уже принимает заявки', 'Подходит для любых форматов']}
+            cards={[
+              {
+                title: 'Каппинги и дегустации',
+                description: 'Открытые дегустации кофе, чая, крепких напитков для профессиональной аудитории.'
+              },
+              {
+                title: 'Чемпионаты и конкурсы',
+                description: 'Соревнования для бариста, обжарщиков и специалистов индустрии.'
+              },
+              {
+                title: 'Лекции и мастер-классы',
+                description: 'Образовательные встречи, тренинги и практические занятия.'
+              }
+            ]}
+            description="Добавьте мероприятие, если оно открыто для профессионального сообщества и связано с барной или кофейной культурой."
+            eyebrow="Афиша"
+            title="Какие события можно добавить"
+          />
+          <section className="border-b border-[var(--line)] py-8 md:py-12">
+            <div className="container">
+              <h3 className="text-[1.05rem] font-semibold leading-tight text-[var(--text)] mb-3">Не пропустите события</h3>
+              <ContentSubscribeForm topic="EVENTS" label="Узнать о новых событиях" />
+            </div>
+          </section>
+        </>
       ) : (
         <Suspense
           fallback={

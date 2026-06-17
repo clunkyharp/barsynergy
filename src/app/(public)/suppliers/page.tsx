@@ -54,6 +54,7 @@ export default async function SuppliersPage({ searchParams }: SuppliersPageProps
     <>
       <JsonLd data={buildStaticPageBreadcrumbJsonLd('/suppliers', 'Поставщики')} />
       <PageHero
+        breadcrumbs={[{ href: '/', label: 'Главная' }, { label: 'Поставщики' }]}
         title="Поставщики"
         subtitle="Проверенные поставщики кофе, оборудования, упаковки и продуктов для вашего бизнеса."
         tone="graphite"

@@ -114,7 +114,7 @@ export async function createBusinessAccountRequestAction(formData: FormData) {
 
   const env = getEnv();
   if (!arePublicApplicationFormsEnabled(env)) {
-    await redirectWithAuthResult('/auth/register', { type: 'error', code: 'disabled' });
+    await redirectWithAuthResult('/auth/register/business', { type: 'error', code: 'disabled' });
   }
 
   const parsed = businessRequestSchema.safeParse({
@@ -130,7 +130,7 @@ export async function createBusinessAccountRequestAction(formData: FormData) {
   });
 
   if (!parsed.success) {
-    await redirectWithAuthResult('/auth/register', { type: 'error', code: 'invalid' });
+    await redirectWithAuthResult('/auth/register/business', { type: 'error', code: 'invalid' });
   }
 
   const businessRequest = parsed.data!;
@@ -173,7 +173,7 @@ export async function createBusinessAccountRequestAction(formData: FormData) {
       return application.id;
     });
 
-    const url = new URL('/auth/register', 'http://localhost');
+    const url = new URL('/auth/register/business', 'http://localhost');
     url.searchParams.set('success', 'business-request-created');
     if (applicationId) {
       url.searchParams.set('applicationId', applicationId);
@@ -181,12 +181,12 @@ export async function createBusinessAccountRequestAction(formData: FormData) {
     redirect(`${url.pathname}${url.search}`);
   } catch (error) {
     if (error instanceof AuthRateLimitError) {
-      await redirectWithAuthResult('/auth/register', { type: 'error', code: 'rate-limited' });
+      await redirectWithAuthResult('/auth/register/business', { type: 'error', code: 'rate-limited' });
     }
-    await redirectWithAuthResult('/auth/register', { type: 'error', code: resolveRegisterErrorCode(error) });
+    await redirectWithAuthResult('/auth/register/business', { type: 'error', code: resolveRegisterErrorCode(error) });
   }
 
-  await redirectWithAuthResult('/auth/register', { type: 'error', code: 'failed' });
+  await redirectWithAuthResult('/auth/register/business', { type: 'error', code: 'failed' });
 }
 
 export async function registerUserAction(

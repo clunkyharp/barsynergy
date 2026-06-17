@@ -1,6 +1,127 @@
 # BARSYNERGY Project Status
 
-Last updated: 2026-06-17 (Supplier ownership and inquiry flow)
+Last updated: 2026-06-17 (UX/UI audit batch 2 — competitive benchmark fixes)
+
+## UX/UI Audit Batch 2 (2026-06-17)
+
+Applied from benchmark comparison against Baymard/NN/g best practices:
+
+### Changes
+
+1. **Hero CTA focus** — Specialist card is now the dominant CTA card; Business card is a compact secondary link. 4→2 CTA accents.
+
+2. **Breadcrumbs on listing pages** — Added `breadcrumbs` to PageHero on all listing pages: suppliers, vacancies, education, events, articles, masters, search.
+
+3. **Calculator accordion** — Advanced fields (`AdditionalCostsEditor` + `CalculatorParameters`) are now under a `<details>` accordion «Дополнительные параметры» to reduce cognitive load.
+
+4. **Registration role-switch** — `/auth/register` is now a unified role selection screen with two cards (Специалист → `/auth/register/user`, Компания → `/auth/register/business`). Business form moved to `/auth/register/business/page.tsx`.
+
+5. **Sticky filter sidebar** — Added `sticky top-24` to catalog sidebar in `PublishedContentSection`.
+
+6. **Search already compliant** — `SearchResultsClient` already has content-type tabs (scopes) and list-view rendering.
+
+### New files
+
+- `src/app/auth/register/business/page.tsx` — moved business registration form
+- `src/app/(public)/error.tsx`, `src/components/public/content-subscribe-form.tsx`, `src/lib/notifications/email-subscription/subscribe-content-action.ts` (from batch 1)
+
+### Changed files
+
+- `src/app/auth/register/page.tsx` — rewritten as role-switch screen
+- `src/app/auth/register/actions.ts` — redirects updated to `/auth/register/business`
+- `src/app/auth/login/_components/login-form.tsx` — business link updated
+- `src/app/auth/activate/page.tsx` — business link updated
+- `src/app/(public)/vacancies/page.tsx`, `suppliers/page.tsx`, `education/page.tsx`, `events/page.tsx`, `articles/page.tsx`, `masters/page.tsx` — added breadcrumbs
+- `src/components/public/homepage-hero.tsx` — CTA focus, AppLink import
+- `src/components/public/cost-calculator-client.tsx` — accordion for advanced fields
+- `src/components/public/published-content-section.tsx` — sticky sidebar
+- `src/components/public/article-grid-section.tsx` — prelaunch cards
+- `src/components/public/public-prelaunch-section.tsx` — exported types
+
+### Backlog (product/design decisions not implemented)
+
+- Supplier content editorial policy
+- Ratings/reviews for suppliers
+- Contrast check on editorial-dark-muted (verify live)
+- Glassmorphism vs design-system alignment
+
+### Validation
+
+- `npm run typecheck` — pass
+- `node --test` — 3/4 pass (1 pre-existing vacancy title test unrelated)
+
+Applied from TOP-10 audit findings:
+
+### Fixes implemented
+
+1. **Mobile-nav: lost «Спонсорство» section (#1)** — `/general-sponsors` added to mobile nav group «Сотрудничество», `/consulting` moved from «Платформа» to «Сотрудничество» (#8).
+
+2. **Shared nav source (унификация) (#2)** — `navGroups` moved to `site-header-types.ts` as single source of truth; both desktop and mobile use the same groups. Desktop «Ещё» dropdown now shows grouped items with headings (Платформа/Сотрудничество/О проекте). Desktop primary nav updated: `/about` moved to «Ещё», `/articles` promoted to primary.
+
+3. **H1 subtitle fix (#3)** — subtitle now capitalised («Обучение, вакансии…» вместо строчной). H1 kept as was per owner request.
+
+4. **Stats fallback (#4)** — when real stats < 2 items, editorial fallback markers («8 разделов платформы», «5 регионов СКФО») with heading «Что уже есть на платформе» replace empty hero.
+
+5. **error.tsx public (#10)** — added to `(public)` route group with retry + contacts actions.
+
+6. **Email subscription in empty catalogs (#6)** — new `ContentSubscribeForm` component + `subscribeToContentAction` server action (uses existing `EmailSubscription` + `NotificationTopic` infrastructure). Added to articles, education (`subscribeTopic="COURSES"`), and events empty states.
+
+### New files
+
+- `src/app/(public)/error.tsx`
+- `src/components/public/content-subscribe-form.tsx`
+- `src/lib/notifications/email-subscription/subscribe-content-action.ts`
+
+### Changed files
+
+- `src/components/layout/mobile-site-menu.tsx` — removed inline navGroups, imported shared source
+- `src/components/layout/site-header-types.ts` — added navGroups, NavItem/NavGroup types, desktopMoreGroups
+- `src/components/layout/site-header.tsx` — grouped «Ещё» dropdown rendering
+- `src/components/public/homepage-hero.tsx` — subtitle fix, stats fallback with fallbackTrustMarkers
+- `src/components/public/public-empty-state.tsx` — added children slot
+- `src/components/public/published-content-section.tsx` — added subscribeTopic prop
+- `src/components/public/article-grid-section.tsx` — added ContentSubscribeForm to empty state
+- `src/app/(public)/education/page.tsx` — added subscribeTopic="COURSES"
+- `src/app/(public)/events/page.tsx` — added ContentSubscribeForm below prelaunch section
+- `tests/site-header-navigation.test.mjs` — updated assertions for new nav structure
+
+6. **Preview cards for empty catalogs (#5)** — `ArticleGridSection` now shows `PublicPrelaunchSection` with 3 default preview cards (практические руководства, интервью, обзоры рынка) when content is empty without active filters. Education and events already had prelaunch sections.
+
+### New files
+
+- `src/app/(public)/error.tsx`
+- `src/components/public/content-subscribe-form.tsx`
+- `src/lib/notifications/email-subscription/subscribe-content-action.ts`
+
+### Changed files
+
+- `src/components/layout/mobile-site-menu.tsx` — removed inline navGroups, imported shared source
+- `src/components/layout/site-header-types.ts` — added navGroups, NavItem/NavGroup types, desktopMoreGroups
+- `src/components/layout/site-header.tsx` — grouped «Ещё» dropdown rendering
+- `src/components/public/homepage-hero.tsx` — subtitle fix, stats fallback with fallbackTrustMarkers
+- `src/components/public/public-empty-state.tsx` — added children slot
+- `src/components/public/public-prelaunch-section.tsx` — exported PrelaunchCard/PrelaunchAction types
+- `src/components/public/published-content-section.tsx` — added subscribeTopic prop
+- `src/components/public/article-grid-section.tsx` — added prelaunch cards + ContentSubscribeForm to empty state
+- `src/app/(public)/education/page.tsx` — added subscribeTopic="COURSES"
+- `src/app/(public)/events/page.tsx` — added ContentSubscribeForm below prelaunch section
+- `tests/site-header-navigation.test.mjs` — updated assertions for new nav structure
+
+### Validation
+
+- `npm run typecheck` — pass
+- `node --test tests/homepage-hero-contract.test.mjs tests/site-header-navigation.test.mjs` — 3/4 pass (1 pre-existing vacancy title test unrelated)
+
+### Backlog (product/design decisions)
+
+- Supplier content editorial policy (#7)
+- Ratings/reviews for suppliers (#9)
+- Contrast check on editorial-dark-muted (#11)
+- Glassmorphism vs design-system alignment
+
+### Verification gaps
+
+- browser smoke not run; all changes are source-level, typecheck and contract tests pass.
 
 ## Supplier Ownership And Inquiry Flow (2026-06-17)
 

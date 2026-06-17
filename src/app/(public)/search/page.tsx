@@ -265,6 +265,31 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
                   Поиск смотрит по вакансиям, поставщикам, материалам, программам обучения и событиям.
                 </p>
               </div>
+              {suggestionChips.length > 0 ? (
+                <div className="flex flex-wrap justify-center gap-2">
+                  {suggestionChips.slice(0, 4).map((chip) => (
+                    <Link
+                      className="inline-flex min-h-9 items-center rounded-[var(--radius-pill)] border border-[var(--line)] bg-[var(--surface)] px-3.5 text-sm font-medium text-[var(--muted)] transition-colors hover:border-[var(--accent)] hover:text-[var(--accent)]"
+                      href={`/search?q=${encodeURIComponent(chip)}`}
+                      key={chip}
+                    >
+                      {chip}
+                    </Link>
+                  ))}
+                </div>
+              ) : (
+                <div className="flex flex-wrap justify-center gap-2">
+                  {['вакансии', 'поставщики', 'обучение', 'события'].map((chip) => (
+                    <Link
+                      className="inline-flex min-h-9 items-center rounded-[var(--radius-pill)] border border-[var(--line)] bg-[var(--surface)] px-3.5 text-sm font-medium text-[var(--muted)] transition-colors hover:border-[var(--accent)] hover:text-[var(--accent)]"
+                      href={`/search?q=${encodeURIComponent(chip)}`}
+                      key={chip}
+                    >
+                      {chip}
+                    </Link>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </section>

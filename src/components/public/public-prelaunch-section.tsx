@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { MetaChip } from '@/components/ui/meta-chip';
 import { displayFont } from '@/lib/fonts';
 
-type PrelaunchCard = {
+export type PrelaunchCard = {
   title: string;
   description: string;
   details?: {
@@ -16,7 +16,7 @@ type PrelaunchCard = {
   action?: PrelaunchAction;
 };
 
-type PrelaunchAction = {
+export type PrelaunchAction = {
   href: string;
   label: string;
   variant?: 'primary' | 'secondary' | 'ghost' | 'inverse';

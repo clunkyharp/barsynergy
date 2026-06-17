@@ -28,10 +28,13 @@ const audienceRoutes = [
     description: "Каталог заведений и рабочий кабинет для команды.",
     primaryLabel: "Открыть для бизнеса",
     primaryHref: "/business",
-    secondaryLabel: "Запросить бизнес-доступ",
-    secondaryHref: "/auth/register",
   },
 ] as const;
+
+const fallbackTrustMarkers = [
+  { value: '8', label: 'разделов платформы' },
+  { value: '5', label: 'регионов СКФО' },
+];
 
 function HomeStatsLine({ stats }: { stats: HomepageData["stats"] }) {
   const allItems = [
@@ -56,7 +59,25 @@ function HomeStatsLine({ stats }: { stats: HomepageData["stats"] }) {
   const statItems = allItems.filter((item) => item.value > 0);
 
   if (statItems.length < 2) {
-    return null;
+    return (
+      <div className="mt-10">
+        <p className="text-[10px] font-semibold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--editorial-dark-label)]">
+          Что уже есть на платформе
+        </p>
+        <dl className="mt-4 flex flex-wrap gap-x-8 gap-y-4 text-[12px] text-[rgba(255,253,249,0.66)] md:gap-x-12">
+          {fallbackTrustMarkers.map((item) => (
+            <div className="flex items-baseline gap-2.5" key={item.label}>
+              <dd className="order-1 text-[2.4rem] font-bold leading-none tabular-nums text-[var(--editorial-dark-text)] md:text-[3rem]">
+                {item.value}
+              </dd>
+              <dt className="order-2 uppercase tracking-[var(--tracking-eyebrow-sm)] text-[var(--editorial-dark-muted)]">
+                {item.label}
+              </dt>
+            </div>
+          ))}
+        </dl>
+      </div>
+    );
   }
 
   return (
@@ -79,41 +100,57 @@ function HomeStatsLine({ stats }: { stats: HomepageData["stats"] }) {
 }
 
 function HomeAudienceRoutes() {
+  const specialist = audienceRoutes[0];
+  const business = audienceRoutes[1];
+
   return (
     <div className="mt-8">
       <p className="text-[10px] font-semibold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--editorial-dark-label)]">
         Выберите свою роль
       </p>
       <div className="mt-4 grid gap-3 md:grid-cols-2">
-        {audienceRoutes.map((route) => (
-          <article
-            className="flex flex-col rounded-[var(--radius-lg)] border border-[var(--editorial-dark-border)] bg-[rgba(18,14,12,0.54)] p-4 backdrop-blur-[10px]"
-            key={route.title}
-          >
-            <h2 className="text-[1.05rem] font-semibold leading-tight text-[var(--editorial-dark-text)]">
-              {route.title}
-            </h2>
-            <p className="mt-2 text-sm leading-6 text-[var(--editorial-dark-muted)]">
-              {route.description}
-            </p>
-            <div className="mt-auto flex flex-col gap-2 pt-4 sm:flex-row sm:flex-wrap">
-              <Button
-                className="min-h-11 rounded-[var(--radius-sm)] px-5 text-[12px] uppercase tracking-[var(--tracking-eyebrow-sm)]"
-                href={route.primaryHref}
-              >
-                {route.primaryLabel}
-              </Button>
-              <Button
-                className="min-h-11 px-3 text-[12px] uppercase tracking-[var(--tracking-eyebrow-sm)]"
-                href={route.secondaryHref}
-                variant="on-dark"
-              >
-                {route.secondaryLabel}
-                <ArrowUpRight aria-hidden="true" size={15} strokeWidth={1.8} />
-              </Button>
-            </div>
-          </article>
-        ))}
+        <article className="flex flex-col rounded-[var(--radius-lg)] border border-[var(--editorial-dark-border)] bg-[rgba(18,14,12,0.54)] p-4 backdrop-blur-[10px]">
+          <h2 className="text-[1.05rem] font-semibold leading-tight text-[var(--editorial-dark-text)]">
+            {specialist.title}
+          </h2>
+          <p className="mt-2 text-sm leading-6 text-[var(--editorial-dark-muted)]">
+            {specialist.description}
+          </p>
+          <div className="mt-auto flex flex-col gap-2 pt-4 sm:flex-row sm:flex-wrap">
+            <Button
+              className="min-h-11 rounded-[var(--radius-sm)] px-5 text-[12px] uppercase tracking-[var(--tracking-eyebrow-sm)]"
+              href={specialist.primaryHref}
+            >
+              {specialist.primaryLabel}
+            </Button>
+            <Button
+              className="min-h-11 px-3 text-[12px] uppercase tracking-[var(--tracking-eyebrow-sm)]"
+              href={specialist.secondaryHref}
+              variant="on-dark"
+            >
+              {specialist.secondaryLabel}
+              <ArrowUpRight aria-hidden="true" size={15} strokeWidth={1.8} />
+            </Button>
+          </div>
+        </article>
+        <article className="flex flex-col rounded-[var(--radius-lg)] border border-[var(--editorial-dark-border)] bg-[rgba(18,14,12,0.7)] p-4">
+          <h2 className="text-[1.05rem] font-semibold leading-tight text-[var(--editorial-dark-text)]">
+            {business.title}
+          </h2>
+          <p className="mt-2 text-sm leading-6 text-[var(--editorial-dark-muted)]">
+            {business.description}
+          </p>
+          <div className="mt-auto flex flex-col gap-2 pt-4 sm:flex-row sm:flex-wrap">
+            <Button
+              className="min-h-11 rounded-[var(--radius-sm)] px-5 text-[12px] uppercase tracking-[var(--tracking-eyebrow-sm)]"
+              href={business.primaryHref}
+              variant="on-dark"
+            >
+              {business.primaryLabel}
+              <ArrowUpRight aria-hidden="true" size={15} strokeWidth={1.8} />
+            </Button>
+          </div>
+        </article>
       </div>
     </div>
   );
@@ -154,7 +191,7 @@ export function HomeHeroRouter({ stats }: { stats: HomepageData["stats"] }) {
             Платформа, которая объединяет людей индустрии кофе и бара
           </h1>
           <p className="mt-5 max-w-2xl text-[15px] leading-7 text-[var(--editorial-dark-muted)] md:text-base">
-            обучение, вакансии, поставщики, события и инструменты для бариста,
+            Обучение, вакансии, поставщики, события и инструменты для бариста,
             команд и заведений региона.
           </p>
           <HomeAudienceRoutes />

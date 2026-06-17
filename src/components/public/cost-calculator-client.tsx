@@ -1,7 +1,7 @@
 'use client';
 
 import { type ReactNode } from 'react';
-import { Link2, RotateCcw } from 'lucide-react';
+import { ChevronDown, Link2, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/toast';
 import { FormField } from '@/components/ui/form-field';
@@ -380,24 +380,32 @@ export function CostCalculatorClient() {
             rows={calc.rows}
           />
 
-          <SectionDivider />
+          <details className="group mt-8 rounded-[var(--radius-lg)] border border-[var(--border-default)]">
+            <summary className="flex cursor-pointer list-none items-center justify-between px-5 py-4 text-sm font-semibold text-[var(--text)] transition-colors hover:text-[var(--accent)] [&::-webkit-details-marker]:hidden">
+              Дополнительные параметры
+              <ChevronDown className="transition-transform duration-[var(--motion-duration-base)] group-open:rotate-180 motion-reduce:transition-none" size={16} strokeWidth={1.8} />
+            </summary>
+            <div className="px-5 pb-5">
+              <SectionDivider />
 
-          {/* Additional costs */}
-          <AdditionalCostsEditor
-            costs={calc.additionalCostRows}
-            onAdd={calc.addAdditionalCost}
-            onRemove={calc.removeAdditionalCost}
-            onUpdate={calc.updateAdditionalCost}
-            total={calc.additionalCostTotal}
-          />
+              {/* Additional costs */}
+              <AdditionalCostsEditor
+                costs={calc.additionalCostRows}
+                onAdd={calc.addAdditionalCost}
+                onRemove={calc.removeAdditionalCost}
+                onUpdate={calc.updateAdditionalCost}
+                total={calc.additionalCostTotal}
+              />
 
-          <SectionDivider />
+              <SectionDivider />
 
-          {/* Drink parameters */}
-          <CalculatorParameters
-            params={calc.drinkParams}
-            onParamChange={calc.updateDrinkParam}
-          />
+              {/* Drink parameters */}
+              <CalculatorParameters
+                params={calc.drinkParams}
+                onParamChange={calc.updateDrinkParam}
+              />
+            </div>
+          </details>
 
           <SectionDivider />
 

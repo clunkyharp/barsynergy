@@ -12,12 +12,17 @@ import { cn } from '@/lib/utils';
 import { ArticleCard, ArticleFeaturedCard, ArticleListItem } from './article-grid-card';
 import { CategoryPill } from './article-grid-category-pill';
 import { listingHref, pageHref } from './article-grid-utils';
+import { ContentSubscribeForm } from '@/components/public/content-subscribe-form';
+import { PublicPrelaunchSection, type PrelaunchCard, type PrelaunchAction } from '@/components/public/public-prelaunch-section';
 
 type ArticleGridSectionProps = {
   content: PublishedContentList;
   basePath: string;
   categories: PublicTaxonomyOption[];
   featuredItem?: PublishedContentItem;
+  prelaunchCards?: PrelaunchCard[];
+  prelaunchActions?: PrelaunchAction[];
+  prelaunchBadges?: string[];
 };
 
 const SUBMIT_TOPIC_HREF = '/contacts?topic=article-topic#contact-form';
@@ -31,7 +36,10 @@ export function ArticleGridSection({
   content,
   basePath,
   categories,
-  featuredItem
+  featuredItem,
+  prelaunchCards,
+  prelaunchActions,
+  prelaunchBadges
 }: ArticleGridSectionProps) {
   const [view, setView] = useState<'grid' | 'list'>('grid');
   const router = useRouter();
@@ -91,28 +99,52 @@ export function ArticleGridSection({
         </div>
 
         {content.items.length === 0 ? (
-          <Panel
-            className="public-missing-state mt-8 space-y-4 border-[var(--border-default)] bg-[var(--surface-wash)]"
-            padding="lg"
-          >
-            <h3 className="text-xl font-semibold leading-7">
-              {currentCategory || content.searchQuery
-                ? 'По этим параметрам материалов нет'
-                : 'Материалов пока нет'}
-            </h3>
-            <p className="max-w-2xl text-sm leading-6 text-[var(--muted)]">
-              {currentCategory || content.searchQuery
-                ? 'Сбросьте фильтры или попробуйте другой запрос.'
-                : 'Первые материалы появятся после публикации.'}
-            </p>
-            <Button
-              className="min-h-12 rounded-[var(--radius-md)] px-6"
-              href={SUBMIT_TOPIC_HREF}
-              variant="primary"
+          currentCategory || content.searchQuery ? (
+            <Panel
+              className="public-missing-state mt-8 space-y-4 border-[var(--border-default)] bg-[var(--surface-wash)]"
+              padding="lg"
             >
-              Предложить тему
-            </Button>
-          </Panel>
+              <h3 className="text-xl font-semibold leading-7">
+                По этим параметрам материалов нет
+              </h3>
+              <p className="max-w-2xl text-sm leading-6 text-[var(--muted)]">
+                Сбросьте фильтры или попробуйте другой запрос.
+              </p>
+              <Button
+                className="min-h-12 rounded-[var(--radius-md)] px-6"
+                href={SUBMIT_TOPIC_HREF}
+                variant="primary"
+              >
+                Предложить тему
+              </Button>
+            </Panel>
+          ) : (
+            <>
+              <PublicPrelaunchSection
+                badges={prelaunchBadges ?? ['Раздел уже принимает заявки', 'Подходит для любых тем']}
+                cards={prelaunchCards ?? [
+                  {
+                    title: 'Практические руководства',
+                    description: 'Разборы себестоимости, ROI оборудования, чек-листы запуска кофейни.'
+                  },
+                  {
+                    title: 'Интервью с экспертами',
+                    description: 'Опыт управляющих, бариста и поставщиков региона.'
+                  },
+                  {
+                    title: 'Обзоры рынка',
+                    description: 'Цены, поставщики, тренды и зарплаты в индустрии СКФО.'
+                  }
+                ]}
+                description="Добавьте материал, если он помогает специалистам или владельцам заведений развивать бизнес."
+                eyebrow="Материалы"
+                title="Какие материалы можно добавить"
+              />
+              <div className="container pb-8">
+                <ContentSubscribeForm topic="ARTICLES" />
+              </div>
+            </>
+          )
         ) : (
           <>
             {/* Featured hero card */}

@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { ArrowUpRight } from 'lucide-react';
 import { Button, type ButtonVariant } from '@/components/ui/button';
 import { Panel } from '@/components/ui/panel';
@@ -17,6 +18,7 @@ type PublicEmptyStateProps = {
   actions?: EmptyStateAction[];
   className?: string;
   compact?: boolean;
+  children?: ReactNode;
 };
 
 export function PublicEmptyState({
@@ -25,7 +27,8 @@ export function PublicEmptyState({
   description,
   actions = [],
   className,
-  compact = false
+  compact = false,
+  children
 }: PublicEmptyStateProps) {
   return (
     <Panel
@@ -61,6 +64,7 @@ export function PublicEmptyState({
           ))}
         </div>
       ) : null}
+      {children ? <div className="pt-2">{children}</div> : null}
     </Panel>
   );
 }

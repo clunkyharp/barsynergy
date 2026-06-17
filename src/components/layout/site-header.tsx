@@ -8,9 +8,10 @@ import { AccountMenu } from '@/components/layout/account-menu';
 import { MobileSiteMenu } from '@/components/layout/mobile-site-menu';
 import {
   type SiteHeaderProps,
+  type NavGroup,
   guestNavItems,
   desktopPrimaryNavItems,
-  desktopMoreNavItems,
+  desktopMoreGroups,
   isWorkspacePath,
   isActiveItem
 } from '@/components/layout/site-header-types';
@@ -25,7 +26,7 @@ export function SiteHeader({ user, logoutAction }: SiteHeaderProps) {
   const moreNavRef = useRef<HTMLDetailsElement>(null);
   const isFixedMobileHeader = isMobileMenuOpen;
   const focusClassName = 'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]';
-  const activeMoreItem = desktopMoreNavItems.find((item) => pathname && isActiveItem(pathname, item.href));
+  const activeMoreItem = desktopMoreGroups.flatMap((g) => g.items).find((item) => pathname && isActiveItem(pathname, item.href));
   const moreLabel = activeMoreItem?.label ?? 'Ещё';
   const isHomePath = pathname === '/';
   const isHomeTop = isHomePath && !hasScrolled && !isMobileMenuOpen;
@@ -75,9 +76,12 @@ export function SiteHeader({ user, logoutAction }: SiteHeaderProps) {
 
   const businessHref = user?.role === 'BUSINESS' ? '/business/cabinet' : '/business';
   const effectiveDesktopPrimaryNavItems = desktopPrimaryNavItems;
-  const effectiveDesktopMoreNavItems = desktopMoreNavItems.map((item) =>
-    item.href === '/business' ? { ...item, href: businessHref } : item
-  );
+  const effectiveDesktopMoreGroups: NavGroup[] = desktopMoreGroups.map((group) => ({
+    ...group,
+    items: group.items.map((item) =>
+      item.href === '/business' ? { ...item, href: businessHref } : item
+    )
+  }));
   const effectiveGuestNavItems = guestNavItems.map((item) =>
     item.href === '/business' ? { ...item, href: businessHref } : item
   );
@@ -150,7 +154,7 @@ export function SiteHeader({ user, logoutAction }: SiteHeaderProps) {
                 </AppLink>
               );
             })}
-            {desktopMoreNavItems.length > 0 ? (
+            {effectiveDesktopMoreGroups.some((g) => g.items.length > 0) ? (
               <details
                 className="group relative shrink-0"
                 ref={moreNavRef}
@@ -173,31 +177,42 @@ export function SiteHeader({ user, logoutAction }: SiteHeaderProps) {
                   aria-expanded={isMoreNavOpen}
                   className={cn(
                     'relative inline-flex min-h-11 shrink-0 cursor-pointer list-none items-center gap-1.5 whitespace-nowrap rounded-[var(--radius-sm)] px-1 opacity-85 transition-[color,opacity] duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] after:absolute after:inset-x-1 after:bottom-1 after:h-px after:origin-left after:scale-x-0 after:bg-[var(--accent)] after:transition-transform after:duration-[var(--motion-duration-base)] after:ease-[var(--motion-ease-move)] hover:opacity-100 hover:after:scale-x-100 group-open:after:scale-x-0 motion-reduce:transition-none motion-reduce:after:transition-none [&::-webkit-details-marker]:hidden 2xl:px-2 2xl:after:inset-x-1.5',
-                    desktopMoreNavItems.some((item) => pathname && isActiveItem(pathname, item.href)) && 'text-[var(--accent)] opacity-100 after:scale-x-100',
+                    effectiveDesktopMoreGroups.some((g) => g.items.some((item) => pathname && isActiveItem(pathname, item.href))) && 'text-[var(--accent)] opacity-100 after:scale-x-100',
                     focusClassName
                   )}
                 >
                   {moreLabel}
                   <ChevronDown aria-hidden="true" className="transition-transform duration-[var(--motion-duration-base)] ease-[var(--motion-ease-standard)] group-open:rotate-180 motion-reduce:transition-none" size={14} strokeWidth={1.8} />
                 </summary>
-                <div className="absolute right-0 top-[calc(100%+0.35rem)] z-20 grid min-w-[12rem] gap-1 rounded-[var(--radius-md)] border border-[var(--card-border)] bg-[var(--surface-elevated)] p-2 shadow-[var(--shadow-panel)]">
-                  {effectiveDesktopMoreNavItems.map((item) => {
-                    const isActive = pathname ? isActiveItem(pathname, item.href) : false;
+                <div className="absolute right-0 top-[calc(100%+0.35rem)] z-20 flex min-w-[14rem] flex-col gap-4 rounded-[var(--radius-md)] border border-[var(--card-border)] bg-[var(--surface-elevated)] p-3 shadow-[var(--shadow-panel)]">
+                  {effectiveDesktopMoreGroups.map((group) => (
+                    <div key={group.label}>
+                      {group.items.length > 0 ? (
+                        <>
+                          <p className="px-3 pb-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--muted)]">
+                            {group.label}
+                          </p>
+                          {group.items.map((item) => {
+                            const isActive = pathname ? isActiveItem(pathname, item.href) : false;
 
-                    return (
-                      <AppLink
-                        className={cn(
-                          'flex min-h-11 items-center rounded-[var(--radius-sm)] px-3 py-2 text-[13px] font-semibold text-[var(--text)] transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] hover:bg-[var(--surface-muted)] hover:text-[var(--accent-strong)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] motion-reduce:transition-none',
-                          isActive && 'bg-[var(--accent-soft)] text-[var(--accent-strong)]'
-                        )}
-                        href={item.href}
-                        key={item.href}
-                        aria-current={isActive ? 'page' : undefined}
-                      >
-                        {item.label}
-                      </AppLink>
-                    );
-                  })}
+                            return (
+                              <AppLink
+                                className={cn(
+                                  'flex min-h-11 items-center rounded-[var(--radius-sm)] px-3 py-2 text-[13px] font-semibold text-[var(--text)] transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] hover:bg-[var(--surface-muted)] hover:text-[var(--accent-strong)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] motion-reduce:transition-none',
+                                  isActive && 'bg-[var(--accent-soft)] text-[var(--accent-strong)]'
+                                )}
+                                href={item.href}
+                                key={item.href}
+                                aria-current={isActive ? 'page' : undefined}
+                              >
+                                {item.label}
+                              </AppLink>
+                            );
+                          })}
+                        </>
+                      ) : null}
+                    </div>
+                  ))}
                 </div>
               </details>
             ) : null}

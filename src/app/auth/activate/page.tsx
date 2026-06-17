@@ -114,7 +114,7 @@ export default async function ActivateBusinessAccessPage({ searchParams }: Activ
               <div className="space-y-4">
                 <InlineAlert tone="error">Ссылка активации недействительна или уже использована.</InlineAlert>
                 <div className="flex flex-wrap gap-3">
-                  <Button className="rounded-[var(--radius-md)]" href="/auth/register" size="lg">
+                  <Button className="rounded-[var(--radius-md)]" href="/auth/register/business" size="lg">
                     Запросить новую ссылку
                   </Button>
                   <Button className="rounded-[var(--radius-md)]" href="/auth/login" size="lg" variant="secondary">

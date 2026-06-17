@@ -102,6 +102,7 @@ export default async function VacanciesPage({ searchParams }: VacanciesPageProps
       <>
         <JsonLd data={buildStaticPageBreadcrumbJsonLd('/vacancies', 'Вакансии')} />
         <PageHero
+          breadcrumbs={[{ label: 'Вакансии' }]}
           title="Каталог"
           subtitle="Работа, специалисты и проекты для барной индустрии."
           tone="graphite"
@@ -136,6 +137,7 @@ export default async function VacanciesPage({ searchParams }: VacanciesPageProps
     <>
       <JsonLd data={buildStaticPageBreadcrumbJsonLd('/vacancies', 'Вакансии')} />
       <PageHero
+        breadcrumbs={[{ label: 'Вакансии' }]}
         title="Каталог"
         subtitle="Работа, специалисты и проекты для барной индустрии."
         tone="graphite"

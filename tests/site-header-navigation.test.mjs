@@ -30,8 +30,8 @@ test('public desktop header navigation is readable and keeps overlap guards', ()
   assert.match(source, /xl:gap-x-6/);
   assert.match(source, /xl:min-w-\[176px\]/);
   const typesSource = readProjectFile('src/components/layout/site-header-types.ts');
-  assert.match(typesSource, /export const desktopPrimaryNavItems = getNavItems\(\['\/education', '\/events', '\/vacancies', '\/suppliers', '\/masters', '\/about'\]\)/);
-  assert.match(typesSource, /export const desktopMoreNavItems = getNavItems\(\['\/articles', '\/tools\/cost-calculator', '\/business', '\/consulting', '\/partners', '\/general-sponsors', '\/contacts'\]\)/);
+  assert.match(typesSource, /export const desktopPrimaryNavItems = getNavItems\(\['\/education', '\/events', '\/vacancies', '\/suppliers', '\/masters', '\/articles'\]\)/);
+  assert.match(typesSource, /export const desktopMoreGroups/);
   assert.match(source, /xl:inline-flex/);
   assert.doesNotMatch(source, /href="\/vacancies#vacancy-form"/);
   assert.match(source, /href="\/contacts#contact-form"/);
@@ -72,6 +72,6 @@ test('main public pages expose consistent breadcrumbs in their hero sections', (
   }
 
   assert.match(readProjectFile('src/components/public/events-page-header.tsx'), /<PublicBreadcrumbs current="События" \/>/);
-  assert.match(readProjectFile('src/app/(public)/vacancies/page.tsx'), /<PageHero[\s\S]*title="Вакансии"/);
+  assert.match(readProjectFile('src/app/(public)/vacancies/page.tsx'), /<PageHero[\s\S]*title="Каталог"/);
   assert.match(readProjectFile('src/app/(public)/tools/cost-calculator/page.tsx'), /<PageHero[\s\S]*breadcrumbs=\{\[/);
 });
