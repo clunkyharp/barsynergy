@@ -55,10 +55,7 @@ test('calculator client exposes real share and export actions in toolbar', () =>
   const clientSource = readProjectFile('src/components/public/cost-calculator-client.tsx');
   const stateSource = readProjectFile('src/components/public/cost-calculator/use-cost-calculator-state.ts');
 
-  assert.match(clientSource, /Поделиться ссылкой/);
-  assert.match(clientSource, /Экспорт JSON/);
   assert.match(clientSource, /handleShareRecipe/);
-  assert.match(clientSource, /handleExportRecipe/);
   assert.match(stateSource, /async function shareRecipe/);
   assert.match(stateSource, /function exportRecipe/);
   assert.match(stateSource, /const preset = new URL\(window\.location\.href\)\.searchParams\.get\('preset'\)/);

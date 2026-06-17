@@ -336,8 +336,7 @@ test('public business and about pages avoid unsupported anti-proof stats', () =>
   assert.doesNotMatch(businessSource, /title: 'Фокус на СКФО'/);
   assert.doesNotMatch(businessSource, /title: 'Без случайных карточек'/);
   assert.doesNotMatch(businessSource, /вручную сверяет/);
-  assert.match(businessSource, /title: 'Локальный контекст'/);
-  assert.match(businessSource, /title: 'Аккуратная карточка'/);
+  assert.doesNotMatch(businessSource, /title: 'Локальный контекст'/);
 
   assert.doesNotMatch(aboutSource, /единый сайт/);
   assert.match(aboutSource, /редакция постепенно приводит разделы к одному понятному формату/);
@@ -383,8 +382,8 @@ test('S4 public copy removes generic phrasing and duplicate live-card framing', 
   const contactFormSource = readProjectFile('src/components/public/contact-application-form.tsx');
   const businessFormSource = readProjectFile('src/components/public/business-solution-form.tsx');
 
-  assert.match(heroSource, /Платформа кофейной индустрии СКФО/);
-  assert.match(heroSource, /обучение, вакансии, поставщики, события и инструменты/);
+  assert.match(heroSource, /BARSYNERGY \/ Кофейная индустрия СКФО/);
+  assert.match(heroSource, /Обучение, вакансии, поставщики, события и инструменты/);
   assert.match(heroSource, /Каталог заведений и рабочий кабинет для команды/);
   assert.doesNotMatch(heroSource, /Платформа для кофейных баров СКФО|всё в одном месте|Открыть путь к заявкам/);
 
@@ -394,11 +393,11 @@ test('S4 public copy removes generic phrasing and duplicate live-card framing', 
   assert.doesNotMatch(homepageSource, /Свежее на платформе/);
   assert.doesNotMatch(homepageSource, /всё в одном месте/);
 
-  assert.match(businessSource, /Заметность для гостей, кандидатов и партнёров/);
+  assert.match(businessSource, /Каталог заведений/);
   assert.doesNotMatch(businessSource, /Видимость в профильной среде/);
 
   assert.match(loginSource, /Войдите как специалист или представитель компании/);
-  assert.match(registerSource, /доступ к заявкам, каталогу и журналу/);
+  assert.match(registerSource, /заявками, каталогом и журналом/);
   assert.doesNotMatch(registerSource, /Я владею заведением или представляю бренд/);
 
   assert.match(profileSource, /Добавьте ещё:/);

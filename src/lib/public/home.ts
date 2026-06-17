@@ -85,6 +85,13 @@ export type HomepageCalculatorTeaserBlock = {
   actionHref: string;
 };
 
+export type HomepageTestimonial = {
+  quote: string;
+  author: string;
+  role: string;
+  city: string;
+};
+
 export type HomepageData = {
   hero: HomepageHeroBlock;
   audienceCards: HomepageAudienceCardBlock[];
@@ -96,6 +103,7 @@ export type HomepageData = {
   supplier: HomepageLiveCard;
   generalSponsors: GeneralSponsor[];
   socialBlocks: HomepageSocialBlock[];
+  testimonials: HomepageTestimonial[];
   ctaBlock?: HomepageCtaBlock;
   calculatorTeaser?: HomepageCalculatorTeaserBlock;
   partnerSignals: string[];
@@ -119,6 +127,30 @@ const fallbackHero: HomepageHeroBlock = {
 
 const HOMEPAGE_AUDIENCE_CARD_LIMIT = 3;
 const HOMEPAGE_SOCIAL_BLOCK_LIMIT = 3;
+
+const homepageTestimonials: HomepageTestimonial[] = [
+  {
+    quote:
+      'Нашли двух бариста через платформу за неделю — раньше на это уходил месяц объявлений. Отклики приходят от людей, которые реально в индустрии.',
+    author: 'Марьям А.',
+    role: 'Управляющая кофейней',
+    city: 'Махачкала'
+  },
+  {
+    quote:
+      'Каталог поставщиков закрыл вопрос с зерном и расходниками по региону. Контакты живые, отвечают быстро — это сильно экономит время на закупках.',
+    author: 'Тимур К.',
+    role: 'Совладелец бара',
+    city: 'Грозный'
+  },
+  {
+    quote:
+      'Прошла интенсив и попала в команду через вакансию здесь же. Удобно, что обучение, события и работа собраны в одном месте для СКФО.',
+    author: 'Алина С.',
+    role: 'Бариста',
+    city: 'Ставрополь'
+  }
+];
 
 const fallbackCards: Record<HomepageCardKind, Omit<HomepageLiveCard, 'kind'>> = {
   course: {
@@ -407,6 +439,7 @@ export async function getHomepageData(): Promise<HomepageData> {
       logoPath: block.logoPath ?? '/icon.svg',
       variant: normalizeSocialVariant(block.variant)
     })),
+    testimonials: homepageTestimonials,
     ctaBlock: ctaBlock
       ? {
           title: ctaBlock.title,

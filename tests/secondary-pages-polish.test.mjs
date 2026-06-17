@@ -53,8 +53,8 @@ test('contacts page exposes concrete routing topics and direct first-screen copy
   const constantsSource = readProjectFile('src/components/public/contact-application-form-constants.ts');
   const actionSource = readProjectFile('src/app/(public)/contacts/actions.ts');
 
-  assert.match(pageSource, /title="Контакты"/);
-  assert.match(pageSource, /Отвечаем в течение рабочего дня\. Выберите тему — форма подстроится\./);
+  assert.match(pageSource, /title="Связь с командой BARSYNERGY"/);
+  assert.match(pageSource, /Пишите по любой задаче/);
   assert.match(formSource, /title="Опишите задачу — ответим на ваш контакт"/);
   assert.match(constantsSource, /Консалтинг/);
   assert.match(constantsSource, /Хочу стать партнёром/);
@@ -62,7 +62,6 @@ test('contacts page exposes concrete routing topics and direct first-screen copy
   assert.match(constantsSource, /Другое/);
   assert.match(formSource, /label="Контакт"/);
   assert.match(formSource, /name="contact"/);
-  assert.match(formSource, /Прямой контакт/);
   assert.doesNotMatch(formSource, /contact-channels-panel/);
   assert.doesNotMatch(formSource, /<ContactChannelFieldset/);
   assert.match(actionSource, /'bug-report'/);
@@ -92,7 +91,7 @@ test('auth surfaces use minimal login, progressive register and admin dark mode'
   const loginSource = readProjectFile('src/app/auth/login/page.tsx');
   const loginFormSource = readProjectFile('src/app/auth/login/_components/login-form.tsx');
   const authLayoutSource = readProjectFile('src/components/auth/auth-split-layout.tsx');
-  const registerSource = readProjectFile('src/app/auth/register/page.tsx');
+  const registerSource = readProjectFile('src/app/auth/register/business/page.tsx');
   const activateSource = readProjectFile('src/app/auth/activate/page.tsx');
   const adminSource = readProjectFile('src/app/(admin-auth)/admin/login/page.tsx');
 

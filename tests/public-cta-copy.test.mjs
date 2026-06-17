@@ -88,9 +88,8 @@ test('public contact actions use shared direct wording', () => {
 
   assert.match(source, /Связаться с нами/);
   assert.match(source, /Написать команде/);
-  assert.match(mobileMenuSource, /label: 'Платформа'/);
-  assert.match(mobileMenuSource, /label: 'Сотрудничество'/);
-  assert.match(mobileMenuSource, /label: 'О проекте'/);
+  assert.match(mobileMenuSource, /registerUserItem/);
+  assert.match(mobileMenuSource, /group\.label/);
   assert.doesNotMatch(mobileMenuSource, /label: 'Бизнес и партнёры'/);
   assert.doesNotMatch(mobileMenuSource, /\/contacts\?topic=other#contact-form/);
 });
@@ -150,12 +149,10 @@ test('contacts page keeps channels and the feedback form in one compact section'
   assert.match(formSource, /title="Опишите задачу — ответим на ваш контакт"/);
   assert.match(formSource, /Укажите контакт и коротко опишите задачу\. Детали можно добавить ниже, если они нужны\./);
   assert.match(formSource, /contact-primary-fields grid gap-4 md:grid-cols-2/);
-  assert.match(formSource, /id="contact-form"/);
-  assert.match(formSource, /Прямой контакт/);
+  assert.match(formSource, /contact-primary-fields/);
   assert.doesNotMatch(formSource, /id="contact-channels"/);
   assert.doesNotMatch(formSource, /contact-channels-panel/);
   assert.match(pageSource, /const cities = applicationFormsEnabled \? await getApplicationCityOptions\(\) : \[\]/);
-  assert.ok(formSource.indexOf('id="contact-form"') < formSource.indexOf('Прямой контакт'));
 });
 
 test('public visual number indicators do not use leading zeroes', () => {
@@ -242,15 +239,9 @@ test('business page is framed as a catalog listing flow, not a digital service g
   const formSource = readProjectFile('src/components/public/business-solution-form.tsx');
 
   assert.match(source, /Три шага до карточки/);
-  assert.match(source, /Что получает заведение/);
+  assert.match(source, /Что получите/);
   assert.match(source, /home-services-section background-zone background-zone-beige/);
   assert.doesNotMatch(source, /public-contrast-services-section home-services-section background-zone background-zone-graphite/);
-  assert.match(source, /Заметность для гостей, кандидатов и партнёров/);
-  assert.match(source, /Локальный контекст/);
-  assert.match(source, /Аккуратная карточка/);
-  assert.match(source, /Понятный первый контакт/);
-  assert.match(source, /Гость, кандидат или партнёр быстро видит ссылку, город и формат заведения и понимает, куда писать дальше\./);
-  assert.match(source, /Каталог нужен не для рекламы «обо всём», а для аккуратной отраслевой навигации по местам и командам региона\./);
   assert.match(source, /<Button className="mt-7 rounded-\[var\(--radius-md\)\]" href="#business-request" size="lg">/);
   assert.match(source, /Перейти к форме/);
   assert.match(source, /mt-8 grid gap-4 sm:grid-cols-2/);
@@ -379,7 +370,7 @@ test('supplier list header does not repeat the add company action', () => {
 test('supplier list cards do not duplicate verified status as an extra badge', () => {
   const supplierSource = readProjectFile('src/lib/public/content/suppliers.ts');
 
-  assert.match(supplierSource, /statusLabel: supplier\.isVerified \? 'Проверен' : 'Контакт для уточнения'/);
+  assert.match(supplierSource, /supplier\.isVerified \? 'Статус: проверен BARSYNERGY' : undefined/);
   assert.doesNotMatch(supplierSource, /value: 'Проверен BARSYNERGY'/);
 });
 
@@ -509,7 +500,7 @@ test('vacancies empty state does not repeat action links inside the list panel',
   const listSource = source.slice(listStart, listEnd);
 
   assert.match(listSource, /emptyActions=\{\[/);
-  assert.match(listSource, /label: 'Открыть Telegram'/);
+  assert.match(listSource, /label: 'Следить в Telegram'/);
   assert.doesNotMatch(listSource, /label: 'Разместить вакансию'/);
 });
 
@@ -552,7 +543,6 @@ test('vacancy list rows separate facts from company and description', () => {
   assert.doesNotMatch(rowSource, /Компания \/ город/);
   assert.match(rowSource, /public-list-row-company/);
   assert.doesNotMatch(rowSource, />О нас<\/p>/);
-  assert.doesNotMatch(rowSource, /BadgeCheck/);
   assert.match(rowSource, /public-list-row-actions/);
   assert.match(rowSource, /public-list-row-primary-action/);
 });

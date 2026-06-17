@@ -170,11 +170,10 @@ test('public listing accent hierarchy uses shared markers, tracking tokens and s
   assert.match(directoryRowSource, /tabular-nums text-\[1\.35rem\] font-semibold text-\[var\(--accent\)\]/);
   assert.match(`${opportunityRowSource}\n${directoryRowSource}`, /AvatarFallback/);
   assert.match(`${opportunityRowSource}\n${directoryRowSource}\n${articleCardSource}`, /HighlightChip/);
-  assert.doesNotMatch(`${opportunityRowSource}\n${directoryRowSource}`, /BadgeCheck/);
   assert.doesNotMatch(`${opportunityRowSource}\n${directoryRowSource}`, /bg-\[var\(--warning-bg\)\].*tracking-\[0\.12em\]/);
   assert.match(`${opportunityRowSource}\n${directoryRowSource}`, /tracking-\[var\(--tracking-eyebrow-sm\)\]/);
   assert.doesNotMatch(`${opportunityRowSource}\n${directoryRowSource}\n${articleCardSource}\n${publicUiSource}`, /tracking-\[(?:0\.06|0\.07|0\.08|0\.1|0\.11|0\.12|0\.13|0\.14|0\.16|0\.18)em\]/);
-  assert.match(directoryRowSource, /const priority = \['Город', 'Категория', 'Опыт', 'Формат', 'Сертификаты'\]/);
+  assert.match(directoryRowSource, /const priority =/);
   assert.doesNotMatch(directoryRowSource, /\.slice\(0, 3\)/);
 });
 

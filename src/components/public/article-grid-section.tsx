@@ -13,7 +13,7 @@ import { ArticleCard, ArticleFeaturedCard, ArticleListItem } from './article-gri
 import { CategoryPill } from './article-grid-category-pill';
 import { listingHref, pageHref } from './article-grid-utils';
 import { ContentSubscribeForm } from '@/components/public/content-subscribe-form';
-import { PublicPrelaunchSection, type PrelaunchCard, type PrelaunchAction } from '@/components/public/public-prelaunch-section';
+import { PublicPrelaunchSection, type PrelaunchCard } from '@/components/public/public-prelaunch-section';
 
 type ArticleGridSectionProps = {
   content: PublishedContentList;
@@ -21,7 +21,6 @@ type ArticleGridSectionProps = {
   categories: PublicTaxonomyOption[];
   featuredItem?: PublishedContentItem;
   prelaunchCards?: PrelaunchCard[];
-  prelaunchActions?: PrelaunchAction[];
   prelaunchBadges?: string[];
 };
 
@@ -38,7 +37,6 @@ export function ArticleGridSection({
   categories,
   featuredItem,
   prelaunchCards,
-  prelaunchActions,
   prelaunchBadges
 }: ArticleGridSectionProps) {
   const [view, setView] = useState<'grid' | 'list'>('grid');

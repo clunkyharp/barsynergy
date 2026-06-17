@@ -47,16 +47,13 @@ test('homepage hero explains the product with one primary action and no search',
 
   assert.match(heroSource, /accentFont\.className/);
   assert.match(heroSource, /BARSYNERGY/);
-  assert.match(heroSource, /max-w-\[58rem\]/);
-  assert.match(heroSource, /leading-\[1\.20\]/);
-  assert.doesNotMatch(heroSource, /max-w-\[19ch\]/);
-  assert.doesNotMatch(heroSource, /leading-\[0\.98\]/);
-  assert.match(heroSource, /обучение, вакансии, поставщики, события и инструменты/);
-  assert.match(heroSource, /Платформа кофейной индустрии СКФО/);
-  assert.doesNotMatch(heroSource, /Платформа, которая объединяет/);
+  assert.match(heroSource, /max-w-\[96rem\]/);
+  assert.match(heroSource, /leading-\[0\.96\]/);
+  assert.match(heroSource, /Обучение, вакансии, поставщики, события и инструменты/);
+  assert.match(heroSource, /BARSYNERGY \/ Кофейная индустрия СКФО/);
   assert.match(heroSource, /Смотреть вакансии/);
   assert.match(heroSource, /Создать профиль/);
-  assert.match(heroSource, /Запросить бизнес-доступ/);
+  assert.match(heroSource, /Открыть для бизнеса/);
   assert.doesNotMatch(heroSource, /home-hero-search/);
   assert.doesNotMatch(heroSource, /action="\/search"/);
   assert.doesNotMatch(heroSource, /Глобальный поиск по платформе/);
@@ -100,7 +97,7 @@ test('public viewport reveal applies only to inner sections and staggered cards'
   assert.match(revealSource, /Math\.min\(index % 4, 3\) \* 100/);
   assert.match(css, /\[data-reveal-state="pending"\]/);
   assert.match(css, /transform: translateY\(20px\)/);
-  assert.match(css, /opacity 400ms ease/);
+  assert.match(css, /opacity var\(--motion-duration-panel\)/);
   assert.match(css, /prefers-reduced-motion: reduce/);
 });
 
@@ -122,7 +119,7 @@ test('homepage mobile rules keep the first screen and scannable cards phone-nati
   assert.match(menuSource, /fixed inset-0/);
   assert.match(menuSource, /text-\[24px\]/);
   assert.match(menuSource, /grid gap-6/);
-  assert.match(menuSource, /Сотрудничество/);
+  assert.match(menuSource, /group\.label/);
   assert.doesNotMatch(menuSource, /ThemeSegmentedToggle/);
   assert.match(menuSource, /Telegram/);
   assert.match(css, /@media \(max-width: 640px\)[\s\S]*line-height: 1\.65/);

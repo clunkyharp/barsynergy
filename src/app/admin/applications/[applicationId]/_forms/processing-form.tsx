@@ -198,7 +198,7 @@ export function ProcessingForm({ application, availableStatuses, canPublish, for
           <HiddenRedirect value={currentPath} />
           <input name="applicationId" type="hidden" value={application.id} />
           <ConfirmSubmitButton
-            className="border-[var(--danger-border)] bg-[var(--danger-bg)] text-[var(--danger-text)] hover:bg-[var(--danger)] hover:text-white"
+            className="border-[var(--danger-border)] text-[var(--danger-text)] hover:bg-[var(--danger)] hover:text-white"
             confirmActionLabel="Удалить"
             confirmText="Заявка, сообщения и уведомления будут удалены безвозвратно."
             confirmTitle="Удалить заявку?"

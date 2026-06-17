@@ -1,5 +1,6 @@
 'use server';
 
+import type { NotificationTopic } from '@prisma/client';
 import { getString } from '@/lib/admin/content-utils';
 import { getCurrentUser } from '@/lib/auth/current-user';
 import { assertSameOriginServerAction } from '@/lib/security/server-action-origin';
@@ -33,7 +34,7 @@ export async function subscribeToContentAction(
   try {
     await createOrRefreshEmailSubscription({
       email: resolvedEmail,
-      topics: [topic as any],
+      topics: [topic as NotificationTopic],
       userId: currentUser?.id
     });
 

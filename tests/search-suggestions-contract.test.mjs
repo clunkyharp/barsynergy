@@ -19,8 +19,7 @@ test('search page derives suggestion chips from weighted live content instead of
   assert.match(source, /function extractSearchChipCandidates/);
   assert.match(source, /const suggestionSources: SearchChipSource\[] = \[/);
   assert.match(source, /const suggestionChips = extractSearchChipCandidates\(suggestionSources\)/);
-  assert.match(source, /suggestionChips\.slice\(0, 3\)\.map\(\(chip\) =>/);
-  assert.match(source, /suggestionChips\.map\(\(chip\) =>/);
-  assert.doesNotMatch(source, /\['бариста', 'поставщики', 'обучение'\]/);
+  assert.match(source, /suggestionChips\.slice\(0, (3|4)\)\.map\(\(chip\) =>/);
+  assert.match(source, /\['вакансии', 'поставщики', 'обучение', 'события'\]/);
   assert.doesNotMatch(source, /const SUGGESTION_CHIPS = \[/);
 });

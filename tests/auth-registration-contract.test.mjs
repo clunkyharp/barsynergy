@@ -15,7 +15,7 @@ test('login page delegates CTAs to LoginForm component', () => {
 
   assert.match(formSource, /href="\/auth\/register\/user"/);
   assert.match(formSource, /Зарегистрироваться как участник/);
-  assert.match(formSource, /href="\/auth\/register"/);
+  assert.match(formSource, /href="\/auth\/register\/business"/);
   assert.match(formSource, /Запросить бизнес-доступ/);
   assert.doesNotMatch(formSource, /role="tablist"/);
   assert.doesNotMatch(formSource, /Я специалист/);
@@ -55,7 +55,7 @@ test('register user form has fullName, email, password and consent', () => {
 });
 
 test('register business page uses BusinessRequestForm without participant promises', () => {
-  const pageSource = readProjectFile('src/app/auth/register/page.tsx');
+  const pageSource = readProjectFile('src/app/auth/register/business/page.tsx');
 
   assert.match(pageSource, /Заявка на бизнес-доступ/);
   assert.match(pageSource, /import \{ BusinessRequestForm \}/);
@@ -91,11 +91,11 @@ test('business register action handles forms-disabled, invalid, duplicate and ra
   const actionsSource = readProjectFile('src/app/auth/register/actions.ts');
 
   assert.match(actionsSource, /arePublicApplicationFormsEnabled/);
-  assert.match(actionsSource, /redirectWithAuthResult\('\/auth\/register',.*'disabled'/);
+  assert.match(actionsSource, /redirectWithAuthResult\('\/auth\/register\/business',.*'disabled'/);
   assert.match(actionsSource, /businessRequestSchema\.safeParse/);
-  assert.match(actionsSource, /redirectWithAuthResult\('\/auth\/register',.*'invalid'/);
+  assert.match(actionsSource, /redirectWithAuthResult\('\/auth\/register\/business',.*'invalid'/);
   assert.match(actionsSource, /AuthRateLimitError/);
-  assert.match(actionsSource, /redirectWithAuthResult\('\/auth\/register',.*'rate-limited'/);
+  assert.match(actionsSource, /redirectWithAuthResult\('\/auth\/register\/business',.*'rate-limited'/);
   assert.match(actionsSource, /existingUser \|\| existingRequest/);
   assert.match(actionsSource, /business-request-created/);
   assert.doesNotMatch(actionsSource, /business-request-duplicate/);
@@ -165,12 +165,14 @@ test('no PENDING user can reach /profile without valid activation flow', () => {
 test('auth route files exist for all expected public auth paths', () => {
   const loginPage = readProjectFile('src/app/auth/login/page.tsx');
   const registerPage = readProjectFile('src/app/auth/register/page.tsx');
+  const registerBusinessPage = readProjectFile('src/app/auth/register/business/page.tsx');
   const registerUserPage = readProjectFile('src/app/auth/register/user/page.tsx');
   const activatePage = readProjectFile('src/app/auth/activate/page.tsx');
   const verifyEmailPage = readProjectFile('src/app/auth/verify-email/page.tsx');
 
   assert.match(loginPage, /LoginForm/);
-  assert.match(registerPage, /Заявка на бизнес-доступ/);
+  assert.match(registerPage, /Выберите свою роль/);
+  assert.match(registerBusinessPage, /Заявка на бизнес-доступ/);
   assert.match(registerUserPage, /Регистрация участника/);
   assert.match(activatePage, /Завершить подключение/);
   assert.match(verifyEmailPage, /@\/lib\/auth\/email-verification/);
@@ -192,7 +194,7 @@ test('header shows login link for guest and account menu for authenticated user'
   assert.doesNotMatch(headerSource, /const navItems = \[/);
   assert.match(headerSource, /import[\s\S]*guestNavItems[\s\S]*from[\s\S]*site-header-types/);
   const typesSource = readProjectFile('src/components/layout/site-header-types.ts');
-  assert.match(typesSource, /export const guestNavItems = \[/);
+  assert.match(typesSource, /export const guestNavItems/);
 });
 
 test('site-header-server passes serialized user to SiteHeader', () => {

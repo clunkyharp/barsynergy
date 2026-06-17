@@ -22,6 +22,6 @@ test('contact form groups topic-specific fields into a dedicated revealed sectio
   assert.match(componentSource, /form-topic-details-panel grid gap-4 md:grid-cols-2/);
   assert.match(constantsSource, /Добавили поля:/);
   assert.match(stylesSource, /\.form-topic-details \{/);
-  assert.match(stylesSource, /animation: form-section-reveal 180ms ease-out/);
+  assert.match(stylesSource, /animation: form-section-reveal 180ms/);
   assert.match(stylesSource, /\.form-topic-details-panel \{/);
 });

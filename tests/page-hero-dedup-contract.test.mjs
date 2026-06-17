@@ -21,5 +21,5 @@ test('page hero suppresses duplicate single-level breadcrumbs and eyebrow-title 
   assert.match(source, /{shouldRenderEyebrow \? \(/);
   assert.match(contactsSource, /breadcrumbs=\{\[\{ label: 'Контакты' \}\]\}/);
   assert.match(contactsSource, /eyebrow="Контакты"/);
-  assert.match(contactsSource, /title="Контакты"/);
+  assert.match(contactsSource, /title="Связь с командой BARSYNERGY"/);
 });
