@@ -246,11 +246,14 @@ export default async function GeneralSponsorsPage() {
                 className={cn(
                   'flex flex-col rounded-[var(--radius-lg)] border p-6 md:p-7',
                   pkg.recommended
-                    ? 'relative border-[var(--accent)]/40 bg-gradient-to-b from-[var(--accent)]/[0.05] to-transparent shadow-[0_0_12px_-8px_var(--accent)]'
-                    : 'border-[var(--border-default)] bg-[var(--surface-card)]'
+                    ? 'relative border-[var(--accent)]/50 bg-gradient-to-b from-[var(--accent)]/[0.08] via-[var(--accent)]/[0.02] to-transparent shadow-[0_0_24px_-6px_var(--accent)]'
+                    : 'border-[var(--border-default)] bg-[var(--surface-card)] shadow-[var(--shadow-card)] hover:border-[var(--accent)]/20 hover:shadow-[var(--shadow-panel)] transition-[border-color,box-shadow] duration-[var(--motion-duration-base)]'
                 )}
                 key={index}
               >
+                {pkg.recommended ? (
+                  <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1 rounded-t-[var(--radius-lg)] bg-[var(--accent)]" />
+                ) : null}
                 <span
                   className={cn(
                     'mb-4 inline-flex w-fit items-center rounded-full border px-3 py-0.5 text-[11px] font-semibold uppercase tracking-[0.1em]',
@@ -286,7 +289,7 @@ export default async function GeneralSponsorsPage() {
                     {pkg.placements.map((item) => (
                       <li className="flex items-center gap-2.5 text-sm leading-[1.5] text-[var(--text)]" key={item}>
                         <Check
-                          className="shrink-0 text-[var(--text)]"
+                          className={cn('shrink-0', pkg.recommended ? 'text-[var(--accent)]' : 'text-[var(--text)]')}
                           size={14}
                           strokeWidth={2.5}
                         />
@@ -307,8 +310,9 @@ export default async function GeneralSponsorsPage() {
                     </Button>
                   ) : (
                     <Button
-                      className="w-full rounded-[var(--radius-md)] !border-[var(--text)] !bg-[var(--text)] !text-[var(--background)] hover:opacity-80"
+                      className="w-full rounded-[var(--radius-md)] border-[var(--border-strong)] bg-transparent text-[var(--text)] hover:border-[var(--accent)]/30 hover:bg-[var(--surface-wash)]"
                       href={`/contacts?topic=sponsorship&partnerType=${encodeURIComponent(pkg.packageName)}#contact-form`}
+                      variant="secondary"
                     >
                       Запросить условия
                     </Button>

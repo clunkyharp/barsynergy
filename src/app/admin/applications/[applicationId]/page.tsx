@@ -17,7 +17,6 @@ import { getConversationThread } from '@/lib/messaging/get-conversation';
 import { getApplicationById } from '@/lib/admin/admin-queries';
 import { ApplicationInfo } from './_components/application-info';
 import { BusinessAccessForm } from './_forms/business-access-form';
-import { MasterPublicationForm, PartnerPublicationForm, SupplierPublicationForm, VacancyPublicationForm } from './_forms/publication-form';
 import { ProcessingForm } from './_forms/processing-form';
 
 export const dynamic = 'force-dynamic';
@@ -55,7 +54,7 @@ export default async function AdminApplicationDetailPage({ params, searchParams 
 
   const messages = await getConversationThread(applicationId);
   const interlocutorName = application.name ?? application.businessAccount?.companyName ?? 'Заявитель';
-  const contextLabel = application.vacancy?.title ?? application.supplier?.title ?? application.master?.title ?? application.type;
+  const contextLabel = application.vacancy?.title ?? application.supplier?.title ?? application.master?.title ?? applicationTypeLabels[application.type];
 
   const forwardedInfo = application.status === ApplicationStatus.FORWARDED_TO_EMPLOYER
     ? [application.forwardedAt ? dateTimeFormatter.format(application.forwardedAt) : null, application.forwardedBy?.email].filter(Boolean).join(' / ')
@@ -94,23 +93,7 @@ export default async function AdminApplicationDetailPage({ params, searchParams 
         <div className="space-y-6">
           <AdminActionAlert params={query} />
 
-          <ProcessingForm application={application} availableStatuses={availableStatuses} forwardedInfo={forwardedInfo} currentPath={currentPath} />
-
-          {application.type === ApplicationType.VACANCY_SUBMISSION ? (
-            <VacancyPublicationForm application={application} canPublish={canPublish} currentPath={currentPath} />
-          ) : null}
-
-          {application.type === ApplicationType.SUPPLIER_SUBMISSION ? (
-            <SupplierPublicationForm application={application} canPublish={canPublish} currentPath={currentPath} />
-          ) : null}
-
-          {application.type === ApplicationType.PARTNER_APPLICATION ? (
-            <PartnerPublicationForm application={application} canPublish={canPublish} currentPath={currentPath} />
-          ) : null}
-
-          {application.type === ApplicationType.MASTER_SUBMISSION ? (
-            <MasterPublicationForm application={application} canPublish={canPublish} currentPath={currentPath} />
-          ) : null}
+          <ProcessingForm application={application} availableStatuses={availableStatuses} canPublish={canPublish} forwardedInfo={forwardedInfo} currentPath={currentPath} />
 
           {application.type === ApplicationType.BUSINESS_ACCOUNT_REQUEST ? (
             <BusinessAccessForm application={application} canPrepareInvite={canPrepareBusinessAccessInvite} isAccessActive={isBusinessAccessActive} activationPreview={activationPreview} currentPath={currentPath} />

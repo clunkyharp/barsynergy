@@ -6,6 +6,7 @@ import { buildApplicationPayload } from '@/lib/applications/application-payloads
 import {
   assertActiveCity,
   baseContactSchema,
+  formatPublicApplicationActionError,
   getString,
   nullableString,
   optionalString,
@@ -13,6 +14,14 @@ import {
   type PublicApplicationResult,
   utmSchema
 } from '@/lib/applications/public-form-helpers';
+import { createPublicApplication } from '@/lib/applications/create-public-application';
+import {
+  assertPublicApplicationFormsEnabled,
+  assertPublicApplicationSubmissionAllowed,
+  hasHoneypotValue
+} from '@/lib/applications/public-submission-guards';
+import { assertSameOriginServerAction } from '@/lib/security/server-action-origin';
+import { assertTurnstilePassed } from '@/lib/security/turnstile';
 import { submitPublicApplicationAction } from '@/lib/applications/submit-public-application-action';
 import { getPublishedMasterInquiryTarget } from '@/lib/public/content';
 
@@ -174,4 +183,77 @@ export async function submitMasterSubmission(
       })
     })
   });
+}
+
+type MasterLeadActionResult = PublicApplicationResult | null;
+
+const masterLeadSchema = z.object({
+  entityType: z.string().trim().min(1),
+  title: z.string().trim().min(2).max(180),
+  specializations: z.string().trim().min(2).max(300),
+  city: z.string().trim().max(120).optional(),
+  contact: z.string().trim().min(2).max(200),
+  comment: z.string().trim().max(4000).optional(),
+  consent: z.literal('accepted')
+});
+
+export async function submitMasterLead(
+  _prevState: MasterLeadActionResult,
+  formData: FormData
+): Promise<MasterLeadActionResult> {
+  try {
+    await assertSameOriginServerAction();
+    assertPublicApplicationFormsEnabled();
+
+    if (hasHoneypotValue(getString(formData, 'website'))) {
+      return { type: 'success', message: 'Заявка мастера отправлена. Команда BARSYNERGY свяжется с вами.' };
+    }
+
+    const turnstileToken = getString(formData, 'turnstileToken');
+    if (turnstileToken) {
+      await assertTurnstilePassed(turnstileToken);
+    }
+    await assertPublicApplicationSubmissionAllowed(ApplicationType.MASTER_SUBMISSION);
+
+    const parsed = masterLeadSchema.parse({
+      entityType: getString(formData, 'entityType'),
+      title: getString(formData, 'title'),
+      specializations: getString(formData, 'specializations'),
+      city: optionalString(getString(formData, 'city')),
+      contact: getString(formData, 'contact'),
+      comment: optionalString(getString(formData, 'comment')),
+      consent: getString(formData, 'consent')
+    });
+
+    const cityPart = parsed.city ? ` (${parsed.city})` : '';
+    const subject = `Мастер: ${parsed.title}${cityPart}`;
+    const message = [
+      `Тип: ${parsed.entityType}`,
+      `Профиль: ${parsed.title}`,
+      `Специализации: ${parsed.specializations}`,
+      parsed.city ? `Город: ${parsed.city}` : null,
+      `Контакт: ${parsed.contact}`,
+      parsed.comment ? `О себе: ${parsed.comment}` : null
+    ]
+      .filter(Boolean)
+      .join('\n');
+
+    await createPublicApplication({
+      type: ApplicationType.MASTER_SUBMISSION,
+      subject,
+      message,
+      name: parsed.title,
+      consentText: PERSONAL_DATA_CONSENT_TEXT
+    });
+
+    return {
+      type: 'success',
+      message: 'Заявка мастера отправлена. Команда BARSYNERGY свяжется с вами.'
+    };
+  } catch (error) {
+    if (error instanceof Error) {
+      return { type: 'error', message: formatPublicApplicationActionError(error) };
+    }
+    return { type: 'error', message: 'Не удалось отправить заявку. Попробуйте ещё раз.' };
+  }
 }

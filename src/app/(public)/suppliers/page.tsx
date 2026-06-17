@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { CategoryType } from '@/modules/content/shared/types';
 import { PageHero } from '@/components/public/page-hero';
+import { PageInfoSection } from '@/components/public/page-info-section';
 import { PublishedContentSectionDirectory } from '@/components/public/published-content-section';
 import { PublicFilters } from '@/components/public/public-filters';
 import { PublicPrelaunchSection } from '@/components/public/public-prelaunch-section';
@@ -128,22 +129,26 @@ export default async function SuppliersPage({ searchParams }: SuppliersPageProps
           title="Каталог"
         />
       )}
-      <section className="background-zone background-zone-graphite border-b border-[var(--line)] py-10 md:py-14">
-        <div className="container prose prose-invert max-w-3xl">
-          <h2>Поставщики кофе и расходников для кофеен СКФО</h2>
-          <p>
-            Каталог BARSYNERGY объединяет проверенных поставщиков кофе, какао, сиропов, молочной продукции, упаковки, оборудования и сервисных услуг
-            для кофеен, баров и ресторанов Махачкалы, Дагестана и Северо-Кавказского региона.
-          </p>
-          <p>
-            Каждая компания в каталоге содержит описание направлений, города работы и контакты для прямой связи. Вы можете найти
-            поставщика по категории, городу или ключевому слову.
-          </p>
-          <p>
-            Если ваша компания поставляет продукты, оборудование или сервис для заведений — добавьте профиль в каталог бесплатно.
-          </p>
-        </div>
-      </section>
+      <PageInfoSection
+        eyebrow="Платформа"
+        title="Поставщики кофе и расходников для кофеен СКФО"
+        sidebarLinks={[
+          { href: 'https://t.me/barsynergy', label: 'Telegram-канал' },
+          { href: '/suppliers', label: 'Каталог поставщиков' },
+        ]}
+      >
+        <p>
+          Каталог BARSYNERGY объединяет проверенных поставщиков кофе, какао, сиропов, молочной продукции, упаковки, оборудования и сервисных услуг
+          для кофеен, баров и ресторанов Махачкалы, Дагестана и Северо-Кавказского региона.
+        </p>
+        <p>
+          Каждая компания в каталоге содержит описание направлений, города работы и контакты для прямой связи. Вы можете найти
+          поставщика по категории, городу или ключевому слову.
+        </p>
+        <p>
+          Если ваша компания поставляет продукты, оборудование или сервис для заведений — добавьте профиль в каталог бесплатно.
+        </p>
+      </PageInfoSection>
     </>
   );
 }

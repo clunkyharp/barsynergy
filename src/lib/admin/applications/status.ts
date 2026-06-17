@@ -111,3 +111,12 @@ export async function updateApplicationProcessingById({
     }
   });
 }
+
+export async function deleteApplicationById(applicationId: string) {
+  await prisma.$transaction(async (tx) => {
+    await tx.businessAccessInvite.deleteMany({ where: { applicationId } });
+    await tx.applicationNotification.deleteMany({ where: { applicationId } });
+    await tx.conversationMessage.deleteMany({ where: { applicationId } });
+    await tx.application.delete({ where: { id: applicationId } });
+  });
+}

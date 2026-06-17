@@ -29,6 +29,7 @@ type DialogProps = {
   onOpenChange: (open: boolean) => void;
   open: boolean;
   overlayProps?: DialogOverlayProps;
+  scrollableBody?: boolean;
   showCloseButton?: boolean;
   size?: DialogSize;
   title: ReactNode;
@@ -53,6 +54,7 @@ export function Dialog({
   onOpenChange,
   open,
   overlayProps,
+  scrollableBody = false,
   showCloseButton = true,
   size = 'md',
   title,
@@ -136,6 +138,7 @@ export function Dialog({
         className={cn(
           'dialog-panel w-full rounded-[var(--radius-xl)] border border-[var(--line)] bg-[var(--surface)] text-left text-[var(--text)] shadow-[var(--shadow-overlay)] motion-reduce:transition-none',
           size === 'confirm' ? 'border-[var(--border-strong)] bg-[var(--surface)] shadow-none p-5' : 'p-6',
+          scrollableBody && 'flex max-h-[85vh] flex-col',
           dialogSizes[size],
           className
         )}
@@ -151,7 +154,7 @@ export function Dialog({
             {description ? <div className="sr-only" id={descriptionId}>{description}</div> : null}
           </>
         ) : (
-          <div className="flex items-start justify-between gap-4">
+          <div className="flex shrink-0 items-start justify-between gap-4">
             <div className="min-w-0">
               <h2 className={cn('font-semibold text-[var(--text)]', size === 'confirm' ? 'text-lg leading-6' : 'text-base leading-6')} id={titleId}>
                 {title}
@@ -174,8 +177,8 @@ export function Dialog({
             ) : null}
           </div>
         )}
-        {children ? <div className={cn(size === 'confirm' ? 'mt-4 text-sm leading-[22px] text-[var(--muted)]' : 'mt-5')}>{children}</div> : null}
-        {footer ? <div className={cn('mt-5 flex gap-2', size === 'confirm' ? 'flex-row justify-end' : 'flex-col-reverse sm:flex-row sm:justify-end')}>{footer}</div> : null}
+        {children ? <div className={cn(size === 'confirm' ? 'mt-4 text-sm leading-[22px] text-[var(--muted)]' : 'mt-5', scrollableBody && 'flex-1 overflow-y-auto')}>{children}</div> : null}
+        {footer ? <div className={cn('mt-5 flex shrink-0 gap-2', size === 'confirm' ? 'flex-row justify-end' : 'flex-col-reverse sm:flex-row sm:justify-end')}>{footer}</div> : null}
       </div>
       </div>
     </div>,

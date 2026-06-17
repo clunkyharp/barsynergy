@@ -1,4 +1,4 @@
-import { SUPPORT_EMAIL, SUPPORT_INSTAGRAM, SUPPORT_TELEGRAM, SUPPORT_WHATSAPP } from '@/lib/contact-info';
+import { SUPPORT_INSTAGRAM, SUPPORT_TELEGRAM, SUPPORT_WHATSAPP } from '@/lib/contact-info';
 import type { ChannelAccentTone } from '@/components/public/channel-accent';
 
 export type ContactMethod = {
@@ -14,16 +14,6 @@ export type ContactMethod = {
 };
 
 export const contactMethods: ContactMethod[] = [
-  {
-    mark: 'EM',
-    name: 'Почта',
-    value: SUPPORT_EMAIL,
-    href: `mailto:${SUPPORT_EMAIL}`,
-    actionLabel: 'Написать',
-    tone: 'email',
-    descriptor: 'Для деловой переписки, договоров и счетов. Прикладывайте файлы и презентации.',
-    helper: 'Ответ — до 4 рабочих часов'
-  },
   {
     mark: 'TG',
     name: 'Telegram',

@@ -12,6 +12,7 @@ import {
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
 import { assertSameOriginServerAction } from '@/lib/security/server-action-origin';
 import {
+  deleteApplicationById,
   updateApplicationProcessingById,
   updateApplicationStatusById
 } from '@/lib/admin/applications/status';
@@ -91,6 +92,26 @@ export async function updateApplicationProcessing(formData: FormData) {
     revalidatePath('/business/cabinet');
     revalidatePath('/business/cabinet/requests');
     result = { type: 'success', message: 'Обработка заявки сохранена.' };
+  } catch (error) {
+    result = getApplicationActionErrorResult(error);
+  }
+
+  redirectWithApplicationActionResult(redirectTo, result);
+}
+
+export async function deleteApplication(formData: FormData) {
+  const redirectTo = getApplicationActionRedirect(formData);
+  let result: AdminApplicationActionResult;
+
+  try {
+    await assertSameOriginServerAction();
+    await requireAdminSectionAccess('applications');
+    const applicationId = getString(formData, 'applicationId');
+
+    await deleteApplicationById(applicationId);
+
+    revalidatePath(ADMIN_APPLICATIONS_PATH);
+    result = { type: 'success', message: 'Заявка удалена.' };
   } catch (error) {
     result = getApplicationActionErrorResult(error);
   }

@@ -1,21 +1,17 @@
 import type { Metadata } from 'next';
 import { CategoryType } from '@/modules/content/shared/types';
 import { PageHero } from '@/components/public/page-hero';
+import { PageInfoSection } from '@/components/public/page-info-section';
 import { PublishedContentSectionMaster } from '@/components/public/published-content-section';
 import { PublicFilters } from '@/components/public/public-filters';
 import { PublicPrelaunchSection } from '@/components/public/public-prelaunch-section';
-import { MasterSubmissionForm } from '@/components/public/master-submission-form';
 import { MastersHeroActions } from '@/app/(public)/masters/masters-hero-actions';
-import { submitMasterSubmission } from '@/app/(public)/masters/actions';
-import { arePublicApplicationFormsEnabled } from '@/lib/applications/public-forms';
-import { getApplicationCityOptions } from '@/lib/applications/form-options';
-import { getPublicApplicationUtm, stripPublicApplicationResultParams } from '@/lib/applications/public-form-helpers';
+import { stripPublicApplicationResultParams } from '@/lib/applications/public-form-helpers';
 import { getPublishedMasters, hasActivePublicContentParams, type PublicContentSearchParams } from '@/lib/public/content';
 import { getMasterFilterOptions, getPublicCategoryOptions, getPublicCityFilterOptions } from '@/lib/public/filter-options';
 import { JsonLd } from '@/components/seo/json-ld';
 import { buildPublicPageMetadata } from '@/lib/public/metadata';
 import { buildStaticPageBreadcrumbJsonLd } from '@/lib/public/structured-data';
-import { getEnv } from '@/lib/validation/env';
 
 type MastersPageProps = {
   searchParams?: Promise<PublicContentSearchParams>;
@@ -46,14 +42,11 @@ export default async function MastersPage({ searchParams }: MastersPageProps) {
   const params = (await searchParams) ?? {};
   const contentParams = stripPublicApplicationResultParams(params);
   const selectedSort = firstParam(contentParams.sort);
-  const env = getEnv();
-  const applicationFormsEnabled = arePublicApplicationFormsEnabled(env);
-  const [content, filterCities, categories, filterOptions, applicationCities] = await Promise.all([
+  const [content, filterCities, categories, filterOptions] = await Promise.all([
     getPublishedMasters(contentParams),
     getPublicCityFilterOptions(),
     getPublicCategoryOptions(CategoryType.MASTER),
-    getMasterFilterOptions(),
-    applicationFormsEnabled ? getApplicationCityOptions() : Promise.resolve([])
+    getMasterFilterOptions()
   ]);
   const hasActiveFilters = hasActivePublicContentParams(contentParams);
   const isPrelaunchEmpty = content.total === 0 && !hasActiveFilters;
@@ -132,12 +125,26 @@ export default async function MastersPage({ searchParams }: MastersPageProps) {
         />
       )}
 
-      <MasterSubmissionForm
-        action={submitMasterSubmission}
-        cities={applicationCities}
-        enabled={applicationFormsEnabled}
-        utm={getPublicApplicationUtm(params)}
-      />
+      <PageInfoSection
+        eyebrow="Платформа"
+        title="Мастера и сервисные команды для кофеен СКФО"
+        sidebarLinks={[
+          { href: 'https://t.me/barsynergy', label: 'Telegram-канал' },
+          { href: '/masters', label: 'Каталог мастеров' },
+          { href: 'mailto:barsynergy@gmail.com', label: 'Добавить профиль' },
+        ]}
+      >
+        <p>
+          BARSYNERGY объединяет частных специалистов и сервисные команды, которые помогают кофейням, барам и ресторанам Махачкалы, Дагестана
+          и Северо-Кавказского региона запускаться, обучать персонал и обслуживать оборудование.
+        </p>
+        <p>
+          Каждый профиль в каталоге содержит описание услуг, специализации, опыт работы и контакт для прямой связи.
+        </p>
+        <p>
+          Если вы работаете с заведениями — добавьте профиль в каталог мастеров бесплатно.
+        </p>
+      </PageInfoSection>
     </>
   );
 }

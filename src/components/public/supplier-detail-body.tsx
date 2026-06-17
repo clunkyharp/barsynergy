@@ -1,21 +1,32 @@
 import { ArticleBodyContent } from '@/components/public/article-body-content';
 import { EditorialShell } from '@/components/ui/editorial-shell';
 import type { PublicContentDetailFact } from '@/modules/content/shared/detail-helpers';
+import { VacancyDirectContacts } from './vacancy-direct-contacts';
 
 type SupplierDetailBodyProps = {
   body?: string;
   facts: PublicContentDetailFact[];
+  contactLabel?: string;
+  contactTelegram?: string;
+  contactPhone?: string;
+  contactWhatsapp?: string;
   contactRail: React.ReactNode;
 };
 
 export function SupplierDetailBody({
   body,
   facts,
+  contactLabel,
+  contactTelegram,
+  contactPhone,
+  contactWhatsapp,
   contactRail,
 }: SupplierDetailBodyProps) {
   const hasBody = Boolean(body?.trim());
   const infoFacts = facts.filter((f) => !['Компания', 'Статус', 'Условия', 'Категория', 'Город', 'География', 'Контакты'].includes(f.label));
   const hasRail = Boolean(contactRail);
+  const hasStructuredContacts = Boolean(contactTelegram || contactPhone || contactWhatsapp);
+  const hasDirectContacts = Boolean(contactLabel || hasStructuredContacts);
 
   return (
     <section className="background-zone background-zone-graphite border-b border-[var(--line)] py-9 md:py-12">
@@ -53,6 +64,25 @@ export function SupplierDetailBody({
               id="supplier-contact-rail"
             >
               <EditorialShell className="overflow-hidden">
+                {hasDirectContacts ? (
+                  <div className="border-b border-[var(--line)] px-5 pb-5 pt-5">
+                    <p className="text-[11px] font-bold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--accent)]">
+                      Контакты поставщика
+                    </p>
+                    {contactLabel ? (
+                      <p className="mt-2 text-sm leading-6 text-[var(--text)]">{contactLabel}</p>
+                    ) : null}
+                    {hasStructuredContacts ? (
+                      <div className={contactLabel ? 'mt-4' : 'mt-3'}>
+                        <VacancyDirectContacts
+                          telegram={contactTelegram}
+                          phone={contactPhone}
+                          whatsapp={contactWhatsapp}
+                        />
+                      </div>
+                    ) : null}
+                  </div>
+                ) : null}
                 <div className="border-b border-[var(--line)] px-5 pb-4 pt-5">
                   <p className="text-[11px] font-bold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--accent)]">
                     Запрос поставщику

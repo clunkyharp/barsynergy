@@ -56,6 +56,7 @@ export function LeadModal({
         onOpenChange(nextOpen);
       }}
       open={open}
+      scrollableBody
       size="md"
       title={
         isSuccess ? (

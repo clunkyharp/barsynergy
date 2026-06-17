@@ -4,7 +4,6 @@ import { useEffect, useState, useActionState } from 'react';
 import { PublicApplicationSection } from '@/components/public/application-form-section';
 import { Button } from '@/components/ui/button';
 import { Dialog } from '@/components/ui/dialog';
-import { SUPPORT_EMAIL } from '@/lib/contact-info';
 import {
   VacancyResponseForm,
   VacancySubmissionForm,
@@ -62,8 +61,8 @@ export function VacancyResponseDialog({
           <Button className="rounded-[var(--radius-md)]" href="/contacts#contact-form" size="lg">
             Написать команде
           </Button>
-          <Button className="rounded-[var(--radius-md)]" href={`mailto:${SUPPORT_EMAIL}`} size="lg" variant="secondary">
-            Написать на почту
+          <Button className="rounded-[var(--radius-md)]" href="https://t.me/barsynergy" size="lg" variant="secondary">
+            Написать в Telegram
           </Button>
         </div>
       </div>

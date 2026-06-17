@@ -346,6 +346,7 @@ model BusinessAccount {
   applications Application[]
   vacancies    Vacancy[]
   masters      Master[]
+  suppliers    Supplier[]
 
   @@index([status, createdAt])
   @@index([cityId, status])
@@ -624,6 +625,7 @@ model Supplier {
   coverImageAlt String?
   cityId        String?
   categoryId    String?
+  businessAccountId String?
   sortOrder     Int           @default(0)
   publishedAt   DateTime?
   archivedAt    DateTime?
@@ -644,6 +646,7 @@ model Supplier {
   coverImage   UploadedFile? @relation("SupplierCoverImage", fields: [coverImageId], references: [id], onDelete: SetNull)
   city         City?         @relation(fields: [cityId], references: [id], onDelete: SetNull)
   category     Category?     @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  businessAccount BusinessAccount? @relation(fields: [businessAccountId], references: [id], onDelete: SetNull)
   createdBy    User?         @relation("SupplierCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
   updatedBy    User?         @relation("SupplierUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
   applications Application[]
@@ -651,6 +654,7 @@ model Supplier {
   @@index([status, publishedAt])
   @@index([cityId, status])
   @@index([categoryId, status])
+  @@index([businessAccountId])
   @@index([isVerified, status])
   @@index([sortOrder])
 }

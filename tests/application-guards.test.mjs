@@ -295,6 +295,7 @@ test('supplier and partner applications can produce published content fields', (
     vacancyId: null,
     supplierId: null,
     partnerId: null,
+    businessAccountId: 'business-1',
     cityId: 'city-1',
     message: 'Поставляем оборудование, расходники и сервис для заведений.',
     name: 'Supplier Contact',
@@ -313,8 +314,12 @@ test('supplier and partner applications can produce published content fields', (
   assert.equal(supplier.title, 'Test Supplier');
   assert.equal(supplier.companyName, 'Test Supplier');
   assert.equal(supplier.cityId, 'city-1');
+  assert.equal(supplier.businessAccountId, 'business-1');
   assert.equal(supplier.websiteUrl, 'https://supplier.example.test/');
-  assert.equal(supplier.contactLabel, null);
+  assert.equal(supplier.contactLabel, 'Supplier Contact');
+  assert.equal(supplier.contactPhone, '+79990000000');
+  assert.equal(supplier.contactTelegram, '@supplier');
+  assert.equal(supplier.contactWhatsapp, null);
   assert.equal(supplier.isVerified, false);
 
   const partner = getPartnerPublicationFieldsFromApplication({

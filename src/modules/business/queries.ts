@@ -75,17 +75,28 @@ export async function getBusinessDashboardData(businessAccountId: string) {
 export async function getBusinessResponses(businessAccountId: string, statusGroup: ConversationStatusGroup) {
   return prisma.application.findMany({
     where: {
-      type: ApplicationType.VACANCY_RESPONSE,
       status: getConversationStatusFilter(statusGroup),
-      vacancy: { businessAccountId }
+      OR: [
+        {
+          type: ApplicationType.VACANCY_RESPONSE,
+          vacancy: { businessAccountId }
+        },
+        {
+          type: ApplicationType.SUPPLIER_INQUIRY,
+          businessAccountId
+        }
+      ]
     },
     select: {
       id: true,
+      type: true,
       status: true,
       createdAt: true,
+      subject: true,
       name: true,
       message: true,
-      vacancy: { select: { title: true, slug: true } }
+      vacancy: { select: { title: true, slug: true } },
+      supplier: { select: { title: true, slug: true } }
     },
     orderBy: { createdAt: 'desc' }
   });
@@ -95,15 +106,24 @@ export async function getBusinessResponseDetail(applicationId: string, businessA
   return prisma.application.findFirst({
     where: {
       id: applicationId,
-      type: ApplicationType.VACANCY_RESPONSE,
       status: { notIn: [ApplicationStatus.DRAFT, ApplicationStatus.ARCHIVED] },
-      vacancy: { businessAccountId }
+      OR: [
+        {
+          type: ApplicationType.VACANCY_RESPONSE,
+          vacancy: { businessAccountId }
+        },
+        {
+          type: ApplicationType.SUPPLIER_INQUIRY,
+          businessAccountId
+        }
+      ]
     },
     select: {
       id: true,
       status: true,
       type: true,
       createdAt: true,
+      subject: true,
       name: true,
       email: true,
       phone: true,
@@ -111,6 +131,9 @@ export async function getBusinessResponseDetail(applicationId: string, businessA
       message: true,
       city: { select: { name: true } },
       vacancy: {
+        select: { id: true, title: true, slug: true, companyName: true }
+      },
+      supplier: {
         select: { id: true, title: true, slug: true, companyName: true }
       }
     }

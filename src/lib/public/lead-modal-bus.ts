@@ -1,5 +1,5 @@
 'use client';
-export type LeadModalKey = 'vacancy' | 'event' | 'education' | 'supplier';
+export type LeadModalKey = 'vacancy' | 'event' | 'education' | 'supplier' | 'master';
 
 const EVENT_NAME = 'barsynergy:open-lead-modal';
 

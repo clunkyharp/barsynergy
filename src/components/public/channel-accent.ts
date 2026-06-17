@@ -1,5 +1,4 @@
 export const channelAccentVars = {
-  email: 'var(--channel-email)',
   instagram: 'var(--channel-instagram)',
   neutral: 'var(--channel-neutral)',
   phone: 'var(--channel-phone)',

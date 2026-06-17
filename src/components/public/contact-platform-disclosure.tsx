@@ -19,6 +19,7 @@ const promiseList = [
 
 export function ContactPlatformDisclosure({ children, defaultOpen = false }: ContactPlatformDisclosureProps) {
   const sectionRef = useRef<HTMLDivElement>(null);
+  const formRef = useRef<HTMLDivElement>(null);
   const hasAutoFocusedRef = useRef(false);
   const [open, setOpen] = useState(defaultOpen);
 
@@ -47,10 +48,11 @@ export function ContactPlatformDisclosure({ children, defaultOpen = false }: Con
       return;
     }
 
-    if (!sectionRef.current || hasAutoFocusedRef.current) return;
+    const target = formRef.current ?? sectionRef.current;
+    if (!target || hasAutoFocusedRef.current) return;
     hasAutoFocusedRef.current = true;
     const frame = requestAnimationFrame(() => {
-      sectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
       const firstField = sectionRef.current?.querySelector<HTMLElement>(
         'input:not([type="hidden"]):not([disabled]), select:not([disabled]), textarea:not([disabled])'
       );
@@ -76,7 +78,7 @@ export function ContactPlatformDisclosure({ children, defaultOpen = false }: Con
       />
       <div className="container relative">
         <div className="mx-auto max-w-5xl">
-          <div className="min-w-0 scroll-mt-36 md:scroll-mt-44" id="contact-form">
+          <div className="min-w-0 scroll-mt-16 md:scroll-mt-44" id="contact-form" ref={formRef}>
             {open ? (
               <div className="animate-form-section-reveal mx-auto max-w-3xl">{children}</div>
             ) : (

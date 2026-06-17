@@ -10,7 +10,7 @@ import { Select } from '@/components/ui/select';
 import { MarkdownEditor } from '@/components/admin/markdown-editor';
 import { Textarea } from '@/components/ui/textarea';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
-import { getActiveCategories, getActiveCities } from '@/lib/admin/admin-queries';
+import { getActiveCategories, getActiveCities, getActiveBusinessAccounts } from '@/lib/admin/admin-queries';
 
 export const dynamic = 'force-dynamic';
 
@@ -19,9 +19,10 @@ const ADMIN_SUPPLIERS_PATH = '/admin/suppliers';
 export default async function AdminSuppliersCreatePage() {
   await requireAdminSectionAccess('suppliers');
 
-  const [categories, cities] = await Promise.all([
+  const [categories, cities, businessAccounts] = await Promise.all([
     getActiveCategories(CategoryType.SUPPLIER),
-    getActiveCities()
+    getActiveCities(),
+    getActiveBusinessAccounts()
   ]);
 
   return (
@@ -61,6 +62,16 @@ export default async function AdminSuppliersCreatePage() {
             </FormField>
             <FormField htmlFor="supplier-websiteUrl" label="Сайт">
               <Input id="supplier-websiteUrl" name="websiteUrl" maxLength={240} type="url" />
+            </FormField>
+            <FormField htmlFor="supplier-businessAccountId" label="Бизнес-аккаунт">
+              <Select id="supplier-businessAccountId" name="businessAccountId" defaultValue="">
+                <option value="">Без привязки</option>
+                {businessAccounts.map((account) => (
+                  <option key={account.id} value={account.id}>
+                    {account.companyName}
+                  </option>
+                ))}
+              </Select>
             </FormField>
             <FormField htmlFor="supplier-contactLabel" label="Контакт (имя)" hint="Имя контактного лица. Если несколько, разделяйте точкой с запятой.">
               <Textarea id="supplier-contactLabel" name="contactLabel" maxLength={160} className="min-h-24" />

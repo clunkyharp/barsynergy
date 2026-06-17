@@ -2,11 +2,14 @@
 
 import { revalidatePath } from 'next/cache';
 import { after } from 'next/dist/server/after';
-import { ApplicationStatus, ConversationSender } from '@prisma/client';
+import { ApplicationNotificationChannel, ApplicationStatus, ApplicationType, ConversationSender } from '@prisma/client';
 import { assertSameOriginServerAction } from '@/lib/security/server-action-origin';
 import { getCurrentUser } from '@/lib/auth/current-user';
 import { prisma } from '@/lib/db/prisma';
-import { dispatchMessageNotificationQueue } from './notifications/message-notification-outbox';
+import {
+  dispatchMessageNotificationQueue,
+  queueMessageNotifications
+} from './notifications/message-notification-outbox';
 
 const MAX_MESSAGE_LENGTH = 2000;
 const MIN_MESSAGE_LENGTH = 1;
@@ -46,10 +49,65 @@ export async function sendConversationMessage(input: {
       where: { id: input.applicationId },
       select: {
         id: true,
+        type: true,
+        subject: true,
         status: true,
         userId: true,
+        name: true,
+        email: true,
         businessAccountId: true,
-        vacancy: { select: { createdById: true, businessAccountId: true } }
+        user: {
+          select: {
+            email: true,
+            profile: { select: { fullName: true } }
+          }
+        },
+        businessAccount: {
+          select: {
+            companyName: true,
+            owner: {
+              select: {
+                email: true,
+                profile: { select: { fullName: true } }
+              }
+            }
+          }
+        },
+        vacancy: {
+          select: {
+            title: true,
+            createdById: true,
+            businessAccountId: true,
+            businessAccount: {
+              select: {
+                companyName: true,
+                owner: {
+                  select: {
+                    email: true,
+                    profile: { select: { fullName: true } }
+                  }
+                }
+              }
+            }
+          }
+        },
+        supplier: {
+          select: {
+            title: true,
+            businessAccountId: true,
+            businessAccount: {
+              select: {
+                companyName: true,
+                owner: {
+                  select: {
+                    email: true,
+                    profile: { select: { fullName: true } }
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     });
 
@@ -103,6 +161,12 @@ export async function sendConversationMessage(input: {
         }
       });
 
+      await queueMessageNotifications(tx, buildMessageNotificationJobs({
+        application,
+        currentUser,
+        senderRole: input.senderRole
+      }));
+
       return message;
     });
 
@@ -128,6 +192,143 @@ export async function sendConversationMessage(input: {
   }
 }
 
+type MessageNotificationApplication = {
+  id: string;
+  type: ApplicationType;
+  subject: string | null;
+  name: string | null;
+  email: string | null;
+  user: {
+    email: string;
+    profile: { fullName: string | null } | null;
+  } | null;
+  businessAccount: {
+    companyName: string;
+    owner: {
+      email: string;
+      profile: { fullName: string | null } | null;
+    };
+  } | null;
+  vacancy: {
+    title: string;
+    businessAccount: {
+      companyName: string;
+      owner: {
+        email: string;
+        profile: { fullName: string | null } | null;
+      };
+    } | null;
+  } | null;
+  supplier: {
+    title: string;
+    businessAccount: {
+      companyName: string;
+      owner: {
+        email: string;
+        profile: { fullName: string | null } | null;
+      };
+    } | null;
+  } | null;
+};
+
+function getDisplayName(user: {
+  email?: string | null;
+  profile?: { fullName: string | null } | null;
+}) {
+  return user.profile?.fullName ?? user.email ?? 'BARSYNERGY';
+}
+
+function getBusinessRecipient(application: MessageNotificationApplication) {
+  const businessAccount = application.businessAccount ?? application.vacancy?.businessAccount ?? application.supplier?.businessAccount;
+  const owner = businessAccount?.owner;
+
+  if (!owner?.email) return null;
+
+  return {
+    email: owner.email,
+    name: owner.profile?.fullName ?? businessAccount?.companyName ?? null
+  };
+}
+
+function getUserRecipient(application: MessageNotificationApplication) {
+  const email = application.user?.email ?? application.email;
+
+  if (!email) return null;
+
+  return {
+    email,
+    name: application.user?.profile?.fullName ?? application.name ?? null
+  };
+}
+
+function getContextLabel(application: MessageNotificationApplication) {
+  return application.vacancy?.title
+    ?? application.supplier?.title
+    ?? application.subject
+    ?? 'Заявка';
+}
+
+function getUserThreadUrl(application: MessageNotificationApplication) {
+  if (application.type === ApplicationType.SUPPLIER_INQUIRY) {
+    return `/profile/inquiries/${application.id}`;
+  }
+
+  return `/profile/responses/${application.id}`;
+}
+
+function buildMessageNotificationJobs(input: {
+  application: MessageNotificationApplication;
+  currentUser: {
+    email?: string | null;
+    profile?: { fullName: string | null } | null;
+  };
+  senderRole: ConversationSender;
+}) {
+  const contextLabel = getContextLabel(input.application);
+  const senderName = input.senderRole === ConversationSender.ADMIN
+    ? 'BARSYNERGY'
+    : getDisplayName(input.currentUser);
+  const jobs: Parameters<typeof queueMessageNotifications>[1] = [];
+
+  if (input.senderRole === ConversationSender.USER || input.senderRole === ConversationSender.ADMIN) {
+    const recipient = getBusinessRecipient(input.application);
+    if (recipient) {
+      jobs.push({
+        channel: ApplicationNotificationChannel.BUSINESS_MESSAGE_EMAIL,
+        payload: {
+          applicationId: input.application.id,
+          senderRole: input.senderRole,
+          recipientEmail: recipient.email,
+          recipientName: recipient.name,
+          senderName,
+          contextLabel,
+          threadUrl: `/business/cabinet/responses/${input.application.id}`
+        }
+      });
+    }
+  }
+
+  if (input.senderRole === ConversationSender.BUSINESS || input.senderRole === ConversationSender.ADMIN) {
+    const recipient = getUserRecipient(input.application);
+    if (recipient) {
+      jobs.push({
+        channel: ApplicationNotificationChannel.USER_MESSAGE_EMAIL,
+        payload: {
+          applicationId: input.application.id,
+          senderRole: input.senderRole,
+          recipientEmail: recipient.email,
+          recipientName: recipient.name,
+          senderName,
+          contextLabel,
+          threadUrl: getUserThreadUrl(input.application)
+        }
+      });
+    }
+  }
+
+  return jobs;
+}
+
 async function checkConversationAccess(
   applicationId: string,
   userId: string,
@@ -150,7 +351,11 @@ async function checkConversationAccess(
     const owned = await prisma.application.findFirst({
       where: {
         id: applicationId,
-        vacancy: { createdById: userId }
+        OR: [
+          { vacancy: { createdById: userId } },
+          { vacancy: { businessAccount: { ownerId: userId } } },
+          { businessAccount: { ownerId: userId } }
+        ]
       },
       select: { id: true }
     });

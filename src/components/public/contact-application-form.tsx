@@ -19,7 +19,6 @@ import { Select } from '@/components/ui/select';
 import { SubmissionResultDialog } from '@/components/ui/submission-result-dialog';
 import { SubmitButton } from '@/components/ui/submit-button';
 import { Textarea } from '@/components/ui/textarea';
-import { SUPPORT_EMAIL } from '@/lib/contact-info';
 import {
   contactTopicOptions,
   getContactMessageHint,
@@ -58,6 +57,7 @@ export function ContactApplicationForm({ enabled, utm, cities, defaultTopic, def
         title="Опишите задачу — ответим на ваш контакт"
         description="Укажите контакт и коротко опишите задачу. Детали можно добавить ниже, если они нужны."
         headingLevel="h2"
+        titleSize="card-compact"
       />
       <div className="relative p-5 md:p-6">
         <div className="grid gap-4">
@@ -176,10 +176,10 @@ export function ContactApplicationForm({ enabled, utm, cities, defaultTopic, def
     <EditorialShell className="p-5 md:p-6">
       <h3 className="text-lg font-semibold leading-7">Форма сейчас закрыта</h3>
       <p className="mt-3 text-sm leading-7 text-[var(--muted)]">
-        Если вопрос срочный, напишите на email команды.
+        Если вопрос срочный, напишите в Telegram команды.
       </p>
-      <Button className="mt-6 rounded-[var(--radius-md)] sm:self-start" href={`mailto:${SUPPORT_EMAIL}`} size="lg" variant="secondary">
-        Написать на почту
+      <Button className="mt-6 rounded-[var(--radius-md)] sm:self-start" href="https://t.me/barsynergy" size="lg" variant="secondary">
+        Написать в Telegram
       </Button>
     </EditorialShell>
   );

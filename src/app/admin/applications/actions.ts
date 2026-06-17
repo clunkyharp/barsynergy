@@ -1,6 +1,7 @@
 'use server';
 
 import {
+  deleteApplication as deleteApplicationHandler,
   updateApplicationProcessing as updateApplicationProcessingHandler,
   updateApplicationStatus as updateApplicationStatusHandler
 } from './status-actions';
@@ -42,4 +43,8 @@ export async function publishContentFromApplication(formData: FormData) {
 
 export async function prepareBusinessAccessAction(formData: FormData) {
   return prepareBusinessAccessActionHandler(formData);
+}
+
+export async function deleteApplication(formData: FormData) {
+  return deleteApplicationHandler(formData);
 }

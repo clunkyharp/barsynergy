@@ -3,6 +3,7 @@ import { PublicBodyText, PublicDisplayTitle, PublicEyebrow } from '@/components/
 import { AppLink } from '@/components/ui/app-link';
 import { Button } from '@/components/ui/button';
 import { MetaChip } from '@/components/ui/meta-chip';
+import { displayFont } from '@/lib/fonts';
 
 type PrelaunchCard = {
   title: string;
@@ -41,12 +42,12 @@ export function PublicPrelaunchSection({
   id
 }: PublicPrelaunchSectionProps) {
   return (
-    <section className="background-zone background-zone-gray border-b border-[var(--line)] py-6 md:py-10" id={id}>
-      <div className="container grid gap-6 md:gap-8 xl:grid-cols-[minmax(18rem,0.9fr)_minmax(0,1.1fr)] xl:gap-10">
+    <section className="background-zone background-zone-gray border-b border-[var(--line)] py-8 md:py-12" id={id}>
+      <div className="container grid gap-7 md:gap-8 xl:grid-cols-[minmax(18rem,0.82fr)_minmax(0,1.18fr)] xl:items-start xl:gap-10">
         <div className="xl:self-start">
           <PublicEyebrow>{eyebrow}</PublicEyebrow>
-          <PublicDisplayTitle className="mt-4 max-w-[13ch]">{title}</PublicDisplayTitle>
-          <PublicBodyText className="mt-5 max-w-md" size="md">
+          <PublicDisplayTitle className="mt-4 max-w-[12ch] text-[clamp(2.6rem,5.4vw,5.2rem)] leading-[0.96]">{title}</PublicDisplayTitle>
+          <PublicBodyText className="mt-5 max-w-lg" size="md">
             {description}
           </PublicBodyText>
           {badges.length > 0 ? (
@@ -76,14 +77,14 @@ export function PublicPrelaunchSection({
         <ol className="grid gap-3">
           {cards.map((card, idx) => (
             <li key={card.title}>
-              <article className="group relative grid gap-3 rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--surface-card)] p-4 transition-colors hover:border-[var(--accent)]/35 md:grid-cols-[auto_minmax(0,1fr)_auto] md:items-start md:gap-5 md:p-5">
-                <span aria-hidden="true" className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[var(--accent)]/30 bg-[var(--surface-wash)] text-sm font-semibold tracking-[var(--tracking-eyebrow-sm)] text-[var(--accent)] tabular-nums">
+              <article className="group relative grid gap-3 rounded-[var(--radius-md)] border border-transparent bg-[var(--surface-card)] p-4 transition-colors hover:border-[var(--accent)]/24 md:grid-cols-[auto_minmax(0,1fr)_auto] md:items-start md:gap-4 md:p-5">
+                <span aria-hidden="true" className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[var(--accent)]/30 bg-[var(--surface-wash)] text-[13px] font-semibold tracking-[var(--tracking-eyebrow-sm)] text-[var(--accent)] tabular-nums">
                   {idx + 1}
                 </span>
                 <div className="min-w-0">
-                  <h3 className="text-lg font-semibold leading-7 text-[var(--text)] md:text-xl md:leading-8">{card.title}</h3>
+                  <h3 className={`${displayFont.className} text-xl font-semibold leading-7 text-[var(--text)] md:text-[1.35rem] md:leading-8`}>{card.title}</h3>
                   {card.hint ? <p className="mt-1 text-[12px] font-semibold uppercase tracking-[var(--tracking-marker)] text-[var(--accent)]">{card.hint}</p> : null}
-                  <p className="mt-2 text-sm leading-6 text-[var(--muted)] md:text-[15px] md:leading-7">{card.description}</p>
+                  <p className="mt-2 text-sm leading-6 text-[var(--muted)] md:text-[15px]">{card.description}</p>
                   {card.details && card.details.length > 0 ? (
                     <dl className="mt-4 grid gap-2 sm:grid-cols-2">
                       {card.details.map((detail) => (

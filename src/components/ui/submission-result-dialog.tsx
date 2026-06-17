@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import { Dialog } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { useCopy } from '@/lib/hooks/use-copy';
-import { SUPPORT_EMAIL } from '@/lib/contact-info';
 import type { PublicApplicationResult } from '@/lib/applications/public-form-helpers';
 
 type SubmissionResultDialogProps = {
@@ -72,7 +71,7 @@ export function SubmissionResultDialog({
             <Button onClick={handleClose} size="lg">
               Закрыть
             </Button>
-            <Button href={`mailto:${SUPPORT_EMAIL}`} size="lg" variant="secondary">
+            <Button href="https://t.me/barsynergy" size="lg" variant="secondary">
               Связаться
             </Button>
           </>

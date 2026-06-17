@@ -13,12 +13,6 @@ function pluralRu(n: number, one: string, few: string, many: string): string {
   return many;
 }
 
-const fallbackTrustMarkers = [
-  "Специалисты и команды СКФО",
-  "Вакансии, обучение и события",
-  "Поставщики, материалы и заявки",
-] as const;
-
 const audienceRoutes = [
   {
     title: "Я специалист",
@@ -62,23 +56,7 @@ function HomeStatsLine({ stats }: { stats: HomepageData["stats"] }) {
   const statItems = allItems.filter((item) => item.value > 0);
 
   if (statItems.length < 2) {
-    return (
-      <div className="mt-10">
-        <p className="text-[10px] font-semibold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--editorial-dark-label)]">
-          Что уже есть на платформе
-        </p>
-        <ul className="mt-4 flex flex-wrap gap-2.5">
-          {fallbackTrustMarkers.map((item) => (
-            <li
-              className="rounded-[var(--radius-pill)] border border-[var(--editorial-dark-border)] bg-[rgba(255,253,249,0.08)] px-3 py-2 text-[12px] leading-5 text-[var(--editorial-dark-text)]"
-              key={item}
-            >
-              {item}
-            </li>
-          ))}
-        </ul>
-      </div>
-    );
+    return null;
   }
 
   return (

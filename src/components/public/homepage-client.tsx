@@ -107,14 +107,14 @@ export function HomepageClient({ data }: HomepageClientProps) {
               </p>
             ) : null}
             <Button
-              className="w-full max-w-[17rem] rounded-[var(--radius-md)] border-[var(--accent)] bg-[var(--accent)] text-[var(--accent-contrast)] shadow-none hover:border-[var(--accent-strong)] hover:bg-[var(--accent-strong)]"
+              className="w-full rounded-[var(--radius-md)] border-[var(--accent)] bg-[var(--accent)] text-[var(--accent-contrast)] shadow-none hover:border-[var(--accent-strong)] hover:bg-[var(--accent-strong)]"
               href={data.ctaBlock?.primaryHref ?? '/vacancies'}
             >
               {data.ctaBlock?.primaryLabel ?? 'Смотреть вакансии'}
             </Button>
             {(data.ctaBlock?.secondaryHref && data.ctaBlock?.secondaryLabel) ? (
               <Link
-                className="inline-flex min-h-10 items-center gap-2 rounded-[var(--radius-sm)] text-sm font-semibold text-[var(--editorial-dark-muted)] transition hover:text-[var(--editorial-dark-text)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+                className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-[var(--radius-md)] border border-[var(--editorial-dark-border)] px-5 text-sm font-semibold text-[var(--editorial-dark-muted)] transition hover:border-[var(--accent)]/40 hover:text-[var(--editorial-dark-text)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] md:w-auto"
                 href={data.ctaBlock.secondaryHref}
               >
                 {data.ctaBlock.secondaryLabel}
@@ -122,7 +122,7 @@ export function HomepageClient({ data }: HomepageClientProps) {
               </Link>
             ) : (
               <Link
-                className="inline-flex min-h-10 items-center gap-2 rounded-[var(--radius-sm)] text-sm font-semibold text-[var(--editorial-dark-muted)] transition hover:text-[var(--editorial-dark-text)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+                className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-[var(--radius-md)] border border-[var(--editorial-dark-border)] px-5 text-sm font-semibold text-[var(--editorial-dark-muted)] transition hover:border-[var(--accent)]/40 hover:text-[var(--editorial-dark-text)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] md:w-auto"
                 href="/contacts"
               >
                 Связаться с нами

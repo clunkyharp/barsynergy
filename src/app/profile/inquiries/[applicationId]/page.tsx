@@ -39,7 +39,9 @@ export default async function InquiryDetailPage({ params }: InquiryDetailPagePro
   }
 
   const messages = await getConversationThread(applicationId);
-  const interlocutorName = 'Платформа BARSYNERGY';
+  const interlocutorName = application.supplier?.businessAccountId
+    ? application.supplier.title
+    : 'Платформа BARSYNERGY';
   const contextLabel = application.supplier?.title ?? 'Запрос поставщику';
 
   return (

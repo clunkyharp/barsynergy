@@ -47,8 +47,7 @@ export default async function ResponseDetailPage({ params }: ResponseDetailPageP
     ? application.businessAccount?.companyName ?? 'Работодатель'
     : 'Платформа BARSYNERGY';
   const contextLabel = application.vacancy?.title ?? applicationTypeLabels[application.type];
-  const isConversationType = application.type === ApplicationType.VACANCY_RESPONSE
-    || application.type === ApplicationType.SUPPLIER_INQUIRY;
+  const isConversationType = application.type === ApplicationType.VACANCY_RESPONSE;
 
   return (
     <div className="space-y-6">

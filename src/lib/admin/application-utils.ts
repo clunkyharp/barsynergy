@@ -113,7 +113,10 @@ export function parseApplicationStatus(value?: string) {
 export const applicationPayloadFieldLabels: Record<string, string> = {
   amountLabel: 'Сумма / формат',
   companyName: 'Компания',
+  contactEmail: 'Контактный email',
+  contactName: 'Контактное лицо',
   contactPerson: 'Контактное лицо',
+  contactPhone: 'Контактный телефон',
   businessType: 'Тип бизнеса',
   businessTypeLabel: 'Тип бизнеса',
   comment: 'Комментарий',
@@ -124,13 +127,17 @@ export const applicationPayloadFieldLabels: Record<string, string> = {
   details: 'Описание',
   employerCompanyName: 'Компания',
   employmentType: 'Тип занятости',
+  entityType: 'Тип организации',
   eventDate: 'Дата события',
   experienceLabel: 'Опыт',
   format: 'Формат',
   formatLabel: 'Формат',
+  fullName: 'ФИО',
   level: 'Уровень',
+  masterTitle: 'Наименование услуги',
   partnerType: 'Тип партнёрства',
   position: 'Позиция',
+  projectDetails: 'Детали проекта',
   projectName: 'Проект / заведение',
   projectStage: 'Стадия проекта',
   projectStageLabel: 'Стадия проекта',
@@ -141,6 +148,7 @@ export const applicationPayloadFieldLabels: Record<string, string> = {
   roleSummary: 'Кратко о кандидате',
   salaryLabel: 'Оплата',
   serviceArea: 'География работы',
+  serviceType: 'Тип услуги',
   shortDescription: 'Краткое описание',
   solutionType: 'Тип решения',
   solutionTypeLabel: 'Тип решения',
@@ -155,6 +163,10 @@ const applicationPayloadValueLabels: Record<string, Record<string, string>> = {
   source: {
     business_cabinet: 'Бизнес-кабинет',
     public_form: 'Публичная форма'
+  },
+  entityType: {
+    INDIVIDUAL: 'Физлицо',
+    BUSINESS: 'Юрлицо'
   }
 };
 

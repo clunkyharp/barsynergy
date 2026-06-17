@@ -1,7 +1,7 @@
 'use client';
 
 import { type ReactNode } from 'react';
-import { Download, Link2, RotateCcw } from 'lucide-react';
+import { Link2, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/toast';
 import { FormField } from '@/components/ui/form-field';
@@ -48,19 +48,15 @@ function formatTime(date: Date) {
 }
 
 function CalculatorToolbar({
-  canExport,
   hasAnyInput,
   lastSavedAt,
   onClear,
-  onExport,
   onFillDemo,
   onShare,
 }: {
-  canExport: boolean;
   hasAnyInput: boolean;
   lastSavedAt: Date | null;
   onClear: () => void;
-  onExport: () => void;
   onFillDemo: () => void;
   onShare: () => void;
 }) {
@@ -89,7 +85,6 @@ function CalculatorToolbar({
         </Button>
         <Button
           className="min-h-10 rounded-[var(--radius-sm)] px-3 text-sm"
-          disabled={!canExport}
           onClick={onShare}
           size="sm"
           type="button"
@@ -97,17 +92,6 @@ function CalculatorToolbar({
         >
           <Link2 size={15} strokeWidth={1.8} />
           Поделиться ссылкой
-        </Button>
-        <Button
-          className="min-h-10 rounded-[var(--radius-sm)] px-3 text-sm"
-          disabled={!canExport}
-          onClick={onExport}
-          size="sm"
-          type="button"
-          variant="ghost"
-        >
-          <Download size={15} strokeWidth={1.8} />
-          Экспорт JSON
         </Button>
       </div>
       {lastSavedAt ? (
@@ -325,21 +309,9 @@ export function CostCalculatorClient() {
     showToast({
       id: 'calculator-share',
       title: 'Не удалось поделиться',
-      description: 'Попробуйте ещё раз. Если не получится, экспортируйте JSON.',
+      description: 'Попробуйте ещё раз.',
       tone: 'error',
       duration: 5000
-    });
-  }
-
-  function handleExportRecipe() {
-    const exported = calc.exportRecipe();
-
-    showToast({
-      id: 'calculator-export',
-      title: exported ? 'JSON выгружен' : 'Экспорт недоступен',
-      description: exported ? 'Файл рецепта сохранён через браузер.' : 'Попробуйте снова в браузере.',
-      tone: exported ? 'success' : 'error',
-      duration: exported ? 3200 : 5000
     });
   }
 
@@ -362,11 +334,9 @@ export function CostCalculatorClient() {
 
           {/* Toolbar */}
           <CalculatorToolbar
-            canExport={calc.hasAnyInput}
             hasAnyInput={calc.hasAnyInput}
             lastSavedAt={calc.lastSavedAt}
             onClear={calc.clearCalculator}
-            onExport={handleExportRecipe}
             onFillDemo={calc.fillDemo}
             onShare={handleShareRecipe}
           />

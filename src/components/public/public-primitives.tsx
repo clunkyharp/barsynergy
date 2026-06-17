@@ -4,7 +4,7 @@ import { displayFont } from '@/lib/fonts';
 import { cn } from '@/lib/utils';
 
 type PublicEyebrowTone = 'accent' | 'muted' | 'inverse';
-type PublicDisplayTitleSize = 'hero' | 'section' | 'card' | 'legal' | 'compact';
+type PublicDisplayTitleSize = 'hero' | 'section' | 'card' | 'card-compact' | 'legal' | 'compact';
 type PublicBodyTone = 'default' | 'muted' | 'inverse';
 type PublicBodySize = 'sm' | 'md';
 
@@ -89,6 +89,7 @@ export function PublicDisplayTitle({
         size === 'hero' && 'max-w-6xl text-[clamp(3.1rem,6.2vw,6.85rem)]',
         size === 'section' && 'text-[44px] md:text-[64px]',
         size === 'card' && 'text-[32px] md:text-[42px]',
+        size === 'card-compact' && 'text-[22px] md:text-[42px]',
         size === 'legal' && 'max-w-3xl break-words text-[34px] sm:text-[42px] md:text-[50px]',
         size === 'compact' && 'text-[clamp(2.1rem,3.6vw,3.2rem)]',
         className

@@ -45,10 +45,6 @@ function inferTone({
     return 'instagram';
   }
 
-  if (text.includes('email') || text.includes('mailto:') || text.includes('почта')) {
-    return 'email';
-  }
-
   if (text.includes('телефон') || text.includes('tel:')) {
     return 'phone';
   }

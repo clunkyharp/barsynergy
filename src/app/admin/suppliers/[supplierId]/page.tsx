@@ -13,7 +13,7 @@ import { MarkdownEditor } from '@/components/admin/markdown-editor';
 import { Textarea } from '@/components/ui/textarea';
 import { contentStatusLabels } from '@/lib/admin/content-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
-import { getSupplierById, getActiveCategories, getActiveCities } from '@/lib/admin/admin-queries';
+import { getSupplierById, getActiveCategories, getActiveCities, getActiveBusinessAccounts } from '@/lib/admin/admin-queries';
 
 export const dynamic = 'force-dynamic';
 
@@ -27,10 +27,11 @@ export default async function AdminSupplierEditPage({ params }: AdminSupplierEdi
   await requireAdminSectionAccess('suppliers');
   const { supplierId } = await params;
 
-  const [supplier, categories, cities] = await Promise.all([
+  const [supplier, categories, cities, businessAccounts] = await Promise.all([
     getSupplierById(supplierId),
     getActiveCategories(CategoryType.SUPPLIER),
-    getActiveCities()
+    getActiveCities(),
+    getActiveBusinessAccounts()
   ]);
 
   if (!supplier) {
@@ -109,6 +110,16 @@ export default async function AdminSupplierEditPage({ params }: AdminSupplierEdi
             </FormField>
             <FormField htmlFor="supplier-websiteUrl" label="Сайт" hint="Необязательно. Если не заполнен, ссылка не покажется на публичной странице.">
               <Input id="supplier-websiteUrl" name="websiteUrl" maxLength={240} type="url" defaultValue={supplier.websiteUrl ?? ''} />
+            </FormField>
+            <FormField htmlFor="supplier-businessAccountId" label="Бизнес-аккаунт">
+              <Select id="supplier-businessAccountId" name="businessAccountId" defaultValue={supplier.businessAccountId ?? ''}>
+                <option value="">Без привязки</option>
+                {businessAccounts.map((account) => (
+                  <option key={account.id} value={account.id}>
+                    {account.companyName}
+                  </option>
+                ))}
+              </Select>
             </FormField>
             <FormField htmlFor="supplier-contactLabel" label="Контакт (имя)" hint="Имя контактного лица. Если несколько, разделяйте точкой с запятой.">
               <Textarea id="supplier-contactLabel" name="contactLabel" maxLength={160} className="min-h-24" defaultValue={supplier.contactLabel ?? ''} />

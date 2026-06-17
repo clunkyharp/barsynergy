@@ -26,7 +26,6 @@ export default function CostCalculatorPage() {
       <PageHero
         breadcrumbs={[
           { href: '/', label: 'Главная' },
-          { href: '/tools', label: 'Инструменты' },
           { label: 'Калькулятор себестоимости' }
         ]}
         eyebrow="Инструменты"

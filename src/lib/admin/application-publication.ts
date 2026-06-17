@@ -110,7 +110,11 @@ export function getSupplierPublicationFieldsFromApplication(application: Publish
     categoryId: null,
     companyName,
     websiteUrl,
-    contactLabel: null,
+    businessAccountId: application.businessAccountId ?? null,
+    contactLabel: application.name,
+    contactPhone: application.phone,
+    contactTelegram: application.telegram,
+    contactWhatsapp: null,
     isVerified: false,
     serviceArea
   };

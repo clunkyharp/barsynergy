@@ -9,10 +9,10 @@ import { InlineAlert } from '@/components/ui/inline-alert';
 import { Input } from '@/components/ui/input';
 import type { ApplicationCityOption } from '@/lib/applications/form-options';
 import type { PublicApplicationResult, PublicApplicationUtm } from '@/lib/applications/public-form-helpers';
-import { SUPPORT_EMAIL } from '@/lib/contact-info';
+import { SUPPORT_TELEGRAM } from '@/lib/contact-info';
 import { cn } from '@/lib/utils';
 
-const PUBLIC_CONTACT_MAILTO = `mailto:${SUPPORT_EMAIL}`;
+const PUBLIC_CONTACT_TELEGRAM = 'https://t.me/barsynergy';
 
 type PublicApplicationSectionProps = {
   eyebrow: string;
@@ -142,12 +142,14 @@ export function PublicFormShellHeader({
   title,
   description,
   headingLevel = 'h3',
+  titleSize = 'card',
   tone = 'light'
 }: {
   eyebrow: string;
   title: string;
   description: string;
   headingLevel?: 'h2' | 'h3';
+  titleSize?: 'card' | 'card-compact';
   tone?: 'light' | 'dark';
 }) {
   const isDark = tone === 'dark';
@@ -171,7 +173,7 @@ export function PublicFormShellHeader({
       />
       <PublicFormValidation />
       <PublicEyebrow tone={isDark ? 'inverse' : 'accent'}>{eyebrow}</PublicEyebrow>
-      <PublicDisplayTitle as={Heading} className={cn('mt-3', isDark ? 'text-white' : 'text-[var(--text)]')} size="card">
+      <PublicDisplayTitle as={Heading} className={cn('mt-3', isDark ? 'text-white' : 'text-[var(--text)]')} size={titleSize}>
         {title}
       </PublicDisplayTitle>
       <PublicBodyText className="mt-3 max-w-xl" tone={isDark ? 'inverse' : 'muted'}>
@@ -267,10 +269,10 @@ export function PublicApplicationSection({
             <EditorialShell className="p-5 md:p-6">
               <h3 className="text-lg font-semibold leading-7">Формы сейчас закрыты</h3>
               <p className="mt-3 text-sm leading-7 text-[var(--muted)]">
-                {disabledDescription ?? `Формы временно закрыты. Напишите нам на ${SUPPORT_EMAIL}.`}
+                {disabledDescription ?? `Формы временно закрыты. Напишите нам в Telegram ${SUPPORT_TELEGRAM}.`}
               </p>
-              <Button className="mt-6 rounded-[var(--radius-md)] sm:self-start" href={disabledLink?.href ?? PUBLIC_CONTACT_MAILTO} size="lg" variant="secondary">
-                {disabledLink?.label ?? 'Написать на почту'}
+              <Button className="mt-6 rounded-[var(--radius-md)] sm:self-start" href={disabledLink?.href ?? PUBLIC_CONTACT_TELEGRAM} size="lg" variant="secondary">
+                {disabledLink?.label ?? 'Написать в Telegram'}
               </Button>
             </EditorialShell>
           ) : content}
@@ -301,10 +303,10 @@ export function PublicApplicationSection({
           <EditorialShell className="p-5 md:p-6">
             <h3 className="text-lg font-semibold leading-7">Формы сейчас закрыты</h3>
             <p className="mt-3 text-sm leading-7 text-[var(--muted)]">
-              {disabledDescription ?? `Формы временно закрыты. Напишите нам на ${SUPPORT_EMAIL}.`}
+              {disabledDescription ?? `Формы временно закрыты. Напишите нам в Telegram ${SUPPORT_TELEGRAM}.`}
             </p>
-            <Button className="mt-6 rounded-[var(--radius-md)] sm:self-start" href={disabledLink?.href ?? PUBLIC_CONTACT_MAILTO} size="lg" variant="secondary">
-              {disabledLink?.label ?? 'Написать на почту'}
+            <Button className="mt-6 rounded-[var(--radius-md)] sm:self-start" href={disabledLink?.href ?? PUBLIC_CONTACT_TELEGRAM} size="lg" variant="secondary">
+              {disabledLink?.label ?? 'Написать в Telegram'}
             </Button>
           </EditorialShell>
         ) : content}

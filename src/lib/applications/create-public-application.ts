@@ -22,6 +22,7 @@ export type CreatePublicApplicationInput = {
   cityId?: string | null;
   cityName?: string | null;
   vacancyId?: string | null;
+  businessAccountId?: string | null;
   supplierId?: string | null;
   masterId?: string | null;
   resumeFileId?: string | null;
@@ -59,6 +60,7 @@ export async function createPublicApplication(input: CreatePublicApplicationInpu
         telegram: input.telegram ?? null,
         cityId: input.cityId ?? null,
         vacancyId: input.vacancyId ?? null,
+        businessAccountId: input.businessAccountId ?? null,
         supplierId: input.supplierId ?? null,
         masterId: input.masterId ?? null,
         resumeFileId: input.resumeFileId ?? null,

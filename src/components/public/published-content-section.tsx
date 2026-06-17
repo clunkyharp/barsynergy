@@ -1,8 +1,9 @@
 import { Fragment, type ReactNode } from 'react';
 import { ArrowUpRight } from 'lucide-react';
-import { PublicBodyText, PublicDisplayTitle, PublicEyebrow } from '@/components/public/public-primitives';
+import { PublicDisplayTitle } from '@/components/public/public-primitives';
 import { Button } from '@/components/ui/button';
 import { Panel } from '@/components/ui/panel';
+import { PublicEmptyState } from '@/components/public/public-empty-state';
 import type { PublishedContentList } from '@/lib/public/content';
 import { cn } from '@/lib/utils';
 import { DefaultListRow } from './published-content-row-default';
@@ -124,46 +125,20 @@ function PublishedContentSectionLayout({
         </aside>
 
         {content.items.length === 0 ? (
-          <Panel className="public-missing-state space-y-4 border-[var(--border-default)] bg-[var(--surface-wash)]" padding="lg">
-            <div>
-              <PublicEyebrow tone="muted">{listLabel}</PublicEyebrow>
-              <h3 className="mt-3 text-2xl font-semibold leading-8">{noResultsTitle}</h3>
-            </div>
-            <PublicBodyText className="max-w-2xl">{noResultsDescription}</PublicBodyText>
-            {emptyStateActions.length > 0 ? (
-              <div className="flex flex-wrap gap-3">
-                {emptyStateActions.map((action) => (
-                  <Button
-                    className="min-h-12 rounded-[var(--radius-md)] px-6 tracking-normal"
-                    href={action.href}
-                    key={`${action.href}-${action.label}`}
-                    variant={action.variant ?? 'primary'}
-                  >
-                    {action.label}
-                  </Button>
-                ))}
-              </div>
-            ) : null}
-          </Panel>
+          <PublicEmptyState
+            actions={emptyStateActions}
+            description={noResultsDescription}
+            eyebrow={listLabel}
+            title={noResultsTitle}
+          />
         ) : visibleItems.length === 0 ? (
-          <Panel className="public-missing-state public-missing-state-secondary space-y-4 border-[var(--border-default)] bg-[var(--surface-wash)]" padding="lg">
-            <h3 className="text-xl font-semibold leading-7">{secondaryEmptyTitle}</h3>
-            <PublicBodyText className="max-w-2xl">{secondaryEmptyDescription}</PublicBodyText>
-            {secondaryEmptyActions.length > 0 ? (
-              <div className="flex flex-wrap gap-3">
-                {secondaryEmptyActions.map((action) => (
-                  <Button
-                    className="min-h-12 rounded-[var(--radius-md)] px-6 tracking-normal"
-                    href={action.href}
-                    key={`${action.href}-${action.label}`}
-                    variant={action.variant ?? 'primary'}
-                  >
-                    {action.label}
-                  </Button>
-                ))}
-              </div>
-            ) : null}
-          </Panel>
+          <PublicEmptyState
+            actions={secondaryEmptyActions}
+            className="public-missing-state-secondary"
+            compact
+            description={secondaryEmptyDescription}
+            title={secondaryEmptyTitle}
+          />
         ) : (
           <Panel className="public-catalog-list-panel min-w-0 overflow-hidden border-[var(--border-default)] bg-[var(--surface-card)]" padding="none">
             {listToolbar}

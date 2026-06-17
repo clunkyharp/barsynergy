@@ -4,6 +4,11 @@ import { forwardRef, useCallback, useEffect, useRef, type TextareaHTMLAttributes
 import { textareaFieldClassName } from '@/components/ui/field-styles';
 import { cn } from '@/lib/utils';
 
+function autoResize(el: HTMLTextAreaElement) {
+  el.style.height = 'auto';
+  el.style.height = `${el.scrollHeight}px`;
+}
+
 export const Textarea = forwardRef<HTMLTextAreaElement, TextareaHTMLAttributes<HTMLTextAreaElement>>(function Textarea(
   { className, defaultValue, onChange, value, ...props },
   ref
@@ -13,7 +18,6 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaHTMLAttributes<H
   const isFilled = isControlled && String(value ?? '').length > 0;
 
   useEffect(() => {
-    if (isControlled) return;
     const el = innerRef.current;
     if (!el) return;
 
@@ -24,6 +28,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaHTMLAttributes<H
       } else {
         delete el.dataset.filled;
       }
+      if (!isControlled) autoResize(el);
     }
 
     sync();
@@ -34,6 +39,13 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaHTMLAttributes<H
       el.removeEventListener('change', sync);
     };
   }, [isControlled]);
+
+  useEffect(() => {
+    if (!isControlled) return;
+    const el = innerRef.current;
+    if (!el) return;
+    autoResize(el);
+  }, [isControlled, value]);
 
   const mergedRef = useCallback(
     (node: HTMLTextAreaElement | null) => {

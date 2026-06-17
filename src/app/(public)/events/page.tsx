@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import { EventAgendaSection } from '@/components/public/platform-ui';
 import { PageHero } from '@/components/public/page-hero';
+import { PageInfoSection } from '@/components/public/page-info-section';
 import { PublicPrelaunchSection } from '@/components/public/public-prelaunch-section';
 import { EventsSearchBar } from '@/components/public/events-page-header';
 import { EventsHeroActions } from '@/app/(public)/events/events-hero-actions';
@@ -104,22 +105,26 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
         </Suspense>
       )}
 
-      <section className="background-zone background-zone-graphite border-b border-[var(--line)] py-10 md:py-14">
-        <div className="container prose prose-invert max-w-3xl">
-          <h2>Кофейные события, мастер-классы и дегустации в СКФО</h2>
-          <p>
-            Афиша BARSYNERGY собирает профессиональные события кофейной и барной индустрии Северного Кавказа: каппинги, чемпионаты бариста,
-            лекции, мастер-классы, тренинги и открытые дегустации в Махачкале, Грозном, Владикавказе и других городах региона.
-          </p>
-          <p>
-            Раздел подходит как для участников, которые хотят найти ближайшие мероприятия, так и для организаторов, которые хотят добавить
-            событие в афишу. Заявки на размещение события принимаются через форму на странице.
-          </p>
-          <p>
-            Следите за расписанием, чтобы не пропустить обучающие форматы, конкурсы и встречи кофейного сообщества СКФО.
-          </p>
-        </div>
-      </section>
+      <PageInfoSection
+        eyebrow="Платформа"
+        title="Кофейные события, мастер-классы и дегустации в СКФО"
+        sidebarLinks={[
+          { href: 'https://t.me/barsynergy', label: 'Telegram-канал' },
+          { href: '/events', label: 'Афиша событий' },
+        ]}
+      >
+        <p>
+          Афиша BARSYNERGY собирает профессиональные события кофейной и барной индустрии Северного Кавказа: каппинги, чемпионаты бариста,
+          лекции, мастер-классы, тренинги и открытые дегустации в Махачкале, Грозном, Владикавказе и других городах региона.
+        </p>
+        <p>
+          Раздел подходит как для участников, которые хотят найти ближайшие мероприятия, так и для организаторов, которые хотят добавить
+          событие в афишу. Заявки на размещение события принимаются через форму на странице.
+        </p>
+        <p>
+          Следите за расписанием, чтобы не пропустить обучающие форматы, конкурсы и встречи кофейного сообщества СКФО.
+        </p>
+      </PageInfoSection>
     </>
   );
 }

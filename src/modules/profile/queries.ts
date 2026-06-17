@@ -247,7 +247,7 @@ export async function getUserInquiry(applicationId: string, userId: string) {
       status: { not: ApplicationStatus.DRAFT }
     },
     include: {
-      supplier: { select: { title: true, slug: true } }
+      supplier: { select: { title: true, slug: true, businessAccountId: true } }
     }
   });
 }

@@ -19,6 +19,7 @@ import {
   applicationStatusLabels
 } from '@/lib/admin/application-utils';
 import {
+  ApplicationType,
   getBusinessResponses
 } from '@/modules/business/queries';
 
@@ -53,7 +54,7 @@ export default async function BusinessResponsesPage({ searchParams }: BusinessRe
           icon={Mail}
           title={statusGroup === 'active' ? 'Откликов пока нет' : 'В этом разделе пусто'}
           description={statusGroup === 'active'
-            ? 'Когда кандидаты начнут откликаться на ваши вакансии, отклики появятся здесь.'
+            ? 'Когда кандидаты откликнутся на вакансии или гости отправят запрос поставщику, сообщения появятся здесь.'
             : 'Переключите вкладку или вернитесь к активным откликам.'}
           actions={[{
             label: statusGroup === 'active' ? 'К заявкам' : 'Активные отклики',
@@ -75,16 +76,24 @@ export default async function BusinessResponsesPage({ searchParams }: BusinessRe
                   </span>
                 </div>
                 <h3 className="mt-1 font-semibold truncate">
-                  {response.name || 'Без имени'}
+                  {response.name || response.subject || 'Без имени'}
                 </h3>
-                {response.vacancy && (
+                {response.type === ApplicationType.VACANCY_RESPONSE && response.vacancy ? (
                   <p className="mt-1 text-sm text-[var(--muted)]">
                     На вакансию:{' '}
                     <AppLink className="hover:text-[var(--accent)] transition-colors" href={`/vacancies/${response.vacancy.slug}`}>
                       {response.vacancy.title}
                     </AppLink>
                   </p>
-                )}
+                ) : null}
+                {response.type === ApplicationType.SUPPLIER_INQUIRY && response.supplier ? (
+                  <p className="mt-1 text-sm text-[var(--muted)]">
+                    Запрос поставщику:{' '}
+                    <AppLink className="hover:text-[var(--accent)] transition-colors" href={`/suppliers/${response.supplier.slug}`}>
+                      {response.supplier.title}
+                    </AppLink>
+                  </p>
+                ) : null}
                 {response.message && (
                   <p className="mt-1 text-sm text-[var(--muted)] line-clamp-2">{response.message}</p>
                 )}

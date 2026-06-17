@@ -11,14 +11,14 @@ import { createBusinessAccountRequestAction } from '@/app/auth/actions';
 import { arePublicApplicationFormsEnabled } from '@/lib/applications/public-forms';
 import { buildPrivatePageMetadata } from '@/lib/public/metadata';
 import { getActiveCities } from '@/modules/auth/shared/queries';
-import { SUPPORT_EMAIL } from '@/lib/contact-info';
+import { SUPPORT_TELEGRAM } from '@/lib/contact-info';
 import { getEnv } from '@/lib/validation/env';
 
-const PUBLIC_CONTACT_MAILTO = `mailto:${SUPPORT_EMAIL}`;
+const PUBLIC_CONTACT_TELEGRAM = 'https://t.me/barsynergy';
 
 const errorMessages: Record<string, string> = {
   invalid: 'Проверьте обязательные поля, email и сайт.',
-  disabled: `Форма сейчас недоступна. Если доступ нужен, напишите на ${SUPPORT_EMAIL}.`,
+  disabled: `Форма сейчас недоступна. Если доступ нужен, напишите в Telegram ${SUPPORT_TELEGRAM}.`,
   failed: 'Не удалось отправить заявку прямо сейчас. Попробуйте позже.',
   'rate-limited': 'Слишком много заявок за короткое время. Повторите позже.'
 };
@@ -122,9 +122,9 @@ export default async function RegisterPage({ searchParams }: RegisterPageProps) 
               </div>
               {!applicationId ? (
                 <p className="mt-4 text-xs leading-5 text-[var(--muted)]">
-                  Если вы уже отправляли заявку раньше — повторная не нужна. Если письмо не пришло, напишите на{' '}
-                  <a className="font-semibold text-[var(--accent)] hover:text-[var(--accent-strong)]" href={PUBLIC_CONTACT_MAILTO}>
-                    {SUPPORT_EMAIL}
+                  Если вы уже отправляли заявку раньше — повторная не нужна. Если письмо не пришло, напишите в{' '}
+                  <a className="font-semibold text-[var(--accent)] hover:text-[var(--accent-strong)]" href={PUBLIC_CONTACT_TELEGRAM}>
+                    Telegram
                   </a>.
                 </p>
               ) : null}
@@ -135,23 +135,23 @@ export default async function RegisterPage({ searchParams }: RegisterPageProps) 
                 <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--warning)]">Доступ временно закрыт</p>
                 <h2 className="mt-4 text-3xl font-semibold leading-tight md:text-4xl">Форма заявок сейчас недоступна</h2>
                 <p className="mt-4 max-w-2xl text-sm leading-7 text-[var(--muted)]">
-                  Новые заявки через эту форму сейчас не принимаются. Если доступ нужен уже сейчас, напишите на{' '}
-                  <a className="font-semibold text-[var(--accent)] hover:text-[var(--accent-strong)]" href={PUBLIC_CONTACT_MAILTO}>
-                    {SUPPORT_EMAIL}
+                  Новые заявки через эту форму сейчас не принимаются. Если доступ нужен уже сейчас, напишите в{' '}
+                  <a className="font-semibold text-[var(--accent)] hover:text-[var(--accent-strong)]" href={PUBLIC_CONTACT_TELEGRAM}>
+                    Telegram
                   </a>
                   .
                 </p>
                 <div className="mt-6 grid gap-3 md:grid-cols-2">
                   <Panel className="bg-[var(--surface-wash)] text-sm leading-6 text-[var(--muted)]" padding="sm">
-                    Для связи по доступу используйте временную почту команды.
+                    Для связи по доступу используйте Telegram команды.
                   </Panel>
                   <Panel className="bg-[var(--surface-wash)] text-sm leading-6 text-[var(--muted)]" padding="sm">
                     Когда форма снова откроется, заявку можно будет оставить на этой же странице.
                   </Panel>
                 </div>
                 <ActionRow className="mt-7 border-t-0 pt-0">
-                  <Button className="rounded-[var(--radius-md)]" href={PUBLIC_CONTACT_MAILTO} size="lg">
-                    Написать на почту
+                  <Button className="rounded-[var(--radius-md)]" href={PUBLIC_CONTACT_TELEGRAM} size="lg">
+                    Написать в Telegram
                   </Button>
                   <Button className="rounded-[var(--radius-md)]" href="/auth/login" size="lg" variant="secondary">
                     Уже есть доступ

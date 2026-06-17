@@ -16,7 +16,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { Turnstile } from '@/components/ui/turnstile';
 import type { PublicApplicationResult, PublicApplicationUtm } from '@/lib/applications/public-form-helpers';
 import { Button } from '@/components/ui/button';
-import { SUPPORT_EMAIL } from '@/lib/contact-info';
 
 export type SupplierInquiryFormProps = {
   supplierId: string;
@@ -66,8 +65,8 @@ export function SupplierInquiryForm({
           <Button className="rounded-[var(--radius-md)]" href={`/contacts?topic=supplier&context=supplier/${supplierSlug}#contact-form`} size="lg">
             Написать команде
           </Button>
-          <Button className="rounded-[var(--radius-md)]" href={`mailto:${SUPPORT_EMAIL}`} size="lg" variant="secondary">
-            Написать на почту
+          <Button className="rounded-[var(--radius-md)]" href="https://t.me/barsynergy" size="lg" variant="secondary">
+            Написать в Telegram
           </Button>
         </div>
       </div>

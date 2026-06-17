@@ -1,6 +1,51 @@
 # BARSYNERGY Project Status
 
-Last updated: 2026-06-15 (Specialists unified feed MVP)
+Last updated: 2026-06-17 (Supplier ownership and inquiry flow)
+
+## Supplier Ownership And Inquiry Flow (2026-06-17)
+
+Applied in this batch:
+
+- `Supplier` now has an optional `businessAccountId` relation to `BusinessAccount` with migration `20260617000000_add_supplier_business_account`;
+- supplier publication from `SUPPLIER_SUBMISSION` carries `businessAccountId`, contact person, phone and Telegram from the source application;
+- admin supplier create/edit forms can manually link a supplier to an active business account for old records without backfill;
+- `SUPPLIER_INQUIRY` now stores `businessAccountId` when the supplier has an owner, creates the first conversation message, marks unread state for business and queues business email message notifications;
+- business cabinet responses now include both vacancy responses and owned supplier inquiries, with supplier-specific list/detail labels and replies through the existing conversation thread;
+- profile inquiry detail now shows the supplier as interlocutor only when the supplier is linked to a business owner, otherwise it keeps the platform fallback;
+- public supplier detail no longer renders raw contact text or direct contact actions in the hero; contacts live in the right rail with the request form.
+
+Validation snapshot:
+
+- `./node_modules/.bin/prisma validate` passes;
+- `npm run prisma:generate` passes;
+- `node --experimental-strip-types --test tests/application-guards.test.mjs tests/supplier-inquiry-flow-contract.test.mjs tests/business-request.test.mjs` passes (21/21);
+- `npm run typecheck` passes;
+- `npm run lint` passes.
+
+Verification gaps:
+
+- browser smoke for `/suppliers/[slug]`, `/profile/inquiries/[applicationId]`, `/business/cabinet/responses`, `/business/cabinet/responses/[applicationId]` was not run because the Browser plugin was not callable in this session; source/type/lint checks are green.
+
+## Specialists Directory UI Reference Adaptation (2026-06-17)
+
+Applied in this batch:
+
+- public `/vacancies` now starts with a compact dark catalog header: vacancy/specialist counters, segmented `Вакансии / Специалисты` switch and existing placement/profile actions in one surface;
+- `/vacancies?view=specialists` uses a darker directory layout with a mode rail, count summary and horizontal specialist rows split into person, description, compensation/status and action zones;
+- specialist rows no longer repeat compensation as metadata chips when a dedicated compensation block is present;
+- `/specialists/svc/[slug]` service detail view was rebuilt around a profile summary panel, facts, skills/body sections and a sticky contact rail;
+- route URLs, Prisma schema, server actions, form names and moderation flow were kept.
+
+Validation snapshot:
+
+- `npm run lint` passes;
+- Playwright fallback smoke passes for `/vacancies` and `/vacancies?view=specialists` at `1440x900` and `390x844`, and `/masters` at desktop/mobile, with no horizontal overflow or console/page errors;
+- temporary QA screenshots under `/tmp/bars-*.png` were removed.
+
+Verification gaps:
+
+- `npm run typecheck` is blocked by pre-existing unrelated supplier/messaging/profile TypeScript errors (`src/app/profile/inquiries/[applicationId]/page.tsx`, `src/lib/messaging/*`, `src/modules/profile/queries.ts`);
+- local DB has no published `Master` records, so browser smoke for a real `/specialists/svc/[slug]` detail page could not be completed.
 
 ## Specialists Unified Feed (2026-06-15)
 

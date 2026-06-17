@@ -6,6 +6,7 @@ import { SiteHeaderServer } from '@/components/layout/site-header-server';
 import { logoutAction } from '@/app/auth/login/actions';
 import { submitEducationLead } from '@/app/(public)/education/actions';
 import { submitEventLead } from '@/app/(public)/events/actions';
+import { submitMasterLead } from '@/app/(public)/masters/actions';
 import { submitSupplierLead } from '@/app/(public)/suppliers/actions';
 import { submitVacancyLead } from '@/app/(public)/vacancies/actions';
 import { ViewportReveal } from '@/components/public/viewport-reveal';
@@ -69,6 +70,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
               leadActions={{
                 submitEducationLead,
                 submitEventLead,
+                submitMasterLead,
                 submitSupplierLead,
                 submitVacancyLead
               }}

@@ -173,7 +173,9 @@ const homepageEditorialImageOverrides = {
   featuredArticle: '/images/home/current-featured-hero.png',
   vacancy: '/images/home/current-vacancy-card.png',
   secondaryArticle: '/images/home/current-event-card.png',
-  supplier: '/images/home/current-supplier-card.png'
+  supplier: '/images/home/current-supplier-card.png',
+  event: '/images/generated/program-events.jpg',
+  course: '/images/home/professional-education.webp'
 } as const;
 
 function parseLinePairs(value?: string | null) {

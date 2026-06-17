@@ -93,7 +93,7 @@ export function ComposeBox({
         <>
           <div className="relative">
             <Textarea
-              className="min-h-[72px] resize-y text-[14px]"
+              className="min-h-[72px] resize-none text-[14px]"
               disabled={isDisabled}
               maxLength={MAX_MESSAGE_LENGTH + 100}
               onChange={(e) => {

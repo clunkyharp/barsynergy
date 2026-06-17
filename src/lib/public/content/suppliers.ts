@@ -23,6 +23,7 @@ import {
 } from './shared';
 
 type SupplierDetail = PublicContentDetail & {
+  contactLabel?: string;
   contactTelegram?: string;
   contactPhone?: string;
   contactWhatsapp?: string;
@@ -69,6 +70,7 @@ export async function getPublishedSupplierDetail(slug: string): Promise<Supplier
     isVerified: supplier.isVerified,
     externalUrl,
     externalUrlLabel: externalUrl ? 'Сайт компании' : undefined,
+    contactLabel: supplier.contactLabel ?? undefined,
     contactTelegram: supplier.contactTelegram ?? undefined,
     contactPhone: supplier.contactPhone ?? undefined,
     contactWhatsapp: supplier.contactWhatsapp ?? undefined,

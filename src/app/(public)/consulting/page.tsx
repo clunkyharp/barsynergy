@@ -353,20 +353,22 @@ export default async function ConsultingPage({ searchParams }: ConsultingPagePro
       </section>
 
       <section className="background-zone background-zone-cta border-b border-[var(--line)] py-10 md:py-14">
-        <div className="container grid gap-5 md:grid-cols-[minmax(0,1fr)_auto] md:items-center">
-          <div>
-            <PublicEyebrow tone="inverse">Финальный шаг</PublicEyebrow>
-            <PublicDisplayTitle className="mt-3 max-w-3xl text-[var(--editorial-dark-text)]">
-              Есть задача для команды BARSYNERGY?
-            </PublicDisplayTitle>
-          </div>
-          <div className="flex flex-col gap-3 sm:flex-row">
-            <Button href="#consulting-request">
-              Описать задачу
-            </Button>
-            <Button href="/business" variant="secondary">
-              Посмотреть каталог заведений
-            </Button>
+        <div className="container">
+          <div className="rounded-[var(--radius-xl)] border border-[var(--editorial-dark-border)] bg-[var(--editorial-dark-surface)] p-6 shadow-[0_24px_72px_rgba(0,0,0,0.22)] md:grid md:grid-cols-[minmax(0,1fr)_auto] md:items-center md:gap-5 md:p-8" data-theme="dark">
+            <div>
+              <PublicEyebrow tone="inverse">Финальный шаг</PublicEyebrow>
+              <PublicDisplayTitle className="mt-3 max-w-3xl text-[var(--editorial-dark-text)]">
+                Есть задача для команды BARSYNERGY?
+              </PublicDisplayTitle>
+            </div>
+            <div className="mt-4 flex flex-col gap-3 sm:flex-row md:mt-0">
+              <Button className="rounded-[var(--radius-md)]" href="#consulting-request">
+                Описать задачу
+              </Button>
+              <Button className="rounded-[var(--radius-md)]" href="/business" variant="secondary">
+                Посмотреть каталог заведений
+              </Button>
+            </div>
           </div>
         </div>
       </section>

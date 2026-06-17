@@ -112,7 +112,7 @@ export default async function BusinessPage({ searchParams }: BusinessPageProps) 
                 className="public-card-shell flex flex-col gap-2 px-4 py-4"
                 key={audience.label}
               >
-                <h3 className="text-[15px] font-semibold leading-tight text-[var(--text)]">{audience.label}</h3>
+                <h3 className={`${displayFont.className} text-[15px] font-semibold leading-tight text-[var(--text)]`}>{audience.label}</h3>
                 <p className="text-[13px] leading-5 text-[var(--muted)]">{audience.description}</p>
               </article>
             ))}
@@ -138,7 +138,7 @@ export default async function BusinessPage({ searchParams }: BusinessPageProps) 
                 <span className={`${displayFont.className} text-[2.2rem] font-bold leading-none text-[var(--accent)] opacity-60 tabular-nums`}>
                   0{i + 1}
                 </span>
-                <h3 className="text-[1rem] font-semibold leading-tight text-[var(--text)]">{step.title}</h3>
+                <h3 className={`${displayFont.className} text-[1rem] font-semibold leading-tight text-[var(--text)]`}>{step.title}</h3>
                 <p className="text-[13px] leading-5 text-[var(--muted)]">{step.description}</p>
               </div>
             ))}
@@ -171,7 +171,7 @@ export default async function BusinessPage({ searchParams }: BusinessPageProps) 
                     <span className="public-meta-label">{benefit.label}</span>
                     <SectionIcon size={40} type={benefit.icon} />
                   </div>
-                  <h3 className="mt-5 text-xl font-semibold leading-7 text-[var(--text)]">{benefit.title}</h3>
+                  <h3 className={`${displayFont.className} mt-5 text-xl font-semibold leading-7 text-[var(--text)]`}>{benefit.title}</h3>
                   <p className="mt-3 text-sm leading-6 text-[var(--muted)]">{benefit.description}</p>
                 </article>
               );

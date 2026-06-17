@@ -1,7 +1,8 @@
 'use server';
 
+import { after } from 'next/dist/server/after';
 import { redirect } from 'next/navigation';
-import { ApplicationType, ContentStatus, ConversationSender, UserRole } from '@prisma/client';
+import { ApplicationNotificationChannel, ApplicationType, ContentStatus, ConversationSender, UserRole } from '@prisma/client';
 import { z } from 'zod';
 import { buildApplicationPayload } from '@/lib/applications/application-payloads';
 import { createPublicApplication } from '@/lib/applications/create-public-application';
@@ -24,6 +25,10 @@ import { assertSameOriginServerAction } from '@/lib/security/server-action-origi
 import { assertTurnstilePassed } from '@/lib/security/turnstile';
 import { getCurrentUser } from '@/lib/auth/current-user';
 import { isRedirectError } from '@/lib/actions/server-action-errors';
+import {
+  dispatchMessageNotificationQueue,
+  queueMessageNotifications
+} from '@/lib/messaging/notifications/message-notification-outbox';
 
 const PROTECTED_INQUIRY_PATH = '/profile/inquiries';
 
@@ -44,6 +49,92 @@ const supplierInquirySchema = baseContactSchema
     consent: z.literal('accepted')
   })
   .refine((data) => data.email || data.phone || data.telegram, { message: 'contact is required' });
+
+type SupplierInquiryTarget = {
+  id: string;
+  title: string;
+  slug: string;
+  businessAccount: {
+    id: string;
+    owner: {
+      email: string;
+      profile: { fullName: string | null } | null;
+    };
+  } | null;
+};
+
+type ParsedSupplierInquiry = z.infer<typeof supplierInquirySchema>;
+
+async function createSupplierInquiryConversation(input: {
+  supplier: SupplierInquiryTarget;
+  parsed: ParsedSupplierInquiry;
+  currentUserId: string | null;
+  isAuthenticatedUser: boolean;
+}) {
+  const application = await createPublicApplication({
+    type: ApplicationType.SUPPLIER_INQUIRY,
+    userId: input.isAuthenticatedUser ? input.currentUserId : null,
+    subject: `Запрос поставщику: ${input.supplier.title}`,
+    message: input.parsed.volumeDetails,
+    name: input.parsed.contactName,
+    email: nullableString(input.parsed.email),
+    phone: nullableString(input.parsed.phone),
+    telegram: nullableString(input.parsed.telegram),
+    businessAccountId: input.supplier.businessAccount?.id ?? null,
+    supplierId: input.supplier.id,
+    consentText: PERSONAL_DATA_CONSENT_TEXT,
+    payload: buildApplicationPayload(ApplicationType.SUPPLIER_INQUIRY, {
+      supplierTitle: input.supplier.title,
+      productCategory: input.parsed.productCategory,
+      volumeDetails: input.parsed.volumeDetails,
+      contactName: input.parsed.contactName,
+      contactPhone: input.parsed.phone,
+      contactEmail: input.parsed.email
+    })
+  });
+
+  await prisma.$transaction(async (tx) => {
+    await tx.conversationMessage.create({
+      data: {
+        applicationId: application.id,
+        authorId: input.isAuthenticatedUser ? input.currentUserId : null,
+        senderRole: ConversationSender.USER,
+        body: input.parsed.volumeDetails
+      }
+    });
+
+    await tx.application.update({
+      where: { id: application.id },
+      data: {
+        hasUnreadForBusiness: Boolean(input.supplier.businessAccount),
+        hasUnreadForUser: false,
+        lastMessageAt: new Date()
+      }
+    });
+
+    const owner = input.supplier.businessAccount?.owner;
+    if (owner?.email) {
+      await queueMessageNotifications(tx, [{
+        channel: ApplicationNotificationChannel.BUSINESS_MESSAGE_EMAIL,
+        payload: {
+          applicationId: application.id,
+          senderRole: ConversationSender.USER,
+          recipientEmail: owner.email,
+          recipientName: owner.profile?.fullName ?? null,
+          senderName: input.parsed.contactName,
+          contextLabel: input.supplier.title,
+          threadUrl: `/business/cabinet/responses/${application.id}`
+        }
+      }]);
+    }
+  });
+
+  after(() => {
+    dispatchMessageNotificationQueue({ applicationId: application.id });
+  });
+
+  return application;
+}
 
 export async function submitSupplierInquiryAction(formData: FormData) {
   let supplierSlug = optionalString(getString(formData, 'supplierSlug'));
@@ -74,7 +165,22 @@ export async function submitSupplierInquiryAction(formData: FormData) {
 
     const supplier = await prisma.supplier.findFirst({
       where: { id: parsed.supplierId, status: ContentStatus.PUBLISHED },
-      select: { id: true, title: true, slug: true }
+      select: {
+        id: true,
+        title: true,
+        slug: true,
+        businessAccount: {
+          select: {
+            id: true,
+            owner: {
+              select: {
+                email: true,
+                profile: { select: { fullName: true } }
+              }
+            }
+          }
+        }
+      }
     });
 
     if (!supplier) {
@@ -91,34 +197,11 @@ export async function submitSupplierInquiryAction(formData: FormData) {
     const currentUser = await getCurrentUser();
     const isAuthenticatedUser = currentUser?.role === UserRole.USER;
 
-    const application = await createPublicApplication({
-      type: ApplicationType.SUPPLIER_INQUIRY,
-      userId: isAuthenticatedUser ? currentUser.id : null,
-      subject: `Запрос поставщику: ${supplier.title}`,
-      message: parsed.volumeDetails,
-      name: parsed.contactName,
-      email: nullableString(parsed.email),
-      phone: nullableString(parsed.phone),
-      telegram: nullableString(parsed.telegram),
-      supplierId: supplier.id,
-      consentText: PERSONAL_DATA_CONSENT_TEXT,
-      payload: buildApplicationPayload(ApplicationType.SUPPLIER_INQUIRY, {
-        supplierTitle: supplier.title,
-        productCategory: parsed.productCategory,
-        volumeDetails: parsed.volumeDetails,
-        contactName: parsed.contactName,
-        contactPhone: parsed.phone,
-        contactEmail: parsed.email
-      })
-    });
-
-    await prisma.conversationMessage.create({
-      data: {
-        applicationId: application.id,
-        authorId: isAuthenticatedUser ? currentUser.id : null,
-        senderRole: ConversationSender.USER,
-        body: parsed.volumeDetails
-      }
+    const application = await createSupplierInquiryConversation({
+      supplier,
+      parsed,
+      currentUserId: currentUser?.id ?? null,
+      isAuthenticatedUser
     });
 
     if (isAuthenticatedUser) {
@@ -163,7 +246,22 @@ export async function submitSupplierInquiryFormAction(
 
     const supplier = await prisma.supplier.findFirst({
       where: { id: parsed.supplierId, status: ContentStatus.PUBLISHED },
-      select: { id: true, title: true, slug: true }
+      select: {
+        id: true,
+        title: true,
+        slug: true,
+        businessAccount: {
+          select: {
+            id: true,
+            owner: {
+              select: {
+                email: true,
+                profile: { select: { fullName: true } }
+              }
+            }
+          }
+        }
+      }
     });
 
     if (!supplier) {
@@ -175,34 +273,11 @@ export async function submitSupplierInquiryFormAction(
     const currentUser = await getCurrentUser();
     const isAuthenticatedUser = currentUser?.role === UserRole.USER;
 
-    const application = await createPublicApplication({
-      type: ApplicationType.SUPPLIER_INQUIRY,
-      userId: isAuthenticatedUser ? currentUser.id : null,
-      subject: `Запрос поставщику: ${supplier.title}`,
-      message: parsed.volumeDetails,
-      name: parsed.contactName,
-      email: nullableString(parsed.email),
-      phone: nullableString(parsed.phone),
-      telegram: nullableString(parsed.telegram),
-      supplierId: supplier.id,
-      consentText: PERSONAL_DATA_CONSENT_TEXT,
-      payload: buildApplicationPayload(ApplicationType.SUPPLIER_INQUIRY, {
-        supplierTitle: supplier.title,
-        productCategory: parsed.productCategory,
-        volumeDetails: parsed.volumeDetails,
-        contactName: parsed.contactName,
-        contactPhone: parsed.phone,
-        contactEmail: parsed.email
-      })
-    });
-
-    await prisma.conversationMessage.create({
-      data: {
-        applicationId: application.id,
-        authorId: isAuthenticatedUser ? currentUser.id : null,
-        senderRole: ConversationSender.USER,
-        body: parsed.volumeDetails
-      }
+    const application = await createSupplierInquiryConversation({
+      supplier,
+      parsed,
+      currentUserId: currentUser?.id ?? null,
+      isAuthenticatedUser
     });
 
     if (isAuthenticatedUser) {
