@@ -155,7 +155,7 @@ const cities = [
   { name: 'Ростов-на-Дону', slug: 'rostov-on-don', region: 'Ростовская область' },
 ];
 
-async function seedCategories(count: number) {
+async function seedCategories(count) {
   let created = 0;
   for (const cat of categories) {
     const existing = await prisma.category.findUnique({
@@ -169,7 +169,7 @@ async function seedCategories(count: number) {
   console.log(`Categories: ${created} new, ${count} total`);
 }
 
-async function seedSkills(count: number) {
+async function seedSkills(count) {
   let created = 0;
   for (const name of skills) {
     const slug = name.toLowerCase().replace(/[^a-zа-яё0-9]+/g, '-').replace(/^-|-$/g, '');
