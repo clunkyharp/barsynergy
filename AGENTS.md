@@ -20,31 +20,47 @@ Primary stack:
 - Nginx
 - S3-compatible Timeweb Cloud Object Storage for production files
 
-## Start Here
+## Start Here — Minimal Reading Per Task
 
-At the start of every new session in this repository, first use `$project-code-map` if the skill is available. If the skill is not loaded in the current client, read `.agents/skills/project-code-map/SKILL.md` manually, then read `docs/agent-project-map.md` before broad source exploration.
+Не читать всё подряд. Читать минимальный набор под задачу.
 
-Before meaningful project work, read the smallest relevant set of docs:
+### 1. Всегда перед работой
 
-1. `docs/agent-project-map.md`
-2. `README.md`
-3. `docs/project-plan.md`
-4. `docs/agent-workflow.md`
-5. `docs/phase-plan.md`
-6. `PROJECT_STATUS.md`
-7. `docs/kanban-sync.md`
-8. phase-specific or task-specific docs under `docs/`
-9. current `git status --short --branch`
+- `.agents/skills/project-code-map/SKILL.md` — если навык недоступен, прочитать вручную
+- `docs/agent-project-map.md` — найти кратчайший путь к коду
+- `AGENTS.md` — этот файл
+- `git status --short --branch`
+
+### 2. Перед значимой разработкой
+
+- `README.md`
+- `docs/project-plan.md` — продуктовый план
+- `docs/phase-plan.md` — дорожная карта реализации
+- `PROJECT_STATUS.md`
+- `docs/agent-workflow.md`
+
+### 3. Перед кодом
+
+- `docs/engineering-standards.md` — лимиты компонентов, CSS, TypeScript, формы
+- `docs/architecture.md` — слои, паттерны, анти-паттерны
+- `docs/pr-checklist.md` — пред-мерж проверки
+- `docs/scaling-playbook.md` — новые типы контента, роли, уведомления
+
+### 4. По типу задачи
+
+| Тип задачи | Куда смотреть |
+|------------|--------------|
+| Публичные страницы | `src/app/(public)/...`, `src/components/public/`, `src/lib/public/`, `src/app/styles/public.css` |
+| Админка | `src/app/admin/...`, `src/components/admin/`, `src/lib/admin/` |
+| Формы и заявки | `src/app/(public)/.../actions.ts`, `src/components/public/*form*`, `src/lib/applications/`, `src/lib/security/` |
+| Auth/session | `src/app/auth/`, `src/lib/auth/`, `src/lib/security/`, `src/middleware.ts` |
+| Бизнес/профиль | `src/app/profile/`, `src/app/(business-workspace)/business/`, `src/lib/profile/`, `src/lib/business/` |
+| Prisma/schema | `prisma/schema.prisma`, `prisma/migrations/`, затронутые `src/lib/**` queries |
+| Деплой/env | `docs/deploy.md`, `docs/env.md`, `.env.example`, `.env.production.example`, `docker-compose*.yml` |
 
 Use `docs/project-plan.md` as the canonical product plan and `docs/phase-plan.md` as the implementation roadmap.
 Use `docs/agent-project-map.md` to find the smallest relevant code surface before opening broad folders.
 If the map is missing, stale for the task area, or not discoverable from a new session, stop implementation and fix the onboarding/map setup first.
-
-**Core engineering references (read before implementation):**
-- `docs/engineering-standards.md` — component limits, CSS rules, TypeScript rules, form rules
-- `docs/architecture.md` — layers, patterns, anti-patterns, pending decisions
-- `docs/pr-checklist.md` — pre-merge checks for every branch
-- `docs/scaling-playbook.md` — step-by-step guides for new content types, roles, notifications
 
 ## Research When Uncertain
 
@@ -54,15 +70,15 @@ When unsure about any library, framework, API, tool, service, dependency, config
 
 Every meaningful change must include a documentation sync decision before closeout.
 
-Always check whether the change affects:
+После работы при необходимости обновлять:
 
-- `PROJECT_STATUS.md`;
-- `docs/phase-plan.md`;
-- `docs/project-plan.md`;
-- phase-specific docs under `docs/`;
-- the Obsidian Kanban board described in `docs/kanban-sync.md`.
-
-If code, schema, migration, UI, route behavior, validation results, active phase, next step, blocker or task status changed, update the relevant docs and the Kanban board in the same batch.
+- `PROJECT_STATUS.md` — если изменился статус, готовность, блокер, проверка или следующий шаг
+- `docs/phase-plan.md` — если закрыт/изменён этап, чекпоинт или план реализации
+- `docs/project-plan.md` — если изменилось продуктовое поведение, scope или долгосрочный план
+- `docs/agent-project-map.md` — если изменились маршруты, владельцы модулей, структура, валидация или onboarding для агентов
+- `docs/kanban-sync.md` + Obsidian Kanban — если изменился статус задачи, фазы, блокера или next step
+- Таск-специфичные docs под `docs/` — если изменение затрагивает конкретную функцию, фазу, деплой, env, безопасность или QA
+- `/Users/amir/llm-wiki-template/system/workflows/improve.md` — только если появился долговечный, обезличенный и проектно-нейтральный урок (не писать туда названия проекта, пути, домены, секреты, локальные детали)
 
 If no docs or Kanban update is needed, state that explicitly in the closeout with the reason.
 

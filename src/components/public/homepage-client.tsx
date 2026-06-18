@@ -4,7 +4,6 @@ import { HomeHeroRouter } from './homepage-hero';
 import { HomeEventsStrip, EditorialFeatured, EditorialSupportCard } from './homepage-current';
 import { CommunityChannelRows } from './homepage-community';
 import { HomeSponsorLogoStrip } from './homepage-sponsors';
-import { HomeTestimonials } from './homepage-testimonials';
 
 import { HomeCtaFaqSection } from './home-cta-faq-section';
 import { Button } from '@/components/ui/button';
@@ -93,8 +92,6 @@ export function HomepageClient({ data }: HomepageClientProps) {
       </section>
 
       {data.generalSponsors.length > 0 ? <HomeSponsorLogoStrip sponsors={data.generalSponsors} /> : null}
-
-      {/* <HomeTestimonials testimonials={data.testimonials} /> */}
 
       <HomeCtaFaqSection />
 

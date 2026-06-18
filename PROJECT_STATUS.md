@@ -1,12 +1,12 @@
 # BARSYNERGY Project Status
 
-Last updated: 2026-06-18
+Last updated: 2026-06-19
 
 ## Current Branch
 
 - Active branch: `prod` (ahead 3 of `origin/prod`)
-- Dirty files: `src/app/(public)/business/page.tsx`, `src/app/(public)/contacts/page.tsx`
-- Work mode: branch not set in this session
+- Dirty files before this docs batch: Pre-7.1 implementation and docs updates
+- Work mode: `IMPLEMENTATION` Pre-7.1 public content discovery and data QA
 
 ## Current Phase
 
@@ -22,14 +22,23 @@ Public personal-data forms remain disabled by default in production until `APPLI
 
 ## Current Validation Snapshot
 
-- `npm run lint` — pass (last batch);
-- `npm run typecheck` — pass (last batch);
+- `npm run lint` — pass;
+- `npm run typecheck` — pass;
 - `./node_modules/.bin/prisma validate` — pass;
 - `npm run build` — pass (last batch);
-- `npm test` — mix of pass/fail; stale source-contract tests remain.
+- `npm test` — pass, 348/348;
+- Pre-7.1 targeted tests — pass: article rubric/discovery, search/listing consistency, supplier inquiry/contact contract;
+- Pre-7.1 browser smoke — pass on local dev server at desktop and mobile widths: `/articles`, `/events?city=makhachkala`, `/suppliers/hustle-brew`;
+- T3 markdown quality source test — pass.
 
 ## Open Items / Backlog
 
+- Completed 2026-06-19:
+  - Pre-7.1 T1 articles rubric sub-grids and topic proposal empty-state CTA;
+  - Pre-7.1 T2 event city tabs and city-specific empty state actions;
+  - T3 espresso article markdown cleanup plus published-materials seed audit;
+  - Pre-7.1 T4 supplier contact rows and supplier request CTA;
+  - validation cleanup: `npm run lint` pass and `npm test` pass after import/seed/homepage lint cleanup and article featured-card aspect marker restoration;
 - Supplier content editorial policy;
 - Ratings/reviews for suppliers;
 - Contrast check on editorial-dark-muted (verify live);
@@ -49,8 +58,8 @@ Public personal-data forms remain disabled by default in production until `APPLI
 
 ## Next Recommended Steps
 
-1. Triage remaining failing source-contract tests on `dev`.
-2. Create checkpoint commit for current dirty tree, then prepare next stabilization or release slice.
+1. Start Phase 5 only from a fresh implementation batch with its own mini-spec.
+2. Before release work, create a clean checkpoint and keep `dev -> prod` flow explicit.
 
 ## Historical Notes
 

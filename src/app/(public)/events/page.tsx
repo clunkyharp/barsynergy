@@ -46,6 +46,7 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
     getPublicCityFilterOptions(),
     getEventFilterOptions()
   ]);
+  const selectedCityOption = selectedCity ? filterCities.find((city) => city.slug === selectedCity) : undefined;
 
   const hasActiveSearch = hasActivePublicContentParams(contentParams, ['q', 'category', 'city', 'format', 'period']);
   const isEmpty = content.total === 0;
@@ -69,6 +70,7 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
         formats={filterOptions.formats}
         selectedCity={selectedCity}
         selectedFormat={selectedFormat}
+        selectedPeriod={selectedPeriod}
         selectedQ={selectedQ}
       />
 
@@ -115,7 +117,10 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
             </section>
           }
         >
-          <EventAgendaSection content={content} />
+          <EventAgendaSection
+            cityName={selectedCityOption?.name}
+            content={content}
+          />
         </Suspense>
       )}
 

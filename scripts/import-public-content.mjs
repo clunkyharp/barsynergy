@@ -1,5 +1,6 @@
 import { PrismaClient, ContentStatus } from '@prisma/client';
 import { readFileSync } from 'fs';
+import { URL } from 'node:url';
 
 const prisma = new PrismaClient({ log: ['error'] });
 const data = JSON.parse(readFileSync(new URL('./public-content-import.json', import.meta.url), 'utf-8'));
@@ -92,13 +93,6 @@ async function upsertSponsor(item) {
   imported++;
 }
 
-async function upsertHomepageItems(table, items, transform) {
-  for (const item of items) {
-    await prisma[table].create({ data: { ...transform(item), createdAt: new Date(), updatedAt: new Date() } });
-    imported++;
-  }
-}
-
 async function main() {
   for (const a of data.articles || []) await upsertArticle(a);
   for (const e of data.events || []) await upsertEvent(e);
@@ -127,7 +121,12 @@ async function main() {
     const count = await prisma[model].count();
     if (count === 0) {
       for (const item of items) {
-        const { id, createdAt, updatedAt, createdById, updatedById, ...rest } = item;
+        const rest = { ...item };
+        delete rest.id;
+        delete rest.createdAt;
+        delete rest.updatedAt;
+        delete rest.createdById;
+        delete rest.updatedById;
         await prisma[model].create({ data: { ...defaults, ...rest } });
         imported++;
       }

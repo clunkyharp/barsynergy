@@ -73,7 +73,7 @@ export function ArticleFeaturedCard({
 
   return (
     <AppLink
-      className="media-card-shell group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)]"
+      className="media-card-shell group aspect-[21/9] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)]"
       href={href}
     >
       <div
