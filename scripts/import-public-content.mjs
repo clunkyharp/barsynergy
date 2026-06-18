@@ -7,10 +7,16 @@ const data = JSON.parse(readFileSync(new URL('./public-content-import.json', imp
 let imported = 0;
 let skipped = 0;
 
+function extractSlug(cat) {
+  if (!cat) return null;
+  if (typeof cat === 'string') return cat;
+  return cat.slug || null;
+}
+
 async function upsertArticle(item) {
   const existing = await prisma.article.findUnique({ where: { slug: item.slug } });
   if (existing) { skipped++; return; }
-  const catSlug = item.category;
+  const catSlug = extractSlug(item.category);
   const category = catSlug ? await prisma.category.findUnique({ where: { slug_type: { slug: catSlug, type: 'ARTICLE' } } }) : null;
   const tagNames = item.tags || [];
   const tagIds = [];
@@ -37,7 +43,7 @@ async function upsertArticle(item) {
 async function upsertEvent(item) {
   const existing = await prisma.event.findUnique({ where: { slug: item.slug } });
   if (existing) { skipped++; return; }
-  const catSlug = item.category;
+  const catSlug = extractSlug(item.category);
   const category = catSlug ? await prisma.category.findUnique({ where: { slug_type: { slug: catSlug, type: 'EVENT' } } }) : null;
   await prisma.event.create({
     data: {
@@ -56,7 +62,7 @@ async function upsertEvent(item) {
 async function upsertSupplier(item) {
   const existing = await prisma.supplier.findUnique({ where: { slug: item.slug } });
   if (existing) { skipped++; return; }
-  const catSlug = item.category;
+  const catSlug = extractSlug(item.category);
   const category = catSlug ? await prisma.category.findUnique({ where: { slug_type: { slug: catSlug, type: 'SUPPLIER' } } }) : null;
   await prisma.supplier.create({
     data: {
