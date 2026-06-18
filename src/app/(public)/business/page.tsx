@@ -176,7 +176,7 @@ export default async function BusinessPage({ searchParams }: BusinessPageProps) 
           <div className="min-w-0 xl:self-start">
             <div className="min-w-0">
               <PublicEyebrow>Польза</PublicEyebrow>
-              <PublicDisplayTitle className="mt-4 max-w-[13ch]">Что получите</PublicDisplayTitle>
+              <PublicDisplayTitle className="mt-4 max-w-[13ch] !text-[clamp(2rem,4.4vw,2.9rem)] [overflow-wrap:break-word]">Что получите</PublicDisplayTitle>
               <PublicBodyText className="mt-5 max-w-md" size="md" tone="default">
                 Каталог собирает кофейный сегмент региона: кто и где работает. Без рекламы «для всех».
               </PublicBodyText>

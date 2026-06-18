@@ -96,8 +96,12 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
           />
           <section className="border-b border-[var(--line)] py-8 md:py-12">
             <div className="container">
-              <h3 className="text-[1.05rem] font-semibold leading-tight text-[var(--text)] mb-3">Не пропустите события</h3>
-              <ContentSubscribeForm topic="EVENTS" label="Узнать о новых событиях" />
+              <div className="mx-auto max-w-3xl rounded-[var(--radius-xl)] border border-[var(--line)] bg-[var(--surface-card)] p-6 md:p-8">
+                <span className="text-[11px] font-semibold uppercase tracking-[var(--tracking-eyebrow-sm)] text-[var(--accent)]">Подписка</span>
+                <h3 className="mt-2 text-[1.15rem] font-semibold leading-tight text-[var(--text)]">Не пропустите события</h3>
+                <p className="mt-2 max-w-xl text-sm leading-6 text-[var(--muted)]">Пришлём анонс, когда появятся новые каппинги, чемпионаты и мастер-классы в регионе.</p>
+                <ContentSubscribeForm className="mt-5" topic="EVENTS" label="Узнать о новых событиях" />
+              </div>
             </div>
           </section>
         </>

@@ -1,6 +1,6 @@
 import type { CSSProperties } from 'react';
 import type { Metadata } from 'next';
-import { ArrowUpRight, Briefcase, Clock, FileQuestion, Newspaper, Package2, Paperclip } from 'lucide-react';
+import { ArrowUpRight, Clock, FileQuestion, Paperclip } from 'lucide-react';
 import { AppLink } from '@/components/ui/app-link';
 import { PageHero } from '@/components/public/page-hero';
 import { ContactChannels } from '@/components/public/contact-channels';
@@ -76,7 +76,6 @@ const workflowItems = [
 
 const alternativeRoutes = [
   {
-    icon: Briefcase,
     title: 'Хочу разместить вакансию',
     description: 'Заполните карточку вакансии — она появится в каталоге и попадёт в подборку для специалистов.',
     href: '/vacancies/new',
@@ -84,20 +83,18 @@ const alternativeRoutes = [
     accent: 'var(--accent)'
   },
   {
-    icon: Package2,
     title: 'Хочу попасть в каталог поставщиков',
     description: 'Карточка компании с продуктами, географией и контактами появляется в каталоге BARSYNERGY.',
     href: '/suppliers?action=join',
     actionLabel: 'Разместить компанию',
-    accent: 'var(--success)'
+    accent: 'var(--accent)'
   },
   {
-    icon: Newspaper,
     title: 'Хочу подписаться на материалы',
     description: 'Подписка на еженедельную рассылку: события, обучение, кейсы и обновления каталога.',
     href: '/articles',
     actionLabel: 'Перейти в материалы',
-    accent: 'color-mix(in oklab, var(--accent) 62%, var(--warning))'
+    accent: 'var(--accent)'
   }
 ] as const;
 
@@ -194,7 +191,7 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
             <div className="flex flex-wrap items-end justify-between gap-4">
               <div>
                 <p className="text-[11px] font-semibold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--accent)]">
-                  Другой маршрут
+                  Быстрые разделы
                 </p>
                 <h2 className={`${displayFont.className} mt-2 text-[1.7rem] font-semibold leading-[1.1] text-[var(--text)] md:text-[2.1rem]`}>
                   Не нашли свой случай?
@@ -207,7 +204,6 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
 
             <div className="mt-8 grid gap-3 md:grid-cols-3">
               {alternativeRoutes.map((route) => {
-                const Icon = route.icon;
                 return (
                   <AppLink
                     className="group flex h-full flex-col overflow-hidden rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--surface)] transition-[border-color,box-shadow] duration-[var(--motion-duration-base)] ease-[var(--motion-ease-standard)] hover:border-[color-mix(in_oklab,var(--route-accent)_45%,var(--border-default))] hover:shadow-[var(--shadow-card)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--route-accent)] motion-reduce:transition-none"
@@ -215,15 +211,7 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
                     key={route.title}
                     style={{ '--route-accent': route.accent } as CSSProperties}
                   >
-                    <span
-                      aria-hidden="true"
-                      className="flex items-center justify-end border-b border-[var(--border-default)] bg-[radial-gradient(circle_at_82%_18%,color-mix(in_oklab,var(--route-accent)_24%,transparent),transparent_46%)] p-5"
-                    >
-                      <span className="grid size-11 place-items-center rounded-[var(--radius-md)] border border-[color-mix(in_oklab,var(--route-accent)_42%,var(--border-default))] bg-[color-mix(in_oklab,var(--route-accent)_16%,var(--surface))] text-[var(--route-accent)]">
-                        <Icon size={20} strokeWidth={1.8} />
-                      </span>
-                    </span>
-                    <span className="flex flex-1 flex-col p-5">
+                    <span className="flex flex-1 flex-col p-6">
                       <h3 className="text-base font-semibold leading-6 text-[var(--text)]">{route.title}</h3>
                       <p className="mt-2 text-sm leading-6 text-[var(--muted)]">{route.description}</p>
                       <span className="mt-auto inline-flex items-center gap-2 pt-4 text-sm font-semibold text-[var(--route-accent)]">

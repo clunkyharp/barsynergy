@@ -42,7 +42,7 @@ export function PageInfoSection({
               </div>
             </div>
             {sidebarLinks && sidebarLinks.length > 0 ? (
-              <div className="rounded-[var(--radius-lg)] border border-[var(--line)] bg-[var(--surface-wash)] p-5">
+              <div className="rounded-[var(--radius-lg)] border border-[var(--line)] bg-[var(--surface-wash)] p-5 lg:self-center">
                 <span className="text-xs font-semibold uppercase tracking-[var(--tracking-eyebrow-sm)] text-[var(--accent)]">
                   {sidebarLabel}
                 </span>

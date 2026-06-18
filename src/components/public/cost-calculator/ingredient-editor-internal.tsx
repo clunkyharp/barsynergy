@@ -197,7 +197,7 @@ function IngredientFields({
         />
       </FormField>
 
-      <FormField className="col-span-2 sm:col-span-1 lg:[&>label]:sr-only lg:[&>p]:sr-only" htmlFor={fieldId('packagePrice')} hint="В рублях" label="Цена упаковки, ₽">
+      <FormField className="col-span-2 sm:col-span-1 lg:[&>label]:sr-only lg:[&>p]:sr-only lg:[&_.field-hint]:sr-only" htmlFor={fieldId('packagePrice')} hint="В рублях" label="Цена упаковки, ₽">
         <Input
           className="h-11 text-right text-sm tabular-nums lg:h-10"
           id={fieldId('packagePrice')}
@@ -209,7 +209,7 @@ function IngredientFields({
       </FormField>
 
       <UnitField
-        className="col-span-2 sm:col-span-1 lg:[&>label]:sr-only lg:[&>p]:sr-only"
+        className="col-span-2 sm:col-span-1 lg:[&>label]:sr-only lg:[&>p]:sr-only lg:[&_.field-hint]:sr-only"
         hint="Например: 1 кг, 1 л, 1000 г, 1 шт."
         id={fieldId('packageAmount')}
         label="Размер упаковки"
@@ -221,7 +221,7 @@ function IngredientFields({
       />
 
       <UnitField
-        className="col-span-2 sm:col-span-1 lg:[&>label]:sr-only lg:[&>p]:sr-only"
+        className="col-span-2 sm:col-span-1 lg:[&>label]:sr-only lg:[&>p]:sr-only lg:[&_.field-hint]:sr-only"
         hint="Сколько ингредиента используется в одной порции."
         id={fieldId('recipeAmount')}
         label="Кол-во в рецепте"

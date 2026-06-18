@@ -116,14 +116,14 @@ function AdditionalCostRow({
       <div className="flex w-[140px] items-center gap-2">
         <Input
           aria-invalid={cost.error ? true : undefined}
-          className="h-10 min-w-0 flex-1 text-right text-sm tabular-nums"
+          className="h-10 min-w-0 flex-1 rounded-[var(--radius-sm)] border border-[var(--border-default)] bg-[var(--surface-wash)] px-3 text-right text-lg tabular-nums text-[var(--text)] placeholder:text-[var(--muted)]"
           id={fieldId('amount')}
           inputMode="decimal"
           onChange={(e) => onUpdate(cost.id, 'amount', e.target.value)}
           placeholder="15"
           value={cost.amount}
         />
-        <span className="shrink-0 text-[11px] font-semibold tabular-nums text-[var(--muted)]">₽</span>
+        <span className="flex shrink-0 items-center rounded-[var(--radius-sm)] border border-[var(--border-default)] bg-[var(--surface-wash)] px-2 text-[11px] font-semibold text-[var(--muted)]">₽</span>
       </div>
       <button
         aria-label={`Удалить расход: ${cost.name || 'без названия'}`}

@@ -55,11 +55,6 @@ export function EducationApplicationForms({ enabled, utm, cities, defaults = {},
       label: 'Заказ сертификата',
       description: 'Если нужен подарочный или командный сертификат.'
     },
-    {
-      href: '/education?formType=course&courseTitle=%D0%9F%D1%80%D0%B5%D0%B4%D0%BB%D0%BE%D0%B6%D0%B8%D1%82%D1%8C%20%D1%82%D0%B5%D0%BC%D1%83#education-request',
-      label: 'Предложить тему',
-      description: 'Если хотите предложить занятие или разбор.'
-    }
   ];
 
   return (

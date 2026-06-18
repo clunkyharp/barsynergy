@@ -49,48 +49,6 @@ type SpecialistListSectionProps = {
   params: PublicContentSearchParams;
 };
 
-function SpecialistFilters({
-  filterOptions,
-  params,
-}: {
-  filterOptions: SpecialistListSectionProps['filterOptions'];
-  params: PublicContentSearchParams;
-}) {
-  const activeMode = Array.isArray(params.mode) ? params.mode[0] : params.mode;
-
-  return (
-    <div className="specialist-mode-panel">
-      <div>
-        <span className="text-xs font-semibold uppercase tracking-[var(--tracking-eyebrow-sm)] text-[var(--accent)]">Режим</span>
-        <p className="mt-3 text-sm leading-6 text-[var(--muted)]">Выберите, какие анкеты показывать в каталоге.</p>
-      </div>
-      <div className="grid gap-2">
-          {filterOptions.mode.map((opt) => {
-            const isActive = activeMode === opt.value || (!activeMode && opt.value === 'seeking');
-            return (
-              <AppLink
-                key={opt.value}
-                className={cn(
-                  'specialist-mode-link',
-                  isActive
-                    ? 'specialist-mode-link-active'
-                    : 'specialist-mode-link-idle'
-                )}
-                href={isActive ? '/vacancies?view=specialists' : buildModeUrl(params, opt.value)}
-              >
-                <span>{opt.label}</span>
-                <span aria-hidden="true">{isActive ? '●' : '○'}</span>
-              </AppLink>
-            );
-          })}
-      </div>
-      <div className="specialist-mode-note">
-        Переключение режима сразу обновляет список.
-      </div>
-    </div>
-  );
-}
-
 function SpecialistModeBar({
   filterOptions,
   params,
@@ -101,7 +59,7 @@ function SpecialistModeBar({
   const activeMode = Array.isArray(params.mode) ? params.mode[0] : params.mode;
 
   return (
-    <div className="specialist-mode-bar lg:hidden">
+    <div className="specialist-mode-bar">
       <span className="text-xs font-semibold uppercase tracking-[var(--tracking-eyebrow-sm)] text-[var(--accent)]">Режим</span>
       <div className="specialist-mode-bar-links">
         {filterOptions.mode.map((opt) => {
@@ -135,20 +93,13 @@ export function SpecialistListSection({
   return (
     <section className="specialist-directory-section background-zone background-zone-graphite border-b border-[var(--line)] py-8 md:py-14">
       <div className="container">
-        <div className="lg:grid lg:grid-cols-[minmax(17rem,0.42fr)_minmax(0,1.58fr)] lg:gap-8">
-          <aside className="hidden lg:block">
-            <div className="flex flex-col gap-4">
-              <SpecialistFilters filterOptions={filterOptions} params={params} />
-            </div>
-          </aside>
-
-          <div className="flex min-w-0 flex-col gap-6">
+        <div className="flex min-w-0 flex-col gap-6">
             <SpecialistModeBar filterOptions={filterOptions} params={params} />
 
             <div className="specialist-directory-summary">
               <div className="min-w-0">
                 <span className="text-xs font-semibold uppercase tracking-[var(--tracking-eyebrow-sm)] text-[var(--accent)]">Каталог специалистов</span>
-                <h2 className="mt-2 text-[2rem] font-semibold leading-none text-[var(--text)] md:text-[2.5rem]">Найдено {content.total}</h2>
+                <h2 className="mt-2 text-[1.6rem] font-semibold leading-tight text-[var(--text)] md:text-[1.9rem]">Найдено {content.total}</h2>
                 <p className="mt-3 max-w-2xl text-sm leading-6 text-[var(--muted)]">
                   Проверенные анкеты и предложения услуг для работы, проектов и сотрудничества.
                 </p>
@@ -209,7 +160,6 @@ export function SpecialistListSection({
                 )}
               </nav>
             ) : null}
-          </div>
         </div>
       </div>
     </section>

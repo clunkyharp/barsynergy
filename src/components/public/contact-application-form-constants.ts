@@ -22,7 +22,7 @@ export const contactMethods: ContactMethod[] = [
     actionLabel: 'Написать в Telegram',
     tone: 'telegram',
     descriptor: 'Быстрый ответ по короткому вопросу. Голосовые, документы и ссылки.',
-    helper: 'Обычно до 1 рабочего часа'
+    helper: 'Ответ до 1 часа'
   },
   {
     mark: 'WA',
@@ -42,7 +42,7 @@ export const contactMethods: ContactMethod[] = [
     actionLabel: 'Смотреть Instagram',
     tone: 'instagram',
     descriptor: 'Свежие материалы, события и анонсы. Личные сообщения смотрим раз в день.',
-    helper: 'Ответ — в течение дня'
+    helper: 'Ответ в течение дня'
   }
 ];
 

@@ -91,7 +91,7 @@ export function SocialChannelCard(props: SocialChannelCardProps) {
   return (
     <a
       className={cn(
-        'group relative flex flex-col overflow-hidden rounded-[28px] border border-[color-mix(in_srgb,var(--accent)_18%,transparent)] bg-[var(--editorial-dark-surface)] p-3 text-[var(--editorial-dark-text)] transition-[border-color] duration-[var(--motion-duration-base)] ease-[var(--motion-ease-standard)] hover:border-[color-mix(in_srgb,var(--accent)_55%,transparent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] motion-reduce:transition-none',
+        'group relative flex h-full flex-col overflow-hidden rounded-[28px] border border-[color-mix(in_srgb,var(--accent)_18%,transparent)] bg-[var(--editorial-dark-surface)] p-3 text-[var(--editorial-dark-text)] transition-[border-color] duration-[var(--motion-duration-base)] ease-[var(--motion-ease-standard)] hover:border-[color-mix(in_srgb,var(--accent)_55%,transparent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] motion-reduce:transition-none',
         className
       )}
       href={href}
@@ -100,7 +100,7 @@ export function SocialChannelCard(props: SocialChannelCardProps) {
       target="_blank"
     >
       {media}
-      <div className="flex flex-col items-start gap-3 rounded-[20px] bg-[var(--editorial-dark-surface-muted)] p-5">
+      <div className="flex flex-1 flex-col items-start gap-3 rounded-[20px] bg-[var(--editorial-dark-surface-muted)] p-5">
         {eyebrow ? (
           <span className="block text-[10px] font-semibold uppercase tracking-[var(--tracking-eyebrow-md)] text-[color-mix(in_srgb,var(--editorial-dark-text)_50%,transparent)]">
             {eyebrow}
@@ -114,13 +114,13 @@ export function SocialChannelCard(props: SocialChannelCardProps) {
             {description}
           </p>
         ) : null}
-        <div className="flex w-full items-center justify-between gap-3 border-t border-[color-mix(in_srgb,var(--editorial-dark-text)_15%,transparent)] pt-4">
+        <div className="mt-auto flex w-full flex-col gap-3 border-t border-[color-mix(in_srgb,var(--editorial-dark-text)_15%,transparent)] pt-4">
           {helper ? (
-            <span className="text-[11px] font-semibold uppercase tracking-[var(--tracking-eyebrow-sm)] text-[color-mix(in_srgb,var(--editorial-dark-text)_50%,transparent)]">
+            <span className="text-[11px] font-semibold uppercase leading-4 tracking-[var(--tracking-eyebrow-sm)] text-[color-mix(in_srgb,var(--editorial-dark-text)_50%,transparent)]">
               {helper}
             </span>
           ) : null}
-          <span className="ml-auto inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-full bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-[var(--editorial-dark-surface)]">
+          <span className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-[var(--accent)] px-4 py-2.5 text-sm font-semibold text-[var(--editorial-dark-surface)]">
             {actionLabel}
             <ArrowUpRight aria-hidden="true" size={16} strokeWidth={2} />
           </span>

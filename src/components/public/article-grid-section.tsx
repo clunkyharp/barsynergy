@@ -1,6 +1,6 @@
 'use client';
 
-import { LayoutGrid, List, Pencil } from 'lucide-react';
+import { LayoutGrid, List } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -23,8 +23,6 @@ type ArticleGridSectionProps = {
   prelaunchCards?: PrelaunchCard[];
   prelaunchBadges?: string[];
 };
-
-const SUBMIT_TOPIC_HREF = '/contacts?topic=article-topic#contact-form';
 
 const SORT_OPTIONS = [
   { value: 'newest', label: 'Сначала новые' },
@@ -70,13 +68,6 @@ export function ArticleGridSection({
   return (
     <section aria-label="Материалы" className="border-b border-[var(--line)] pt-6 pb-10 sm:pb-14" id="articles-list">
       <div className="container">
-        <div className="flex items-start justify-end">
-          <Button className="w-full gap-2 sm:w-auto sm:shrink-0" href={SUBMIT_TOPIC_HREF} variant="primary">
-            <Pencil size={14} />
-            Предложить тему
-          </Button>
-        </div>
-
         {/* Category pills */}
         <div className="mt-6 flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
           <CategoryPill
@@ -108,13 +99,6 @@ export function ArticleGridSection({
               <p className="max-w-2xl text-sm leading-6 text-[var(--muted)]">
                 Сбросьте фильтры или попробуйте другой запрос.
               </p>
-              <Button
-                className="min-h-12 rounded-[var(--radius-md)] px-6"
-                href={SUBMIT_TOPIC_HREF}
-                variant="primary"
-              >
-                Предложить тему
-              </Button>
             </Panel>
           ) : (
             <>

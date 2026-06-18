@@ -67,18 +67,16 @@ function DirectoryBar({
   return (
     <section className="background-zone background-zone-graphite border-b border-[var(--line)] pt-6 pb-6 md:pt-8 md:pb-8">
       <div className="container">
-        <div className="inline-flex max-w-full flex-wrap items-center gap-x-6 gap-y-3 rounded-[var(--radius-xl)] border border-[var(--line)] bg-[var(--surface-card)]/80 p-4 md:p-5">
-          <div className="flex gap-5" aria-label="Сводка каталога">
-            <div className="border-l border-[var(--line)] pl-4">
-              <strong className="block text-[clamp(1.5rem,2.5vw,2rem)] font-semibold leading-none text-[var(--accent)]">{vacanciesCount}</strong>
-              <span className="mt-0.5 block text-sm text-[var(--muted)]">вакансий</span>
-            </div>
-            <div className="border-l border-[var(--line)] pl-4">
-              <strong className="block text-[clamp(1.5rem,2.5vw,2rem)] font-semibold leading-none text-[var(--accent)]">{specialistsCount}</strong>
-              <span className="mt-0.5 block text-sm text-[var(--muted)]">специалистов</span>
-            </div>
+        <div className="inline-flex max-w-full flex-wrap items-center gap-3 rounded-[var(--radius-lg)] border border-[var(--line)] bg-[color-mix(in_oklab,var(--surface-card)_72%,transparent)] px-3 py-2 sm:gap-4 sm:px-4">
+          <span className="text-[11px] font-bold uppercase tracking-[var(--tracking-eyebrow-sm)] text-[var(--accent)]">Каталог</span>
+          <div className="flex items-center gap-3 text-sm leading-none text-[var(--muted)]">
+            <span className="tabular-nums"><strong className="text-[var(--text)]">{vacanciesCount}</strong> вакансий</span>
+            <span className="text-[var(--line)]">·</span>
+            <span className="tabular-nums"><strong className="text-[var(--text)]">{specialistsCount}</strong> специалистов</span>
           </div>
-          <VacanciesViewTabs vacanciesCount={vacanciesCount} specialistsCount={specialistsCount} />
+          <div className="ml-auto">
+            <VacanciesViewTabs vacanciesCount={vacanciesCount} specialistsCount={specialistsCount} />
+          </div>
         </div>
       </div>
     </section>

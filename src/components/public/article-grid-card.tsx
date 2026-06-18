@@ -5,6 +5,7 @@ import { HighlightChip } from '@/components/ui/highlight-chip';
 import { displayFont } from '@/lib/fonts';
 import type { PublishedContentItem } from '@/lib/public/content';
 import { cn } from '@/lib/utils';
+import { OutlinedPill } from '@/components/public/outlined-pill';
 
 const COFFEE_KEYWORDS = [
   'эспрессо', 'кофейни', 'кофейня', 'обжарка', 'бариста',
@@ -72,23 +73,24 @@ export function ArticleFeaturedCard({
 
   return (
     <AppLink
-      className="group relative flex aspect-[21/9] min-h-[360px] w-full overflow-hidden rounded-[var(--radius-xl)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)] sm:min-h-[440px]"
+      className="media-card-shell group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)]"
       href={href}
     >
       <div
         aria-hidden="true"
-        className="gpu absolute inset-0 bg-cover bg-center transition-transform duration-[var(--motion-duration-media)] ease-[var(--motion-ease-move)] group-hover:scale-[1.02] motion-reduce:transition-none"
+        className="media-card-media gpu"
         style={{ backgroundImage: `url("${imageUrl}")` }}
       />
-      <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-black/92 via-black/50 to-black/20" />
-      <div className="relative flex w-full flex-col justify-between p-6 sm:p-8">
-        <div>
+      <div aria-hidden="true" className="media-card-scrim" />
+      <div className="media-card-content">
+        <div className="flex flex-wrap items-start gap-2">
           <HighlightChip variant="editor">
             <Star fill="currentColor" size={10} />
             Выбор редакции
           </HighlightChip>
+          {item.label ? <OutlinedPill>{item.label}</OutlinedPill> : null}
         </div>
-        <div className="mt-auto">
+        <div className="media-card-footer">
           <h2
             className={cn(
               displayFont.className,
@@ -108,16 +110,10 @@ export function ArticleFeaturedCard({
                 <>
                   <AuthorAvatar name={item.authorName} />
                   <span>{item.authorName}</span>
-                  {(readingTime ?? item.label) ? <span className="text-white/30">·</span> : null}
+                  {readingTime ? <span className="text-white/30">·</span> : null}
                 </>
               ) : null}
-              {readingTime ? (
-                <>
-                  <span>{readingTime}</span>
-                  {item.label ? <span className="text-white/30">·</span> : null}
-                </>
-              ) : null}
-              {item.label ? <span>{item.label}</span> : null}
+              {readingTime ? <span>{readingTime}</span> : null}
             </div>
             <span className="inline-flex shrink-0 items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-[13px] font-semibold text-white backdrop-blur-sm transition-colors duration-[var(--motion-duration-base)] group-hover:bg-white/20 motion-reduce:transition-none">
               Читать материал
