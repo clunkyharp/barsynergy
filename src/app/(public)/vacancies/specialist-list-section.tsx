@@ -160,7 +160,7 @@ export function SpecialistListSection({
                 actions={hasActiveFilters
                   ? [{ href: '/vacancies?view=specialists', label: 'Сбросить фильтры', variant: 'primary' }]
                   : [
-                      { href: '/specialists/svc/new', label: 'Опубликовать резюме', variant: 'primary' },
+                      { href: '/profile/settings#publish', label: 'Опубликовать резюме', variant: 'primary' },
                       { href: 'https://t.me/barsynergy', label: 'Следить в Telegram', variant: 'link' }
                     ]}
                 className="bg-[var(--surface-card)]"

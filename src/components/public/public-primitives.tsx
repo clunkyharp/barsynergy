@@ -87,7 +87,7 @@ export function PublicDisplayTitle({
         displayFont.className,
         'display-tight font-semibold text-[var(--text)]',
         size === 'hero' && 'max-w-6xl text-[clamp(3.1rem,6.2vw,6.85rem)]',
-        size === 'section' && 'text-[44px] md:text-[64px]',
+        size === 'section' && 'text-[clamp(2.25rem,10vw,2.75rem)] md:text-[64px]',
         size === 'card' && 'text-[32px] md:text-[42px]',
         size === 'card-compact' && 'text-[22px] md:text-[42px]',
         size === 'legal' && 'max-w-3xl break-words text-[34px] sm:text-[42px] md:text-[50px]',

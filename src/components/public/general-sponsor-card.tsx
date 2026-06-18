@@ -323,8 +323,8 @@ export function GeneralSponsorCard({ priority = false, sponsor, variant = 'full'
             </section>
           ) : null}
 
-          <CardActionRow>
-            <Button className="rounded-[var(--radius-md)] px-7" href="/general-sponsors">
+          <CardActionRow className="flex-col items-stretch sm:flex-row sm:items-center">
+            <Button className="w-full sm:w-auto rounded-[var(--radius-md)] px-7" href="/general-sponsors">
               Смотреть условия партнёрства
             </Button>
           </CardActionRow>

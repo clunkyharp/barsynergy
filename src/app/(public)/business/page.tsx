@@ -136,7 +136,7 @@ export default async function BusinessPage({ searchParams }: BusinessPageProps) 
                 key={step.title}
               >
                 <span className={`${displayFont.className} text-[2.2rem] font-bold leading-none text-[var(--accent)] opacity-60 tabular-nums`}>
-                  0{i + 1}
+                  {i + 1}
                 </span>
                 <h3 className={`${displayFont.className} text-[1rem] font-semibold leading-tight text-[var(--text)]`}>{step.title}</h3>
                 <p className="text-[13px] leading-5 text-[var(--muted)]">{step.description}</p>

@@ -82,24 +82,37 @@ export function EditorialSupportCard({
   card,
   label,
   actionLabel,
-  fallbackMeta = 'Раздел платформы'
+  fallbackMeta = 'Раздел платформы',
+  className,
+  density = 'default'
 }: {
   card?: HomepageLiveCard;
   label: string;
   actionLabel: string;
   fallbackMeta?: string;
+  className?: string;
+  density?: 'default' | 'compact';
 }) {
   const title = card?.title ?? label;
   const summary = card ? supportMetaText(card) : fallbackMeta;
   const href = card?.href ?? '#';
   const imageUrl = card?.imageUrl;
+  const mediaAspect = density === 'compact'
+    ? imageUrl ? 'aspect-[16/7]' : 'aspect-[16/4]'
+    : imageUrl ? 'aspect-[16/10]' : 'aspect-[16/3]';
+  const bodyClassName = density === 'compact'
+    ? 'editorial-support-body flex flex-1 flex-col gap-1.5 p-4'
+    : 'editorial-support-body flex flex-1 flex-col gap-2 p-4 md:p-5';
+  const titleClassName = density === 'compact'
+    ? 'text-[1.1rem] md:text-[1.2rem]'
+    : 'text-[1.15rem] md:text-[1.35rem]';
 
   return (
     <Link
-      className="editorial-support-card group flex flex-col overflow-hidden rounded-[var(--radius-lg)] border border-white/8 bg-[var(--editorial-dark-surface-muted)] transition-[border-color,box-shadow] duration-[var(--motion-duration-base)] hover:border-[var(--accent)]/40 hover:shadow-[0_4px_24px_rgba(0,0,0,0.3)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
+      className={`editorial-support-card group flex flex-col overflow-hidden rounded-[var(--radius-lg)] border border-white/8 bg-[var(--editorial-dark-surface-muted)] transition-[border-color,box-shadow] duration-[var(--motion-duration-base)] hover:border-[var(--accent)]/40 hover:shadow-[0_4px_24px_rgba(0,0,0,0.3)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]${className ? ` ${className}` : ''}`}
       href={href}
     >
-      <span className="editorial-support-media relative block aspect-[16/10] overflow-hidden bg-[var(--editorial-dark-surface)]">
+      <span className={`editorial-support-media relative block overflow-hidden bg-[var(--editorial-dark-surface)] ${mediaAspect}`}>
         {imageUrl ? (
           <span
             aria-hidden="true"
@@ -107,14 +120,14 @@ export function EditorialSupportCard({
             style={{ backgroundImage: `url("${imageUrl}")` }}
           />
         ) : (
-          <span aria-hidden="true" className="absolute inset-0 bg-gradient-to-br from-[var(--editorial-dark-surface-muted)] to-[var(--editorial-dark-surface)]" />
+          <span aria-hidden="true" className="absolute inset-0 bg-gradient-to-br from-[var(--accent)]/[0.14] via-[var(--editorial-dark-surface-muted)] to-[var(--editorial-dark-surface)]" />
         )}
         <span aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
         <span className="editorial-support-label absolute left-3 top-3 z-10">{label}</span>
       </span>
 
-      <span className="editorial-support-body flex flex-1 flex-col gap-2 p-4 md:p-5">
-        <h3 className={`${displayFont.className} editorial-support-title text-[1.15rem] font-semibold leading-[1.2] text-[var(--editorial-dark-text)] group-hover:text-[var(--accent)] md:text-[1.35rem]`}>
+      <span className={bodyClassName}>
+        <h3 className={`${displayFont.className} editorial-support-title ${titleClassName} font-semibold leading-[1.2] text-[var(--editorial-dark-text)] group-hover:text-[var(--accent)]`}>
           {title}
         </h3>
         <p className={`${bodyFont.className} editorial-support-summary text-[13px] leading-[1.5] text-[var(--editorial-dark-muted)]`}>

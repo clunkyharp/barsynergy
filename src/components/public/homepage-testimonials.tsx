@@ -28,14 +28,14 @@ export function HomeTestimonials({ testimonials }: { testimonials: HomepageData[
         <ul className="grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-5">
           {testimonials.map((testimonial) => (
             <li
-              className="flex flex-col rounded-[var(--radius-xl)] border border-[var(--line)] bg-[var(--surface)] p-6 shadow-[var(--shadow-card,0_12px_32px_rgba(0,0,0,0.06))]"
+              className="flex flex-col rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--surface-card)] p-6 shadow-[var(--shadow-card)]"
               key={`${testimonial.author}-${testimonial.city}`}
             >
               <Quote aria-hidden="true" className="text-[var(--accent)]" size={26} strokeWidth={2} />
               <blockquote className={`${bodyFont.className} mt-4 flex-1 text-[0.95rem] leading-7 text-[var(--text)]`}>
                 {testimonial.quote}
               </blockquote>
-              <figcaption className="mt-5 border-t border-[var(--line)] pt-4">
+              <figcaption className="mt-5 border-t border-[var(--border-default)] pt-4">
                 <p className="text-sm font-semibold text-[var(--text)]">{testimonial.author}</p>
                 <p className="mt-0.5 text-xs text-[var(--muted)]">
                   {testimonial.role} · {testimonial.city}

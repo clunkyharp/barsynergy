@@ -195,6 +195,38 @@
   background: var(--surface-card-muted);
 }
 
+.home-step-card {
+  --home-step-accent: var(--accent);
+  --home-step-accent-muted: color-mix(in oklab, var(--home-step-accent) 18%, transparent);
+}
+
+.home-step-card[data-step-tone="contact"] {
+  --home-step-accent: var(--success);
+}
+
+.home-step-card[data-step-tone="growth"] {
+  --home-step-accent: color-mix(in oklab, var(--accent) 62%, var(--warning));
+}
+
+.home-step-card-visual {
+  border-bottom: 1px solid var(--border-default);
+  background:
+    radial-gradient(circle at 82% 12%, color-mix(in oklab, var(--home-step-accent) 24%, transparent), transparent 38%),
+    linear-gradient(135deg, color-mix(in oklab, var(--surface-card) 82%, var(--home-step-accent-muted)), var(--surface-card-muted));
+}
+
+.home-step-card-watermark {
+  position: absolute;
+  inset-inline-end: -0.2em;
+  inset-block-end: -0.48em;
+  color: color-mix(in oklab, var(--home-step-accent) 16%, transparent);
+  font-family: var(--font-display);
+  font-size: clamp(5rem, 18vw, 9rem);
+  font-weight: 800;
+  line-height: 1;
+  pointer-events: none;
+}
+
 .home-section-card,
 .home-event-card {
   transition:

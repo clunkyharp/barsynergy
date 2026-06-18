@@ -84,6 +84,24 @@ const calculatorSchema = z.object({
   priority: z.coerce.number().int().min(0).max(100_000).default(0)
 });
 
+const testimonialSchema = z.object({
+  testimonialId: z.string().trim().optional(),
+  status: statusSchema,
+  quote: z.string().trim().min(10).max(700),
+  author: z.string().trim().min(2).max(120),
+  role: z.string().trim().min(2).max(160),
+  city: z.string().trim().min(2).max(120),
+  priority: z.coerce.number().int().min(0).max(100_000).default(0)
+});
+
+const stepSchema = z.object({
+  stepId: z.string().trim().optional(),
+  status: statusSchema,
+  title: z.string().trim().min(2).max(160),
+  description: z.string().trim().min(10).max(700),
+  priority: z.coerce.number().int().min(0).max(100_000).default(0)
+});
+
 const deleteSchema = z.object({
   id: z.string().trim().min(1)
 });
@@ -312,6 +330,99 @@ export async function saveHomepageCalculatorTeaser(formData: FormData) {
 
       revalidateHomepagePaths();
       return { type: 'success', message: resultMessage(parsed.calculatorId ? 'updated' : 'created') };
+    }
+  });
+}
+
+export async function saveHomepageTestimonial(formData: FormData) {
+  await withAdminAction({
+    formData,
+    section: 'homepage',
+    defaultRedirectPath: ADMIN_HOMEPAGE_PATH,
+    handler: async ({ user }) => {
+      const parsed = testimonialSchema.parse({
+        testimonialId: optionalString(getString(formData, 'testimonialId')),
+        status: getString(formData, 'status') || ContentStatus.DRAFT,
+        quote: getString(formData, 'quote'), author: getString(formData, 'author'),
+        role: getString(formData, 'role'), city: getString(formData, 'city'),
+        priority: getString(formData, 'priority') || '0'
+      });
+      const data = {
+        status: parsed.status, quote: parsed.quote, author: parsed.author,
+        role: parsed.role, city: parsed.city, priority: parsed.priority, updatedById: user.id
+      };
+
+      if (parsed.testimonialId) {
+        const current = await prisma.homepageTestimonial.findUnique({ where: { id: parsed.testimonialId }, select: { publishedAt: true } });
+        await prisma.homepageTestimonial.update({ where: { id: parsed.testimonialId }, data: { ...data, ...statusTransitionDates(parsed.status, current?.publishedAt ?? null) } });
+      } else {
+        await prisma.homepageTestimonial.create({ data: { ...data, createdById: user.id, ...initialPublicationDates(parsed.status) } });
+      }
+
+      revalidateHomepagePaths();
+      return { type: 'success', message: resultMessage(parsed.testimonialId ? 'updated' : 'created') };
+    }
+  });
+}
+
+export async function saveHomepageStep(formData: FormData) {
+  await withAdminAction({
+    formData,
+    section: 'homepage',
+    defaultRedirectPath: ADMIN_HOMEPAGE_PATH,
+    handler: async ({ user }) => {
+      const parsed = stepSchema.parse({
+        stepId: optionalString(getString(formData, 'stepId')),
+        status: getString(formData, 'status') || ContentStatus.DRAFT,
+        title: getString(formData, 'title'), description: getString(formData, 'description'),
+        priority: getString(formData, 'priority') || '0'
+      });
+      const data = {
+        status: parsed.status, title: parsed.title, description: parsed.description,
+        priority: parsed.priority, updatedById: user.id
+      };
+
+      if (parsed.stepId) {
+        const current = await prisma.homepageHowItWorksStep.findUnique({ where: { id: parsed.stepId }, select: { publishedAt: true } });
+        await prisma.homepageHowItWorksStep.update({ where: { id: parsed.stepId }, data: { ...data, ...statusTransitionDates(parsed.status, current?.publishedAt ?? null) } });
+      } else {
+        await prisma.homepageHowItWorksStep.create({ data: { ...data, createdById: user.id, ...initialPublicationDates(parsed.status) } });
+      }
+
+      revalidateHomepagePaths();
+      return { type: 'success', message: resultMessage(parsed.stepId ? 'updated' : 'created') };
+    }
+  });
+}
+
+export async function deleteHomepageTestimonial(formData: FormData) {
+  await withAdminAction({
+    formData,
+    section: 'homepage',
+    defaultRedirectPath: ADMIN_HOMEPAGE_PATH,
+    handler: async () => {
+      const parsed = deleteSchema.parse({ id: getString(formData, 'id') });
+      const current = await prisma.homepageTestimonial.findUnique({ where: { id: parsed.id }, select: { status: true } });
+      await assertCanDeleteHomepageRecord(current);
+      await prisma.homepageTestimonial.delete({ where: { id: parsed.id } });
+      revalidateHomepagePaths();
+      return { type: 'success', message: resultMessage('deleted') };
+    }
+  });
+}
+
+export async function deleteHomepageStep(formData: FormData) {
+  await withAdminAction({
+    formData,
+    section: 'homepage',
+    defaultRedirectPath: ADMIN_HOMEPAGE_PATH,
+    handler: async () => {
+      const parsed = deleteSchema.parse({ id: getString(formData, 'id') });
+      const current = await prisma.homepageHowItWorksStep.findUnique({ where: { id: parsed.id }, select: { status: true } });
+      await assertCanDeleteHomepageRecord(current);
+      await prisma.homepageHowItWorksStep.delete({ where: { id: parsed.id } });
+      revalidateHomepagePaths();
+      return { type: 'success', message: resultMessage('deleted') };
     }
   });
 }

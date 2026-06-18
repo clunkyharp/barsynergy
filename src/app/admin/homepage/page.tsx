@@ -8,13 +8,17 @@ import { AdminCmsCompactRecordSummary } from '@/components/admin/admin-cms-form'
 import {
   deleteHomepageAudienceCard,
   deleteHomepageSocialBlock,
+  deleteHomepageStep,
+  deleteHomepageTestimonial,
   saveHomepageAudienceCard,
   saveHomepageCalculatorTeaser,
   saveHomepageCtaBlock,
   saveHomepageHero,
-  saveHomepageSocialBlock
+  saveHomepageSocialBlock,
+  saveHomepageStep,
+  saveHomepageTestimonial
 } from '@/app/admin/homepage/actions';
-import { HeroSection, AudienceSection, CtaSection, SocialSection, CalculatorSection } from '@/components/admin/homepage-cms/homepage-cms-sections';
+import { HeroSection, AudienceSection, CtaSection, SocialSection, CalculatorSection, TestimonialSection, StepsSection } from '@/components/admin/homepage-cms/homepage-cms-sections';
 import { getHomepageCmsData } from '@/lib/admin/homepage-queries';
 import type { AdminContentSearchParams } from '@/lib/admin/content-utils';
 
@@ -42,6 +46,8 @@ export default async function AdminHomepagePage({ searchParams }: { searchParams
 
       <AudienceSection cards={cmsData.audienceCards} activeSection={activeSection} saveAction={saveHomepageAudienceCard} deleteAction={deleteHomepageAudienceCard} />
 
+      <StepsSection steps={cmsData.steps} activeSection={activeSection} saveAction={saveHomepageStep} deleteAction={deleteHomepageStep} />
+
       <CtaSection ctaBlocks={cmsData.ctaBlocks} activeSection={activeSection} saveAction={saveHomepageCtaBlock} />
 
       <CalculatorSection teasers={cmsData.calculatorTeasers} activeSection={activeSection} saveAction={saveHomepageCalculatorTeaser} />
@@ -67,6 +73,8 @@ export default async function AdminHomepagePage({ searchParams }: { searchParams
       </HomepageSectionEditor>
 
       <SocialSection socialBlocks={cmsData.socialBlocks} activeSection={activeSection} saveAction={saveHomepageSocialBlock} deleteAction={deleteHomepageSocialBlock} />
+
+      <TestimonialSection testimonials={cmsData.testimonials} activeSection={activeSection} saveAction={saveHomepageTestimonial} deleteAction={deleteHomepageTestimonial} />
 
       <HomepageSectionEditor
         defaultOpen={activeSection === 'homepage-general-sponsors'}

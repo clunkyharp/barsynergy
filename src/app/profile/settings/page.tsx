@@ -113,9 +113,9 @@ export default async function ProfileSettingsPage({ searchParams }: ProfileSetti
             </div>
           ) : null}
           <AvatarCropper currentAvatarUrl={avatarUrl} />
-          <div className="flex items-center justify-between gap-3">
+          <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-sm text-[var(--muted)]">Рекомендуем квадратное фото не меньше 400×400 px.</p>
-            <SubmitButton>Загрузить</SubmitButton>
+            <SubmitButton className="w-full sm:w-auto">Загрузить</SubmitButton>
           </div>
         </ProfileSectionForm>
       </ProfileSettingsSection>
@@ -152,9 +152,9 @@ export default async function ProfileSettingsPage({ searchParams }: ProfileSetti
           <FormField htmlFor="bio" label="О себе">
             <Textarea id="bio" name="bio" maxLength={1000} rows={4} placeholder="Расскажите о себе…" defaultValue={profile?.bio ?? ''} />
           </FormField>
-          <div className="flex items-center justify-between gap-3 border-t border-[var(--line)] pt-5">
+          <div className="flex flex-col items-stretch gap-3 border-t border-[var(--line)] pt-5 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-sm text-[var(--muted)]">После сохранения данные обновятся в профиле.</p>
-            <SubmitButton>Сохранить профиль</SubmitButton>
+            <SubmitButton className="w-full sm:w-auto">Сохранить профиль</SubmitButton>
           </div>
         </ProfileSectionForm>
       </ProfileSettingsSection>
@@ -179,7 +179,7 @@ export default async function ProfileSettingsPage({ searchParams }: ProfileSetti
           </div>
           <fieldset>
             <legend className="mb-3 text-sm font-semibold text-[var(--text)]">Формат работы</legend>
-            <div className="flex flex-wrap gap-4">
+            <div className="grid gap-3 sm:flex sm:flex-wrap">
               {employmentTypeOptions.map((opt) => (
                 <CheckboxField
                   key={opt.value}
@@ -192,12 +192,9 @@ export default async function ProfileSettingsPage({ searchParams }: ProfileSetti
               ))}
             </div>
           </fieldset>
-          <CheckboxField name="isPublic" defaultChecked={profile?.isPublic ?? false}>
-            Показывать профиль работодателям в каталоге специалистов
-          </CheckboxField>
-          <div className="flex items-center justify-between gap-3 border-t border-[var(--line)] pt-5">
+          <div className="flex flex-col items-stretch gap-3 border-t border-[var(--line)] pt-5 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-sm text-[var(--muted)]">Статус и условия поиска помогут работодателям понять ваши предпочтения.</p>
-            <SubmitButton>Сохранить профиль</SubmitButton>
+            <SubmitButton className="w-full sm:w-auto">Сохранить профиль</SubmitButton>
           </div>
         </ProfileSectionForm>
       </ProfileSettingsSection>
@@ -236,11 +233,11 @@ export default async function ProfileSettingsPage({ searchParams }: ProfileSetti
             <p className="mt-1 text-xs text-[var(--muted)]">Только латиница, цифры и дефисы. Оставьте пустым для автогенерации.</p>
           </FormField>
 
-          <div className="flex items-center justify-between gap-3 border-t border-[var(--line)] pt-5">
+          <div className="flex flex-col items-stretch gap-3 border-t border-[var(--line)] pt-5 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-sm text-[var(--muted)]">
               Для публикации нужно заполнить ФИО, профессию, город и формат занятости.
             </p>
-            <SubmitButton>Сохранить</SubmitButton>
+            <SubmitButton className="w-full sm:w-auto">Сохранить</SubmitButton>
           </div>
         </ProfileSectionForm>
       </ProfileSettingsSection>
@@ -295,9 +292,9 @@ export default async function ProfileSettingsPage({ searchParams }: ProfileSetti
               <PasswordInput id="confirm-password" name="confirmPassword" required autoComplete="new-password" placeholder="Повторите новый пароль" minLength={PASSWORD_MIN_LENGTH} maxLength={200} />
             </FormField>
           </div>
-          <div className="flex items-center justify-between gap-3 border-t border-[var(--line)] pt-5">
+          <div className="flex flex-col items-stretch gap-3 border-t border-[var(--line)] pt-5 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-sm text-[var(--muted)]">{PASSWORD_HINT}</p>
-            <SubmitButton>Сменить пароль</SubmitButton>
+            <SubmitButton className="w-full sm:w-auto">Сменить пароль</SubmitButton>
           </div>
         </ProfileSectionForm>
       </ProfileSettingsSection>

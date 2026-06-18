@@ -9,7 +9,9 @@ import {
   type CalculatorValues,
   type CtaValues,
   type HeroValues,
-  type SocialValues
+  type SocialValues,
+  type StepValues,
+  type TestimonialValues
 } from './homepage-cms-types';
 import { PriorityField, StatusSelect } from './homepage-cms-utils';
 
@@ -157,6 +159,52 @@ export function CtaFields({ cta, uid }: { cta?: CtaValues; uid: string }) {
           <Input id={`cta-secondaryHref-${uid}`} name="secondaryHref" maxLength={500} defaultValue={cta?.secondaryHref ?? ''} />
         </FormField>
       </AdminCmsGrid>
+    </>
+  );
+}
+
+export function TestimonialFields({ testimonial, uid }: { testimonial?: TestimonialValues; uid: string }) {
+  return (
+    <>
+      <AdminCmsGrid columns="three">
+        <FormField label="Статус" htmlFor={`testimonial-status-${uid}`} hint={PUBLICATION_STATUS_HINT}>
+          <StatusSelect id={`testimonial-status-${uid}`} defaultValue={testimonial?.status} />
+        </FormField>
+        <FormField label="Автор" htmlFor={`testimonial-author-${uid}`}>
+          <Input id={`testimonial-author-${uid}`} name="author" required minLength={2} maxLength={120} defaultValue={testimonial?.author ?? ''} />
+        </FormField>
+        <PriorityField id={`testimonial-priority-${uid}`} defaultValue={testimonial?.priority ?? 0} />
+      </AdminCmsGrid>
+      <FormField label="Цитата" htmlFor={`testimonial-quote-${uid}`}>
+        <Textarea id={`testimonial-quote-${uid}`} name="quote" required minLength={10} maxLength={700} defaultValue={testimonial?.quote ?? ''} />
+      </FormField>
+      <AdminCmsGrid columns="two">
+        <FormField label="Роль" htmlFor={`testimonial-role-${uid}`}>
+          <Input id={`testimonial-role-${uid}`} name="role" required minLength={2} maxLength={160} placeholder="Управляющая кофейней" defaultValue={testimonial?.role ?? ''} />
+        </FormField>
+        <FormField label="Город" htmlFor={`testimonial-city-${uid}`}>
+          <Input id={`testimonial-city-${uid}`} name="city" required minLength={2} maxLength={120} placeholder="Махачкала" defaultValue={testimonial?.city ?? ''} />
+        </FormField>
+      </AdminCmsGrid>
+    </>
+  );
+}
+
+export function StepFields({ step, uid }: { step?: StepValues; uid: string }) {
+  return (
+    <>
+      <AdminCmsGrid columns="three">
+        <FormField label="Статус" htmlFor={`step-status-${uid}`} hint={PUBLICATION_STATUS_HINT}>
+          <StatusSelect id={`step-status-${uid}`} defaultValue={step?.status} />
+        </FormField>
+        <FormField label="Заголовок" htmlFor={`step-title-${uid}`}>
+          <Input id={`step-title-${uid}`} name="title" required minLength={2} maxLength={160} defaultValue={step?.title ?? ''} />
+        </FormField>
+        <PriorityField id={`step-priority-${uid}`} defaultValue={step?.priority ?? 0} />
+      </AdminCmsGrid>
+      <FormField label="Описание" htmlFor={`step-description-${uid}`} hint="Номер шага задаётся автоматически по порядку (меньший приоритет — выше).">
+        <Textarea id={`step-description-${uid}`} name="description" required minLength={10} maxLength={700} defaultValue={step?.description ?? ''} />
+      </FormField>
     </>
   );
 }

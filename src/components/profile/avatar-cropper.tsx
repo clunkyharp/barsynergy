@@ -174,29 +174,31 @@ export function AvatarCropper({ currentAvatarUrl }: AvatarCropperProps) {
         type="file"
       />
 
-      <div className="flex flex-wrap items-center gap-4 rounded-[var(--radius-lg)] border border-[var(--line)] bg-[var(--surface)] p-4">
-        <div className="h-20 w-20 overflow-hidden rounded-full border border-[var(--border-default)] bg-[var(--surface-muted)]">
-          {confirmedPreviewUrl || currentAvatarUrl ? (
-            <img
-              alt="Предпросмотр аватара"
-              className="h-full w-full object-cover"
-              src={confirmedPreviewUrl ?? currentAvatarUrl ?? undefined}
-            />
-          ) : (
-            <span className="grid h-full w-full place-items-center text-[var(--muted)]">
-              <ImageUp aria-hidden size={22} strokeWidth={1.8} />
-            </span>
-          )}
+      <div className="grid gap-4 rounded-[var(--radius-lg)] border border-[var(--line)] bg-[var(--surface)] p-4 sm:flex sm:flex-wrap sm:items-center sm:gap-4">
+        <div className="flex items-center gap-4 sm:contents">
+          <div className="h-20 w-20 shrink-0 overflow-hidden rounded-full border border-[var(--border-default)] bg-[var(--surface-muted)]">
+            {confirmedPreviewUrl || currentAvatarUrl ? (
+              <img
+                alt="Предпросмотр аватара"
+                className="h-full w-full object-cover"
+                src={confirmedPreviewUrl ?? currentAvatarUrl ?? undefined}
+              />
+            ) : (
+              <span className="grid h-full w-full place-items-center text-[var(--muted)]">
+                <ImageUp aria-hidden size={22} strokeWidth={1.8} />
+              </span>
+            )}
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-semibold text-[var(--text)]">
+              {confirmedPreviewUrl ? 'Фото подготовлено' : 'Подготовьте квадратный аватар'}
+            </p>
+            <p className="mt-1 text-sm leading-6 text-[var(--muted)]">
+              Выберите изображение, настройте масштаб и сохраните обрезку. На сервер уйдёт JPEG 512×512.
+            </p>
+          </div>
         </div>
-        <div className="min-w-0 flex-1">
-          <p className="text-sm font-semibold text-[var(--text)]">
-            {confirmedPreviewUrl ? 'Фото подготовлено' : 'Подготовьте квадратный аватар'}
-          </p>
-          <p className="mt-1 text-sm leading-6 text-[var(--muted)]">
-            Выберите изображение, настройте масштаб и сохраните обрезку. На сервер уйдёт JPEG 512×512.
-          </p>
-        </div>
-        <Button onClick={() => sourceInputRef.current?.click()} type="button" variant="secondary">
+        <Button className="w-full sm:w-auto" onClick={() => sourceInputRef.current?.click()} type="button" variant="secondary">
           Выбрать фото
         </Button>
       </div>

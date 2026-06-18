@@ -6,9 +6,11 @@ export const ADMIN_GENERAL_SPONSORS_PATH = '/admin/general-sponsors';
 export const homepageSectionIds = [
   'homepage-hero',
   'homepage-audience',
+  'homepage-steps',
   'homepage-positioning',
   'homepage-navigation',
   'homepage-social',
+  'homepage-testimonials',
   'homepage-general-sponsors',
   'homepage-calculator'
 ] as const;
@@ -25,9 +27,11 @@ export const sectionMeta: Array<{
 }> = [
   { description: 'Первый экран главной страницы.', id: 'homepage-hero', title: 'Главный экран' },
   { description: 'Карточки для ролей на главной.', id: 'homepage-audience', title: 'Карточки аудитории' },
+  { description: 'Блок «Как это работает» — шаги под первым экраном.', id: 'homepage-steps', title: 'Шаги «Как это работает»' },
   { description: 'Короткий текст о проекте и кнопки действия внизу главной.', id: 'homepage-positioning', title: 'Короткое позиционирование' },
   { description: 'Переходы в основные разделы сайта.', id: 'homepage-navigation', title: 'Навигационные блоки', externalStatus: { details: 'Статический блок', label: 'Правится в коде', variant: 'neutral' } },
   { description: 'Публичные каналы сообщества и ссылки.', id: 'homepage-social', title: 'Соцсети' },
+  { description: 'Отзывы заведений и специалистов на главной.', id: 'homepage-testimonials', title: 'Отзывы индустрии' },
   { description: 'Профили генеральных спонсоров, которые попадают на главную.', id: 'homepage-general-sponsors', title: 'Генеральные спонсоры' },
   { description: 'Блок, который ведёт к калькулятору себестоимости.', id: 'homepage-calculator', title: 'Тизер калькулятора' }
 ];
@@ -81,6 +85,22 @@ export type CtaValues = Partial<{
   priority: number;
   secondaryHref: string | null;
   secondaryLabel: string | null;
+  status: ContentStatus;
+  title: string;
+}>;
+
+export type TestimonialValues = Partial<{
+  author: string;
+  city: string;
+  priority: number;
+  quote: string;
+  role: string;
+  status: ContentStatus;
+}>;
+
+export type StepValues = Partial<{
+  description: string;
+  priority: number;
   status: ContentStatus;
   title: string;
 }>;

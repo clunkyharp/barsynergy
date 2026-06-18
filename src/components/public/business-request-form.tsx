@@ -88,12 +88,12 @@ export function BusinessRequestForm({ cities, action }: BusinessRequestFormProps
               />
             </FormField>
           </div>
-          <ActionRow align="between">
+          <ActionRow align="between" className="sm:flex-row sm:items-center">
             <p className="max-w-md text-xs leading-6 text-[var(--muted)]">
               На первом шаге нужен контакт для ответа.
             </p>
             <Button
-              className="rounded-[var(--radius-md)]"
+              className="w-full rounded-[var(--radius-md)] sm:w-auto"
               onClick={handleContinue}
               size="lg"
               type="button"
@@ -152,11 +152,11 @@ export function BusinessRequestForm({ cities, action }: BusinessRequestFormProps
           </ConsentField>
           <input name="turnstileToken" type="hidden" value={turnstileToken} />
           <Turnstile onVerify={setTurnstileToken} />
-          <ActionRow align="between">
-            <Button className="rounded-[var(--radius-md)]" onClick={() => setStep(1)} size="lg" type="button" variant="secondary">
+          <ActionRow align="between" className="sm:flex-row sm:items-center">
+            <Button className="w-full rounded-[var(--radius-md)] sm:w-auto" onClick={() => setStep(1)} size="lg" type="button" variant="secondary">
               Назад
             </Button>
-            <SubmitButton className="rounded-[var(--radius-md)]" size="lg">
+            <SubmitButton className="w-full rounded-[var(--radius-md)] sm:w-auto" size="lg">
               Отправить заявку
             </SubmitButton>
           </ActionRow>

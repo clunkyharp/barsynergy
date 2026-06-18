@@ -23,3 +23,29 @@ test('homepage replaces the platform link grid with live support cards', () => {
   assert.doesNotMatch(source, /const platformTools = \[/);
   assert.doesNotMatch(source, /Разделы платформы/);
 });
+
+test('homepage work sections use compact uniform cards without artificial bento spans', () => {
+  const source = readProjectFile('src/components/public/homepage-client.tsx');
+  const cardSource = readProjectFile('src/components/public/homepage-current.tsx');
+  const sectionStart = source.indexOf('id="home-tools"');
+  const sectionEnd = source.indexOf('{data.generalSponsors.length');
+  const sectionSource = source.slice(sectionStart, sectionEnd);
+
+  assert.match(sectionSource, /grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3/);
+  assert.match(sectionSource, /density="compact"/);
+  assert.doesNotMatch(sectionSource, /wideIndexes/);
+  assert.doesNotMatch(sectionSource, /lg:col-span-2/);
+  assert.match(cardSource, /density = 'default'/);
+  assert.match(cardSource, /density === 'compact'/);
+});
+
+test('homepage steps use varied visual cards without fixed heights', () => {
+  const source = readProjectFile('src/components/public/homepage-steps.tsx');
+
+  assert.match(source, /const stepVisuals/);
+  assert.match(source, /data-step-tone=\{visual\.tone\}/);
+  assert.match(source, /home-step-card-visual/);
+  assert.match(source, /SectionIcon/);
+  assert.doesNotMatch(source, /min-h-\[/);
+  assert.doesNotMatch(source, /h-\[/);
+});
