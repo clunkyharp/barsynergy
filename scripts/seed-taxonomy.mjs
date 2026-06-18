@@ -1,4 +1,4 @@
-import { PrismaClient, CategoryType } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient({
   log: process.env.NODE_ENV === 'development' ? ['error', 'warn'] : ['error']
@@ -155,7 +155,7 @@ const cities = [
   { name: 'Ростов-на-Дону', slug: 'rostov-on-don', region: 'Ростовская область' },
 ];
 
-async function seedCategories(count) {
+async function seedCategories() {
   let created = 0;
   for (const cat of categories) {
     const existing = await prisma.category.findUnique({
@@ -166,10 +166,11 @@ async function seedCategories(count) {
       created++;
     }
   }
-  console.log(`Categories: ${created} new, ${count} total`);
+  const total = await prisma.category.count();
+  console.log(`Categories: ${created} new, ${total} total`);
 }
 
-async function seedSkills(count) {
+async function seedSkills() {
   let created = 0;
   for (const name of skills) {
     const slug = name.toLowerCase().replace(/[^a-zа-яё0-9]+/g, '-').replace(/^-|-$/g, '');
@@ -179,7 +180,8 @@ async function seedSkills(count) {
       created++;
     }
   }
-  console.log(`Skills: ${created} new, ${count} total`);
+  const total = await prisma.skill.count();
+  console.log(`Skills: ${created} new, ${total} total`);
 }
 
 async function seedCities() {
@@ -198,20 +200,8 @@ async function seedCities() {
 }
 
 async function main() {
-  const catCount = await prisma.category.count();
-  if (catCount === 0) {
-    await seedCategories(catCount);
-  } else {
-    console.log(`Categories already present (${catCount}), skipping.`);
-  }
-
-  const skillCount = await prisma.skill.count();
-  if (skillCount === 0) {
-    await seedSkills(skillCount);
-  } else {
-    console.log(`Skills already present (${skillCount}), skipping.`);
-  }
-
+  await seedCategories();
+  await seedSkills();
   await seedCities();
 }
 
