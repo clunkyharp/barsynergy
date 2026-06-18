@@ -4,7 +4,7 @@ const prisma = new PrismaClient({
   log: process.env.NODE_ENV === 'development' ? ['error', 'warn'] : ['error']
 });
 
-const categories: { name: string; slug: string; type: CategoryType; sortOrder: number }[] = [
+const categories = [
   { name: 'Организация работы', slug: 'organization', type: 'ARTICLE', sortOrder: 0 },
   { name: 'Рецепты и меню', slug: 'recipes-menu', type: 'ARTICLE', sortOrder: 1 },
   { name: 'Оборудование', slug: 'equipment', type: 'ARTICLE', sortOrder: 2 },
