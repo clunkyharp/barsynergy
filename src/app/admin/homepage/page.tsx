@@ -41,7 +41,7 @@ export default async function AdminHomepagePage({ searchParams }: { searchParams
 
       <AdminActionAlert params={params} />
 
-      <h2 className="text-sm font-semibold uppercase tracking-[0.12em] text-[var(--muted)]">Контент главной</h2>
+      <h2 className="font-mono text-xs font-medium uppercase tracking-[0.22em] text-[var(--muted)]">Контент главной</h2>
       <HeroSection heroes={cmsData.heroes} activeSection={activeSection} saveAction={saveHomepageHero} />
 
       <AudienceSection cards={cmsData.audienceCards} activeSection={activeSection} saveAction={saveHomepageAudienceCard} deleteAction={deleteHomepageAudienceCard} />
@@ -52,7 +52,7 @@ export default async function AdminHomepagePage({ searchParams }: { searchParams
 
       <CalculatorSection teasers={cmsData.calculatorTeasers} activeSection={activeSection} saveAction={saveHomepageCalculatorTeaser} />
 
-      <h2 className="pt-2 text-sm font-semibold uppercase tracking-[0.12em] text-[var(--muted)]">Внешние блоки и каналы</h2>
+      <h2 className="pt-2 font-mono text-xs font-medium uppercase tracking-[0.22em] text-[var(--muted)]">Внешние блоки и каналы</h2>
       <HomepageSectionEditor
         defaultOpen={activeSection === 'homepage-navigation'}
         description="Эти блоки ведут в основные разделы сайта. Отдельной формы редактирования пока нет — структура задана в коде."

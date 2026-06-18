@@ -59,7 +59,7 @@ export function AdminContentVisibilityPanel({
     <section className="admin-visibility-panel admin-surface-shell rounded-[var(--radius-md)] border border-[var(--line)] border-l-[3px] border-l-[var(--admin-structure-accent)] bg-[var(--surface)] p-4">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--admin-label)]">Видимость на сайте</p>
+          <p className="font-mono text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--admin-label)]">Видимость на сайте</p>
           <p className="mt-1 text-sm leading-6 text-[var(--muted)]">{PUBLICATION_STATUS_HINT}</p>
         </div>
         <AdminActionRow className="justify-start lg:justify-end">

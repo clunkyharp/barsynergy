@@ -64,7 +64,7 @@ export function AdminTableHead({ className, ...props }: HTMLAttributes<HTMLTable
   return (
     <thead
       className={cn(
-        'admin-data-table-head border-b border-[var(--line)] bg-[var(--admin-table-header)] text-[11px] text-[var(--muted)]',
+        'admin-data-table-head border-b border-[var(--line)] bg-[var(--admin-table-header)] font-mono text-[10px] uppercase tracking-[0.12em] text-[var(--muted)]',
         className
       )}
       {...props}
@@ -107,7 +107,7 @@ export function AdminTableRow({ className, ...props }: HTMLAttributes<HTMLTableR
 }
 
 export function AdminTableHeaderCell({ className, ...props }: ThHTMLAttributes<HTMLTableCellElement>) {
-  return <th className={cn('admin-data-table-header-cell min-w-[7rem] whitespace-nowrap px-4 py-3 font-semibold', className)} {...props} />;
+  return <th className={cn('admin-data-table-header-cell min-w-[7rem] whitespace-nowrap px-4 py-3 font-medium', className)} {...props} />;
 }
 
 export function AdminTableCell({ className, label, ...props }: AdminTableCellProps) {

@@ -89,7 +89,7 @@ function PartnershipStartSequence() {
 
   return (
     <section className="background-zone background-zone-gray editorial-grid border-b border-[var(--line)] py-10 md:py-14">
-      <div className="container grid gap-8 xl:grid-cols-[minmax(16rem,0.58fr)_minmax(0,1.42fr)] xl:items-end">
+      <div className="container grid gap-8 xl:grid-cols-[minmax(16rem,0.58fr)_minmax(0,1.42fr)] xl:items-center">
         <div>
           <PublicEyebrow>Партнёрство</PublicEyebrow>
           <PublicDisplayTitle className="mt-4 max-w-[13ch]">С чего можно начать</PublicDisplayTitle>

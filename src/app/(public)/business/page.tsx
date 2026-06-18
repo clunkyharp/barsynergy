@@ -25,23 +25,35 @@ export const metadata: Metadata = buildPublicPageMetadata({
   path: '/business'
 });
 
-const processSteps = [
+const processSteps: {
+  number: string;
+  title: string;
+  description: string;
+  icon: SectionIconType;
+  tone: 'search' | 'contact' | 'growth';
+}[] = [
   {
-    label: 'Шаг 1',
+    number: '1',
     title: 'Оставьте заявку',
-    description: 'Укажите название заведения, город, формат, контакт и ссылку на сайт или соцсети.'
+    description: 'Укажите название заведения, город, формат, контакт и ссылку на сайт или соцсети.',
+    icon: 'search',
+    tone: 'search'
   },
   {
-    label: 'Шаг 2',
+    number: '2',
     title: 'Уточним карточку',
-    description: 'Свяжемся, чтобы уточнить описание, фото и контакты.'
+    description: 'Свяжемся, чтобы уточнить описание, фото и контакты.',
+    icon: 'contact',
+    tone: 'contact'
   },
   {
-    label: 'Шаг 3',
+    number: '3',
     title: 'Разместим в каталоге',
-    description: 'После согласования карточка появляется в каталоге.'
+    description: 'После согласования карточка появляется в каталоге.',
+    icon: 'building',
+    tone: 'growth'
   }
-] as const;
+];
 
 const benefits: { label: string; title: string; description: string; icon: SectionIconType }[] = [
   {
@@ -129,20 +141,32 @@ export default async function BusinessPage({ searchParams }: BusinessPageProps) 
               <PublicDisplayTitle className="mt-3 max-w-sm">Три шага до карточки</PublicDisplayTitle>
             </div>
           </div>
-          <div className="grid gap-px sm:grid-cols-3">
-            {processSteps.map((step, i) => (
-              <div
-                className="relative flex flex-col gap-3 border border-[var(--line)] bg-[var(--surface-card)] px-5 py-6 first:rounded-t-[var(--radius-md)] last:rounded-b-[var(--radius-md)] sm:first:rounded-l-[var(--radius-md)] sm:first:rounded-tr-none sm:last:rounded-r-[var(--radius-md)] sm:last:rounded-bl-none"
+          <ol className="grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-5">
+            {processSteps.map((step, index) => {
+              const stepLabel = String(index + 1).padStart(2, '0');
+
+              return (
+              <li
+                className="home-step-card flex flex-col overflow-hidden rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--surface-card)] shadow-[var(--shadow-card)]"
+                data-step-tone={step.tone}
                 key={step.title}
               >
-                <span className={`${displayFont.className} text-[2.2rem] font-bold leading-none text-[var(--accent)] opacity-60 tabular-nums`}>
-                  {i + 1}
+                <span className="home-step-card-visual flex items-center gap-4 border-b border-[var(--border-default)] p-5">
+                  <span className="text-[var(--home-step-accent)]">
+                    <SectionIcon size={28} type={step.icon} />
+                  </span>
+                  <span className="font-mono text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--muted)]">
+                    {stepLabel}
+                  </span>
                 </span>
-                <h3 className={`${displayFont.className} text-[1rem] font-semibold leading-tight text-[var(--text)]`}>{step.title}</h3>
-                <p className="text-[13px] leading-5 text-[var(--muted)]">{step.description}</p>
-              </div>
-            ))}
-          </div>
+                <span className="flex flex-1 flex-col p-5 pt-4">
+                  <h3 className={`${displayFont.className} text-[1.25rem] font-semibold leading-tight text-[var(--text)]`}>{step.title}</h3>
+                  <p className="mt-2 text-sm leading-6 text-[var(--muted)]">{step.description}</p>
+                </span>
+              </li>
+            );
+          })}
+          </ol>
         </div>
       </section>
 

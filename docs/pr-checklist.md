@@ -11,6 +11,7 @@ Use this checklist before merging any branch into `dev`, and before merging `dev
 - [ ] No `any` TypeScript types introduced (`grep -r ': any' src/`)
 - [ ] No hardcoded hex colors in component files (use CSS tokens)
 - [ ] No direct `prisma` calls in `page.tsx` or `layout.tsx` files
+- [ ] If the changed area already has tests, those tests were reviewed and synced to the new behavior in the same batch
 - [ ] No new `rowVariant` values added to `PublishedContentSection` without a dedicated sub-component
 - [ ] No `required` fields inside `<details>` blocks marked «по желанию»
 - [ ] All new server actions return `{ type: 'error' | 'success' }` objects with try/catch

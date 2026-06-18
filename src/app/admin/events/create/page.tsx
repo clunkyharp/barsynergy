@@ -27,7 +27,7 @@ export default async function AdminEventsCreatePage() {
     <div className="space-y-8">
       <header className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Админка / События / Создание</p>
+          <p className="font-mono text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--muted)]">Админка / События / Создание</p>
           <h1 className="mt-2 text-3xl font-semibold">Новое событие</h1>
         </div>
         <Button href={ADMIN_EVENTS_PATH} variant="secondary">

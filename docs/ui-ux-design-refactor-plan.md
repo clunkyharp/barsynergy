@@ -4,7 +4,7 @@
 
 Основа для плана:
 
-- `docs/ui-ux-audit-final-2026-04-29.md`
+- `docs/archive/ui-ux-audit-final-2026-04-29.md` (archived)
 - `docs/design-system-consistency-audit-final-2026-04-29.md`
 
 Режим: `IMPLEMENTATION`
@@ -207,7 +207,7 @@ Closeout 2026-05-24:
 
 Актуальными контрольными документами для этой темы считать:
 
-- `docs/ui-ux-audit-final-2026-04-29.md`
+- `docs/archive/ui-ux-audit-final-2026-04-29.md` (archived)
 - `docs/design-system-consistency-audit-final-2026-04-29.md`
 - `docs/ui-ux-design-refactor-plan.md`
 

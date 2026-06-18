@@ -2,10 +2,9 @@
 
 import type { CSSProperties } from 'react';
 import Image from 'next/image';
-import { ArrowRight, ArrowUpRight, Copy } from 'lucide-react';
+import { ArrowRight, ArrowUpRight } from 'lucide-react';
 import type { SocialChannelVariant } from '@/components/public/social-channel-assets';
 import { channelBackgrounds, channelAccentVars } from '@/components/public/social-channel-assets';
-import { useCopy } from '@/lib/hooks/use-copy';
 import { displayFont } from '@/lib/fonts';
 import { cn } from '@/lib/utils';
 
@@ -33,7 +32,6 @@ export type SocialChannelCardProps = SocialChannelCardLinkMode | SocialChannelCa
 
 export function SocialChannelCard(props: SocialChannelCardProps) {
   const { mode, variant, eyebrow, href, actionLabel, className } = props;
-  const { copy } = useCopy();
   const bgSrc = channelBackgrounds[variant];
   const accentVar = channelAccentVars[variant];
   const style = { '--channel-accent': accentVar } as CSSProperties;
@@ -91,12 +89,15 @@ export function SocialChannelCard(props: SocialChannelCardProps) {
   const { value, description, helper } = props;
 
   return (
-    <article
+    <a
       className={cn(
-        'group relative flex flex-col overflow-hidden rounded-[28px] border border-[color-mix(in_srgb,var(--accent)_18%,transparent)] bg-[var(--editorial-dark-surface)] p-3 text-[var(--editorial-dark-text)] transition-[border-color] duration-[var(--motion-duration-base)] ease-[var(--motion-ease-standard)] hover:border-[color-mix(in_srgb,var(--accent)_55%,transparent)] motion-reduce:transition-none',
+        'group relative flex flex-col overflow-hidden rounded-[28px] border border-[color-mix(in_srgb,var(--accent)_18%,transparent)] bg-[var(--editorial-dark-surface)] p-3 text-[var(--editorial-dark-text)] transition-[border-color] duration-[var(--motion-duration-base)] ease-[var(--motion-ease-standard)] hover:border-[color-mix(in_srgb,var(--accent)_55%,transparent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] motion-reduce:transition-none',
         className
       )}
+      href={href}
+      rel="noreferrer"
       style={style}
+      target="_blank"
     >
       {media}
       <div className="flex flex-col items-start gap-3 rounded-[20px] bg-[var(--editorial-dark-surface-muted)] p-5">
@@ -105,23 +106,9 @@ export function SocialChannelCard(props: SocialChannelCardProps) {
             {eyebrow}
           </span>
         ) : null}
-        <div className="flex min-w-0 flex-wrap items-center gap-2">
-          <span className="break-all text-sm font-semibold leading-5 text-[var(--editorial-dark-text)]">
-            {value}
-          </span>
-          <button
-            aria-label={`Копировать ${value}`}
-            className="inline-grid size-7 shrink-0 place-items-center rounded-[var(--radius-sm)] border border-[color-mix(in_srgb,var(--editorial-dark-text)_18%,transparent)] bg-[color-mix(in_srgb,var(--editorial-dark-surface)_82%,transparent)] text-[color-mix(in_srgb,var(--editorial-dark-text)_55%,transparent)] transition-colors duration-150 ease-in-out hover:border-[color-mix(in_srgb,var(--channel-accent)_42%,transparent)] hover:text-[var(--editorial-dark-text)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              void copy(value);
-            }}
-            type="button"
-          >
-            <Copy aria-hidden="true" size={13} strokeWidth={1.8} />
-          </button>
-        </div>
+        <span className="text-sm font-semibold leading-5 text-[var(--editorial-dark-text)]">
+          {value}
+        </span>
         {description ? (
           <p className="text-sm leading-6 text-[color-mix(in_srgb,var(--editorial-dark-text)_60%,transparent)]">
             {description}
@@ -133,17 +120,12 @@ export function SocialChannelCard(props: SocialChannelCardProps) {
               {helper}
             </span>
           ) : null}
-          <a
-            className="ml-auto inline-flex items-center gap-2 rounded-full bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-[var(--editorial-dark-surface)] transition-transform duration-[var(--motion-duration-base)] ease-[var(--motion-ease-move)] hover:translate-x-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] motion-reduce:transition-none"
-            href={href}
-            rel="noreferrer"
-            target="_blank"
-          >
+          <span className="ml-auto inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-full bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-[var(--editorial-dark-surface)]">
             {actionLabel}
             <ArrowUpRight aria-hidden="true" size={16} strokeWidth={2} />
-          </a>
+          </span>
         </div>
       </div>
-    </article>
+    </a>
   );
 }

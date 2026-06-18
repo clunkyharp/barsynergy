@@ -48,14 +48,14 @@ function StatCardInner({
         <div className="min-w-0">
           <p
             className={cn(
-              'overflow-hidden text-ellipsis whitespace-nowrap text-[11px] font-semibold uppercase tracking-[var(--tracking-eyebrow-md)]',
+              'overflow-hidden text-ellipsis whitespace-nowrap font-mono text-[10px] font-medium uppercase tracking-[0.22em]',
               isInverse ? 'text-[var(--editorial-dark-label)]' : 'text-[var(--muted)]',
               labelClassName
             )}
           >
             {label}
           </p>
-          <div className={cn('mt-3 text-[32px] font-semibold leading-none tracking-[-0.03em] text-[var(--text)]', isInverse && 'text-white', valueClassName)}>
+          <div className={cn('mt-3 font-mono text-[32px] font-semibold leading-none tracking-[-0.03em] tabular-nums text-[var(--text)]', isInverse && 'text-white', valueClassName)}>
             {value}
           </div>
         </div>
@@ -82,7 +82,7 @@ function StatCardInner({
           {delta ? (
             <span
               className={cn(
-                'text-xs font-semibold uppercase tracking-[var(--tracking-eyebrow-sm)]',
+                'font-mono text-[10px] font-medium uppercase tracking-[0.22em]',
                 isInverse ? 'text-[var(--editorial-dark-muted)]' : 'text-[var(--muted)]',
                 deltaClassName
               )}

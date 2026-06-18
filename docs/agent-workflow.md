@@ -39,6 +39,8 @@ Default implementation workflow:
 6. Refactor only after the targeted test is green.
 7. Rerun targeted validation and broaden to lint, typecheck, browser QA or build only when the changed surface requires it.
 
+If the touched module, page, component or flow already has tests, the agent must inspect those tests and sync them in the same batch when behavior or copy changes. Do not treat failing or stale tests as acceptable just because the implementation changed intentionally. Either update the tests to the new approved contract and rerun them, or declare a pre-approved temporary exception before closeout.
+
 The mini-spec must identify:
 
 - goal;

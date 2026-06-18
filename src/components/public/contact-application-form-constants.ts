@@ -19,7 +19,7 @@ export const contactMethods: ContactMethod[] = [
     name: 'Telegram',
     value: SUPPORT_TELEGRAM,
     href: 'https://t.me/barsynergy',
-    actionLabel: 'Открыть чат',
+    actionLabel: 'Написать в Telegram',
     tone: 'telegram',
     descriptor: 'Быстрый ответ по короткому вопросу. Голосовые, документы и ссылки.',
     helper: 'Обычно до 1 рабочего часа'
@@ -29,7 +29,7 @@ export const contactMethods: ContactMethod[] = [
     name: 'WhatsApp',
     value: SUPPORT_WHATSAPP,
     href: `https://wa.me/${SUPPORT_WHATSAPP.replace(/[^\d]/g, '')}`,
-    actionLabel: 'Написать',
+    actionLabel: 'Написать в WhatsApp',
     tone: 'whatsapp',
     descriptor: 'Если удобнее голосом или для звонка. Скиньте номер — перезвоним.',
     helper: 'Звонок по договорённости'
@@ -39,7 +39,7 @@ export const contactMethods: ContactMethod[] = [
     name: 'Instagram',
     value: SUPPORT_INSTAGRAM,
     href: 'https://instagram.com/barsynergy',
-    actionLabel: 'Открыть профиль',
+    actionLabel: 'Смотреть Instagram',
     tone: 'instagram',
     descriptor: 'Свежие материалы, события и анонсы. Личные сообщения смотрим раз в день.',
     helper: 'Ответ — в течение дня'

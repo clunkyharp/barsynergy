@@ -127,7 +127,7 @@ function ArticleCtaBlock() {
         className="mt-4 w-full min-w-0 justify-center rounded-[var(--radius-sm)] px-4"
         href="/tools/cost-calculator"
       >
-        Открыть калькулятор
+        Рассчитать себестоимость
         <ArrowUpRight size={16} />
       </Button>
     </Panel>

@@ -4,7 +4,6 @@ import { AppLink } from '@/components/ui/app-link';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Panel } from '@/components/ui/panel';
-import { StatCard } from '@/components/ui/stat-card';
 import { StatusBadge, type StatusBadgeVariant } from '@/components/ui/status-badge';
 import {
   applicationStatusBadgeVariants,
@@ -21,6 +20,9 @@ const dateFormatter = new Intl.DateTimeFormat('ru-RU', {
   day: '2-digit',
   month: '2-digit'
 });
+
+// Techno-editorial micro-label: mono, uppercase, wide tracking (see docs/ui-references.md).
+const microLabel = 'font-mono text-[10px] font-medium uppercase tracking-[0.22em]';
 
 const adminRoleLabels: Record<UserRole, string> = {
   [UserRole.ADMIN]: 'администратор',
@@ -221,60 +223,83 @@ export default async function AdminPage() {
   ];
   const contentWarningCount = contentHealthRows.filter((row) => row.variant !== 'success').length;
 
+  const heroBreakdown = [
+    { label: 'Новые', value: newApplications, href: `/admin/applications?status=${ApplicationStatus.NEW}` },
+    { label: 'Проверка', value: inReviewApplications, href: `/admin/applications?status=${ApplicationStatus.IN_REVIEW}` },
+    { label: 'Оплата', value: paymentPendingApplications, href: `/admin/applications?status=${ApplicationStatus.PAYMENT_PENDING}` }
+  ];
+  const checksHref =
+    contentWarningCount > 0 ? contentHealthRows.find((row) => row.variant !== 'success')?.href ?? '/admin/categories' : '/admin/categories';
+
   return (
-    <div className="space-y-5">
-      <Panel className="grid gap-4 md:grid-cols-[1fr_auto] md:items-end" padding="lg" tone="elevated">
-        <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">BARSYNERGY / админка</p>
-          <h1 className="mt-3 text-[2rem] font-semibold leading-[1.20] text-balance tracking-normal md:text-[2.6rem]">
-            Рабочая очередь
-          </h1>
-          <p className="mt-3 max-w-2xl text-sm leading-6 text-[var(--muted)]">
-            Входящие заявки, публикации и проверки контента в одном коротком списке действий.
-          </p>
-        </div>
-        <div className="text-sm leading-6 text-[var(--muted)] md:text-right">
-          <p className="font-semibold text-[var(--text)]">{currentUser.email}</p>
-          <p>роль: {adminRoleLabels[currentUser.role]}</p>
-        </div>
-      </Panel>
+    <div className="space-y-3">
+      <div className="flex flex-wrap items-center justify-between gap-3 px-1">
+        <p className={cn(microLabel, 'text-[var(--muted)]')}>BARSYNERGY / админка · рабочая очередь</p>
+        <span className="flex items-center gap-2 text-xs text-[var(--muted)]">
+          <span className="font-semibold text-[var(--text)]">{currentUser.email}</span>
+          <span aria-hidden="true">·</span>
+          <span>{adminRoleLabels[currentUser.role]}</span>
+        </span>
+      </div>
 
-      <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard
-          delta={`Новых: ${newApplications}`}
-          description="Активная очередь входящих форм"
-          href="/admin/applications"
-          label="Заявки в работе"
-          status="модерация"
-          value={activeApplicationTotal}
-        />
-        <StatCard
-          delta={`Ожидают: ${pendingBusinessAccounts}`}
-          description="Подключение и проверка бизнес-кабинетов"
-          href={businessAccessHref}
-          label="Бизнес-доступы"
-          status={canManageUsers ? 'админ' : 'просмотр'}
-          value={pendingBusinessAccounts}
-        />
-        <StatCard
-          delta={`Черновиков: ${draftArticles + draftEvents + draftVacancies}`}
-          description="Черновики перед публикацией"
-          href={draftArticles > 0 ? '/admin/articles?status=DRAFT' : draftEvents > 0 ? '/admin/events?status=DRAFT' : '/admin/vacancies?status=DRAFT'}
-          label="Черновики"
-          status="публикация"
-          value={draftContentTotal}
-        />
-        <StatCard
-          delta={contentWarningCount > 0 ? `замечаний: ${contentWarningCount}` : 'всё в норме'}
-          description="Разделы с незакрытыми замечаниями"
-          href={contentWarningCount > 0 ? contentHealthRows.find((r) => r.variant !== 'success')?.href ?? '/admin/categories' : '/admin/categories'}
-          label="Проверки контента"
-          status="контроль"
-          value={contentWarningCount}
-        />
-      </section>
+      <div className="grid gap-3 xl:grid-cols-12">
+        {/* Hero KPI — dark command tile */}
+        <Panel
+          className="flex flex-col justify-between gap-6 overflow-hidden border-[var(--border-inverse)] bg-[var(--surface-inverse)] text-white xl:col-span-7"
+          padding="lg"
+          tone="inverse"
+        >
+          <div className="flex items-start justify-between gap-4">
+            <p className={cn(microLabel, 'text-[var(--editorial-dark-label)]')}>Очередь · в работе</p>
+            <Button className="min-h-9 rounded-[var(--radius-pill)] px-4 py-1.5 text-xs" href="/admin/applications">
+              Открыть заявки →
+            </Button>
+          </div>
+          <div>
+            <div className="font-mono text-[64px] font-semibold leading-none tracking-[-0.04em] tabular-nums md:text-[84px]">
+              {activeApplicationTotal}
+            </div>
+            <p className="mt-2 text-sm text-[var(--editorial-dark-muted)]">активных заявок в очереди модерации</p>
+          </div>
+          <div className="grid grid-cols-3 gap-2">
+            {heroBreakdown.map((item) => (
+              <AppLink
+                className="rounded-[var(--radius-md)] border border-[var(--border-inverse-soft)] px-3 py-3 transition hover:border-[var(--accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/40"
+                href={item.href}
+                key={item.label}
+              >
+                <span className="font-mono text-2xl font-semibold tabular-nums">{item.value}</span>
+                <span className={cn(microLabel, 'mt-1 block text-[var(--editorial-dark-muted)]')}>{item.label}</span>
+              </AppLink>
+            ))}
+          </div>
+        </Panel>
 
-      <section className="grid gap-5 xl:grid-cols-12">
+        {/* Right KPI stack */}
+        <div className="grid gap-3 xl:col-span-5">
+          <KpiTile
+            href={businessAccessHref}
+            label="Бизнес-доступы"
+            note={canManageUsers ? 'ожидают подключения' : 'на проверке'}
+            value={pendingBusinessAccounts}
+          />
+          <KpiTile
+            href={draftArticles > 0 ? '/admin/articles?status=DRAFT' : draftEvents > 0 ? '/admin/events?status=DRAFT' : '/admin/vacancies?status=DRAFT'}
+            label="Черновики"
+            note="перед публикацией"
+            value={draftContentTotal}
+          />
+          <KpiTile
+            href={checksHref}
+            label="Проверки контента"
+            note={contentWarningCount > 0 ? `${contentWarningCount} замечаний` : 'всё в норме'}
+            tone={contentWarningCount > 0 ? 'warning' : 'default'}
+            value={contentWarningCount}
+          />
+        </div>
+      </div>
+
+      <section className="grid gap-3 xl:grid-cols-12">
         <AdminWorkQueue className="xl:col-span-8" items={queueItems} />
         <PublishingStatusRail className="xl:col-span-4" items={publishingRailItems} />
         <ContentHealthTable className="xl:col-span-12" rows={contentHealthRows} />
@@ -294,7 +319,7 @@ function AdminWorkQueue({ className, items }: { className?: string; items: Queue
         title="Очередь действий"
       />
       <div className="border-t border-[var(--line)]">
-        <div className="hidden grid-cols-[minmax(7rem,1fr)_4.75rem_6rem_minmax(8rem,1fr)_5rem] gap-4 border-b border-[var(--line)] bg-[var(--surface-muted)] px-4 py-3 text-xs font-semibold uppercase tracking-[0.08em] text-[var(--muted)] md:grid">
+        <div className="hidden grid-cols-[minmax(7rem,1fr)_4.75rem_6rem_minmax(8rem,1fr)_5rem] gap-4 border-b border-[var(--line)] bg-[var(--surface-muted)] px-4 py-3 font-mono text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--muted)] md:grid">
           <span className="whitespace-nowrap">Участок</span>
           <span className="whitespace-nowrap">Кол-во</span>
           <span className="whitespace-nowrap">Ведёт</span>
@@ -341,7 +366,7 @@ function ContentHealthTable({ className, rows }: { className?: string; rows: Hea
   return (
     <Card className={cn('overflow-hidden', className)}>
       <div className="flex flex-col gap-3 border-b border-[var(--line)] px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Контроль контента</p>
+        <p className="font-mono text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--accent)]">Контроль контента</p>
         <StatusBadge variant={rows.some((row) => row.variant !== 'success') ? 'warning' : 'success'}>
           {rows.some((row) => row.variant !== 'success') ? 'нужна проверка' : 'в норме'}
         </StatusBadge>
@@ -372,7 +397,7 @@ function PublishingStatusRail({ className, items }: { className?: string; items:
   return (
     <Card className={cn('overflow-hidden', className)}>
       <div className="flex items-center justify-between gap-4 border-b border-[var(--line)] px-5 py-4">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Статус разделов</p>
+        <p className="font-mono text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--accent)]">Статус разделов</p>
         <StatusBadge variant={items.some((item) => item.draft > 0) ? 'pending' : 'success'}>
           {items.some((item) => item.draft > 0) ? 'есть черновики' : 'чисто'}
         </StatusBadge>
@@ -411,7 +436,7 @@ function ModerationActionLane({ applications, className }: { applications: Dashb
   return (
     <Card className={cn('overflow-hidden', className)}>
       <div className="flex flex-col gap-3 border-b border-[var(--line)] px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Модерация</p>
+        <p className="font-mono text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--accent)]">Модерация</p>
         <Button className="min-h-9 px-3 py-1.5 text-xs" href="/admin/applications" variant="secondary">
           Вся очередь
         </Button>
@@ -424,7 +449,7 @@ function ModerationActionLane({ applications, className }: { applications: Dashb
               href={`/admin/applications/${application.id}`}
               key={application.id}
             >
-              <span className="text-xs font-semibold uppercase tracking-[0.08em] text-[var(--muted)] lg:whitespace-nowrap">
+              <span className="font-mono text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--muted)] lg:whitespace-nowrap">
                 {applicationTypeLabels[application.type]} · {dateFormatter.format(application.createdAt)}
               </span>
               <StatusBadge className="w-fit self-start lg:self-center" variant={applicationStatusBadgeVariants[application.status]}>
@@ -487,7 +512,7 @@ function SectionHeader({
   return (
     <div className="grid gap-3 px-5 py-4 sm:grid-cols-[1fr_auto] sm:items-end">
       <div>
-        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">{eyebrow}</p>
+        <p className="font-mono text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--accent)]">{eyebrow}</p>
         <h2 className="mt-2 text-lg font-semibold">{title}</h2>
       </div>
       {actionHref && actionLabel ? (
@@ -496,6 +521,42 @@ function SectionHeader({
         </Button>
       ) : null}
     </div>
+  );
+}
+
+function KpiTile({
+  href,
+  label,
+  value,
+  note,
+  tone = 'default'
+}: {
+  href: string;
+  label: string;
+  value: number;
+  note: string;
+  tone?: 'default' | 'warning';
+}) {
+  return (
+    <AppLink
+      className="block rounded-[var(--radius-md)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)]"
+      href={href}
+    >
+      <Card
+        className={cn(
+          'flex h-full items-center justify-between gap-4 px-5 py-4',
+          tone === 'warning' && 'border-[var(--warning-border)] bg-[var(--warning-bg)]'
+        )}
+        elevation="raised"
+        interactive
+      >
+        <div className="min-w-0">
+          <p className={cn(microLabel, 'text-[var(--muted)]')}>{label}</p>
+          <p className="mt-1 text-xs text-[var(--muted)]">{note}</p>
+        </div>
+        <span className="font-mono text-[34px] font-semibold leading-none tabular-nums text-[var(--text)]">{value}</span>
+      </Card>
+    </AppLink>
   );
 }
 

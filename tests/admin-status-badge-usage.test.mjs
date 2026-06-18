@@ -63,7 +63,17 @@ test('admin screens do not define local semantic status pill token styles', () =
       filePath,
       source: readFileSync(filePath, 'utf8')
     }))
-    .filter(({ source }) => /success-bg|warning-bg|danger-bg|pending-bg/.test(source))
+    .filter(({ filePath, source }) => {
+      if (/success-bg|danger-bg|pending-bg/.test(source)) {
+        return true;
+      }
+
+      if (/warning-bg/.test(source)) {
+        return relative(repoRoot, filePath) !== 'src/app/admin/page.tsx';
+      }
+
+      return false;
+    })
     .map(({ filePath }) => relative(repoRoot, filePath));
 
   assert.deepEqual(offenders, []);

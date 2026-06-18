@@ -291,10 +291,11 @@
   margin: 0;
   padding-inline: 10px;
   color: var(--admin-sidebar-text-soft);
-  font-size: 11px;
-  font-weight: 800;
+  font-family: ui-monospace, "SF Mono", "JetBrains Mono", "Menlo", monospace;
+  font-size: 10px;
+  font-weight: 500;
   line-height: 14px;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
 }
 
@@ -312,12 +313,26 @@
   align-items: center;
   gap: 8px;
   border: 0;
-  border-left: 2px solid transparent;
-  border-radius: 0 var(--radius-md) var(--radius-md) 0;
-  padding: 7px 10px 7px 8px;
+  border-radius: var(--radius-md);
+  padding: 7px 10px 7px 10px;
   background: transparent;
   line-height: 18px;
   touch-action: manipulation;
+  transition:
+    background-color var(--motion-duration-fast) var(--motion-ease-standard),
+    color var(--motion-duration-fast) var(--motion-ease-standard);
+}
+
+.admin-nav-link::before {
+  position: absolute;
+  left: 0;
+  top: 7px;
+  bottom: 7px;
+  width: 3px;
+  border-radius: 999px;
+  background: transparent;
+  content: '';
+  transition: background-color var(--motion-duration-fast) var(--motion-ease-standard);
 }
 
 .admin-sidebar-count-badge {
@@ -352,9 +367,20 @@
 
 .admin-sidebar-shell .admin-nav-link[aria-current="page"],
 .admin-sidebar-shell .admin-nav-link[aria-current="page"]:hover {
-  border-left-color: var(--accent);
   background: var(--admin-sidebar-item-active-bg);
   color: var(--admin-sidebar-text);
+}
+
+.admin-sidebar-shell .admin-nav-link[aria-current="page"]::before {
+  background: var(--accent);
+}
+
+.admin-sidebar-shell .admin-nav-link[aria-current="page"] .admin-sidebar-link-icon {
+  color: var(--accent);
+}
+
+.admin-sidebar-shell .admin-nav-link[aria-current="page"] .admin-sidebar-link-label {
+  font-weight: 700;
 }
 
 .admin-sidebar-link-icon {
@@ -420,6 +446,11 @@
   .admin-sidebar-toggle {
     transition: none;
   }
+
+  .admin-nav-link,
+  .admin-nav-link::before {
+    transition: none;
+  }
 }
 
 .admin-workspace-header {
@@ -439,10 +470,11 @@
 
 .admin-topbar-kicker {
   color: var(--admin-label);
-  font-size: 11px;
-  font-weight: 750;
+  font-family: ui-monospace, "SF Mono", "JetBrains Mono", "Menlo", monospace;
+  font-size: 10px;
+  font-weight: 500;
   line-height: 14px;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
 }
 
@@ -498,10 +530,11 @@
 
 .admin-page-intro-eyebrow {
   color: var(--accent);
-  font-size: 11px;
-  font-weight: 750;
+  font-family: ui-monospace, "SF Mono", "JetBrains Mono", "Menlo", monospace;
+  font-size: 10px;
+  font-weight: 500;
   line-height: 14px;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
 }
 
@@ -1017,9 +1050,10 @@
 
 .sponsor-contact-compact-label {
   color: var(--muted);
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
+  font-family: ui-monospace, "SF Mono", "JetBrains Mono", "Menlo", monospace;
+  font-size: 0.66rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
   line-height: 1.25;
   text-transform: uppercase;
 }

@@ -287,7 +287,7 @@ export function PublicApplicationSection({
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_24%,var(--accent-soft),transparent_18%),radial-gradient(circle_at_72%_82%,rgba(20,20,18,0.05),transparent_22%)]"
       />
-      <div className="container relative grid gap-5 xl:grid-cols-[minmax(15rem,0.48fr)_minmax(0,1.52fr)] xl:items-start">
+      <div className="container relative grid gap-5 xl:grid-cols-[minmax(15rem,0.48fr)_minmax(0,1.52fr)] xl:items-center">
         <div className="xl:self-start">
           <EditorialShell className="p-5 md:p-6">
             <PublicEyebrow>{eyebrow}</PublicEyebrow>

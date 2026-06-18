@@ -5,7 +5,7 @@ import { HomeEventsStrip, EditorialFeatured, EditorialSupportCard } from './home
 import { CommunityChannelRows } from './homepage-community';
 import { HomeSponsorLogoStrip } from './homepage-sponsors';
 import { HomeTestimonials } from './homepage-testimonials';
-import { HomeSteps } from './homepage-steps';
+
 import { HomeCtaFaqSection } from './home-cta-faq-section';
 import { Button } from '@/components/ui/button';
 import { bodyFont, displayFont } from '@/lib/fonts';
@@ -33,7 +33,6 @@ export function HomepageClient({ data }: HomepageClientProps) {
     <div className="overflow-x-hidden">
       <HomeHeroRouter stats={data.stats} />
 
-      <HomeSteps steps={data.steps} />
 
       <section className="editorial-current-section scroll-mt-28 border-b border-white/8 py-12 md:py-20" data-theme="dark" id="home-fresh">
         <div className="container">
@@ -54,7 +53,7 @@ export function HomepageClient({ data }: HomepageClientProps) {
             <div className="editorial-current-support-row grid grid-cols-1 gap-4 sm:grid-cols-3 md:gap-5">
               <EditorialSupportCard actionLabel={data.vacancy ? 'Откликнуться' : 'Все вакансии'} card={data.vacancy} label="Вакансии" />
               <EditorialSupportCard actionLabel="Читать" card={materialsCard} fallbackMeta="Другие материалы" label="Материалы" />
-              <EditorialSupportCard actionLabel={data.supplier ? 'Открыть' : 'Смотреть поставщиков'} card={data.supplier} label="Поставщики" />
+              <EditorialSupportCard actionLabel={data.supplier ? 'Смотреть поставщика' : 'Смотреть поставщиков'} card={data.supplier} label="Поставщики" />
             </div>
           </div>
         </div>

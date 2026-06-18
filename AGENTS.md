@@ -97,6 +97,8 @@ Before implementation work, freeze the smallest useful mini-spec:
 
 For new features, bug fixes, refactors and behavior changes, the default order is mandatory when the behavior is testable: write or update the smallest meaningful failing test first, run or record that failing check when practical, and only then change production code. Then implement the minimum code needed to pass, rerun the targeted test, and broaden validation only as risk requires.
 
+If the changed code path already has automated tests, those tests must be reviewed and synchronized in the same batch. Do not leave old expectations asserting removed UI, copy, flows or contracts after changing the implementation. A code change in a covered area is not done until the relevant tests either pass with updated expectations or an explicit exception is recorded before closeout.
+
 If a failing automated test is not practical, state why before implementation and define the substitute proof before editing production code: source test, type/lint check, browser smoke, visual QA, manual reproduction, or an explicit verification gap.
 
 Documentation-only, configuration-only and owner-approved exploratory work may use the mini-spec plus targeted validation without a failing code test, but the exception must be explicit in the closeout.

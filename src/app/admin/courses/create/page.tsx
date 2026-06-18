@@ -25,7 +25,7 @@ export default async function AdminCreateCoursePage() {
   return (
     <div className="space-y-8">
       <header>
-        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Админка / Курсы / Создание</p>
+        <p className="font-mono text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--muted)]">Админка / Курсы / Создание</p>
         <h1 className="mt-2 text-3xl font-semibold">Новый курс</h1>
       </header>
 

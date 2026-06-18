@@ -95,8 +95,8 @@ export function AdminCmsAdvancedSection({
           <span className="form-section-title block">{title}</span>
           {description ? <span className="mt-1 block max-w-3xl text-sm leading-6 text-[var(--muted)]">{description}</span> : null}
         </span>
-        <span className="shrink-0 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--muted)] group-open/admin-advanced:hidden">Раскрыть</span>
-        <span className="hidden shrink-0 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--muted)] group-open/admin-advanced:inline">Свернуть</span>
+        <span className="shrink-0 font-mono text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--muted)] group-open/admin-advanced:hidden">Раскрыть</span>
+        <span className="hidden shrink-0 font-mono text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--muted)] group-open/admin-advanced:inline">Свернуть</span>
       </summary>
       <div className={cn('form-section-body mt-4', bodyClassName)}>{children}</div>
     </details>
@@ -107,13 +107,13 @@ export function AdminCmsSummary({ actions, className, items, title = 'Сводк
   return (
     <section className={cn('border-b border-[var(--line)] pb-5', className)}>
       <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
-        <h2 className="text-sm font-semibold uppercase tracking-[0.12em] text-[var(--muted)]">{title}</h2>
+        <h2 className="font-mono text-xs font-medium uppercase tracking-[0.22em] text-[var(--muted)]">{title}</h2>
         {actions ? <div className="flex flex-wrap gap-2">{actions}</div> : null}
       </div>
       <dl className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         {items.map((item) => (
           <div className="min-w-0" key={item.label}>
-            <dt className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--muted)]">{item.label}</dt>
+            <dt className="font-mono text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--muted)]">{item.label}</dt>
             <dd className="mt-1 min-w-0 text-sm font-medium text-[var(--text)]">{item.value ?? 'Не указано'}</dd>
           </div>
         ))}
@@ -132,7 +132,7 @@ export function AdminCmsCompactRecordSummary({ items, status, subtitle, title }:
       <dl className="grid min-w-0 gap-3 sm:grid-cols-2 xl:grid-cols-4">
         {items.map((item) => (
           <div className="min-w-0" key={item.label}>
-            <dt className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--muted)]">{item.label}</dt>
+            <dt className="font-mono text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--muted)]">{item.label}</dt>
             <dd className="mt-1 truncate text-sm font-medium text-[var(--text)]">{item.value ?? 'Не указано'}</dd>
           </div>
         ))}

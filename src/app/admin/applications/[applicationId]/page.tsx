@@ -69,7 +69,7 @@ export default async function AdminApplicationDetailPage({ params, searchParams 
     <div className="space-y-8">
       <header className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Админка / Заявки / {applicationTypeLabels[application.type]}</p>
+          <p className="font-mono text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--muted)]">Админка / Заявки / {applicationTypeLabels[application.type]}</p>
           <h1 className="mt-2 text-3xl font-semibold">{application.subject || applicationTypeLabels[application.type]}</h1>
           <div className="mt-3 flex flex-wrap items-center gap-3">
             <StatusBadge variant={applicationStatusBadgeVariants[application.status]}>

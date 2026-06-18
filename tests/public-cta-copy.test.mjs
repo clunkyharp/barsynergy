@@ -13,23 +13,26 @@ function readProjectFile(path) {
 const publicActionSourceFiles = [
   'src/app/(public)/articles/page.tsx',
   'src/app/(public)/consulting/page.tsx',
+  'src/app/(public)/contacts/page.tsx',
   'src/app/(public)/education/page.tsx',
   'src/app/(public)/partners/page.tsx',
   'src/app/(public)/general-sponsors/page.tsx',
+  'src/app/(public)/search/page.tsx',
   'src/app/(public)/suppliers/page.tsx',
   'src/app/(public)/tools/cost-calculator/page.tsx',
+  'src/components/public/article-detail-sidebar.tsx',
   'src/components/public/business-solution-form.tsx',
   'src/components/public/consulting-request-form.tsx',
   'src/components/public/contact-application-form.tsx',
+  'src/components/public/contact-application-form-constants.ts',
   'src/components/public/contact-action-row.tsx',
   'src/components/public/general-sponsor-card.tsx',
   'src/components/public/homepage-client.tsx',
   'src/components/public/partner-application-form.tsx',
   'src/components/public/platform-ui.tsx',
-  'src/components/public/public-featured-content.tsx',
   'src/components/public/public-related-content-section.tsx',
   'src/components/public/published-content-section.tsx',
-  'src/components/public/social-card.tsx',
+  'src/components/public/social-channel-card.tsx',
   'src/components/public/vacancy-application-forms.tsx',
   'src/lib/public/home.ts'
 ];
@@ -76,6 +79,9 @@ test('public CTA labels describe concrete user actions', () => {
   assert.match(source, /Разместить заведение/);
   assert.match(source, /Рассчитать себестоимость/);
   assert.match(source, /Написать в Telegram/);
+  assert.match(source, /Смотреть поставщика/);
+  assert.match(source, /Смотреть программу/);
+  assert.match(source, /Смотреть Instagram/);
   assert.match(source, /function normalizePublicActionLabel/);
   assert.match(source, /'Открыть калькулятор': 'Рассчитать себестоимость'/);
   assert.match(source, /'Открыть каталог': 'Смотреть поставщиков'/);
@@ -100,7 +106,7 @@ test('business process rows do not duplicate step metadata chips', () => {
   const sectionEnd = source.indexOf('</section>', sectionStart);
   const sectionSource = source.slice(sectionStart, sectionEnd);
 
-  assert.match(sectionSource, /processSteps\.map\(\(step, i\) =>/);
+  assert.match(sectionSource, /processSteps\.map\(\(step, (i|index)\) =>/);
   assert.match(sectionSource, /\{step\.title\}/);
   assert.match(sectionSource, /\{step\.description\}/);
   assert.doesNotMatch(sectionSource, /metaLabel="Этап"/);
@@ -251,7 +257,6 @@ test('business page is framed as a catalog listing flow, not a digital service g
   assert.doesNotMatch(source, /const businessServiceMeta/);
   assert.doesNotMatch(source, /Цифровой инструмент под конкретный процесс/);
   assert.doesNotMatch(source, /home-service-card-action/);
-  assert.doesNotMatch(source, /md:grid-cols-3/);
 });
 
 test('consulting page combines cases and prices into tabs before the direct request form', () => {

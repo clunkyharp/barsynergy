@@ -8,6 +8,8 @@ const stepVisuals: { icon: SectionIconType; tone: 'search' | 'contact' | 'growth
   { icon: 'chart', tone: 'growth' }
 ];
 
+const stepLabels = ['01', '02', '03'];
+
 export function HomeSteps({ steps }: { steps: HomepageData['steps'] }) {
   if (steps.length === 0) {
     return null;
@@ -34,22 +36,20 @@ export function HomeSteps({ steps }: { steps: HomepageData['steps'] }) {
         <ol className="grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-5">
           {steps.map((step, index) => {
             const visual = stepVisuals[index % stepVisuals.length];
+            const stepIndex = stepLabels[index % stepLabels.length];
 
             return (
               <li
-                className="home-step-card relative flex flex-col overflow-hidden rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--surface-card)] shadow-[var(--shadow-card)]"
+                className="home-step-card flex flex-col overflow-hidden rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--surface-card)] shadow-[var(--shadow-card)]"
                 data-step-tone={visual.tone}
                 key={step.number}
               >
-                <span className="home-step-card-visual relative flex items-center justify-between gap-4 overflow-hidden p-5">
-                  <span className="relative z-10 grid size-12 place-items-center rounded-[var(--radius-md)] border border-[color-mix(in_oklab,var(--home-step-accent)_42%,var(--border-default))] bg-[color-mix(in_oklab,var(--home-step-accent)_16%,var(--surface-card))]">
-                    <SectionIcon className="relative z-10" size={30} type={visual.icon} />
+                <span className="home-step-card-visual flex items-center gap-4 border-b border-[var(--border-default)] p-5">
+                  <span className="text-[var(--home-step-accent)]">
+                    <SectionIcon size={28} type={visual.icon} />
                   </span>
-                  <span className={`${displayFont.className} relative z-10 text-[3rem] font-bold leading-none text-[var(--home-step-accent)]`}>
-                    {step.number}
-                  </span>
-                  <span aria-hidden="true" className="home-step-card-watermark">
-                    {step.number}
+                  <span className="font-mono text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--muted)]">
+                    {stepIndex}
                   </span>
                 </span>
                 <span className="flex flex-1 flex-col p-5 pt-4">

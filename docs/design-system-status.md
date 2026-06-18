@@ -7,7 +7,7 @@
 Актуальный статус дизайн-системы описывается в трех документах:
 
 - `docs/design-system-consistency-audit-final-2026-04-29.md`
-- `docs/ui-ux-audit-final-2026-04-29.md`
+- `docs/archive/ui-ux-audit-final-2026-04-29.md` (archived)
 - `docs/ui-ux-design-refactor-plan.md`
 
 Этот файл нужен только как короткая статусная сводка.

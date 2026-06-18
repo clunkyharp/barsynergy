@@ -122,7 +122,7 @@ export function ImagePickerField({ defaultValue, hint, id, label, name, placehol
           </label>
         </div>
         <details className="group/image-path rounded-[var(--radius-sm)] border border-[var(--line)] bg-[var(--surface-muted)] px-3 py-2">
-          <summary className="cursor-pointer list-none text-xs font-semibold uppercase tracking-[0.08em] text-[var(--muted)] [&::-webkit-details-marker]:hidden">
+          <summary className="cursor-pointer list-none font-mono text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--muted)] [&::-webkit-details-marker]:hidden">
             Указать путь вручную
           </summary>
           <Input

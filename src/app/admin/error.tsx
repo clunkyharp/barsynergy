@@ -7,7 +7,7 @@ export default function AdminErrorPage({ error, reset }: { error: Error & { dige
   return (
     <div className="flex min-h-[60vh] items-center justify-center p-8">
       <Card className="max-w-lg p-8 text-center">
-        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Ошибка</p>
+        <p className="font-mono text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--muted)]">Ошибка</p>
         <h1 className="mt-4 text-2xl font-semibold text-[var(--text)]">Что-то пошло не так</h1>
         <p className="mt-3 text-sm leading-6 text-[var(--muted)]">
           {error.message || 'Произошла непредвиденная ошибка. Попробуйте обновить страницу или вернуться в панель управления.'}

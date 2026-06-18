@@ -26,7 +26,7 @@ export function HomepageSectionEditor({
     <details id={id} className="group/homepage-section editorial-form-shell scroll-mt-24 overflow-visible p-0" open={defaultOpen}>
       <summary className="grid cursor-pointer list-none gap-4 p-5 transition hover:bg-[var(--surface-muted)] sm:p-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center [&::-webkit-details-marker]:hidden">
         <div className="min-w-0">
-          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--muted)]">Секция главной</p>
+          <p className="font-mono text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--muted)]">Секция главной</p>
           <h2 className="mt-2 text-xl font-semibold text-[var(--text)]">{title}</h2>
           <p className="mt-2 max-w-3xl text-sm leading-6 text-[var(--muted)]">{description}</p>
         </div>

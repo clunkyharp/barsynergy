@@ -184,7 +184,7 @@ export default async function AdminUsersPage({ searchParams }: AdminUsersPagePro
       </AdminFilterBar>
       <section className="rounded-[var(--radius-md)] border border-[var(--line)] border-l-[3px] border-l-[var(--admin-structure-accent)] bg-[var(--surface)] p-4">
         <div className="grid gap-1 border-b border-[var(--line)] pb-3">
-          <h2 className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--admin-label)]">Фильтр доступов</h2>
+          <h2 className="font-mono text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--admin-label)]">Фильтр доступов</h2>
           <p className="text-xs leading-5 text-[var(--muted)]">Отбор меняет только список ниже. Доступы и заявки не изменяются.</p>
         </div>
         <div className="mt-4 flex flex-wrap gap-2">
