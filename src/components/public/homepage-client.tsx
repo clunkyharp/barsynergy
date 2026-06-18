@@ -94,7 +94,7 @@ export function HomepageClient({ data }: HomepageClientProps) {
 
       {data.generalSponsors.length > 0 ? <HomeSponsorLogoStrip sponsors={data.generalSponsors} /> : null}
 
-      <HomeTestimonials testimonials={data.testimonials} />
+      {/* <HomeTestimonials testimonials={data.testimonials} /> */}
 
       <HomeCtaFaqSection />
 
