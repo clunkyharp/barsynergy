@@ -58,7 +58,7 @@ export async function updateJobSearch(_prevState: ProfileActionResult, formData:
     });
 
     revalidatePath('/profile');
-    revalidatePath(SETTINGS_PATH);
+    revalidatePath(SETTINGS_PATH, 'layout');
     result = { type: 'success', message: 'Статус поиска сохранён.' };
   } catch (error) {
     result = {
@@ -100,7 +100,7 @@ export async function openProfileVisibilityAction(_prevState: ProfileActionResul
     }
 
     revalidatePath('/profile');
-    revalidatePath(SETTINGS_PATH);
+    revalidatePath(SETTINGS_PATH, 'layout');
     result = { type: 'success', message: 'Профиль открыт для работодателей.' };
   } catch (error) {
     result = {
@@ -214,7 +214,7 @@ export async function setProfilePublic(_prevState: ProfileActionResult, formData
     }
 
     revalidatePath('/profile');
-    revalidatePath(SETTINGS_PATH);
+    revalidatePath(SETTINGS_PATH, 'layout');
     result = {
       type: 'success',
       message: parsed.publish ? 'Резюме опубликовано.' : 'Резюме скрыто.'

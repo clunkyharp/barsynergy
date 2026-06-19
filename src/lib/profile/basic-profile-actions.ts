@@ -78,7 +78,7 @@ export async function updateBasicProfile(_prevState: ProfileActionResult, formDa
     });
 
     revalidatePath('/profile');
-    revalidatePath(SETTINGS_PATH);
+    revalidatePath(SETTINGS_PATH, 'layout');
     result = { type: 'success', message: 'Профиль сохранён.' };
   } catch (error) {
     result = {

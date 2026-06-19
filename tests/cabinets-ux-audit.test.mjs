@@ -74,7 +74,7 @@ test('business dashboard uses panel primitive for local dashboard surfaces', () 
   const componentSource = readProjectFile('src/components/business/business-cabinet.tsx');
 
   assert.match(pageSource, /import \{ Panel \} from '@\/components\/ui\/panel'/);
-  assert.match(pageSource, /<Panel padding="md" tone="elevated">/);
+  assert.match(pageSource, /<Panel[^>]*padding="md"[^>]*tone="elevated"[^>]*>/);
   assert.match(pageSource, /<Panel className="grid gap-3 md:grid-cols-4/);
   assert.match(pageSource, /<Panel className="text-sm leading-6 text-\[var\(--muted\)\]" padding="md" tone="elevated">/);
   assert.doesNotMatch(pageSource, /rounded-\[var\(--radius-lg\)\] border border-\[var\(--line\)\] bg-\[var\(--surface-elevated\)\]/);
@@ -201,7 +201,7 @@ test('admin skills page exposes moderation view for user generated skills', () =
 test('password policy uses min 10 and HIBP checks on password-setting actions', () => {
   const policySource = readProjectFile('src/lib/auth/password-policy-constants.ts');
   const hibpSource = readProjectFile('src/lib/security/hibp.ts');
-  const profileSettingsSource = readProjectFile('src/app/profile/settings/page.tsx');
+  const profileSettingsSource = readProjectFile('src/app/profile/settings/security/page.tsx');
   const registerFormSource = readProjectFile('src/components/public/register-user-form.tsx');
   const resetFormSource = readProjectFile('src/app/auth/password-reset/_components/password-reset-forms.tsx');
   const activatePageSource = readProjectFile('src/app/auth/activate/page.tsx');
@@ -237,7 +237,7 @@ test('password policy uses min 10 and HIBP checks on password-setting actions', 
 });
 
 test('profile avatar upload uses client cropper before server action upload', () => {
-  const settingsSource = readProjectFile('src/app/profile/settings/page.tsx');
+  const settingsSource = readProjectFile('src/app/profile/settings/profile/page.tsx');
   const cropperSource = readProjectFile('src/components/profile/avatar-cropper.tsx');
   const avatarActionSource = readProjectFile('src/lib/profile/avatar-actions.ts');
 
@@ -259,7 +259,12 @@ test('profile avatar upload uses client cropper before server action upload', ()
 });
 
 test('profile settings forms save inline without redirecting away from drafts', () => {
-  const settingsSource = readProjectFile('src/app/profile/settings/page.tsx');
+  const profilePageSource = readProjectFile('src/app/profile/settings/profile/page.tsx');
+  const careerPageSource = readProjectFile('src/app/profile/settings/career/page.tsx');
+  const securityPageSource = readProjectFile('src/app/profile/settings/security/page.tsx');
+  const settingsSource = profilePageSource + careerPageSource + securityPageSource;
+  const layoutSource = readProjectFile('src/app/profile/settings/layout.tsx');
+  const navTabsSource = readProjectFile('src/components/profile/settings-nav-tabs.tsx');
   const formSource = readProjectFile('src/components/profile/profile-section-form.tsx');
   const sectionSource = readProjectFile('src/components/profile/profile-settings-section.tsx');
   const disclosureSource = readProjectFile('src/components/ui/disclosure-panel.tsx');
@@ -281,7 +286,7 @@ test('profile settings forms save inline without redirecting away from drafts', 
   assert.match(settingsSource, /sectionId="password"/);
   assert.match(settingsSource, /ProfileSettingsSection/);
   assert.match(settingsSource, /id="avatar" title="Аватар"/);
-  assert.match(settingsSource, /id="password" title="Смена пароля"/);
+  assert.match(settingsSource, /id="password"[\s\S]*?Смена пароля/);
   assert.doesNotMatch(settingsSource, /<Panel className="max-w-2xl scroll-mt-6"/);
   assert.doesNotMatch(settingsSource, /<form action=\{update/);
   assert.doesNotMatch(settingsSource, /<form action=\{changePassword\}/);
@@ -300,8 +305,11 @@ test('profile settings forms save inline without redirecting away from drafts', 
   assert.match(disclosureSource, /Открыть/);
   assert.match(disclosureSource, /Свернуть/);
 
-  assert.match(settingsSource, /<ProfileTabs sections=\{\[\.\.\.sections\]\}/);
-  assert.match(readProjectFile('src/components/profile/profile-tabs.tsx'), /onClick=\{\(\) => requestProfileSettingsSectionOpen\(s\.id\)\}/);
+  assert.match(layoutSource, /SettingsNavTabs/);
+  assert.match(navTabsSource, /\/profile\/settings\/profile/);
+  assert.match(navTabsSource, /\/profile\/settings\/career/);
+  assert.match(navTabsSource, /\/profile\/settings\/notifications/);
+  assert.match(navTabsSource, /\/profile\/settings\/security/);
 
   assert.match(formSource, /useActionState/);
   assert.match(formSource, /FieldSuccess/);
@@ -350,8 +358,8 @@ test('S3 cabinet action controls meet touch and hidden-profile UX requirements',
   const jobSearchActionSource = readProjectFile('src/lib/profile/job-search-actions.ts');
 
   assert.doesNotMatch(profileSource, /href="\/profile\/settings" size="sm"/);
-  assert.match(profileSource, /href="\/profile\/settings" size="md" variant="primary"/);
-  assert.match(profileSource, /href="\/profile\/settings" size="md" variant="secondary"/);
+  assert.match(profileSource, /href="\/profile\/settings\/career" size="md" variant="primary"/);
+  assert.match(profileSource, /href="\/profile\/settings\/career" size="md" variant="secondary"/);
   assert.match(profileSource, /flex flex-col gap-4 md:flex-row md:items-center/);
   assert.match(profileSource, /ProfileVisibilityAlert action=\{openProfileVisibilityAction\}/);
 
@@ -393,7 +401,7 @@ test('S4 public copy removes generic phrasing and duplicate live-card framing', 
   assert.doesNotMatch(homepageSource, /Свежее на платформе/);
   assert.doesNotMatch(homepageSource, /всё в одном месте/);
 
-  assert.match(businessSource, /Каталог заведений/);
+  assert.match(businessSource, /Разместить заведение в каталоге/);
   assert.doesNotMatch(businessSource, /Видимость в профильной среде/);
 
   assert.match(loginSource, /Войдите как специалист или представитель компании/);
@@ -401,7 +409,7 @@ test('S4 public copy removes generic phrasing and duplicate live-card framing', 
   assert.doesNotMatch(registerSource, /Я владею заведением или представляю бренд/);
 
   assert.match(profileSource, /Добавьте ещё:/);
-  assert.match(profileSource, /Полный профиль чаще попадает в подборки работодателей/);
+  assert.match(profileSource, /Профиль заполнен на \$\{completeness\.percent\}%/);
   assert.doesNotMatch(profileSource, /Не хватает:|Заполненный профиль помогает/);
 
   assert.match(contactFormSource, /title="Опишите задачу — ответим на ваш контакт"/);

@@ -112,7 +112,7 @@ export async function updateWorkExperiences(_prevState: ProfileActionResult, for
     });
 
     revalidatePath('/profile');
-    revalidatePath(SETTINGS_PATH);
+    revalidatePath(SETTINGS_PATH, 'layout');
     result = { type: 'success', message: 'Опыт работы сохранён.' };
   } catch (error) {
     result = {

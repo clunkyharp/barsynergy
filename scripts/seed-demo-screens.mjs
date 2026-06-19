@@ -789,7 +789,7 @@ async function main() {
         authorName: 'Редакция BARSYNERGY',
         readingTimeMinutes: 7,
         sortOrder: 14,
-        sourceReferences: '- [Perfect Daily Grind — Bloom practices](https://perfectdailygrind.com/)\n- [Barista Hustle — Extraction theory](https://www.baristahustle.com/)',
+        sourceReferences: '- [Perfect Daily Grind — Bloom practices](https://perfectdailygrind.com/)',
         tags: { deleteMany: {}, create: articleTagLinks([brewTag, baristaTag, extractionTag, coffeeShopTag]) }
       },
       create: {
@@ -825,7 +825,7 @@ async function main() {
         authorName: 'Редакция BARSYNERGY',
         readingTimeMinutes: 7,
         sortOrder: 14,
-        sourceReferences: '- [Perfect Daily Grind — Bloom practices](https://perfectdailygrind.com/)\n- [Barista Hustle — Extraction theory](https://www.baristahustle.com/)',
+        sourceReferences: '- [Perfect Daily Grind — Bloom practices](https://perfectdailygrind.com/)',
         tags: { create: articleTagLinks([brewTag, baristaTag, extractionTag, coffeeShopTag]) }
       }
     }),
@@ -863,7 +863,7 @@ async function main() {
         authorName: 'Редакция BARSYNERGY',
         readingTimeMinutes: 8,
         sortOrder: 15,
-        sourceReferences: '- [Perfect Daily Grind — Espresso gadgets](https://perfectdailygrind.com/)\n- [Barista Hustle — Tools review](https://www.baristahustle.com/)',
+        sourceReferences: '- [Perfect Daily Grind — Espresso gadgets](https://perfectdailygrind.com/)',
         tags: { deleteMany: {}, create: articleTagLinks([espressoTag, workflowTag, baristaTag, coffeeShopTag]) }
       },
       create: {
@@ -898,7 +898,7 @@ async function main() {
         authorName: 'Редакция BARSYNERGY',
         readingTimeMinutes: 8,
         sortOrder: 15,
-        sourceReferences: '- [Perfect Daily Grind — Espresso gadgets](https://perfectdailygrind.com/)\n- [Barista Hustle — Tools review](https://www.baristahustle.com/)',
+        sourceReferences: '- [Perfect Daily Grind — Espresso gadgets](https://perfectdailygrind.com/)',
         tags: { create: articleTagLinks([espressoTag, workflowTag, baristaTag, coffeeShopTag]) }
       }
     }),

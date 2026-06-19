@@ -104,7 +104,7 @@ export function SiteHeader({ user, logoutAction }: SiteHeaderProps) {
       )}
     >
       <div className="container">
-        <div className="relative z-10 flex min-h-[56px] items-center justify-between gap-3 px-0 xl:grid xl:min-h-[64px] xl:grid-cols-[176px_minmax(0,1fr)_max-content] xl:items-center xl:gap-x-6 2xl:grid-cols-[220px_minmax(0,1fr)_max-content] 2xl:gap-x-8">
+        <div className="relative z-10 flex min-h-[56px] items-center justify-between gap-3 px-0 lg:grid lg:min-h-[64px] lg:grid-cols-[176px_minmax(0,1fr)_max-content] lg:items-center lg:gap-x-6 2xl:grid-cols-[220px_minmax(0,1fr)_max-content] 2xl:gap-x-8">
           <AppLink
             aria-label="BARSYNERGY"
             className={cn(
@@ -135,7 +135,7 @@ export function SiteHeader({ user, logoutAction }: SiteHeaderProps) {
               width={162}
             />
           </AppLink>
-          <nav className="hidden min-w-0 items-center justify-center gap-1 px-0 text-[11px] font-semibold uppercase tracking-[0.06em] text-inherit xl:flex xl:justify-self-start 2xl:gap-2 2xl:text-[12px] 2xl:tracking-[0.08em]">
+          <nav className="hidden min-w-0 items-center justify-center gap-1 px-0 text-[11px] font-semibold uppercase tracking-[0.06em] text-inherit lg:flex lg:justify-self-start 2xl:gap-2 2xl:text-[12px] 2xl:tracking-[0.08em]">
             {effectiveDesktopPrimaryNavItems.map((item) => {
               const isActive = pathname ? isActiveItem(pathname, item.href) : false;
 
@@ -217,7 +217,7 @@ export function SiteHeader({ user, logoutAction }: SiteHeaderProps) {
               </details>
             ) : null}
           </nav>
-          <div className="hidden shrink-0 items-center justify-end gap-2 xl:flex xl:w-full">
+          <div className="hidden shrink-0 items-center justify-end gap-2 lg:flex lg:w-full">
             <AppLink
               aria-label="Поиск"
               className={cn(
@@ -231,17 +231,17 @@ export function SiteHeader({ user, logoutAction }: SiteHeaderProps) {
             {user?.role === 'BUSINESS' ? (
               <AppLink
                 className={cn(
-                  'hidden min-h-10 shrink-0 items-center justify-center whitespace-nowrap rounded-[var(--radius-sm)] border-[1.5px] border-[var(--accent)] bg-[var(--accent-soft)] px-3 text-[11px] font-bold uppercase tracking-[0.1em] text-[var(--accent)] transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] hover:bg-[var(--accent)] hover:text-[var(--accent-contrast)] motion-reduce:transition-none xl:inline-flex xl:px-4',
+                  'hidden min-h-10 shrink-0 items-center justify-center whitespace-nowrap rounded-[var(--radius-sm)] border-[1.5px] border-[var(--accent)] bg-[var(--accent-soft)] px-3 text-[11px] font-bold uppercase tracking-[0.1em] text-[var(--accent)] transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] hover:bg-[var(--accent)] hover:text-[var(--accent-contrast)] motion-reduce:transition-none lg:inline-flex lg:px-4',
                   focusClassName
                 )}
-                href="/contacts#contact-form"
+                href="/business/cabinet"
               >
                 Разместить вакансию
               </AppLink>
             ) : user?.role === 'USER' ? (
               <AppLink
                 className={cn(
-                  'hidden min-h-10 shrink-0 items-center justify-center whitespace-nowrap rounded-[var(--radius-sm)] border-[1.5px] px-3 text-[11px] font-bold uppercase tracking-[0.1em] transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] motion-reduce:transition-none xl:inline-flex xl:px-4',
+                  'hidden min-h-10 shrink-0 items-center justify-center whitespace-nowrap rounded-[var(--radius-sm)] border-[1.5px] px-3 text-[11px] font-bold uppercase tracking-[0.1em] transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] motion-reduce:transition-none lg:inline-flex lg:px-4',
                   isHomeTop
                     ? 'border-white/20 bg-white/10 text-[var(--editorial-dark-text)] hover:bg-white/18 hover:text-white'
                     : 'border-[var(--border-strong)] bg-[var(--surface-elevated)] text-[var(--text)] hover:border-[var(--accent)] hover:bg-[var(--surface-wash)] hover:text-[var(--accent-strong)]',
@@ -282,7 +282,7 @@ export function SiteHeader({ user, logoutAction }: SiteHeaderProps) {
               </div>
             )}
           </div>
-          <div className="flex shrink-0 items-center gap-2 xl:hidden">
+          <div className="flex shrink-0 items-center gap-2 lg:hidden">
             {user ? <AccountMenu logoutAction={logoutAction!} user={user} /> : null}
             <AppLink
               aria-label="Поиск"

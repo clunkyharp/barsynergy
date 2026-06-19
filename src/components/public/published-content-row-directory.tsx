@@ -62,13 +62,17 @@ export function DirectoryListRow({
   item,
   basePath,
   actionLabel = 'Связаться',
-  profileLabel = 'Профиль'
+  profileLabel = 'Профиль',
+  primaryActionHash
 }: {
   item: PublishedContentItem;
   basePath: string;
   actionLabel?: string;
   profileLabel?: string;
+  primaryActionHash?: string;
 }) {
+  const profileHref = detailHref(basePath, item.slug);
+  const primaryHref = primaryActionHash ? `${profileHref}#${primaryActionHash}` : profileHref;
   const media = item.imageUrl ? (
     <div className="grid h-12 w-12 place-items-center overflow-hidden rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--surface-wash)] sm:h-14 sm:w-14 md:h-16 md:w-16">
       <span aria-hidden="true" className="h-full w-full bg-cover bg-center" style={{ backgroundImage: `url("${item.imageUrl}")` }} />
@@ -119,7 +123,7 @@ export function DirectoryListRow({
         <div className="public-list-row-actions flex flex-col gap-2.5 sm:flex-row sm:flex-wrap">
           <Button
             className="public-list-row-primary-action rounded-[var(--radius-md)] px-5 tracking-normal max-sm:w-full"
-            href={detailHref(basePath, item.slug)}
+            href={primaryHref}
             size="lg"
             variant="primary"
           >
@@ -128,7 +132,7 @@ export function DirectoryListRow({
           </Button>
           <Button
             className="public-list-row-secondary-action rounded-[var(--radius-md)] px-5 tracking-normal max-sm:w-full"
-            href={detailHref(basePath, item.slug)}
+            href={profileHref}
             size="lg"
             variant="secondary"
           >

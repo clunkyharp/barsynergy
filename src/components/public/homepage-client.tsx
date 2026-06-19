@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { ArrowUpRight } from 'lucide-react';
-import { HomeHeroRouter } from './homepage-hero';
+import { HomeHeroRouter, HomeStatsLine } from './homepage-hero';
 import { HomeEventsStrip, EditorialFeatured, EditorialSupportCard } from './homepage-current';
 import { CommunityChannelRows } from './homepage-community';
 import { HomeSponsorLogoStrip } from './homepage-sponsors';
@@ -30,7 +30,16 @@ export function HomepageClient({ data }: HomepageClientProps) {
 
   return (
     <div className="overflow-x-hidden">
-      <HomeHeroRouter stats={data.stats} />
+      <HomeHeroRouter />
+
+      <section className="border-b border-[var(--line)] bg-[var(--surface-wash)] py-8 md:py-10">
+        <div className="container">
+          <p className="text-[10px] font-semibold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--muted)]">
+            Платформа в цифрах
+          </p>
+          <HomeStatsLine stats={data.stats} />
+        </div>
+      </section>
 
 
       <section className="editorial-current-section scroll-mt-28 border-b border-white/8 py-12 md:py-20" data-theme="dark" id="home-fresh">

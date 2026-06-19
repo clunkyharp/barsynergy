@@ -20,8 +20,7 @@ test('homepage hero exposes audience routing and a no-data fallback strip', () =
   assert.match(source, /У меня компания/);
   assert.match(source, /Открыть для бизнеса/);
   assert.match(source, /Открыть для бизнеса/);
-  assert.match(source, /const fallbackTrustMarkers = \[/);
-  assert.match(source, /Что уже есть на платформе/);
   assert.match(source, /if \(statItems\.length < 2\)/);
+  assert.match(source, /HomeStatsLine/);
   assert.doesNotMatch(source, /item\.value >= 10/);
 });

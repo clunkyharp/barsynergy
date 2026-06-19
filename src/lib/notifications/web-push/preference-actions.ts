@@ -33,7 +33,7 @@ export async function updateNotificationPreferences(formData: FormData) {
 
     await setNotificationPreferences(user.id, topics.topics);
 
-    revalidatePath('/profile/settings');
+    revalidatePath('/profile/settings', 'layout');
     return { type: 'success' as const, message: 'Настройки уведомлений сохранены.' };
   } catch (error) {
     console.error('[preference-actions:updateNotificationPreferences]', error);

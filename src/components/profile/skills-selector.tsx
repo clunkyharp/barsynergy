@@ -38,6 +38,8 @@ export function SkillsSelector({ allSkills, selectedSkillIds }: SkillsSelectorPr
     .filter((skill) => selectedSkillIds.has(skill.id))
     .map((skill) => skill.name);
   const [query, setQuery] = useState('');
+  const queryTrimmed = query.trim();
+  const queryTooLong = queryTrimmed.length > MAX_SKILL_LENGTH;
   const selectedKeys = useMemo(
     () => new Set(selectedNames.map((name) => name.toLocaleLowerCase('ru-RU'))),
     [selectedNames]
@@ -98,6 +100,9 @@ export function SkillsSelector({ allSkills, selectedSkillIds }: SkillsSelectorPr
           value={query}
         />
       </div>
+      {queryTooLong ? (
+        <p className="text-xs text-[var(--danger-text)]" role="alert">Максимальная длина навыка — {MAX_SKILL_LENGTH} символов.</p>
+      ) : null}
       <p className="text-xs text-[var(--muted)]">Лимит 20 навыков</p>
 
       <div aria-live="polite" aria-relevant="additions removals">

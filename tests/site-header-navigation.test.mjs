@@ -19,22 +19,22 @@ test('public desktop header navigation is readable and keeps overlap guards', ()
   assert.match(navClass, /text-\[11px\]/);
   assert.match(navClass, /tracking-\[0\.06em\]/);
   assert.match(navClass, /min-w-0/);
-  assert.match(navClass, /xl:flex/);
-  assert.match(navClass, /xl:justify-self-start/);
-  assert.match(source, /xl:grid-cols-\[176px_minmax\(0,1fr\)_max-content\]/);
+  assert.match(navClass, /2xl:gap-2/);
+  assert.match(navClass, /2xl:text-\[12px\]/);
+  assert.match(source, /lg:grid-cols-\[176px_minmax\(0,1fr\)_max-content\]/);
   assert.match(source, /2xl:grid-cols-\[220px_minmax\(0,1fr\)_max-content\]/);
   assert.match(source, /src="\/brand\/barsynergy-lockup-light\.svg"/);
   assert.match(source, /whitespace-nowrap/);
   assert.doesNotMatch(source, /href="\/contacts\?topic=other#contact-form"/);
   assert.doesNotMatch(source, /<ArrowUpRight/);
-  assert.match(source, /xl:gap-x-6/);
+  assert.match(source, /lg:gap-x-6/);
   assert.match(source, /xl:min-w-\[176px\]/);
   const typesSource = readProjectFile('src/components/layout/site-header-types.ts');
   assert.match(typesSource, /export const desktopPrimaryNavItems = getNavItems\(\['\/education', '\/events', '\/vacancies', '\/suppliers', '\/masters', '\/articles'\]\)/);
   assert.match(typesSource, /export const desktopMoreGroups/);
-  assert.match(source, /xl:inline-flex/);
+  assert.match(source, /lg:inline-flex/);
   assert.doesNotMatch(source, /href="\/vacancies#vacancy-form"/);
-  assert.match(source, /href="\/contacts#contact-form"/);
+  assert.match(typesSource, /href: '\/contacts'/);
 });
 
 test('public desktop more menu opens by click and closes predictably', () => {
@@ -72,6 +72,6 @@ test('main public pages expose consistent breadcrumbs in their hero sections', (
   }
 
   assert.match(readProjectFile('src/components/public/events-page-header.tsx'), /<PublicBreadcrumbs current="События" \/>/);
-  assert.match(readProjectFile('src/app/(public)/vacancies/page.tsx'), /<PageHero[\s\S]*title="Каталог"/);
+  assert.match(readProjectFile('src/app/(public)/vacancies/page.tsx'), /<PageHero[\s\S]*title="Вакансии и специалисты"/);
   assert.match(readProjectFile('src/app/(public)/tools/cost-calculator/page.tsx'), /<PageHero[\s\S]*breadcrumbs=\{\[/);
 });

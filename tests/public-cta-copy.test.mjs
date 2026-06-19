@@ -121,7 +121,7 @@ test('business page renders the catalog listing request form directly', () => {
   const formSource = readProjectFile('src/components/public/business-solution-form.tsx');
   const actionSource = readProjectFile('src/app/(public)/business/actions.ts');
 
-  assert.match(source, /Каталог заведений/);
+  assert.match(source, /Добавить заведение в каталог/);
   assert.match(source, /BusinessSolutionForm/);
   assert.match(source, /direct/);
   assert.match(source, /#business-request/);

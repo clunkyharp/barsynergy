@@ -31,7 +31,7 @@ export async function subscribeUserToPush(formData: FormData) {
 
     await saveSubscription(user.id, parsed);
 
-    revalidatePath('/profile/settings');
+    revalidatePath('/profile/settings', 'layout');
     return { type: 'success' as const, message: 'Подписка на уведомления сохранена.' };
   } catch (error) {
     console.error('[subscription-actions:subscribeUserToPush]', error);
@@ -56,7 +56,7 @@ export async function unsubscribeUserFromPush(formData: FormData) {
 
     await disableUserSubscriptionByEndpoint(user.id, endpoint);
 
-    revalidatePath('/profile/settings');
+    revalidatePath('/profile/settings', 'layout');
     return { type: 'success' as const, message: 'Подписка отключена.' };
   } catch (error) {
     console.error('[subscription-actions:unsubscribeUserFromPush]', error);

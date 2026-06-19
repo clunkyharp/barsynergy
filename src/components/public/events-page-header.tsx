@@ -1,11 +1,51 @@
 import { Search } from 'lucide-react';
-import { AppLink } from '@/components/ui/app-link';
+import { CategoryPill } from '@/components/public/article-grid-category-pill';
+import { ChipFilterRow } from '@/components/ui/chip-filter-row';
 import { PublicBreadcrumbs } from '@/components/public/public-primitives';
 import { Button } from '@/components/ui/button';
 import { Select } from '@/components/ui/select';
 import { displayFont } from '@/lib/fonts';
 import type { PublicTaxonomyOption, PublicSelectOption } from '@/lib/public/filter-options';
-import { cn } from '@/lib/utils';
+
+type EventCityTabsProps = {
+  cities: PublicTaxonomyOption[];
+  selectedCity?: string;
+  preserve?: { q?: string; format?: string; period?: string };
+};
+
+export function EventCityTabs({ cities, selectedCity, preserve }: EventCityTabsProps) {
+  if (cities.length === 0) {
+    return null;
+  }
+
+  const buildHref = (citySlug?: string) => {
+    const sp = new URLSearchParams();
+    if (citySlug) sp.set('city', citySlug);
+    if (preserve?.q) sp.set('q', preserve.q);
+    if (preserve?.format) sp.set('format', preserve.format);
+    if (preserve?.period) sp.set('period', preserve.period);
+    const qs = sp.toString();
+    return qs ? `/events?${qs}` : '/events';
+  };
+
+  return (
+    <nav
+      aria-label="Города"
+      className="background-zone background-zone-graphite border-b border-[var(--line)] py-4"
+    >
+      <div className="container">
+        <ChipFilterRow aria-label="Города">
+          <CategoryPill active={!selectedCity} href={buildHref()}>Все города</CategoryPill>
+          {cities.map((city) => (
+            <CategoryPill active={selectedCity === city.slug} href={buildHref(city.slug)} key={city.id}>
+              {city.name}
+            </CategoryPill>
+          ))}
+        </ChipFilterRow>
+      </div>
+    </nav>
+  );
+}
 
 export function EventsHeroSection() {
   return (
@@ -38,77 +78,17 @@ export function EventsHeroSection() {
 }
 
 type EventsSearchBarProps = {
-  cities: PublicTaxonomyOption[];
   formats: PublicSelectOption[];
   selectedQ?: string;
   selectedCity?: string;
   selectedFormat?: string;
-  selectedPeriod?: string;
 };
 
-const CITY_TAB_NAMES = ['Махачкала', 'Грозный', 'Владикавказ', 'Нальчик'] as const;
-
-function buildEventsFilterHref({
-  city,
-  format,
-  period,
-  q
-}: {
-  city?: string;
-  format?: string;
-  period?: string;
-  q?: string;
-}) {
-  const params = new URLSearchParams();
-
-  if (q) params.set('q', q);
-  if (city) params.set('city', city);
-  if (format) params.set('format', format);
-  if (period) params.set('period', period);
-
-  const query = params.toString();
-  return query ? `/events?${query}` : '/events';
-}
-
-export function EventsSearchBar({ cities, formats, selectedQ, selectedCity, selectedFormat, selectedPeriod }: EventsSearchBarProps) {
-  const preferredCityTabs = CITY_TAB_NAMES
-    .map((name) => cities.find((city) => city.name === name))
-    .filter((city): city is PublicTaxonomyOption => Boolean(city));
-  const extraCityTabs = cities.filter((city) => !preferredCityTabs.some((tab) => tab.slug === city.slug));
-  const cityTabs = [...preferredCityTabs, ...extraCityTabs].slice(0, 5);
-
+export function EventsSearchBar({ formats, selectedQ, selectedCity, selectedFormat }: EventsSearchBarProps) {
   return (
     <section className="background-zone background-zone-graphite border-b border-[var(--line)] py-4">
-      <div className="container space-y-3">
-        <nav aria-label="Города событий" className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
-          <AppLink
-            className={cn(
-              'shrink-0 rounded-full border px-4 py-2 text-sm font-semibold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]',
-              !selectedCity
-                ? 'border-[var(--accent)] bg-[var(--accent-soft)] text-[var(--accent)]'
-                : 'border-[var(--border-default)] bg-[var(--surface-card)] text-[var(--muted)] hover:text-[var(--text)]'
-            )}
-            href={buildEventsFilterHref({ format: selectedFormat, period: selectedPeriod, q: selectedQ })}
-          >
-            Все
-          </AppLink>
-          {cityTabs.map((city) => (
-            <AppLink
-              className={cn(
-                'shrink-0 rounded-full border px-4 py-2 text-sm font-semibold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]',
-                selectedCity === city.slug
-                  ? 'border-[var(--accent)] bg-[var(--accent-soft)] text-[var(--accent)]'
-                  : 'border-[var(--border-default)] bg-[var(--surface-card)] text-[var(--muted)] hover:text-[var(--text)]'
-              )}
-              href={buildEventsFilterHref({ city: city.slug, format: selectedFormat, period: selectedPeriod, q: selectedQ })}
-              key={city.slug}
-            >
-              {city.name}
-            </AppLink>
-          ))}
-        </nav>
+      <div className="container">
         <form action="/events" className="flex flex-col gap-3 sm:flex-row sm:items-center" method="GET">
-          {selectedPeriod ? <input name="period" type="hidden" value={selectedPeriod} /> : null}
           <div className="relative flex-1">
             <Search
               aria-hidden="true"
@@ -128,19 +108,7 @@ export function EventsSearchBar({ cities, formats, selectedQ, selectedCity, sele
             />
           </div>
 
-          <div className="sm:min-w-[9rem]">
-            <Select
-              aria-label="Город"
-              className="min-h-[2.75rem] text-sm"
-              defaultValue={selectedCity ?? ''}
-              name="city"
-            >
-              <option value="">Город</option>
-              {cities.map((city) => (
-                <option key={city.id} value={city.slug}>{city.name}</option>
-              ))}
-            </Select>
-          </div>
+          <input defaultValue={selectedCity ?? ''} name="city" type="hidden" />
 
           <div className="sm:min-w-[9rem]">
             <Select
@@ -164,3 +132,4 @@ export function EventsSearchBar({ cities, formats, selectedQ, selectedCity, sele
     </section>
   );
 }
+

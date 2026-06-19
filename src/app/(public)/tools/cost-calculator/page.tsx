@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { CostCalculatorClient } from '@/components/public/cost-calculator-client';
 import { PageHero } from '@/components/public/page-hero';
 import { buildPublicPageMetadata } from '@/lib/public/metadata';
+import { HowItWorksSection } from '@/components/ui/how-it-works-steps';
 import { JsonLd } from '@/components/seo/json-ld';
 import { buildStaticPageBreadcrumbJsonLd, buildWebApplicationJsonLd } from '@/lib/public/structured-data';
 
@@ -33,6 +34,16 @@ export default function CostCalculatorPage() {
         subtitle="Рассчитайте себестоимость напитка, установите оптимальную цену и контролируйте прибыль."
         tone="light-editorial"
         density="compact"
+      />
+
+      <HowItWorksSection
+        columns={4}
+        steps={[
+          { title: 'Выберите напиток', description: 'Выберите из списка популярных или создайте свой рецепт.' },
+          { title: 'Добавьте ингредиенты', description: 'Укажите вес, цену, порционность и расход каждого компонента.' },
+          { title: 'Рассчитайте себестоимость', description: 'Калькулятор суммирует затраты, food cost и наценку.' },
+          { title: 'Установите продажную цену', description: 'Подберите розничную цену и спланируйте маржу.' },
+        ]}
       />
 
       <div className="scroll-mt-4" id="calculator">

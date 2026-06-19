@@ -12,6 +12,7 @@ import type { PublicTaxonomyOption } from '@/lib/public/filter-options';
 import { cn } from '@/lib/utils';
 import { ArticleCard, ArticleFeaturedCard, ArticleListItem } from './article-grid-card';
 import { CategoryPill } from './article-grid-category-pill';
+import { ChipFilterRow } from '@/components/ui/chip-filter-row';
 import { listingHref, pageHref } from './article-grid-utils';
 import { ContentSubscribeForm } from '@/components/public/content-subscribe-form';
 import { PublicPrelaunchSection, type PrelaunchCard } from '@/components/public/public-prelaunch-section';
@@ -78,7 +79,7 @@ export function ArticleGridSection({
     <section aria-label="Материалы" className="border-b border-[var(--line)] pt-6 pb-10 sm:pb-14" id="articles-list">
       <div className="container">
         {/* Category pills */}
-        <div className="mt-6 flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+        <ChipFilterRow aria-label="Категории материалов" className="mt-6">
           <CategoryPill
             active={!currentCategory}
             href={listingHref(content, basePath, { category: null })}
@@ -94,7 +95,7 @@ export function ArticleGridSection({
               {cat.name}
             </CategoryPill>
           ))}
-        </div>
+        </ChipFilterRow>
 
         {content.items.length === 0 ? (
           currentCategory || content.searchQuery ? (

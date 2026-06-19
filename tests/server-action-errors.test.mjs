@@ -1,5 +1,7 @@
 import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
 import test from 'node:test';
+import { URL } from 'node:url';
 
 const { hasErrorMessage, resolveServerActionError } = await import('../src/lib/actions/server-action-errors.ts');
 
@@ -70,4 +72,15 @@ test('resolveServerActionError falls back for unexpected errors', () => {
 
   assert.equal(loggedCalls.length, 1);
   assert.equal(loggedCalls[0][0], '[test:fallback] Unexpected server action error.');
+});
+
+test('withAdminAction rethrows redirect control flow before cleanup', async () => {
+  const source = await readFile(new URL('../src/lib/server-action-wrappers.ts', import.meta.url), 'utf8');
+  const catchStart = source.indexOf('catch (error) {');
+  const catchEnd = source.indexOf('await opts.cleanup?.();', catchStart);
+  const catchPrefix = source.slice(catchStart, catchEnd);
+
+  assert.ok(source.includes("import { isRedirectError } from '@/lib/actions/server-action-errors';"));
+  assert.ok(catchPrefix.includes('if (isRedirectError(error))'));
+  assert.ok(catchPrefix.includes('throw error;'));
 });

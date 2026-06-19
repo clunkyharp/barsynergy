@@ -67,7 +67,7 @@ export async function changePassword(_prevState: ProfileActionResult, formData: 
       await tx.session.deleteMany({ where: { userId: user.id } });
     });
 
-    revalidatePath(SETTINGS_PATH);
+    revalidatePath(SETTINGS_PATH, 'layout');
     result = { type: 'success', message: 'Пароль изменён. Перезайдите с новым паролем.' };
   } catch (error) {
     result = {

@@ -216,6 +216,7 @@ export function PublishedContentSectionDirectory(props: PublishedContentSectionP
         <DirectoryListRow
           basePath={props.basePath}
           item={item}
+          primaryActionHash="supplier-contact-rail"
         />
       )}
     />

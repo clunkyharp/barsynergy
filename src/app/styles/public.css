@@ -383,6 +383,43 @@
   flex-shrink: 0;
 }
 
+/* ── Featured hierarchy: magazine cover + navigation tiles ── */
+
+.editorial-featured-gradient {
+  background:
+    linear-gradient(180deg, rgba(27, 30, 37, 0.25) 0%, transparent 28%),
+    linear-gradient(180deg, transparent 25%, rgba(27, 30, 37, 0.55) 55%, rgba(27, 30, 37, 0.88) 78%, rgba(27, 30, 37, 0.96) 100%);
+}
+
+.editorial-current-support-row .editorial-support-media {
+  aspect-ratio: 4 / 3;
+}
+
+.editorial-current-support-row .editorial-support-body {
+  padding: 0.75rem 0.9rem;
+}
+
+.editorial-current-support-row .editorial-support-title {
+  font-size: 0.95rem;
+}
+
+@media (min-width: 768px) {
+  .editorial-current-support-row .editorial-support-title {
+    font-size: 1.05rem;
+  }
+}
+
+.editorial-current-support-row .editorial-support-summary {
+  font-size: 0.75rem;
+  -webkit-line-clamp: 1;
+}
+
+.editorial-current-support-row .editorial-support-action {
+  font-size: 0.75rem;
+}
+
+/* ── End featured hierarchy ── */
+
 @media (min-width: 1024px) {
   .featured-now-media {
     min-height: 100%;

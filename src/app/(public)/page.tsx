@@ -9,7 +9,7 @@ import { buildFaqPageJsonLd } from '@/lib/public/structured-data';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = buildPublicPageMetadata({
-  title: 'BARSYNERGY — кофейная индустрия СКФО: вакансии, поставщики, обучение',
+  title: 'BARSYNERGY — вакансии, поставщики, обучение для кофеен СКФО',
   description: 'Платформа для кофейной и барной индустрии Северного Кавказа: вакансии бариста, каталог поставщиков, обучение, события и инструменты для кофеен Махачкалы, Дагестана и СКФО.',
   path: '/'
 });
