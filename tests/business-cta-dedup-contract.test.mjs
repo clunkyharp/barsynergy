@@ -15,5 +15,5 @@ test('business page keeps a single jump-to-form CTA in the upper sections', () =
 
   assert.equal((source.match(/Перейти к форме/g) ?? []).length, 1);
   assert.doesNotMatch(source, /label: 'Заполнить заявку'/);
-  assert.match(source, /label: 'Посмотреть каталог'/);
+  assert.match(source, /label: 'Смотреть поставщиков'/);
 });

@@ -129,7 +129,7 @@ test('activate page guards with invalid-invite, blocked-user and mismatch error 
 
 test('all new-password forms share password pair validation helper', () => {
   const resetComponentSource = readProjectFile('src/app/auth/password-reset/_components/password-reset-forms.tsx');
-  const profileSource = readProjectFile('src/app/profile/settings/page.tsx');
+  const profileSource = readProjectFile('src/app/profile/settings/security/page.tsx');
   const helperSource = readProjectFile('src/components/ui/password-pair-validation.tsx');
 
   assert.match(helperSource, /confirmTouched = false/);
