@@ -82,6 +82,7 @@ type EventsSearchBarProps = {
   selectedQ?: string;
   selectedCity?: string;
   selectedFormat?: string;
+  selectedPeriod?: string;
 };
 
 export function EventsSearchBar({ formats, selectedQ, selectedCity, selectedFormat }: EventsSearchBarProps) {
