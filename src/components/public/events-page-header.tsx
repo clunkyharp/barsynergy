@@ -1,9 +1,51 @@
 import { Search } from 'lucide-react';
+import { CategoryPill } from '@/components/public/article-grid-category-pill';
+import { ChipFilterRow } from '@/components/ui/chip-filter-row';
 import { PublicBreadcrumbs } from '@/components/public/public-primitives';
 import { Button } from '@/components/ui/button';
 import { Select } from '@/components/ui/select';
 import { displayFont } from '@/lib/fonts';
 import type { PublicTaxonomyOption, PublicSelectOption } from '@/lib/public/filter-options';
+
+type EventCityTabsProps = {
+  cities: PublicTaxonomyOption[];
+  selectedCity?: string;
+  preserve?: { q?: string; format?: string; period?: string };
+};
+
+export function EventCityTabs({ cities, selectedCity, preserve }: EventCityTabsProps) {
+  if (cities.length === 0) {
+    return null;
+  }
+
+  const buildHref = (citySlug?: string) => {
+    const sp = new URLSearchParams();
+    if (citySlug) sp.set('city', citySlug);
+    if (preserve?.q) sp.set('q', preserve.q);
+    if (preserve?.format) sp.set('format', preserve.format);
+    if (preserve?.period) sp.set('period', preserve.period);
+    const qs = sp.toString();
+    return qs ? `/events?${qs}` : '/events';
+  };
+
+  return (
+    <nav
+      aria-label="Города"
+      className="background-zone background-zone-graphite border-b border-[var(--line)] py-4"
+    >
+      <div className="container">
+        <ChipFilterRow aria-label="Города">
+          <CategoryPill active={!selectedCity} href={buildHref()}>Все города</CategoryPill>
+          {cities.map((city) => (
+            <CategoryPill active={selectedCity === city.slug} href={buildHref(city.slug)} key={city.id}>
+              {city.name}
+            </CategoryPill>
+          ))}
+        </ChipFilterRow>
+      </div>
+    </nav>
+  );
+}
 
 export function EventsHeroSection() {
   return (
@@ -36,14 +78,13 @@ export function EventsHeroSection() {
 }
 
 type EventsSearchBarProps = {
-  cities: PublicTaxonomyOption[];
   formats: PublicSelectOption[];
   selectedQ?: string;
   selectedCity?: string;
   selectedFormat?: string;
 };
 
-export function EventsSearchBar({ cities, formats, selectedQ, selectedCity, selectedFormat }: EventsSearchBarProps) {
+export function EventsSearchBar({ formats, selectedQ, selectedCity, selectedFormat }: EventsSearchBarProps) {
   return (
     <section className="background-zone background-zone-graphite border-b border-[var(--line)] py-4">
       <div className="container">
@@ -67,19 +108,7 @@ export function EventsSearchBar({ cities, formats, selectedQ, selectedCity, sele
             />
           </div>
 
-          <div className="sm:min-w-[9rem]">
-            <Select
-              aria-label="Город"
-              className="min-h-[2.75rem] text-sm"
-              defaultValue={selectedCity ?? ''}
-              name="city"
-            >
-              <option value="">Город</option>
-              {cities.map((city) => (
-                <option key={city.id} value={city.slug}>{city.name}</option>
-              ))}
-            </Select>
-          </div>
+          <input defaultValue={selectedCity ?? ''} name="city" type="hidden" />
 
           <div className="sm:min-w-[9rem]">
             <Select

@@ -118,7 +118,7 @@ export async function updateProfileSkills(_prevState: ProfileActionResult, formD
     });
 
     revalidatePath('/profile');
-    revalidatePath(SETTINGS_PATH);
+    revalidatePath(SETTINGS_PATH, 'layout');
     result = { type: 'success', message: 'Навыки сохранены.' };
   } catch (error) {
     result = {

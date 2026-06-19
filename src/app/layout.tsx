@@ -30,7 +30,7 @@ const themeInitScript = `
 export const metadata: Metadata = {
   metadataBase: new URL(env.APP_URL),
   title: {
-    default: 'BARSYNERGY — кофейная индустрия СКФО: вакансии, поставщики, обучение',
+    default: 'BARSYNERGY — вакансии, поставщики, обучение для кофеен СКФО',
     template: '%s | BARSYNERGY'
   },
   description:

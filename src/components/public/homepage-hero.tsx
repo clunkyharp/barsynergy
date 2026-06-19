@@ -28,15 +28,14 @@ const audienceRoutes = [
     description: "Каталог заведений и рабочий кабинет для команды.",
     primaryLabel: "Открыть для бизнеса",
     primaryHref: "/business",
+    secondaryLabel: "Смотреть поставщиков",
+    secondaryHref: "/suppliers",
   },
 ] as const;
 
-const fallbackTrustMarkers = [
-  { value: '8', label: 'разделов платформы' },
-  { value: '5', label: 'регионов СКФО' },
-];
 
-function HomeStatsLine({ stats }: { stats: HomepageData["stats"] }) {
+
+export function HomeStatsLine({ stats }: { stats: HomepageData["stats"] }) {
   const allItems = [
     {
       value: stats.vacancies,
@@ -59,38 +58,20 @@ function HomeStatsLine({ stats }: { stats: HomepageData["stats"] }) {
   const statItems = allItems.filter((item) => item.value > 0);
 
   if (statItems.length < 2) {
-    return (
-      <div className="mt-10">
-        <p className="text-[10px] font-semibold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--editorial-dark-label)]">
-          Что уже есть на платформе
-        </p>
-        <dl className="mt-4 flex flex-wrap gap-x-8 gap-y-4 text-[12px] text-[rgba(255,253,249,0.66)] md:gap-x-12">
-          {fallbackTrustMarkers.map((item) => (
-            <div className="flex items-baseline gap-2.5" key={item.label}>
-              <dd className="order-1 text-[2.4rem] font-bold leading-none tabular-nums text-[var(--editorial-dark-text)] md:text-[3rem]">
-                {item.value}
-              </dd>
-              <dt className="order-2 uppercase tracking-[var(--tracking-eyebrow-sm)] text-[var(--editorial-dark-muted)]">
-                {item.label}
-              </dt>
-            </div>
-          ))}
-        </dl>
-      </div>
-    );
+    return null;
   }
 
   return (
-    <dl className="mt-10 flex flex-wrap gap-x-8 gap-y-4 text-[12px] text-[rgba(255,253,249,0.66)] md:gap-x-12">
+    <dl className="flex flex-wrap gap-x-8 gap-y-4 text-[12px] text-[var(--muted)] md:gap-x-12">
       {statItems.map((item) => (
         <div className="flex items-baseline gap-2.5" key={item.label}>
           <dd
             aria-label={`${item.value} ${item.label}`}
-            className="order-1 text-[2.4rem] font-bold leading-none tabular-nums text-[var(--editorial-dark-text)] md:text-[3rem]"
+            className="order-1 text-[2.4rem] font-bold leading-none tabular-nums text-[var(--text)] md:text-[3rem]"
           >
             {item.value}
           </dd>
-          <dt className="order-2 uppercase tracking-[var(--tracking-eyebrow-sm)] text-[var(--editorial-dark-muted)]">
+          <dt className="order-2 uppercase tracking-[var(--tracking-eyebrow-sm)] text-[var(--muted)]">
             {item.label}
           </dt>
         </div>
@@ -149,6 +130,14 @@ function HomeAudienceRoutes() {
               {business.primaryLabel}
               <ArrowUpRight aria-hidden="true" size={15} strokeWidth={1.8} />
             </Button>
+            <Button
+              className="min-h-11 px-3 text-[12px] uppercase tracking-[var(--tracking-eyebrow-sm)]"
+              href={business.secondaryHref}
+              variant="on-dark"
+            >
+              {business.secondaryLabel}
+              <ArrowUpRight aria-hidden="true" size={15} strokeWidth={1.8} />
+            </Button>
           </div>
         </article>
       </div>
@@ -156,7 +145,7 @@ function HomeAudienceRoutes() {
   );
 }
 
-export function HomeHeroRouter({ stats }: { stats: HomepageData["stats"] }) {
+export function HomeHeroRouter() {
   return (
     <section
       aria-labelledby="home-hero-title"
@@ -195,7 +184,6 @@ export function HomeHeroRouter({ stats }: { stats: HomepageData["stats"] }) {
             команд и заведений региона.
           </p>
           <HomeAudienceRoutes />
-          <HomeStatsLine stats={stats} />
         </div>
       </div>
     </section>

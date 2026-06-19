@@ -201,7 +201,7 @@ test('admin skills page exposes moderation view for user generated skills', () =
 test('password policy uses min 10 and HIBP checks on password-setting actions', () => {
   const policySource = readProjectFile('src/lib/auth/password-policy-constants.ts');
   const hibpSource = readProjectFile('src/lib/security/hibp.ts');
-  const profileSettingsSource = readProjectFile('src/app/profile/settings/page.tsx');
+  const profileSettingsSource = readProjectFile('src/app/profile/settings/security/page.tsx');
   const registerFormSource = readProjectFile('src/components/public/register-user-form.tsx');
   const resetFormSource = readProjectFile('src/app/auth/password-reset/_components/password-reset-forms.tsx');
   const activatePageSource = readProjectFile('src/app/auth/activate/page.tsx');
@@ -237,7 +237,7 @@ test('password policy uses min 10 and HIBP checks on password-setting actions', 
 });
 
 test('profile avatar upload uses client cropper before server action upload', () => {
-  const settingsSource = readProjectFile('src/app/profile/settings/page.tsx');
+  const settingsSource = readProjectFile('src/app/profile/settings/profile/page.tsx');
   const cropperSource = readProjectFile('src/components/profile/avatar-cropper.tsx');
   const avatarActionSource = readProjectFile('src/lib/profile/avatar-actions.ts');
 
@@ -259,7 +259,12 @@ test('profile avatar upload uses client cropper before server action upload', ()
 });
 
 test('profile settings forms save inline without redirecting away from drafts', () => {
-  const settingsSource = readProjectFile('src/app/profile/settings/page.tsx');
+  const profilePageSource = readProjectFile('src/app/profile/settings/profile/page.tsx');
+  const careerPageSource = readProjectFile('src/app/profile/settings/career/page.tsx');
+  const securityPageSource = readProjectFile('src/app/profile/settings/security/page.tsx');
+  const settingsSource = profilePageSource + careerPageSource + securityPageSource;
+  const layoutSource = readProjectFile('src/app/profile/settings/layout.tsx');
+  const navTabsSource = readProjectFile('src/components/profile/settings-nav-tabs.tsx');
   const formSource = readProjectFile('src/components/profile/profile-section-form.tsx');
   const sectionSource = readProjectFile('src/components/profile/profile-settings-section.tsx');
   const disclosureSource = readProjectFile('src/components/ui/disclosure-panel.tsx');
@@ -300,8 +305,11 @@ test('profile settings forms save inline without redirecting away from drafts', 
   assert.match(disclosureSource, /Открыть/);
   assert.match(disclosureSource, /Свернуть/);
 
-  assert.match(settingsSource, /<ProfileTabs sections=\{\[\.\.\.sections\]\}/);
-  assert.match(readProjectFile('src/components/profile/profile-tabs.tsx'), /onClick=\{\(\) => requestProfileSettingsSectionOpen\(s\.id\)\}/);
+  assert.match(layoutSource, /SettingsNavTabs/);
+  assert.match(navTabsSource, /\/profile\/settings\/profile/);
+  assert.match(navTabsSource, /\/profile\/settings\/career/);
+  assert.match(navTabsSource, /\/profile\/settings\/notifications/);
+  assert.match(navTabsSource, /\/profile\/settings\/security/);
 
   assert.match(formSource, /useActionState/);
   assert.match(formSource, /FieldSuccess/);

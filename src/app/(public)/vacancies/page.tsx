@@ -18,6 +18,7 @@ import { getPublicCategoryOptions, getPublicCityFilterOptions, getVacancyFilterO
 import { JsonLd } from '@/components/seo/json-ld';
 import { buildPublicPageMetadata } from '@/lib/public/metadata';
 import { buildStaticPageBreadcrumbJsonLd } from '@/lib/public/structured-data';
+import { HowItWorksSection } from '@/components/ui/how-it-works-steps';
 import { SpecialistListSection } from './specialist-list-section';
 
 type VacanciesPageProps = {
@@ -102,8 +103,8 @@ export default async function VacanciesPage({ searchParams }: VacanciesPageProps
       <>
         <JsonLd data={buildStaticPageBreadcrumbJsonLd('/vacancies', 'Вакансии')} />
         <PageHero
-          breadcrumbs={[{ label: 'Вакансии' }]}
-          title="Каталог"
+          breadcrumbs={[{ href: '/', label: 'Главная' }, { label: 'Вакансии' }]}
+          title="Вакансии и специалисты"
           subtitle="Работа, специалисты и проекты для барной индустрии."
           tone="graphite"
           density="compact"
@@ -138,7 +139,7 @@ export default async function VacanciesPage({ searchParams }: VacanciesPageProps
       <JsonLd data={buildStaticPageBreadcrumbJsonLd('/vacancies', 'Вакансии')} />
       <PageHero
         breadcrumbs={[{ label: 'Вакансии' }]}
-        title="Каталог"
+        title="Вакансии и специалисты"
         subtitle="Работа, специалисты и проекты для барной индустрии."
         tone="graphite"
         density="compact"
@@ -149,11 +150,22 @@ export default async function VacanciesPage({ searchParams }: VacanciesPageProps
         vacanciesCount={directoryCounts.vacancies}
         specialistsCount={directoryCounts.specialists}
       />
+      {content.total === 0 ? (
+        <HowItWorksSection
+          columns={4}
+          steps={[
+            { title: 'Отправляете вакансию', description: 'Заполните форму с описанием позиции, требованиями и контактами.' },
+            { title: 'Редакция проверяет', description: 'Уточняем детали и сверяемся с форматом платформы.' },
+            { title: 'Вакансия публикуется', description: 'После согласования появляется в каталоге.' },
+            { title: 'Кандидаты пишут вам', description: 'Заинтересованные специалисты связываются напрямую.' },
+          ]}
+        />
+      ) : null}
       <PublishedContentSectionOpportunity
         basePath="/vacancies"
         content={content}
         emptyActions={[
-          { href: '/profile/settings#publish', label: 'Добавить резюме', variant: 'primary' },
+          { href: '/profile/settings/career#publish', label: 'Добавить резюме', variant: 'primary' },
           { href: 'https://t.me/barsynergy', label: 'Следить в Telegram' }
         ]}
         emptyDescription="Открытых вакансий сейчас нет. Подпишитесь на Telegram — публикуем вакансии там первыми."
@@ -188,7 +200,7 @@ export default async function VacanciesPage({ searchParams }: VacanciesPageProps
         sidebarLinks={[
           { href: 'https://t.me/barsynergy', label: 'Telegram-канал' },
           { href: '/vacancies?view=specialists', label: 'Каталог специалистов' },
-          { href: '/profile/settings#publish', label: 'Добавить резюме' },
+          { href: '/profile/settings/career#publish', label: 'Добавить резюме' },
         ]}
       >
         <p>

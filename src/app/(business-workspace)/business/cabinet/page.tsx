@@ -46,12 +46,12 @@ export default async function BusinessDashboardPage({ searchParams }: BusinessDa
     Date.now() - businessAccount.updatedAt.getTime() <= PROFILE_READY_ACTION_GRACE_MS;
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8" data-ux-metric="business_dashboard_viewed">
       <PageHeader eyebrow="Компания" title={businessAccount.companyName} />
       <AdminActionAlert params={params} />
 
       {isWelcome ? (
-        <Panel padding="md" tone="elevated">
+        <Panel padding="md" tone="elevated" data-ux-event="business_welcome_shown">
           <div className="flex items-start gap-4">
             <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[var(--accent-soft)]">
               <PartyPopper aria-hidden className="text-[var(--accent)]" size={22} strokeWidth={1.5} />
@@ -87,7 +87,7 @@ export default async function BusinessDashboardPage({ searchParams }: BusinessDa
         </Panel>
       ) : null}
 
-      <Panel className="grid gap-3 md:grid-cols-4 lg:grid-cols-[repeat(4,minmax(0,1fr))_auto] md:items-center" padding="md" tone="elevated">
+      <Panel className="grid gap-3 md:grid-cols-4 lg:grid-cols-[repeat(4,minmax(0,1fr))_auto] md:items-center" padding="md" tone="elevated" data-ux-metric="business_kpi_viewed" data-ux-value={`${requestCount},${activeRequestCount},${draftRequestCount},${newResponseCount}`}>
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--muted)]">Всего заявок</p>
           <p className="mt-1 text-xl font-semibold text-[var(--text)]">{requestCount}</p>

@@ -1,8 +1,10 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState, type ChangeEvent } from 'react';
+import Image from 'next/image';
 import { ImageUp, RotateCcw, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { focusFirstElement, trapFocusInContainer } from '@/components/ui/focus-trap';
 
 type AvatarCropperProps = {
   currentAvatarUrl?: string | null;
@@ -58,6 +60,7 @@ export function AvatarCropper({ currentAvatarUrl }: AvatarCropperProps) {
   const sourceInputRef = useRef<HTMLInputElement>(null);
   const outputInputRef = useRef<HTMLInputElement>(null);
   const previewCanvasRef = useRef<HTMLCanvasElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLImageElement | null>(null);
   const [sourceUrl, setSourceUrl] = useState<string | null>(null);
   const [confirmedPreviewUrl, setConfirmedPreviewUrl] = useState<string | null>(null);
@@ -97,10 +100,14 @@ export function AvatarCropper({ currentAvatarUrl }: AvatarCropperProps) {
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
 
+    focusFirstElement(dialogRef.current);
+
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === 'Escape') {
         resetSource();
+        return;
       }
+      trapFocusInContainer(event, dialogRef.current);
     }
 
     document.addEventListener('keydown', handleKeyDown);
@@ -123,7 +130,7 @@ export function AvatarCropper({ currentAvatarUrl }: AvatarCropperProps) {
 
     if (sourceUrl) URL.revokeObjectURL(sourceUrl);
     const url = URL.createObjectURL(file);
-    const image = new Image();
+    const image = new globalThis.Image();
     image.onload = () => {
       imageRef.current = image;
       const canvas = previewCanvasRef.current;
@@ -177,10 +184,13 @@ export function AvatarCropper({ currentAvatarUrl }: AvatarCropperProps) {
       <div className="flex flex-wrap items-center gap-4 rounded-[var(--radius-lg)] border border-[var(--line)] bg-[var(--surface)] p-4">
         <div className="h-20 w-20 overflow-hidden rounded-full border border-[var(--border-default)] bg-[var(--surface-muted)]">
           {confirmedPreviewUrl || currentAvatarUrl ? (
-            <img
+            <Image
               alt="Предпросмотр аватара"
               className="h-full w-full object-cover"
-              src={confirmedPreviewUrl ?? currentAvatarUrl ?? undefined}
+              src={confirmedPreviewUrl ?? currentAvatarUrl ?? ''}
+              width={80}
+              height={80}
+              unoptimized
             />
           ) : (
             <span className="grid h-full w-full place-items-center text-[var(--muted)]">
@@ -205,6 +215,7 @@ export function AvatarCropper({ currentAvatarUrl }: AvatarCropperProps) {
 
       {sourceUrl ? (
         <div
+          ref={dialogRef}
           aria-label="Обрезка аватара"
           aria-modal="true"
           className="fixed inset-0 z-50 overflow-y-auto bg-black/65"

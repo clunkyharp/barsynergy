@@ -95,7 +95,7 @@ export async function updateAvatar(_prevState: ProfileActionResult, formData: Fo
     }
 
     revalidatePath('/profile');
-    revalidatePath(SETTINGS_PATH);
+    revalidatePath(SETTINGS_PATH, 'layout');
     result = { type: 'success', message: 'Аватар обновлён.' };
   } catch (error) {
     if (pendingStorageKey) {

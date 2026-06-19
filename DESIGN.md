@@ -530,6 +530,29 @@ Do not create a new local variant unless:
 
 If the same exception appears for the third time, it becomes a shared primitive or a formal variant.
 
+## Image Direction
+
+Visuals reinforce editorial tone and help users orient across content types. Each section has a consistent photographic direction so images don't look like random stock.
+
+| Content type | Visual treatment | What to generate |
+|---|---|---|
+| Articles / Materials | Still life, shallow focus, editorial flat lay | Carefully arranged objects on a surface (coffee, equipment, ingredients), soft natural light, muted tones, shallow depth of field. No people, no hands. |
+| Events | Two-shot or medium shot, handheld feel | People interacting in a venue context — speaker and audience, barista at competition, workshop group. Slightly wider than close-up, natural/ambient light, candid pose. |
+| Suppliers | Overhead or close-up, hard / directional light | Product-centric: coffee beans, espresso shot, equipment detail, packaging. Shot from above or tight on the product, high contrast, defined shadows. Clean background. |
+| Vacancies / Specialists | Environmental portrait, soft editorial light | A person in their workspace — barista at the machine, roaster by the drum, manager in the coffee shop. Natural window light or soft diffused fill. Candid but composed. |
+| Education / Courses | Wide shot, bright open composition | Classroom or workshop setting with visible learning context — trainee group, instructor demonstration, tasting table. Even lighting, warm tone, clear sightlines. |
+| Partners / Sponsorship | Brand safe, clean product or logo environment | Minimal composition with logo, product or branded environment. Flat or soft directional light. Consistent with the partner's own visual identity. |
+
+Rules:
+
+- Images must not feature bottles, glasses, shakers or cocktail-object cliches.
+- Do not generate photo-realistic people in editorial still-life articles unless the article is specifically about people.
+- Facial close-ups are reserved for specialist/employee profiles and testimonials, not for general content cards.
+- Keep background muted and contextual — no busy streets, random cafes or generic urban environments.
+- Image fills on the homepage editorial section should use high-contrast, narrative compositions that work with the dark overlay gradient.
+- Generated images should avoid watermarks, signatures, text overlays or decorative borders.
+- When the image prompt is ambiguous, default to the still-life / editorial flat-lay direction.
+
 ## Validation Checklist
 
 Before closing a meaningful UI batch:

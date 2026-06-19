@@ -712,6 +712,44 @@ Validation gap:
   - **🟢 admin-shell-frame.tsx:20** — sidebar collapse uses lazy `useState` initializer (reads `localStorage` directly), no `useEffect` flash on reload;
   - **🟢 admin/page.tsx:305** — `contentWarningCount` StatCard gets `href` pointing to `/admin/suppliers?filter=no-city` when count > 0.
 
+## SEO Audit Fixes (2026-06-19)
+
+Applied from Semrush + live HTTP audit findings:
+
+### Changes
+
+1. **Canonical for specialist detail pages** — `generateMetadata` in `/specialists/cv/[handle]` and `/specialists/svc/[slug]` now sets `alternates.canonical` with the full URL. Previously inherited root layout's canonical (homepage), causing Semrush «Incorrect pages found in sitemap.xml».
+
+2. **/legal index page** — Created `src/app/(public)/legal/page.tsx` to resolve the 404. Breadcrumbs in `document-header.tsx` referenced `/legal` («Юридический раздел») but no route existed. The index page lists all 4 legal documents with descriptions and links.
+
+3. **Long page titles** — Root layout `title.default` and homepage metadata shortened from 70 to 59 chars: «BARSYNERGY — кофейная индустрия СКФО: вакансии, поставщики, обучение» → «BARSYNERGY — вакансии, поставщики, обучение для кофеен СКФО».
+
+4. **Broken external link** — Removed 4 `baristahustle.com` references from `scripts/seed-demo-screens.mjs` (403 response for audit checks). Perfect Daily Grind links kept as working alternatives.
+
+### New files
+
+- `src/app/(public)/legal/page.tsx` — legal documents index
+
+### Changed files
+
+- `src/app/(public)/specialists/cv/[handle]/page.tsx` — added canonical URL
+- `src/app/(public)/specialists/svc/[slug]/page.tsx` — added canonical URL
+- `src/app/layout.tsx` — shortened `title.default`
+- `src/app/(public)/page.tsx` — shortened homepage metadata title
+- `scripts/seed-demo-screens.mjs` — removed baristahustle.com references
+
+### Not changed (documented)
+
+- HSTS — requires nginx/proxy-level config, not in code
+- No other external links were found broken beyond baristahustle.com
+- `/llms.txt` 404 — low SEO priority, deferred
+
+### Validation
+
+- `npm run typecheck` — pass
+- `npm run lint` — pass
+- `node --test tests/seo-metadata-sitemap.test.mjs tests/site-header-navigation.test.mjs` — 7/7 pass
+
 ## Active Blockers / Risks
 
 - Owner/legal review is still required before production personal-data collection.

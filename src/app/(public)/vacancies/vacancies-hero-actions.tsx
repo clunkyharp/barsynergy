@@ -38,7 +38,7 @@ export function VacanciesHeroActions() {
           primaryLabel="Опубликовать резюме"
           secondaryLabel="Предложить услуги"
           onPrimaryClick={() => {
-            window.location.href = '/profile/settings#publish';
+            window.location.href = '/profile/settings/career#publish';
           }}
           onSecondaryClick={() => {
             window.location.href = '/specialists/svc/new';

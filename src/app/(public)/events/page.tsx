@@ -4,7 +4,7 @@ import { EventAgendaSection } from '@/components/public/platform-ui';
 import { PageHero } from '@/components/public/page-hero';
 import { PageInfoSection } from '@/components/public/page-info-section';
 import { PublicPrelaunchSection } from '@/components/public/public-prelaunch-section';
-import { EventsSearchBar } from '@/components/public/events-page-header';
+import { EventCityTabs, EventsSearchBar } from '@/components/public/events-page-header';
 import { EventsHeroActions } from '@/app/(public)/events/events-hero-actions';
 import { ContentSubscribeForm } from '@/components/public/content-subscribe-form';
 import { JsonLd } from '@/components/seo/json-ld';
@@ -13,6 +13,7 @@ import { getPublishedEvents, hasActivePublicContentParams, type PublicContentSea
 import { getEventFilterOptions, getPublicCityFilterOptions } from '@/lib/public/filter-options';
 import { buildPublicPageMetadata } from '@/lib/public/metadata';
 import { buildStaticPageBreadcrumbJsonLd } from '@/lib/public/structured-data';
+import { HowItWorksSection } from '@/components/ui/how-it-works-steps';
 
 
 type EventsPageProps = {
@@ -64,8 +65,23 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
         <EventsHeroActions />
       </PageHero>
 
-      <EventsSearchBar
+      {isPrelaunchEmpty ? (
+        <HowItWorksSection
+          columns={3}
+          steps={[
+            { title: 'Отправляете событие', description: 'Заполните форму с названием, компанией и контактами.' },
+            { title: 'Редакция проверяет', description: 'Уточняем детали и проверяем формат.' },
+            { title: 'Анонс в афише', description: 'После согласования событие появляется на платформе.' },
+          ]}
+        />
+      ) : null}
+
+      <EventCityTabs
         cities={filterCities}
+        selectedCity={selectedCity}
+        preserve={{ q: selectedQ, format: selectedFormat, period: selectedPeriod }}
+      />
+      <EventsSearchBar
         formats={filterOptions.formats}
         selectedCity={selectedCity}
         selectedFormat={selectedFormat}

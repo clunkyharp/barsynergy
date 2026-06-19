@@ -38,7 +38,7 @@ export function ContactApplicationForm({ enabled, utm, cities, defaultTopic, def
   const initialTopic = hasDefaultTopic ? (defaultTopic as ContactTopicValue) : '';
   const [topic, setTopic] = useState<ContactTopicValue | ''>(initialTopic);
   const selectedTopic = useMemo(
-    () => contactTopicOptions.find((option) => option.value === topic) ?? contactTopicOptions.at(-1)!,
+    () => topic ? contactTopicOptions.find((option) => option.value === topic) ?? null : null,
     [topic]
   );
   const messageLabel = getContactMessageLabel(topic);
@@ -98,7 +98,7 @@ export function ContactApplicationForm({ enabled, utm, cities, defaultTopic, def
                   ))}
                 </Select>
               </FormField>
-              <p className="form-inline-note md:col-span-2">{selectedTopic.description}</p>
+              {selectedTopic ? <p className="form-inline-note md:col-span-2">{selectedTopic.description}</p> : null}
             </div>
           </FormSection>
 

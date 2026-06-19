@@ -198,19 +198,19 @@ export function RequestLedger({
         <div className="divide-y divide-[var(--line)]">
           {applications.map((application, index) => (
             <article
-              className="grid gap-3 px-5 py-4 lg:grid-cols-[3rem_minmax(0,1fr)_auto] lg:items-start"
+              className="grid gap-2 px-5 py-3 lg:grid-cols-[3rem_minmax(0,1fr)_auto] lg:items-start"
               key={application.id}
             >
               <div className="font-mono text-xs tabular-nums text-[var(--muted)]">#{index + 1}</div>
               <div className="min-w-0">
-                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--muted)]">{applicationTypeLabels[application.type]}</p>
-                <h3 className="mt-1 text-base font-semibold leading-6">{application.subject ?? applicationTypeLabels[application.type]}</h3>
-                <p className="mt-1 text-sm text-[var(--muted)]">{formatRequestDate(application)}</p>
+                <div className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--muted)]">{applicationTypeLabels[application.type]}</p>
+                  <p className="text-xs text-[var(--muted)]">{formatRequestDate(application)}</p>
+                </div>
+                <h3 className="mt-0.5 text-base font-semibold leading-6">{application.subject ?? applicationTypeLabels[application.type]}</h3>
                 {application.businessNotes ? (
-                  <p className="mt-2 line-clamp-2 text-sm leading-6 text-[var(--muted)]">{application.businessNotes}</p>
-                ) : (
-                  <p className="mt-2 text-sm leading-6 text-[var(--muted)]">Комментариев пока нет.</p>
-                )}
+                  <p className="mt-0.5 line-clamp-1 text-sm leading-6 text-[var(--muted)]">{application.businessNotes}</p>
+                ) : null}
               </div>
               <div className="flex flex-wrap items-center gap-2 lg:justify-end">
                 <StatusBadge variant={applicationStatusBadgeVariants[application.status] as StatusBadgeVariant}>

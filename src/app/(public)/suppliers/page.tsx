@@ -12,6 +12,7 @@ import { getPublicCategoryOptions, getPublicCityFilterOptions } from '@/lib/publ
 import { JsonLd } from '@/components/seo/json-ld';
 import { buildPublicPageMetadata } from '@/lib/public/metadata';
 import { buildStaticPageBreadcrumbJsonLd } from '@/lib/public/structured-data';
+import { HowItWorksSection } from '@/components/ui/how-it-works-steps';
 
 type SuppliersPageProps = {
   searchParams?: Promise<PublicContentSearchParams>;
@@ -61,6 +62,17 @@ export default async function SuppliersPage({ searchParams }: SuppliersPageProps
       >
         <SuppliersHeroActions />
       </PageHero>
+      {isPrelaunchEmpty ? (
+        <HowItWorksSection
+          columns={4}
+          steps={[
+            { title: 'Отправляете данные компании', description: 'Заполните форму с названием, категорией и контактами.' },
+            { title: 'Редакция проверяет', description: 'Сверяем данные и связываемся для уточнения.' },
+            { title: 'Карточка в каталоге', description: 'После проверки компания становится видна в каталоге.' },
+            { title: 'Клиенты связываются', description: 'Потенциальные заказчики видят контакты и пишут напрямую.' },
+          ]}
+        />
+      ) : null}
       {isPrelaunchEmpty ? (
         <PublicPrelaunchSection
           badges={['Каталог уже принимает заявки', 'Подходит для поставок, сервиса и оборудования']}

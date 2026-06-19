@@ -181,8 +181,8 @@ export async function updateBusinessMasterAction(masterId: string, formData: For
     const title = nameFieldValue;
     const city = await assertActiveCity(parsed.cityId);
 
-    await prisma.master.update({
-      where: { id: existing.id },
+    const updateResult = await prisma.master.updateMany({
+      where: { id: existing.id, businessAccountId: businessAccount.id },
       data: {
         title,
         summary: parsed.summary,
@@ -202,6 +202,10 @@ export async function updateBusinessMasterAction(masterId: string, formData: For
         updatedById: user.id
       }
     });
+
+    if (updateResult.count !== 1) {
+      throw new Error('master not found');
+    }
 
     revalidatePath('/business/cabinet');
     revalidatePath(BUSINESS_MASTERS_PATH);

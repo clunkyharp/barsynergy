@@ -4,6 +4,7 @@ import { SectionIcon, type SectionIconType } from '@/components/public/section-i
 import { BusinessSolutionForm } from '@/components/public/business-solution-form';
 import { submitBusinessSolutionRequest } from '@/app/(public)/business/actions';
 import { PageHero } from '@/components/public/page-hero';
+import { PlacementExample } from '@/components/public/placement-example';
 import { PublicBodyText, PublicDisplayTitle, PublicEyebrow } from '@/components/public/public-primitives';
 import { Button } from '@/components/ui/button';
 import { JsonLd } from '@/components/seo/json-ld';
@@ -20,7 +21,7 @@ type BusinessPageProps = {
 };
 
 export const metadata: Metadata = buildPublicPageMetadata({
-  title: 'Каталог заведений',
+  title: 'Разместить заведение в каталоге',
   description: 'Добавление кофейных баров, кофеен, обжарочных и близких форматов в каталог BARSYNERGY по СКФО.',
   path: '/business'
 });
@@ -79,6 +80,43 @@ const targetAudiences = [
 
 const defaultParamKeys = ['projectName', 'contactName', 'cityId', 'solutionType', 'comment'] as const;
 
+function VenuePlacementMock() {
+  return (
+    <div aria-hidden="true" className="grid gap-4 rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--surface)] p-4 md:p-5">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <span className="text-[11px] font-semibold uppercase tracking-[var(--tracking-eyebrow-sm)] text-[var(--accent)]">Кофейня</span>
+          <p className={`${displayFont.className} mt-2 text-[1.5rem] font-semibold leading-none text-[var(--text)]`}>Заведение «Пример»</p>
+        </div>
+        <span className="inline-flex items-center gap-1 rounded-full border border-[var(--accent)]/40 bg-[var(--accent-soft)] px-3 py-1 text-[10px] font-semibold uppercase tracking-[var(--tracking-eyebrow-sm)] text-[var(--text)]">
+          Проверено
+        </span>
+      </div>
+
+      <p className="text-[13px] leading-[1.5] text-[var(--muted)]">Specialty-кофейня с собственной обжаркой и сезонным меню.</p>
+
+      <div className="flex flex-wrap gap-1.5">
+        {['Махачкала', 'Кофейня', 'Обжарка'].map((chip) => (
+          <span
+            className="rounded-[var(--radius-sm)] border border-[var(--border-default)] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[var(--tracking-eyebrow-sm)] text-[var(--text)]"
+            key={chip}
+          >
+            {chip}
+          </span>
+        ))}
+      </div>
+
+      <div className="flex items-center justify-between gap-3 rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--surface-wash)] px-4 py-2.5">
+        <span className="text-[12px] font-semibold text-[var(--text)]">Связаться с заведением</span>
+        <span className="inline-flex items-center gap-1 text-[12px] font-semibold text-[var(--accent)]">
+          Telegram
+          <ArrowUpRight size={14} strokeWidth={1.8} />
+        </span>
+      </div>
+    </div>
+  );
+}
+
 export default async function BusinessPage({ searchParams }: BusinessPageProps) {
   const params = (await searchParams) ?? {};
   const applicationFormsEnabled = arePublicApplicationFormsEnabled(getEnv());
@@ -89,16 +127,16 @@ export default async function BusinessPage({ searchParams }: BusinessPageProps) 
 
   return (
     <>
-      <JsonLd data={buildStaticPageBreadcrumbJsonLd('/business', 'Каталог заведений')} />
+      <JsonLd data={buildStaticPageBreadcrumbJsonLd('/business', 'Размещение заведения')} />
       <PageHero
-        breadcrumbs={[{ label: 'Каталог заведений' }]}
-        eyebrow="Каталог заведений"
+        breadcrumbs={[{ label: 'Размещение заведения' }]}
+        eyebrow="Размещение заведения"
         title="Добавить заведение в каталог"
         subtitle="Кофейные бары, кофейни, обжарочные и смежные форматы — в каталоге BARSYNERGY."
         tone="graphite"
         density="compact"
         actions={[
-          { label: 'Посмотреть каталог', href: '/suppliers', kind: 'secondary' }
+          { label: 'Смотреть поставщиков', href: '/suppliers', kind: 'secondary' }
         ]}
       />
 
@@ -179,6 +217,21 @@ export default async function BusinessPage({ searchParams }: BusinessPageProps) 
           </div>
         </div>
       </section>
+
+      {/* Placement example with callouts */}
+      <PlacementExample
+        eyebrow="Пример размещения"
+        title="Как заведение выглядит в каталоге"
+        description="После добавления заведение получает карточку, по которой его находят коллеги, поставщики и гости индустрии."
+        tone="ivory"
+        visual={<VenuePlacementMock />}
+        annotations={[
+          { title: 'Название и формат', description: 'Понятно, что это за заведение: кофейня, бар, обжарка.' },
+          { title: 'Город и направления', description: 'Чипы с городом и специализацией — заведение находят по фильтрам.' },
+          { title: 'Проверенный статус', description: 'Отметка проверки повышает доверие к карточке.' },
+          { title: 'Прямая связь', description: 'Контакт заведения виден сразу — без посредников.' }
+        ]}
+      />
 
       <BusinessSolutionForm
         direct
