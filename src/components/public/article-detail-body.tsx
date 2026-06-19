@@ -37,7 +37,7 @@ export function ArticleDetailBody({
               </div>
             ) : (
               <p className="text-sm leading-7 text-[var(--muted)]">
-                Основная информация собрана в кратком виде.
+                Основная информация.
               </p>
             )}
 

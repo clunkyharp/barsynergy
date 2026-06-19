@@ -1,7 +1,6 @@
 import Image from "next/image";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, BriefcaseBusiness, UserRound } from "lucide-react";
 import { PublicEyebrow } from "@/components/public/public-primitives";
-import { Button } from "@/components/ui/button";
 import { accentFont, displayFont } from "@/lib/fonts";
 import type { HomepageData } from "@/lib/public/home";
 
@@ -17,7 +16,7 @@ const audienceRoutes = [
   {
     title: "Я специалист",
     description:
-      "Найти работу, обучение и материалы по теме для роста в барной индустрии.",
+      "Вакансии, обучение, события и материалы для роста в кофейной и барной индустрии.",
     primaryLabel: "Смотреть вакансии",
     primaryHref: "/vacancies",
     secondaryLabel: "Создать профиль",
@@ -25,7 +24,8 @@ const audienceRoutes = [
   },
   {
     title: "У меня компания",
-    description: "Каталог заведений и рабочий кабинет для команды.",
+    description:
+      "Поставщики, вакансии, размещение, партнёрства и инструменты для заведений и брендов.",
     primaryLabel: "Открыть для бизнеса",
     primaryHref: "/business",
     secondaryLabel: "Смотреть поставщиков",
@@ -35,7 +35,7 @@ const audienceRoutes = [
 
 
 
-export function HomeStatsLine({ stats }: { stats: HomepageData["stats"] }) {
+export function HomeStatsSection({ stats }: { stats: HomepageData["stats"] }) {
   const allItems = [
     {
       value: stats.vacancies,
@@ -55,93 +55,77 @@ export function HomeStatsLine({ stats }: { stats: HomepageData["stats"] }) {
       label: pluralRu(stats.articles, "материал", "материала", "материалов"),
     },
   ];
-  const statItems = allItems.filter((item) => item.value > 0);
+  const statItems = allItems.filter((item) => item.value >= 1);
 
   if (statItems.length < 2) {
     return null;
   }
 
   return (
-    <dl className="flex flex-wrap gap-x-8 gap-y-4 text-[12px] text-[var(--muted)] md:gap-x-12">
-      {statItems.map((item) => (
-        <div className="flex items-baseline gap-2.5" key={item.label}>
-          <dd
-            aria-label={`${item.value} ${item.label}`}
-            className="order-1 text-[2.4rem] font-bold leading-none tabular-nums text-[var(--text)] md:text-[3rem]"
-          >
-            {item.value}
-          </dd>
-          <dt className="order-2 uppercase tracking-[var(--tracking-eyebrow-sm)] text-[var(--muted)]">
-            {item.label}
-          </dt>
-        </div>
-      ))}
-    </dl>
+    <section className="border-b border-[var(--line)] bg-[var(--surface-wash)] py-8 md:py-10">
+      <div className="container">
+        <p className="text-[10px] font-semibold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--muted)]">
+          Платформа в цифрах
+        </p>
+        <dl className="mt-4 flex flex-wrap gap-x-8 gap-y-4 text-[12px] text-[var(--muted)] md:gap-x-12">
+          {statItems.map((item) => (
+            <div className="flex items-baseline gap-2.5" key={item.label}>
+              <dd
+                aria-label={`${item.value} ${item.label}`}
+                className="order-1 text-[2.4rem] font-bold leading-none tabular-nums text-[var(--text)] md:text-[3rem]"
+              >
+                {item.value}
+              </dd>
+              <dt className="order-2 uppercase tracking-[var(--tracking-eyebrow-sm)] text-[var(--muted)]">
+                {item.label}
+              </dt>
+            </div>
+          ))}
+        </dl>
+      </div>
+    </section>
   );
 }
 
-function HomeAudienceRoutes() {
-  const specialist = audienceRoutes[0];
-  const business = audienceRoutes[1];
+export function HomeAudienceSection() {
+  const routes = audienceRoutes;
 
   return (
-    <div className="mt-8">
-      <p className="text-[10px] font-semibold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--editorial-dark-label)]">
-        Выберите свою роль
-      </p>
-      <div className="mt-4 grid gap-3 md:grid-cols-2">
-        <article className="flex flex-col rounded-[var(--radius-lg)] border border-[var(--editorial-dark-border)] bg-[rgba(18,14,12,0.54)] p-4 backdrop-blur-[10px]">
-          <h2 className="text-[1.05rem] font-semibold leading-tight text-[var(--editorial-dark-text)]">
-            {specialist.title}
-          </h2>
-          <p className="mt-2 text-sm leading-6 text-[var(--editorial-dark-muted)]">
-            {specialist.description}
-          </p>
-          <div className="mt-auto flex flex-col gap-2 pt-4 sm:flex-row sm:flex-wrap">
-            <Button
-              className="min-h-11 rounded-[var(--radius-sm)] px-5 text-[12px] uppercase tracking-[var(--tracking-eyebrow-sm)]"
-              href={specialist.primaryHref}
-            >
-              {specialist.primaryLabel}
-            </Button>
-            <Button
-              className="min-h-11 px-3 text-[12px] uppercase tracking-[var(--tracking-eyebrow-sm)]"
-              href={specialist.secondaryHref}
-              variant="on-dark"
-            >
-              {specialist.secondaryLabel}
-              <ArrowUpRight aria-hidden="true" size={15} strokeWidth={1.8} />
-            </Button>
-          </div>
-        </article>
-        <article className="flex flex-col rounded-[var(--radius-lg)] border border-[var(--editorial-dark-border)] bg-[rgba(18,14,12,0.7)] p-4">
-          <h2 className="text-[1.05rem] font-semibold leading-tight text-[var(--editorial-dark-text)]">
-            {business.title}
-          </h2>
-          <p className="mt-2 text-sm leading-6 text-[var(--editorial-dark-muted)]">
-            {business.description}
-          </p>
-          <div className="mt-auto flex flex-col gap-2 pt-4 sm:flex-row sm:flex-wrap">
-            <Button
-              className="min-h-11 rounded-[var(--radius-sm)] px-5 text-[12px] uppercase tracking-[var(--tracking-eyebrow-sm)]"
-              href={business.primaryHref}
-              variant="on-dark"
-            >
-              {business.primaryLabel}
-              <ArrowUpRight aria-hidden="true" size={15} strokeWidth={1.8} />
-            </Button>
-            <Button
-              className="min-h-11 px-3 text-[12px] uppercase tracking-[var(--tracking-eyebrow-sm)]"
-              href={business.secondaryHref}
-              variant="on-dark"
-            >
-              {business.secondaryLabel}
-              <ArrowUpRight aria-hidden="true" size={15} strokeWidth={1.8} />
-            </Button>
-          </div>
-        </article>
+    <section className="border-b border-[var(--line)] bg-[var(--surface-wash)] py-10 md:py-14">
+      <div className="container">
+        <p className="text-[10px] font-semibold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--muted)]">
+          Выберите свою роль
+        </p>
+        <div className="mt-6 grid gap-4 md:grid-cols-2">
+          {routes.map((route) => {
+            const Icon = route.title.includes("специалист") ? UserRound : BriefcaseBusiness;
+            return (
+              <a
+                key={route.title}
+                href={route.primaryHref}
+                className="group block rounded-[var(--radius-lg)] border border-[var(--line)] bg-[var(--surface)] p-5 transition-colors hover:border-[var(--accent)]/24"
+              >
+                <Icon
+                  className="mb-3 text-[var(--accent)]"
+                  size={22}
+                  strokeWidth={1.8}
+                />
+                <h2 className="text-[1.05rem] font-semibold leading-tight text-[var(--text)]">
+                  {route.title}
+                </h2>
+                <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
+                  {route.description}
+                </p>
+                <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--accent)] transition-colors group-hover:text-[var(--accent-strong)]">
+                  {route.primaryLabel}
+                  <ArrowUpRight size={15} strokeWidth={2} />
+                </span>
+              </a>
+            );
+          })}
+        </div>
       </div>
-    </div>
+    </section>
   );
 }
 
@@ -180,10 +164,9 @@ export function HomeHeroRouter() {
             Платформа, которая объединяет людей индустрии кофе и бара
           </h1>
           <p className="mt-5 max-w-2xl text-[15px] leading-7 text-[var(--editorial-dark-muted)] md:text-base">
-            Обучение, вакансии, поставщики, события и инструменты для бариста,
-            команд и заведений региона.
+            Люди, события, вакансии, поставщики, обучение и материалы СКФО,
+            которые помогают работать точнее.
           </p>
-          <HomeAudienceRoutes />
         </div>
       </div>
     </section>

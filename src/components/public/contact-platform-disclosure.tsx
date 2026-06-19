@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import type { ReactNode } from 'react';
-import { useEffect, useRef, useState } from 'react';
-import { ArrowUpRight, Check, FileText, Sparkles } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { displayFont } from '@/lib/fonts';
+import type { ReactNode } from "react";
+import { useEffect, useRef, useState } from "react";
+import { ArrowUpRight, Check, FileText, Sparkles } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { displayFont } from "@/lib/fonts";
 
 type ContactPlatformDisclosureProps = {
   children: ReactNode;
@@ -12,12 +12,15 @@ type ContactPlatformDisclosureProps = {
 };
 
 const promiseList = [
-  'Подберём формат — событие, обучение, материал или каталог',
-  'Свяжемся с экспертом, который ближе всего к задаче',
-  'Пришлём короткое предложение с шагами и сроком'
+  "Подберём формат — событие, обучение, материал или каталог",
+  "Передадим запрос человеку, который отвечает за нужное направление",
+  "Пришлём короткое предложение с шагами и сроком",
 ] as const;
 
-export function ContactPlatformDisclosure({ children, defaultOpen = false }: ContactPlatformDisclosureProps) {
+export function ContactPlatformDisclosure({
+  children,
+  defaultOpen = false,
+}: ContactPlatformDisclosureProps) {
   const sectionRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLDivElement>(null);
   const hasAutoFocusedRef = useRef(false);
@@ -31,15 +34,19 @@ export function ContactPlatformDisclosure({ children, defaultOpen = false }: Con
 
   useEffect(() => {
     function checkHash() {
-      const hash = window.location.hash.replace(/^#/, '');
-      if (hash === 'platform' || hash === 'contact-form' || hash === 'applications') {
+      const hash = window.location.hash.replace(/^#/, "");
+      if (
+        hash === "platform" ||
+        hash === "contact-form" ||
+        hash === "applications"
+      ) {
         setOpen(true);
       }
     }
 
     checkHash();
-    window.addEventListener('hashchange', checkHash);
-    return () => window.removeEventListener('hashchange', checkHash);
+    window.addEventListener("hashchange", checkHash);
+    return () => window.removeEventListener("hashchange", checkHash);
   }, []);
 
   useEffect(() => {
@@ -52,9 +59,9 @@ export function ContactPlatformDisclosure({ children, defaultOpen = false }: Con
     if (!target || hasAutoFocusedRef.current) return;
     hasAutoFocusedRef.current = true;
     const frame = requestAnimationFrame(() => {
-      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      target.scrollIntoView({ behavior: "smooth", block: "start" });
       const firstField = sectionRef.current?.querySelector<HTMLElement>(
-        'input:not([type="hidden"]):not([disabled]), select:not([disabled]), textarea:not([disabled])'
+        'input:not([type="hidden"]):not([disabled]), select:not([disabled]), textarea:not([disabled])',
       );
       firstField?.focus({ preventScroll: true });
     });
@@ -62,7 +69,7 @@ export function ContactPlatformDisclosure({ children, defaultOpen = false }: Con
   }, [open]);
 
   function handleOpen() {
-    window.history.pushState(null, '', '#platform');
+    window.history.pushState(null, "", "#platform");
     setOpen(true);
   }
 
@@ -78,9 +85,15 @@ export function ContactPlatformDisclosure({ children, defaultOpen = false }: Con
       />
       <div className="container relative">
         <div className="mx-auto max-w-5xl">
-          <div className="min-w-0 scroll-mt-16 md:scroll-mt-44" id="contact-form" ref={formRef}>
+          <div
+            className="min-w-0 scroll-mt-16 md:scroll-mt-44"
+            id="contact-form"
+            ref={formRef}
+          >
             {open ? (
-              <div className="animate-form-section-reveal mx-auto max-w-3xl">{children}</div>
+              <div className="animate-form-section-reveal mx-auto max-w-3xl">
+                {children}
+              </div>
             ) : (
               <article className="relative overflow-hidden rounded-[var(--radius-xl)] border border-[var(--border-default)] bg-[var(--surface)] p-6 shadow-[var(--shadow-panel)] md:p-10">
                 <span
@@ -93,11 +106,15 @@ export function ContactPlatformDisclosure({ children, defaultOpen = false }: Con
                       <Sparkles aria-hidden="true" size={12} strokeWidth={2} />
                       Рекомендуемый путь
                     </span>
-                    <h2 className={`${displayFont.className} mt-4 text-[1.85rem] font-semibold leading-[1.05] text-[var(--text)] md:text-[2.6rem]`}>
+                    <h2
+                      className={`${displayFont.className} mt-4 text-[1.85rem] font-semibold leading-[1.05] text-[var(--text)] md:text-[2.6rem]`}
+                    >
                       Опишите задачу — соберём формат под неё
                     </h2>
                     <p className="mt-4 max-w-xl text-base leading-7 text-[var(--muted)]">
-                      Платформа подстраивается под тему. Заполните короткую форму — она сама раскроет нужные поля, чтобы мы получили достаточно контекста для ответа.
+                      Опишите, что хотите сделать: событие, обучение, материал,
+                      партнёрство или размещение. Мы уточним детали и предложим
+                      следующий шаг.
                     </p>
 
                     <div className="mt-6 flex flex-wrap items-center gap-3">
@@ -111,7 +128,11 @@ export function ContactPlatformDisclosure({ children, defaultOpen = false }: Con
                         <ArrowUpRight aria-hidden="true" size={16} />
                       </Button>
                       <span className="inline-flex items-center gap-2 text-[12px] font-semibold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--muted)]">
-                        <FileText aria-hidden="true" size={14} strokeWidth={1.8} />
+                        <FileText
+                          aria-hidden="true"
+                          size={14}
+                          strokeWidth={1.8}
+                        />
                         Занимает 2 минуты
                       </span>
                     </div>
@@ -119,9 +140,16 @@ export function ContactPlatformDisclosure({ children, defaultOpen = false }: Con
 
                   <ul className="grid gap-3 rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--surface-wash)] p-5">
                     {promiseList.map((promise) => (
-                      <li className="flex items-start gap-3 text-sm leading-6 text-[var(--text)]" key={promise}>
+                      <li
+                        className="flex items-start gap-3 text-sm leading-6 text-[var(--text)]"
+                        key={promise}
+                      >
                         <span className="mt-0.5 grid size-5 shrink-0 place-items-center rounded-full bg-[color-mix(in_srgb,var(--accent)_18%,transparent)] text-[var(--accent)]">
-                          <Check aria-hidden="true" size={12} strokeWidth={2.4} />
+                          <Check
+                            aria-hidden="true"
+                            size={12}
+                            strokeWidth={2.4}
+                          />
                         </span>
                         <span>{promise}</span>
                       </li>

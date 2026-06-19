@@ -94,6 +94,14 @@ export async function confirmEmailSubscription(token: string) {
   return updated.count > 0;
 }
 
+export async function unsubscribeEmailSubscriptionById(id: string) {
+  const updated = await prisma.emailSubscription.updateMany({
+    where: { id, unsubscribedAt: null },
+    data: { unsubscribedAt: new Date() }
+  });
+  return updated.count > 0;
+}
+
 export async function unsubscribeEmailSubscription(token: string) {
   const tokenHash = hashEmailSubscriptionToken(token);
 

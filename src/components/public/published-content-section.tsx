@@ -82,19 +82,26 @@ function PublishedContentSectionLayout({
   const visibleItems = content.items.filter((item) => !excludedItemIds.includes(item.id));
   const resolvedEmptyActions = emptyActions ?? (emptyAction ? [emptyAction] : []);
   const hasActiveFilters = Object.keys(content.params).length > 0;
+  const activeParamCount = Object.keys(content.params).filter((k) => !['page', 'sort', 'pageSize'].includes(k)).length;
   const noResultsTitle = hasActiveFilters ? 'По этим параметрам ничего не найдено' : emptyTitle;
   const noResultsDescription = hasActiveFilters
-    ? 'Сбросьте фильтры или измените запрос. Так можно вернуться к полному списку.'
+    ? 'Сбросьте фильтры или измените запрос.'
     : emptyDescription;
   const emptyStateActions = buildEmptyActions(basePath, hasActiveFilters, resolvedEmptyActions);
   const listToolbar = (
     <div className="public-catalog-toolbar flex flex-wrap items-center justify-between gap-3">
-      <div className="flex items-center gap-2">
-        <span className="text-sm text-[var(--muted)]">{content.total} {countLabel.toLowerCase()}</span>
-      </div>
+      <span className="text-sm text-[var(--muted)]">{content.total} {countLabel.toLowerCase()}</span>
       <div className="flex items-center gap-3">
         {sortLabel ? (
           <span className="text-xs text-[var(--muted)]">↓ {sortLabel}</span>
+        ) : null}
+        {activeParamCount > 0 ? (
+          <a
+            className="text-xs font-semibold text-[var(--accent)] transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] hover:text-[var(--accent-strong)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
+            href={basePath}
+          >
+            Сбросить
+          </a>
         ) : null}
         {listAction ? (
           <Button className="gap-2 px-4 text-sm tracking-normal" href={listAction.href} size="sm" variant={listAction.variant ?? 'link'}>
@@ -149,27 +156,30 @@ function PublishedContentSectionLayout({
             title={secondaryEmptyTitle}
           />
         ) : (
-          <Panel className="public-catalog-list-panel min-w-0 overflow-hidden border-[var(--border-default)] bg-[var(--surface-card)]" padding="none">
-            {listToolbar}
-
-            <div className={cn('public-catalog-list-rows', listClassName ?? 'divide-y divide-[var(--line)] border-y border-[var(--line)] md:flex md:flex-col md:gap-4 md:divide-y-0 md:border-y-0')}>
-              {visibleItems.map((item) => <Fragment key={item.id}>{renderRow(item)}</Fragment>)}
+          <div className="public-catalog-list-wrapper min-w-0">
+            <div className="sticky top-14 lg:top-16 z-20 rounded-t-[var(--radius-md)] border-l border-r border-t border-[var(--border-default)] bg-[var(--surface-card)] px-5 py-3">
+              {listToolbar}
             </div>
+            <Panel className="public-catalog-list-panel min-w-0 overflow-hidden rounded-t-none border-t-0 border-[var(--border-default)] bg-[var(--surface-card)]" padding="none">
+              <div className={cn('public-catalog-list-rows', listClassName ?? 'divide-y divide-[var(--line)] border-y border-[var(--line)] md:flex md:flex-col md:gap-4 md:divide-y-0 md:border-y-0')}>
+                {visibleItems.map((item) => <Fragment key={item.id}>{renderRow(item)}</Fragment>)}
+              </div>
 
-            <div className="public-catalog-pagination flex flex-wrap items-center justify-between gap-3">
-              {content.totalPages > 1 ? (
-                <div className="flex w-full items-center justify-between gap-3">
-                  <Button disabled={content.page <= 1} href={pageHref(content, basePath, content.page - 1)} variant="secondary">
-                    ← Назад
-                  </Button>
-                  <span className="text-sm text-[var(--muted)]">{content.page} / {content.totalPages}</span>
-                  <Button disabled={content.page >= content.totalPages} href={pageHref(content, basePath, content.page + 1)} variant="secondary">
-                    Вперед →
-                  </Button>
-                </div>
-              ) : null}
-            </div>
-          </Panel>
+              <div className="public-catalog-pagination flex flex-wrap items-center justify-between gap-3">
+                {content.totalPages > 1 ? (
+                  <div className="flex w-full items-center justify-between gap-3">
+                    <Button disabled={content.page <= 1} href={pageHref(content, basePath, content.page - 1)} variant="secondary">
+                      ← Назад
+                    </Button>
+                    <span className="text-sm text-[var(--muted)]">{content.page} / {content.totalPages}</span>
+                    <Button disabled={content.page >= content.totalPages} href={pageHref(content, basePath, content.page + 1)} variant="secondary">
+                      Вперед →
+                    </Button>
+                  </div>
+                ) : null}
+              </div>
+            </Panel>
+          </div>
         )}
       </div>
     </section>

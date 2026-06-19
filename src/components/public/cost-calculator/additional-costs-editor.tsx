@@ -63,7 +63,7 @@ export function AdditionalCostsEditor({
       {showHint ? (
         <div className="mx-1 mt-3 rounded-[var(--radius-md)] border border-dashed border-[var(--border-default)] bg-[var(--surface-wash)] p-3">
           <p className="text-xs leading-5 text-[var(--muted)]">
-            Укажите дополнительные расходы на порцию напитка. Например: аренда, зарплата бариста, амортизация оборудования.
+            Укажите дополнительные расходы. Например: аренда, зарплата бариста, амортизация оборудования.
           </p>
         </div>
       ) : (

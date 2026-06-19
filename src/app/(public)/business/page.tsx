@@ -60,7 +60,7 @@ const benefits: { label: string; title: string; description: string; icon: Secti
   {
     label: 'Проверка',
     title: 'Карточку собираем вместе',
-    description: 'Перед публикацией редакция уточняет описание, контакты и ссылки. Без сюрпризов.',
+    description: 'Перед публикацией редакция уточняет описание, контакты и ссылки.',
     icon: 'star'
   },
   {
@@ -192,7 +192,7 @@ export default async function BusinessPage({ searchParams }: BusinessPageProps) 
               <PublicEyebrow>Польза</PublicEyebrow>
               <PublicDisplayTitle className="mt-4 max-w-[13ch]">Что получите</PublicDisplayTitle>
               <PublicBodyText className="mt-5 max-w-md" size="md" tone="default">
-                Каталог собирает кофейный сегмент региона: кто и где работает. Без рекламы «для всех».
+                Каталог помогает кофейням, поставщикам, мастерам и партнёрам быстрее находить друг друга внутри региона — без случайного трафика и лишних заявок.
               </PublicBodyText>
               <Button className="mt-7 rounded-[var(--radius-md)]" href="#business-request" size="lg">
                 Перейти к форме

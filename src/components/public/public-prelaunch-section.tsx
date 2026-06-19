@@ -4,6 +4,7 @@ import { AppLink } from '@/components/ui/app-link';
 import { Button } from '@/components/ui/button';
 import { MetaChip } from '@/components/ui/meta-chip';
 import { displayFont } from '@/lib/fonts';
+import { cn } from '@/lib/utils';
 
 export type PrelaunchCard = {
   title: string;
@@ -29,6 +30,7 @@ type PublicPrelaunchSectionProps = {
   cards: PrelaunchCard[];
   actions?: PrelaunchAction[];
   badges?: string[];
+  compact?: boolean;
   id?: string;
 };
 
@@ -39,6 +41,7 @@ export function PublicPrelaunchSection({
   cards,
   actions = [],
   badges = [],
+  compact = false,
   id
 }: PublicPrelaunchSectionProps) {
   return (
@@ -46,7 +49,11 @@ export function PublicPrelaunchSection({
       <div className="container grid gap-7 md:gap-8 xl:grid-cols-[minmax(18rem,0.82fr)_minmax(0,1.18fr)] xl:items-start xl:gap-10">
         <div className="xl:self-start">
           <PublicEyebrow>{eyebrow}</PublicEyebrow>
-          <PublicDisplayTitle className="mt-4 max-w-[12ch] text-[clamp(2.6rem,5.4vw,5.2rem)] leading-[0.96]">{title}</PublicDisplayTitle>
+          {compact ? (
+            <h2 className={cn(displayFont.className, 'mt-4 text-[1.7rem] font-semibold leading-[1.1] text-[var(--text)] md:text-[2.1rem]')}>{title}</h2>
+          ) : (
+            <PublicDisplayTitle className="mt-4 max-w-[12ch] text-[clamp(2.6rem,5.4vw,5.2rem)] leading-[0.96]">{title}</PublicDisplayTitle>
+          )}
           <PublicBodyText className="mt-5 max-w-lg" size="md">
             {description}
           </PublicBodyText>

@@ -2,7 +2,7 @@
 
 import { redirect } from 'next/navigation';
 import { cookies } from 'next/headers';
-import { ApplicationStatus, ApplicationType, UserRole, UserStatus } from '@prisma/client';
+import { ApplicationStatus, ApplicationType, BusinessAccountStatus, UserRole, UserStatus } from '@prisma/client';
 import { Prisma } from '@prisma/client';
 import { z } from 'zod';
 import { getString, nullableString, optionalString } from '@/lib/admin/content-utils';
@@ -18,6 +18,8 @@ import { assertSameOriginServerAction } from '@/lib/security/server-action-origi
 import { assertTurnstilePassed } from '@/lib/security/turnstile';
 import { CompromisedPasswordError, assertPasswordNotCompromised } from '@/lib/security/hibp';
 import { setRegisterUserFlashCookie } from '@/lib/auth/register-user-flash';
+import { SESSION_COOKIE_NAME, createSessionToken, getSessionCookieOptions, getSessionExpiresAt, hashSessionToken } from '@/lib/auth/session';
+import { slugify } from '@/lib/utils/slugify';
 
 const businessRequestSchema = z.object({
   companyName: z.string().trim().min(2).max(160),
@@ -135,58 +137,117 @@ export async function createBusinessAccountRequestAction(formData: FormData) {
 
   const businessRequest = parsed.data!;
 
+  // Compute bcrypt hash before transaction to avoid holding DB connection during slow hashing
+  const placeholderPasswordHash = await hashPassword(randomBytes(32).toString('hex'));
+
+  type RegistrationOutcome =
+    | { status: 'created'; sessionRaw: string; setPasswordUrl: string }
+    | { status: 'duplicate' }
+    | { status: 'error'; code: string };
+
+  let outcome: RegistrationOutcome;
+
   try {
     await assertAuthAttemptAllowed({ action: 'register', email: businessRequest.email });
 
-    const applicationId = await prisma.$transaction(async (tx) => {
-      const [existingUser, existingRequest] = await Promise.all([
-        tx.user.findUnique({ where: { email: businessRequest.email }, select: { id: true } }),
-        tx.application.findFirst({
-          where: {
-            type: ApplicationType.BUSINESS_ACCOUNT_REQUEST, email: businessRequest.email,
-            status: { notIn: [ApplicationStatus.REJECTED, ApplicationStatus.ARCHIVED, ApplicationStatus.COMPLETED] }
-          },
-          select: { id: true }
-        })
-      ]);
+    const result = await prisma.$transaction(async (tx) => {
+      const existingUser = await tx.user.findUnique({
+        where: { email: businessRequest.email },
+        select: { id: true }
+      });
 
-      if (existingUser || existingRequest) return null;
+      if (existingUser) return null;
 
       if (businessRequest.cityId) {
         const city = await tx.city.findFirst({ where: { id: businessRequest.cityId, isActive: true }, select: { id: true } });
         if (!city) throw new Error('city is invalid');
       }
 
-      const application = await tx.application.create({
+      const baseSlug = slugify(businessRequest.companyName);
+      const existing = await tx.businessAccount.count({ where: { slug: { startsWith: baseSlug } } });
+      const slug = existing === 0 ? baseSlug : `${baseSlug}-${randomBytes(3).toString('hex')}`;
+
+      const user = await tx.user.create({
         data: {
-          type: ApplicationType.BUSINESS_ACCOUNT_REQUEST, status: ApplicationStatus.NEW,
-          subject: `Заявка на бизнес-доступ: ${businessRequest.companyName}`,
-          name: businessRequest.contactPerson, email: businessRequest.email,
-          phone: nullableString(businessRequest.phone), telegram: nullableString(businessRequest.telegram),
-          cityId: nullableString(businessRequest.cityId),
-          payload: { companyName: businessRequest.companyName, contactPerson: businessRequest.contactPerson, websiteUrl: businessRequest.websiteUrl || null, description: businessRequest.description || null },
-          consentAcceptedAt: new Date(),
-          consentText: 'Пользователь согласился с политикой обработки персональных данных и дал согласие на обработку персональных данных для рассмотрения заявки на бизнес-доступ.'
+          email: businessRequest.email,
+          passwordHash: placeholderPasswordHash,
+          role: UserRole.BUSINESS,
+          status: UserStatus.ACTIVE,
+          emailVerifiedAt: new Date(),
+          profile: { create: { fullName: businessRequest.contactPerson } }
         }
       });
 
-      return application.id;
+      await tx.businessAccount.create({
+        data: {
+          ownerId: user.id,
+          companyName: businessRequest.companyName,
+          slug,
+          status: BusinessAccountStatus.ACTIVE,
+          contactPerson: businessRequest.contactPerson,
+          phone: nullableString(businessRequest.phone),
+          telegram: nullableString(businessRequest.telegram),
+          cityId: businessRequest.cityId || null,
+          websiteUrl: businessRequest.websiteUrl || null,
+          description: businessRequest.description || null,
+        }
+      });
+
+      const rawResetToken = randomBytes(32).toString('hex');
+      await tx.userPasswordResetToken.create({
+        data: {
+          userId: user.id,
+          tokenHash: createHash('sha256').update(rawResetToken).digest('hex'),
+          expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+        }
+      });
+
+      const sessionRaw = createSessionToken();
+      await tx.session.create({
+        data: {
+          userId: user.id,
+          tokenHash: hashSessionToken(sessionRaw),
+          expiresAt: getSessionExpiresAt()
+        }
+      });
+
+      return {
+        sessionRaw,
+        setPasswordUrl: `${env.APP_URL}/auth/password-reset/confirm?token=${rawResetToken}`
+      };
     });
 
-    const url = new URL('/auth/register/business', 'http://localhost');
-    url.searchParams.set('success', 'business-request-created');
-    if (applicationId) {
-      url.searchParams.set('applicationId', applicationId);
-    }
-    redirect(`${url.pathname}${url.search}`);
+    outcome = result
+      ? { status: 'created', sessionRaw: result.sessionRaw, setPasswordUrl: result.setPasswordUrl }
+      : { status: 'duplicate' };
+
   } catch (error) {
-    if (error instanceof AuthRateLimitError) {
-      await redirectWithAuthResult('/auth/register/business', { type: 'error', code: 'rate-limited' });
-    }
-    await redirectWithAuthResult('/auth/register/business', { type: 'error', code: resolveRegisterErrorCode(error) });
+    const code = error instanceof AuthRateLimitError ? 'rate-limited' : resolveRegisterErrorCode(error);
+    outcome = { status: 'error', code };
   }
 
-  await redirectWithAuthResult('/auth/register/business', { type: 'error', code: 'failed' });
+  // All redirects outside try/catch
+  if (outcome.status === 'error') {
+    redirect(authResultPath('/auth/register/business', { type: 'error', code: outcome.code }));
+  }
+
+  if (outcome.status === 'duplicate') {
+    redirect(authResultPath('/auth/register/business', { type: 'error', code: 'already-registered' }));
+  }
+
+  const cookieStore = await cookies();
+  cookieStore.set(SESSION_COOKIE_NAME, outcome.sessionRaw, getSessionCookieOptions());
+
+  void (async () => {
+    const { sendBusinessWelcomeEmail } = await import('@/lib/notifications/auth-email');
+    await sendBusinessWelcomeEmail({
+      to: businessRequest.email,
+      companyName: businessRequest.companyName,
+      setPasswordUrl: outcome.status === 'created' ? outcome.setPasswordUrl : ''
+    });
+  })().catch(() => {});
+
+  redirect('/business/cabinet?welcome=1');
 }
 
 export async function registerUserAction(

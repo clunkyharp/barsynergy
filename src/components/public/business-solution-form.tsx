@@ -52,10 +52,10 @@ export function BusinessSolutionForm({ enabled, utm, cities, defaults = {}, dire
           <div className="relative border-b border-[var(--editorial-dark-border)] bg-[var(--editorial-dark-surface)] px-5 py-6 text-[var(--editorial-dark-text)] md:px-6 md:py-7 lg:border-b-0 lg:border-r lg:border-[var(--editorial-dark-border)]">
             <PublicEyebrow tone="inverse">Каталог СКФО</PublicEyebrow>
             <PublicDisplayTitle as="h3" className="mt-3 text-white" size="card">
-              Проверим данные и подготовим карточку
+              Проверим данные и подготовим карточку бизнеса
             </PublicDisplayTitle>
             <PublicBodyText className="mt-4 max-w-md" tone="inverse">
-              Укажите данные, по которым команда сможет связаться и уточнить карточку.
+              Укажите данные, по которым команда сможет связаться с вами.
             </PublicBodyText>
 
             <div className="mt-8 border-t border-white/10 pt-5">

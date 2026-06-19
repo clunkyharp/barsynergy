@@ -31,11 +31,11 @@ export function ConsultingTabs({ cases, prices }: ConsultingTabsProps) {
       <div className="container">
         <div className="grid gap-6 lg:grid-cols-[minmax(0,0.92fr)_minmax(18rem,0.5fr)] lg:items-end">
           <div className="min-w-0">
-            <PublicEyebrow>Задачи и пакеты</PublicEyebrow>
+            <PublicEyebrow>Задачи</PublicEyebrow>
             <PublicDisplayTitle className="mt-4">Типовые задачи и стоимость</PublicDisplayTitle>
           </div>
           <PublicBodyText className="max-w-2xl lg:justify-self-end" size="md">
-            Сначала выберите тип задачи. Если нужно понять порядок цены, откройте пакеты в той же секции.
+            Сначала выберите тип задачи.
           </PublicBodyText>
         </div>
 

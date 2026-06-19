@@ -19,8 +19,9 @@ const PUBLIC_CONTACT_TELEGRAM = 'https://t.me/barsynergy';
 const errorMessages: Record<string, string> = {
   invalid: 'Проверьте обязательные поля, email и сайт.',
   disabled: `Форма сейчас недоступна. Если доступ нужен, напишите в Telegram ${SUPPORT_TELEGRAM}.`,
-  failed: 'Не удалось отправить заявку прямо сейчас. Попробуйте позже.',
-  'rate-limited': 'Слишком много заявок за короткое время. Повторите позже.'
+  failed: 'Не удалось создать кабинет прямо сейчас. Попробуйте позже.',
+  'rate-limited': 'Слишком много запросов за короткое время. Повторите позже.',
+  'already-registered': 'Аккаунт с таким email уже существует. Войдите или восстановите пароль.'
 };
 
 type RegisterBusinessPageProps = {
@@ -41,9 +42,6 @@ export default async function RegisterBusinessPage({ searchParams }: RegisterBus
   const formsEnabled = arePublicApplicationFormsEnabled(env);
   const params = (await searchParams) ?? {};
   const error = firstParam(params.error);
-  const success = firstParam(params.success);
-  const applicationId = firstParam(params.applicationId);
-  const showSuccess = success === 'business-request-created';
   const cities = formsEnabled
     ? await getActiveCities()
     : [];
@@ -69,67 +67,23 @@ export default async function RegisterBusinessPage({ searchParams }: RegisterBus
           <p className="mt-4 max-w-md text-base leading-7 text-[var(--muted)]">
             Для заведений, брендов, поставщиков и партнёров, которым нужен доступ к заявкам, каталогу и журналу.
           </p>
-          {!showSuccess ? (
-            <div className="mt-8 border-t border-black/10 pt-5">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Что указать</p>
-              <ul className="mt-4 grid gap-3 text-sm leading-6 text-[var(--muted)]">
-                <li className="grid grid-cols-[0.5rem_minmax(0,1fr)] gap-3">
-                  <span className="mt-2 h-2 w-2 rounded-full bg-[var(--accent)]" />
-                  <span>Шаг 1: контактные данные.</span>
-                </li>
-                <li className="grid grid-cols-[0.5rem_minmax(0,1fr)] gap-3">
-                  <span className="mt-2 h-2 w-2 rounded-full bg-[var(--accent)]" />
-                  <span>Шаг 2: информация о компании.</span>
-                </li>
-              </ul>
-            </div>
-          ) : null}
+          <div className="mt-8 border-t border-black/10 pt-5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Что указать</p>
+            <ul className="mt-4 grid gap-3 text-sm leading-6 text-[var(--muted)]">
+              <li className="grid grid-cols-[0.5rem_minmax(0,1fr)] gap-3">
+                <span className="mt-2 h-2 w-2 rounded-full bg-[var(--accent)]" />
+                <span>Шаг 1: контактные данные.</span>
+              </li>
+              <li className="grid grid-cols-[0.5rem_minmax(0,1fr)] gap-3">
+                <span className="mt-2 h-2 w-2 rounded-full bg-[var(--accent)]" />
+                <span>Шаг 2: информация о компании.</span>
+              </li>
+            </ul>
+          </div>
         </section>
 
         <section className="editorial-form-shell overflow-hidden">
-          {showSuccess ? (
-            <div className="p-6 md:p-8">
-              <InlineAlert className="mb-4" density="compact" tone="success">
-                Заявка принята
-              </InlineAlert>
-              {applicationId ? (
-                <p className="mb-4 text-xs leading-5 text-[var(--muted)]">
-                  Номер заявки: <span className="font-mono text-[var(--text)]">{applicationId}</span>
-                </p>
-              ) : null}
-              <h2 className="mt-2 text-2xl font-semibold leading-tight">Что дальше?</h2>
-              <ol className="mt-6 grid gap-4 text-sm leading-6 text-[var(--text)]">
-                <li className="flex items-start gap-3">
-                  <span className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-[var(--accent-soft)] text-[11px] font-bold text-[var(--accent)]">1</span>
-                  <span>Мы проверяем данные — обычно это занимает 1–2 рабочих дня.</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <span className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-[var(--accent-soft)] text-[11px] font-bold text-[var(--accent)]">2</span>
-                  <span>Если всё в порядке, пришлём на указанный email ссылку для активации кабинета.</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <span className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-[var(--accent-soft)] text-[11px] font-bold text-[var(--accent)]">3</span>
-                  <span>После активации вы сможете войти в кабинет и управлять заявками компании.</span>
-                </li>
-              </ol>
-              <div className="mt-8 flex flex-wrap items-center gap-3 border-t border-[var(--line)] pt-6">
-                <Button href="/auth/login" size="md">
-                  Перейти ко входу
-                </Button>
-                <Button href="/" size="md" variant="secondary">
-                  На главную
-                </Button>
-              </div>
-              {!applicationId ? (
-                <p className="mt-4 text-xs leading-5 text-[var(--muted)]">
-                  Если вы уже отправляли заявку раньше — повторная не нужна. Если письмо не пришло, напишите в{' '}
-                  <a className="font-semibold text-[var(--accent)] hover:text-[var(--accent-strong)]" href={PUBLIC_CONTACT_TELEGRAM}>
-                    Telegram
-                  </a>.
-                </p>
-              ) : null}
-            </div>
-          ) : !formsEnabled ? (
+          {!formsEnabled ? (
             <div className="p-5 md:p-6">
               <Panel className="border-[var(--warning-border)] bg-[var(--warning-bg)] p-6 md:p-7" padding="lg">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--warning)]">Доступ временно закрыт</p>
@@ -162,10 +116,10 @@ export default async function RegisterBusinessPage({ searchParams }: RegisterBus
           ) : (
             <>
               <div className="border-b border-black/10 bg-[var(--surface-wash)] px-5 py-5 md:px-6 md:py-6">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Заявка на бизнес-доступ</p>
-                <h2 className="auth-register-form-title mt-3 text-[clamp(1.55rem,7vw,2rem)] font-semibold leading-tight tracking-normal md:text-[2rem]">Данные для рассмотрения</h2>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Бизнес-доступ</p>
+                <h2 className="auth-register-form-title mt-3 text-[clamp(1.55rem,7vw,2rem)] font-semibold leading-tight tracking-normal md:text-[2rem]">Данные компании</h2>
                 <p className="mt-3 max-w-xl text-sm leading-7 text-[var(--muted)]">
-                  Оставьте контакты и информацию о компании. Мы рассмотрим заявку и напишем вам.
+                  Укажите данные компании — кабинет откроется сразу после отправки. На email придёт ссылка для установки пароля.
                 </p>
               </div>
               <div className="p-5 md:p-6">

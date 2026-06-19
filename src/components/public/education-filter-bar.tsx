@@ -6,6 +6,11 @@ import { Search } from 'lucide-react';
 import { Select } from '@/components/ui/select';
 import type { PublicTaxonomyOption, PublicSelectOption } from '@/lib/public/filter-options';
 
+const educationSortOptions = [
+  { value: 'recent', label: 'Сначала новые' },
+  { value: 'name', label: 'По названию' }
+] as const;
+
 type EducationFilterBarProps = {
   categories: PublicTaxonomyOption[];
   cities: PublicTaxonomyOption[];
@@ -48,6 +53,7 @@ function EducationFilterBarContent({
   const currentFormat = searchParams.get('format') ?? '';
   const currentLevel = searchParams.get('level') ?? '';
   const currentCategory = searchParams.get('category') ?? '';
+  const currentSort = searchParams.get('sort') ?? '';
 
   const [searchValue, setSearchValue] = useState(currentQ);
 
@@ -149,6 +155,21 @@ function EducationFilterBarContent({
                 <option value="">Город</option>
                 {cities.map((city) => (
                   <option key={city.id} value={city.slug}>{city.name}</option>
+                ))}
+              </Select>
+            </div>
+
+            <div className="sm:min-w-[9rem]">
+              <Select
+                aria-label="Сортировка"
+                className="min-h-[2.75rem] text-sm"
+                name="sort"
+                onChange={handleSelectChange('sort')}
+                value={currentSort}
+              >
+                <option value="">По умолчанию</option>
+                {educationSortOptions.map((opt) => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
                 ))}
               </Select>
             </div>

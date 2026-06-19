@@ -61,12 +61,16 @@ function ChannelCard({ method }: { method: ContactMethod }) {
           </div>
         </div>
 
-        <p className={`${displayFont.className} relative mt-5 text-[1.45rem] font-semibold leading-[1.15] text-[var(--editorial-dark-text)] md:text-[1.7rem]`}>
-          {method.descriptor.split('.')[0]}.
-        </p>
-        <p className="relative mt-2 text-sm leading-6 text-[color-mix(in_srgb,var(--editorial-dark-text)_60%,transparent)]">
-          {method.descriptor.split('.').slice(1).join('.').trim()}
-        </p>
+        {method.descriptor ? (
+          <>
+            <p className={`${displayFont.className} relative mt-5 text-[1.45rem] font-semibold leading-[1.15] text-[var(--editorial-dark-text)] md:text-[1.7rem]`}>
+              {method.descriptor.split('.')[0]}.
+            </p>
+            <p className="relative mt-2 text-sm leading-6 text-[color-mix(in_srgb,var(--editorial-dark-text)_60%,transparent)]">
+              {method.descriptor.split('.').slice(1).join('.').trim()}
+            </p>
+          </>
+        ) : null}
 
         <div className="relative mt-5 flex items-center justify-between gap-3 border-t border-[color-mix(in_srgb,var(--editorial-dark-text)_15%,transparent)] pt-4">
           <span className="text-[11px] font-semibold uppercase tracking-[var(--tracking-eyebrow-sm)] text-[color-mix(in_srgb,var(--editorial-dark-text)_50%,transparent)]">
@@ -111,7 +115,7 @@ export function ContactChannels() {
             </p>
           </div>
 
-          <div className="mt-6 grid gap-3 sm:grid-cols-3">
+          <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {contactMethods.map((method) => (
               <ChannelCard
                 key={method.mark}

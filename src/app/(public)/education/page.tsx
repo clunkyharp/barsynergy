@@ -33,6 +33,15 @@ export const metadata: Metadata = buildPublicPageMetadata({
 
 const FEATURED_COUNT = 4;
 
+const educationSortOptions = [
+  { value: 'recent', label: 'Сначала новые' },
+  { value: 'name', label: 'По названию' }
+] as const;
+
+function getEducationSortLabel(sort?: string) {
+  return educationSortOptions.find((opt) => opt.value === sort)?.label;
+}
+
 function EducationHero() {
   return (
     <>
@@ -111,6 +120,7 @@ function EducationFeaturedSection({
 export default async function EducationPage({ searchParams }: EducationPageProps) {
   const params = (await searchParams) ?? {};
   const contentParams = stripPublicApplicationResultParams(params);
+  const selectedSort = Array.isArray(contentParams.sort) ? contentParams.sort[0] : contentParams.sort;
   const [content, filterCities, categories, filterOptions] = await Promise.all([
     getPublishedCourses(contentParams),
     getPublicCityFilterOptions(),
@@ -158,6 +168,7 @@ export default async function EducationPage({ searchParams }: EducationPageProps
             basePath="/education"
             content={content}
             countLabel="Все программы"
+            sortLabel={getEducationSortLabel(selectedSort)}
             emptyDescription="Список пока пуст. Можно сразу написать, какое обучение вам нужно."
             emptyActions={[
               { href: '/contacts', label: 'Связаться с командой' }
@@ -179,6 +190,7 @@ export default async function EducationPage({ searchParams }: EducationPageProps
 
       {isPrelaunchEmpty ? (
         <PublicPrelaunchSection
+          compact
           badges={['Раздел уже принимает заявки', 'Подходит для открытых и корпоративных форматов']}
           cards={[
             {

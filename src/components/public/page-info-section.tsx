@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { ArrowUpRight } from 'lucide-react';
 import { displayFont } from '@/lib/fonts';
 import { cn } from '@/lib/utils';
 import { AppLink } from '@/components/ui/app-link';
@@ -26,8 +27,8 @@ export function PageInfoSection({
   return (
     <section className="background-zone background-zone-graphite border-b border-[var(--line)] py-10 md:py-14">
       <div className="container">
-        <div className="mx-auto max-w-5xl rounded-[var(--radius-xl)] border border-[var(--line)] bg-[var(--surface-card)] p-6 md:p-10">
-          <div className="grid gap-8 lg:grid-cols-[2fr_1fr] lg:items-start">
+        <div className="rounded-[var(--radius-xl)] border border-[var(--line)] bg-[var(--surface-card)] p-6 md:p-10">
+          <div className="grid gap-8 lg:grid-cols-[1.6fr_1fr] lg:items-start">
             <div className="min-w-0">
               {eyebrow ? (
                 <span className="text-[11px] font-semibold uppercase tracking-[var(--tracking-eyebrow-sm)] text-[var(--accent)]">
@@ -43,17 +44,18 @@ export function PageInfoSection({
             </div>
             {sidebarLinks && sidebarLinks.length > 0 ? (
               <div className="rounded-[var(--radius-lg)] border border-[var(--line)] bg-[var(--surface-wash)] p-5">
-                <span className="text-xs font-semibold uppercase tracking-[var(--tracking-eyebrow-sm)] text-[var(--accent)]">
+                <span className="text-xs font-semibold uppercase tracking-[var(--tracking-eyebrow-sm)] text-[var(--muted)]">
                   {sidebarLabel}
                 </span>
-                <ul className="mt-4 flex flex-col gap-3">
+                <ul className="mt-4 flex flex-col divide-y divide-[var(--line)]">
                   {sidebarLinks.map((link) => (
                     <li key={link.href}>
                       <AppLink
-                        className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--accent)] transition-colors hover:text-[var(--accent-strong)]"
+                        className="group flex items-center justify-between gap-2 py-3 text-sm font-semibold text-[var(--text)] transition-colors hover:text-[var(--accent)]"
                         href={link.href}
                       >
-                        {link.label}
+                        <span>{link.label}</span>
+                        <ArrowUpRight aria-hidden="true" className="shrink-0 text-[var(--muted)] transition-colors group-hover:text-[var(--accent)]" size={15} strokeWidth={1.8} />
                       </AppLink>
                     </li>
                   ))}

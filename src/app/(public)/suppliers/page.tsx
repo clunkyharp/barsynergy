@@ -75,6 +75,7 @@ export default async function SuppliersPage({ searchParams }: SuppliersPageProps
       ) : null}
       {isPrelaunchEmpty ? (
         <PublicPrelaunchSection
+          compact
           badges={['Каталог уже принимает заявки', 'Подходит для поставок, сервиса и оборудования']}
           cards={[
             {
@@ -151,7 +152,7 @@ export default async function SuppliersPage({ searchParams }: SuppliersPageProps
         ]}
       >
         <p>
-          Каталог BARSYNERGY объединяет проверенных поставщиков кофе, какао, сиропов, молочной продукции, упаковки, оборудования и сервисных услуг
+          В каталоге собраны проверенные поставщики кофе, какао, сиропов, молочной продукции, упаковки, оборудования и сервисных услуг
           для кофеен, баров и ресторанов Махачкалы, Дагестана и Северо-Кавказского региона.
         </p>
         <p>

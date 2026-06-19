@@ -23,7 +23,7 @@ export function PopularDrinks() {
     <div>
       <h3 className="text-base font-bold leading-tight text-[var(--text)]">Ориентиры по напиткам</h3>
       <p className="mt-1 max-w-lg text-xs leading-5 text-[var(--muted)]">
-        Средние показатели себестоимости и цен. Используйте как отправную точку, а не как точную норму.
+        Средние показатели себестоимости и цен. Используйте как отправную точку.
       </p>
       <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {POPULAR_DRINKS.map((drink) => (

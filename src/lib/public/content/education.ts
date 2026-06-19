@@ -78,6 +78,16 @@ export async function getPublishedCourseDetail(slug: string): Promise<PublicCont
   };
 }
 
+function getCourseOrderBy(sort?: string): Prisma.CourseOrderByWithRelationInput[] {
+  if (sort === 'recent') {
+    return [{ publishedAt: 'desc' }, { createdAt: 'desc' }];
+  }
+  if (sort === 'name') {
+    return [{ title: 'asc' }];
+  }
+  return [{ sortOrder: 'asc' }, { publishedAt: 'desc' }, { createdAt: 'desc' }];
+}
+
 const courseSearchFields = (q: string): Prisma.CourseWhereInput[] => [
   { title: { contains: q, mode: 'insensitive' as const } },
   { summary: { contains: q, mode: 'insensitive' as const } },
@@ -89,6 +99,8 @@ export async function getPublishedCourses(params: PublicContentSearchParams = {}
   const page = getPage(params);
   const pageSize = getPageSize(params);
   const q = optionalParam(params, 'q');
+  const sort = optionalParam(params, 'sort');
+  const orderBy = getCourseOrderBy(sort);
   const baseWhere: Prisma.CourseWhereInput = {
     status: ContentStatus.PUBLISHED,
     category: optionalParam(params, 'category') ? { slug: optionalParam(params, 'category'), type: CategoryType.COURSE } : undefined,
@@ -103,7 +115,6 @@ export async function getPublishedCourses(params: PublicContentSearchParams = {}
     pageSize,
     ({ idsOnly }) => {
       const selectIdAndTitle = { id: true, title: true } as const;
-      const orderBy = [{ sortOrder: 'asc' as const }, { publishedAt: 'desc' as const }, { createdAt: 'desc' as const }];
       if (idsOnly) {
         const searchWhere: Prisma.CourseWhereInput = {
           ...baseWhere,

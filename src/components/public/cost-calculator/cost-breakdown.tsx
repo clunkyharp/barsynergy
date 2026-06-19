@@ -18,7 +18,7 @@ export function CostBreakdown({ breakdown }: { breakdown: CostBreakdownItem[] })
     return (
       <div className="rounded-[var(--radius-md)] border border-dashed border-[var(--border-default)] bg-[var(--surface-wash)] p-4">
         <p className="text-sm text-[var(--muted)]">
-          Структура себестоимости появится после заполнения ингредиентов и дополнительных расходов.
+          Данные себестоимости появится после заполнения ингредиентов и дополнительных расходов.
         </p>
       </div>
     );

@@ -91,6 +91,7 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
       {isPrelaunchEmpty ? (
         <>
           <PublicPrelaunchSection
+            compact
             badges={['Афиша уже принимает заявки', 'Подходит для любых форматов']}
             cards={[
               {
@@ -140,7 +141,7 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
         ]}
       >
         <p>
-          Афиша BARSYNERGY собирает профессиональные события кофейной и барной индустрии Северного Кавказа: каппинги, чемпионаты бариста,
+          Афиша собирает профессиональные события кофейной и барной индустрии Северного Кавказа: каппинги, чемпионаты бариста,
           лекции, мастер-классы, тренинги и открытые дегустации в Махачкале, Грозном, Владикавказе и других городах региона.
         </p>
         <p>

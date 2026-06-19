@@ -37,6 +37,7 @@ const envSchema = z
     S3_BUCKET_PRIVATE: optionalString,
     S3_ACCESS_KEY_ID: optionalString,
     S3_SECRET_ACCESS_KEY: optionalString,
+    CRON_SECRET: z.preprocess(emptyToUndefined, z.string().min(16).optional()),
     SMTP_HOST: optionalString,
     SMTP_PORT: z.preprocess(emptyToUndefined, z.coerce.number().int().positive().optional()),
     SMTP_USER: optionalString,

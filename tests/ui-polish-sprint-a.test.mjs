@@ -13,7 +13,7 @@ function readSrc(path) {
 test('Sprint A [2] hero stats use the larger display size with tabular numbers', () => {
   const source = readSrc('src/components/public/homepage-hero.tsx');
 
-  const heroBlock = source.slice(source.indexOf('function HomeStatsLine'), source.indexOf('export function HomeHeroRouter'));
+  const heroBlock = source.slice(source.indexOf('export function HomeStatsSection'), source.indexOf('export function HomeAudienceSection'));
 
   assert.match(heroBlock, /text-\[2\.4rem\]/, 'stat numbers must scale up to 2.4rem on mobile');
   assert.match(heroBlock, /md:text-\[3rem\]/, 'stat numbers must scale to 3rem on desktop');

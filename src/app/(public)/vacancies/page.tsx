@@ -68,19 +68,7 @@ function DirectoryBar({
   return (
     <section className="background-zone background-zone-graphite border-b border-[var(--line)] pt-6 pb-6 md:pt-8 md:pb-8">
       <div className="container">
-        <div className="inline-flex max-w-full flex-wrap items-center gap-x-6 gap-y-3 rounded-[var(--radius-xl)] border border-[var(--line)] bg-[var(--surface-card)]/80 p-4 md:p-5">
-          <div className="flex gap-5" aria-label="Сводка каталога">
-            <div className="border-l border-[var(--line)] pl-4">
-              <strong className="block text-[clamp(1.5rem,2.5vw,2rem)] font-semibold leading-none text-[var(--accent)]">{vacanciesCount}</strong>
-              <span className="mt-0.5 block text-sm text-[var(--muted)]">вакансий</span>
-            </div>
-            <div className="border-l border-[var(--line)] pl-4">
-              <strong className="block text-[clamp(1.5rem,2.5vw,2rem)] font-semibold leading-none text-[var(--accent)]">{specialistsCount}</strong>
-              <span className="mt-0.5 block text-sm text-[var(--muted)]">специалистов</span>
-            </div>
-          </div>
-          <VacanciesViewTabs vacanciesCount={vacanciesCount} specialistsCount={specialistsCount} />
-        </div>
+        <VacanciesViewTabs vacanciesCount={vacanciesCount} specialistsCount={specialistsCount} />
       </div>
     </section>
   );
@@ -204,8 +192,8 @@ export default async function VacanciesPage({ searchParams }: VacanciesPageProps
         ]}
       >
         <p>
-          BARSYNERGY собирает актуальные вакансии для бариста, обжарщиков, управляющих кофеен, технологов и других специалистов барной индустрии
-          Северо-Кавказского федерального округа. Раздел охватывает позиции в Махачкале, Грозном, Владикавказе, Нальчике и других городах региона.
+          В этом разделе собраны вакансии для бариста, управляющих, обжарщиков, технологов и других специалистов кофейной индустрии СКФО —
+          позиции в Махачкале, Грозном, Владикавказе, Нальчике и других городах региона.
         </p>
         <p>
           Здесь публикуются предложения от проверенных работодателей: кофейных сетей, независимых кофеен, обжарщиков, поставщиков оборудования

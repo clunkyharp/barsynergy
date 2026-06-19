@@ -254,7 +254,7 @@ export function SiteFooter({ userRole, userEmail, newsletterDisabled = false, le
               Платформа для барной индустрии
             </p>
             <p className="mt-4 max-w-md text-sm leading-7 text-[var(--editorial-dark-muted)] sm:text-[1rem]">
-              BARSYNERGY — платформа для размещения и поиска актуальной информации о предстоящих мастер-классах, событиях, вакансиях, поставщиках и возможности сотрудничества с платформой в качестве спонсора.
+              BARSYNERGY — медиа и рабочая платформа для кофейной и барной индустрии СКФО: материалы, события, вакансии, обучение, поставщики и партнёрские проекты.
             </p>
             <div className="mt-7 flex flex-wrap items-center gap-4 text-sm">
               <AppLink

@@ -13,15 +13,9 @@ import {
   titleInitials
 } from './published-content-section-builders';
 
-function directoryLead(item: PublishedContentItem) {
-  const value = metaGroupValue(item, 'Продукты / услуги') ?? metaGroupValue(item, 'География') ?? item.label ?? 'Поставки для заведений';
-  return <span className="tabular-nums text-[1.35rem] font-semibold text-[var(--accent)]">{value}</span>;
-}
-
 function directoryDescription(item: PublishedContentItem) {
   const geography = metaGroupValue(item, 'География') ?? metaGroupValue(item, 'Город');
-  const hasProductsLead = Boolean(metaGroupValue(item, 'Продукты / услуги'));
-  const summary = hasProductsLead ? null : item.summary?.trim() ?? null;
+  const summary = item.summary?.trim() ?? null;
   return [geography, summary].filter(Boolean).join('. ');
 }
 
@@ -82,7 +76,7 @@ export function DirectoryListRow({
   );
 
   return (
-    <article className="public-list-row-shell public-list-row-shell-hh public-list-row-shell-directory">
+    <article className="public-list-row-shell public-list-row-shell-hh">
       <div className="grid min-w-0 gap-6">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2.5">
@@ -97,16 +91,13 @@ export function DirectoryListRow({
           <h3 className="public-list-row-title mt-3 text-balance text-[1.35rem] font-bold leading-[1.15] text-[var(--text)] md:text-[1.55rem]">
             {item.title}
           </h3>
-          <div className="public-list-row-lead mt-3 text-[1.25rem] font-semibold leading-8 text-[var(--text)] md:text-[1.45rem]">
-            {directoryLead(item)}
-          </div>
           <div className="public-list-row-meta mt-4">{directoryMeta(item)}</div>
         </div>
         <div className="public-list-row-company min-w-0">
           <div className="grid grid-cols-[3.25rem_minmax(0,1fr)] items-start gap-3 sm:grid-cols-[4rem_minmax(0,1fr)]">
             {media}
             <div className="min-w-0">
-              {item.subtitle ? (
+              {item.subtitle && item.subtitle !== item.title ? (
                 <div className="flex min-w-0 flex-wrap items-center gap-2 text-[1.05rem] font-semibold leading-7 text-[var(--text)]">
                   <span className="min-w-0 break-words">{item.subtitle}</span>
                   {item.isVerified ? (
@@ -114,7 +105,7 @@ export function DirectoryListRow({
                   ) : null}
                 </div>
               ) : null}
-              <div className={cn('text-[15px] leading-7 text-[var(--muted)]', item.subtitle ? 'mt-3' : '')}>
+              <div className={cn('text-[15px] leading-7 text-[var(--muted)]', item.subtitle && item.subtitle !== item.title ? 'mt-3' : '')}>
                 {directoryDescription(item)}
               </div>
             </div>

@@ -33,7 +33,7 @@ export function HelpfulTips() {
       <div className="container">
         <h3 className="text-base font-bold leading-tight text-[var(--text)]">Полезные советы</h3>
         <p className="mt-1 max-w-lg text-xs leading-5 text-[var(--muted)]">
-          Практические рекомендации для точного расчёта себестоимости и управления ценами в кофейне.
+          Практические рекомендации для точного расчёта себестоимости.
         </p>
         <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {TIPS.map((tip) => (

@@ -63,7 +63,7 @@ export function ConsultingRequestForm({ enabled, utm, cities, defaults = {}, dir
           <div className="relative border-b border-[var(--editorial-dark-border)] bg-[var(--editorial-dark-surface)] px-5 py-6 text-[var(--editorial-dark-text)] md:px-6 md:py-7 lg:border-b-0 lg:border-r lg:border-[var(--editorial-dark-border)]">
             <PublicEyebrow tone="inverse">Экспертная помощь</PublicEyebrow>
             <PublicDisplayTitle as="h3" className="mt-3 text-white" size="card">
-              Разбор задачи без календаря и оплаты на сайте
+              Разбор задачи и определение последующих действий 
             </PublicDisplayTitle>
             <PublicBodyText className="mt-4 max-w-md" tone="inverse">
               Опишите, что нужно разобрать. После заявки уточним формат консультации и специалиста.

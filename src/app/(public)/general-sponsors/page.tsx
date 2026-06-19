@@ -159,7 +159,7 @@ export default async function GeneralSponsorsPage() {
         breadcrumbs={[{ label: 'Спонсорство' }]}
         eyebrow="Спонсорство BARSYNERGY"
         title="Бренд рядом с профессией"
-        subtitle="Поддержите события, обучение и материалы для барной индустрии СКФО. Формат, период и места размещения обсуждаем отдельно."
+        subtitle="Присутствие бренда внутри профессиональной среды: на страницах событий, в материалах, Telegram-анонсах, карточках партнёров и сезонных проектах. Формат и период обсуждаем отдельно."
         tone="graphite"
         actions={[
           { label: 'Запросить условия сотрудничества', href: '/contacts?topic=sponsorship#contact-form', kind: 'primary' },

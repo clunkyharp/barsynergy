@@ -176,7 +176,7 @@ export function ContactApplicationForm({ enabled, utm, cities, defaultTopic, def
     <EditorialShell className="p-5 md:p-6">
       <h3 className="text-lg font-semibold leading-7">Форма сейчас закрыта</h3>
       <p className="mt-3 text-sm leading-7 text-[var(--muted)]">
-        Если вопрос срочный, напишите в Telegram команды.
+        Если вопрос срочный, напишите нам в Telegram.
       </p>
       <Button className="mt-6 rounded-[var(--radius-md)] sm:self-start" href="https://t.me/barsynergy" size="lg" variant="secondary">
         Написать в Telegram

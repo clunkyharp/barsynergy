@@ -121,7 +121,7 @@ export function CalculatorResultRail({
             </Button>
             {copyState === 'failed' ? (
               <p className="mt-1.5 text-xs leading-5 text-[var(--danger)]">
-                Не удалось скопировать автоматически. Выделите итог вручную.
+                Не удалось скопировать.
               </p>
             ) : null}
           </div>

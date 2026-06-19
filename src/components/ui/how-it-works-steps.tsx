@@ -18,16 +18,16 @@ export function HowItWorksSteps({ steps, columns = 4 }: HowItWorksStepsProps) {
   }[columns];
 
   return (
-    <div className={`grid gap-px overflow-hidden rounded-[var(--radius-md)] bg-[var(--background)] ${gridClass}`}>
+    <div className={`grid gap-3 ${gridClass}`}>
       {steps.map((step, i) => (
         <div
-          className="relative flex flex-col gap-3 border border-[var(--line)] bg-[var(--surface-card)] px-5 py-6"
+          className="flex flex-col gap-3 rounded-[var(--radius-md)] border border-[var(--line)] bg-[var(--surface-card)] px-5 py-6"
           key={step.title}
         >
-          <span className={`${displayFont.className} text-[2.2rem] font-bold leading-none text-[var(--accent)] opacity-60 tabular-nums`}>
-            {(i + 1).toString().padStart(2, '0')}
+          <span aria-hidden="true" className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[var(--accent)]/30 bg-[var(--surface-wash)] text-[13px] font-semibold tracking-[var(--tracking-eyebrow-sm)] text-[var(--accent)] tabular-nums">
+            {i + 1}
           </span>
-          <h3 className={`${displayFont.className} text-[1rem] font-semibold leading-tight text-[var(--text)]`}>{step.title}</h3>
+          <h3 className={`${displayFont.className} text-[1.05rem] font-semibold leading-tight text-[var(--text)]`}>{step.title}</h3>
           <p className="text-[13px] leading-5 text-[var(--muted)]">{step.description}</p>
         </div>
       ))}
