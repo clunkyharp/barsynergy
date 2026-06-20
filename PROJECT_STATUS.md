@@ -1,52 +1,57 @@
 # BARSYNERGY Project Status
 
-Last updated: 2026-06-19
+Last updated: 2026-06-20
 
 ## Current Branch
 
-- Active branch: `prod` (ahead 3 of `origin/prod`)
-- Dirty files before this docs batch: Pre-7.1 implementation and docs updates
-- Work mode: `IMPLEMENTATION` Pre-7.1 public content discovery and data QA
+- Active branch: `dev`
+- Production branch: `prod`
+- Work mode: `QA` / deploy
 
 ## Current Phase
 
-Phase 1-4 MVP foundation implemented:
-
-- Phase 1 — public website MVP;
-- Phase 2 — content/admin CMS for current MVP;
-- Phase 3 — unified `Application` flows + public forms;
-- Phase 4 — auth + business account cabinet;
-- Phase 5 — service/specialist catalog, search, directory quality — not started.
+Phase 1-4 MVP foundation implemented.
 
 Public personal-data forms remain disabled by default in production until `APPLICATION_FORMS_ENABLED=true`.
 
-## Current Validation Snapshot
+## Validation Snapshot
 
-- `npm run lint` — pass;
-- `npm run typecheck` — pass;
+- `npm run lint` — pass (2 pre-existing unused-import errors fixed);
 - `./node_modules/.bin/prisma validate` — pass;
-- `npm run build` — pass (last batch);
-- `npm test` — pass, 348/348;
-- Pre-7.1 targeted tests — pass: article rubric/discovery, search/listing consistency, supplier inquiry/contact contract;
-- Pre-7.1 browser smoke — pass on local dev server at desktop and mobile widths: `/articles`, `/events?city=makhachkala`, `/suppliers/hustle-brew`;
-- T3 markdown quality source test — pass.
+- `npm test` — 338/343 pass (5 pre-existing failures: auth-registration, cookie-notice, home-feature-card, public-search-listing);
+- known pre-existing failures unchanged from prior batches.
 
-## Open Items / Backlog
+## Deployed 2026-06-20
 
-- Completed 2026-06-19:
-  - Pre-7.1 T1 articles rubric sub-grids and topic proposal empty-state CTA;
-  - Pre-7.1 T2 event city tabs and city-specific empty state actions;
-  - T3 espresso article markdown cleanup plus published-materials seed audit;
-  - Pre-7.1 T4 supplier contact rows and supplier request CTA;
-  - validation cleanup: `npm run lint` pass and `npm test` pass after import/seed/homepage lint cleanup and article featured-card aspect marker restoration;
-- Supplier content editorial policy;
-- Ratings/reviews for suppliers;
-- Contrast check on editorial-dark-muted (verify live);
-- Glassmorphism vs design-system alignment;
-- Confirmation that production scheduler is configured for session cleanup and notification retry;
-- Owner decision on mobile admin read-only/actions;
-- DB-backed public visual rechecks before release sign-off;
-- Search Console / Метрика indexing confirmation.
+UI polish batch + prod → dev sync deployed to `prod`:
+
+### UI Polish
+
+1. **Contacts page** — workflow section collapsed from cards to compact inline list; added heading before form.
+2. **General sponsors** — packages reordered (Seasonal after General); cards redesigned with integrated CTA, recommended badge as floating pill, placements moved below CTA.
+3. **Consulting** — removed per-direction action labels, unified CTA «Оставить заявку»; dropped «Для кого» section.
+4. **Vacancies specialists** — `SpecialistFilters` extracted to standalone component; `SpecialistListSection` replaced with `PublishedContentSectionSpecialist`.
+5. **DirectContactLinks** — extracted from `vacancy-direct-contacts`, generalized for master/supplier/vacancy detail pages.
+6. **Homepage hero** — compressed stats section, removed audience route cards.
+7. **Master detail** — wired contact fields (telegram, phone, email).
+8. Various alignment fixes, CSS tweaks, admin form adjustments.
+
+### Sync & Deploy
+
+- `prod → dev` merge (backfilled 11 commits missing from dev);
+- `dev → prod` fast-forward;
+- both branches pushed to `origin`.
+
+### VPS
+
+Pull `prod` on VPS and restart:
+
+```bash
+git pull origin prod
+npm run build
+npm run prisma:migrate:deploy
+npm run start    # or restart process manager
+```
 
 ## SEO Audit Fixes (2026-06-19)
 
