@@ -1,4 +1,12 @@
 import { Fragment, type ReactNode } from 'react';
+
+function pluralRu(n: number, [one, few, many]: [string, string, string]): string {
+  const mod10 = n % 10;
+  const mod100 = n % 100;
+  if (mod10 === 1 && mod100 !== 11) return one;
+  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 10 || mod100 >= 20)) return few;
+  return many;
+}
 import { ArrowUpRight } from 'lucide-react';
 import { PublicDisplayTitle } from '@/components/public/public-primitives';
 import { Button } from '@/components/ui/button';
@@ -10,7 +18,9 @@ import { DefaultListRow } from './published-content-row-default';
 import { DirectoryListRow } from './published-content-row-directory';
 import { OpportunityListRow } from './published-content-row-opportunity';
 import { CourseListRow } from './published-content-row-course';
+import { SpecialistCard } from './specialist-card';
 import { ContentSubscribeForm } from '@/components/public/content-subscribe-form';
+import type { SpecialistCardItem } from '@/lib/public/content';
 import {
   pageHref,
   buildEmptyActions,
@@ -44,6 +54,7 @@ type PublishedContentSectionProps = {
   }>;
   filters?: ReactNode;
   countLabel?: string;
+  countForms?: [string, string, string];
   listLabel?: string;
   listAction?: {
     href: string;
@@ -54,6 +65,9 @@ type PublishedContentSectionProps = {
   rowActionLabel?: string;
   showSidebarTitle?: boolean;
   subscribeTopic?: string;
+  resetHref?: string;
+  ignoredParamKeys?: string[];
+  backgroundZone?: 'ivory' | 'graphite';
 };
 
 function PublishedContentSectionLayout({
@@ -71,26 +85,33 @@ function PublishedContentSectionLayout({
   secondaryEmptyActions = [],
   filters,
   countLabel = 'Найдено',
+  countForms,
   listLabel = 'Список',
   listAction,
   sortLabel,
   showSidebarTitle = true,
   subscribeTopic,
+  resetHref,
+  ignoredParamKeys,
+  backgroundZone = 'ivory',
   renderRow,
   listClassName
 }: PublishedContentSectionProps & { renderRow: (item: PublishedContentList['items'][number]) => ReactNode; listClassName?: string }) {
   const visibleItems = content.items.filter((item) => !excludedItemIds.includes(item.id));
   const resolvedEmptyActions = emptyActions ?? (emptyAction ? [emptyAction] : []);
-  const hasActiveFilters = Object.keys(content.params).length > 0;
-  const activeParamCount = Object.keys(content.params).filter((k) => !['page', 'sort', 'pageSize'].includes(k)).length;
+  const ignored = ignoredParamKeys ?? ['page', 'sort', 'pageSize'];
+  const activeParamCount = Object.keys(content.params).filter((k) => !ignored.includes(k)).length;
+  const hasActiveFilters = activeParamCount > 0;
+  const resetBase = resetHref ?? basePath;
   const noResultsTitle = hasActiveFilters ? 'По этим параметрам ничего не найдено' : emptyTitle;
   const noResultsDescription = hasActiveFilters
     ? 'Сбросьте фильтры или измените запрос.'
     : emptyDescription;
-  const emptyStateActions = buildEmptyActions(basePath, hasActiveFilters, resolvedEmptyActions);
+  const emptyStateActions = buildEmptyActions(resetBase, hasActiveFilters, resolvedEmptyActions);
+  const resolvedCountLabel = countForms ? pluralRu(content.total, countForms) : countLabel.toLowerCase();
   const listToolbar = (
     <div className="public-catalog-toolbar flex flex-wrap items-center justify-between gap-3">
-      <span className="text-sm text-[var(--muted)]">{content.total} {countLabel.toLowerCase()}</span>
+      <span className="text-sm text-[var(--muted)]">{content.total} {resolvedCountLabel}</span>
       <div className="flex items-center gap-3">
         {sortLabel ? (
           <span className="text-xs text-[var(--muted)]">↓ {sortLabel}</span>
@@ -98,7 +119,7 @@ function PublishedContentSectionLayout({
         {activeParamCount > 0 ? (
           <a
             className="text-xs font-semibold text-[var(--accent)] transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] hover:text-[var(--accent-strong)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
-            href={basePath}
+            href={resetBase}
           >
             Сбросить
           </a>
@@ -116,7 +137,7 @@ function PublishedContentSectionLayout({
   return (
     <section
       aria-label={showSidebarTitle ? undefined : title}
-      className="public-catalog-section background-zone background-zone-ivory editorial-grid border-b border-[var(--line)] py-8 md:py-14"
+      className={`public-catalog-section background-zone background-zone-${backgroundZone} editorial-grid border-b border-[var(--line)] py-8 md:py-14`}
       id={sectionId}
     >
       {showSidebarTitle ? (
@@ -131,7 +152,7 @@ function PublishedContentSectionLayout({
       ) : null}
       <div className="public-catalog-layout container grid gap-6 md:gap-8 xl:grid-cols-[minmax(16rem,0.48fr)_minmax(0,1.52fr)] xl:items-start xl:gap-8">
         <aside className="public-catalog-sidebar min-w-0 xl:self-stretch">
-          <div className="xl:sticky xl:top-24 xl:max-h-[calc(100dvh-8rem)] xl:overflow-y-auto">
+          <div className="xl:sticky xl:top-14 xl:max-h-[calc(100dvh-5rem)] xl:overflow-y-auto">
             {filters}
           </div>
         </aside>
@@ -161,7 +182,7 @@ function PublishedContentSectionLayout({
               {listToolbar}
             </div>
             <Panel className="public-catalog-list-panel min-w-0 overflow-hidden rounded-t-none border-t-0 border-[var(--border-default)] bg-[var(--surface-card)]" padding="none">
-              <div className={cn('public-catalog-list-rows', listClassName ?? 'divide-y divide-[var(--line)] border-y border-[var(--line)] md:flex md:flex-col md:gap-4 md:divide-y-0 md:border-y-0')}>
+              <div className={cn('public-catalog-list-rows pt-8', listClassName ?? 'divide-y divide-[var(--line)] border-y border-[var(--line)] md:flex md:flex-col md:gap-4 md:divide-y-0 md:border-y-0')}>
                 {visibleItems.map((item) => <Fragment key={item.id}>{renderRow(item)}</Fragment>)}
               </div>
 
@@ -259,6 +280,21 @@ export function PublishedContentSectionCourse(props: PublishedContentSectionProp
           actionLabel={props.rowActionLabel ?? 'Записаться'}
           basePath={props.basePath}
           item={item}
+        />
+      )}
+    />
+  );
+}
+
+export function PublishedContentSectionSpecialist(props: PublishedContentSectionProps) {
+  return (
+    <PublishedContentSectionLayout
+      {...props}
+      listClassName="flex flex-col gap-3 md:gap-4"
+      renderRow={(item) => (
+        <SpecialistCard
+          item={item as SpecialistCardItem}
+          rowActionLabel={props.rowActionLabel}
         />
       )}
     />

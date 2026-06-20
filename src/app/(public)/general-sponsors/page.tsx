@@ -60,19 +60,6 @@ const packageLevels = [
     recommended: false
   },
   {
-    packageName: 'Сезонный партнёр',
-    scope: 'Участие в серии событий сезона.',
-    periodLabel: 'Сезонная серия',
-    placements: [
-      'Всё из пакета события',
-      'Логотип на событиях сезона',
-      '2 публикации в соцсетях',
-      'Упоминание в email-рассылке'
-    ],
-    requiredAssets: 'Логотип, описание бренда, сезонная тема, материалы для анонсов.',
-    recommended: false
-  },
-  {
     packageName: 'Генеральный спонсор',
     scope: 'Главная партнёрская позиция на сезон.',
     periodLabel: 'Сезон / по договорённости',
@@ -84,6 +71,19 @@ const packageLevels = [
     ],
     requiredAssets: 'Логотип, бренд-гайд, контакты, тема размещения и материалы.',
     recommended: true
+  },
+  {
+    packageName: 'Сезонный партнёр',
+    scope: 'Участие в серии событий сезона.',
+    periodLabel: 'Сезонная серия',
+    placements: [
+      'Всё из пакета события',
+      'Логотип на событиях сезона',
+      '2 публикации в соцсетях',
+      'Упоминание в email-рассылке'
+    ],
+    requiredAssets: 'Логотип, описание бренда, сезонная тема, материалы для анонсов.',
+    recommended: false
   }
 ] as const;
 
@@ -278,33 +278,27 @@ export default async function GeneralSponsorsPage() {
             <h2 className={`${displayFont.className} mt-4 text-[clamp(2.4rem,4.2vw,4.2rem)] font-semibold leading-[0.96] text-[var(--text)]`}>
               Выберите формат
             </h2>
+            <p className="mx-auto mt-5 max-w-xl text-base leading-7 text-[var(--muted)]">
+              Три уровня присутствия бренда — от поддержки отдельного события до главной партнёрской позиции на сезон. Формат и период обсуждаем индивидуально.
+            </p>
           </div>
 
-          <div className="grid gap-4 md:grid-cols-3">
+          <div className="grid items-stretch gap-4 md:grid-cols-3">
             {packageLevels.map((pkg, index) => (
               <article
                 className={cn(
-                  'flex flex-col rounded-[var(--radius-lg)] border p-6 md:p-7',
+                  'relative flex flex-col rounded-[var(--radius-lg)] border',
                   pkg.recommended
-                    ? 'relative border-[var(--accent)]/50 bg-gradient-to-b from-[var(--accent)]/[0.08] via-[var(--accent)]/[0.02] to-transparent shadow-[0_0_24px_-6px_var(--accent)]'
-                    : 'border-[var(--border-default)] bg-[var(--surface-card)] shadow-[var(--shadow-card)] hover:border-[var(--accent)]/20 hover:shadow-[var(--shadow-panel)] transition-[border-color,box-shadow] duration-[var(--motion-duration-base)]'
+                    ? 'z-10 border-[var(--accent)] bg-[var(--accent-soft)] p-6 pt-9 shadow-[0_18px_50px_-12px_var(--accent)] md:-my-4 md:p-8 md:pt-10'
+                    : 'border-[var(--border-default)] bg-[var(--surface-card)] p-6 shadow-[var(--shadow-card)] transition-[border-color,box-shadow] duration-[var(--motion-duration-base)] hover:border-[var(--accent)]/20 hover:shadow-[var(--shadow-panel)] md:p-7'
                 )}
                 key={index}
               >
                 {pkg.recommended ? (
-                  <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1 rounded-t-[var(--radius-lg)] bg-[var(--accent)]" />
+                  <span className="absolute -top-3 left-1/2 inline-flex -translate-x-1/2 items-center whitespace-nowrap rounded-full border border-[var(--accent)] bg-[var(--accent)] px-3.5 py-1 text-[11px] font-bold uppercase tracking-[0.1em] text-[var(--accent-contrast)] shadow-sm">
+                    Главный формат
+                  </span>
                 ) : null}
-                <span
-                  className={cn(
-                    'mb-4 inline-flex w-fit items-center rounded-full border px-3 py-0.5 text-[11px] font-semibold uppercase tracking-[0.1em]',
-                    pkg.recommended
-                      ? 'border-[var(--accent)]/30 bg-[var(--accent)]/10 text-[var(--accent)]'
-                      : 'border-transparent opacity-0'
-                  )}
-                  aria-hidden={!pkg.recommended}
-                >
-                  Главный формат
-                </span>
 
                 <div>
                   <h3 className={`${displayFont.className} text-[2rem] font-semibold leading-none text-[var(--text)] md:text-[2.2rem]`}>
@@ -315,49 +309,47 @@ export default async function GeneralSponsorsPage() {
 
                 <div className="my-5 border-t border-[var(--line)]" />
 
-                <div className="mb-1">
+                <div>
                   <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-[var(--muted)]">Период</p>
                   <p className={`${displayFont.className} mt-1.5 text-[1.6rem] font-semibold leading-[1.1] text-[var(--text)]`}>
                     {pkg.periodLabel}
                   </p>
                 </div>
 
+                <div className="mt-6">
+                  <Button
+                    className={cn(
+                      'w-full rounded-[var(--radius-md)]',
+                      !pkg.recommended &&
+                        'border-[var(--border-strong)] bg-transparent text-[var(--text)] hover:border-[var(--accent)]/30 hover:bg-[var(--surface-wash)]'
+                    )}
+                    href={`/contacts?topic=sponsorship&partnerType=${encodeURIComponent(pkg.packageName)}#contact-form`}
+                    variant={pkg.recommended ? 'primary' : 'secondary'}
+                  >
+                    Запросить условия
+                  </Button>
+                </div>
+
                 <div className="my-5 border-t border-[var(--line)]" />
 
-                <div className="flex-1">
-                  <ul className="grid gap-3">
-                    {pkg.placements.map((item) => (
-                      <li className="flex items-center gap-2.5 text-sm leading-[1.5] text-[var(--text)]" key={item}>
-                        <Check
-                          className={cn('shrink-0', pkg.recommended ? 'text-[var(--accent)]' : 'text-[var(--text)]')}
-                          size={14}
-                          strokeWidth={2.5}
-                        />
-                        <span>{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                <div className="mt-7">
-                  {pkg.recommended ? (
-                    <Button
-                      className="w-full rounded-[var(--radius-md)]"
-                      href={`/contacts?topic=sponsorship&partnerType=${encodeURIComponent(pkg.packageName)}#contact-form`}
-                      variant="primary"
-                    >
-                      Запросить условия
-                    </Button>
-                  ) : (
-                    <Button
-                      className="w-full rounded-[var(--radius-md)] border-[var(--border-strong)] bg-transparent text-[var(--text)] hover:border-[var(--accent)]/30 hover:bg-[var(--surface-wash)]"
-                      href={`/contacts?topic=sponsorship&partnerType=${encodeURIComponent(pkg.packageName)}#contact-form`}
-                      variant="secondary"
-                    >
-                      Запросить условия
-                    </Button>
-                  )}
-                </div>
+                <ul className="grid flex-1 gap-3">
+                  {pkg.placements.map((item) => (
+                    <li className="flex items-center gap-2.5 text-sm leading-[1.5] text-[var(--text)]" key={item}>
+                      <span
+                        aria-hidden="true"
+                        className={cn(
+                          'grid size-5 shrink-0 place-items-center rounded-full',
+                          pkg.recommended
+                            ? 'bg-[var(--accent)] text-[var(--accent-contrast)]'
+                            : 'bg-[var(--accent-soft)] text-[var(--accent)]'
+                        )}
+                      >
+                        <Check size={12} strokeWidth={3} />
+                      </span>
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
               </article>
             ))}
           </div>

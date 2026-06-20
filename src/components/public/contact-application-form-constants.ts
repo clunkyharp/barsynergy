@@ -26,6 +26,8 @@ export const contactMethods: ContactMethod[] = [
     href: "https://t.me/barsynergy",
     actionLabel: "Перейти в telegram",
     tone: "telegram",
+    descriptor: "Новости, анонсы и обновления платформы.",
+    helper: "Публикуем первыми",
   },
   {
     mark: "WA",
@@ -34,6 +36,8 @@ export const contactMethods: ContactMethod[] = [
     href: `https://wa.me/${SUPPORT_WHATSAPP.replace(/[^\d]/g, "")}`,
     actionLabel: "Написать в whatsapp",
     tone: "whatsapp",
+    descriptor: "Связь в мессенджере — кому так удобнее.",
+    helper: "Ответ в течение дня",
   },
   {
     mark: "IG",
@@ -42,8 +46,8 @@ export const contactMethods: ContactMethod[] = [
     href: "https://instagram.com/barsynergy",
     actionLabel: "Открыть профиль",
     tone: "instagram",
-    descriptor: "Актуальные материалы, события и анонсы.",
-    helper: "Ответ — в течение дня",
+    descriptor: "Пишите в Директ — удобно с телефона.",
+    helper: "Ответ в течение дня",
   },
   {
     mark: "EM",
@@ -52,7 +56,7 @@ export const contactMethods: ContactMethod[] = [
     href: `mailto:${SUPPORT_EMAIL}`,
     actionLabel: "Написать письмо",
     tone: "neutral",
-    descriptor: "Для документов, договоров и подробных запросов с вложениями.",
+    descriptor: "Документы, договоры и подробные запросы.",
     helper: "До 1 рабочего дня",
   },
 ];

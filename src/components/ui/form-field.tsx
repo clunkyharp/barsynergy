@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils';
 
 type FormFieldProps = {
   label: string;
+  labelSuffix?: ReactNode;
   htmlFor: string;
   error?: string;
   hint?: string;
@@ -60,7 +61,7 @@ export function FieldSuccess({ children, className, id }: { children: ReactNode;
   );
 }
 
-export function FormField({ label, htmlFor, error, hint, className, labelClassName, labelSize, children, required, success }: FormFieldProps) {
+export function FormField({ label, labelSuffix, htmlFor, error, hint, className, labelClassName, labelSize, children, required, success }: FormFieldProps) {
   const errorId = `${htmlFor}-error`;
   const hintId = `${htmlFor}-hint`;
   const successId = `${htmlFor}-success`;
@@ -85,7 +86,7 @@ export function FormField({ label, htmlFor, error, hint, className, labelClassNa
 
   return (
     <div className={cn('form-field', className)} data-state={error ? 'error' : success ? 'success' : undefined}>
-      <FieldLabel className={labelClassName} htmlFor={htmlFor} required={isRequired} size={labelSize}>{label}</FieldLabel>
+      <FieldLabel className={cn('inline-flex items-center gap-1.5', labelClassName)} htmlFor={htmlFor} required={isRequired} size={labelSize}>{label}{labelSuffix ?? null}</FieldLabel>
       {field}
       <div className="field-message-slot">
         {error

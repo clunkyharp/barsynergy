@@ -187,7 +187,7 @@ export default async function BusinessPage({ searchParams }: BusinessPageProps) 
       {/* Benefits */}
       <section className="home-services-section background-zone background-zone-beige border-b border-[var(--line)] py-12 md:py-16">
         <div className="container grid gap-8 xl:grid-cols-[minmax(18rem,0.54fr)_minmax(0,1.46fr)]">
-          <div className="min-w-0 xl:self-start">
+          <div className="min-w-0 xl:self-center">
             <div className="min-w-0">
               <PublicEyebrow>Польза</PublicEyebrow>
               <PublicDisplayTitle className="mt-4 max-w-[13ch]">Что получите</PublicDisplayTitle>

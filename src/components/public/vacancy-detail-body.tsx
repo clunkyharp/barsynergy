@@ -1,6 +1,6 @@
 import { ArticleBodyContent } from '@/components/public/article-body-content';
 import { EditorialShell } from '@/components/ui/editorial-shell';
-import { VacancyDirectContacts } from '@/components/public/vacancy-direct-contacts';
+import { DirectContactLinks } from '@/components/public/direct-contact-links';
 
 type VacancyDetailBodyProps = {
   body?: string;
@@ -46,7 +46,7 @@ export function VacancyDetailBody({
                 </div>
                 {hasDirectContact ? (
                   <div className="px-5 pb-4 pt-4">
-                    <VacancyDirectContacts
+                    <DirectContactLinks
                       telegram={contactDirect!.telegram}
                       phone={contactDirect!.phone}
                       email={contactDirect!.email}

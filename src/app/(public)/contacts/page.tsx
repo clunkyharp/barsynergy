@@ -129,6 +129,20 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
         density="compact"
       />
       <ContactChannels />
+
+      <section className="border-b border-[var(--line)] bg-[var(--surface)] py-12 md:py-16">
+        <div className="container">
+          <div className="mx-auto max-w-2xl text-center">
+            <h2 className={`${displayFont.className} text-[1.9rem] font-semibold leading-[1.1] text-[var(--text)] md:text-[2.4rem]`}>
+              Напишите нам
+            </h2>
+            <p className="mt-4 text-sm leading-7 text-[var(--muted)] md:text-base">
+              Вопросы, обратная связь, партнёрства и сотрудничество — заполните форму ниже, и мы ответим в течение рабочего дня.
+            </p>
+          </div>
+        </div>
+      </section>
+
       <ContactPlatformDisclosure defaultOpen={Boolean(defaultTopic)}>
         <ContactApplicationForm
           defaultTopic={defaultTopic}
@@ -140,41 +154,20 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
         />
       </ContactPlatformDisclosure>
 
-      <section className="border-b border-[var(--line)] bg-[var(--surface)] py-12 md:py-16">
+      <section className="border-b border-[var(--line)] bg-[var(--surface)] py-6">
         <div className="container">
-          <div className="mx-auto max-w-5xl">
-            <div className="flex flex-wrap items-end justify-between gap-4">
-              <div>
-                <p className="text-[11px] font-semibold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--accent)]">
-                  Как мы работаем
-                </p>
-                <h2 className={`${displayFont.className} mt-2 text-[1.7rem] font-semibold leading-[1.1] text-[var(--text)] md:text-[2.1rem]`}>
-                  Чего ждать после сообщения
-                </h2>
-              </div>
-              <p className="max-w-sm text-sm leading-6 text-[var(--muted)]">
-                Прозрачные правила: сколько ждать ответа, что приложить, что произойдёт дальше.
-              </p>
-            </div>
-
-            <div className="mt-8 grid gap-4 md:grid-cols-3">
-              {workflowItems.map((item) => {
-                const Icon = item.icon;
-                return (
-                  <article
-                    className="flex h-full flex-col rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--surface-wash)] p-5 md:p-6"
-                    key={item.title}
-                  >
-                    <span className="grid size-11 place-items-center rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--surface)] text-[var(--accent)]">
-                      <Icon aria-hidden="true" size={20} strokeWidth={1.8} />
-                    </span>
-                    <h3 className="mt-4 text-lg font-semibold leading-6 text-[var(--text)]">{item.title}</h3>
-                    <p className="mt-2 text-sm leading-6 text-[var(--muted)]">{item.body}</p>
-                  </article>
-                );
-              })}
-            </div>
-          </div>
+          <ul className="mx-auto flex max-w-5xl flex-wrap items-center gap-x-6 gap-y-3">
+            {workflowItems.map((item, i) => {
+              const Icon = item.icon;
+              return (
+                <li className="flex items-center gap-2 text-sm text-[var(--muted)]" key={item.title}>
+                  {i > 0 && <span aria-hidden="true" className="hidden text-[var(--line)] sm:inline">·</span>}
+                  <Icon aria-hidden="true" className="shrink-0 text-[var(--accent)]" size={15} strokeWidth={1.8} />
+                  <span><span className="font-semibold text-[var(--text)]">{item.title}:</span> {item.body}</span>
+                </li>
+              );
+            })}
+          </ul>
         </div>
       </section>
 

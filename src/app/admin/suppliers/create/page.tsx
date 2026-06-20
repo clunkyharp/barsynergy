@@ -73,8 +73,8 @@ export default async function AdminSuppliersCreatePage() {
                 ))}
               </Select>
             </FormField>
-            <FormField htmlFor="supplier-contactLabel" label="Контакт (имя)" hint="Имя контактного лица. Если несколько, разделяйте точкой с запятой.">
-              <Textarea id="supplier-contactLabel" name="contactLabel" maxLength={160} className="min-h-24" />
+            <FormField htmlFor="supplier-contactLabel" label="Контактное лицо" hint="Только имя. Telegram/телефон — в полях ниже.">
+              <Input id="supplier-contactLabel" name="contactLabel" maxLength={120} />
             </FormField>
             <FormField htmlFor="supplier-contactTelegram" label="Telegram">
               <Input id="supplier-contactTelegram" name="contactTelegram" maxLength={120} placeholder="@username или t.me/..." />

@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowUpRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -41,31 +42,39 @@ export function EditorialFeatured({ card }: { card: HomepageLiveCard }) {
   return (
     <Link
       aria-label={`${card.eyebrow}: ${card.title}`}
-      className="editorial-featured group relative block aspect-[3/2] overflow-hidden rounded-[var(--radius-xl)] border border-white/8 md:aspect-[21/9] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--editorial-dark-surface)]"
+      className="editorial-featured group flex flex-col overflow-hidden rounded-[var(--radius-xl)] border border-white/8 md:flex-row md:min-h-[380px] lg:min-h-[440px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--editorial-dark-surface)]"
       href={card.href}
     >
-      <span
-        aria-hidden="true"
-        className="gpu editorial-featured-media absolute inset-0 bg-cover bg-center transition-transform duration-[var(--motion-duration-media)] ease-[var(--motion-ease-move)] group-hover:scale-[1.015] motion-reduce:transition-none"
-        style={card.imageUrl ? { backgroundImage: `url("${card.imageUrl}")` } : undefined}
-      />
-      <span aria-hidden="true" className="editorial-featured-gradient absolute inset-0" />
+      <span className="relative block aspect-[16/10] shrink-0 overflow-hidden md:aspect-auto md:w-[55%]">
+        {card.imageUrl ? (
+          <Image
+            alt=""
+            aria-hidden="true"
+            className="object-cover transition-transform duration-[var(--motion-duration-media)] ease-[var(--motion-ease-move)] group-hover:scale-[1.015] motion-reduce:transition-none"
+            fill
+            sizes="(max-width: 768px) 100vw, 55vw"
+            src={card.imageUrl}
+          />
+        ) : (
+          <span aria-hidden="true" className="absolute inset-0 bg-gradient-to-br from-[var(--editorial-dark-surface-muted)] to-[var(--editorial-dark-surface)]" />
+        )}
+      </span>
 
-      <span className="editorial-featured-content absolute inset-0 flex flex-col justify-end p-5 md:p-8 lg:p-10">
-        <span className="mb-1.5 block text-[11px] font-semibold uppercase tracking-[var(--tracking-marker)] text-[var(--accent)] md:mb-2">
+      <span className="flex flex-1 flex-col justify-center gap-0 p-6 md:p-8 lg:p-10">
+        <span className="block text-[11px] font-semibold uppercase tracking-[var(--tracking-marker)] text-[var(--accent)]">
           {card.eyebrow}
         </span>
 
-        <h3 className={`${displayFont.className} editorial-featured-headline text-[1.6rem] font-bold leading-[1.05] tracking-[-0.01em] text-[var(--editorial-dark-text)] md:text-[2.2rem] lg:text-[3rem]`}>
+        <h3 className={`${displayFont.className} mt-3 text-[1.6rem] font-bold leading-[1.05] tracking-[-0.01em] text-[var(--editorial-dark-text)] md:text-[2rem] lg:text-[2.6rem]`}>
           {card.title}
         </h3>
 
-        <p className={`${bodyFont.className} editorial-featured-summary mt-3 max-w-[38rem] text-sm leading-[1.6] text-[var(--editorial-dark-muted)] md:mt-4 md:text-[15px]`}>
+        <p className={`${bodyFont.className} mt-3 text-sm leading-[1.65] text-[var(--editorial-dark-muted)] md:text-[15px]`}>
           {card.summary}
         </p>
 
-        <span className="editorial-featured-footer mt-5 flex flex-col gap-3 md:mt-6 md:flex-row md:items-center md:gap-6">
-          <span className="editorial-featured-cta inline-flex w-fit items-center gap-2 rounded-[var(--radius-pill)] border border-[var(--accent)]/50 px-4 py-2 text-sm font-semibold text-[var(--editorial-dark-text)] transition-colors duration-[var(--motion-duration-fast)] group-hover:border-[var(--accent)] group-hover:text-[var(--accent)]">
+        <span className="mt-6 flex flex-col gap-3 md:flex-row md:items-center md:gap-6">
+          <span className="inline-flex w-fit items-center gap-2 rounded-[var(--radius-pill)] border border-[var(--accent)]/50 px-4 py-2 text-sm font-semibold text-[var(--editorial-dark-text)] transition-colors duration-[var(--motion-duration-fast)] group-hover:border-[var(--accent)] group-hover:text-[var(--accent)]">
             {card.actionLabel}
             <ArrowUpRight size={15} strokeWidth={2} />
           </span>

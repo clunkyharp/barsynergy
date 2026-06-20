@@ -1,17 +1,24 @@
 import { ArticleBodyContent } from '@/components/public/article-body-content';
 import { EditorialShell } from '@/components/ui/editorial-shell';
 import type { PublicContentDetailFact } from '@/modules/content/shared/detail-helpers';
+import { DirectContactLinks } from './direct-contact-links';
 
 type MasterDetailBodyProps = {
   body?: string;
   facts: PublicContentDetailFact[];
+  contactLabel?: string;
+  contactTelegram?: string;
+  contactPhone?: string;
+  contactEmail?: string;
   contactRail: React.ReactNode;
 };
 
-export function MasterDetailBody({ body, facts, contactRail }: MasterDetailBodyProps) {
+export function MasterDetailBody({ body, facts, contactLabel, contactTelegram, contactPhone, contactEmail, contactRail }: MasterDetailBodyProps) {
   const hasBody = Boolean(body?.trim());
   const infoFacts = facts.filter((fact) => !['Тип', 'Профиль', 'Статус', 'Категория', 'Город', 'География', 'Контакты'].includes(fact.label));
-  const hasRail = Boolean(contactRail);
+  const hasStructuredContacts = Boolean(contactTelegram || contactPhone || contactEmail);
+  const hasDirectContacts = Boolean(contactLabel || hasStructuredContacts);
+  const hasRail = Boolean(contactRail) || hasDirectContacts;
 
   return (
     <section className="background-zone background-zone-graphite border-b border-[var(--line)] py-9 md:py-12">
@@ -46,12 +53,35 @@ export function MasterDetailBody({ body, facts, contactRail }: MasterDetailBodyP
           {hasRail ? (
             <aside className="scroll-mt-24 xl:self-start" id="master-contact-rail">
               <EditorialShell className="overflow-hidden">
-                <div className="border-b border-[var(--line)] px-5 pb-4 pt-5">
-                  <p className="text-[11px] font-bold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--accent)]">
-                    Запрос мастеру
-                  </p>
-                </div>
-                {contactRail}
+                {hasDirectContacts ? (
+                  <div className="border-b border-[var(--line)] px-5 pb-5 pt-5">
+                    <p className="text-[11px] font-bold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--accent)]">
+                      Контакты мастера
+                    </p>
+                    {contactLabel ? (
+                      <p className="mt-2 text-sm leading-6 text-[var(--text)]">{contactLabel}</p>
+                    ) : null}
+                    {hasStructuredContacts ? (
+                      <div className={contactLabel ? 'mt-4' : 'mt-3'}>
+                        <DirectContactLinks
+                          telegram={contactTelegram}
+                          phone={contactPhone}
+                          email={contactEmail}
+                        />
+                      </div>
+                    ) : null}
+                  </div>
+                ) : null}
+                {contactRail ? (
+                  <>
+                    <div className="border-b border-[var(--line)] px-5 pb-4 pt-5">
+                      <p className="text-[11px] font-bold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--accent)]">
+                        Запрос мастеру
+                      </p>
+                    </div>
+                    {contactRail}
+                  </>
+                ) : null}
               </EditorialShell>
             </aside>
           ) : null}

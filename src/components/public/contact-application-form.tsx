@@ -1,6 +1,7 @@
 'use client';
 
 import { useActionState, useMemo, useState } from 'react';
+import { Send } from 'lucide-react';
 import type { PublicApplicationResult } from '@/lib/applications/public-form-helpers';
 import {
   HiddenUtmFields,
@@ -151,6 +152,15 @@ export function ContactApplicationForm({ enabled, utm, cities, defaultTopic, def
               htmlFor="contactMessage"
               hint={messageHint}
               label={messageLabel}
+              labelSuffix={messageHint ? (
+                <span
+                  aria-hidden="true"
+                  title={messageHint}
+                  className="inline-flex h-4 w-4 cursor-default items-center justify-center rounded-full border border-[var(--border-default)] text-[9px] font-bold leading-none text-[var(--muted)] select-none"
+                >
+                  ?
+                </span>
+              ) : undefined}
             >
               <Textarea id="contactMessage" name="message" required className="min-h-40" maxLength={4000} placeholder={messagePlaceholder} />
             </FormField>
@@ -162,8 +172,9 @@ export function ContactApplicationForm({ enabled, utm, cities, defaultTopic, def
           </ConsentField>
         </div>
         <PublicFormShellFooter note="Отвечаем в течение рабочего дня.">
-          <SubmitButton className="min-h-12 rounded-[var(--radius-md)] px-6 tracking-normal sm:self-start">
+          <SubmitButton className="inline-flex w-full items-center justify-center gap-2 min-h-12 rounded-[var(--radius-md)] px-6 tracking-normal sm:w-auto">
             Отправить сообщение
+            <Send aria-hidden="true" size={14} strokeWidth={1.8} />
           </SubmitButton>
         </PublicFormShellFooter>
         <SubmissionResultDialog

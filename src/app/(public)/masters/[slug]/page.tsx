@@ -101,6 +101,10 @@ export default async function MasterDetailPage({ params, searchParams }: MasterD
       />
       <MasterDetailBody
         body={master.body}
+        contactLabel={master.contactLabel}
+        contactTelegram={master.contactTelegram}
+        contactPhone={master.contactPhone}
+        contactEmail={master.contactEmail}
         contactRail={
           showUserActions ? (
             <MasterInquiryForm

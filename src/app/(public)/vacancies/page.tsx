@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { CategoryType } from '@/modules/content/shared/types';
 import { PageHero } from '@/components/public/page-hero';
 import { PageInfoSection } from '@/components/public/page-info-section';
-import { PublishedContentSectionOpportunity } from '@/components/public/published-content-section';
+import { PublishedContentSectionOpportunity, PublishedContentSectionSpecialist } from '@/components/public/published-content-section';
 import { PublicFilters } from '@/components/public/public-filters';
 import { VacanciesHeroActions } from '@/app/(public)/vacancies/vacancies-hero-actions';
 import { VacanciesViewTabs } from '@/app/(public)/vacancies/vacancies-view-tabs';
@@ -19,7 +19,7 @@ import { JsonLd } from '@/components/seo/json-ld';
 import { buildPublicPageMetadata } from '@/lib/public/metadata';
 import { buildStaticPageBreadcrumbJsonLd } from '@/lib/public/structured-data';
 import { HowItWorksSection } from '@/components/ui/how-it-works-steps';
-import { SpecialistListSection } from './specialist-list-section';
+import { SpecialistFilters } from './specialist-filters';
 
 type VacanciesPageProps = {
   searchParams?: Promise<PublicContentSearchParams>;
@@ -103,10 +103,24 @@ export default async function VacanciesPage({ searchParams }: VacanciesPageProps
           vacanciesCount={directoryCounts.vacancies}
           specialistsCount={directoryCounts.specialists}
         />
-        <SpecialistListSection
+        <PublishedContentSectionSpecialist
+          basePath="/vacancies"
+          resetHref="/vacancies?view=specialists"
+          ignoredParamKeys={['page', 'sort', 'pageSize', 'view', 'mode']}
+          backgroundZone="graphite"
           content={content}
-          filterOptions={filterOptions}
-          params={contentParams}
+          title="Каталог специалистов"
+          listLabel="Специалисты"
+          countForms={['специалист', 'специалиста', 'специалистов']}
+          rowActionLabel="Подробнее"
+          sectionId="specialist-list"
+          emptyTitle="Специалистов пока нет"
+          emptyDescription="Когда появятся первые резюме и предложения услуг, они будут здесь."
+          emptyActions={[
+            { href: '/specialists/svc/new', label: 'Опубликовать резюме', variant: 'primary' },
+            { href: 'https://t.me/barsynergy', label: 'Следить в Telegram' }
+          ]}
+          filters={<SpecialistFilters filterOptions={filterOptions} params={contentParams} />}
         />
       </>
     );
@@ -158,6 +172,7 @@ export default async function VacanciesPage({ searchParams }: VacanciesPageProps
         ]}
         emptyDescription="Открытых вакансий сейчас нет. Подпишитесь на Telegram — публикуем вакансии там первыми."
         emptyTitle="Вакансий пока нет"
+        countForms={['вакансия', 'вакансии', 'вакансий']}
         title="Открытые позиции"
         filters={
           <PublicFilters

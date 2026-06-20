@@ -81,8 +81,8 @@ export function BusinessMasterForm({ action, cities, defaultCityId }: BusinessMa
         <FormField htmlFor="description" label="Подробности">
           <Textarea id="description" name="description" className="min-h-40" required minLength={20} maxLength={4000} rows={6} />
         </FormField>
-        <FormField htmlFor="contactLabel" label="Контакт для заявки">
-          <Input id="contactLabel" name="contactLabel" maxLength={180} placeholder="Например, отдел проектов" />
+        <FormField htmlFor="contactLabel" label="Контактное лицо" hint="Имя или должность.">
+          <Input id="contactLabel" name="contactLabel" maxLength={120} placeholder="Например, отдел проектов" />
         </FormField>
         <ActionRow>
           <SubmitButton className="rounded-[var(--radius-md)]" size="lg">

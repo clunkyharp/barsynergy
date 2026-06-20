@@ -1,7 +1,7 @@
 import { ArticleBodyContent } from '@/components/public/article-body-content';
 import { EditorialShell } from '@/components/ui/editorial-shell';
 import type { PublicContentDetailFact } from '@/modules/content/shared/detail-helpers';
-import { VacancyDirectContacts } from './vacancy-direct-contacts';
+import { DirectContactLinks } from './direct-contact-links';
 
 type SupplierDetailBodyProps = {
   body?: string;
@@ -74,7 +74,7 @@ export function SupplierDetailBody({
                     ) : null}
                     {hasStructuredContacts ? (
                       <div className={contactLabel ? 'mt-4' : 'mt-3'}>
-                        <VacancyDirectContacts
+                        <DirectContactLinks
                           telegram={contactTelegram}
                           phone={contactPhone}
                           whatsapp={contactWhatsapp}

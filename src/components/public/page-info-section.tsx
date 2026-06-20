@@ -38,9 +38,15 @@ export function PageInfoSection({
               <h2 className={cn(displayFont.className, 'mt-2 text-2xl font-semibold text-[var(--text)] md:text-3xl')}>
                 {title}
               </h2>
-              <div className="mt-4 space-y-4 text-sm leading-6 text-[var(--muted)]">
-                {children}
-              </div>
+              <details className="mt-4 group">
+                <summary className="cursor-pointer list-none text-sm font-semibold text-[var(--accent)] hover:underline">
+                  <span className="group-open:hidden">Подробнее о разделе</span>
+                  <span className="hidden group-open:inline">Скрыть</span>
+                </summary>
+                <div className="mt-3 space-y-4 text-sm leading-6 text-[var(--muted)]">
+                  {children}
+                </div>
+              </details>
             </div>
             {sidebarLinks && sidebarLinks.length > 0 ? (
               <div className="rounded-[var(--radius-lg)] border border-[var(--line)] bg-[var(--surface-wash)] p-5">

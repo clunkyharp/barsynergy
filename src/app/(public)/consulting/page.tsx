@@ -40,15 +40,6 @@ const directionDescriptions: Record<(typeof consultingDirectionOptions)[number][
   operational_audit: 'Разбор смен, запасов, скорости сервиса, ошибок и точек контроля.'
 };
 
-const directionActionLabels: Record<(typeof consultingDirectionOptions)[number]['value'], string> = {
-  venue_opening: 'Обсудить открытие',
-  bar_menu: 'Разобрать меню',
-  team_training: 'Описать задачу команды',
-  cost_pricing: 'Проверить расчёт',
-  suppliers_procurement: 'Навести порядок в закупках',
-  operational_audit: 'Заказать аудит'
-};
-
 const directionMeta: Record<
   (typeof consultingDirectionOptions)[number]['value'],
   {
@@ -247,12 +238,8 @@ function ConsultingDirectionCards() {
               <h3 className={`${displayFont.className} home-service-title`}>{direction.title}</h3>
               <p className="home-service-description">{direction.description}</p>
             </div>
-            <div className="home-service-result">
-              <span>Для кого</span>
-              <p>{direction.result}</p>
-            </div>
             <Link className="home-service-card-action" href={getConsultingContactHref({ consultingDirection: direction.value })}>
-              <span>{directionActionLabels[direction.value]}</span>
+              <span>Оставить заявку</span>
               <span className="home-service-card-action-icon" aria-hidden="true">
                 <ArrowUpRight size={15} strokeWidth={1.9} />
               </span>

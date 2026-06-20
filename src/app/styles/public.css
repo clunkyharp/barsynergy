@@ -757,7 +757,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 0.85rem;
-  margin-top: 1rem;
+  margin-top: auto;
   border-radius: var(--radius-pill);
   background: var(--home-service-action-bg);
   padding: 0.55rem 0.62rem 0.55rem 1rem;

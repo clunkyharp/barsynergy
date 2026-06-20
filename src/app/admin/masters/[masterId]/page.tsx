@@ -112,8 +112,8 @@ export default async function AdminMasterEditPage({ params }: AdminMasterEditPag
 
         <AdminCmsSection title="Контакты" description="Способ связи с мастером.">
           <AdminCmsGrid>
-            <FormField htmlFor="master-contactLabel" label="Контакт" hint="Коротко: имя, телефон, Telegram или email.">
-              <Textarea id="master-contactLabel" name="contactLabel" maxLength={160} className="min-h-24" defaultValue={master.contactLabel ?? ''} />
+            <FormField htmlFor="master-contactLabel" label="Контактное лицо" hint="Только имя. Telegram/email — в полях ниже.">
+              <Input id="master-contactLabel" name="contactLabel" maxLength={120} defaultValue={master.contactLabel ?? ''} />
             </FormField>
             <FormField htmlFor="master-contactTelegram" label="Telegram">
               <Input id="master-contactTelegram" name="contactTelegram" maxLength={120} defaultValue={master.contactTelegram ?? ''} />

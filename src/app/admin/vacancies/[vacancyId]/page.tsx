@@ -174,7 +174,7 @@ export default async function AdminVacancyEditPage({ params }: AdminVacancyEditP
 
         <AdminCmsSection title="Контакты для отклика" description="Как кандидату лучше оставить отклик или с кем связаться после просмотра вакансии.">
           <AdminCmsGrid>
-            <FormField htmlFor="vacancy-contactMode" label="Контакт" hint="Например: форма на сайте, Telegram HR, телефон управляющего.">
+            <FormField htmlFor="vacancy-contactMode" label="Контактное лицо" hint="Только имя или должность. Telegram/телефон — в полях ниже.">
               <Input id="vacancy-contactMode" name="contactMode" maxLength={120} defaultValue={vacancy.contactMode ?? ''} />
             </FormField>
             <FormField htmlFor="vacancy-contactTelegram" label="Telegram для связи">

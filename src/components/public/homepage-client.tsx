@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { ArrowUpRight } from 'lucide-react';
-import { HomeHeroRouter, HomeAudienceSection, HomeStatsSection } from './homepage-hero';
+import { HomeHeroRouter } from './homepage-hero';
 import { HomeEventsStrip, EditorialFeatured, EditorialSupportCard } from './homepage-current';
 import { CommunityChannelRows } from './homepage-community';
 import { HomeSponsorLogoStrip } from './homepage-sponsors';
@@ -30,11 +30,7 @@ export function HomepageClient({ data }: HomepageClientProps) {
 
   return (
     <div className="overflow-x-hidden">
-      <HomeHeroRouter />
-
-      <HomeAudienceSection />
-
-      <HomeStatsSection stats={data.stats} />
+      <HomeHeroRouter stats={data.stats} />
 
       <section className="editorial-current-section scroll-mt-28 border-b border-white/8 py-12 md:py-20" data-theme="dark" id="home-fresh">
         <div className="container">

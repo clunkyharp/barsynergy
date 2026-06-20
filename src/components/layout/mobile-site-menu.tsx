@@ -223,9 +223,11 @@ export function MobileSiteMenu({ isOpen, navItems, onOpenChange, user }: MobileS
                       <span className="block text-sm font-semibold text-[var(--editorial-dark-text)] truncate">
                         {user.displayName ?? user.email}
                       </span>
-                      <span className="block text-xs text-[var(--editorial-dark-muted)]">
-                        {user.displayName ? user.email : null}
-                        <span className="inline-flex items-center gap-1 text-[var(--accent)] ml-auto">
+                      <span className="flex items-center gap-2 text-xs text-[var(--editorial-dark-muted)]">
+                        {user.displayName ? (
+                          <span className="min-w-0 truncate">{user.email}</span>
+                        ) : null}
+                        <span className="ml-auto inline-flex shrink-0 items-center gap-1 text-[var(--accent)]">
                           Кабинет <ArrowUpRight size={12} strokeWidth={1.8} />
                         </span>
                       </span>

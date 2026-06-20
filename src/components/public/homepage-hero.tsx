@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { ArrowUpRight, BriefcaseBusiness, UserRound } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import { PublicEyebrow } from "@/components/public/public-primitives";
 import { accentFont, displayFont } from "@/lib/fonts";
 import type { HomepageData } from "@/lib/public/home";
@@ -12,30 +12,7 @@ function pluralRu(n: number, one: string, few: string, many: string): string {
   return many;
 }
 
-const audienceRoutes = [
-  {
-    title: "Я специалист",
-    description:
-      "Вакансии, обучение, события и материалы для роста в кофейной и барной индустрии.",
-    primaryLabel: "Смотреть вакансии",
-    primaryHref: "/vacancies",
-    secondaryLabel: "Создать профиль",
-    secondaryHref: "/auth/register/user",
-  },
-  {
-    title: "У меня компания",
-    description:
-      "Поставщики, вакансии, размещение, партнёрства и инструменты для заведений и брендов.",
-    primaryLabel: "Открыть для бизнеса",
-    primaryHref: "/business",
-    secondaryLabel: "Смотреть поставщиков",
-    secondaryHref: "/suppliers",
-  },
-] as const;
-
-
-
-export function HomeStatsSection({ stats }: { stats: HomepageData["stats"] }) {
+export function HomeHeroRouter({ stats }: { stats: HomepageData["stats"] }) {
   const allItems = [
     {
       value: stats.vacancies,
@@ -43,12 +20,7 @@ export function HomeStatsSection({ stats }: { stats: HomepageData["stats"] }) {
     },
     {
       value: stats.suppliers,
-      label: pluralRu(
-        stats.suppliers,
-        "поставщик",
-        "поставщика",
-        "поставщиков",
-      ),
+      label: pluralRu(stats.suppliers, "поставщик", "поставщика", "поставщиков"),
     },
     {
       value: stats.articles,
@@ -57,79 +29,6 @@ export function HomeStatsSection({ stats }: { stats: HomepageData["stats"] }) {
   ];
   const statItems = allItems.filter((item) => item.value >= 1);
 
-  if (statItems.length < 2) {
-    return null;
-  }
-
-  return (
-    <section className="border-b border-[var(--line)] bg-[var(--surface-wash)] py-8 md:py-10">
-      <div className="container">
-        <p className="text-[10px] font-semibold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--muted)]">
-          Платформа в цифрах
-        </p>
-        <dl className="mt-4 flex flex-wrap gap-x-8 gap-y-4 text-[12px] text-[var(--muted)] md:gap-x-12">
-          {statItems.map((item) => (
-            <div className="flex items-baseline gap-2.5" key={item.label}>
-              <dd
-                aria-label={`${item.value} ${item.label}`}
-                className="order-1 text-[2.4rem] font-bold leading-none tabular-nums text-[var(--text)] md:text-[3rem]"
-              >
-                {item.value}
-              </dd>
-              <dt className="order-2 uppercase tracking-[var(--tracking-eyebrow-sm)] text-[var(--muted)]">
-                {item.label}
-              </dt>
-            </div>
-          ))}
-        </dl>
-      </div>
-    </section>
-  );
-}
-
-export function HomeAudienceSection() {
-  const routes = audienceRoutes;
-
-  return (
-    <section className="border-b border-[var(--line)] bg-[var(--surface-wash)] py-10 md:py-14">
-      <div className="container">
-        <p className="text-[10px] font-semibold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--muted)]">
-          Выберите свою роль
-        </p>
-        <div className="mt-6 grid gap-4 md:grid-cols-2">
-          {routes.map((route) => {
-            const Icon = route.title.includes("специалист") ? UserRound : BriefcaseBusiness;
-            return (
-              <a
-                key={route.title}
-                href={route.primaryHref}
-                className="group block rounded-[var(--radius-lg)] border border-[var(--line)] bg-[var(--surface)] p-5 transition-colors hover:border-[var(--accent)]/24"
-              >
-                <Icon
-                  className="mb-3 text-[var(--accent)]"
-                  size={22}
-                  strokeWidth={1.8}
-                />
-                <h2 className="text-[1.05rem] font-semibold leading-tight text-[var(--text)]">
-                  {route.title}
-                </h2>
-                <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
-                  {route.description}
-                </p>
-                <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--accent)] transition-colors group-hover:text-[var(--accent-strong)]">
-                  {route.primaryLabel}
-                  <ArrowUpRight size={15} strokeWidth={2} />
-                </span>
-              </a>
-            );
-          })}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-export function HomeHeroRouter() {
   return (
     <section
       aria-labelledby="home-hero-title"
@@ -167,6 +66,41 @@ export function HomeHeroRouter() {
             Люди, события, вакансии, поставщики, обучение и материалы СКФО,
             которые помогают работать точнее.
           </p>
+          <div className="mt-8 flex flex-wrap gap-3 max-sm:flex-col max-sm:items-start">
+            <a
+              href="/vacancies"
+              className="inline-flex items-center gap-2 rounded-[var(--radius-md)] bg-[var(--accent)] px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[var(--accent-strong)] max-sm:w-full max-sm:justify-center"
+            >
+              Смотреть вакансии
+              <ArrowUpRight size={15} strokeWidth={2} />
+            </a>
+            <a
+              href="/business"
+              className="inline-flex items-center gap-2 rounded-[var(--radius-md)] border border-white/30 px-5 py-2.5 text-sm font-semibold text-[var(--editorial-dark-text)] transition-colors hover:border-white/60 hover:bg-white/8 max-sm:w-full max-sm:justify-center"
+            >
+              Для бизнеса
+            </a>
+          </div>
+          {statItems.length >= 2 && (
+            <dl className="mt-12 flex flex-wrap gap-x-8 gap-y-4 md:gap-x-12">
+              <p className="w-full text-[10px] font-semibold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--editorial-dark-muted)]">
+                Платформа в цифрах
+              </p>
+              {statItems.map((item) => (
+                <div className="flex items-baseline gap-2.5" key={item.label}>
+                  <dd
+                    aria-label={`${item.value} ${item.label}`}
+                    className="order-1 text-[2.4rem] font-bold leading-none tabular-nums text-[var(--editorial-dark-text)] md:text-[3rem]"
+                  >
+                    {item.value}
+                  </dd>
+                  <dt className="order-2 text-[12px] uppercase tracking-[var(--tracking-eyebrow-sm)] text-[var(--editorial-dark-muted)]">
+                    {item.label}
+                  </dt>
+                </div>
+              ))}
+            </dl>
+          )}
         </div>
       </div>
     </section>

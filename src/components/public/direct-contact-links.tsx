@@ -1,13 +1,13 @@
 import { AppLink } from '@/components/ui/app-link';
 
-type VacancyDirectContactsProps = {
+type DirectContactLinksProps = {
   telegram?: string;
   phone?: string;
   email?: string;
   whatsapp?: string;
 };
 
-function normalizeTelegram(value: string): { type: 'link'; href: string; label: string } | null {
+function normalizeTelegram(value: string): { href: string; label: string } | null {
   const v = value.trim();
   if (!v) return null;
 
@@ -29,7 +29,7 @@ function normalizeTelegram(value: string): { type: 'link'; href: string; label: 
   }
 
   if (!username) return null;
-  return { type: 'link' as const, href: `tg://resolve?domain=${encodeURIComponent(username)}`, label: `@${username}` };
+  return { href: `tg://resolve?domain=${encodeURIComponent(username)}`, label: `@${username}` };
 }
 
 function normalizePhone(value: string): { href: string; label: string } | null {
@@ -50,24 +50,36 @@ function normalizeWhatsapp(value: string): { href: string; label: string } | nul
   return { href: `https://wa.me/${digits}`, label: `WhatsApp ${value.trim()}` };
 }
 
-export function VacancyDirectContacts({ telegram, phone, email, whatsapp }: VacancyDirectContactsProps) {
+function splitField(value: string, pattern: RegExp): string[] {
+  return value.split(pattern).map((s) => s.trim()).filter(Boolean);
+}
+
+export function DirectContactLinks({ telegram, phone, email, whatsapp }: DirectContactLinksProps) {
   const links: { href: string; label: string }[] = [];
 
   if (telegram) {
-    const t = normalizeTelegram(telegram);
-    if (t) links.push(t);
+    for (const t of splitField(telegram, /[;,\n]/)) {
+      const r = normalizeTelegram(t);
+      if (r) links.push(r);
+    }
   }
   if (whatsapp) {
-    const w = normalizeWhatsapp(whatsapp);
-    if (w) links.push(w);
+    for (const w of splitField(whatsapp, /[/;,\n]/)) {
+      const r = normalizeWhatsapp(w);
+      if (r) links.push(r);
+    }
   }
   if (phone) {
-    const p = normalizePhone(phone);
-    if (p) links.push(p);
+    for (const p of splitField(phone, /[/;,\n]/)) {
+      const r = normalizePhone(p);
+      if (r) links.push(r);
+    }
   }
   if (email) {
-    const e = normalizeEmail(email);
-    if (e) links.push(e);
+    for (const e of splitField(email, /[;,\n]/)) {
+      const r = normalizeEmail(e);
+      if (r) links.push(r);
+    }
   }
 
   if (links.length === 0) return null;
