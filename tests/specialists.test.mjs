@@ -15,7 +15,7 @@ test('GET /vacancies?view=specialists — page renders specialist list section',
 
   assert.match(source, /view === 'specialists'/);
   assert.match(source, /getPublishedSpecialists\(contentParams\)/);
-  assert.match(source, /SpecialistListSection/);
+  assert.match(source, /PublishedContentSectionSpecialist/);
   assert.doesNotMatch(source, /notFound\(\)/);
 });
 

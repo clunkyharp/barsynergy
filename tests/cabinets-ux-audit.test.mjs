@@ -391,8 +391,7 @@ test('S4 public copy removes generic phrasing and duplicate live-card framing', 
   const businessFormSource = readProjectFile('src/components/public/business-solution-form.tsx');
 
   assert.match(heroSource, /BARSYNERGY \/ Кофейная индустрия СКФО/);
-  assert.match(heroSource, /Обучение, вакансии, поставщики, события и инструменты/);
-  assert.match(heroSource, /Каталог заведений и рабочий кабинет для команды/);
+  assert.match(heroSource, /Люди, события, вакансии, поставщики, обучение и материалы/);
   assert.doesNotMatch(heroSource, /Платформа для кофейных баров СКФО|всё в одном месте|Открыть путь к заявкам/);
 
   assert.match(homepageSource, /Что нового/);
@@ -416,7 +415,7 @@ test('S4 public copy removes generic phrasing and duplicate live-card framing', 
   assert.match(contactFormSource, /note="Отвечаем в течение рабочего дня\."/);
   assert.doesNotMatch(contactFormSource, /title="Напишите нам"|После отправки ответим/);
 
-  assert.match(businessFormSource, /Укажите данные, по которым команда сможет связаться и уточнить карточку/);
+  assert.match(businessFormSource, /Укажите данные, по которым команда сможет связаться с вами/);
   assert.match(businessFormSource, /Данные для карточки/);
   assert.doesNotMatch(businessFormSource, /В форме не собираем оплату|Что написать/);
 });

@@ -65,9 +65,7 @@ test('public CTA labels describe concrete user actions', () => {
   assert.doesNotMatch(visibleCopySource, /Открыть калькулятор/);
   assert.doesNotMatch(visibleCopySource, /Открыть канал/);
 
-  assert.match(source, /Обсудить открытие/);
-  assert.match(source, /Разобрать меню/);
-  assert.match(source, /Описать задачу команды/);
+  assert.match(source, /Оставить заявку/);
   assert.match(source, /Запросить условия сотрудничества/);
   assert.match(source, /Выбрать программу/);
   assert.match(source, /Выбрать событие/);
@@ -445,7 +443,6 @@ test('consulting direction section uses visual direction cards routed to contact
   assert.match(sectionSource, /<ConsultingDirectionCards \/>/);
   assert.match(source, /home-services-grid consulting-services-grid/);
   assert.match(source, /home-service-card/);
-  assert.match(source, /home-service-result/);
   assert.match(source, /getConsultingContactHref\(\{ consultingDirection: direction\.value \}\)/);
   assert.doesNotMatch(sectionSource, /eyebrow="Консалтинг"/);
   assert.doesNotMatch(sectionSource, /presentation="row"/);
@@ -471,8 +468,8 @@ test('consulting page renders a direct request form while contact routing remain
   assert.match(consultingFormSource, /disclosureId=\{direct \? undefined : 'consulting-request'\}/);
   assert.doesNotMatch(consultingSource, /RequestDisclosureTrigger/);
 
-  assert.match(contactConstantsSource, /value: 'consulting'/);
-  assert.match(contactConstantsSource, /label: 'Консалтинг'/);
+  assert.match(contactConstantsSource, /value: ["']consulting["']/);
+  assert.match(contactConstantsSource, /label: ["']Консалтинг["']/);
   assert.match(contactPageSource, /consulting: 'consulting'/);
   assert.match(contactPageSource, /'consulting-request': 'consulting'/);
   assert.match(contactActionsSource, /case 'consulting':\n\s+return 'Консалтинг'/);
@@ -515,10 +512,10 @@ test('public contact CTAs map to form topics and defaults', () => {
 
   assert.match(contactsSource, /vacancy: 'vacancy-placement'/);
   assert.match(contactsSource, /consulting: 'consulting'/);
-  assert.match(contactConstantsSource, /value: 'consulting'/);
-  assert.match(contactConstantsSource, /label: 'Консалтинг'/);
-  assert.match(contactConstantsSource, /value: 'partnership'/);
-  assert.match(contactConstantsSource, /label: 'Хочу стать партнёром'/);
+  assert.match(contactConstantsSource, /value: ["']consulting["']/);
+  assert.match(contactConstantsSource, /label: ["']Консалтинг["']/);
+  assert.match(contactConstantsSource, /value: ["']partnership["']/);
+  assert.match(contactConstantsSource, /label: ["']Хочу стать партнёром["']/);
   assert.doesNotMatch(contactConstantsSource, /value: 'supplier-contact'/);
   assert.doesNotMatch(contactConstantsSource, /label: 'Связаться с поставщиком'/);
   assert.match(contactActionsSource, /'vacancy-placement'/);

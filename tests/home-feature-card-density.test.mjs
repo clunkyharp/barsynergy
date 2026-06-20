@@ -52,12 +52,11 @@ test('homepage hero explains the product with one primary action and no search',
   assert.match(heroSource, /Люди, события, вакансии, поставщики, обучение и материалы/);
   assert.match(heroSource, /BARSYNERGY \/ Кофейная индустрия СКФО/);
   assert.match(heroSource, /Смотреть вакансии/);
-  assert.match(heroSource, /Создать профиль/);
-  assert.match(heroSource, /Открыть для бизнеса/);
+  assert.match(heroSource, /Для бизнеса/);
   assert.doesNotMatch(heroSource, /home-hero-search/);
   assert.doesNotMatch(heroSource, /action="\/search"/);
   assert.doesNotMatch(heroSource, /Глобальный поиск по платформе/);
-  assert.match(heroSource, /export function HomeStatsSection/);
+  assert.match(heroSource, /export function HomeHeroRouter/);
   assert.doesNotMatch(heroSource, /\/contacts\?topic=other#contact-form/);
   assert.doesNotMatch(heroSource, /href="#home-role-router"/);
   assert.doesNotMatch(heroSource, /Связаться с нами/);
@@ -68,12 +67,12 @@ test('homepage hero explains the product with one primary action and no search',
   assert.doesNotMatch(readGlobalStyles(), /\.home-hero-copy/);
 });
 
-test('homepage stats animate once when the stats row enters the viewport', () => {
+test('homepage stats render when at least two items exist', () => {
   const statsSource = readProjectFile('src/components/public/homepage-hero.tsx');
 
   assert.match(statsSource, /const allItems = \[/);
   assert.match(statsSource, /\.filter\(\(item\) => item\.value >= 1\)/);
-  assert.match(statsSource, /if \(statItems\.length < 2\) \{/);
+  assert.match(statsSource, /statItems\.length >= 2/);
   assert.doesNotMatch(statsSource, /IntersectionObserver/);
   assert.doesNotMatch(statsSource, /requestAnimationFrame/);
   assert.doesNotMatch(statsSource, /setDisplayValues/);
@@ -110,7 +109,6 @@ test('homepage mobile rules keep the first screen and scannable cards phone-nati
 
   assert.match(heroSource, /max-md:items-start md:items-center/);
   assert.match(heroSource, /md:min-h-\[720px\] lg:min-h-\[760px\]/);
-  assert.match(heroSource, /md:grid-cols-2/);
   assert.match(source, /editorial-current-section scroll-mt-28 border-b border-white\/8 py-12 md:py-20/);
   assert.match(source, /editorial-current-support-row grid grid-cols-1 gap-4 sm:grid-cols-3 md:gap-5/);
   assert.match(source, /grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3/);

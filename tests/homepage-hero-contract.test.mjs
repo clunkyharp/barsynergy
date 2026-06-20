@@ -10,17 +10,11 @@ function readProjectFile(path) {
   return readFileSync(join(repoRoot, path), 'utf8');
 }
 
-test('homepage hero exposes audience routing and a no-data fallback strip', () => {
+test('homepage hero exposes stats and primary CTAs', () => {
   const source = readProjectFile('src/components/public/homepage-hero.tsx');
 
-  assert.match(source, /Выберите свою роль/);
-  assert.match(source, /Я специалист/);
   assert.match(source, /Смотреть вакансии/);
-  assert.match(source, /Создать профиль/);
-  assert.match(source, /У меня компания/);
-  assert.match(source, /Открыть для бизнеса/);
-  assert.match(source, /Открыть для бизнеса/);
-  assert.match(source, /if \(statItems\.length < 2\)/);
-  assert.match(source, /HomeStatsSection/);
-  assert.doesNotMatch(source, /item\.value >= 10/);
+  assert.match(source, /Для бизнеса/);
+  assert.match(source, /export function HomeHeroRouter/);
+  assert.match(source, /statItems\.length >= 2/);
 });

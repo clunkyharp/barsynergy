@@ -2,7 +2,7 @@
 
 import { redirect } from 'next/navigation';
 import { cookies } from 'next/headers';
-import { ApplicationStatus, ApplicationType, BusinessAccountStatus, UserRole, UserStatus } from '@prisma/client';
+import { BusinessAccountStatus, UserRole, UserStatus } from '@prisma/client';
 import { Prisma } from '@prisma/client';
 import { z } from 'zod';
 import { getString, nullableString, optionalString } from '@/lib/admin/content-utils';

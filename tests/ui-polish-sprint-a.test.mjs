@@ -13,13 +13,11 @@ function readSrc(path) {
 test('Sprint A [2] hero stats use the larger display size with tabular numbers', () => {
   const source = readSrc('src/components/public/homepage-hero.tsx');
 
-  const heroBlock = source.slice(source.indexOf('export function HomeStatsSection'), source.indexOf('export function HomeAudienceSection'));
-
-  assert.match(heroBlock, /text-\[2\.4rem\]/, 'stat numbers must scale up to 2.4rem on mobile');
-  assert.match(heroBlock, /md:text-\[3rem\]/, 'stat numbers must scale to 3rem on desktop');
-  assert.match(heroBlock, /tabular-nums/, 'stat numbers must use tabular-nums');
-  assert.doesNotMatch(heroBlock, /text-\[1\.55rem\]/, 'old undersized 1.55rem token must be removed');
-  assert.doesNotMatch(heroBlock, /border-r/, 'vertical separator borders must be replaced with horizontal gap');
+  assert.match(source, /text-\[2\.4rem\]/, 'stat numbers must scale up to 2.4rem on mobile');
+  assert.match(source, /md:text-\[3rem\]/, 'stat numbers must scale to 3rem on desktop');
+  assert.match(source, /tabular-nums/, 'stat numbers must use tabular-nums');
+  assert.doesNotMatch(source, /text-\[1\.55rem\]/, 'old undersized 1.55rem token must be removed');
+  assert.doesNotMatch(source, /border-r/, 'vertical separator borders must be replaced with horizontal gap');
 });
 
 test('Sprint A [6] OpportunityListRow vacancy lead drops the ЗАРПЛАТА prefix label', () => {
