@@ -36,8 +36,9 @@ export function MobileCabinetNav({ links }: MobileCabinetNavProps) {
   const pathname = usePathname();
 
   return (
-    <nav aria-label="Навигация по разделам" className="-mx-4 overflow-x-auto border-b border-[var(--line)] px-4 lg:hidden">
-      <div className="flex min-w-max gap-1 pb-1">
+    <nav aria-label="Навигация по разделам" className="border-b border-[var(--line)] lg:hidden">
+      <div className="container overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <div className="flex min-w-max gap-1 py-2">
         {links.map((link) => {
           const isActive =
             link.href === '/profile' || link.href === '/business/cabinet'
@@ -66,6 +67,7 @@ export function MobileCabinetNav({ links }: MobileCabinetNavProps) {
             </AppLink>
           );
         })}
+        </div>
       </div>
     </nav>
   );

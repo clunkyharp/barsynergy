@@ -73,7 +73,7 @@ export function ContentSubscribeForm({
           />
         </div>
         <Button
-          className="min-h-11 shrink-0 rounded-[var(--radius-md)] px-4 text-[12px] uppercase tracking-[0.06em]"
+          className="h-[52px] shrink-0 rounded-[var(--radius-md)] px-4 text-[12px] uppercase tracking-[0.06em]"
           disabled={pending}
           type="submit"
           variant="primary"

@@ -190,8 +190,8 @@ function PublishedContentSectionLayout({
                 {visibleItems.map((item) => <Fragment key={item.id}>{renderRow(item)}</Fragment>)}
               </div>
 
-              <div className="public-catalog-pagination flex flex-wrap items-center justify-between gap-3">
-                {content.totalPages > 1 ? (
+              {content.totalPages > 1 ? (
+                <div className="public-catalog-pagination flex flex-wrap items-center justify-between gap-3">
                   <div className="flex w-full items-center justify-between gap-3">
                     <Button disabled={content.page <= 1} href={pageHref(content, basePath, content.page - 1)} variant="secondary">
                       ← Назад
@@ -201,8 +201,8 @@ function PublishedContentSectionLayout({
                       Вперед →
                     </Button>
                   </div>
-                ) : null}
-              </div>
+                </div>
+              ) : null}
             </Panel>
           </div>
         )}

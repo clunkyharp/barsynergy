@@ -45,3 +45,6 @@ ssh.md
 
 # Framer MCP config (holds API key)
 .mcp.json
+
+# local audit scratch (screenshots, dev log, findings)
+.audit/

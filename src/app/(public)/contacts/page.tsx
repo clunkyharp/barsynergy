@@ -60,7 +60,7 @@ const alternativeRoutes = [
   {
     title: 'Хочу разместить вакансию',
     description: 'Заполните карточку вакансии — она появится в каталоге и попадёт в подборку для специалистов.',
-    href: '/vacancies/new',
+    href: '/contacts?topic=vacancy-placement',
     actionLabel: 'Разместить вакансию',
     accent: 'var(--accent)'
   },

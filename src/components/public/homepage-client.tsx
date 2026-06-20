@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowUpRight } from 'lucide-react';
 import { HomeHeroRouter } from './homepage-hero';
@@ -27,7 +28,14 @@ export function HomepageClient({ data, isAuthenticated = false }: HomepageClient
     imageUrl: '/images/home/current-event-card.png',
     isFallback: true
   };
-  const liveSectionCards = [data.vacancy, data.supplier, data.event, data.course, data.article, materialsCard];
+  const workSections: { title: string; summary: string; href: string; image: string }[] = [
+    { title: 'Вакансии', summary: 'Открытые позиции для бариста, барменов и специалистов индустрии.', href: '/vacancies', image: '/images/home/sections/vacancies.png' },
+    { title: 'Поставщики', summary: 'Каталог поставок: зерно, оборудование, упаковка и сервис.', href: '/suppliers', image: '/images/home/sections/suppliers.png' },
+    { title: 'События', summary: 'Афиша встреч, чемпионатов и отраслевых событий региона.', href: '/events', image: '/images/home/sections/events.png' },
+    { title: 'Обучение', summary: 'Курсы и интенсивы для команд и специалистов кофеен и баров.', href: '/education', image: '/images/home/sections/education.png' },
+    { title: 'Материалы', summary: 'Статьи, гайды и разборы по работе бара и кофейни.', href: '/articles', image: '/images/home/sections/materials.png' },
+    { title: 'Мастера', summary: 'Сервисные команды для запуска и обслуживания техники.', href: '/masters', image: '/images/home/sections/masters.png' }
+  ];
 
   return (
     <div className="overflow-x-hidden">
@@ -76,16 +84,34 @@ export function HomepageClient({ data, isAuthenticated = false }: HomepageClient
             </Button>
           </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {liveSectionCards.map((card, index) => {
+            {workSections.map((section) => {
               return (
-                <EditorialSupportCard
-                  actionLabel={card.actionLabel}
-                  card={card}
-                  density="compact"
-                  fallbackMeta="Рабочий раздел"
-                  key={`${card.kind}-${card.href}-${index}`}
-                  label={card.eyebrow}
-                />
+                <Link
+                  aria-label={`${section.title} — открыть раздел`}
+                  className="work-section-card group flex flex-col overflow-hidden rounded-[var(--radius-lg)] border border-white/8 bg-[var(--editorial-dark-surface-muted)] transition-[border-color,box-shadow] duration-[var(--motion-duration-base)] hover:border-[var(--accent)]/40 hover:shadow-[0_4px_24px_rgba(0,0,0,0.3)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
+                  href={section.href}
+                  key={section.href}
+                >
+                  <span className="relative block aspect-[16/7] overflow-hidden bg-[var(--editorial-dark-surface)]">
+                    <Image
+                      alt=""
+                      aria-hidden="true"
+                      className="object-cover transition-transform duration-[var(--motion-duration-media)] ease-[var(--motion-ease-move)] group-hover:scale-[1.04] motion-reduce:transition-none"
+                      fill
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                      src={section.image}
+                    />
+                  </span>
+                  <span className="flex flex-1 flex-col gap-1.5 p-4">
+                    <p className={`${bodyFont.className} text-[13px] leading-[1.5] text-[var(--editorial-dark-muted)]`}>
+                      {section.summary}
+                    </p>
+                    <span className="mt-auto inline-flex items-center gap-1.5 pt-2 text-[13px] font-semibold text-[var(--accent)] transition-colors duration-[var(--motion-duration-fast)] group-hover:text-[var(--accent-strong)]">
+                      Открыть раздел
+                      <ArrowUpRight size={13} strokeWidth={2} />
+                    </span>
+                  </span>
+                </Link>
               );
             })}
           </div>

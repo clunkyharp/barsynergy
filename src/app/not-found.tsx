@@ -1,6 +1,12 @@
+import type { Metadata } from 'next';
 import { AppLink } from '@/components/ui/app-link';
 import { Button } from '@/components/ui/button';
 import { displayFont } from '@/lib/fonts';
+
+export const metadata: Metadata = {
+  title: 'Страница не найдена',
+  description: 'Запрошенная страница не существует или была удалена.'
+};
 
 const quickLinks = [
   { href: '/vacancies', label: 'Вакансии', description: 'Открытые роли и заявки от заведений.' },
