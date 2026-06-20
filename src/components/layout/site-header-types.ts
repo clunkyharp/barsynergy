@@ -24,7 +24,7 @@ export type NavGroup = {
 export const navGroups = [
   {
     label: 'Платформа',
-    hrefs: ['/education', '/events', '/vacancies', '/vacancies?view=specialists', '/masters', '/suppliers', '/articles', '/tools/cost-calculator']
+    hrefs: ['/education', '/events', '/vacancies', '/masters', '/suppliers', '/articles', '/tools/cost-calculator']
   },
   {
     label: 'Сотрудничество',
@@ -42,7 +42,6 @@ export const guestNavItems: NavItem[] = [
   { label: 'События', href: '/events' },
   { label: 'Материалы', href: '/articles' },
   { label: 'Вакансии', href: '/vacancies' },
-  { label: 'Специалисты', href: '/vacancies?view=specialists' },
   { label: 'Мастера', href: '/masters' },
   { label: 'Поставщики', href: '/suppliers' },
   { label: 'Калькулятор', href: '/tools/cost-calculator' },
@@ -65,7 +64,7 @@ export const desktopPrimaryNavItems = getNavItems(['/education', '/events', '/va
 export const desktopMoreGroups: NavGroup[] = [
   {
     label: 'Инструменты',
-    items: getNavItems(['/vacancies?view=specialists', '/tools/cost-calculator'])
+    items: getNavItems(['/tools/cost-calculator'])
   },
   {
     label: 'Сотрудничество',

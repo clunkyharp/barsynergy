@@ -54,7 +54,7 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
   const isPrelaunchEmpty = isEmpty && !hasActiveSearch;
 
   return (
-    <>
+    <div className="events-directory-page">
       <JsonLd data={buildStaticPageBreadcrumbJsonLd('/events', 'События')} />
 
       <PageHero
@@ -161,6 +161,6 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
           Следите за расписанием, чтобы не пропустить обучающие форматы, конкурсы и встречи кофейного сообщества СКФО.
         </p>
       </PageInfoSection>
-    </>
+    </div>
   );
 }

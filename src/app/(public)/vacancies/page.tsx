@@ -4,7 +4,7 @@ import { PageHero } from '@/components/public/page-hero';
 import { PageInfoSection } from '@/components/public/page-info-section';
 import { PublishedContentSectionOpportunity, PublishedContentSectionSpecialist } from '@/components/public/published-content-section';
 import { PublicFilters } from '@/components/public/public-filters';
-import { VacanciesHeroActions } from '@/app/(public)/vacancies/vacancies-hero-actions';
+import { VacanciesHeroActions, VacanciesHeroStats } from '@/app/(public)/vacancies/vacancies-hero-actions';
 import { VacanciesViewTabs } from '@/app/(public)/vacancies/vacancies-view-tabs';
 import {
   stripPublicApplicationResultParams
@@ -66,7 +66,7 @@ function DirectoryBar({
   specialistsCount: number;
 }) {
   return (
-    <section className="background-zone background-zone-graphite border-b border-[var(--line)] pt-6 pb-6 md:pt-8 md:pb-8">
+    <section className="vacancies-directory-tabs-section background-zone background-zone-graphite border-b border-[var(--line)]">
       <div className="container">
         <VacanciesViewTabs vacanciesCount={vacanciesCount} specialistsCount={specialistsCount} />
       </div>
@@ -88,16 +88,18 @@ export default async function VacanciesPage({ searchParams }: VacanciesPageProps
     ]);
 
     return (
-      <>
+      <div className="vacancies-directory-page">
         <JsonLd data={buildStaticPageBreadcrumbJsonLd('/vacancies', 'Вакансии')} />
         <PageHero
           breadcrumbs={[{ href: '/', label: 'Главная' }, { label: 'Вакансии' }]}
-          title="Вакансии и специалисты"
-          subtitle="Работа, специалисты и проекты для барной индустрии."
+          eyebrow="Работа в кофейной индустрии"
+          title="Специалисты"
+          subtitle="Резюме, услуги и анкеты специалистов для кофеен, баров и ресторанов."
           tone="graphite"
           density="compact"
+          media={{ kind: 'slot', children: <VacanciesHeroActions /> }}
         >
-          <VacanciesHeroActions
+          <VacanciesHeroStats
             vacanciesCount={directoryCounts.vacancies}
             specialistsCount={directoryCounts.specialists}
           />
@@ -124,9 +126,10 @@ export default async function VacanciesPage({ searchParams }: VacanciesPageProps
             { href: '/specialists/svc/new', label: 'Опубликовать резюме', variant: 'primary' },
             { href: 'https://t.me/barsynergy', label: 'Следить в Telegram' }
           ]}
+          showSidebarTitle={false}
           filters={<SpecialistFilters filterOptions={filterOptions} params={contentParams} />}
         />
-      </>
+      </div>
     );
   }
 
@@ -141,16 +144,18 @@ export default async function VacanciesPage({ searchParams }: VacanciesPageProps
   ]);
 
   return (
-    <>
+    <div className="vacancies-directory-page">
       <JsonLd data={buildStaticPageBreadcrumbJsonLd('/vacancies', 'Вакансии')} />
       <PageHero
         breadcrumbs={[{ label: 'Вакансии' }]}
-        title="Вакансии и специалисты"
-        subtitle="Работа, специалисты и проекты для барной индустрии."
+        eyebrow="Работа в кофейной индустрии"
+        title="Вакансии"
+        subtitle="Работа в кофейнях, барах, обжарках и сервисных командах СКФО."
         tone="graphite"
         density="compact"
+        media={{ kind: 'slot', children: <VacanciesHeroActions /> }}
       >
-        <VacanciesHeroActions
+        <VacanciesHeroStats
           vacanciesCount={directoryCounts.vacancies}
           specialistsCount={directoryCounts.specialists}
         />
@@ -203,6 +208,7 @@ export default async function VacanciesPage({ searchParams }: VacanciesPageProps
         sectionId="vacancy-list"
         listLabel="Вакансии индустрии"
         rowActionLabel="Открыть вакансию"
+        showSidebarTitle={false}
         sortLabel={getVacancySortLabel(selectedSort)}
       />
       <PageInfoSection
@@ -227,6 +233,6 @@ export default async function VacanciesPage({ searchParams }: VacanciesPageProps
           на обновления раздела или добавьте своё резюме в каталог специалистов.
         </p>
       </PageInfoSection>
-    </>
+    </div>
   );
 }

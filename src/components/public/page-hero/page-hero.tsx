@@ -206,7 +206,7 @@ export function PageHero(props: PageHeroProps | PageHeroLegacyProps) {
             )}>
               <div className={cn(
                 'max-w-[42rem]',
-                media?.kind !== 'slot' && 'mx-auto flex max-w-3xl flex-col items-center text-center'
+                media?.kind !== 'slot' && 'flex max-w-3xl flex-col items-start text-left'
               )}>
                 {shouldRenderBreadcrumbs ? (
                   <PublicBreadcrumbs

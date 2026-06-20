@@ -55,7 +55,7 @@ export default async function ArticlesPage({ searchParams }: ArticlesPageProps) 
   }
 
   return (
-    <>
+    <div className="articles-directory-page">
       <JsonLd data={buildStaticPageBreadcrumbJsonLd('/articles', 'Материалы')} />
       <PageHero
         breadcrumbs={[{ href: '/', label: 'Главная' }, { label: 'Материалы' }]}
@@ -92,6 +92,6 @@ export default async function ArticlesPage({ searchParams }: ArticlesPageProps) 
           каталог поставщиков и раздел вакансий.
         </p>
       </PageInfoSection>
-    </>
+    </div>
   );
 }

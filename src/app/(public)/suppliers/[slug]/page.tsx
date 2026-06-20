@@ -82,7 +82,6 @@ export default async function SupplierDetailPage({ params, searchParams }: Suppl
         companyName={supplier.companyName}
         externalUrl={supplier.externalUrl}
         externalUrlLabel={supplier.externalUrlLabel}
-        image={supplier.imageUrl}
         isVerified={isVerified}
         label={supplier.label}
         serviceArea={serviceArea}

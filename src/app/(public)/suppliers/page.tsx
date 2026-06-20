@@ -52,10 +52,11 @@ export default async function SuppliersPage({ searchParams }: SuppliersPageProps
   const isPrelaunchEmpty = isEmpty && !hasActiveFilters;
 
   return (
-    <>
+    <div className="suppliers-directory-page">
       <JsonLd data={buildStaticPageBreadcrumbJsonLd('/suppliers', 'Поставщики')} />
       <PageHero
         breadcrumbs={[{ href: '/', label: 'Главная' }, { label: 'Поставщики' }]}
+        eyebrow="Каталог для заведений"
         title="Поставщики"
         subtitle="Проверенные поставщики кофе, оборудования, упаковки и продуктов для вашего бизнеса."
         tone="graphite"
@@ -164,6 +165,6 @@ export default async function SuppliersPage({ searchParams }: SuppliersPageProps
           Если ваша компания поставляет продукты, оборудование или сервис для заведений — добавьте профиль в каталог бесплатно.
         </p>
       </PageInfoSection>
-    </>
+    </div>
   );
 }

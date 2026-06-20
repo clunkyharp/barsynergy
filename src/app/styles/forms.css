@@ -917,6 +917,306 @@ form[data-public-validation="true"] .grid-cols-2 .form-field {
     background: color-mix(in oklab, var(--surface-muted) 58%, var(--surface));
 }
 
+.education-directory-page .public-catalog-section.background-zone {
+    padding-top: clamp(2rem, 4vw, 3.5rem);
+}
+
+.education-directory-page .public-catalog-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: clamp(1.5rem, 3vw, 2.5rem);
+}
+
+.education-directory-page .public-catalog-sidebar {
+    width: 100%;
+}
+
+.education-directory-page .public-catalog-sidebar > div {
+    position: static;
+    max-height: none;
+    overflow: visible;
+}
+
+.education-directory-page .public-catalog-list-wrapper > .sticky {
+    position: static;
+    border: 0;
+    background: transparent;
+    padding: 0 0 1.5rem;
+}
+
+.education-directory-page .public-catalog-toolbar {
+    border: 0;
+    background: transparent;
+    padding: 0;
+}
+
+.education-directory-page .public-catalog-list-panel.inset-panel {
+    border: 0;
+    background: transparent;
+}
+
+.education-directory-page .public-catalog-list-rows {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 21rem), 1fr));
+    gap: 1rem;
+    padding: 0;
+}
+
+.education-directory-page .public-list-row-shell {
+    min-height: 100%;
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+}
+
+.education-directory-page .public-list-row-shell > a {
+    width: 100%;
+}
+
+.education-directory-page .public-list-row-shell > a {
+    display: flex;
+    min-height: 100%;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 0;
+}
+
+.education-directory-page .public-list-row-shell > a > div {
+    width: 100%;
+}
+
+.education-directory-page .public-list-row-shell > a > div:first-child {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.education-directory-page .public-list-row-shell [aria-hidden="true"].gpu {
+    aspect-ratio: 16 / 10;
+}
+
+.education-directory-page .public-list-row-shell h3 {
+    font-family: var(--font-display), var(--font-body, system-ui), system-ui, sans-serif;
+    font-size: 1.125rem;
+    line-height: 1.3;
+}
+
+.education-directory-page .public-list-row-shell .button {
+    width: 100%;
+}
+
+.suppliers-directory-page .public-catalog-section.background-zone,
+.masters-directory-page .public-catalog-section.background-zone {
+    padding-top: clamp(2rem, 4vw, 3.5rem);
+}
+
+.suppliers-directory-page .public-catalog-list-rows,
+.masters-directory-page .public-catalog-list-rows {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 21rem), 1fr));
+    gap: 1rem;
+    padding: 0;
+}
+
+.suppliers-directory-page .public-list-row-shell-hh,
+.masters-directory-page .public-list-row-shell-hh {
+    min-height: 100%;
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+}
+
+.suppliers-directory-page .public-list-row-shell-hh > div,
+.masters-directory-page .public-list-row-shell-hh > div {
+    width: 100%;
+}
+
+.suppliers-directory-page .public-list-row-title,
+.masters-directory-page .public-list-row-title {
+    font-family: var(--font-display), var(--font-body, system-ui), system-ui, sans-serif;
+    font-size: 1.125rem;
+    line-height: 1.3;
+}
+
+.suppliers-directory-page .public-list-row-actions .button,
+.suppliers-directory-page .public-list-row-actions a,
+.masters-directory-page .public-list-row-actions .button,
+.masters-directory-page .public-list-row-actions a {
+    width: 100%;
+}
+
+.suppliers-directory-page .public-list-row-company,
+.masters-directory-page .public-list-row-company {
+    display: flex;
+    min-height: 8rem;
+}
+
+.suppliers-directory-page .public-list-row-company > div,
+.masters-directory-page .public-list-row-company > div {
+    width: 100%;
+}
+
+.articles-directory-page #articles-list {
+    background: var(--background);
+    padding-top: clamp(1.5rem, 3vw, 2.5rem);
+}
+
+.articles-directory-page #articles-list .container > .mt-6 {
+    margin-top: 0;
+}
+
+.articles-directory-page #articles-list .media-card-shell,
+.articles-directory-page #articles-list .group.relative,
+.articles-directory-page #articles-list [class*="grid"] > a.group {
+    border-radius: var(--radius-lg);
+}
+
+.articles-directory-page #articles-list .divide-y {
+    overflow: hidden;
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-lg);
+    background: var(--surface-card);
+    padding: 0.25rem 1rem;
+}
+
+.events-directory-page nav[aria-label="Города"],
+.events-directory-page nav[aria-label="Города"] + section {
+    background: var(--background);
+}
+
+.events-directory-page nav[aria-label="Города"] {
+    padding-top: 1.5rem;
+    padding-bottom: 0.75rem;
+}
+
+.events-directory-page nav[aria-label="Города"] + section {
+    padding-top: 0.75rem;
+    padding-bottom: 1.5rem;
+}
+
+.events-directory-page nav[aria-label="Города"] + section form {
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    padding: 1rem;
+}
+
+.events-directory-page #events-list {
+    background: var(--background);
+    padding-top: clamp(2rem, 4vw, 3.5rem);
+}
+
+.events-directory-page #events-list article {
+    border-radius: var(--radius-lg);
+}
+
+.events-directory-page #events-list .public-card-shell {
+    border-color: var(--border-default);
+    background: var(--surface-card);
+}
+
+.supplier-detail-hero {
+    padding: clamp(3rem, 7vw, 5rem) 0 clamp(2.5rem, 5vw, 4rem);
+}
+
+.supplier-detail-hero-content {
+    display: flex;
+    align-items: flex-start;
+    gap: clamp(1.25rem, 3vw, 2.25rem);
+}
+
+.supplier-detail-logo {
+    display: grid;
+    flex: 0 0 auto;
+    width: clamp(5.5rem, 12vw, 7.5rem);
+    height: clamp(5.5rem, 12vw, 7.5rem);
+    place-items: center;
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-lg);
+    background: var(--surface-card);
+    color: var(--accent);
+    font-family: var(--font-display), var(--font-body, system-ui), system-ui, sans-serif;
+    font-size: clamp(1rem, 2vw, 1.25rem);
+    font-weight: 700;
+    letter-spacing: var(--tracking-eyebrow-sm);
+}
+
+.supplier-detail-title {
+    font-size: clamp(2rem, 5vw, 3.25rem);
+    line-height: 1.08;
+}
+
+.supplier-detail-chip {
+    display: inline-flex;
+    min-height: 2rem;
+    align-items: center;
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-pill);
+    background: var(--surface-wash);
+    padding: 0.35rem 0.75rem;
+    color: var(--text);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+.supplier-detail-chip-accent {
+    border-color: color-mix(in oklab, var(--accent) 34%, var(--border-default));
+    color: var(--accent);
+}
+
+@media (max-width: 767px) {
+    .supplier-detail-hero-content {
+        flex-direction: column;
+    }
+
+    .education-directory-page .public-catalog-list-rows,
+    .suppliers-directory-page .public-catalog-list-rows,
+    .masters-directory-page .public-catalog-list-rows {
+        gap: 0.875rem;
+    }
+
+    .events-directory-page nav[aria-label="Города"] + section form {
+        padding: 0.875rem;
+    }
+}
+
+.vacancies-directory-page section[aria-labelledby="page-hero-title"] {
+    padding-top: 72px;
+}
+
+.vacancies-directory-page section[aria-labelledby="page-hero-title"] h1 {
+    font-size: clamp(2rem, 5vw, 3.25rem);
+    line-height: 1.15;
+}
+
+.vacancies-directory-page section[aria-labelledby="page-hero-title"] h1 + p {
+    color: var(--text);
+}
+
+.vacancies-hero-stats {
+    margin-top: 1.75rem;
+}
+
+.vacancies-hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 0.75rem;
+}
+
+.vacancies-hero-actions .button,
+.vacancies-hero-actions a {
+    min-height: 48px;
+    border-radius: var(--radius-lg);
+    padding-inline: 1.75rem;
+    font-size: 0.9375rem;
+    letter-spacing: 0;
+    text-transform: none;
+}
+
+.vacancies-directory-tabs-section {
+    padding: 32px 0;
+}
+
 .vacancy-directory-tabs {
     display: inline-flex;
     width: max-content;
@@ -984,6 +1284,154 @@ form[data-public-validation="true"] .grid-cols-2 .form-field {
 .vacancy-directory-tab-idle .vacancy-directory-tab-count {
     background: var(--surface-muted);
     color: var(--muted);
+}
+
+.vacancies-directory-page .public-catalog-section.background-zone {
+    padding-top: clamp(2rem, 4vw, 3.5rem);
+}
+
+.vacancies-directory-page .public-catalog-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2rem;
+}
+
+.vacancies-directory-page .public-catalog-sidebar {
+    width: 100%;
+}
+
+.vacancies-directory-page .specialist-mode-panel {
+    border-color: var(--border-default);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    box-shadow: none;
+}
+
+.vacancies-directory-page .public-catalog-list-wrapper > .sticky {
+    position: static;
+    border: 0;
+    background: transparent;
+    padding: 0 0 1.5rem;
+}
+
+.vacancies-directory-page .public-catalog-toolbar {
+    border: 0;
+    background: transparent;
+    padding: 0;
+}
+
+.vacancies-directory-page .public-catalog-list-panel.inset-panel {
+    border: 0;
+    background: transparent;
+}
+
+.vacancies-directory-page .public-catalog-list-rows {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 21rem), 1fr));
+    gap: 1rem;
+    padding: 0;
+}
+
+.vacancies-directory-page .public-list-row-shell-hh,
+.vacancies-directory-page .specialist-directory-card {
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+}
+
+.vacancies-directory-page .public-list-row-shell-hh {
+    display: flex;
+    min-height: 100%;
+}
+
+.vacancies-directory-page .public-list-row-shell-hh > div {
+    width: 100%;
+}
+
+.vacancies-directory-page .public-list-row-title {
+    font-family: var(--font-display), var(--font-body, system-ui), system-ui, sans-serif;
+    font-size: 1.125rem;
+    line-height: 1.3;
+}
+
+.vacancies-directory-page .public-list-row-lead {
+    font-size: 1.125rem;
+    line-height: 1.4;
+}
+
+.vacancies-directory-page .public-list-row-meta .public-filter-chip,
+.vacancies-directory-page .public-list-row-meta [class*="rounded"] {
+    min-height: 1.75rem;
+    font-size: 0.75rem;
+}
+
+.vacancies-directory-page .public-list-row-actions .button,
+.vacancies-directory-page .public-list-row-actions a {
+    width: 100%;
+}
+
+.vacancies-directory-page .specialist-mode-panel {
+    display: grid;
+    gap: 1rem;
+    padding: 1rem;
+}
+
+.vacancies-directory-page .specialist-directory-card {
+    min-height: 100%;
+    grid-column: 1 / -1;
+}
+
+@media (min-width: 769px) {
+    .vacancies-directory-page section[aria-labelledby="page-hero-title"] [class*="xl:grid-cols"] {
+        align-items: end;
+    }
+
+    .vacancies-hero-actions {
+        justify-content: flex-end;
+    }
+}
+
+.vacancies-directory-page .public-filter-sidebar-panel.inset-panel,
+.suppliers-directory-page .public-filter-sidebar-panel.inset-panel,
+.masters-directory-page .public-filter-sidebar-panel.inset-panel {
+    border-color: var(--border-default);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    box-shadow: none;
+}
+
+.vacancies-directory-page .public-filter-sidebar-panel .public-filter-field,
+.suppliers-directory-page .public-filter-sidebar-panel .public-filter-field,
+.masters-directory-page .public-filter-sidebar-panel .public-filter-field {
+    min-width: 0;
+}
+
+.vacancies-directory-page .public-filter-sidebar-panel .public-filter-control.field-base,
+.vacancies-directory-page .public-filter-sidebar-panel .public-filter-control.custom-select-trigger,
+.suppliers-directory-page .public-filter-sidebar-panel .public-filter-control.field-base,
+.suppliers-directory-page .public-filter-sidebar-panel .public-filter-control.custom-select-trigger,
+.masters-directory-page .public-filter-sidebar-panel .public-filter-control.field-base,
+.masters-directory-page .public-filter-sidebar-panel .public-filter-control.custom-select-trigger {
+    min-height: 48px;
+    border-radius: var(--radius-md);
+    background: var(--field-bg);
+}
+
+@media (min-width: 1280px) {
+    .vacancies-directory-page .public-catalog-layout,
+    .suppliers-directory-page .public-catalog-layout,
+    .masters-directory-page .public-catalog-layout {
+        grid-template-columns: minmax(16rem, 0.48fr) minmax(0, 1.52fr);
+        align-items: start;
+    }
+
+    .vacancies-directory-page .public-catalog-sidebar > div,
+    .suppliers-directory-page .public-catalog-sidebar > div,
+    .masters-directory-page .public-catalog-sidebar > div {
+        position: sticky;
+        top: 3.5rem;
+        max-height: calc(100dvh - 5rem);
+        overflow-y: auto;
+    }
 }
 
 .specialist-mode-bar {

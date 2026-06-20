@@ -52,7 +52,7 @@ export default async function MastersPage({ searchParams }: MastersPageProps) {
   const isPrelaunchEmpty = content.total === 0 && !hasActiveFilters;
 
   return (
-    <>
+    <div className="masters-directory-page">
       <JsonLd data={buildStaticPageBreadcrumbJsonLd('/masters', 'Мастера')} />
       <PageHero
         breadcrumbs={[{ href: '/', label: 'Главная' }, { label: 'Мастера' }]}
@@ -65,6 +65,7 @@ export default async function MastersPage({ searchParams }: MastersPageProps) {
 
       {isPrelaunchEmpty ? (
         <PublicPrelaunchSection
+          compact
           badges={['Каталог принимает заявки', 'Подходит для частных мастеров и компаний']}
           cards={[
             {
@@ -147,6 +148,6 @@ export default async function MastersPage({ searchParams }: MastersPageProps) {
           Если вы работаете с заведениями — добавьте профиль в каталог мастеров бесплатно.
         </p>
       </PageInfoSection>
-    </>
+    </div>
   );
 }

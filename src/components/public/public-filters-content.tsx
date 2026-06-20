@@ -57,7 +57,7 @@ export function PublicFiltersContent({
   const [draftQuery, setDraftQuery] = useState('');
   const resolvedVariant = resolveFilterVariant({ embedded, variant });
   const defaultCollapsed = defaultCollapsedProp ?? (resolvedVariant === 'sidebar');
-  const [showFilters, setShowFilters] = useState(false);
+  const [showFilters, setShowFilters] = useState(defaultCollapsedProp === false);
   const [areSidebarFieldsCollapsed, setAreSidebarFieldsCollapsed] = useState(defaultCollapsed);
   const filterInstanceId = useId();
   const searchInputId = `${filterInstanceId}-search`;

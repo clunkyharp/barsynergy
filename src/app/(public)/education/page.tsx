@@ -144,7 +144,7 @@ export default async function EducationPage({ searchParams }: EducationPageProps
   const isPrelaunchEmpty = isEmpty && !hasActiveFilters;
 
   return (
-    <>
+    <div className="education-directory-page">
       <EducationHero />
 
       {!isPrelaunchEmpty ? (
@@ -220,7 +220,6 @@ export default async function EducationPage({ searchParams }: EducationPageProps
           title="Какие программы можно добавить"
         />
       ) : null}
-
-    </>
+    </div>
   );
 }
