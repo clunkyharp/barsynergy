@@ -1,5 +1,10 @@
 import { SocialChannelCard } from '@/components/public/social-channel-card';
-import { contactMethods } from '@/components/public/contact-application-form-constants';
+import { contactMethods, type ContactMethod } from '@/components/public/contact-application-form-constants';
+import { useCopy } from '@/lib/hooks/use-copy';
+import { getChannelAccentVar } from '@/components/public/channel-accent';
+import type { CSSProperties } from 'react';
+import Image from 'next/image';
+import { ArrowUpRight, Copy } from 'lucide-react';
 import { displayFont } from '@/lib/fonts';
 
 const channelBackgrounds = {

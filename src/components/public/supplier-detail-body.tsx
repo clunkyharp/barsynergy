@@ -4,6 +4,14 @@ import { EditorialShell } from '@/components/ui/editorial-shell';
 import type { PublicContentDetailFact } from '@/modules/content/shared/detail-helpers';
 import { DirectContactLinks } from './direct-contact-links';
 
+type SupplierContactRow = {
+  typeLabel: string;
+  serviceName: string;
+  descriptor?: string;
+  href?: string;
+  actionLabel?: string;
+};
+
 type SupplierDetailBodyProps = {
   body?: string;
   facts: PublicContentDetailFact[];
@@ -157,15 +165,11 @@ export function SupplierDetailBody({
                     {contactLabel ? (
                       <p className="mt-2 text-sm leading-6 text-[var(--text)]">{contactLabel}</p>
                     ) : null}
-                    {hasStructuredContacts ? (
-                      <div className={contactLabel ? 'mt-4' : 'mt-3'}>
-                        <DirectContactLinks
-                          telegram={contactTelegram}
-                          phone={contactPhone}
-                          whatsapp={contactWhatsapp}
-                        />
-                      ))}
-                    </div>
+                    <DirectContactLinks
+                      telegram={contactTelegram}
+                      phone={contactPhone}
+                      whatsapp={contactWhatsapp}
+                    />
                   </div>
                 ) : null}
                 <div className="border-b border-[var(--line)] px-5 pb-4 pt-5">

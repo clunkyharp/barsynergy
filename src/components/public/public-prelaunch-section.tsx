@@ -50,6 +50,8 @@ export function PublicPrelaunchSection({
   actions = [],
   badges = [],
   compact = false,
+  presentation = 'list',
+  toneByIndex = false,
   id
 }: PublicPrelaunchSectionProps) {
   const isVisualSteps = presentation === 'visualSteps';
