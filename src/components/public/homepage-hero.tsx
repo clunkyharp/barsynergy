@@ -1,6 +1,5 @@
 import Image from "next/image";
 import { ArrowUpRight } from "lucide-react";
-import { PublicEyebrow } from "@/components/public/public-primitives";
 import { accentFont, displayFont } from "@/lib/fonts";
 import type { HomepageData } from "@/lib/public/home";
 
@@ -32,69 +31,66 @@ export function HomeHeroRouter({ stats }: { stats: HomepageData["stats"] }) {
   return (
     <section
       aria-labelledby="home-hero-title"
-      className="relative isolate flex max-md:items-start md:items-center overflow-hidden border-b border-[var(--line)] bg-[var(--editorial-dark-surface)] text-[var(--editorial-dark-text)] md:min-h-[720px] lg:min-h-[760px]"
+      className="relative isolate flex items-center justify-center overflow-hidden border-b border-[var(--line)] bg-[var(--editorial-dark-surface)] text-[var(--editorial-dark-text)] md:min-h-[720px] lg:min-h-[760px]"
     >
       <div className="absolute inset-0 z-0">
         <Image
-          alt="Кофейный бар с эспрессо-машиной и полками"
-          className="object-cover object-[center_52%] saturate-[0.94] contrast-[1.02]"
+          alt="Бариста наливает молоко в чашку кофе"
+          className="object-cover object-[center_35%]"
           fill
           priority
           sizes="100vw"
-          src="/images/home/hero-coffee-counter-haberdoedas.jpg"
+          src="/images/home/hero-coffee-pour.png"
         />
       </div>
       <div
         aria-hidden="true"
         className="home-hero-gradient absolute inset-0 z-[1]"
       />
-      <div className="container relative z-[2] py-16 md:py-32">
-        <div className="max-w-[96rem]">
-          <PublicEyebrow
-            className={`${accentFont.className} tracking-[var(--tracking-eyebrow-md)]`}
-            tone="inverse"
+      <div className="container relative z-[2] py-20 md:py-32">
+        <div className="mx-auto flex max-w-[52rem] flex-col items-center text-center">
+          <span
+            className={`${accentFont.className} inline-flex items-center gap-1.5 rounded-[var(--radius-pill)] bg-[var(--brand-soft)] px-4 py-1.5 text-[0.78rem] font-semibold tracking-[var(--tracking-eyebrow-sm)] text-[var(--accent)]`}
           >
             BARSYNERGY / Кофейная индустрия СКФО
-          </PublicEyebrow>
+          </span>
           <h1
-            className={`${displayFont.className} mt-4 max-w-[18ch] text-[clamp(2.6rem,4.6vw,5.4rem)] font-semibold tracking-[-0.01em] leading-[0.96] text-balance text-[var(--editorial-dark-text)] max-[640px]:max-w-[13ch] max-[640px]:text-[clamp(2.2rem,9vw,3.2rem)]`}
+            className={`${displayFont.className} mt-6 text-[clamp(2.2rem,6vw,4rem)] font-bold tracking-[-0.03em] leading-[1.08] text-balance text-[var(--editorial-dark-text)]`}
             id="home-hero-title"
           >
-            Платформа, которая объединяет людей индустрии кофе и бара
+            Платформа, которая объединяет людей индустрии{" "}
+            <span className="text-[var(--accent)]">кофе и бара</span>
           </h1>
-          <p className="mt-5 max-w-2xl text-[15px] leading-7 text-[var(--editorial-dark-muted)] md:text-base">
+          <p className="mx-auto mt-5 max-w-xl text-base leading-7 text-[var(--editorial-dark-text)] md:text-[1.1rem]">
             Люди, события, вакансии, поставщики, обучение и материалы СКФО,
             которые помогают работать точнее.
           </p>
-          <div className="mt-8 flex flex-wrap gap-3 max-sm:flex-col max-sm:items-start">
+          <div className="mt-9 flex flex-wrap justify-center gap-3 max-sm:w-full max-sm:flex-col max-sm:items-stretch">
             <a
               href="/vacancies"
-              className="inline-flex items-center gap-2 rounded-[var(--radius-md)] bg-[var(--accent)] px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[var(--accent-strong)] max-sm:w-full max-sm:justify-center"
+              className="inline-flex items-center justify-center gap-2 rounded-[var(--radius-lg)] bg-[var(--accent)] px-6 py-3 text-sm font-semibold text-[var(--accent-contrast)] shadow-[var(--shadow-action)] transition-colors hover:bg-[var(--accent-strong)]"
             >
               Смотреть вакансии
               <ArrowUpRight size={15} strokeWidth={2} />
             </a>
             <a
               href="/business"
-              className="inline-flex items-center gap-2 rounded-[var(--radius-md)] border border-white/30 px-5 py-2.5 text-sm font-semibold text-[var(--editorial-dark-text)] transition-colors hover:border-white/60 hover:bg-white/8 max-sm:w-full max-sm:justify-center"
+              className="inline-flex items-center justify-center gap-2 rounded-[var(--radius-lg)] border border-white/30 px-6 py-3 text-sm font-semibold text-[var(--editorial-dark-text)] transition-colors hover:border-white/60 hover:bg-white/10"
             >
               Для бизнеса
             </a>
           </div>
           {statItems.length >= 2 && (
-            <dl className="mt-12 flex flex-wrap gap-x-8 gap-y-4 md:gap-x-12">
-              <p className="w-full text-[10px] font-semibold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--editorial-dark-muted)]">
-                Платформа в цифрах
-              </p>
+            <dl className="mt-14 flex flex-wrap justify-center gap-x-12 gap-y-6">
               {statItems.map((item) => (
-                <div className="flex items-baseline gap-2.5" key={item.label}>
+                <div className="flex flex-col items-center" key={item.label}>
                   <dd
                     aria-label={`${item.value} ${item.label}`}
-                    className="order-1 text-[2.4rem] font-bold leading-none tabular-nums text-[var(--editorial-dark-text)] md:text-[3rem]"
+                    className={`${displayFont.className} text-[1.75rem] font-bold leading-none tabular-nums text-[var(--accent)]`}
                   >
                     {item.value}
                   </dd>
-                  <dt className="order-2 text-[12px] uppercase tracking-[var(--tracking-eyebrow-sm)] text-[var(--editorial-dark-muted)]">
+                  <dt className="mt-1.5 text-[0.85rem] font-medium text-[var(--editorial-dark-muted)]">
                     {item.label}
                   </dt>
                 </div>

@@ -100,6 +100,7 @@ export default async function SuppliersPage({ searchParams }: SuppliersPageProps
           basePath="/suppliers"
           content={content}
           emptyDescription="Каталог пополняется. Добавьте компанию, если она работает с кофейными барами, зерном, оборудованием или сервисом в регионе."
+          emptyIcon="suppliers"
           emptyTitle="Поставщиков пока нет"
           filters={
             <PublicFilters

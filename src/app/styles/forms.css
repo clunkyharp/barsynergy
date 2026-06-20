@@ -755,12 +755,21 @@ form[data-public-validation="true"] .grid-cols-2 .form-field {
 .public-catalog-title {
     font-size: clamp(2.35rem, 3.3vw, 3.25rem);
     line-height: 0.96;
-    overflow-wrap: normal;
+    overflow-wrap: break-word;
     word-break: normal;
+    hyphens: auto;
 }
 
 .public-catalog-layout {
     align-items: start;
+}
+
+/* background-zone sets overflow:hidden, which turns the section into a scroll
+   container and breaks the sticky list toolbar (it sticks at top:64px even at
+   scroll 0, shifting the content column down). overflow:clip clips ambient the
+   same way but does not create a scroll container, so the toolbar stays put. */
+.public-catalog-section.background-zone {
+    overflow: clip;
 }
 
 @media (pointer: coarse) {
@@ -909,54 +918,72 @@ form[data-public-validation="true"] .grid-cols-2 .form-field {
 }
 
 .vacancy-directory-tabs {
-    display: flex;
+    display: inline-flex;
     width: max-content;
     max-width: 100%;
     align-self: flex-start;
     gap: 0.25rem;
-    border: 1px solid var(--line);
+    border: 1px solid var(--border-default);
     border-radius: var(--radius-lg);
-    background: color-mix(in oklab, var(--surface-card) 68%, transparent);
-    padding: 0.2rem;
+    background: var(--surface);
+    padding: 0.25rem;
 }
 
 .vacancy-directory-tab {
     display: inline-flex;
     flex: 0 0 auto;
     min-width: 0;
-    min-height: 2.25rem;
+    min-height: 2.75rem;
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-    border-radius: var(--radius-sm);
-    padding: 0.35rem 0.85rem;
+    border-radius: var(--radius-md);
+    padding: 0.625rem 1.75rem;
     color: var(--muted);
-    font-size: 0.85rem;
-    font-weight: 700;
+    font-size: 0.875rem;
+    font-weight: 600;
     line-height: 1.2;
     text-align: center;
     transition:
         background-color var(--motion-duration-fast) var(--motion-ease-standard),
-        border-color var(--motion-duration-fast) var(--motion-ease-standard),
-        color var(--motion-duration-fast) var(--motion-ease-standard);
+        color var(--motion-duration-fast) var(--motion-ease-standard),
+        box-shadow var(--motion-duration-fast) var(--motion-ease-standard);
 }
 
 .vacancy-directory-tab-active {
-    border: 1px solid color-mix(in oklab, var(--accent) 36%, var(--line));
-    background: var(--surface-card);
-    color: var(--text);
+    background: var(--accent);
+    color: var(--accent-contrast);
+    box-shadow: var(--shadow-action);
 }
 
 .vacancy-directory-tab-idle:hover,
 .vacancy-directory-tab-idle:focus-visible {
-    background: var(--surface-wash);
+    background: var(--surface-muted);
     color: var(--text);
 }
 
 .vacancy-directory-tab-count {
-    color: inherit;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    margin-left: 0.25rem;
+    padding: 0 6px;
+    border-radius: var(--radius-pill);
+    font-size: 0.6875rem;
+    font-weight: 700;
     font-variant-numeric: tabular-nums;
-    opacity: 0.78;
+}
+
+.vacancy-directory-tab-active .vacancy-directory-tab-count {
+    background: rgb(28 28 30 / 0.14);
+    color: var(--accent-contrast);
+}
+
+.vacancy-directory-tab-idle .vacancy-directory-tab-count {
+    background: var(--surface-muted);
+    color: var(--muted);
 }
 
 .specialist-mode-bar {
@@ -1009,6 +1036,66 @@ form[data-public-validation="true"] .grid-cols-2 .form-field {
 .specialist-mode-bar-link-idle:focus-visible {
     background: var(--surface-wash);
     color: var(--text);
+}
+
+/* Specialist mode panel (sidebar radio-style selector) */
+.specialist-mode-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-lg);
+    background: var(--surface-card);
+    padding: 1.25rem;
+}
+
+.specialist-mode-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    min-height: 2.75rem;
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    padding: 0.625rem 0.875rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    line-height: 1.2;
+    color: var(--muted);
+    transition:
+        background-color var(--motion-duration-fast) var(--motion-ease-standard),
+        border-color var(--motion-duration-fast) var(--motion-ease-standard),
+        color var(--motion-duration-fast) var(--motion-ease-standard);
+}
+
+.specialist-mode-link span:last-child {
+    font-size: 0.7rem;
+    line-height: 1;
+}
+
+.specialist-mode-link-active {
+    border-color: color-mix(in oklab, var(--accent) 48%, var(--border-default));
+    background: var(--accent-soft);
+    color: var(--text);
+}
+
+.specialist-mode-link-active span:last-child {
+    color: var(--accent);
+}
+
+.specialist-mode-link-idle:hover,
+.specialist-mode-link-idle:focus-visible {
+    border-color: var(--border-strong);
+    background: var(--surface-wash);
+    color: var(--text);
+}
+
+.specialist-mode-note {
+    border-top: 1px solid var(--line);
+    padding-top: 0.875rem;
+    font-size: 0.8rem;
+    line-height: 1.5;
+    color: var(--muted);
 }
 
 .specialist-directory-summary {

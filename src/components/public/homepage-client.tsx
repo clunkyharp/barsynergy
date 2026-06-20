@@ -12,9 +12,10 @@ import type { HomepageData, HomepageLiveCard } from '@/lib/public/home';
 
 type HomepageClientProps = {
   data: HomepageData;
+  isAuthenticated?: boolean;
 };
 
-export function HomepageClient({ data }: HomepageClientProps) {
+export function HomepageClient({ data, isAuthenticated = false }: HomepageClientProps) {
   const materialsCard: HomepageLiveCard = data.secondaryArticle ?? {
     kind: 'article',
     eyebrow: 'Материал',
@@ -92,6 +93,35 @@ export function HomepageClient({ data }: HomepageClientProps) {
       </section>
 
       {data.generalSponsors.length > 0 ? <HomeSponsorLogoStrip sponsors={data.generalSponsors} /> : null}
+
+      {!isAuthenticated ? (
+      <section className="border-b border-[var(--line)] py-10 md:py-14">
+        <div className="container">
+          <div className="mx-auto max-w-[64rem] rounded-[var(--radius-xl)] border border-[var(--border-default)] bg-[var(--surface)] px-8 py-14 text-center md:px-10 md:py-16">
+            <h2 className={`${displayFont.className} text-[clamp(1.5rem,3vw,2.2rem)] font-bold leading-[1.1] text-[var(--text)]`}>
+              Готовы начать?
+            </h2>
+            <p className="mx-auto mt-3 max-w-xl text-[var(--muted)]">
+              Присоединяйтесь к сообществу профессионалов кофейной и барной индустрии Юга России.
+            </p>
+            <div className="mt-7 flex flex-wrap justify-center gap-3 max-sm:flex-col max-sm:items-stretch">
+              <Link
+                href="/auth/register"
+                className="inline-flex items-center justify-center gap-2 rounded-[var(--radius-lg)] bg-[var(--accent)] px-6 py-3 text-sm font-semibold text-[var(--accent-contrast)] shadow-[var(--shadow-action)] transition-colors hover:bg-[var(--accent-strong)]"
+              >
+                Зарегистрироваться
+              </Link>
+              <Link
+                href="/about"
+                className="inline-flex items-center justify-center gap-2 rounded-[var(--radius-lg)] border border-[var(--border-default)] px-6 py-3 text-sm font-semibold text-[var(--text)] transition-colors hover:border-[var(--border-strong)] hover:bg-[var(--surface-muted)]"
+              >
+                Узнать больше
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+      ) : null}
 
       <HomeCtaFaqSection />
 

@@ -89,6 +89,7 @@ export default async function MastersPage({ searchParams }: MastersPageProps) {
           basePath="/masters"
           content={content}
           emptyDescription="Каталог пополняется. Добавьте профиль, если работаете с барами, кофейнями или ресторанами."
+          emptyIcon="handshake"
           emptyTitle="Мастеров пока нет"
           filters={
             <PublicFilters

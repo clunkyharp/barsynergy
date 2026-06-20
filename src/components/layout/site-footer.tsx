@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import type { ReactNode } from 'react';
 import { useState } from 'react';
-import { ArrowUpRight, ChevronDown } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -13,6 +13,8 @@ import { openLeadModal } from '@/lib/public/lead-modal-bus';
 import { LeadModalRoot, type LeadModalActions } from '@/components/public/lead-modal-providers';
 import { NewsletterModalRoot } from '@/components/public/newsletter-modal';
 import { NewsletterModalTrigger } from '@/components/public/newsletter-modal/newsletter-modal-trigger';
+import { FooterNewsletterForm } from './footer-newsletter-form';
+import { FooterSocialLinks } from './footer-social-links';
 
 type SiteFooterProps = {
   userRole?: string | null;
@@ -242,7 +244,7 @@ export function SiteFooter({ userRole, userEmail, newsletterDisabled = false, le
       ) : null}
 
       <section className="bg-[var(--editorial-dark-surface)] py-7 text-[var(--editorial-dark-text)] sm:py-9" data-theme="dark">
-        <div className="container grid gap-y-10 pt-8 sm:grid-cols-2 sm:gap-8 sm:pt-10 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.72fr)_minmax(0,0.72fr)_minmax(0,0.62fr)] lg:items-start lg:gap-x-12">
+        <div className="container grid gap-y-10 pt-8 sm:grid-cols-2 sm:gap-8 sm:pt-10 lg:grid-cols-[1fr_auto] lg:items-start lg:gap-x-12">
           <div className="sm:col-span-2 lg:col-span-1">
             <AppLink
               className="inline-flex min-h-10 w-fit items-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
@@ -256,42 +258,34 @@ export function SiteFooter({ userRole, userEmail, newsletterDisabled = false, le
             <p className="mt-4 max-w-md text-sm leading-7 text-[var(--editorial-dark-muted)] sm:text-[1rem]">
               BARSYNERGY — медиа и рабочая платформа для кофейной и барной индустрии СКФО: материалы, события, вакансии, обучение, поставщики и партнёрские проекты.
             </p>
-            <div className="mt-7 flex flex-wrap items-center gap-4 text-sm">
-              <AppLink
-                className="group inline-flex min-h-10 items-center gap-2 rounded-[var(--radius-sm)] border border-[var(--editorial-dark-border)] px-3 py-2 text-[var(--editorial-dark-muted)] transition hover:border-[var(--accent)]/45 hover:text-[var(--accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
-                href="https://t.me/barsynergy"
-                rel="noopener noreferrer"
-                target="_blank"
-              >
-                <span className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--editorial-dark-label)]">Telegram</span>
-                <ArrowUpRight className="transition-transform duration-[var(--motion-duration-base)] ease-[var(--motion-ease-move)] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 motion-reduce:transition-none" size={16} strokeWidth={1.8} />
-              </AppLink>
-            </div>
+            <FooterNewsletterForm />
           </div>
 
-          <FooterNavSection heading="Платформа">
-            {platformLinks.map((link) => (
-              <FooterLink href={link.href} key={link.href}>
-                {link.label}
-              </FooterLink>
-            ))}
-          </FooterNavSection>
+          <div className="flex flex-col gap-6 sm:col-span-2 sm:flex-row sm:gap-8 lg:col-span-1 lg:justify-end lg:gap-10">
+            <FooterNavSection heading="Платформа">
+              {platformLinks.map((link) => (
+                <FooterLink href={link.href} key={link.href}>
+                  {link.label}
+                </FooterLink>
+              ))}
+            </FooterNavSection>
 
-          <FooterNavSection heading="Для бизнеса">
-            {businessLinks.map((link) => (
-              <FooterLink href={link.href} key={link.href}>
-                {link.label}
-              </FooterLink>
-            ))}
-          </FooterNavSection>
+            <FooterNavSection heading="Для бизнеса">
+              {businessLinks.map((link) => (
+                <FooterLink href={link.href} key={link.href}>
+                  {link.label}
+                </FooterLink>
+              ))}
+            </FooterNavSection>
 
-          <FooterNavSection heading="BARSYNERGY">
-            {barsynergyLinks.map((link) => (
-              <FooterLink href={link.href} key={link.href}>
-                {link.label}
-              </FooterLink>
-            ))}
-          </FooterNavSection>
+            <FooterNavSection heading="BARSYNERGY">
+              {barsynergyLinks.map((link) => (
+                <FooterLink href={link.href} key={link.href}>
+                  {link.label}
+                </FooterLink>
+              ))}
+            </FooterNavSection>
+          </div>
         </div>
       </section>
 
@@ -303,7 +297,10 @@ export function SiteFooter({ userRole, userEmail, newsletterDisabled = false, le
             <FooterLink href="/legal/terms">Пользовательское соглашение</FooterLink>
             <FooterLink href="/legal/cookies">Куки</FooterLink>
           </div>
-          <p className="text-[var(--editorial-dark-muted)]">Барная индустрия СКФО</p>
+          <div className="flex items-center gap-4">
+            <p className="text-[var(--editorial-dark-muted)]">Барная индустрия СКФО</p>
+            <FooterSocialLinks />
+          </div>
         </div>
       </div>
     </footer>

@@ -1,6 +1,6 @@
 import type { CSSProperties } from 'react';
 import type { Metadata } from 'next';
-import { ArrowUpRight, Clock, FileQuestion, Paperclip } from 'lucide-react';
+import { ArrowUpRight } from 'lucide-react';
 import { AppLink } from '@/components/ui/app-link';
 import { PageHero } from '@/components/public/page-hero';
 import { ContactChannels } from '@/components/public/contact-channels';
@@ -54,24 +54,6 @@ const contextParamKeys = [
   'formatLabel',
   'registrationUrl',
   'partnerType'
-] as const;
-
-const workflowItems = [
-  {
-    icon: Clock,
-    title: 'Скорость ответа',
-    body: 'В будни — до 4 рабочих часов. По выходным — следующий рабочий день. Срочные вопросы ускоряем через Telegram.'
-  },
-  {
-    icon: Paperclip,
-    title: 'Что приложить',
-    body: 'Контекст, сроки, бюджетный ориентир и ссылки. Для презентаций — PDF до 20 МБ. Так мы отвечаем сразу по сути.'
-  },
-  {
-    icon: FileQuestion,
-    title: 'Что будет потом',
-    body: 'После ответа фиксируем формат, ответственного и шаги. Если задача не наша — честно скажем и подскажем, куда идти.'
-  }
 ] as const;
 
 const alternativeRoutes = [
@@ -154,23 +136,6 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
           action={submitContactMessage}
         />
       </ContactPlatformDisclosure>
-
-      <section className="border-b border-[var(--line)] bg-[var(--surface)] py-6">
-        <div className="container">
-          <ul className="mx-auto flex max-w-5xl flex-wrap items-center gap-x-6 gap-y-3">
-            {workflowItems.map((item, i) => {
-              const Icon = item.icon;
-              return (
-                <li className="flex items-center gap-2 text-sm text-[var(--muted)]" key={item.title}>
-                  {i > 0 && <span aria-hidden="true" className="hidden text-[var(--line)] sm:inline">·</span>}
-                  <Icon aria-hidden="true" className="shrink-0 text-[var(--accent)]" size={15} strokeWidth={1.8} />
-                  <span><span className="font-semibold text-[var(--text)]">{item.title}:</span> {item.body}</span>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
-      </section>
 
       <section className="bg-[var(--surface-muted)] py-12 md:py-16">
         <div className="container">

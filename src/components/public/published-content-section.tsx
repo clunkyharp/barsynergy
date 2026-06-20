@@ -12,6 +12,7 @@ import { PublicDisplayTitle } from '@/components/public/public-primitives';
 import { Button } from '@/components/ui/button';
 import { Panel } from '@/components/ui/panel';
 import { PublicEmptyState } from '@/components/public/public-empty-state';
+import type { SectionIconType } from '@/components/public/section-icon';
 import type { PublishedContentList } from '@/lib/public/content';
 import { cn } from '@/lib/utils';
 import { DefaultListRow } from './published-content-row-default';
@@ -68,6 +69,7 @@ type PublishedContentSectionProps = {
   resetHref?: string;
   ignoredParamKeys?: string[];
   backgroundZone?: 'ivory' | 'graphite';
+  emptyIcon?: SectionIconType;
 };
 
 function PublishedContentSectionLayout({
@@ -94,6 +96,7 @@ function PublishedContentSectionLayout({
   resetHref,
   ignoredParamKeys,
   backgroundZone = 'ivory',
+  emptyIcon,
   renderRow,
   listClassName
 }: PublishedContentSectionProps & { renderRow: (item: PublishedContentList['items'][number]) => ReactNode; listClassName?: string }) {
@@ -162,6 +165,7 @@ function PublishedContentSectionLayout({
             actions={emptyStateActions}
             description={noResultsDescription}
             eyebrow={listLabel}
+            icon={emptyIcon}
             title={noResultsTitle}
           >
             {subscribeTopic && !hasActiveFilters ? (

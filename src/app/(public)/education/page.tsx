@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 
 import { Suspense } from 'react';
-import { ArrowUpRight, BarChart2, Clock, Monitor, User } from 'lucide-react';
+import { ArrowUpRight, BarChart2, Clock, Monitor, User, Wallet } from 'lucide-react';
 import { CategoryType } from '@/modules/content/shared/types';
 import { AppLink } from '@/components/ui/app-link';
 import { EditorialCard } from '@/components/ui/cards';
@@ -89,7 +89,8 @@ function EducationFeaturedSection({
             const duration = metaGroupValue(item, 'Длительность');
             const level = metaGroupValue(item, 'Уровень');
             const format = metaGroupValue(item, 'Формат');
-            const hasMeta = Boolean(instructor || duration || level || format);
+            const price = metaGroupValue(item, 'Стоимость');
+            const hasMeta = Boolean(instructor || duration || level || format || price);
             return (
               <EditorialCard
                 action={{ href: `${href}#course-request`, label: 'Подробнее' }}
@@ -99,11 +100,18 @@ function EducationFeaturedSection({
                 key={item.id}
                 media={item.imageUrl ? { kind: 'image' as const, src: item.imageUrl } : undefined}
                 meta={hasMeta ? (
-                  <div className="flex flex-wrap gap-x-3 gap-y-1 text-[12px] text-[var(--muted)]">
-                    {instructor ? <span className="flex items-center gap-1"><User aria-hidden="true" className="shrink-0 text-[var(--accent)]" size={12} />{instructor}</span> : null}
-                    {duration ? <span className="flex items-center gap-1"><Clock aria-hidden="true" className="shrink-0 text-[var(--accent)]" size={12} />{duration}</span> : null}
-                    {level ? <span className="flex items-center gap-1"><BarChart2 aria-hidden="true" className="shrink-0 text-[var(--accent)]" size={12} />{level}</span> : null}
-                    {format ? <span className="flex items-center gap-1"><Monitor aria-hidden="true" className="shrink-0 text-[var(--accent)]" size={12} />{format}</span> : null}
+                  <div className="flex flex-col gap-1.5">
+                    {price ? (
+                      <span className="flex items-center gap-1.5 text-[14px] font-semibold text-[var(--text)]">
+                        <Wallet aria-hidden="true" className="shrink-0 text-[var(--accent)]" size={14} />{price}
+                      </span>
+                    ) : null}
+                    <div className="flex flex-wrap gap-x-3 gap-y-1 text-[12px] text-[var(--muted)]">
+                      {instructor ? <span className="flex items-center gap-1"><User aria-hidden="true" className="shrink-0 text-[var(--accent)]" size={12} />{instructor}</span> : null}
+                      {duration ? <span className="flex items-center gap-1"><Clock aria-hidden="true" className="shrink-0 text-[var(--accent)]" size={12} />{duration}</span> : null}
+                      {level ? <span className="flex items-center gap-1"><BarChart2 aria-hidden="true" className="shrink-0 text-[var(--accent)]" size={12} />{level}</span> : null}
+                      {format ? <span className="flex items-center gap-1"><Monitor aria-hidden="true" className="shrink-0 text-[var(--accent)]" size={12} />{format}</span> : null}
+                    </div>
                   </div>
                 ) : undefined}
                 summary={item.summary ?? undefined}
@@ -173,6 +181,7 @@ export default async function EducationPage({ searchParams }: EducationPageProps
             emptyActions={[
               { href: '/contacts', label: 'Связаться с командой' }
             ]}
+            emptyIcon="education"
             emptyTitle="Программ пока нет"
             excludedItemIds={excludedIds}
             rowActionLabel="Записаться"

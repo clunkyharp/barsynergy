@@ -49,16 +49,6 @@ export const contactMethods: ContactMethod[] = [
     descriptor: "Пишите в Директ — удобно с телефона.",
     helper: "Ответ в течение дня",
   },
-  {
-    mark: "EM",
-    name: "Email",
-    value: SUPPORT_EMAIL,
-    href: `mailto:${SUPPORT_EMAIL}`,
-    actionLabel: "Написать письмо",
-    tone: "neutral",
-    descriptor: "Документы, договоры и подробные запросы.",
-    helper: "До 1 рабочего дня",
-  },
 ];
 
 export const contactTopicOptions = [

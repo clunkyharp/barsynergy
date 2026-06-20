@@ -83,12 +83,12 @@ const benefits: { label: string; title: string; description: string; icon: Secti
   }
 ];
 
-const targetAudiences = [
-  { label: 'Кофейни', description: 'Specialty, авторские и третья волна' },
-  { label: 'Кофейные бары', description: 'Стойки, концепты, мини-форматы' },
-  { label: 'Обжарочные', description: 'Роастеры с розничными продажами' },
-  { label: 'Поставщики', description: 'Зерно, молоко, расходники, оборудование' },
-] as const;
+const targetAudiences: { label: string; description: string; icon: SectionIconType }[] = [
+  { label: 'Кофейни', description: 'Specialty, авторские и третья волна', icon: 'coffee' },
+  { label: 'Кофейные бары', description: 'Стойки, концепты, мини-форматы', icon: 'espresso' },
+  { label: 'Обжарочные', description: 'Роастеры с розничными продажами', icon: 'coffee-bean' },
+  { label: 'Поставщики', description: 'Зерно, молоко, расходники, оборудование', icon: 'suppliers' },
+];
 
 const defaultParamKeys = ['projectName', 'contactName', 'cityId', 'solutionType', 'comment'] as const;
 
@@ -153,17 +153,22 @@ export default async function BusinessPage({ searchParams }: BusinessPageProps) 
       />
 
       {/* Who it's for */}
-      <section className="background-zone background-zone-beige border-b border-[var(--line)] py-10 md:py-12">
+      <section className="background-zone background-zone-beige border-b border-[var(--line)] py-12 md:py-16">
         <div className="container">
           <PublicEyebrow>Кому подходит</PublicEyebrow>
-          <div className="mt-5 grid gap-3 sm:grid-cols-2 md:grid-cols-4">
+          <PublicDisplayTitle className="mt-3 max-w-2xl" size="compact">Для кого этот каталог</PublicDisplayTitle>
+          <PublicBodyText className="mt-4 max-w-xl" size="md">
+            Каталог принимает профильные проекты, которым нужен деловой контакт, а не рекламная витрина.
+          </PublicBodyText>
+          <div className="mt-8 grid gap-4 sm:grid-cols-2 md:grid-cols-4">
             {targetAudiences.map((audience) => (
               <article
-                className="public-card-shell flex flex-col gap-2 px-4 py-4"
+                className="public-card-shell flex flex-col gap-3 p-5 md:p-6"
                 key={audience.label}
               >
-                <h3 className={`${displayFont.className} text-[15px] font-semibold leading-tight text-[var(--text)]`}>{audience.label}</h3>
-                <p className="text-[13px] leading-5 text-[var(--muted)]">{audience.description}</p>
+                <SectionIcon size={40} type={audience.icon} />
+                <h3 className={`${displayFont.className} text-[1.05rem] font-semibold leading-tight text-[var(--text)]`}>{audience.label}</h3>
+                <p className="text-[13px] leading-[1.6] text-[var(--muted)]">{audience.description}</p>
               </article>
             ))}
           </div>
@@ -173,11 +178,12 @@ export default async function BusinessPage({ searchParams }: BusinessPageProps) 
       {/* How it works */}
       <section className="background-zone background-zone-beige border-b border-[var(--line)] py-10 md:py-14">
         <div className="container">
-          <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
-            <div>
-              <PublicEyebrow>Как это работает</PublicEyebrow>
-              <PublicDisplayTitle className="mt-3 max-w-sm">Три шага до карточки</PublicDisplayTitle>
-            </div>
+          <div className="mb-8 max-w-2xl">
+            <PublicEyebrow>Как это работает</PublicEyebrow>
+            <PublicDisplayTitle className="mt-3" size="compact">Три шага до карточки</PublicDisplayTitle>
+            <PublicBodyText className="mt-4 max-w-xl" size="md">
+              Заявка короткая, но карточка собирается как рабочий профиль заведения.
+            </PublicBodyText>
           </div>
           <ol className="grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-5">
             {processSteps.map((step, index) => {

@@ -6,6 +6,7 @@ export const channelBackgrounds: Partial<Record<SocialChannelVariant, string>> =
   telegram: '/images/social/generated/telegram-bg.png',
   whatsapp: '/images/social/generated/whatsapp-bg.png',
   instagram: '/images/social/generated/instagram-bg.png',
+  neutral: '/images/social/generated/email-bg.png',
 };
 
 export const channelAccentVars: Record<SocialChannelVariant, string> = {

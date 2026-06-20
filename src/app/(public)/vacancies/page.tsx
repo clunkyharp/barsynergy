@@ -97,7 +97,10 @@ export default async function VacanciesPage({ searchParams }: VacanciesPageProps
           tone="graphite"
           density="compact"
         >
-          <VacanciesHeroActions />
+          <VacanciesHeroActions
+            vacanciesCount={directoryCounts.vacancies}
+            specialistsCount={directoryCounts.specialists}
+          />
         </PageHero>
         <DirectoryBar
           vacanciesCount={directoryCounts.vacancies}
@@ -114,6 +117,7 @@ export default async function VacanciesPage({ searchParams }: VacanciesPageProps
           countForms={['специалист', 'специалиста', 'специалистов']}
           rowActionLabel="Подробнее"
           sectionId="specialist-list"
+          emptyIcon="user"
           emptyTitle="Специалистов пока нет"
           emptyDescription="Когда появятся первые резюме и предложения услуг, они будут здесь."
           emptyActions={[
@@ -146,7 +150,10 @@ export default async function VacanciesPage({ searchParams }: VacanciesPageProps
         tone="graphite"
         density="compact"
       >
-        <VacanciesHeroActions />
+        <VacanciesHeroActions
+          vacanciesCount={directoryCounts.vacancies}
+          specialistsCount={directoryCounts.specialists}
+        />
       </PageHero>
       <DirectoryBar
         vacanciesCount={directoryCounts.vacancies}
@@ -166,6 +173,7 @@ export default async function VacanciesPage({ searchParams }: VacanciesPageProps
       <PublishedContentSectionOpportunity
         basePath="/vacancies"
         content={content}
+        emptyIcon="vacancies"
         emptyActions={[
           { href: '/profile/settings/career#publish', label: 'Добавить резюме', variant: 'primary' },
           { href: 'https://t.me/barsynergy', label: 'Следить в Telegram' }

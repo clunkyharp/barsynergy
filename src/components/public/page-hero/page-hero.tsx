@@ -99,7 +99,7 @@ function ActionsRow({ actions, density, tone }: { actions: readonly [Action, Act
   const isGraphite = tone === 'graphite';
 
   return (
-    <div className={cn('flex flex-col gap-2.5 sm:flex-row', density === 'compact' ? 'mt-5' : 'mt-6')}>
+    <div className={cn('flex flex-col gap-2.5 sm:flex-row sm:justify-center', density === 'compact' ? 'mt-5' : 'mt-6')}>
       {items.map((action) => (
         <Button
           className={cn(
@@ -204,7 +204,10 @@ export function PageHero(props: PageHeroProps | PageHeroLegacyProps) {
               'min-w-0',
               isCompact ? 'pb-7 md:pb-10' : 'pb-8 md:pb-10'
             )}>
-              <div className="max-w-[42rem]">
+              <div className={cn(
+                'max-w-[42rem]',
+                media?.kind !== 'slot' && 'mx-auto flex max-w-3xl flex-col items-center text-center'
+              )}>
                 {shouldRenderBreadcrumbs ? (
                   <PublicBreadcrumbs
                     current={lastBreadcrumbLabel}

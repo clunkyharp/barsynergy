@@ -120,7 +120,7 @@ export function SocialChannelCard(props: SocialChannelCardProps) {
               {helper}
             </span>
           ) : null}
-          <span className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-[var(--accent)] px-4 py-2.5 text-sm font-semibold text-[var(--editorial-dark-surface)]">
+          <span className="inline-flex w-full items-center justify-center gap-2 whitespace-nowrap rounded-full bg-[var(--accent)] px-4 py-2.5 text-sm font-semibold text-[var(--editorial-dark-surface)]">
             {actionLabel}
             <ArrowUpRight aria-hidden="true" size={16} strokeWidth={2} />
           </span>
