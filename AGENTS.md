@@ -171,6 +171,8 @@ npm run typecheck
 
 `npm run build` is mandatory only before creating a commit. For ordinary implementation checks, run it only when the task explicitly needs production-build, deploy or standalone-runtime validation.
 
+Important: after any `prod → dev` merge, `npm run build` catches syntax errors and missing imports that `tsc` does not (Turbopack parsing is stricter). Run it even if typecheck passes.
+
 Prisma:
 
 ```bash

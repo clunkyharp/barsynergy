@@ -55,6 +55,15 @@ Before merging to `prod`:
 
 On the VPS, pull and restart only from `prod`. If a narrow production fix is needed while `dev` contains unrelated work, create a small fix branch or cherry-pick only the required commits into `prod`.
 
+## Sync Notes
+
+If `prod` has commits not in `dev` (e.g. from a previous merge that was not back-ported):
+
+1. Check what `prod` has that `dev` does not: `git log --oneline dev..prod`.
+2. Merge `prod` into `dev` with careful conflict resolution. Do NOT use `-X ours` — this drops code from prod-only commits (type definitions, imports, new components).
+3. After any merge, run `npm run build` even if typecheck passes. Next.js Turbopack catches syntax errors, missing imports, and JSX issues that `tsc` does not.
+4. Only then merge `dev` → `prod`.
+
 ## Commit Message Format
 
 ```
