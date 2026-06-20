@@ -38,6 +38,66 @@ const SORT_OPTIONS = [
   { value: 'oldest', label: 'Сначала старые' }
 ] as const;
 
+function buildPageList(current: number, total: number): (number | 'ellipsis')[] {
+  const pages = new Set<number>([1, total, current, current - 1, current + 1]);
+  const sorted = [...pages].filter((n) => n >= 1 && n <= total).sort((a, b) => a - b);
+  const result: (number | 'ellipsis')[] = [];
+  let prev = 0;
+  for (const n of sorted) {
+    if (n - prev > 1) result.push('ellipsis');
+    result.push(n);
+    prev = n;
+  }
+  return result;
+}
+
+const pageBtnClass =
+  'inline-flex h-10 min-w-10 items-center justify-center rounded-[var(--radius-md)] border border-[var(--border-subtle)] px-2 text-sm font-medium text-[var(--muted)] transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)]';
+const pageBtnInteractive = 'hover:border-[var(--accent)] hover:text-[var(--text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)]';
+
+function ListPagination({ content, basePath }: { content: PublishedContentList; basePath: string }) {
+  if (content.totalPages <= 1) return null;
+  const { page, totalPages } = content;
+
+  return (
+    <nav aria-label="Страницы материалов" className="mt-10 flex flex-wrap items-center justify-center gap-2">
+      {page > 1 ? (
+        <AppLink aria-label="Предыдущая страница" className={cn(pageBtnClass, pageBtnInteractive)} href={pageHref(content, basePath, page - 1)}>
+          ←
+        </AppLink>
+      ) : (
+        <span aria-disabled="true" className={cn(pageBtnClass, 'opacity-30')}>←</span>
+      )}
+      {buildPageList(page, totalPages).map((p, index) =>
+        p === 'ellipsis' ? (
+          <span className={cn(pageBtnClass, 'border-transparent')} key={`ellipsis-${index}`}>
+            …
+          </span>
+        ) : p === page ? (
+          <span
+            aria-current="page"
+            className={cn(pageBtnClass, 'border-[var(--accent)] bg-[var(--accent)] font-semibold text-[var(--accent-contrast)]')}
+            key={p}
+          >
+            {p}
+          </span>
+        ) : (
+          <AppLink className={cn(pageBtnClass, pageBtnInteractive)} href={pageHref(content, basePath, p)} key={p}>
+            {p}
+          </AppLink>
+        )
+      )}
+      {page < totalPages ? (
+        <AppLink aria-label="Следующая страница" className={cn(pageBtnClass, pageBtnInteractive)} href={pageHref(content, basePath, page + 1)}>
+          →
+        </AppLink>
+      ) : (
+        <span aria-disabled="true" className={cn(pageBtnClass, 'opacity-30')}>→</span>
+      )}
+    </nav>
+  );
+}
+
 export function ArticleGridSection({
   content,
   basePath,
@@ -257,20 +317,7 @@ export function ArticleGridSection({
               )}
             </div>
 
-            {/* Показать ещё */}
-            {content.totalPages > 1 && content.page < content.totalPages ? (
-              <div className="mt-10 flex justify-center">
-                <Button
-                  className="min-w-[160px]"
-                  onClick={() => {
-                    router.push(pageHref(content, basePath, content.page + 1), { scroll: false });
-                  }}
-                  variant="secondary"
-                >
-                  Показать ещё
-                </Button>
-              </div>
-            ) : null}
+            <ListPagination basePath={basePath} content={content} />
           </>
         )}
       </div>
