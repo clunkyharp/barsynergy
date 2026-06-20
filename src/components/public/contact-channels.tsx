@@ -1,11 +1,5 @@
-'use client';
-
-import { type CSSProperties } from 'react';
-import Image from 'next/image';
-import { ArrowUpRight, Copy } from 'lucide-react';
-import { getChannelAccentVar } from '@/components/public/channel-accent';
-import { contactMethods, type ContactMethod } from '@/components/public/contact-application-form-constants';
-import { useCopy } from '@/lib/hooks/use-copy';
+import { SocialChannelCard } from '@/components/public/social-channel-card';
+import { contactMethods } from '@/components/public/contact-application-form-constants';
 import { displayFont } from '@/lib/fonts';
 
 const channelBackgrounds = {
@@ -106,15 +100,22 @@ export function ContactChannels() {
               </h2>
             </div>
             <p className="max-w-md text-sm leading-6 text-[color-mix(in_srgb,var(--editorial-dark-text)_60%,transparent)]">
-              Выберите канал — каждый удобен для своего типа задачи. Наведите на карточку, чтобы скопировать контакт.
+              Выберите канал — каждый удобен для своего типа задачи.
             </p>
           </div>
 
           <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {contactMethods.map((method) => (
-              <ChannelCard
+              <SocialChannelCard
+                actionLabel={method.actionLabel}
+                description={method.descriptor}
+                eyebrow={method.name}
+                helper={method.helper}
+                href={method.href}
                 key={method.mark}
-                method={method}
+                mode="contact"
+                value={method.value}
+                variant={method.tone}
               />
             ))}
           </div>

@@ -23,14 +23,14 @@ export function ProfileSidebar({ logoutAction }: ProfileSidebarProps) {
 
   return (
     <Panel className="h-fit" padding="md" tone="elevated">
-      <nav aria-label="Profile navigation" className="grid gap-2 text-sm">
+      <nav aria-label="Profile navigation" className="profile-sidebar-nav grid gap-2 text-sm">
         {links.map((link) => {
           const isActive = link.href === '/profile'
             ? pathname === link.href
             : pathname === link.href || pathname?.startsWith(`${link.href}/`);
 
           return (
-            <NavLink active={isActive} className="flex items-center gap-3" href={link.href} key={link.href}>
+            <NavLink aria-current={isActive ? 'page' : undefined} className="flex items-center gap-3" href={link.href} key={link.href}>
               <link.icon aria-hidden="true" className="shrink-0" size={16} strokeWidth={1.8} />
               {link.label}
             </NavLink>

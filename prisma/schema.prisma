@@ -891,6 +891,40 @@ model HomepageCalculatorTeaser {
   @@index([status, priority])
 }
 
+model HomepageTestimonial {
+  id          String        @id @default(cuid())
+  status      ContentStatus @default(DRAFT)
+  quote       String
+  author      String
+  role        String
+  city        String
+  priority    Int           @default(0)
+  publishedAt DateTime?
+  archivedAt  DateTime?
+  createdById String?
+  updatedById String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@index([status, priority])
+}
+
+model HomepageHowItWorksStep {
+  id          String        @id @default(cuid())
+  status      ContentStatus @default(DRAFT)
+  title       String
+  description String
+  priority    Int           @default(0)
+  publishedAt DateTime?
+  archivedAt  DateTime?
+  createdById String?
+  updatedById String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@index([status, priority])
+}
+
 model Application {
   id                String            @id @default(cuid())
   type              ApplicationType

@@ -151,8 +151,8 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
   const articleItems = articles.items.map((item) => ({ ...item, contentType: 'article' as const, basePath: '/articles', actionLabel: 'Читать материал' }));
   const vacancyItems = vacancies.items.map((item) => ({ ...item, contentType: 'vacancy' as const, basePath: '/vacancies', actionLabel: 'Смотреть вакансию' }));
-  const supplierItems = suppliers.items.map((item) => ({ ...item, contentType: 'supplier' as const, basePath: '/suppliers', actionLabel: 'Открыть каталог' }));
-  const courseItems = courses.items.map((item) => ({ ...item, contentType: 'course' as const, basePath: '/education', actionLabel: 'Открыть программу' }));
+  const supplierItems = suppliers.items.map((item) => ({ ...item, contentType: 'supplier' as const, basePath: '/suppliers', actionLabel: 'Смотреть поставщика' }));
+  const courseItems = courses.items.map((item) => ({ ...item, contentType: 'course' as const, basePath: '/education', actionLabel: 'Смотреть программу' }));
   const eventItems = events.items.map((item) => ({ ...item, contentType: 'event' as const, basePath: '/events', actionLabel: 'Подробнее' }));
   const partnerItems = partners.items.map((item) => ({ ...item, contentType: 'partner' as const, basePath: '/partners', actionLabel: 'Смотреть профиль' }));
 

@@ -92,6 +92,12 @@ export type HomepageTestimonial = {
   city: string;
 };
 
+export type HomepageStep = {
+  number: string;
+  title: string;
+  description: string;
+};
+
 export type HomepageData = {
   hero: HomepageHeroBlock;
   audienceCards: HomepageAudienceCardBlock[];
@@ -104,6 +110,7 @@ export type HomepageData = {
   generalSponsors: GeneralSponsor[];
   socialBlocks: HomepageSocialBlock[];
   testimonials: HomepageTestimonial[];
+  steps: HomepageStep[];
   ctaBlock?: HomepageCtaBlock;
   calculatorTeaser?: HomepageCalculatorTeaserBlock;
   partnerSignals: string[];
@@ -127,6 +134,8 @@ const fallbackHero: HomepageHeroBlock = {
 
 const HOMEPAGE_AUDIENCE_CARD_LIMIT = 3;
 const HOMEPAGE_SOCIAL_BLOCK_LIMIT = 3;
+const HOMEPAGE_TESTIMONIAL_LIMIT = 6;
+const HOMEPAGE_STEP_LIMIT = 6;
 
 const homepageTestimonials: HomepageTestimonial[] = [
   {
@@ -152,6 +161,24 @@ const homepageTestimonials: HomepageTestimonial[] = [
   }
 ];
 
+const homepageSteps: HomepageStep[] = [
+  {
+    number: '1',
+    title: 'Найдите нужное',
+    description: 'Вакансии, поставщики, обучение и события барной индустрии СКФО — собраны в одном месте.'
+  },
+  {
+    number: '2',
+    title: 'Свяжитесь напрямую',
+    description: 'Отклик на вакансию, заявка поставщику или запись на обучение — без посредников и лишних шагов.'
+  },
+  {
+    number: '3',
+    title: 'Работайте и растите',
+    description: 'Нанимайте команду, закрывайте закупки, обучайтесь и развивайте заведение в своём регионе.'
+  }
+];
+
 const fallbackCards: Record<HomepageCardKind, Omit<HomepageLiveCard, 'kind'>> = {
   course: {
     eyebrow: 'Обучение',
@@ -160,6 +187,7 @@ const fallbackCards: Record<HomepageCardKind, Omit<HomepageLiveCard, 'kind'>> = 
     meta: ['Очные и онлайн-занятия', 'СКФО'],
     href: '/education',
     actionLabel: 'Выбрать программу',
+    imageUrl: '/images/generated/program-intensive.jpg',
     isFallback: true
   },
   event: {
@@ -169,6 +197,7 @@ const fallbackCards: Record<HomepageCardKind, Omit<HomepageLiveCard, 'kind'>> = 
     meta: ['Афиша обновляется', 'СКФО'],
     href: '/events',
     actionLabel: 'Выбрать событие',
+    imageUrl: '/images/generated/program-events.jpg',
     isFallback: true
   },
   article: {
@@ -188,6 +217,7 @@ const fallbackCards: Record<HomepageCardKind, Omit<HomepageLiveCard, 'kind'>> = 
     meta: ['Для кандидатов и компаний', 'СКФО'],
     href: '/vacancies',
     actionLabel: 'Найти вакансию',
+    imageUrl: '/images/home/current-vacancy-card.png',
     isFallback: true
   },
   supplier: {
@@ -197,6 +227,7 @@ const fallbackCards: Record<HomepageCardKind, Omit<HomepageLiveCard, 'kind'>> = 
     meta: ['Закупки и сервис', 'Для заведений'],
     href: '/suppliers',
     actionLabel: 'Смотреть поставщиков',
+    imageUrl: '/images/home/current-supplier-card.png',
     isFallback: true
   }
 };
@@ -336,7 +367,9 @@ export async function getHomepageData(): Promise<HomepageData> {
     audienceCards,
     socialBlocks,
     ctaBlock,
-    calculatorTeaser
+    calculatorTeaser,
+    testimonialRecords,
+    stepRecords
   ] = await Promise.all([
     getPublishedCourses({ pageSize: '1' }),
     getPublishedEvents({ pageSize: '1', period: 'upcoming' }),
@@ -367,8 +400,37 @@ export async function getHomepageData(): Promise<HomepageData> {
     prisma.homepageCalculatorTeaser.findFirst({
       where: { status: ContentStatus.PUBLISHED },
       orderBy: [{ priority: 'asc' }, { publishedAt: 'desc' }, { updatedAt: 'desc' }]
+    }),
+    prisma.homepageTestimonial.findMany({
+      where: { status: ContentStatus.PUBLISHED },
+      orderBy: [{ priority: 'asc' }, { publishedAt: 'desc' }, { updatedAt: 'desc' }],
+      take: HOMEPAGE_TESTIMONIAL_LIMIT
+    }),
+    prisma.homepageHowItWorksStep.findMany({
+      where: { status: ContentStatus.PUBLISHED },
+      orderBy: [{ priority: 'asc' }, { publishedAt: 'desc' }, { updatedAt: 'desc' }],
+      take: HOMEPAGE_STEP_LIMIT
     })
   ]);
+
+  const testimonials: HomepageTestimonial[] =
+    testimonialRecords.length > 0
+      ? testimonialRecords.map((record) => ({
+          quote: record.quote,
+          author: record.author,
+          role: record.role,
+          city: record.city
+        }))
+      : homepageTestimonials;
+
+  const steps: HomepageStep[] =
+    stepRecords.length > 0
+      ? stepRecords.map((record, index) => ({
+          number: String(index + 1),
+          title: record.title,
+          description: record.description
+        }))
+      : homepageSteps;
 
   const featuredEvent = upcomingEvents.items[0] ?? latestEvents.items[0];
   const featuredSupplier = suppliers.items[0];
@@ -439,7 +501,8 @@ export async function getHomepageData(): Promise<HomepageData> {
       logoPath: block.logoPath ?? '/icon.svg',
       variant: normalizeSocialVariant(block.variant)
     })),
-    testimonials: homepageTestimonials,
+    testimonials,
+    steps,
     ctaBlock: ctaBlock
       ? {
           title: ctaBlock.title,

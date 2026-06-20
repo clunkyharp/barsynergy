@@ -201,7 +201,7 @@ export default async function GeneralSponsorsPage() {
       {/* ── Dark pitch section ── */}
       <section className="background-zone background-zone-sponsor border-b border-[var(--line)] py-14 md:py-20">
         <div className="container">
-          <div className="grid items-end gap-10 md:grid-cols-[minmax(0,1fr)_minmax(0,0.56fr)]">
+          <div className="grid items-center gap-10 md:grid-cols-[minmax(0,1fr)_minmax(0,0.56fr)]">
             <h2 className={`${displayFont.className} text-[clamp(2.6rem,5.2vw,5.4rem)] font-semibold leading-[0.96] text-[var(--text)]`}>
               Там, где бармены, владельцы и менеджеры СКФО принимают решения
             </h2>

@@ -77,7 +77,8 @@ test('public listing pages share headers, filters and pagination primitives', ()
 
   assert.match(eventsSource, /<PageHero/);
   assert.match(eventsSource, /EventsSearchBar/);
-  assert.match(eventsSource, /<EventAgendaSection content=\{content\} \/>/);
+  assert.match(eventsSource, /<EventAgendaSection/);
+  assert.match(eventsSource, /cityName=\{selectedCityOption\?\.name\}/);
   assert.doesNotMatch(eventsSource, /<PublicDisplayTitle/);
   assert.doesNotMatch(eventsSource, /<EditorialPublicPage/);
 

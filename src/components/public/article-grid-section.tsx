@@ -1,8 +1,9 @@
 'use client';
 
-import { LayoutGrid, List, Pencil } from 'lucide-react';
+import { LayoutGrid, List } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useState } from 'react';
+import { AppLink } from '@/components/ui/app-link';
 import { Button } from '@/components/ui/button';
 import { Panel } from '@/components/ui/panel';
 import { Select } from '@/components/ui/select';
@@ -16,16 +17,21 @@ import { listingHref, pageHref } from './article-grid-utils';
 import { ContentSubscribeForm } from '@/components/public/content-subscribe-form';
 import { PublicPrelaunchSection, type PrelaunchCard } from '@/components/public/public-prelaunch-section';
 
+export type ArticleRubricSection = {
+  categoryName: string;
+  categorySlug: string;
+  items: PublishedContentItem[];
+};
+
 type ArticleGridSectionProps = {
   content: PublishedContentList;
   basePath: string;
   categories: PublicTaxonomyOption[];
   featuredItem?: PublishedContentItem;
+  rubricSections?: ArticleRubricSection[];
   prelaunchCards?: PrelaunchCard[];
   prelaunchBadges?: string[];
 };
-
-const SUBMIT_TOPIC_HREF = '/contacts?topic=article-topic#contact-form';
 
 const SORT_OPTIONS = [
   { value: 'newest', label: 'Сначала новые' },
@@ -37,6 +43,7 @@ export function ArticleGridSection({
   basePath,
   categories,
   featuredItem,
+  rubricSections = [],
   prelaunchCards,
   prelaunchBadges
 }: ArticleGridSectionProps) {
@@ -71,13 +78,6 @@ export function ArticleGridSection({
   return (
     <section aria-label="Материалы" className="border-b border-[var(--line)] pt-6 pb-10 sm:pb-14" id="articles-list">
       <div className="container">
-        <div className="flex items-start justify-end">
-          <Button className="w-full gap-2 sm:w-auto sm:shrink-0" href={SUBMIT_TOPIC_HREF} variant="primary">
-            <Pencil size={14} />
-            Предложить тему
-          </Button>
-        </div>
-
         {/* Category pills */}
         <ChipFilterRow aria-label="Категории материалов" className="mt-6">
           <CategoryPill
@@ -109,11 +109,7 @@ export function ArticleGridSection({
               <p className="max-w-2xl text-sm leading-6 text-[var(--muted)]">
                 Сбросьте фильтры или попробуйте другой запрос.
               </p>
-              <Button
-                className="min-h-12 rounded-[var(--radius-md)] px-6"
-                href={SUBMIT_TOPIC_HREF}
-                variant="primary"
-              >
+              <Button href="/contacts?topic=article-topic#contact-form" variant="secondary">
                 Предложить тему
               </Button>
             </Panel>
@@ -150,6 +146,45 @@ export function ArticleGridSection({
             {featuredItem ? (
               <div className="mt-8">
                 <ArticleFeaturedCard basePath={basePath} item={featuredItem} />
+              </div>
+            ) : null}
+
+            {rubricSections.length > 0 ? (
+              <div className="mt-12 space-y-8" aria-label="Рубрики">
+                <div className="flex flex-wrap items-end justify-between gap-3">
+                  <div>
+                    <p className="text-[11px] font-semibold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--accent)]">
+                      Рубрики
+                    </p>
+                    <h2 className="mt-1 text-xl font-semibold text-[var(--text)]">
+                      Читать по темам
+                    </h2>
+                  </div>
+                  <AppLink
+                    className="inline-flex items-center text-sm font-semibold text-[var(--accent)] transition-colors hover:text-[var(--accent-strong)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
+                    href={basePath}
+                  >
+                    Все материалы
+                  </AppLink>
+                </div>
+                {rubricSections.map((section) => (
+                  <section className="border-t border-[var(--line)] pt-6" key={section.categorySlug}>
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                      <h3 className="text-[1.05rem] font-semibold text-[var(--text)]">{section.categoryName}</h3>
+                      <AppLink
+                        className="inline-flex items-center text-sm font-semibold text-[var(--accent)] transition-colors hover:text-[var(--accent-strong)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
+                        href={listingHref(content, basePath, { category: section.categorySlug })}
+                      >
+                        Все в рубрике
+                      </AppLink>
+                    </div>
+                    <div className="mt-4 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                      {section.items.map((item) => (
+                        <ArticleCard basePath={basePath} item={item} key={item.id} />
+                      ))}
+                    </div>
+                  </section>
+                ))}
               </div>
             ) : null}
 
@@ -232,7 +267,7 @@ export function ArticleGridSection({
                   }}
                   variant="secondary"
                 >
-                  Следующая страница →
+                  Показать ещё
                 </Button>
               </div>
             ) : null}

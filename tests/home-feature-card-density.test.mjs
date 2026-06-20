@@ -111,7 +111,7 @@ test('homepage mobile rules keep the first screen and scannable cards phone-nati
   assert.match(heroSource, /md:min-h-\[720px\] lg:min-h-\[760px\]/);
   assert.match(source, /editorial-current-section scroll-mt-28 border-b border-white\/8 py-12 md:py-20/);
   assert.match(source, /editorial-current-support-row grid grid-cols-1 gap-4 sm:grid-cols-3 md:gap-5/);
-  assert.match(source, /grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3/);
+  assert.match(source, /grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3/);
   assert.match(headerSource, /min-h-\[56px\]/);
   assert.match(headerSource, /lg:min-h-\[64px\]/);
   assert.match(menuSource, /fixed inset-0/);

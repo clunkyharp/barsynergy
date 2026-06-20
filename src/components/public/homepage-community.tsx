@@ -1,4 +1,4 @@
-import { SocialLinkCard } from './social-card';
+import { SocialChannelCard } from './social-channel-card';
 import { accentFont, displayFont } from '@/lib/fonts';
 import type { HomepageSocialBlock } from '@/lib/public/home';
 
@@ -29,17 +29,18 @@ export function CommunityChannelRows({ channels }: { channels: HomepageSocialBlo
         </div>
       </div>
 
-      <div className="mt-6 grid items-stretch gap-3 md:grid-cols-3">
+      <div className="mt-6 grid items-stretch gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {channels.map((channel) => {
           const details = channelDetailsByVariant[channel.variant];
 
           return (
-            <SocialLinkCard
+            <SocialChannelCard
               actionLabel={channel.actionLabel}
+              eyebrow={details.typeLabel}
               href={channel.href}
               key={channel.id}
+              mode="link"
               title={channel.title}
-              typeLabel={details.typeLabel}
               variant={channel.variant}
             />
           );

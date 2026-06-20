@@ -50,7 +50,7 @@ export default async function AdminVacancyEditPage({ params }: AdminVacancyEditP
     <div className="space-y-8">
       <header className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Админка / Вакансии / Редактирование</p>
+          <p className="font-mono text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--muted)]">Админка / Вакансии / Редактирование</p>
           <h1 className="mt-2 text-3xl font-semibold">{vacancy.title}</h1>
         </div>
         <Button href={ADMIN_VACANCIES_PATH} variant="secondary">

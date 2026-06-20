@@ -38,4 +38,10 @@ test-results
 output/
 docs/output
 
+.audit-*/
+audit/
+
 ssh.md
+
+# Framer MCP config (holds API key)
+.mcp.json

@@ -47,7 +47,7 @@ export default async function AdminArticleDetailPage({ params, searchParams }: A
     <div className="space-y-8">
       <header className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Админка / Статьи</p>
+          <p className="font-mono text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--muted)]">Админка / Статьи</p>
           <h1 className="mt-2 text-3xl font-semibold">{article.title}</h1>
         </div>
         <Button href={ADMIN_ARTICLES_PATH} variant="ghost">

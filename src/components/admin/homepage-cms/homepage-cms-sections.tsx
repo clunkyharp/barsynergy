@@ -3,7 +3,7 @@ import type { HomepageFormAction } from '@/components/admin/homepage-cms/homepag
 import { AdminCmsInlineEditRecord, AdminCmsCompactRecordSummary } from '@/components/admin/admin-cms-form';
 import { SectionRedirect, SubmitRow, DeleteButton, RecordStatus, formatDate, lineCount } from '@/components/admin/homepage-cms/homepage-cms-utils';
 import { HomepageSectionEditor, NewRecordEditor } from '@/components/admin/homepage-cms/homepage-cms-section-layout';
-import { HeroFields, AudienceFields, CtaFields, CalculatorFields, SocialFields } from '@/components/admin/homepage-cms/homepage-cms-fields';
+import { HeroFields, AudienceFields, CtaFields, CalculatorFields, SocialFields, TestimonialFields, StepFields } from '@/components/admin/homepage-cms/homepage-cms-fields';
 
 type SectionProps = { activeSection: string };
 
@@ -12,6 +12,8 @@ type AudienceRecord = { id: string; priority: number; href: string; updatedAt: D
 type CtaRecord = { id: string; priority: number; primaryHref: string; secondaryHref: string | null; updatedAt: Date; primaryLabel: string; title: string; status: ContentStatus };
 type SocialRecord = { id: string; priority: number; href: string; variant: string | null; updatedAt: Date; name: string; title: string; status: ContentStatus };
 type CalculatorRecord = { id: string; priority: number; stepsText: string | null; updatedAt: Date; actionHref: string; cardTitle: string; title: string; status: ContentStatus };
+type TestimonialRecord = { id: string; priority: number; quote: string; author: string; role: string; city: string; updatedAt: Date; status: ContentStatus };
+type StepRecord = { id: string; priority: number; title: string; description: string; updatedAt: Date; status: ContentStatus };
 
 export function HeroSection({ heroes, activeSection, saveAction }: { heroes: HeroRecord[] } & SectionProps & { saveAction: HomepageFormAction }) {
   return (
@@ -241,6 +243,100 @@ export function CalculatorSection({ teasers, activeSection, saveAction }: { teas
           <SubmitRow />
         </NewRecordEditor>
       )}
+    </HomepageSectionEditor>
+  );
+}
+
+export function TestimonialSection({ testimonials, activeSection, saveAction, deleteAction }: { testimonials: TestimonialRecord[] } & SectionProps & { saveAction: HomepageFormAction; deleteAction: HomepageFormAction }) {
+  return (
+    <HomepageSectionEditor
+      defaultOpen={activeSection === 'homepage-testimonials'}
+      description="Отзывы заведений и специалистов. Если опубликованных записей нет, на главной показывается резервный набор."
+      id="homepage-testimonials"
+      records={testimonials}
+      title="Отзывы индустрии"
+    >
+      <NewRecordEditor action={saveAction} title="Новый отзыв" description="Добавьте отзыв кофейни, бара или специалиста.">
+        <SectionRedirect sectionId="homepage-testimonials" />
+        <TestimonialFields uid="new" />
+        <SubmitRow />
+      </NewRecordEditor>
+
+      <div className="grid gap-4">
+        {testimonials.map((testimonial) => (
+          <AdminCmsInlineEditRecord
+            action={saveAction}
+            groupName="homepage-testimonial-records"
+            key={testimonial.id}
+            summary={
+              <AdminCmsCompactRecordSummary
+                items={[
+                  { label: 'Порядок', value: testimonial.priority },
+                  { label: 'Роль', value: testimonial.role },
+                  { label: 'Город', value: testimonial.city },
+                  { label: 'Обновлено', value: formatDate(testimonial.updatedAt) }
+                ]}
+                status={<RecordStatus record={testimonial} />}
+                subtitle={testimonial.author}
+                title={testimonial.quote}
+              />
+            }
+          >
+            <SectionRedirect sectionId="homepage-testimonials" />
+            <input name="testimonialId" type="hidden" value={testimonial.id} />
+            <TestimonialFields testimonial={testimonial} uid={testimonial.id} />
+            <SubmitRow record={testimonial}>
+              {testimonial.status === ContentStatus.DRAFT ? <DeleteButton action={deleteAction} id={testimonial.id} /> : null}
+            </SubmitRow>
+          </AdminCmsInlineEditRecord>
+        ))}
+      </div>
+    </HomepageSectionEditor>
+  );
+}
+
+export function StepsSection({ steps, activeSection, saveAction, deleteAction }: { steps: StepRecord[] } & SectionProps & { saveAction: HomepageFormAction; deleteAction: HomepageFormAction }) {
+  return (
+    <HomepageSectionEditor
+      defaultOpen={activeSection === 'homepage-steps'}
+      description="Блок «Как это работает». Номера шагов проставляются автоматически по порядку. Если опубликованных записей нет, показывается резервный набор."
+      id="homepage-steps"
+      records={steps}
+      title="Шаги «Как это работает»"
+    >
+      <NewRecordEditor action={saveAction} title="Новый шаг" description="Добавьте шаг сценария использования платформы.">
+        <SectionRedirect sectionId="homepage-steps" />
+        <StepFields uid="new" />
+        <SubmitRow />
+      </NewRecordEditor>
+
+      <div className="grid gap-4">
+        {steps.map((step) => (
+          <AdminCmsInlineEditRecord
+            action={saveAction}
+            groupName="homepage-step-records"
+            key={step.id}
+            summary={
+              <AdminCmsCompactRecordSummary
+                items={[
+                  { label: 'Порядок', value: step.priority },
+                  { label: 'Обновлено', value: formatDate(step.updatedAt) }
+                ]}
+                status={<RecordStatus record={step} />}
+                subtitle={step.description}
+                title={step.title}
+              />
+            }
+          >
+            <SectionRedirect sectionId="homepage-steps" />
+            <input name="stepId" type="hidden" value={step.id} />
+            <StepFields step={step} uid={step.id} />
+            <SubmitRow record={step}>
+              {step.status === ContentStatus.DRAFT ? <DeleteButton action={deleteAction} id={step.id} /> : null}
+            </SubmitRow>
+          </AdminCmsInlineEditRecord>
+        ))}
+      </div>
     </HomepageSectionEditor>
   );
 }

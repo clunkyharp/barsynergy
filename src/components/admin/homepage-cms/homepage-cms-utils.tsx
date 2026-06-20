@@ -159,7 +159,7 @@ export function ExternalSectionStats({ details, label, variant = 'neutral' }: Ex
     <div className="flex flex-wrap items-center gap-2">
       <StatusBadge variant={variant}>{label}</StatusBadge>
       {details ? (
-        <span className="rounded-[var(--radius-sm)] border border-[var(--line)] px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">
+        <span className="rounded-[var(--radius-sm)] border border-[var(--line)] px-2.5 py-1 font-mono text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--muted)]">
           {details}
         </span>
       ) : null}

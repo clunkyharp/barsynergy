@@ -57,7 +57,7 @@ export function HomeHeroRouter({ stats }: { stats: HomepageData["stats"] }) {
             BARSYNERGY / Кофейная индустрия СКФО
           </PublicEyebrow>
           <h1
-            className={`${displayFont.className} mt-4 max-w-[18ch] text-[clamp(2.6rem,4.6vw,5.4rem)] font-normal leading-[0.96] text-balance text-[var(--editorial-dark-text)] max-[640px]:max-w-[13ch] max-[640px]:text-[clamp(2.2rem,9vw,3.2rem)]`}
+            className={`${displayFont.className} mt-4 max-w-[18ch] text-[clamp(2.6rem,4.6vw,5.4rem)] font-semibold tracking-[-0.01em] leading-[0.96] text-balance text-[var(--editorial-dark-text)] max-[640px]:max-w-[13ch] max-[640px]:text-[clamp(2.2rem,9vw,3.2rem)]`}
             id="home-hero-title"
           >
             Платформа, которая объединяет людей индустрии кофе и бара

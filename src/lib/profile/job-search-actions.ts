@@ -16,8 +16,7 @@ const jobSearchSchema = z.object({
   jobSearchStatus: z.enum(['ACTIVE', 'OPEN', 'NOT_LOOKING']).optional(),
   desiredSalary: z.coerce.number().int().min(0).optional().nullable(),
   desiredSalaryMax: z.coerce.number().int().min(0).optional().nullable(),
-  employmentTypes: z.array(z.enum(['FULL_TIME', 'PART_TIME', 'FREELANCE', 'REMOTE'])),
-  isPublic: z.coerce.boolean()
+  employmentTypes: z.array(z.enum(['FULL_TIME', 'PART_TIME', 'FREELANCE', 'REMOTE']))
 });
 
 const SETTINGS_PATH = '/profile/settings';
@@ -37,8 +36,7 @@ export async function updateJobSearch(_prevState: ProfileActionResult, formData:
       jobSearchStatus: optionalString(getString(formData, 'jobSearchStatus')),
       desiredSalary: optionalString(getString(formData, 'desiredSalary').replace(/\D/g, '')),
       desiredSalaryMax: optionalString(getString(formData, 'desiredSalaryMax').replace(/\D/g, '')),
-      employmentTypes: getArray(formData, 'employmentTypes'),
-      isPublic: formData.get('isPublic') === 'on'
+      employmentTypes: getArray(formData, 'employmentTypes')
     });
 
     await prisma.profile.upsert({
@@ -49,15 +47,13 @@ export async function updateJobSearch(_prevState: ProfileActionResult, formData:
         jobSearchStatus: parsed.jobSearchStatus as never,
         desiredSalary: parsed.desiredSalary ?? null,
         desiredSalaryMax: parsed.desiredSalaryMax ?? null,
-        employmentTypes: parsed.employmentTypes as never,
-        isPublic: parsed.isPublic
+        employmentTypes: parsed.employmentTypes as never
       },
       update: {
         jobSearchStatus: parsed.jobSearchStatus as never,
         desiredSalary: parsed.desiredSalary ?? null,
         desiredSalaryMax: parsed.desiredSalaryMax ?? null,
-        employmentTypes: parsed.employmentTypes as never,
-        isPublic: parsed.isPublic
+        employmentTypes: parsed.employmentTypes as never
       }
     });
 

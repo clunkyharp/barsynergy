@@ -2,26 +2,11 @@ import { ArrowUpRight, CalendarDays, Clock, MapPin } from 'lucide-react';
 import { AppLink } from '@/components/ui/app-link';
 import { Button } from '@/components/ui/button';
 import { MetaChip } from '@/components/ui/meta-chip';
+import { ContentSubscribeForm } from '@/components/public/content-subscribe-form';
 import { displayFont } from '@/lib/fonts';
 import type { PublishedContentList, PublishedContentItem } from '@/lib/public/content';
+import { getCategoryStyle } from '@/lib/public/event-category-styles';
 import { cn } from '@/lib/utils';
-
-const categoryColors: Record<string, { bg: string; text: string }> = {
-  'каппинг': { bg: 'rgba(255,208,47,0.18)', text: '#c89b00' },
-  'лекция': { bg: 'rgba(34,197,94,0.15)', text: '#15803d' },
-  'чемпионат': { bg: 'rgba(239,68,68,0.15)', text: '#b91c1c' },
-  'мастер-класс': { bg: 'rgba(168,85,247,0.15)', text: '#7c3aed' },
-  'встреча': { bg: 'rgba(59,130,246,0.15)', text: '#1d4ed8' },
-  'обучение': { bg: 'rgba(249,115,22,0.15)', text: '#c2410c' }
-};
-
-function getCategoryStyle(label?: string, isDark: boolean = false) {
-  const colors = categoryColors[label?.toLowerCase() ?? ''];
-  if (colors) return colors;
-  return isDark
-    ? { bg: 'var(--accent)', text: 'var(--accent-contrast)' }
-    : { bg: 'var(--accent-soft)', text: 'var(--accent)' };
-}
 
 function pageHref(content: PublishedContentList, basePath: string, page: number) {
   const params = new URLSearchParams();
@@ -251,7 +236,7 @@ function CompactEventCard({ item }: { item: PublishedContentItem }) {
   );
 }
 
-export function EventAgendaSection({ content }: { content: PublishedContentList }) {
+export function EventAgendaSection({ cityName, content }: { cityName?: string; content: PublishedContentList }) {
   const period = Array.isArray(content.params.period) ? content.params.period[0] : content.params.period;
   const isPastArchive = period === 'past';
   const hasActiveEventFilters = Object.entries(content.params).some(([key, value]) => {
@@ -265,6 +250,7 @@ export function EventAgendaSection({ content }: { content: PublishedContentList 
 
   const sectionLabel = isPastArchive ? 'Архив событий' : 'Ближайшие события';
   const showViewAll = period && period !== 'upcoming';
+  const hasCityFilter = Boolean(cityName);
 
   return (
     <section className="background-zone background-zone-graphite border-b border-[var(--line)] py-10 md:py-14" id="events-list">
@@ -326,18 +312,33 @@ export function EventAgendaSection({ content }: { content: PublishedContentList 
             ) : (
               <div className="min-w-0 py-6">
                 <h3 className="text-xl font-semibold leading-7">
-                  {isPastArchive && !hasActiveEventFilters
+                  {hasCityFilter && !isPastArchive
+                    ? `В ${cityName} пока нет событий`
+                    : isPastArchive && !hasActiveEventFilters
                     ? 'Архив событий пока пуст'
                     : 'По этим параметрам ничего не найдено'}
                 </h3>
                 <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--muted)]">
-                  {isPastArchive && !hasActiveEventFilters
+                  {hasCityFilter && !isPastArchive
+                    ? 'Можно предложить событие для афиши или подписаться на новые анонсы по региону.'
+                    : isPastArchive && !hasActiveEventFilters
                     ? 'Прошедшие встречи появятся здесь после публикации архива.'
                     : 'Измените параметры поиска или сбросьте фильтры выше.'}
                 </p>
-                <Button className="mt-5" href="/events" variant="secondary">
-                  Сбросить фильтры
-                </Button>
+                {hasCityFilter && !isPastArchive ? (
+                  <div className="mt-5 grid gap-4 rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--surface-card)] p-4 md:grid-cols-[minmax(0,0.42fr)_minmax(0,0.58fr)] md:items-end">
+                    <div>
+                      <Button href="/contacts?topic=event#contact-form" variant="secondary">
+                        Предложить событие
+                      </Button>
+                    </div>
+                    <ContentSubscribeForm topic="EVENTS" label="Получить уведомление" />
+                  </div>
+                ) : (
+                  <Button className="mt-5" href="/events" variant="secondary">
+                    Сбросить фильтры
+                  </Button>
+                )}
               </div>
             )}
           </div>

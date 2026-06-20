@@ -86,7 +86,7 @@ export function MasterSubmissionForm() {
 
       <ConsentField>
         Я согласен на обработку персональных данных в соответствии с{' '}
-        <a className="text-[var(--accent)] hover:underline" href="/legal/privacy" target="_blank">политикой конфиденциальности</a>.
+        <a className="break-words text-[var(--accent)] hover:underline" href="/legal/privacy" target="_blank">политикой конфиденциальности</a>.
       </ConsentField>
 
       <PublicFormValidation />
@@ -97,8 +97,8 @@ export function MasterSubmissionForm() {
         </p>
       ) : null}
 
-      <div className="flex justify-end border-t border-[var(--line)] pt-6">
-        <SubmitButton disabled={isPending}>
+      <div className="flex flex-col items-stretch gap-3 border-t border-[var(--line)] pt-6 sm:flex-row sm:items-center sm:justify-end">
+        <SubmitButton className="w-full sm:w-auto" disabled={isPending}>
           {isPending ? 'Отправляем…' : 'Отправить заявку'}
         </SubmitButton>
       </div>

@@ -35,7 +35,7 @@ export default async function AdminGeneralSponsorEditPage({ params, searchParams
     <div className="space-y-8">
       <header className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Админка / Генспонсоры</p>
+          <p className="font-mono text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--muted)]">Админка / Генспонсоры</p>
           <h1 className="mt-2 text-3xl font-semibold">{sponsor.name}</h1>
         </div>
         <Button href={ADMIN_GENERAL_SPONSORS_PATH} variant="ghost">

@@ -1,5 +1,6 @@
 import nodemailer from 'nodemailer';
 import { getEnv } from '@/lib/validation/env';
+import { brandButtonHtml, mutedTextHtml } from '@/lib/notifications/email-theme';
 
 export async function sendBusinessWelcomeEmail({
   to,
@@ -91,11 +92,9 @@ export async function sendVerificationEmail({
     html: `
       <p>Спасибо за регистрацию в <strong>BARSYNERGY</strong>.</p>
       <p style="margin:24px 0">
-        <a href="${verificationUrl}" style="background:#ffd02f;color:#1c1c1e;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:600">
-          Подтвердить email
-        </a>
+        ${brandButtonHtml(verificationUrl, 'Подтвердить email')}
       </p>
-      <p style="color:#888;font-size:13px">Ссылка действует 24 часа. Если вы не регистрировались — проигнорируйте это письмо.</p>
+      <p>${mutedTextHtml('Ссылка действует 24 часа. Если вы не регистрировались — проигнорируйте это письмо.')}</p>
     `
   });
 }
@@ -138,11 +137,9 @@ export async function sendPasswordResetEmail({
     html: `
       <p>Вы запросили сброс пароля для входа в <strong>BARSYNERGY</strong>.</p>
       <p style="margin:24px 0">
-        <a href="${resetUrl}" style="background:#ffd02f;color:#1c1c1e;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:600">
-          Сбросить пароль
-        </a>
+        ${brandButtonHtml(resetUrl, 'Сбросить пароль')}
       </p>
-      <p style="color:#888;font-size:13px">Ссылка действует 1 час. Если вы не запрашивали сброс — проигнорируйте это письмо.</p>
+      <p>${mutedTextHtml('Ссылка действует 1 час. Если вы не запрашивали сброс — проигнорируйте это письмо.')}</p>
     `
   });
 }

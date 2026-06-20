@@ -12,7 +12,7 @@ function AdminMobileUnsupportedState() {
   return (
     <div className="grid min-h-screen place-items-center px-4 py-6 lg:hidden">
       <Panel aria-labelledby="admin-mobile-title" className="w-full max-w-md" padding="lg" tone="elevated">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Админка BARSYNERGY</p>
+        <p className="font-mono text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--accent)]">Админка BARSYNERGY</p>
         <h1 className="mt-3 text-2xl font-semibold leading-[1.20] text-balance" id="admin-mobile-title">
           Нужен широкий экран
         </h1>

@@ -99,9 +99,15 @@ export async function getPublishedArticles(params: PublicContentSearchParams = {
   const pageSize = getPageSize(params);
   const q = optionalParam(params, 'q');
   const sort = optionalParam(params, 'sort');
+  const excludedIds = Array.isArray(params.excludeId)
+    ? params.excludeId.filter(Boolean)
+    : params.excludeId
+      ? [params.excludeId]
+      : [];
   const publishedAtOrder = sort === 'oldest' ? ('asc' as const) : ('desc' as const);
   const baseWhere: Prisma.ArticleWhereInput = {
     status: ContentStatus.PUBLISHED,
+    id: excludedIds.length > 0 ? { notIn: excludedIds } : undefined,
     category: optionalParam(params, 'category') ? { slug: optionalParam(params, 'category'), type: CategoryType.ARTICLE } : undefined,
     city: optionalParam(params, 'city') ? { slug: optionalParam(params, 'city') } : undefined,
     tags: optionalParam(params, 'tag')

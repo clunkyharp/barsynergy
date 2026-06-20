@@ -52,7 +52,7 @@ export function CalculatorResultRail({
         data-calculator-result-state={resultState}
       >
         {/* Dark accent header */}
-        <div className="bg-[var(--editorial-dark-surface-muted)] px-5 py-4" data-theme="dark">
+        <div className="deco-card bg-[var(--editorial-dark-surface-muted)] px-5 py-4" data-pattern="dots" data-theme="dark">
           <p className="text-[10px] font-bold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--editorial-dark-label)]">
             {resultState === 'error' ? 'Проверьте данные' : canShowSalePrice ? 'Итоговый расчёт' : 'Новый расчёт'}
           </p>

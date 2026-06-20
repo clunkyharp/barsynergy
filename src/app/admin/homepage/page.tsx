@@ -8,13 +8,17 @@ import { AdminCmsCompactRecordSummary } from '@/components/admin/admin-cms-form'
 import {
   deleteHomepageAudienceCard,
   deleteHomepageSocialBlock,
+  deleteHomepageStep,
+  deleteHomepageTestimonial,
   saveHomepageAudienceCard,
   saveHomepageCalculatorTeaser,
   saveHomepageCtaBlock,
   saveHomepageHero,
-  saveHomepageSocialBlock
+  saveHomepageSocialBlock,
+  saveHomepageStep,
+  saveHomepageTestimonial
 } from '@/app/admin/homepage/actions';
-import { HeroSection, AudienceSection, CtaSection, SocialSection, CalculatorSection } from '@/components/admin/homepage-cms/homepage-cms-sections';
+import { HeroSection, AudienceSection, CtaSection, SocialSection, CalculatorSection, TestimonialSection, StepsSection } from '@/components/admin/homepage-cms/homepage-cms-sections';
 import { getHomepageCmsData } from '@/lib/admin/homepage-queries';
 import type { AdminContentSearchParams } from '@/lib/admin/content-utils';
 
@@ -37,16 +41,18 @@ export default async function AdminHomepagePage({ searchParams }: { searchParams
 
       <AdminActionAlert params={params} />
 
-      <h2 className="text-sm font-semibold uppercase tracking-[0.12em] text-[var(--muted)]">Контент главной</h2>
+      <h2 className="font-mono text-xs font-medium uppercase tracking-[0.22em] text-[var(--muted)]">Контент главной</h2>
       <HeroSection heroes={cmsData.heroes} activeSection={activeSection} saveAction={saveHomepageHero} />
 
       <AudienceSection cards={cmsData.audienceCards} activeSection={activeSection} saveAction={saveHomepageAudienceCard} deleteAction={deleteHomepageAudienceCard} />
+
+      <StepsSection steps={cmsData.steps} activeSection={activeSection} saveAction={saveHomepageStep} deleteAction={deleteHomepageStep} />
 
       <CtaSection ctaBlocks={cmsData.ctaBlocks} activeSection={activeSection} saveAction={saveHomepageCtaBlock} />
 
       <CalculatorSection teasers={cmsData.calculatorTeasers} activeSection={activeSection} saveAction={saveHomepageCalculatorTeaser} />
 
-      <h2 className="pt-2 text-sm font-semibold uppercase tracking-[0.12em] text-[var(--muted)]">Внешние блоки и каналы</h2>
+      <h2 className="pt-2 font-mono text-xs font-medium uppercase tracking-[0.22em] text-[var(--muted)]">Внешние блоки и каналы</h2>
       <HomepageSectionEditor
         defaultOpen={activeSection === 'homepage-navigation'}
         description="Эти блоки ведут в основные разделы сайта. Отдельной формы редактирования пока нет — структура задана в коде."
@@ -67,6 +73,8 @@ export default async function AdminHomepagePage({ searchParams }: { searchParams
       </HomepageSectionEditor>
 
       <SocialSection socialBlocks={cmsData.socialBlocks} activeSection={activeSection} saveAction={saveHomepageSocialBlock} deleteAction={deleteHomepageSocialBlock} />
+
+      <TestimonialSection testimonials={cmsData.testimonials} activeSection={activeSection} saveAction={saveHomepageTestimonial} deleteAction={deleteHomepageTestimonial} />
 
       <HomepageSectionEditor
         defaultOpen={activeSection === 'homepage-general-sponsors'}

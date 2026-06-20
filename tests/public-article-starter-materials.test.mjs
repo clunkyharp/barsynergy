@@ -57,3 +57,16 @@ test('latest articles use the shared published content section', () => {
   assert.doesNotMatch(articleGridSection, /function ArticleEmptyResults/);
   assert.doesNotMatch(articleGridSection, /md:min-h-\[220px\]/);
 });
+
+test('articles index renders rubric-led discovery before the compact all-materials list', () => {
+  const articlesPage = readProjectFile('src/app/(public)/articles/page.tsx');
+  const articleGridSection = readProjectFile('src/components/public/article-grid-section.tsx');
+
+  assert.match(articlesPage, /rubricSections=\{rubricSections\}/);
+  assert.match(articlesPage, /getPublishedArticles\(\{ category: rubric\.slug, pageSize: '3'/);
+  assert.match(articlesPage, /excludeId: excludedArticleIds/);
+  assert.match(articleGridSection, /type ArticleRubricSection/);
+  assert.match(articleGridSection, /Все в рубрике/);
+  assert.match(articleGridSection, /Рубрики/);
+  assert.match(articleGridSection, /Все материалы/);
+});

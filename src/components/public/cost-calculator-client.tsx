@@ -191,17 +191,20 @@ function ParameterFields({
         label="Food cost, %"
         error={foodCostError ?? undefined}
       >
-        <input
-          aria-invalid={foodCostError ? 'true' : undefined}
-          className="field-base h-11 w-full text-right text-sm font-semibold tabular-nums disabled:opacity-50"
-          disabled={isManualMode}
-          id="calculatorFoodCost"
-          inputMode="decimal"
-          maxLength={8}
-          onChange={(e) => onFoodCostChange(e.target.value)}
-          placeholder="30"
-          value={foodCostPercent}
-        />
+        <div className="grid grid-cols-[minmax(0,1fr)_48px] gap-2">
+          <input
+            aria-invalid={foodCostError ? 'true' : undefined}
+            className="h-11 w-full rounded-[var(--radius-sm)] border border-[var(--border-default)] bg-[var(--surface-wash)] px-3 text-right text-lg font-semibold tabular-nums text-[var(--text)] outline-none transition-[border-color,box-shadow] duration-[var(--motion-duration-fast)] placeholder:text-[var(--muted)] focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]/20 disabled:opacity-50"
+            disabled={isManualMode}
+            id="calculatorFoodCost"
+            inputMode="decimal"
+            maxLength={8}
+            onChange={(e) => onFoodCostChange(e.target.value)}
+            placeholder="30"
+            value={foodCostPercent}
+          />
+          <span className="flex items-center rounded-[var(--radius-sm)] border border-[var(--border-default)] bg-[var(--surface-wash)] px-2 text-[11px] font-semibold text-[var(--muted)]">%</span>
+        </div>
       </FormField>
 
       <FormField
@@ -209,17 +212,20 @@ function ParameterFields({
         label="Своя цена, ₽"
         error={salePriceError ?? undefined}
       >
-        <input
-          aria-invalid={salePriceError ? 'true' : undefined}
-          className="field-base h-11 w-full text-right text-sm font-semibold tabular-nums disabled:opacity-50"
-          disabled={!isManualMode}
-          id="calculatorSalePrice"
-          inputMode="decimal"
-          maxLength={12}
-          onChange={(e) => onSalePriceChange(e.target.value)}
-          placeholder={canShowRecommendedPrice ? decimal(recommendedPrice) : '190'}
-          value={salePrice}
-        />
+        <div className="grid grid-cols-[minmax(0,1fr)_48px] gap-2">
+          <input
+            aria-invalid={salePriceError ? 'true' : undefined}
+            className="h-11 w-full rounded-[var(--radius-sm)] border border-[var(--border-default)] bg-[var(--surface-wash)] px-3 text-right text-lg font-semibold tabular-nums text-[var(--text)] outline-none transition-[border-color,box-shadow] duration-[var(--motion-duration-fast)] placeholder:text-[var(--muted)] focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]/20 disabled:opacity-50"
+            disabled={!isManualMode}
+            id="calculatorSalePrice"
+            inputMode="decimal"
+            maxLength={12}
+            onChange={(e) => onSalePriceChange(e.target.value)}
+            placeholder={canShowRecommendedPrice ? decimal(recommendedPrice) : '190'}
+            value={salePrice}
+          />
+          <span className="flex items-center rounded-[var(--radius-sm)] border border-[var(--border-default)] bg-[var(--surface-wash)] px-2 text-[11px] font-semibold text-[var(--muted)]">₽</span>
+        </div>
       </FormField>
     </div>
   );

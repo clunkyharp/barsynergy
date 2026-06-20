@@ -13,6 +13,18 @@ const publishedEventUpdates = [
   }
 ];
 
+function repairEspressoGadgetsBody(body) {
+  return body
+    .replaceAll(
+      'стандартного темпеоа и корзины',
+      'стандартного темпера и корзины'
+    )
+    .replaceAll(
+      'WDT-игла — да, для любой кофейни с качественным зерном.\nPuck screen — да, если команда готова к дополнительному шагу и очистке.\nCalibrated tamper — да для обучения и стандартизации, нет если бариста предпочитают ручной контроль.\nDistribution tool — нет, WDT эффективнее.\nRefractometer — да для обучения и R&D, нет для повседневного потока.\nChilled tools — нет, нишевый инструмент.',
+      '- WDT-игла — да, для любой кофейни с качественным зерном.\n- Puck screen — да, если команда готова к дополнительному шагу и очистке.\n- Calibrated tamper — да для обучения и стандартизации, нет если бариста предпочитают ручной контроль.\n- Distribution tool — нет, WDT эффективнее.\n- Refractometer — да для обучения и R&D, нет для повседневного потока.\n- Chilled tools — нет, нишевый инструмент.'
+    );
+}
+
 async function main() {
   const deletedVacancies = await prisma.vacancy.deleteMany({
     where: {
@@ -74,13 +86,31 @@ async function main() {
     }
   });
 
+  const espressoArticle = await prisma.article.findFirst({
+    where: {
+      slug: 'espresso-gadgets-guide',
+      status: ContentStatus.PUBLISHED
+    },
+    select: { id: true, body: true }
+  });
+
+  const repairedEspressoBody = espressoArticle ? repairEspressoGadgetsBody(espressoArticle.body) : null;
+  const espressoArticleFixed = espressoArticle && repairedEspressoBody !== espressoArticle.body
+    ? await prisma.article.update({
+      where: { id: espressoArticle.id },
+      data: { body: repairedEspressoBody },
+      select: { id: true }
+    })
+    : null;
+
   console.log(
     JSON.stringify(
       {
         deletedVacancies: deletedVacancies.count,
         updatedEvents: publishedEventUpdates.map((event) => event.slug),
         hustleBrewSupplierFixed: hustleBrewFix.count,
-        hustleBrewSponsorFixed: hustleBrewSponsorFix.count
+        hustleBrewSponsorFixed: hustleBrewSponsorFix.count,
+        espressoArticleFixed: Boolean(espressoArticleFixed)
       },
       null,
       2

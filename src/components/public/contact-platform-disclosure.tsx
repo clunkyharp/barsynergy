@@ -100,7 +100,7 @@ export function ContactPlatformDisclosure({
                   aria-hidden="true"
                   className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-[radial-gradient(circle,color-mix(in_srgb,var(--accent)_24%,transparent),transparent_70%)]"
                 />
-                <div className="relative grid gap-8 md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] md:items-start">
+                <div className="relative grid gap-8 md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] md:items-center">
                   <div>
                     <span className="inline-flex items-center gap-2 rounded-[var(--radius-pill)] border border-[var(--accent)]/30 bg-[color-mix(in_srgb,var(--accent)_8%,transparent)] px-3 py-1 text-[11px] font-semibold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--accent)]">
                       <Sparkles aria-hidden="true" size={12} strokeWidth={2} />
@@ -138,7 +138,7 @@ export function ContactPlatformDisclosure({
                     </div>
                   </div>
 
-                  <ul className="grid gap-3 rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--surface-wash)] p-5">
+                  <ul className="grid gap-3 rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--surface-wash)] p-5 md:self-center">
                     {promiseList.map((promise) => (
                       <li
                         className="flex items-start gap-3 text-sm leading-6 text-[var(--text)]"

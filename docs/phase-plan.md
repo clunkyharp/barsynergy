@@ -424,6 +424,197 @@ Current status:
 
 - 2026-06-07 Sprint A in progress on `fix/code-review-remediation`: hero stats, vacancy salary prefix, vacancy CTA label wiring, profile salary panels merge, articles aspect ratio, supplier logo visibility.
 
+## Phase Pre-7.1: Public Content Discovery And Data QA
+
+Goal:
+
+Tighten the public content/discovery layer after the current MVP surface review, without changing the data model, routes, auth, public forms, dependencies or production configuration.
+
+Source:
+
+- owner follow-up on 2026-06-19 after the public UX review;
+- WhatsApp contact is owner-confirmed valid and is not part of this remediation plan.
+
+In scope:
+
+- improve `/articles` from one flat grid into rubric-led discovery;
+- improve `/events` discovery by city when event content exists;
+- clean broken article markdown/data defects, starting with the espresso article;
+- lightly polish supplier detail contact cards if visual QA confirms the current block is too plain.
+
+Out of scope:
+
+- changing `SUPPORT_WHATSAPP`;
+- new Prisma models or migrations;
+- new public routes;
+- new dependencies;
+- redesigning the whole public visual system;
+- implementing Phase 5 service/specialist catalog scope.
+
+Done when:
+
+- each task has a mini-spec before implementation;
+- affected UI routes pass source checks and targeted browser smoke at desktop and mobile widths;
+- content/data cleanup includes a repeatable audit note for the checked articles;
+- `PROJECT_STATUS.md` and the Obsidian Kanban board are updated after each implemented slice.
+
+Task plan:
+
+### T1 - Materials: rubric sub-grids
+
+Files:
+
+- `src/app/(public)/articles/page.tsx`;
+- `src/components/public/article-grid-section.tsx`;
+- likely public content query helpers under `src/lib/public/content/articles.ts` if extra rubric fetches are needed.
+
+Current:
+
+- `/articles` uses `featuredItem` plus one flat grid across categories.
+
+Target:
+
+- after the featured article, render rubric sections for top categories such as `Гайды`, `Оборудование`, `Бизнес и финансы`;
+- each rubric section shows up to 3 cards and a link `Все в рубрике`;
+- keep a compact `Все материалы` section below;
+- reuse `getPublicCategoryOptions(CategoryType.ARTICLE)` and fetch bounded article lists for the selected rubrics.
+
+Reference:
+
+- Dezeen archive-style category blocks.
+
+Estimate:
+
+- M.
+
+Validation:
+
+- source review for bounded queries and no duplicated featured article;
+- `npm run lint`;
+- `npm run typecheck`;
+- browser smoke for `/articles` at desktop and mobile.
+
+Implementation note 2026-06-19:
+
+- Added rubric-led discovery on `/articles` for bounded category sections after the featured card.
+- Added `excludeId` support to the public article query so featured and already-rendered rubric articles are not duplicated.
+- Kept the flat latest-materials grid and pagination below the rubric block.
+- Added a filtered empty-state CTA to propose a topic.
+
+### T2 - Events: city sections or city tabs
+
+Files:
+
+- `src/components/public/platform-ui-event-agenda.tsx`;
+- `src/components/public/events-page-header.tsx`;
+- possibly `src/app/(public)/events/page.tsx` if the active city/filter state needs to be passed down.
+
+Current:
+
+- `EventAgendaSection` groups by date/month;
+- `EventsSearchBar` already supports city filtering.
+
+Target:
+
+- add quick city tabs above the agenda: `Махачкала`, `Грозный`, `Владикавказ`, `Нальчик`, `Все`;
+- alternatively render city sections when there is no active city filter;
+- city empty state should offer `Предложить событие` plus `Получить уведомление`;
+- reuse existing `ContentSubscribeForm`.
+
+Reference:
+
+- Boucherie Events city-led discovery.
+
+Estimate:
+
+- M, optional while the existing city filter covers the base scenario.
+
+Validation:
+
+- source review for query-param behavior and empty states;
+- `npm run lint`;
+- `npm run typecheck`;
+- browser smoke for `/events` with no filter and with a city filter.
+
+Implementation note 2026-06-19:
+
+- Added quick city tabs to the events header while preserving existing search, city, format and period query parameters.
+- Passed the active city label into the agenda section.
+- Added a city-specific empty state with `Предложить событие` and `Получить уведомление` actions.
+
+### T3 - Content QA: espresso article and related markdown audit
+
+Files/data:
+
+- source seed/import script for public articles;
+- article markdown records in the current content source or CMS data.
+
+Current defect class:
+
+- long H1 ending with a colon;
+- broken headings like `###3. Давление`;
+- list items collapsed into continuous paragraphs.
+
+Target:
+
+- find the source markdown for the espresso article;
+- fix heading hierarchy to normal H2/H3 and readable lists;
+- audit the other published materials for the same broken markdown patterns;
+- record which articles were checked and what was corrected.
+
+Estimate:
+
+- S-M, depending on how many articles are affected.
+
+Validation:
+
+- markdown/source diff review;
+- article detail browser smoke for the fixed article;
+- optional pattern search for `###\\d`, heading-colon defects and collapsed list markers.
+
+Implementation note 2026-06-19:
+
+- Source found in `scripts/seed-demo-screens.mjs`; existing demo DB repair path added to `scripts/repair-public-demo-content.mjs`.
+- Checked published article seed slugs: `how-to-calculate-drink-cost`, `what-to-include-in-vacancy`, `how-to-choose-supplier`, `how-to-prepare-guest-shift`, `skfo-bar-industry-map`, `specialty-coffee-2025-2026`, `why-coffee-prices-are-rising`, `how-to-choose-espresso-machine`, `cold-coffee-menu-category`, `bloom-filter-coffee-guide`, `espresso-gadgets-guide`, `coffee-value-assessment-explained`.
+- Corrected `espresso-gadgets-guide`: fixed typo `темпеоа` -> `темпера` and converted the final checklist into a markdown list.
+- Did not run the repair script in this batch because it mutates local demo data and also contains unrelated public-content repairs.
+- Added regression source test `tests/public-article-markdown-quality.test.mjs` for broken H3 patterns and the espresso checklist defect.
+
+### T4 - Supplier contact card polish
+
+Files:
+
+- `src/components/public/supplier-detail-body.tsx`;
+- `src/components/public/supplier-detail-hero.tsx` only if hero contact treatment needs adjustment.
+
+Current:
+
+- supplier detail already has hero, body, inquiry rail and related content;
+- contacts can still read as plain reference text when multiple people/numbers are stored in `contactLabel`.
+
+Target:
+
+- after visual QA, convert contact text such as `Иса: номер / Арсен: номер` into premium contact rows/cards with role/person label and actions: WhatsApp, phone call, supplier request;
+- keep existing data fields and avoid schema changes;
+- do not expose private application contacts beyond the already published supplier contact data.
+
+Estimate:
+
+- S, low priority.
+
+Validation:
+
+- source review for phone/WhatsApp normalization;
+- `npm run lint`;
+- `npm run typecheck`;
+- browser smoke for at least one supplier detail page.
+
+Implementation note 2026-06-19:
+
+- Added contact parsing for multi-person supplier contact labels, email, phone, Telegram and WhatsApp values.
+- Rendered parsed contacts as `ContactActionRow` items using existing published supplier fields.
+- Added a compact `Запросить условия` CTA in the supplier contact rail.
+
 ## Phase 7: Stabilization And Release 1.0
 
 Goal:

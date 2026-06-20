@@ -117,7 +117,7 @@ export function AdminSidebar({ collapsed, onCollapsedChange, newApplicationsCoun
 
                     return (
                       <NavLink
-                        active={isActive}
+                        aria-current={isActive ? 'page' : undefined}
                         aria-label={item.label}
                         className="admin-nav-link"
                         href={item.href}

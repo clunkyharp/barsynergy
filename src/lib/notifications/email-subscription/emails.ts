@@ -1,5 +1,6 @@
 import nodemailer from 'nodemailer';
 import { getEnv } from '@/lib/validation/env';
+import { brandButtonHtml, mutedTextHtml } from '@/lib/notifications/email-theme';
 
 function escapeHtml(value: string) {
   return value
@@ -102,11 +103,9 @@ export async function sendNewsletterConfirmEmail({
     html: `
       <p>Вы оставили email для еженедельного дайджеста <strong>BARSYNERGY</strong>.</p>
       <p style="margin:24px 0">
-        <a href="${safeConfirmUrl}" style="background:#ffd02f;color:#1c1c1e;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:600">
-          Подтвердить подписку
-        </a>
+        ${brandButtonHtml(safeConfirmUrl, 'Подтвердить подписку')}
       </p>
-      <p style="color:#888;font-size:13px">Если вы не оставляли email — проигнорируйте это письмо.</p>
+      <p>${mutedTextHtml('Если вы не оставляли email — проигнорируйте это письмо.')}</p>
     `
   });
 }

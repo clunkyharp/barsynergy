@@ -917,21 +917,21 @@ form[data-public-validation="true"] .grid-cols-2 .form-field {
     border: 1px solid var(--line);
     border-radius: var(--radius-lg);
     background: color-mix(in oklab, var(--surface-card) 68%, transparent);
-    padding: 0.35rem;
+    padding: 0.2rem;
 }
 
 .vacancy-directory-tab {
     display: inline-flex;
     flex: 0 0 auto;
     min-width: 0;
-    min-height: 3rem;
+    min-height: 2.25rem;
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-    border-radius: var(--radius-md);
-    padding: 0.6rem 1rem;
+    border-radius: var(--radius-sm);
+    padding: 0.35rem 0.85rem;
     color: var(--muted);
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     font-weight: 700;
     line-height: 1.2;
     text-align: center;
@@ -959,65 +959,8 @@ form[data-public-validation="true"] .grid-cols-2 .form-field {
     opacity: 0.78;
 }
 
-.specialist-mode-panel {
-    display: grid;
-    gap: 1.5rem;
-    border: 1px solid var(--line);
-    border-radius: var(--radius-lg);
-    background:
-        linear-gradient(
-            180deg,
-            color-mix(in oklab, var(--surface-card) 94%, transparent),
-            color-mix(in oklab, var(--surface-card) 78%, transparent)
-        );
-    padding: 1.5rem;
-}
-
-.specialist-mode-link {
-    display: flex;
-    min-height: 3.5rem;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-    border: 1px solid var(--line);
-    border-radius: var(--radius-md);
-    padding: 0.9rem 1rem;
-    font-size: 0.95rem;
-    font-weight: 700;
-    line-height: 1.25;
-    transition:
-        background-color var(--motion-duration-fast) var(--motion-ease-standard),
-        border-color var(--motion-duration-fast) var(--motion-ease-standard),
-        color var(--motion-duration-fast) var(--motion-ease-standard);
-}
-
-.specialist-mode-link-active {
-    border-color: color-mix(in oklab, var(--accent) 72%, var(--line));
-    background: color-mix(in oklab, var(--accent-soft) 68%, transparent);
-    color: var(--accent);
-}
-
-.specialist-mode-link-idle {
-    color: var(--text);
-}
-
-.specialist-mode-link-idle:hover,
-.specialist-mode-link-idle:focus-visible {
-    border-color: color-mix(in oklab, var(--accent) 38%, var(--line));
-    background: var(--surface-wash);
-}
-
-.specialist-mode-note {
-    align-self: end;
-    border-top: 1px solid var(--line);
-    padding-top: 1.25rem;
-    color: var(--muted);
-    font-size: 0.9rem;
-    line-height: 1.55;
-}
-
 .specialist-mode-bar {
-    display: none;
+    display: flex;
     flex-wrap: wrap;
     align-items: center;
     gap: 0.75rem;
@@ -1025,12 +968,6 @@ form[data-public-validation="true"] .grid-cols-2 .form-field {
     border-radius: var(--radius-lg);
     background: color-mix(in oklab, var(--surface-card) 72%, transparent);
     padding: 0.75rem 1rem;
-}
-
-@media (max-width: 1023px) {
-    .specialist-mode-bar {
-        display: flex;
-    }
 }
 
 .specialist-mode-bar-links {

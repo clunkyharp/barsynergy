@@ -4,7 +4,7 @@ import { HomeHeroRouter } from './homepage-hero';
 import { HomeEventsStrip, EditorialFeatured, EditorialSupportCard } from './homepage-current';
 import { CommunityChannelRows } from './homepage-community';
 import { HomeSponsorLogoStrip } from './homepage-sponsors';
-import { HomeTestimonials } from './homepage-testimonials';
+
 import { HomeCtaFaqSection } from './home-cta-faq-section';
 import { Button } from '@/components/ui/button';
 import { bodyFont, displayFont } from '@/lib/fonts';
@@ -32,6 +32,7 @@ export function HomepageClient({ data }: HomepageClientProps) {
     <div className="overflow-x-hidden">
       <HomeHeroRouter stats={data.stats} />
 
+
       <section className="editorial-current-section scroll-mt-28 border-b border-white/8 py-12 md:py-20" data-theme="dark" id="home-fresh">
         <div className="container">
           <div className="mb-7 flex flex-wrap items-end justify-between gap-4 md:mb-9">
@@ -51,7 +52,7 @@ export function HomepageClient({ data }: HomepageClientProps) {
             <div className="editorial-current-support-row grid grid-cols-1 gap-4 sm:grid-cols-3 md:gap-5">
               <EditorialSupportCard actionLabel={data.vacancy ? 'Откликнуться' : 'Все вакансии'} card={data.vacancy} label="Вакансии" />
               <EditorialSupportCard actionLabel="Читать" card={materialsCard} fallbackMeta="Другие материалы" label="Материалы" />
-              <EditorialSupportCard actionLabel={data.supplier ? 'Открыть' : 'Смотреть поставщиков'} card={data.supplier} label="Поставщики" />
+              <EditorialSupportCard actionLabel={data.supplier ? 'Смотреть поставщика' : 'Смотреть поставщиков'} card={data.supplier} label="Поставщики" />
             </div>
           </div>
         </div>
@@ -73,23 +74,24 @@ export function HomepageClient({ data }: HomepageClientProps) {
               <ArrowUpRight size={16} />
             </Button>
           </div>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
-            {liveSectionCards.map((card, index) => (
-              <EditorialSupportCard
-                actionLabel={card.actionLabel}
-                card={card}
-                fallbackMeta="Рабочий раздел"
-                key={`${card.kind}-${card.href}-${index}`}
-                label={card.eyebrow}
-              />
-            ))}
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {liveSectionCards.map((card, index) => {
+              return (
+                <EditorialSupportCard
+                  actionLabel={card.actionLabel}
+                  card={card}
+                  density="compact"
+                  fallbackMeta="Рабочий раздел"
+                  key={`${card.kind}-${card.href}-${index}`}
+                  label={card.eyebrow}
+                />
+              );
+            })}
           </div>
         </div>
       </section>
 
       {data.generalSponsors.length > 0 ? <HomeSponsorLogoStrip sponsors={data.generalSponsors} /> : null}
-
-      <HomeTestimonials testimonials={data.testimonials} />
 
       <HomeCtaFaqSection />
 
