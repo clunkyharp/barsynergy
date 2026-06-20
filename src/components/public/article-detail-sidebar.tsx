@@ -2,6 +2,7 @@ import type { TocItem } from '@/lib/public/content/articles';
 import type { PublishedContentItem } from '@/lib/public/content';
 import { Panel } from '@/components/ui/panel';
 import { ContentSubscribeForm } from '@/components/public/content-subscribe-form';
+import { getArticleFallbackImage } from '@/components/public/article-grid-card';
 
 type ArticleDetailSidebarProps = {
   toc: TocItem[];
@@ -68,7 +69,7 @@ function ArticleRelatedBlock({
             <span
               aria-hidden="true"
               className="h-16 w-16 shrink-0 overflow-hidden rounded-[var(--radius-md)] bg-[var(--surface-muted)] bg-cover bg-center"
-              style={item.imageUrl ? { backgroundImage: `url("${item.imageUrl}")` } : undefined}
+              style={{ backgroundImage: `url("${item.imageUrl ?? getArticleFallbackImage(item.label)}")` }}
             />
             <span className="min-w-0 flex-1">
               {item.label ? (
@@ -182,7 +183,6 @@ export function ArticleDetailSidebar({
   return (
     <aside className="space-y-4 xl:sticky xl:top-20 xl:self-start">
       <ArticleTocBlock toc={toc} />
-      <ArticleRelatedBlock basePath={basePath} related={related} />
       <ArticleDetailBlock
         authorName={authorName}
         cityName={cityName}
@@ -191,6 +191,7 @@ export function ArticleDetailSidebar({
         sourceLabel={sourceLabel}
       />
       <ArticleTagsBlock tags={tags} />
+      <ArticleRelatedBlock basePath={basePath} related={related} />
       <ArticleSubscribeBlock topic={subscribeTopic} />
     </aside>
   );

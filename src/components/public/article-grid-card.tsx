@@ -52,7 +52,7 @@ function AuthorAvatar({ name }: { name: string }) {
   );
 }
 
-function getArticleFallbackImage(label?: string): string {
+export function getArticleFallbackImage(label?: string): string {
   const upper = (label ?? '').toUpperCase();
   if (upper === 'МЕНЮ' || upper === 'ЭКОНОМИКА') return '/images/generated/content-guide.jpg';
   if (upper === 'КОМАНДА' || upper === 'СЕРВИС') return '/images/generated/content-service.jpg';
