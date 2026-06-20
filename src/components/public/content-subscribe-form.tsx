@@ -15,6 +15,7 @@ type ContentSubscribeFormProps = {
   topic: string;
   label?: string;
   className?: string;
+  stack?: boolean;
 };
 
 const initialState: ContentSubscribeState = null;
@@ -23,6 +24,7 @@ export function ContentSubscribeForm({
   topic,
   label = "Уведомить о новых",
   className,
+  stack = false,
 }: ContentSubscribeFormProps) {
   const [state, formAction, pending] = useActionState(
     subscribeToContentAction,
@@ -54,7 +56,7 @@ export function ContentSubscribeForm({
   return (
     <form action={formAction} className={cn("max-w-xl", className)}>
       <input name="topic" type="hidden" value={topic} />
-      <div className="flex flex-wrap items-end gap-2">
+      <div className={cn("flex gap-2", stack ? "flex-col items-stretch" : "flex-wrap items-end")}>
         <div className="min-w-0 flex-1">
           <label
             className="mb-1 block text-[11px] font-semibold uppercase tracking-[0.1em] text-[var(--muted)]"
@@ -73,7 +75,10 @@ export function ContentSubscribeForm({
           />
         </div>
         <Button
-          className="h-[52px] shrink-0 rounded-[var(--radius-md)] px-4 text-[12px] uppercase tracking-[0.06em]"
+          className={cn(
+            "h-[52px] shrink-0 rounded-[var(--radius-md)] px-4 text-[12px] uppercase tracking-[0.06em]",
+            stack && "w-full justify-center",
+          )}
           disabled={pending}
           type="submit"
           variant="primary"

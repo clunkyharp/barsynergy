@@ -34,13 +34,15 @@ export async function generateMetadata({ params }: ArticleDetailPageProps): Prom
 export default async function ArticleDetailPage({ params }: ArticleDetailPageProps) {
   const { slug: rawSlug } = await params;
   const slug = decodeURIComponent(rawSlug);
-  const [article, related] = await Promise.all([getPublishedArticleDetail(slug), getPublishedArticles({ pageSize: '4' })]);
+  const [article, related] = await Promise.all([getPublishedArticleDetail(slug), getPublishedArticles({ pageSize: '8' })]);
 
   if (!article) {
     notFound();
   }
   const detailPath = `/articles/${article.slug}`;
-  const relatedItems = related.items.filter((item) => item.slug !== slug).slice(0, 3);
+  const allRelated = related.items.filter((item) => item.slug !== slug);
+  const sidebarRelated = allRelated.slice(0, 3);
+  const bottomRelated = allRelated.slice(3, 6);
 
   const knownMetaItems = compact([article.cityName, article.authorName, article.readingTime]);
   const tags = article.meta.filter((item) => !knownMetaItems.includes(item));
@@ -73,16 +75,18 @@ export default async function ArticleDetailPage({ params }: ArticleDetailPagePro
       />
       <ArticleDetailBody
         authorName={article.authorName}
+        basePath="/articles"
         body={article.body}
         cityName={article.cityName}
         publishedAtIso={article.publishedAtIso}
         readingTime={article.readingTime}
+        related={sidebarRelated}
         sourceReferences={article.sourceReferences}
         tags={tags}
         toc={toc}
       />
       <ArticleRelatedSection
-        items={relatedItems}
+        items={bottomRelated}
       />
     </>
   );
