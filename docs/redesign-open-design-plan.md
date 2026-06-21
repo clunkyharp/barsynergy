@@ -29,5 +29,18 @@
 
 Ключевые правки файлов: `article-detail-body.tsx` (layout, lead, pull-quote), `article-detail-sidebar.tsx` (полная пересборка: TOC+Похожие+Подписка), `article-detail-hero.tsx` (+image), `article-related-section.tsx` (карточки), CSS `base.css .article-body` + `public.css`. Проводка related → sidebar в `articles/[slug]/page.tsx`.
 
-## Экраны 2–6
-Снять референс-скрины и спеку отличий аналогично перед каждым портом.
+## Прогресс
+- [x] Экран 1 — article-detail: sticky-сайдбар (TOC+Похожие+Детали+Темы+Подписка), related-карточки по макету (фото+rubric-пилюля+title+дата), фолбэк-обложки. Коммиты 5d34c8b, b79333b.
+- [x] Экран 2 — articles: карточки (фото+пилюля+title+дата), featured горизонтальный split, нумерованная пагинация. Коммиты b62bb4d, ad23aca.
+- [x] Экран 3 — vacancy-detail: «Другие вакансии» = компактная карточка вакансии. cbb36e0.
+- [x] Экран 4 — vacancies: `OpportunityListRow` → компактная кликабельная карточка (бейдж+«Новая»+должность+амбер-зарплата+чипы). cbb36e0.
+- [ ] Экран 5 — suppliers
+- [ ] Экран 6 — masters
+
+Демо-данные засеяны частично (`demo:seed:screens`, упал на publicHandle): vacancy 3 PUB, supplier 4 PUB, master 7 PUB. Сбросить при желании.
+
+## Экраны 5–6 (suppliers / masters) — спека
+Общий компонент `DirectoryListRow` (published-content-row-directory.tsx). Сейчас: высокая карточка badge-слева + name + chips + описание + 2 кнопки (Связаться+Профиль) + сайт.
+Макет suppliers: 4-кол сетка, карточка = МЕДИА-ШАПКА с крупной категорией (ROAST/ESPRESSO/SYRUP) flush к краям + body (name+verified, city, chips, описание 2 строки, «Связаться» full-width amber).
+ЗАМЕЧАНИЕ: flush-медиа конфликтует с `.public-list-row-shell-hh` padding 1.5rem (forms.css ~1020). Чистый порт = вынести карточку из shell-системы (own border/overflow) ИЛИ убрать padding шелла для suppliers/masters и дать body свой padding. Грид: суж. minmax до ~16rem для 4 колонок.
+Альтернатива (дешевле): компактная карточка как у вакансий (в рамках shell, без flush-медиа) — консистентно с vacancy, но без медиа-шапки макета.
