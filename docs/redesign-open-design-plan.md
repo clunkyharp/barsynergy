@@ -34,8 +34,10 @@
 - [x] Экран 2 — articles: карточки (фото+пилюля+title+дата), featured горизонтальный split, нумерованная пагинация. Коммиты b62bb4d, ad23aca.
 - [x] Экран 3 — vacancy-detail: «Другие вакансии» = компактная карточка вакансии. cbb36e0.
 - [x] Экран 4 — vacancies: `OpportunityListRow` → компактная кликабельная карточка (бейдж+«Новая»+должность+амбер-зарплата+чипы). cbb36e0.
-- [ ] Экран 5 — suppliers
-- [ ] Экран 6 — masters
+- [x] Экран 5 — suppliers: `DirectoryListRow` → self-contained карточка с медиа-шапкой (крупная категория / лого+чип) + name+verified + city + chips + описание + «Связаться». Грид ~4 кол. 173673a.
+- [x] Экран 6 — masters: тот же `DirectoryListRow`, кнопка «Смотреть профиль». 173673a.
+
+ФАЗА ЗАВЕРШЕНА — все 6 экранов портированы по макетам Open Design.
 
 Демо-данные засеяны частично (`demo:seed:screens`, упал на publicHandle): vacancy 3 PUB, supplier 4 PUB, master 7 PUB. Сбросить при желании.
 
