@@ -1,9 +1,7 @@
-import { ArrowUpRight, BadgeCheck } from 'lucide-react';
+import { BadgeCheck } from 'lucide-react';
 import { VERIFIED_COMPANY_ARIA } from '@/lib/public/content/trust-labels';
-import { AvatarFallback } from '@/components/ui/avatar-fallback';
-import { Button } from '@/components/ui/button';
+import { AppLink } from '@/components/ui/app-link';
 import { HighlightChip } from '@/components/ui/highlight-chip';
-import { cn } from '@/lib/utils';
 import type { PublishedContentItem, PublishedContentMetaGroup } from '@/lib/public/content';
 import {
   detailHref,
@@ -11,20 +9,6 @@ import {
   renderCompactChips,
   titleInitials
 } from './published-content-section-builders';
-
-function opportunityLabel(item: PublishedContentItem) {
-  const city = item.metaGroups?.find((entry) => entry.label === 'Город')?.value;
-  return (
-    <div className="flex flex-wrap items-center gap-2.5">
-      <span className="text-[11px] font-semibold uppercase tracking-[var(--tracking-eyebrow-sm)] text-[var(--accent)]">{item.label ?? 'Вакансия'}</span>
-      {city ? <span className="text-[11px] font-medium text-[var(--muted)]">{city}</span> : null}
-    </div>
-  );
-}
-
-function opportunityLabelMeta(item: PublishedContentItem) {
-  return item.updatedLabel ? <span className="text-[11px] font-medium text-[var(--muted)]">{item.updatedLabel}</span> : null;
-}
 
 function opportunityMeta(item: PublishedContentItem) {
   const compactEntries: PublishedContentMetaGroup[] = ['Опыт', 'Формат', 'График']
@@ -36,102 +20,69 @@ function opportunityMeta(item: PublishedContentItem) {
   return renderCompactChips(compactEntries);
 }
 
-function vacancyLead(item: PublishedContentItem) {
+function vacancySalary(item: PublishedContentItem) {
   const value = metaGroupValue(item, 'Оплата') ?? 'по договорённости';
-  return <span className="tabular-nums text-[1.35rem] font-semibold text-[var(--accent)]">{value}</span>;
-}
-
-function opportunityDescription(item: PublishedContentItem) {
-  const city = metaGroupValue(item, 'Город');
-  const summary = item.summary?.trim();
-  return [city, summary].filter(Boolean).join('. ');
-}
-
-function opportunityActions(item: PublishedContentItem, basePath: string, actionLabel: string) {
-  return [
-    { href: detailHref(basePath, item.slug), label: actionLabel, variant: 'primary' as const }
-  ];
+  return <span className="tabular-nums text-[1.3rem] font-semibold text-[var(--accent)]">{value}</span>;
 }
 
 export function OpportunityListRow({
   item,
-  basePath,
-  actionLabel = 'Открыть вакансию'
+  basePath
 }: {
   item: PublishedContentItem;
   basePath: string;
   actionLabel?: string;
 }) {
-  const actions = opportunityActions(item, basePath, actionLabel);
-  const media = item.imageUrl ? (
-    <div className="hidden sm:block">
-      <div className="grid h-14 w-14 place-items-center overflow-hidden rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--surface-wash)] md:h-16 md:w-16">
-        <span aria-hidden="true" className="h-full w-full bg-cover bg-center" style={{ backgroundImage: `url("${item.imageUrl}")` }} />
-      </div>
-    </div>
-  ) : (
-    <div className="hidden sm:block">
-      <AvatarFallback initials={titleInitials(item.subtitle ?? item.title)} />
-    </div>
-  );
-
   return (
-    <article className="public-list-row-shell public-list-row-shell-hh public-list-row-shell-vacancy">
-      <div className="grid min-w-0 gap-6">
-        <div className="min-w-0">
-          <div className="flex flex-wrap items-center gap-2.5">
-            <div>{opportunityLabel(item)}</div>
-            <div>{opportunityLabelMeta(item)}</div>
-            {item.isNew ? (
-              <HighlightChip variant="fresh">Новая</HighlightChip>
-            ) : null}
-          </div>
-          <h3 className="public-list-row-title mt-3 text-balance text-[1.35rem] font-bold leading-[1.15] text-[var(--text)] md:text-[1.55rem]">
-            {item.title}
-          </h3>
-          <div className="public-list-row-lead mt-3 text-[1.25rem] font-semibold leading-8 text-[var(--text)] md:text-[1.45rem]">
-            {vacancyLead(item)}
-          </div>
-          <div className="public-list-row-meta mt-5 sm:mt-4">{opportunityMeta(item)}</div>
-        </div>
-        <div className="public-list-row-company min-w-0">
-          <div className="grid gap-3 sm:grid-cols-[4rem_minmax(0,1fr)] sm:items-start">
-            {media}
-            <div className="min-w-0">
-              {item.subtitle ? (
-                <div className="flex min-w-0 flex-wrap items-center gap-2 text-[1.05rem] font-semibold leading-7 text-[var(--text)]">
-                  <span className="min-w-0 break-words">{item.subtitle}</span>
-                  {item.isVerified ? (
-                    <BadgeCheck aria-label={VERIFIED_COMPANY_ARIA} size={18} strokeWidth={1.8} className="shrink-0 text-[var(--accent)]" />
-                  ) : null}
-                </div>
-              ) : null}
-              <div className={cn('text-[15px] leading-7 text-[var(--muted)]', item.subtitle ? 'mt-3' : '')}>
-                {opportunityDescription(item)}
+    <article className="public-list-row-shell public-list-row-shell-hh public-list-row-shell-vacancy group relative flex flex-col gap-3.5">
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex min-w-0 items-center gap-3">
+          {item.imageUrl ? (
+            <span className="grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--surface-wash)]">
+              <span
+                aria-hidden="true"
+                className="h-full w-full bg-cover bg-center"
+                style={{ backgroundImage: `url("${item.imageUrl}")` }}
+              />
+            </span>
+          ) : (
+            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--surface-wash)] text-[13px] font-bold text-[var(--muted)]">
+              {titleInitials(item.subtitle ?? item.title)}
+            </span>
+          )}
+          <div className="min-w-0">
+            {item.subtitle ? (
+              <div className="flex items-center gap-1.5 text-[0.95rem] font-semibold leading-5 text-[var(--text)]">
+                <span className="truncate">{item.subtitle}</span>
+                {item.isVerified ? (
+                  <BadgeCheck aria-label={VERIFIED_COMPANY_ARIA} className="shrink-0 text-[var(--accent)]" size={15} strokeWidth={1.8} />
+                ) : null}
               </div>
-            </div>
+            ) : null}
+            {(() => {
+              const city = metaGroupValue(item, 'Город');
+              return city ? <span className="text-[12px] text-[var(--muted)]">{city}</span> : null;
+            })()}
           </div>
         </div>
-        {actions.length > 0 ? (
-          <div className="public-list-row-actions flex flex-col gap-2.5 sm:flex-row sm:flex-wrap">
-            {actions.map((action, index) => (
-              <Button
-                className={cn(
-                  'rounded-[var(--radius-md)] px-5 tracking-normal max-sm:w-full',
-                  index === 0 ? 'public-list-row-primary-action' : 'public-list-row-secondary-action'
-                )}
-                href={action.href}
-                key={`${action.href}-${action.label}`}
-                size="lg"
-                variant={action.variant ?? (index === 0 ? 'primary' : 'secondary')}
-              >
-                {action.label}
-                {index === 0 ? <ArrowUpRight aria-hidden="true" size={16} strokeWidth={1.8} /> : null}
-              </Button>
-            ))}
-          </div>
+        {item.isNew ? (
+          <HighlightChip variant="fresh">Новая</HighlightChip>
+        ) : item.updatedLabel ? (
+          <span className="shrink-0 text-[11px] text-[var(--muted)]">{item.updatedLabel}</span>
         ) : null}
       </div>
+
+      <h3 className="text-[1.2rem] font-bold leading-[1.2] text-[var(--text)] md:text-[1.3rem]">
+        <AppLink
+          className="transition-colors after:absolute after:inset-0 after:rounded-[inherit] focus-visible:outline-none group-hover:text-[var(--accent)]"
+          href={detailHref(basePath, item.slug)}
+        >
+          {item.title}
+        </AppLink>
+      </h3>
+
+      <div>{vacancySalary(item)}</div>
+      <div className="mt-auto">{opportunityMeta(item)}</div>
     </article>
   );
 }
