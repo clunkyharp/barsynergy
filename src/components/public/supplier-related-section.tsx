@@ -1,4 +1,4 @@
-import { EditorialCard } from '@/components/ui/cards';
+import { DirectoryListRow } from '@/components/public/published-content-row-directory';
 import { PublicDisplayTitle, PublicEyebrow } from '@/components/public/public-primitives';
 import type { PublishedContentItem } from '@/lib/public/content/shared';
 
@@ -19,26 +19,10 @@ export function SupplierRelatedSection({
         <PublicEyebrow tone="accent">Дальше</PublicEyebrow>
         <PublicDisplayTitle className="mt-3">{title}</PublicDisplayTitle>
 
-        <div className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {items.map((item) => {
-            const hasImage = Boolean(item.imageUrl);
-            const categoryMeta = item.metaGroups?.find((g) => g.label === 'Категория')?.value;
-            const cityMeta = item.metaGroups?.find((g) => g.label === 'Город')?.value;
-            const metaParts = [item.subtitle, categoryMeta, cityMeta].filter(Boolean);
-
-            return (
-              <EditorialCard
-                href={`/suppliers/${item.slug}`}
-                key={item.id}
-                media={hasImage ? { kind: 'image', src: item.imageUrl, alt: item.title } : undefined}
-                meta={metaParts.join(' · ')}
-                summary={item.summary}
-                tags={item.label ? [item.label] : undefined}
-                title={item.title}
-                tone="dark"
-              />
-            );
-          })}
+        <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {items.map((item) => (
+            <DirectoryListRow basePath="/suppliers" item={item} key={item.id} primaryActionHash="supplier-contact-rail" />
+          ))}
         </div>
       </div>
     </section>

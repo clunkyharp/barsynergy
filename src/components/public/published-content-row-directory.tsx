@@ -60,7 +60,7 @@ export function DirectoryListRow({
   const summary = item.summary?.trim();
 
   return (
-    <article className="group flex h-full flex-col overflow-hidden rounded-[var(--radius-lg)] border border-[var(--border-subtle)] bg-[var(--surface-card)] transition-colors duration-[var(--motion-duration-base)] ease-[var(--motion-ease-standard)] hover:border-[var(--border-strong)]">
+    <article className="group relative flex h-full flex-col overflow-hidden rounded-[var(--radius-lg)] border border-[var(--border-subtle)] bg-[var(--surface-card)] transition-colors duration-[var(--motion-duration-base)] ease-[var(--motion-ease-standard)] hover:border-[var(--border-strong)] focus-within:border-[var(--border-strong)]">
       <div className="relative flex h-[124px] items-center justify-center overflow-hidden bg-[var(--surface-muted)]">
         {item.imageUrl ? (
           <>
@@ -72,7 +72,7 @@ export function DirectoryListRow({
             <span aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" />
           </>
         ) : category ? (
-          <span className={`${displayFont.className} relative px-4 text-center text-[1.5rem] font-semibold uppercase leading-none tracking-[0.04em] text-[var(--muted)] opacity-70`}>
+          <span className={`${displayFont.className} relative px-6 py-4 text-center text-[1.05rem] font-semibold uppercase leading-tight tracking-[0.08em] text-[var(--muted)] opacity-60`}>
             {category}
           </span>
         ) : null}
@@ -92,7 +92,7 @@ export function DirectoryListRow({
         <div className="min-w-0">
           <h3 className="text-[1.1rem] font-bold leading-[1.25] text-[var(--text)]">
             <AppLink
-              className="inline-flex items-center gap-1.5 transition-colors hover:text-[var(--accent)] focus-visible:outline-none focus-visible:underline"
+              className="inline-flex items-center gap-1.5 transition-colors after:absolute after:inset-0 after:rounded-[inherit] hover:text-[var(--accent)] focus-visible:outline-none focus-visible:underline"
               href={profileHref}
             >
               <span className="min-w-0 break-words">{name}</span>
@@ -109,7 +109,7 @@ export function DirectoryListRow({
         {summary ? <p className="line-clamp-2 text-[13px] leading-5 text-[var(--muted)]">{summary}</p> : null}
 
         <Button
-          className="mt-auto w-full justify-center rounded-[var(--radius-md)] px-5 tracking-normal"
+          className="relative z-10 mt-auto w-full justify-center rounded-[var(--radius-md)] px-5 tracking-normal"
           href={primaryHref}
           variant="primary"
         >
