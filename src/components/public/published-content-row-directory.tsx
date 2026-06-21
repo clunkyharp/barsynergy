@@ -1,25 +1,14 @@
 import { ArrowUpRight, BadgeCheck } from 'lucide-react';
 import { VERIFIED_SUPPLIER_ARIA } from '@/lib/public/content/trust-labels';
 import { AppLink } from '@/components/ui/app-link';
-import { AvatarFallback } from '@/components/ui/avatar-fallback';
 import { Button } from '@/components/ui/button';
 import { HighlightChip } from '@/components/ui/highlight-chip';
 import { MetaChip } from '@/components/ui/meta-chip';
-import { cn } from '@/lib/utils';
+import { displayFont } from '@/lib/fonts';
 import type { PublishedContentItem, PublishedContentMetaGroup } from '@/lib/public/content';
-import {
-  detailHref,
-  metaGroupValue,
-  titleInitials
-} from './published-content-section-builders';
+import { detailHref, metaGroupValue } from './published-content-section-builders';
 
-function directoryDescription(item: PublishedContentItem) {
-  const geography = metaGroupValue(item, 'География') ?? metaGroupValue(item, 'Город');
-  const summary = item.summary?.trim() ?? null;
-  return [geography, summary].filter(Boolean).join('. ');
-}
-
-function directoryMeta(item: PublishedContentItem) {
+function directoryChips(item: PublishedContentItem) {
   const priority = ['Категория', 'Опыт', 'Формат', 'Сертификаты'];
   const usedLabels = new Set<string>();
   const entries = item.metaGroups?.filter((entry) => !['Продукты / услуги', 'География'].includes(entry.label ?? '')) ?? [];
@@ -32,17 +21,16 @@ function directoryMeta(item: PublishedContentItem) {
       usedLabels.add(label);
     }
   }
-
   for (const entry of entries) {
-    if (compactEntries.length >= 3) break;
+    if (compactEntries.length >= 2) break;
     if (!entry.label || usedLabels.has(entry.label)) continue;
     compactEntries.push(entry);
   }
+  compactEntries.splice(2);
+  if (!compactEntries.length) return null;
 
-  compactEntries.splice(3);
-  if (!compactEntries?.length) return null;
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className="flex flex-wrap gap-1.5">
       {compactEntries.map((entry) => (
         <MetaChip key={entry.label} variant="filter">
           {entry.value}
@@ -56,7 +44,6 @@ export function DirectoryListRow({
   item,
   basePath,
   actionLabel = 'Связаться',
-  profileLabel = 'Профиль',
   primaryActionHash
 }: {
   item: PublishedContentItem;
@@ -67,76 +54,68 @@ export function DirectoryListRow({
 }) {
   const profileHref = detailHref(basePath, item.slug);
   const primaryHref = primaryActionHash ? `${profileHref}#${primaryActionHash}` : profileHref;
-  const media = item.imageUrl ? (
-    <div className="grid h-12 w-12 place-items-center overflow-hidden rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--surface-wash)] sm:h-14 sm:w-14 md:h-16 md:w-16">
-      <span aria-hidden="true" className="h-full w-full bg-cover bg-center" style={{ backgroundImage: `url("${item.imageUrl}")` }} />
-    </div>
-  ) : (
-    <AvatarFallback initials={titleInitials(item.subtitle ?? item.title)} />
-  );
+  const category = item.label;
+  const geography = metaGroupValue(item, 'География') ?? metaGroupValue(item, 'Город');
+  const name = item.subtitle && item.subtitle !== item.title ? item.subtitle : item.title;
+  const summary = item.summary?.trim();
 
   return (
-    <article className="public-list-row-shell public-list-row-shell-hh">
-      <div className="grid min-w-0 gap-6">
-        <div className="min-w-0">
-          <div className="flex flex-wrap items-center gap-2.5">
-            <span className="text-[11px] font-semibold uppercase tracking-[var(--tracking-eyebrow-sm)] text-[var(--accent)]">{item.label ?? 'Поставщик'}</span>
-            {item.updatedLabel ? (
-              <span className="text-[11px] font-medium text-[var(--muted)]">{item.updatedLabel}</span>
-            ) : null}
-            {item.statusLabel ? (
-              <HighlightChip variant="fresh">{item.statusLabel}</HighlightChip>
-            ) : null}
-          </div>
-          <h3 className="public-list-row-title mt-3 text-balance text-[1.35rem] font-bold leading-[1.15] text-[var(--text)] md:text-[1.55rem]">
-            {item.title}
-          </h3>
-          <div className="public-list-row-meta mt-4">{directoryMeta(item)}</div>
-        </div>
-        <div className="public-list-row-company min-w-0">
-          <div className="grid grid-cols-[3.25rem_minmax(0,1fr)] items-start gap-3 sm:grid-cols-[4rem_minmax(0,1fr)]">
-            {media}
-            <div className="min-w-0">
-              {item.subtitle && item.subtitle !== item.title ? (
-                <div className="flex min-w-0 flex-wrap items-center gap-2 text-[1.05rem] font-semibold leading-7 text-[var(--text)]">
-                  <span className="min-w-0 break-words">{item.subtitle}</span>
-                  {item.isVerified ? (
-                    <BadgeCheck aria-label={VERIFIED_SUPPLIER_ARIA} size={18} strokeWidth={1.8} className="shrink-0 text-[var(--accent)]" />
-                  ) : null}
-                </div>
-              ) : null}
-              <div className={cn('text-[15px] leading-7 text-[var(--muted)]', item.subtitle && item.subtitle !== item.title ? 'mt-3' : '')}>
-                {directoryDescription(item)}
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="public-list-row-actions flex flex-col gap-2.5 sm:flex-row sm:flex-wrap">
-          <Button
-            className="public-list-row-primary-action rounded-[var(--radius-md)] px-5 tracking-normal max-sm:w-full"
-            href={primaryHref}
-            size="lg"
-            variant="primary"
-          >
-            {actionLabel}
-            <ArrowUpRight aria-hidden="true" size={16} strokeWidth={1.8} />
-          </Button>
-          <Button
-            className="public-list-row-secondary-action rounded-[var(--radius-md)] px-5 tracking-normal max-sm:w-full"
-            href={profileHref}
-            size="lg"
-            variant="secondary"
-          >
-            {profileLabel}
-          </Button>
-        </div>
-        {item.websiteUrl ? (
-          <div className="public-list-row-website min-w-0">
-            <AppLink className="text-sm leading-6 text-[var(--muted)] transition-colors hover:text-[var(--accent)]" href={item.websiteUrl}>
-              {item.websiteUrl.replace(/^https?:\/\/(www\.)?/, '')}
-            </AppLink>
-          </div>
+    <article className="group flex h-full flex-col overflow-hidden rounded-[var(--radius-lg)] border border-[var(--border-subtle)] bg-[var(--surface-card)] transition-colors duration-[var(--motion-duration-base)] ease-[var(--motion-ease-standard)] hover:border-[var(--border-strong)]">
+      <div className="relative flex h-[124px] items-center justify-center overflow-hidden bg-[var(--surface-muted)]">
+        {item.imageUrl ? (
+          <>
+            <span
+              aria-hidden="true"
+              className="absolute inset-0 bg-cover bg-center transition-transform duration-[var(--motion-duration-media)] ease-[var(--motion-ease-move)] group-hover:scale-[1.04] motion-reduce:transition-none"
+              style={{ backgroundImage: `url("${item.imageUrl}")` }}
+            />
+            <span aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" />
+          </>
+        ) : category ? (
+          <span className={`${displayFont.className} relative px-4 text-center text-[1.5rem] font-semibold uppercase leading-none tracking-[0.04em] text-[var(--muted)] opacity-70`}>
+            {category}
+          </span>
         ) : null}
+        {item.imageUrl && category ? (
+          <span className="absolute left-3 top-3 inline-flex items-center rounded-[var(--radius-pill)] border border-white/20 bg-black/30 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[var(--tracking-eyebrow-sm)] text-white backdrop-blur-sm">
+            {category}
+          </span>
+        ) : null}
+        {item.statusLabel ? (
+          <span className="absolute right-3 top-3">
+            <HighlightChip variant="fresh">{item.statusLabel}</HighlightChip>
+          </span>
+        ) : null}
+      </div>
+
+      <div className="flex flex-1 flex-col gap-3 p-5">
+        <div className="min-w-0">
+          <h3 className="text-[1.1rem] font-bold leading-[1.25] text-[var(--text)]">
+            <AppLink
+              className="inline-flex items-center gap-1.5 transition-colors hover:text-[var(--accent)] focus-visible:outline-none focus-visible:underline"
+              href={profileHref}
+            >
+              <span className="min-w-0 break-words">{name}</span>
+              {item.isVerified ? (
+                <BadgeCheck aria-label={VERIFIED_SUPPLIER_ARIA} className="shrink-0 text-[var(--accent)]" size={16} strokeWidth={1.8} />
+              ) : null}
+            </AppLink>
+          </h3>
+          {geography ? <span className="mt-1 block text-[13px] text-[var(--muted)]">{geography}</span> : null}
+        </div>
+
+        {directoryChips(item)}
+
+        {summary ? <p className="line-clamp-2 text-[13px] leading-5 text-[var(--muted)]">{summary}</p> : null}
+
+        <Button
+          className="mt-auto w-full justify-center rounded-[var(--radius-md)] px-5 tracking-normal"
+          href={primaryHref}
+          variant="primary"
+        >
+          {actionLabel}
+          <ArrowUpRight aria-hidden="true" size={16} strokeWidth={1.8} />
+        </Button>
       </div>
     </article>
   );

@@ -1012,8 +1012,8 @@ form[data-public-validation="true"] .grid-cols-2 .form-field {
 .suppliers-directory-page .public-catalog-list-rows,
 .masters-directory-page .public-catalog-list-rows {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 21rem), 1fr));
-    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+    gap: 1.25rem;
     padding: 0;
 }
 
