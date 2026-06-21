@@ -1,4 +1,4 @@
-import { EditorialCard } from '@/components/ui/cards';
+import { DirectoryListRow } from '@/components/public/published-content-row-directory';
 import { PublicDisplayTitle, PublicEyebrow } from '@/components/public/public-primitives';
 import type { PublishedContentItem } from '@/lib/public/content/shared';
 
@@ -16,25 +16,10 @@ export function MasterRelatedSection({ items, title = 'Другие мастер
         <PublicEyebrow tone="accent">Дальше</PublicEyebrow>
         <PublicDisplayTitle className="mt-3">{title}</PublicDisplayTitle>
 
-        <div className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {items.map((item) => {
-            const categoryMeta = item.metaGroups?.find((group) => group.label === 'Категория')?.value;
-            const cityMeta = item.metaGroups?.find((group) => group.label === 'Город')?.value;
-            const metaParts = [item.subtitle, categoryMeta, cityMeta].filter(Boolean);
-
-            return (
-              <EditorialCard
-                href={`/masters/${item.slug}`}
-                key={item.id}
-                media={item.imageUrl ? { kind: 'image', src: item.imageUrl, alt: item.title } : undefined}
-                meta={metaParts.join(' · ')}
-                summary={item.summary}
-                tags={item.label ? [item.label] : undefined}
-                title={item.title}
-                tone="dark"
-              />
-            );
-          })}
+        <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {items.map((item) => (
+            <DirectoryListRow actionLabel="Смотреть профиль" basePath="/masters" item={item} key={item.id} />
+          ))}
         </div>
       </div>
     </section>

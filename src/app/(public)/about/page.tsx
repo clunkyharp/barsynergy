@@ -170,7 +170,7 @@ export default function AboutPage() {
               Следующий шаг
             </p>
             <h2
-              className={`${displayFont.className} mt-4 max-w-4xl text-[clamp(2.55rem,5vw,4rem)] font-semibold leading-none text-white`}
+              className={`${displayFont.className} mx-auto mt-4 max-w-4xl text-[clamp(2.55rem,5vw,4rem)] font-semibold leading-none text-white`}
             >
               Хотите добавить событие, компанию, вакансию или партнёрскую идею?
             </h2>

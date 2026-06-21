@@ -91,15 +91,22 @@ export function EditorialCard({
 
         {action ? (
           <div className={cardFooterClass()}>
-            <Button
-              className="shrink-0 rounded-[var(--radius-md)] px-4"
-              href={action.href}
-              size="sm"
-              variant="secondary"
-            >
-              {action.label}
-              <ArrowUpRight size={14} strokeWidth={1.8} />
-            </Button>
+            {href ? (
+              <span className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-[var(--radius-md)] border border-[var(--border-strong)] bg-[var(--surface)] px-3.5 text-[13px] font-semibold leading-5 text-[var(--text)] shadow-none h-9 py-[7px] shrink-0">
+                {action.label}
+                <ArrowUpRight size={14} strokeWidth={1.8} />
+              </span>
+            ) : (
+              <Button
+                className="shrink-0 rounded-[var(--radius-md)] px-4"
+                href={action.href}
+                size="sm"
+                variant="secondary"
+              >
+                {action.label}
+                <ArrowUpRight size={14} strokeWidth={1.8} />
+              </Button>
+            )}
           </div>
         ) : null}
       </div>

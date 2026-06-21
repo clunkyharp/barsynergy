@@ -957,9 +957,9 @@ form[data-public-validation="true"] .grid-cols-2 .form-field {
 
 .education-directory-page .public-catalog-list-rows {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 21rem), 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 21rem), 1fr));
     gap: 1rem;
-    padding: 0;
+    padding: 1.25rem;
 }
 
 .education-directory-page .public-list-row-shell {
@@ -1012,9 +1012,9 @@ form[data-public-validation="true"] .grid-cols-2 .form-field {
 .suppliers-directory-page .public-catalog-list-rows,
 .masters-directory-page .public-catalog-list-rows {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 21rem), 1fr));
-    gap: 1rem;
-    padding: 0;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+    gap: 1.25rem;
+    padding: 1.25rem;
 }
 
 .suppliers-directory-page .public-list-row-shell-hh,
@@ -1327,9 +1327,9 @@ form[data-public-validation="true"] .grid-cols-2 .form-field {
 
 .vacancies-directory-page .public-catalog-list-rows {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 21rem), 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 21rem), 1fr));
     gap: 1rem;
-    padding: 0;
+    padding: 1.25rem;
 }
 
 .vacancies-directory-page .public-list-row-shell-hh,

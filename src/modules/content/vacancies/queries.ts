@@ -169,7 +169,6 @@ export async function getPublishedVacancies(params: PublicContentSearchParams = 
         subtitle: vacancy.companyName,
         meta: [
           vacancy.city?.name,
-          vacancy.companyName,
           getAdminOptionLabel(vacancyEmploymentTypeOptions, vacancy.employmentType, ''),
           vacancy.salaryLabel
         ].filter(Boolean) as string[],

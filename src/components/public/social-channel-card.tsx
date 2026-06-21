@@ -48,7 +48,6 @@ export function SocialChannelCard(props: SocialChannelCardProps) {
             src={bgSrc}
           />
         ) : null}
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[var(--editorial-dark-surface)] via-[var(--editorial-dark-surface)]/40 to-transparent" />
       </div>
     </div>
   );

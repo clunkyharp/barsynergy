@@ -1591,6 +1591,10 @@
   background-size: cover;
   background-position: center;
   transition: transform var(--motion-duration-media) var(--motion-ease-move);
+  /* override .gpu (will-change: transform): its own composited layer ignores
+     the shell's rounded clip, so the scaled image leaks past the corners on
+     hover. Painting within the parent keeps it clipped to the rounded frame. */
+  will-change: auto;
 }
 
 @media (prefers-reduced-motion: reduce) {

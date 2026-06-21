@@ -1,11 +1,9 @@
-import { ArrowRight, Star } from 'lucide-react';
+import { Star } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { AppLink } from '@/components/ui/app-link';
-import { HighlightChip } from '@/components/ui/highlight-chip';
 import { displayFont } from '@/lib/fonts';
 import type { PublishedContentItem } from '@/lib/public/content';
 import { cn } from '@/lib/utils';
-import { OutlinedPill } from '@/components/public/outlined-pill';
 
 const COFFEE_KEYWORDS = [
   'эспрессо', 'кофейни', 'кофейня', 'обжарка', 'бариста',
@@ -52,12 +50,19 @@ function AuthorAvatar({ name }: { name: string }) {
   );
 }
 
-function getArticleFallbackImage(label?: string): string {
+export function getArticleFallbackImage(label?: string): string {
   const upper = (label ?? '').toUpperCase();
   if (upper === 'МЕНЮ' || upper === 'ЭКОНОМИКА') return '/images/generated/content-guide.jpg';
   if (upper === 'КОМАНДА' || upper === 'СЕРВИС') return '/images/generated/content-service.jpg';
   if (upper === 'СОБЫТИЯ') return '/images/home/hero-bar-counter-bundo.jpg';
   return '/images/home/hero-coffee-counter-haberdoedas.jpg';
+}
+
+function formatArticleDate(dateIso?: string): string | undefined {
+  if (!dateIso) return undefined;
+  const date = new Date(dateIso);
+  if (Number.isNaN(date.getTime())) return undefined;
+  return date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
 }
 
 export function ArticleFeaturedCard({
@@ -68,61 +73,41 @@ export function ArticleFeaturedCard({
   basePath: string;
 }) {
   const href = `${basePath}/${item.slug}`;
-  const readingTime = extractReadingTime(item.meta);
   const imageUrl = item.imageUrl ?? getArticleFallbackImage(item.label);
+  const date = formatArticleDate(item.dateIso) ?? extractReadingTime(item.meta);
 
   return (
     <AppLink
-      className="media-card-shell group aspect-[21/9] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)]"
+      className="group grid overflow-hidden rounded-[var(--radius-xl)] border border-[var(--border-subtle)] bg-[var(--surface-card)] transition-colors duration-[var(--motion-duration-base)] ease-[var(--motion-ease-standard)] hover:border-[var(--border-strong)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)] md:grid-cols-2"
       href={href}
     >
-      <div
-        aria-hidden="true"
-        className="media-card-media gpu"
-        style={{ backgroundImage: `url("${imageUrl}")` }}
-      />
-      <div aria-hidden="true" className="media-card-scrim" />
-      <div className="media-card-content">
-        <div className="flex flex-wrap items-start gap-2">
-          <HighlightChip variant="editor">
-            <Star fill="currentColor" size={10} />
-            Выбор редакции
-          </HighlightChip>
-          {item.label ? <OutlinedPill>{item.label}</OutlinedPill> : null}
-        </div>
-        <div className="media-card-footer">
-          <h2
-            className={cn(
-              displayFont.className,
-              'mt-6 text-[1.75rem] font-semibold leading-[1.1] text-white sm:text-[2.25rem]'
-            )}
-          >
-            {highlightKeyword(item.title, item.label)}
-          </h2>
-          {item.summary ? (
-            <p className="mt-3 line-clamp-2 max-w-2xl text-[15px] leading-6 text-white/70">
-              {item.summary}
-            </p>
-          ) : null}
-          <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
-            <div className="flex items-center gap-2 text-[13px] text-white/60">
-              {item.authorName ? (
-                <>
-                  <AuthorAvatar name={item.authorName} />
-                  <span>{item.authorName}</span>
-                  {readingTime ? <span className="text-white/30">·</span> : null}
-                </>
-              ) : null}
-              {readingTime ? <span>{readingTime}</span> : null}
-            </div>
-            <span className="inline-flex shrink-0 items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-[13px] font-semibold text-white backdrop-blur-sm transition-colors duration-[var(--motion-duration-base)] group-hover:bg-white/20 motion-reduce:transition-none">
-              Читать материал
-              <ArrowRight
-                className="transition-transform duration-[var(--motion-duration-base)] group-hover:translate-x-1 motion-reduce:transition-none"
-                size={14}
-              />
-            </span>
-          </div>
+      <div className="relative min-h-[220px] overflow-hidden bg-[var(--surface-muted)] md:min-h-[320px]">
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 bg-cover bg-center transition-transform duration-[var(--motion-duration-media)] ease-[var(--motion-ease-move)] group-hover:scale-[1.03] motion-reduce:transition-none"
+          style={{ backgroundImage: `url("${imageUrl}")` }}
+        />
+      </div>
+      <div className="flex flex-col justify-center gap-3 p-6 md:p-10">
+        <span className="inline-flex items-center gap-1.5 self-start rounded-[var(--radius-pill)] bg-[var(--accent)] px-3 py-1 text-[12px] font-semibold uppercase tracking-[var(--tracking-eyebrow-sm)] text-[var(--accent-contrast)]">
+          <Star fill="currentColor" size={11} />
+          Выбор редакции
+        </span>
+        <h2
+          className={cn(
+            displayFont.className,
+            'text-[1.5rem] font-semibold leading-[1.3] text-[var(--text)] transition-colors group-hover:text-[var(--accent)] md:text-[1.9rem]'
+          )}
+        >
+          {item.title}
+        </h2>
+        {item.summary ? (
+          <p className="line-clamp-3 text-[15px] leading-7 text-[var(--muted)]">{item.summary}</p>
+        ) : null}
+        <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[13px] text-[var(--muted)]">
+          {item.label ? <span>{item.label}</span> : null}
+          {item.label && date ? <span aria-hidden="true" className="h-[3px] w-[3px] rounded-full bg-[var(--muted)] opacity-50" /> : null}
+          {date ? <span>{date}</span> : null}
         </div>
       </div>
     </AppLink>
@@ -137,61 +122,36 @@ export function ArticleCard({
   basePath: string;
 }) {
   const href = `${basePath}/${item.slug}`;
-  const readingTime = extractReadingTime(item.meta);
   const imageUrl = item.imageUrl ?? getArticleFallbackImage(item.label);
+  const date = formatArticleDate(item.dateIso) ?? extractReadingTime(item.meta);
 
   return (
     <AppLink
-      className="group relative flex flex-col overflow-hidden rounded-[var(--radius-xl)] border border-[var(--border-default)] bg-[var(--surface-card)] transition-shadow duration-[var(--motion-duration-base)] ease-[var(--motion-ease-standard)] hover:shadow-[var(--shadow-card)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)] motion-reduce:transition-none"
+      className="group flex flex-col overflow-hidden rounded-[var(--radius-lg)] border border-[var(--border-subtle)] bg-[var(--surface-card)] transition-[border-color,background-color,box-shadow] duration-[var(--motion-duration-base)] ease-[var(--motion-ease-standard)] hover:border-[var(--border-strong)] hover:shadow-[var(--shadow-card)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)] motion-reduce:transition-none"
       href={href}
     >
-      <div className="relative aspect-[16/9] w-full overflow-hidden">
+      <div className="relative h-[180px] w-full overflow-hidden bg-[var(--surface-muted)]">
         <div
           aria-hidden="true"
-          className="gpu absolute inset-0 bg-cover bg-center transition-transform duration-[var(--motion-duration-media)] ease-[var(--motion-ease-move)] group-hover:scale-[1.04] motion-reduce:transition-none"
+          className="absolute inset-0 bg-cover bg-center transition-transform duration-[var(--motion-duration-media)] ease-[var(--motion-ease-move)] group-hover:scale-[1.04] motion-reduce:transition-none"
           style={{ backgroundImage: `url("${imageUrl}")` }}
         />
-        {item.label ? (
-          <HighlightChip className="absolute left-3 top-3" surface="image">
-            {item.label}
-          </HighlightChip>
-        ) : null}
       </div>
-      <div className="flex flex-1 flex-col p-4 sm:p-5">
+      <div className="flex flex-1 flex-col p-5">
+        {item.label ? (
+          <span className="inline-flex items-center self-start rounded-[var(--radius-pill)] border border-[var(--border-default)] px-2.5 py-[3px] text-[11px] font-semibold uppercase tracking-[var(--tracking-eyebrow-sm)] text-[var(--muted)]">
+            {item.label}
+          </span>
+        ) : null}
         <h3
           className={cn(
             displayFont.className,
-            'font-semibold leading-[1.15] text-[var(--text)] line-clamp-3',
-            'text-[1.1rem] sm:text-[1.2rem]'
+            'mt-2.5 line-clamp-3 text-base font-semibold leading-[1.45] text-[var(--text)] transition-colors group-hover:text-[var(--accent)]'
           )}
         >
-          {highlightKeyword(item.title, item.label)}
+          {item.title}
         </h3>
-        {item.summary ? (
-          <p className="mt-2 text-[13px] leading-5 text-[var(--muted)] line-clamp-2">
-            {item.summary}
-          </p>
-        ) : null}
-        <div className="mt-auto flex items-center gap-2 pt-3 text-[12px] text-[var(--muted)]">
-          {item.authorName ? (
-            <>
-              <AuthorAvatar name={item.authorName} />
-              <span>{item.authorName}</span>
-            </>
-          ) : null}
-          {readingTime ? (
-            <>
-              <span className="text-[var(--line)]">·</span>
-              <span>{readingTime}</span>
-            </>
-          ) : null}
-          {item.label ? (
-            <>
-              <span className="text-[var(--line)]">·</span>
-              <span>{item.label}</span>
-            </>
-          ) : null}
-        </div>
+        {date ? <span className="mt-3 text-[13px] text-[var(--muted)]">{date}</span> : null}
       </div>
     </AppLink>
   );

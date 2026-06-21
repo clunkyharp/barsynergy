@@ -1,4 +1,5 @@
 import type { TocItem } from '@/lib/public/content/articles';
+import type { PublishedContentItem } from '@/lib/public/content';
 import { ArticleBodyContent } from '@/components/public/article-body-content';
 import { ArticleDetailSidebar } from '@/components/public/article-detail-sidebar';
 import { Panel } from '@/components/ui/panel';
@@ -12,6 +13,8 @@ type ArticleDetailBodyProps = {
   publishedAtIso?: string;
   tags: string[];
   sourceReferences?: string;
+  related?: PublishedContentItem[];
+  basePath?: string;
 };
 
 export function ArticleDetailBody({
@@ -22,7 +25,9 @@ export function ArticleDetailBody({
   cityName,
   publishedAtIso,
   tags,
-  sourceReferences
+  sourceReferences,
+  related,
+  basePath
 }: ArticleDetailBodyProps) {
   const hasBody = Boolean(body?.trim());
 
@@ -55,9 +60,11 @@ export function ArticleDetailBody({
 
           <ArticleDetailSidebar
             authorName={authorName}
+            basePath={basePath}
             cityName={cityName}
             publishedAtIso={publishedAtIso}
             readingTime={readingTime}
+            related={related}
             tags={tags}
             toc={toc}
           />
