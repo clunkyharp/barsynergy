@@ -1,7 +1,7 @@
 'use server';
 
 import type { NotificationTopic } from '@prisma/client';
-import { getString } from '@/lib/admin/content-utils';
+import { getString } from '@/lib/forms/form-data';
 import { getCurrentUser } from '@/lib/auth/current-user';
 import { assertSameOriginServerAction } from '@/lib/security/server-action-origin';
 import { createOrRefreshEmailSubscription } from './service';

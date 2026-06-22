@@ -72,7 +72,7 @@ export function DirectoryListRow({
             <span aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" />
           </>
         ) : category ? (
-          <span className={`${displayFont.className} relative px-6 py-4 text-center text-[1.05rem] font-semibold uppercase leading-tight tracking-[0.08em] text-[var(--muted)] opacity-60`}>
+          <span className={`${displayFont.className} relative px-6 py-4 text-center text-[1.05rem] font-semibold uppercase leading-tight tracking-[var(--tracking-eyebrow-sm)] text-[var(--muted)] opacity-60`}>
             {category}
           </span>
         ) : null}

@@ -3,7 +3,7 @@
 import { redirect } from 'next/navigation';
 import { createHash, randomBytes } from 'node:crypto';
 import { prisma } from '@/lib/db/prisma';
-import { getString } from '@/lib/admin/content-utils';
+import { getString } from '@/lib/forms/form-data';
 import { AuthRateLimitError, assertAuthAttemptAllowed } from '@/lib/auth/auth-rate-limit';
 import { verifyUserEmailToken } from '@/lib/auth/email-verification';
 import { assertSameOriginServerAction } from '@/lib/security/server-action-origin';

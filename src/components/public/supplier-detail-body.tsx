@@ -1,5 +1,4 @@
 import { ArticleBodyContent } from '@/components/public/article-body-content';
-import { ContactActionRow } from '@/components/public/contact-action-row';
 import { EditorialShell } from '@/components/ui/editorial-shell';
 import type { PublicContentDetailFact } from '@/modules/content/shared/detail-helpers';
 import { DirectContactLinks } from './direct-contact-links';

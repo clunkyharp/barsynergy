@@ -14,6 +14,30 @@ import {
 const MAX_MESSAGE_LENGTH = 2000;
 const MIN_MESSAGE_LENGTH = 1;
 
+function buildUnreadFlags(senderRole: ConversationSender) {
+  switch (senderRole) {
+    case ConversationSender.USER:
+      return { hasUnreadForBusiness: true, hasUnreadForUser: false };
+    case ConversationSender.BUSINESS:
+      return { hasUnreadForUser: true, hasUnreadForBusiness: false };
+    default:
+      return { hasUnreadForUser: true, hasUnreadForBusiness: true };
+  }
+}
+
+function buildMessageStatusUpdate(status: ApplicationStatus, senderRole: ConversationSender) {
+  if (status !== ApplicationStatus.NEW) return {};
+
+  switch (senderRole) {
+    case ConversationSender.BUSINESS:
+      return { status: ApplicationStatus.CONTACTED };
+    case ConversationSender.ADMIN:
+      return { status: ApplicationStatus.IN_REVIEW };
+    default:
+      return {};
+  }
+}
+
 const CLOSED_STATUSES: ApplicationStatus[] = [
   ApplicationStatus.COMPLETED,
   ApplicationStatus.REJECTED,
@@ -141,23 +165,15 @@ export async function sendConversationMessage(input: {
         select: { id: true }
       });
 
-      const unreadUpdate =
-        input.senderRole === ConversationSender.USER
-          ? { hasUnreadForBusiness: true, hasUnreadForUser: false }
-          : input.senderRole === ConversationSender.BUSINESS
-            ? { hasUnreadForUser: true, hasUnreadForBusiness: false }
-            : { hasUnreadForUser: true, hasUnreadForBusiness: true };
+      const unreadUpdate = buildUnreadFlags(input.senderRole);
+      const statusUpdate = buildMessageStatusUpdate(application.status, input.senderRole);
 
       await tx.application.update({
         where: { id: application.id },
         data: {
           ...unreadUpdate,
           lastMessageAt: new Date(),
-          ...(application.status === ApplicationStatus.NEW && input.senderRole === ConversationSender.BUSINESS
-            ? { status: ApplicationStatus.CONTACTED }
-            : application.status === ApplicationStatus.NEW && input.senderRole === ConversationSender.ADMIN
-              ? { status: ApplicationStatus.IN_REVIEW }
-              : {})
+          ...statusUpdate
         }
       });
 

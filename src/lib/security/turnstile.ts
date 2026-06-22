@@ -7,7 +7,18 @@ export class TurnstileError extends Error {
 
 export async function assertTurnstilePassed(token: string) {
   const secretKey = process.env.TURNSTILE_SECRET_KEY;
-  if (!secretKey) return;
+  const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+
+  if (!secretKey) {
+    // Captcha is only truly disabled when neither key is set (local/dev).
+    // If a public site key is configured but the server secret is missing,
+    // the widget renders for users yet verification is impossible — fail
+    // closed instead of silently letting every submission through.
+    if (siteKey) {
+      throw new TurnstileError();
+    }
+    return;
+  }
 
   if (!token) {
     throw new TurnstileError();

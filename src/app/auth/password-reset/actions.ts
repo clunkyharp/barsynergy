@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation';
 import { createHash, randomBytes } from 'node:crypto';
 import { z } from 'zod';
 import { prisma } from '@/lib/db/prisma';
-import { getString } from '@/lib/admin/content-utils';
+import { getString } from '@/lib/forms/form-data';
 import { AuthRateLimitError, assertAuthAttemptAllowed } from '@/lib/auth/auth-rate-limit';
 import { hashPassword } from '@/lib/auth/password';
 import { PASSWORD_MIN_LENGTH } from '@/lib/auth/password-policy';

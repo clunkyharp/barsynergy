@@ -1,31 +1,23 @@
-import { ApplicationStatus, ApplicationType, type Prisma } from '@/modules/admin/queries';
+import { ApplicationType } from '@/modules/admin/queries';
 import { publishContentFromApplication } from '@/app/admin/applications/actions';
-import { AdminActionAlert, AdminFilterBar, AdminPagination, AdminStatusTabs, HiddenRedirect } from '@/components/admin/content-admin-controls';
+import { AdminActionAlert, AdminFilterBar, AdminPagination, AdminStatusTabs } from '@/components/admin/content-admin-controls';
 import { AdminPageIntro } from '@/components/admin/admin-page-intro';
 import { Button } from '@/components/ui/button';
-import { ConfirmSubmitButton } from '@/components/ui/confirm-submit-button';
+import { ApplicationTableRow } from '@/components/admin/applications-table-row';
 import {
   DataTable,
   DataTableActionRow,
-  DataTableActionsCell,
   DataTableActionsHeaderCell,
   DataTableBody,
-  DataTableCell,
-  DataTableClamp,
   DataTableFrame,
   DataTableHead,
   DataTableHeaderCell,
-  DataTableRow,
   DataTableStateRow
 } from '@/components/ui/data-table';
 import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
-import { AdminStatusChip } from '@/components/ui/status-badge';
 import {
-  applicationStatusBadgeVariants,
-  applicationStatusLabels,
-  applicationTypeLabels,
   parseApplicationStatus,
   parseApplicationType
 } from '@/lib/admin/application-utils';
@@ -37,139 +29,17 @@ import {
   type AdminContentSearchParams
 } from '@/lib/admin/content-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
-import { getApplicationPayloadText } from '@/lib/applications/application-payloads';
-import { getApplicationList } from '@/lib/admin/admin-queries';
+import { listAdminApplications } from '@/modules/admin/applications/queries';
+import {
+  ADMIN_APPLICATIONS_PATH,
+  quickStatusFilters
+} from '@/lib/admin/application-page-helpers';
 
 export const dynamic = 'force-dynamic';
-
-const ADMIN_APPLICATIONS_PATH = '/admin/applications';
-
-const dateTimeFormatter = new Intl.DateTimeFormat('ru-RU', {
-  day: '2-digit',
-  month: '2-digit',
-  year: 'numeric',
-  hour: '2-digit',
-  minute: '2-digit'
-});
-
-const quickStatusFilters = [
-  { label: 'Новые', status: ApplicationStatus.NEW },
-  { label: 'На проверке', status: ApplicationStatus.IN_REVIEW },
-  { label: 'Одобрены', status: ApplicationStatus.APPROVED },
-  { label: 'Завершены', status: ApplicationStatus.COMPLETED }
-] as const;
-
-type ApplicationPublicationTarget = 'master' | 'partner' | 'supplier' | 'vacancy';
 
 type AdminApplicationsPageProps = {
   searchParams?: Promise<AdminContentSearchParams>;
 };
-
-function applicationActionLabel(application: {
-  type: ApplicationType;
-  status: ApplicationStatus;
-  vacancy: { title: string; slug: string } | null;
-  supplier: { title: string; slug: string } | null;
-  partner: { title: string; slug: string } | null;
-  master: { title: string; slug: string } | null;
-  resumeFileId: string | null;
-  consentAcceptedAt: Date | null;
-}) {
-  if (application.status === ApplicationStatus.NEW && application.type === ApplicationType.BUSINESS_ACCOUNT_REQUEST) {
-    return 'Проверить бизнес-заявку';
-  }
-
-  if (application.status === ApplicationStatus.NEW && application.type === ApplicationType.VACANCY_RESPONSE && application.resumeFileId) {
-    return 'Проверить отклик';
-  }
-
-  if (application.status === ApplicationStatus.NEW) {
-    return 'Назначить следующий статус';
-  }
-
-  if (application.status === ApplicationStatus.IN_REVIEW) {
-    return 'Завершить проверку';
-  }
-
-  if (application.status === ApplicationStatus.PAYMENT_PENDING) {
-    return 'Проверить оплату';
-  }
-
-  if (application.type === ApplicationType.VACANCY_SUBMISSION && application.status === ApplicationStatus.APPROVED && !application.vacancy) {
-    return 'Опубликовать вакансию';
-  }
-
-  if (application.type === ApplicationType.SUPPLIER_SUBMISSION && application.status === ApplicationStatus.APPROVED && !application.supplier) {
-    return 'Опубликовать поставщика';
-  }
-
-  if (application.type === ApplicationType.PARTNER_APPLICATION && application.status === ApplicationStatus.APPROVED && !application.partner) {
-    return 'Опубликовать партнёра';
-  }
-
-  if (application.type === ApplicationType.MASTER_SUBMISSION && application.status === ApplicationStatus.APPROVED && !application.master) {
-    return 'Опубликовать мастера';
-  }
-
-  if (!application.consentAcceptedAt && application.type !== ApplicationType.CONTACT_MESSAGE) {
-    return 'Проверить согласие';
-  }
-
-  return 'Контроль не требуется';
-}
-
-function applicationPublicationTarget(application: {
-  consentAcceptedAt: Date | null;
-  partner: { title: string; slug: string } | null;
-  master: { title: string; slug: string } | null;
-  status: ApplicationStatus;
-  supplier: { title: string; slug: string } | null;
-  type: ApplicationType;
-  vacancy: { title: string; slug: string } | null;
-}): ApplicationPublicationTarget | null {
-  if (application.status !== ApplicationStatus.APPROVED || !application.consentAcceptedAt) {
-    return null;
-  }
-
-  if (application.type === ApplicationType.VACANCY_SUBMISSION && !application.vacancy) {
-    return 'vacancy';
-  }
-
-  if (application.type === ApplicationType.SUPPLIER_SUBMISSION && !application.supplier) {
-    return 'supplier';
-  }
-
-  if (application.type === ApplicationType.PARTNER_APPLICATION && !application.partner) {
-    return 'partner';
-  }
-
-  if (application.type === ApplicationType.MASTER_SUBMISSION && !application.master) {
-    return 'master';
-  }
-
-  return null;
-}
-
-function applicationPersonOrCompany(application: {
-  businessAccount: { companyName: string } | null;
-  email: string | null;
-  name: string | null;
-  payload: Prisma.JsonValue | null;
-  phone: string | null;
-  subject: string | null;
-  telegram: string | null;
-  type: ApplicationType;
-}) {
-  const companyName =
-    application.businessAccount?.companyName ??
-    getApplicationPayloadText(application.type, application.payload, ['projectName', 'companyName', 'employerCompanyName']);
-  const primary = companyName ?? application.name?.trim() ?? application.subject?.trim() ?? application.email ?? 'Не указано';
-  const secondary = [application.name && companyName ? application.name : null, application.email, application.phone, application.telegram]
-    .filter(Boolean)
-    .join(' / ');
-
-  return { primary, secondary };
-}
 
 export default async function AdminApplicationsPage({ searchParams }: AdminApplicationsPageProps) {
   await requireAdminSectionAccess('applications');
@@ -179,33 +49,12 @@ export default async function AdminApplicationsPage({ searchParams }: AdminAppli
   const search = firstParam(params.search)?.trim() ?? '';
   const selectedType = parseApplicationType(firstParam(params.type));
   const selectedStatus = parseApplicationStatus(firstParam(params.status));
-  const searchWhere: Prisma.ApplicationWhereInput = search
-    ? {
-        OR: [
-          { subject: { contains: search, mode: 'insensitive' } },
-          { name: { contains: search, mode: 'insensitive' } },
-          { email: { contains: search, mode: 'insensitive' } },
-          { phone: { contains: search, mode: 'insensitive' } },
-          { telegram: { contains: search, mode: 'insensitive' } },
-          { businessAccount: { companyName: { contains: search, mode: 'insensitive' } } },
-          { payload: { path: ['companyName'], string_contains: search } },
-          { payload: { path: ['projectName'], string_contains: search } },
-          { payload: { path: ['employerCompanyName'], string_contains: search } }
-        ]
-      }
-    : {};
-  const where: Prisma.ApplicationWhereInput = {
-    ...searchWhere,
-    ...(selectedType ? { type: selectedType } : {}),
-    ...(selectedStatus ? { status: selectedStatus } : {})
-  };
-
-  const [applications, total] = await getApplicationList(
-    where,
-    { createdAt: 'desc' },
-    (page - 1) * ADMIN_CONTENT_PAGE_SIZE,
-    ADMIN_CONTENT_PAGE_SIZE
-  );
+  const { applications, total } = await listAdminApplications({
+    page,
+    search,
+    type: selectedType,
+    status: selectedStatus
+  });
   const totalPages = getAdminTotalPages(total);
   const hasActiveFilters = Boolean(search || selectedType || selectedStatus);
 
@@ -217,23 +66,10 @@ export default async function AdminApplicationsPage({ searchParams }: AdminAppli
   }
 
   const currentParams = new URLSearchParams();
-
-  if (search) {
-    currentParams.set('search', search);
-  }
-
-  if (selectedType) {
-    currentParams.set('type', selectedType);
-  }
-
-  if (selectedStatus) {
-    currentParams.set('status', selectedStatus);
-  }
-
-  if (page > 1) {
-    currentParams.set('page', String(page));
-  }
-
+  if (search) currentParams.set('search', search);
+  if (selectedType) currentParams.set('type', selectedType);
+  if (selectedStatus) currentParams.set('status', selectedStatus);
+  if (page > 1) currentParams.set('page', String(page));
   const currentPath = `${ADMIN_APPLICATIONS_PATH}${currentParams.toString() ? `?${currentParams.toString()}` : ''}`;
 
   return (
@@ -248,51 +84,15 @@ export default async function AdminApplicationsPage({ searchParams }: AdminAppli
       <AdminStatusTabs
         items={[
           { current: !selectedType, href: hrefWithoutType(''), label: 'Все' },
-          {
-            current: selectedType === ApplicationType.VACANCY_RESPONSE,
-            href: hrefWithoutType(ApplicationType.VACANCY_RESPONSE),
-            label: 'Отклики'
-          },
-          {
-            current: selectedType === ApplicationType.VACANCY_SUBMISSION,
-            href: hrefWithoutType(ApplicationType.VACANCY_SUBMISSION),
-            label: 'Размещения вакансий'
-          },
-          {
-            current: selectedType === ApplicationType.CERTIFICATE_ORDER,
-            href: hrefWithoutType(ApplicationType.CERTIFICATE_ORDER),
-            label: 'Заказы'
-          },
-          {
-            current: selectedType === ApplicationType.SUPPLIER_SUBMISSION,
-            href: hrefWithoutType(ApplicationType.SUPPLIER_SUBMISSION),
-            label: 'Заявки поставщиков'
-          },
-          {
-            current: selectedType === ApplicationType.MASTER_INQUIRY,
-            href: hrefWithoutType(ApplicationType.MASTER_INQUIRY),
-            label: 'Запросы мастерам'
-          },
-          {
-            current: selectedType === ApplicationType.MASTER_SUBMISSION,
-            href: hrefWithoutType(ApplicationType.MASTER_SUBMISSION),
-            label: 'Анкеты мастеров'
-          },
-          {
-            current: selectedType === ApplicationType.PARTNER_APPLICATION,
-            href: hrefWithoutType(ApplicationType.PARTNER_APPLICATION),
-            label: 'Партнёры'
-          },
-          {
-            current: selectedType === ApplicationType.BUSINESS_ACCOUNT_REQUEST,
-            href: hrefWithoutType(ApplicationType.BUSINESS_ACCOUNT_REQUEST),
-            label: 'Бизнес-доступ'
-          },
-          {
-            current: selectedType === ApplicationType.CONTACT_MESSAGE,
-            href: hrefWithoutType(ApplicationType.CONTACT_MESSAGE),
-            label: 'Контакты'
-          }
+          { current: selectedType === ApplicationType.VACANCY_RESPONSE, href: hrefWithoutType(ApplicationType.VACANCY_RESPONSE), label: 'Отклики' },
+          { current: selectedType === ApplicationType.VACANCY_SUBMISSION, href: hrefWithoutType(ApplicationType.VACANCY_SUBMISSION), label: 'Размещения вакансий' },
+          { current: selectedType === ApplicationType.CERTIFICATE_ORDER, href: hrefWithoutType(ApplicationType.CERTIFICATE_ORDER), label: 'Заказы' },
+          { current: selectedType === ApplicationType.SUPPLIER_SUBMISSION, href: hrefWithoutType(ApplicationType.SUPPLIER_SUBMISSION), label: 'Заявки поставщиков' },
+          { current: selectedType === ApplicationType.MASTER_INQUIRY, href: hrefWithoutType(ApplicationType.MASTER_INQUIRY), label: 'Запросы мастерам' },
+          { current: selectedType === ApplicationType.MASTER_SUBMISSION, href: hrefWithoutType(ApplicationType.MASTER_SUBMISSION), label: 'Анкеты мастеров' },
+          { current: selectedType === ApplicationType.PARTNER_APPLICATION, href: hrefWithoutType(ApplicationType.PARTNER_APPLICATION), label: 'Партнёры' },
+          { current: selectedType === ApplicationType.BUSINESS_ACCOUNT_REQUEST, href: hrefWithoutType(ApplicationType.BUSINESS_ACCOUNT_REQUEST), label: 'Бизнес-доступ' },
+          { current: selectedType === ApplicationType.CONTACT_MESSAGE, href: hrefWithoutType(ApplicationType.CONTACT_MESSAGE), label: 'Контакты' }
         ]}
         label="Типы заявок"
       />
@@ -311,12 +111,8 @@ export default async function AdminApplicationsPage({ searchParams }: AdminAppli
           </Select>
         </FormField>
         <DataTableActionRow className="justify-start xl:col-span-full">
-          <Button type="submit" variant="secondary">
-            Применить
-          </Button>
-          <Button href={ADMIN_APPLICATIONS_PATH} type="button" variant="ghost">
-            Сбросить
-          </Button>
+          <Button type="submit" variant="secondary">Применить</Button>
+          <Button href={ADMIN_APPLICATIONS_PATH} type="button" variant="ghost">Сбросить</Button>
         </DataTableActionRow>
       </AdminFilterBar>
 
@@ -351,97 +147,14 @@ export default async function AdminApplicationsPage({ searchParams }: AdminAppli
                   title={hasActiveFilters ? 'Заявки не найдены' : 'Заявок пока нет'}
                 />
               ) : (
-                applications.map((application) => {
-                  const actionLabel = applicationActionLabel(application);
-                  const identity = applicationPersonOrCompany(application);
-                  const publicationTarget = applicationPublicationTarget(application);
-
-                  return (
-                    <DataTableRow key={application.id}>
-                      <DataTableCell className="max-w-[240px]" label="Тип заявки">
-                        <DataTableClamp className="font-semibold">{applicationTypeLabels[application.type]}</DataTableClamp>
-                        {application.subject ? <DataTableClamp className="mt-1 text-xs text-[var(--muted)]">{application.subject}</DataTableClamp> : null}
-                      </DataTableCell>
-                      <DataTableCell className="max-w-[300px]" label="Имя / компания">
-                        <DataTableClamp className="font-semibold">{identity.primary}</DataTableClamp>
-                        {identity.secondary ? <DataTableClamp className="mt-1 text-xs text-[var(--muted)]">{identity.secondary}</DataTableClamp> : null}
-                      </DataTableCell>
-                      <DataTableCell className="text-[var(--muted)]" label="Город">
-                        <div>{application.city?.name ?? 'Город не указан'}</div>
-                        {application.vacancy ? (
-                          <div className="mt-1 text-xs">
-                            <DataTableClamp>Вакансия: {application.vacancy.title}</DataTableClamp>
-                            <DataTableClamp className="mt-1 text-[var(--muted)]">/{application.vacancy.slug}</DataTableClamp>
-                          </div>
-                        ) : null}
-                        {application.supplier ? (
-                          <div className="mt-1 text-xs">
-                            <DataTableClamp>Поставщик: {application.supplier.title}</DataTableClamp>
-                            <DataTableClamp className="mt-1 text-[var(--muted)]">/{application.supplier.slug}</DataTableClamp>
-                          </div>
-                        ) : null}
-                        {application.partner ? (
-                          <div className="mt-1 text-xs">
-                            <DataTableClamp>Партнёр: {application.partner.title}</DataTableClamp>
-                            <DataTableClamp className="mt-1 text-[var(--muted)]">/{application.partner.slug}</DataTableClamp>
-                          </div>
-                        ) : null}
-                        {application.master ? (
-                          <div className="mt-1 text-xs">
-                            <DataTableClamp>Мастер: {application.master.title}</DataTableClamp>
-                            <DataTableClamp className="mt-1 text-[var(--muted)]">/{application.master.slug}</DataTableClamp>
-                          </div>
-                        ) : null}
-                      </DataTableCell>
-                      <DataTableCell label="Статус">
-                        <AdminStatusChip variant={applicationStatusBadgeVariants[application.status]}>
-                          {applicationStatusLabels[application.status]}
-                        </AdminStatusChip>
-                      </DataTableCell>
-                      <DataTableCell label="Файлы / согласия">
-                        <div className="flex flex-wrap gap-1.5">
-                          {application.resumeFileId ? <AdminStatusChip variant="neutral">Резюме</AdminStatusChip> : null}
-                          {application.consentAcceptedAt ? <AdminStatusChip variant="success">Согласие</AdminStatusChip> : null}
-                          {application.email || application.phone || application.telegram ? <AdminStatusChip variant="neutral">Контакты</AdminStatusChip> : null}
-                          {!application.resumeFileId && !application.consentAcceptedAt && !application.email && !application.phone && !application.telegram ? (
-                            <span className="text-sm text-[var(--muted)]">Нет</span>
-                          ) : null}
-                        </div>
-                      </DataTableCell>
-                      <DataTableCell className="text-[var(--muted)]" label="Создана">
-                        {dateTimeFormatter.format(application.createdAt)}
-                      </DataTableCell>
-                      <DataTableCell className="max-w-[260px]" label="Следующий шаг">
-                        <DataTableClamp className={actionLabel === 'Контроль не требуется' ? 'text-[var(--muted)]' : 'font-medium'}>
-                          {actionLabel}
-                        </DataTableClamp>
-                      </DataTableCell>
-                      <DataTableActionsCell>
-                        <DataTableActionRow className="justify-end">
-                          {publicationTarget ? (
-                            <form action={publishContentFromApplication}>
-                              <HiddenRedirect value={currentPath} />
-                              <input name="applicationId" type="hidden" value={application.id} />
-                              <input name="target" type="hidden" value={publicationTarget} />
-                              <ConfirmSubmitButton
-                                className="min-h-9 px-3 py-1.5 text-xs"
-                                confirmActionLabel="Опубликовать"
-                                confirmText="Запись станет доступна на публичной странице."
-                                confirmTitle="Опубликовать на сайте?"
-                                type="submit"
-                              >
-                                Опубликовать
-                              </ConfirmSubmitButton>
-                            </form>
-                          ) : null}
-                          <Button className="min-h-9 px-3 py-1.5 text-xs" href={`/admin/applications/${application.id}`} variant="secondary">
-                            Открыть
-                          </Button>
-                        </DataTableActionRow>
-                      </DataTableActionsCell>
-                    </DataTableRow>
-                  );
-                })
+                applications.map((application) => (
+                  <ApplicationTableRow
+                    application={application}
+                    currentPath={currentPath}
+                    key={application.id}
+                    publishContentFromApplication={publishContentFromApplication}
+                  />
+                ))
               )}
             </DataTableBody>
           </DataTable>

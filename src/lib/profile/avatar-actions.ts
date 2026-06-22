@@ -10,6 +10,7 @@ import type { ProfileActionResult } from '@/lib/profile/profile-action-result';
 import { assertSameOriginServerAction } from '@/lib/security/server-action-origin';
 import { getStorageService } from '@/lib/storage/storage.service';
 import { isAllowedPublicImageUpload } from '@/lib/storage/file-signatures';
+import { MAX_UPLOAD_FILE_SIZE_BYTES } from '@/lib/storage/storage.types';
 
 const SETTINGS_PATH = '/profile/settings';
 
@@ -29,6 +30,10 @@ export async function updateAvatar(_prevState: ProfileActionResult, formData: Fo
 
     if (!file || file.size === 0) {
       throw new Error('no file');
+    }
+
+    if (file.size > MAX_UPLOAD_FILE_SIZE_BYTES) {
+      throw new Error('file too large');
     }
 
     const buffer = Buffer.from(await file.arrayBuffer());
@@ -114,6 +119,10 @@ export async function updateAvatar(_prevState: ProfileActionResult, formData: Fo
           {
             matches: (e: Error) => e.message === 'no file',
             message: 'Файл не выбран.'
+          },
+          {
+            matches: (e: Error) => e.message === 'file too large',
+            message: 'Файл слишком большой. Максимум 8 МБ.'
           },
           {
             matches: (e: Error) => e.message === 'invalid image type',

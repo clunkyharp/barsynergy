@@ -46,9 +46,16 @@ export function Turnstile({
   useEffect(() => {
     if (typeof window === 'undefined' || !siteKey) return;
 
+    const cleanup = () => {
+      if (widgetIdRef.current && window.turnstile) {
+        window.turnstile.remove(widgetIdRef.current);
+        widgetIdRef.current = null;
+      }
+    };
+
     if (document.querySelector('script[src*="turnstile"]')) {
       onLoadTurnstile();
-      return;
+      return cleanup;
     }
 
     const script = document.createElement('script');
@@ -58,11 +65,7 @@ export function Turnstile({
     script.onload = onLoadTurnstile;
     document.head.appendChild(script);
 
-    return () => {
-      if (widgetIdRef.current && window.turnstile) {
-        window.turnstile.remove(widgetIdRef.current);
-      }
-    };
+    return cleanup;
   }, [onLoadTurnstile]);
 
   if (!siteKey) return null;

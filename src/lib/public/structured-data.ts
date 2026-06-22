@@ -155,92 +155,63 @@ export function buildPublicContentJsonLd({
     mainEntityOfPage: url
   };
 
-  if (kind === 'article') {
-    return {
-      '@context': 'https://schema.org',
-      '@type': 'Article',
-      headline: detail.title,
-      ...common,
-      datePublished: detail.publishedAtIso,
-      dateModified: detail.updatedAtIso,
-      publisher: organizationReference()
-    };
-  }
-
-  if (kind === 'event') {
-    const cityName = detail.cityName ?? factValue(detail, 'Город');
-    const locationName = detail.locationName ?? factValue(detail, 'Место');
-    const address = detail.address ?? factValue(detail, 'Адрес');
-
-    return {
-      '@context': 'https://schema.org',
-      '@type': 'Event',
-      ...common,
-      startDate: detail.startsAtIso,
-      endDate: detail.endsAtIso,
-      eventStatus: 'https://schema.org/EventScheduled',
-      eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
-      organizer: organizationReference(),
-      location:
-        cityName || locationName || address
-          ? {
-              '@type': 'Place',
-              name: locationName ?? cityName,
-              address: {
-                '@type': 'PostalAddress',
-                streetAddress: address,
-                addressLocality: cityName,
-                addressCountry: 'RU'
-              }
-            }
+  switch (kind) {
+    case 'article':
+      return {
+        '@context': 'https://schema.org',
+        '@type': 'Article',
+        headline: detail.title,
+        ...common,
+        datePublished: detail.publishedAtIso,
+        dateModified: detail.updatedAtIso,
+        publisher: organizationReference()
+      };
+    case 'event': {
+      const cityName = detail.cityName ?? factValue(detail, 'Город');
+      const locationName = detail.locationName ?? factValue(detail, 'Место');
+      const address = detail.address ?? factValue(detail, 'Адрес');
+      return {
+        '@context': 'https://schema.org',
+        '@type': 'Event',
+        ...common,
+        startDate: detail.startsAtIso,
+        endDate: detail.endsAtIso,
+        eventStatus: 'https://schema.org/EventScheduled',
+        eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+        organizer: organizationReference(),
+        location:
+          cityName || locationName || address
+            ? { '@type': 'Place', name: locationName ?? cityName, address: { '@type': 'PostalAddress', streetAddress: address, addressLocality: cityName, addressCountry: 'RU' } }
+            : undefined
+      };
+    }
+    case 'course':
+      return { '@context': 'https://schema.org', '@type': 'Course', ...common, provider: organizationReference() };
+    case 'vacancy':
+      return {
+        '@context': 'https://schema.org',
+        '@type': 'JobPosting',
+        title: detail.title,
+        description: detail.summary,
+        url,
+        datePosted: detail.publishedAtIso,
+        hiringOrganization: { '@type': 'Organization', name: detail.companyName ?? siteName },
+        jobLocation: detail.cityName
+          ? { '@type': 'Place', address: { '@type': 'PostalAddress', addressLocality: detail.cityName, addressCountry: 'RU' } }
           : undefined
-    };
-  }
-
-  if (kind === 'course') {
-    return {
-      '@context': 'https://schema.org',
-      '@type': 'Course',
-      ...common,
-      provider: organizationReference()
-    };
-  }
-
-  if (kind === 'vacancy') {
-    return {
-      '@context': 'https://schema.org',
-      '@type': 'JobPosting',
-      title: detail.title,
-      description: detail.summary,
-      url,
-      datePosted: detail.publishedAtIso,
-      hiringOrganization: {
+      };
+    default:
+      return {
+        '@context': 'https://schema.org',
         '@type': 'Organization',
-        name: detail.companyName ?? siteName
-      },
-      jobLocation: detail.cityName
-        ? {
-            '@type': 'Place',
-            address: {
-              '@type': 'PostalAddress',
-              addressLocality: detail.cityName,
-              addressCountry: 'RU'
-            }
-          }
-        : undefined
-    };
+        name: detail.companyName ?? detail.title,
+        description: detail.summary,
+        url: detail.externalUrl ?? url,
+        image,
+        sameAs: detail.externalUrl,
+        mainEntityOfPage: url
+      };
   }
-
-  return {
-    '@context': 'https://schema.org',
-    '@type': 'Organization',
-    name: detail.companyName ?? detail.title,
-    description: detail.summary,
-    url: detail.externalUrl ?? url,
-    image,
-    sameAs: detail.externalUrl,
-    mainEntityOfPage: url
-  };
 }
 
 export function buildMasterJsonLd(detail: PublicMasterDetail, path: string): JsonLdValue {

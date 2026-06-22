@@ -5,7 +5,7 @@ import { cookies } from 'next/headers';
 import { BusinessAccountStatus, UserRole, UserStatus } from '@prisma/client';
 import { Prisma } from '@prisma/client';
 import { z } from 'zod';
-import { getString, nullableString, optionalString } from '@/lib/admin/content-utils';
+import { getString, nullableString, optionalString } from '@/lib/forms/form-data';
 import { hasErrorMessage, resolveServerActionError } from '@/lib/actions/server-action-errors';
 import { arePublicApplicationFormsEnabled } from '@/lib/applications/public-forms';
 import { AuthRateLimitError, assertAuthAttemptAllowed } from '@/lib/auth/auth-rate-limit';

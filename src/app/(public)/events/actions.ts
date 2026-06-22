@@ -43,10 +43,7 @@ export async function submitEventLead(
       return { type: 'success', message: 'Заявка на событие отправлена. Команда BARSYNERGY свяжется с вами.' };
     }
 
-    const turnstileToken = getString(formData, 'turnstileToken');
-    if (turnstileToken) {
-      await assertTurnstilePassed(turnstileToken);
-    }
+    await assertTurnstilePassed(getString(formData, 'turnstileToken'));
     await assertPublicApplicationSubmissionAllowed(ApplicationType.EVENT_APPLICATION);
 
     const parsed = eventLeadSchema.parse({

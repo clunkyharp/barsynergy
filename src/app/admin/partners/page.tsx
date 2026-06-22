@@ -1,4 +1,3 @@
-import { CategoryType, type Prisma } from '@/modules/admin/queries';
 import { deletePartnerDraft, updatePartnerStatus } from '@/app/admin/partners/actions';
 import {
   AdminActionAlert,
@@ -38,7 +37,7 @@ import {
   partnerTypeOptions,
   type AdminContentSearchParams
 } from '@/lib/admin/content-utils';
-import { getActiveCategories, getPartnerList } from '@/lib/admin/admin-queries';
+import { listAdminPartners } from '@/modules/admin/partners/queries';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
 
 export const dynamic = 'force-dynamic';
@@ -67,28 +66,14 @@ export default async function AdminPartnersPage({ searchParams }: AdminPartnersP
   const partnerType = getAdminStringFilter(params, 'partnerType');
   const featuredFilter = getAdminStringFilter(params, 'featured');
   const isFeatured = getAdminBooleanFilter(params, 'featured');
-  const where: Prisma.PartnerWhereInput = {
+  const { partners, total, categories } = await listAdminPartners({
+    page,
+    q,
     status,
     categoryId,
     partnerType,
-    isFeatured,
-    ...(q
-      ? {
-          OR: [
-            { title: { contains: q, mode: 'insensitive' } },
-            { summary: { contains: q, mode: 'insensitive' } },
-            { slug: { contains: q, mode: 'insensitive' } },
-            { companyName: { contains: q, mode: 'insensitive' } },
-            { partnerType: { contains: q, mode: 'insensitive' } }
-          ]
-        }
-      : {})
-  };
-
-  const [[partners, total], categories] = await Promise.all([
-    getPartnerList(where, (page - 1) * ADMIN_CONTENT_PAGE_SIZE, ADMIN_CONTENT_PAGE_SIZE),
-    getActiveCategories(CategoryType.PARTNER)
-  ]);
+    isFeatured
+  });
   const totalPages = getAdminTotalPages(total);
   const hasActiveFilters = Boolean(q || status || categoryId || partnerType || featuredFilter);
 

@@ -1,5 +1,4 @@
 import {
-  SUPPORT_EMAIL,
   SUPPORT_INSTAGRAM,
   SUPPORT_TELEGRAM,
   SUPPORT_WHATSAPP,
@@ -44,7 +43,7 @@ export const contactMethods: ContactMethod[] = [
     name: "Instagram",
     value: SUPPORT_INSTAGRAM,
     href: "https://instagram.com/barsynergy",
-    actionLabel: "Открыть профиль",
+    actionLabel: "Смотреть Instagram",
     tone: "instagram",
     descriptor: "Пишите в Директ — удобно с телефона.",
     helper: "Ответ в течение дня",

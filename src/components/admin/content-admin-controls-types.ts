@@ -1,5 +1,5 @@
 import type { FormHTMLAttributes, ReactNode } from 'react';
-import { ContentStatus } from '@prisma/client';
+import type { ContentStatusValue } from '@/lib/admin/content-status';
 import type { AdminContentSearchParams } from '@/lib/admin/content-utils';
 
 export type AdminActionAlertProps = {
@@ -68,7 +68,7 @@ export type AdminContentRowActionsProps = {
   idName: string;
   idValue: string;
   publicHref?: string;
-  status: ContentStatus;
+  status: ContentStatusValue;
   updateStatusAction: (formData: FormData) => Promise<void>;
 };
 
@@ -77,6 +77,6 @@ export type AdminContentVisibilityPanelProps = {
   idName: string;
   idValue: string;
   publicHref?: string;
-  status: ContentStatus;
+  status: ContentStatusValue;
   updateStatusAction: (formData: FormData) => Promise<void>;
 };

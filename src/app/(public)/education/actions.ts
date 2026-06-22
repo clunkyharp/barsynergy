@@ -227,10 +227,7 @@ export async function submitEducationLead(
       return { type: 'success', message: 'Заявка на программу отправлена. Команда BARSYNERGY свяжется с вами.' };
     }
 
-    const turnstileToken = getString(formData, 'turnstileToken');
-    if (turnstileToken) {
-      await assertTurnstilePassed(turnstileToken);
-    }
+    await assertTurnstilePassed(getString(formData, 'turnstileToken'));
     await assertPublicApplicationSubmissionAllowed(ApplicationType.COURSE_APPLICATION);
 
     const parsed = educationLeadSchema.parse({

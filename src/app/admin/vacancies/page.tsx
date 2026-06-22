@@ -1,4 +1,4 @@
-import { CategoryType, ContentStatus, type Prisma } from '@/modules/admin/queries';
+import { ContentStatus } from '@/modules/admin/queries';
 import { deleteVacancyDraft, updateVacancyStatus } from '@/app/admin/vacancies/actions';
 import {
   AdminActionAlert,
@@ -38,7 +38,7 @@ import {
   type AdminContentSearchParams
 } from '@/lib/admin/content-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
-import { getVacancyList, getVacancyStatusCounts, getActiveCategories, getActiveCities } from '@/lib/admin/admin-queries';
+import { listAdminVacancies } from '@/modules/admin/vacancies/queries';
 
 export const dynamic = 'force-dynamic';
 
@@ -65,31 +65,15 @@ export default async function AdminVacanciesPage({ searchParams }: AdminVacancie
   const categoryId = getAdminStringFilter(params, 'categoryId');
   const cityId = getAdminStringFilter(params, 'cityId');
   const employmentType = getAdminStringFilter(params, 'employmentType');
-  const searchWhere: Prisma.VacancyWhereInput = q
-    ? {
-        OR: [
-          { title: { contains: q, mode: 'insensitive' as const } },
-          { summary: { contains: q, mode: 'insensitive' as const } },
-          { slug: { contains: q, mode: 'insensitive' as const } },
-          { companyName: { contains: q, mode: 'insensitive' as const } },
-          { position: { contains: q, mode: 'insensitive' as const } }
-        ]
-      }
-    : {};
-  const where: Prisma.VacancyWhereInput = {
+
+  const { vacancies, total, statusCounts: vacancyStatusCounts, categories, cities } = await listAdminVacancies({
+    page,
+    q,
     status,
     categoryId,
     cityId,
-    employmentType,
-    ...searchWhere
-  };
-
-  const [[vacancies, total], vacancyStatusCounts, categories, cities] = await Promise.all([
-    getVacancyList(where, (page - 1) * ADMIN_CONTENT_PAGE_SIZE, ADMIN_CONTENT_PAGE_SIZE),
-    getVacancyStatusCounts(searchWhere),
-    getActiveCategories(CategoryType.VACANCY),
-    getActiveCities()
-  ]);
+    employmentType
+  });
   const totalPages = getAdminTotalPages(total);
   const vacancyCountByStatus = new Map(vacancyStatusCounts.map((item) => [item.status, item._count.id] as const));
   const hasActiveFilters = Boolean(q || status || categoryId || cityId || employmentType);

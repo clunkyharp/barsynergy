@@ -153,7 +153,7 @@ test('conversation lists use active closed archive tabs instead of enum status d
     assert.doesNotMatch(source, /Применить/);
   }
 
-  assert.match(profileResponsesSource, /getConversationStatusFilter\(statusGroup\)/);
+  assert.match(profileQueriesSource, /listUserResponses/);
   assert.match(profileInquiriesSource, /getUserInquiries\(user\.id, statusGroup, sort, page, PAGE_SIZE\)/);
   assert.match(businessRequestsSource, /getBusinessRequestsPage\(businessAccount\.id, statusGroup, skip, PAGE_SIZE\)/);
   assert.match(businessResponsesSource, /getBusinessResponses\(businessAccount\.id, statusGroup\)/);
@@ -347,7 +347,7 @@ test('public business and about pages avoid unsupported anti-proof stats', () =>
   assert.doesNotMatch(businessSource, /title: 'Локальный контекст'/);
 
   assert.doesNotMatch(aboutSource, /единый сайт/);
-  assert.match(aboutSource, /редакция постепенно приводит разделы к одному понятному формату/);
+  assert.match(aboutSource, /редакция постепенно приводит\s+разделы к одному понятному формату/);
 });
 
 test('S3 cabinet action controls meet touch and hidden-profile UX requirements', () => {
@@ -492,7 +492,7 @@ test('profile KPI tiles use AppLink and homepage fresh block has a distinct angl
 
   assert.match(homepageSource, /Актуальное/);
   assert.match(homepageSource, /Разделы для работы/);
-  assert.match(homepageSource, /fallbackMeta="Рабочий раздел"/);
+  assert.match(homepageSource, /fallbackMeta="Другие материалы"/);
   assert.doesNotMatch(homepageSource, /Свежее на платформе/);
 });
 
@@ -503,5 +503,5 @@ test('homepage hero gradient uses stylesheet class instead of inline background'
   assert.match(heroSource, /className="home-hero-gradient absolute inset-0 z-\[1\]"/);
   assert.doesNotMatch(heroSource, /style=\{\{[\s\S]*background:/);
   assert.match(publicCssSource, /\.home-hero-gradient/);
-  assert.match(publicCssSource, /radial-gradient\(circle at 18% 34%/);
+  assert.match(publicCssSource, /radial-gradient\(circle at 50% 42%/);
 });

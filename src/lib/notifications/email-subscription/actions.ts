@@ -1,7 +1,7 @@
 'use server';
 
 import { headers } from 'next/headers';
-import { getString } from '@/lib/admin/content-utils';
+import { getString } from '@/lib/forms/form-data';
 import { getCurrentUser } from '@/lib/auth/current-user';
 import { assertSameOriginServerAction } from '@/lib/security/server-action-origin';
 import { createOrRefreshEmailSubscription } from './service';
@@ -18,6 +18,8 @@ const RATE_LIMIT_IP_HOUR_MAX = 5;
 const RATE_LIMIT_EMAIL_DAY_MAX = 3;
 
 const RATE_LIMIT_CLEANUP_THRESHOLD = 10_000;
+// Hard ceiling on entries per map — bounds heap even under unique-key flood (bots).
+const RATE_LIMIT_HARD_CAP = 20_000;
 // TODO: shared store (Upstash Redis) when scale > 1 instance
 
 type RateEntry = { count: number; resetAt: number };
@@ -30,6 +32,16 @@ function cleanupExpiredEntries(map: Map<string, RateEntry>) {
   const now = Date.now();
   for (const [key, entry] of map) {
     if (now >= entry.resetAt) map.delete(key);
+  }
+  // If the expiry sweep didn't free enough (all entries still live), evict the
+  // oldest by insertion order so the map can never grow without bound.
+  if (map.size > RATE_LIMIT_HARD_CAP) {
+    const excess = map.size - RATE_LIMIT_HARD_CAP;
+    let removed = 0;
+    for (const key of map.keys()) {
+      map.delete(key);
+      if (++removed >= excess) break;
+    }
   }
 }
 

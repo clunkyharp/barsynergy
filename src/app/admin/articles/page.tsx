@@ -1,4 +1,3 @@
-import { CategoryType, type Prisma } from '@/modules/admin/queries';
 import { deleteArticleDraft, updateArticleStatus } from '@/app/admin/articles/actions';
 import {
   AdminActionAlert,
@@ -36,7 +35,7 @@ import {
   type AdminContentSearchParams
 } from '@/lib/admin/content-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
-import { getActiveCategories, getActiveCities, getArticleList } from '@/lib/admin/admin-queries';
+import { listAdminArticles } from '@/modules/admin/articles/queries';
 
 export const dynamic = 'force-dynamic';
 
@@ -62,26 +61,13 @@ export default async function AdminArticlesPage({ searchParams }: AdminArticlesP
   const status = getAdminStatusFilter(params);
   const categoryId = getAdminStringFilter(params, 'categoryId');
   const cityId = getAdminStringFilter(params, 'cityId');
-  const where: Prisma.ArticleWhereInput = {
+  const { articles, total, categories, cities } = await listAdminArticles({
+    page,
+    q,
     status,
     categoryId,
-    cityId,
-    ...(q
-      ? {
-          OR: [
-            { title: { contains: q, mode: 'insensitive' } },
-            { summary: { contains: q, mode: 'insensitive' } },
-            { slug: { contains: q, mode: 'insensitive' } }
-          ]
-        }
-      : {})
-  };
-
-  const [[articles, total], categories, cities] = await Promise.all([
-    getArticleList(where, (page - 1) * ADMIN_CONTENT_PAGE_SIZE, ADMIN_CONTENT_PAGE_SIZE),
-    getActiveCategories(CategoryType.ARTICLE),
-    getActiveCities()
-  ]);
+    cityId
+  });
   const totalPages = getAdminTotalPages(total);
   const hasActiveFilters = Boolean(q || status || categoryId || cityId);
 

@@ -18,31 +18,15 @@ function itemHref(basePath: string, slug: string) {
 }
 
 function relatedActionLabel(basePath: string) {
-  if (basePath === '/articles') {
-    return 'Читать материал';
+  switch (basePath) {
+    case '/articles':   return 'Читать материал';
+    case '/events':     return 'Подробнее о событии';
+    case '/vacancies':  return 'Смотреть вакансию';
+    case '/suppliers':  return 'Смотреть профиль';
+    case '/education':  return 'Смотреть программу';
+    case '/partners':   return 'Смотреть партнёра';
+    default:            return 'Подробнее';
   }
-
-  if (basePath === '/events') {
-    return 'Подробнее о событии';
-  }
-
-  if (basePath === '/vacancies') {
-    return 'Смотреть вакансию';
-  }
-
-  if (basePath === '/suppliers') {
-    return 'Смотреть профиль';
-  }
-
-  if (basePath === '/education') {
-    return 'Смотреть программу';
-  }
-
-  if (basePath === '/partners') {
-    return 'Смотреть партнёра';
-  }
-
-  return 'Подробнее';
 }
 
 export function PublicRelatedContentSection({

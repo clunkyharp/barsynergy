@@ -1,4 +1,3 @@
-import type { Prisma } from '@/modules/admin/queries';
 import {
   deleteGeneralSponsorDraft,
   updateGeneralSponsorStatus
@@ -39,7 +38,7 @@ import {
   getAdminTotalPages,
   type AdminContentSearchParams
 } from '@/lib/admin/content-utils';
-import { getActiveCities, getGeneralSponsorList } from '@/lib/admin/admin-queries';
+import { listAdminGeneralSponsors } from '@/modules/admin/general-sponsors/queries';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
 
 export const dynamic = 'force-dynamic';
@@ -67,25 +66,13 @@ export default async function AdminGeneralSponsorsPage({ searchParams }: AdminGe
   const cityId = getAdminStringFilter(params, 'cityId');
   const featuredFilter = getAdminStringFilter(params, 'featured');
   const isFeatured = getAdminBooleanFilter(params, 'featured');
-  const where: Prisma.GeneralSponsorWhereInput = {
+  const { sponsors, total, cities } = await listAdminGeneralSponsors({
+    page,
+    q,
     status,
     cityId,
-    isFeatured,
-    ...(q
-      ? {
-          OR: [
-            { name: { contains: q, mode: 'insensitive' } },
-            { shortDescription: { contains: q, mode: 'insensitive' } },
-            { fullDescription: { contains: q, mode: 'insensitive' } }
-          ]
-        }
-      : {})
-  };
-
-  const [[sponsors, total], cities] = await Promise.all([
-    getGeneralSponsorList(where, (page - 1) * ADMIN_CONTENT_PAGE_SIZE, ADMIN_CONTENT_PAGE_SIZE),
-    getActiveCities()
-  ]);
+    isFeatured
+  });
   const totalPages = getAdminTotalPages(total);
   const hasActiveFilters = Boolean(q || status || cityId || featuredFilter);
 

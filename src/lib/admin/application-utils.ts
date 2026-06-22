@@ -199,51 +199,33 @@ export function formatApplicationPayloadValue(key: string, value: unknown) {
     return directLabel;
   }
 
-  if (key === 'employmentType') {
-    return getAdminOptionLabel(vacancyEmploymentTypeOptions, normalizedValue, normalizedValue);
+  switch (key) {
+    case 'employmentType':
+      return getAdminOptionLabel(vacancyEmploymentTypeOptions, normalizedValue, normalizedValue);
+    case 'experienceLabel':
+      return getAdminOptionLabel(vacancyExperienceOptions, normalizedValue, normalizedValue);
+    case 'partnerType':
+      return getAdminOptionLabel(partnerTypeOptions, normalizedValue, normalizedValue);
+    case 'solutionType':
+      return getOptionLabel(businessSolutionTypeOptions, normalizedValue) ?? normalizedValue;
+    case 'businessType':
+      return getOptionLabel(consultingBusinessTypeOptions, normalizedValue) ?? normalizedValue;
+    case 'projectStage':
+      return getOptionLabel(consultingProjectStageOptions, normalizedValue) ?? normalizedValue;
+    case 'consultingDirection':
+      return getOptionLabel(consultingDirectionOptions, normalizedValue) ?? normalizedValue;
+    case 'preferredExpert':
+      return getOptionLabel(consultingExpertOptions, normalizedValue) ?? normalizedValue;
+    case 'registrationMode':
+      return getAdminOptionLabel(eventRegistrationModeOptions, normalizedValue, normalizedValue);
+    case 'level':
+      return getAdminOptionLabel(courseLevelOptions, normalizedValue, normalizedValue);
+    case 'format':
+    case 'formatLabel':
+      return getAdminOptionLabel([...eventFormatOptions, ...courseFormatOptions], normalizedValue, normalizedValue);
+    default:
+      return normalizedValue;
   }
-
-  if (key === 'experienceLabel') {
-    return getAdminOptionLabel(vacancyExperienceOptions, normalizedValue, normalizedValue);
-  }
-
-  if (key === 'partnerType') {
-    return getAdminOptionLabel(partnerTypeOptions, normalizedValue, normalizedValue);
-  }
-
-  if (key === 'solutionType') {
-    return getOptionLabel(businessSolutionTypeOptions, normalizedValue) ?? normalizedValue;
-  }
-
-  if (key === 'businessType') {
-    return getOptionLabel(consultingBusinessTypeOptions, normalizedValue) ?? normalizedValue;
-  }
-
-  if (key === 'projectStage') {
-    return getOptionLabel(consultingProjectStageOptions, normalizedValue) ?? normalizedValue;
-  }
-
-  if (key === 'consultingDirection') {
-    return getOptionLabel(consultingDirectionOptions, normalizedValue) ?? normalizedValue;
-  }
-
-  if (key === 'preferredExpert') {
-    return getOptionLabel(consultingExpertOptions, normalizedValue) ?? normalizedValue;
-  }
-
-  if (key === 'registrationMode') {
-    return getAdminOptionLabel(eventRegistrationModeOptions, normalizedValue, normalizedValue);
-  }
-
-  if (key === 'level') {
-    return getAdminOptionLabel(courseLevelOptions, normalizedValue, normalizedValue);
-  }
-
-  if (key === 'format' || key === 'formatLabel') {
-    return getAdminOptionLabel([...eventFormatOptions, ...courseFormatOptions], normalizedValue, normalizedValue);
-  }
-
-  return normalizedValue;
 }
 
 export function formatApplicationActionError(error: unknown) {

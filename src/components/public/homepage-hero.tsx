@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { ArrowUpRight } from "lucide-react";
+import { AppLink } from "@/components/ui/app-link";
 import { accentFont, displayFont } from "@/lib/fonts";
 import type { HomepageData } from "@/lib/public/home";
 
@@ -66,19 +67,19 @@ export function HomeHeroRouter({ stats }: { stats: HomepageData["stats"] }) {
             которые помогают работать точнее.
           </p>
           <div className="mt-9 flex flex-wrap justify-center gap-3 max-sm:w-full max-sm:flex-col max-sm:items-stretch">
-            <a
+            <AppLink
               href="/vacancies"
               className="inline-flex items-center justify-center gap-2 rounded-[var(--radius-lg)] bg-[var(--accent)] px-6 py-3 text-sm font-semibold text-[var(--accent-contrast)] shadow-[var(--shadow-action)] transition-colors hover:bg-[var(--accent-strong)]"
             >
               Смотреть вакансии
               <ArrowUpRight size={15} strokeWidth={2} />
-            </a>
-            <a
+            </AppLink>
+            <AppLink
               href="/business"
               className="inline-flex items-center justify-center gap-2 rounded-[var(--radius-lg)] border border-white/30 px-6 py-3 text-sm font-semibold text-[var(--editorial-dark-text)] transition-colors hover:border-white/60 hover:bg-white/10"
             >
               Для бизнеса
-            </a>
+            </AppLink>
           </div>
           {statItems.length >= 2 && (
             <dl className="mt-14 flex flex-wrap justify-center gap-x-12 gap-y-6">

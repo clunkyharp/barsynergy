@@ -3,6 +3,7 @@
 import { useEffect, useTransition, useState, useCallback, type ChangeEvent } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Search } from 'lucide-react';
+import { AppLink } from '@/components/ui/app-link';
 import { Select } from '@/components/ui/select';
 import type { PublicTaxonomyOption, PublicSelectOption } from '@/lib/public/filter-options';
 
@@ -186,20 +187,20 @@ function EducationFilterBarContent({
 
         {categories.length > 0 ? (
           <div className="mt-3 flex items-center gap-2 overflow-x-auto pb-0.5 scrollbar-none">
-            <a
+            <AppLink
               className={!currentCategory ? activePillCls : inactivePillCls}
               href={buildNextUrl(basePath, searchParams, { category: '' })}
             >
               Все
-            </a>
+            </AppLink>
             {categories.map((cat) => (
-              <a
+              <AppLink
                 className={currentCategory === cat.slug ? activePillCls : inactivePillCls}
                 href={buildNextUrl(basePath, searchParams, { category: cat.slug })}
                 key={cat.slug}
               >
                 {cat.name}
-              </a>
+              </AppLink>
             ))}
           </div>
         ) : null}

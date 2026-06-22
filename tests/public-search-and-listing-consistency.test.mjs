@@ -112,10 +112,12 @@ test('public catalog and listing pages use the same graphite hero tone', () => {
 });
 
 test('hero action modals share the numbered step primitive', () => {
+  // Vacancies now opens a shared lead modal via the lead-modal bus instead of
+  // an inline numbered-step modal; suppliers/events/masters still use the step.
   const actionFiles = [
-    'src/app/(public)/vacancies/vacancies-hero-actions.tsx',
     'src/app/(public)/suppliers/suppliers-hero-actions.tsx',
-    'src/app/(public)/events/events-hero-actions.tsx'
+    'src/app/(public)/events/events-hero-actions.tsx',
+    'src/app/(public)/masters/masters-hero-actions.tsx'
   ];
 
   for (const filePath of actionFiles) {
@@ -139,15 +141,14 @@ test('vacancy and supplier rows use an HH-like public card contract', () => {
   const sidebarVariantSource = readProjectFile('src/components/public/public-filters-variant-sidebar.tsx');
   const toolbarVariantSource = readProjectFile('src/components/public/public-filters-variant-toolbar.tsx');
 
-  assert.match(opportunityRowSource, /function opportunityActions/);
-  assert.match(opportunityRowSource, /function vacancyLead/);
-  assert.match(directoryRowSource, /function directoryLead/);
+  // Redesign: both rows are fully clickable cards (no separate action/lead
+  // helper functions); the opportunity row keeps the HH-style shell.
+  assert.match(opportunityRowSource, /function vacancySalary/);
+  assert.match(directoryRowSource, /function directoryChips/);
   assert.match(directoryRowSource, /Связаться/);
-  assert.match(directoryRowSource, /Профиль/);
   assert.doesNotMatch(opportunityRowSource, /label: 'Откликнуться'/);
   assert.match(`${opportunityRowSource}\n${directoryRowSource}`, /public-list-row-shell-hh/);
-  assert.match(`${opportunityRowSource}\n${directoryRowSource}`, /public-list-row-actions/);
-  assert.match(`${opportunityRowSource}\n${directoryRowSource}`, /public-list-row-primary-action/);
+  assert.match(`${opportunityRowSource}\n${directoryRowSource}`, /after:absolute after:inset-0/);
   assert.match(filtersSource, /const defaultCollapsed = defaultCollapsedProp \?\? \(resolvedVariant === 'sidebar'\)/);
   assert.match(filtersSource, /useState\(defaultCollapsed\)/);
   assert.match(sidebarVariantSource, /areSidebarFieldsCollapsed \? expandLabel : collapseLabel/);
@@ -167,9 +168,8 @@ test('public listing accent hierarchy uses shared markers, tracking tokens and s
   assert.match(tokensSource, /--tracking-eyebrow-sm: 0\.08em;/);
   assert.match(tokensSource, /--tracking-marker: 0\.12em;/);
 
-  assert.match(opportunityRowSource, /tabular-nums text-\[1\.35rem\] font-semibold text-\[var\(--accent\)\]/);
-  assert.match(directoryRowSource, /tabular-nums text-\[1\.35rem\] font-semibold text-\[var\(--accent\)\]/);
-  assert.match(`${opportunityRowSource}\n${directoryRowSource}`, /AvatarFallback/);
+  assert.match(opportunityRowSource, /tabular-nums text-\[1\.3rem\] font-semibold text-\[var\(--accent\)\]/);
+  assert.match(`${opportunityRowSource}\n${directoryRowSource}`, /titleInitials/);
   assert.match(`${opportunityRowSource}\n${directoryRowSource}\n${articleCardSource}`, /HighlightChip/);
   assert.doesNotMatch(`${opportunityRowSource}\n${directoryRowSource}`, /bg-\[var\(--warning-bg\)\].*tracking-\[0\.12em\]/);
   assert.match(`${opportunityRowSource}\n${directoryRowSource}`, /tracking-\[var\(--tracking-eyebrow-sm\)\]/);

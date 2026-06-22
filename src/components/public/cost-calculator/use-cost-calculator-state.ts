@@ -71,7 +71,15 @@ const demoAdditionalCosts: AdditionalCost[] = [
   { id: 'ac-3', name: 'Расходные материалы', amount: '5' },
 ];
 
-function createEmptyIngredient(id = `ingredient-${Date.now()}`): Ingredient {
+// Monotonic counter for new row ids — avoids Date.now() collisions on rapid
+// add/duplicate. Distinct `-row-` segment keeps these clear of demo/preset ids.
+let rowIdCounter = 0;
+function nextRowId(prefix: string) {
+  rowIdCounter += 1;
+  return `${prefix}-row-${rowIdCounter}`;
+}
+
+function createEmptyIngredient(id = nextRowId('ingredient')): Ingredient {
   return {
     id,
     name: '',
@@ -83,7 +91,7 @@ function createEmptyIngredient(id = `ingredient-${Date.now()}`): Ingredient {
   };
 }
 
-function createEmptyAdditionalCost(id = `ac-${Date.now()}`): AdditionalCost {
+function createEmptyAdditionalCost(id = nextRowId('ac')): AdditionalCost {
   return { id, name: '', amount: '' };
 }
 
@@ -277,7 +285,7 @@ export function useCostCalculatorState() {
     setIngredients((current) => {
       const source = current.find((ingredient) => ingredient.id === id);
       if (!source) return current;
-      return [...current, { ...source, id: `ingredient-${Date.now()}` }];
+      return [...current, { ...source, id: nextRowId('ingredient') }];
     });
   }
 

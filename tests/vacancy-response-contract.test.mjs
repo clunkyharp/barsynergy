@@ -47,10 +47,13 @@ test('profile responses detail page guards by userId ownership', () => {
 
 test('profile responses list queries by userId', () => {
   const listSource = readProjectFile('src/app/profile/responses/page.tsx');
+  const querySource = readProjectFile('src/modules/profile/queries.ts');
 
+  // Page passes the ownership filter; the where clause is built in the query module (A-01).
   assert.match(listSource, /userId: user\.id/);
-  assert.match(listSource, /const where: Prisma\.ApplicationWhereInput = \{/);
-  assert.match(listSource, /getUserResponses\(where, sort, page, PAGE_SIZE\)/);
+  assert.match(listSource, /listUserResponses\(\{/);
+  assert.match(querySource, /const where: Prisma\.ApplicationWhereInput = \{/);
+  assert.match(querySource, /getUserResponses\(where, sort, page, pageSize\)/);
 });
 
 test('profile responses empty state uses plain signed-in account copy', () => {

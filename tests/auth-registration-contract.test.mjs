@@ -95,11 +95,11 @@ test('business register action handles forms-disabled, invalid, duplicate and ra
   assert.match(actionsSource, /businessRequestSchema\.safeParse/);
   assert.match(actionsSource, /redirectWithAuthResult\('\/auth\/register\/business',.*'invalid'/);
   assert.match(actionsSource, /AuthRateLimitError/);
-  assert.match(actionsSource, /redirectWithAuthResult\('\/auth\/register\/business',.*'rate-limited'/);
-  assert.match(actionsSource, /existingUser \|\| existingRequest/);
-  assert.match(actionsSource, /business-request-created/);
+  assert.match(actionsSource, /AuthRateLimitError \? 'rate-limited'/);
+  assert.match(actionsSource, /if \(existingUser\) return null;/);
+  assert.match(actionsSource, /code: 'already-registered'/);
   assert.doesNotMatch(actionsSource, /business-request-duplicate/);
-  assert.match(actionsSource, /if \(existingUser \|\| existingRequest\) return null;/);
+  assert.match(actionsSource, /outcome\.status === 'duplicate'/);
 });
 
 test('login page shows duplicate business request message', () => {

@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
-import { getString } from '@/lib/admin/content-utils';
+import { getString } from '@/lib/forms/form-data';
 import { resolveServerActionError } from '@/lib/actions/server-action-errors';
 import { getCurrentUser } from '@/lib/auth/current-user';
 import { hashPassword, verifyPassword } from '@/lib/auth/password';

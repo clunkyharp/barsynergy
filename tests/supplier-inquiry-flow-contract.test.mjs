@@ -93,7 +93,7 @@ test('supplier hero does not render direct contact dump', () => {
   assert.doesNotMatch(page, /facts\.find\(\(f\) => f\.label === 'Контакты'\)/);
   assert.match(page, /contactLabel=\{supplier\.contactLabel\}/);
   assert.match(body, /Контакты поставщика/);
-  assert.match(body, /ContactActionRow/);
+  assert.match(body, /DirectContactLinks/);
   assert.match(body, /parseSupplierContactRows/);
   assert.match(body, /Запросить условия/);
 });

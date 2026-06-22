@@ -13,25 +13,22 @@ function readProjectFile(path) {
 
 test('about page uses narrative story, visual facts, timeline, and focused final CTA', () => {
   const source = readProjectFile('src/app/(public)/about/page.tsx');
-  const css = readGlobalStyles();
 
-  assert.match(source, /breadcrumbs=\{\[\{ label: 'О проекте' \}\]\}/);
-  assert.doesNotMatch(source, /<p className="mt-5 inline-flex[\s\S]*О проекте[\s\S]*<\/p>/);
+  // Redesigned About: bespoke page-hero + mission narrative + timeline + features
+  // + focused final CTA (no PageHero/breadcrumbs).
+  assert.match(source, /<section className="page-hero">/);
+  assert.match(source, /<p className="section-label">О проекте<\/p>/);
   assert.match(source, /Бариста искали обучение в чатах/);
   assert.match(source, /половина профессионального круга узнала уже постфактум/);
-  assert.match(source, /обучение, афиша, вакансии, материалы и каталог поставщиков/);
-  assert.match(source, /Ближайшее направление развития/);
+  assert.match(source, /обучение, афиша, вакансии, материалы и каталог/);
+  assert.match(source, /Как развивается платформа/);
   assert.match(source, /<blockquote/);
-  assert.match(source, /const insidePlatform:/);
-  assert.match(source, /hero-coffee-counter-haberdoedas/);
-  assert.match(source, /about-timeline grid/);
-  assert.doesNotMatch(source, /about-timeline grid gap-0 border-y/);
-  assert.doesNotMatch(source, /about-timeline-item relative grid gap-3 border-b/);
-  assert.match(css, /\.about-timeline-item::before/);
+  assert.match(source, /const timeline = \[/);
+  assert.match(source, /const platformFeatures:/);
+  assert.match(source, /<ol className="timeline">/);
   assert.match(source, /Связаться с командой/);
   assert.match(source, /Предложить событие/);
   assert.match(source, /Стать партнёром/);
-  assert.match(source, /xl:grid-cols-\[minmax\(0,0\.62fr\)_minmax\(18rem,0\.38fr\)\]/);
 });
 
 test('editorial public page hero does not duplicate breadcrumb as eyebrow', () => {
@@ -97,7 +94,7 @@ test('auth surfaces use minimal login, progressive register and admin dark mode'
 
   assert.match(loginSource, /<AuthSplitLayout>/);
   assert.match(authLayoutSource, /auth-login-screen/);
-  assert.match(authLayoutSource, /Вернуться на сайт/);
+  assert.match(authLayoutSource, /На сайт/);
   assert.doesNotMatch(authLayoutSource, /auth-split-photo/);
   assert.doesNotMatch(loginSource, /Хороший эспрессо начинается с правильной экстракции/);
   assert.doesNotMatch(loginSource, /AuthRoleCard/);

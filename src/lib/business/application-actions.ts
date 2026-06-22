@@ -37,23 +37,18 @@ const applicationIdSchema = z.object({
 });
 
 function getApplicationSubject(input: { type: ApplicationType; companyName: string; title: string }) {
-  if (input.type === ApplicationType.VACANCY_SUBMISSION) {
-    return `${input.companyName}: ${input.title}`;
+  switch (input.type) {
+    case ApplicationType.VACANCY_SUBMISSION:
+      return `${input.companyName}: ${input.title}`;
+    case ApplicationType.SUPPLIER_SUBMISSION:
+      return `Поставщик: ${input.companyName}`;
+    case ApplicationType.PARTNER_APPLICATION:
+      return `Партнёрство: ${input.companyName}`;
+    case ApplicationType.CORPORATE_TRAINING_APPLICATION:
+      return `Корпоративное обучение: ${input.companyName}`;
+    default:
+      return `Заказ сертификата: ${input.companyName}`;
   }
-
-  if (input.type === ApplicationType.SUPPLIER_SUBMISSION) {
-    return `Поставщик: ${input.companyName}`;
-  }
-
-  if (input.type === ApplicationType.PARTNER_APPLICATION) {
-    return `Партнёрство: ${input.companyName}`;
-  }
-
-  if (input.type === ApplicationType.CORPORATE_TRAINING_APPLICATION) {
-    return `Корпоративное обучение: ${input.companyName}`;
-  }
-
-  return `Заказ сертификата: ${input.companyName}`;
 }
 
 function getBusinessApplicationFormData(formData: FormData) {

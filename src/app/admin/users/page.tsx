@@ -1,4 +1,5 @@
-import { ApplicationType, BusinessAccountStatus, UserRole, UserStatus, type Prisma } from '@/modules/admin/queries';
+import { ApplicationType, BusinessAccountStatus, UserStatus } from '@/modules/admin/queries';
+import { accessFilterValues, listAdminBusinessUsers, type AccessFilter } from '@/modules/admin/users/queries';
 import { updateBusinessUserAccess } from '@/app/admin/users/actions';
 import { AdminActionAlert, HiddenRedirect } from '@/components/admin/content-admin-controls';
 import { AdminPageIntro } from '@/components/admin/admin-page-intro';
@@ -20,17 +21,12 @@ import { AdminStatusChip, type StatusBadgeVariant } from '@/components/ui/status
 import { AdminFilterBar } from '@/components/admin/content-admin-controls';
 import { applicationStatusLabels } from '@/lib/admin/application-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
-import { getUserList } from '@/lib/admin/admin-queries';
 import { firstParam, getAdminCurrentPath, type AdminContentSearchParams } from '@/lib/admin/content-utils';
 import { cn } from '@/lib/utils';
 
 export const dynamic = 'force-dynamic';
 
 const ADMIN_USERS_PATH = '/admin/users';
-
-const accessFilterValues = ['all', 'pending', 'active', 'blocked'] as const;
-
-type AccessFilter = (typeof accessFilterValues)[number];
 
 const accessFilterLabels: Record<AccessFilter, string> = {
   all: 'Все',
@@ -80,40 +76,6 @@ function getAccessFilter(params: AdminContentSearchParams): AccessFilter {
   return accessFilterValues.includes(value as AccessFilter) ? (value as AccessFilter) : 'all';
 }
 
-function getBusinessAccessWhere(accessFilter: AccessFilter): Prisma.UserWhereInput {
-  const baseWhere: Prisma.UserWhereInput = { role: UserRole.BUSINESS };
-
-  if (accessFilter === 'active') {
-    return {
-      ...baseWhere,
-      status: UserStatus.ACTIVE,
-      businessAccount: { is: { status: BusinessAccountStatus.ACTIVE } }
-    };
-  }
-
-  if (accessFilter === 'pending') {
-    return {
-      ...baseWhere,
-      OR: [
-        { status: UserStatus.PENDING },
-        { businessAccount: { is: { status: BusinessAccountStatus.PENDING } } }
-      ]
-    };
-  }
-
-  if (accessFilter === 'blocked') {
-    return {
-      ...baseWhere,
-      OR: [
-        { status: UserStatus.BLOCKED },
-        { businessAccount: { is: { status: BusinessAccountStatus.BLOCKED } } }
-      ]
-    };
-  }
-
-  return baseWhere;
-}
-
 function businessAccessFilterHref(params: AdminContentSearchParams, access: AccessFilter) {
   const query = new URLSearchParams();
 
@@ -151,19 +113,7 @@ export default async function AdminUsersPage({ searchParams }: AdminUsersPagePro
   const accessFilter = getAccessFilter(params);
   const searchQuery = firstParam(params.q)?.trim() ?? '';
   const currentPath = getAdminCurrentPath(ADMIN_USERS_PATH, params);
-  const searchWhere: Prisma.UserWhereInput = searchQuery
-    ? {
-        OR: [
-          { email: { contains: searchQuery, mode: 'insensitive' } },
-          { businessAccount: { companyName: { contains: searchQuery, mode: 'insensitive' } } }
-        ]
-      }
-    : {};
-  const where: Prisma.UserWhereInput = {
-    ...getBusinessAccessWhere(accessFilter),
-    ...searchWhere
-  };
-  const [users] = await getUserList(where, 0, 50);
+  const { users } = await listAdminBusinessUsers({ accessFilter, searchQuery });
 
   return (
     <div className="space-y-8">

@@ -150,6 +150,21 @@ const envSchema = z
         }
       }
     }
+
+    // Captcha must be fully wired in production once public forms accept input:
+    // a missing secret makes verification fail open, a missing site key means the
+    // widget never renders. Require both together so neither half is silently absent.
+    if (isProductionRuntime && env.APPLICATION_FORMS_ENABLED === true) {
+      for (const key of ['NEXT_PUBLIC_TURNSTILE_SITE_KEY', 'TURNSTILE_SECRET_KEY'] as const) {
+        if (!env[key]) {
+          ctx.addIssue({
+            code: 'custom',
+            path: [key],
+            message: `${key} is required in production when APPLICATION_FORMS_ENABLED=true`
+          });
+        }
+      }
+    }
   });
 
 export type AppEnv = z.infer<typeof envSchema>;

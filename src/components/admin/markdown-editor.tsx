@@ -1,166 +1,30 @@
 'use client';
 
-import { createPortal } from 'react-dom';
 import { useCallback, useEffect, useRef, useState, type TextareaHTMLAttributes } from 'react';
-import {
-  Bold, Eye, Heading2, Heading3, Italic, Link,
-  List, ListOrdered, Minus, Pen, Quote, Redo2, Undo2,
-} from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeSanitize from 'rehype-sanitize';
 import { cn } from '@/lib/utils';
-
-type EditorMode = 'edit' | 'preview';
-
-type FormatDef = {
-  before: string;
-  after: string;
-  block: boolean;
-  icon: React.ComponentType<{ size?: number }>;
-  title: string;
-};
-
-const FORMATS = {
-  bold:   { before: '**',        after: '**',     block: false, icon: Bold,        title: 'Жирный (Ctrl+B)' },
-  italic: { before: '_',         after: '_',      block: false, icon: Italic,      title: 'Курсив (Ctrl+I)' },
-  h2:     { before: '## ',       after: '',       block: true,  icon: Heading2,    title: 'Заголовок 2' },
-  h3:     { before: '### ',      after: '',       block: true,  icon: Heading3,    title: 'Заголовок 3' },
-  ul:     { before: '- ',        after: '',       block: true,  icon: List,        title: 'Список' },
-  ol:     { before: '1. ',       after: '',       block: true,  icon: ListOrdered, title: 'Нумерованный список' },
-  link:   { before: '[',         after: '](url)', block: false, icon: Link,        title: 'Ссылка (Ctrl+K)' },
-  quote:  { before: '> ',        after: '',       block: true,  icon: Quote,       title: 'Цитата' },
-  hr:     { before: '\n\n---\n\n', after: '',     block: false, icon: Minus,       title: 'Разделитель' },
-} as const satisfies Record<string, FormatDef>;
-
-type FormatKey = keyof typeof FORMATS;
-
-function applyInlineFormat(value: string, start: number, end: number, before: string, after: string) {
-  if (start === end) {
-    const v = value.slice(0, start) + before + after + value.slice(end);
-    return { value: v, selectionStart: start + before.length, selectionEnd: start + before.length };
-  }
-  const selected = value.slice(start, end);
-  if (selected.startsWith(before) && selected.endsWith(after) && selected.length >= before.length + after.length + 1) {
-    const inner = selected.slice(before.length, -after.length);
-    return { value: value.slice(0, start) + inner + value.slice(end), selectionStart: start, selectionEnd: start + inner.length };
-  }
-  return {
-    value: value.slice(0, start) + before + selected + after + value.slice(end),
-    selectionStart: start, selectionEnd: end + before.length + after.length,
-  };
-}
-
-function applyBlockFormat(value: string, start: number, _end: number, prefix: string) {
-  const lineStart = value.lastIndexOf('\n', start - 1) + 1;
-  const nextNl = value.indexOf('\n', start);
-  const lineEnd = nextNl === -1 ? value.length : nextNl;
-  const line = value.slice(lineStart, lineEnd);
-  if (line.startsWith(prefix)) {
-    const shift = Math.min(prefix.length, start - lineStart);
-    return { value: value.slice(0, lineStart) + line.slice(prefix.length) + value.slice(lineEnd), selectionStart: start - shift, selectionEnd: start - shift };
-  }
-  return { value: value.slice(0, lineStart) + prefix + line + value.slice(lineEnd), selectionStart: start + prefix.length, selectionEnd: start + prefix.length };
-}
-
-const LIST_PREFIX_RE = /^(\s*)([-*]|\d+\.)\s/;
-const ORDERED_LIST_RE = /^(\s*)(\d+)\.\s/;
-
-// ── Floating toolbar: position measurement ──────────────────────────────────
-
-type FloatAnchor = { top: number; bottom: number; centerX: number; above: boolean };
-
-function measureSelectionAnchor(el: HTMLTextAreaElement): FloatAnchor | null {
-  const { selectionStart: ss, selectionEnd: se } = el;
-  if (ss === se) return null;
-
-  const mirror = document.createElement('div');
-  const cs = window.getComputedStyle(el);
-
-  for (const p of [
-    'fontFamily', 'fontSize', 'fontWeight', 'fontStyle', 'lineHeight',
-    'letterSpacing', 'paddingTop', 'paddingRight', 'paddingBottom', 'paddingLeft',
-    'borderTopWidth', 'borderRightWidth', 'borderBottomWidth', 'borderLeftWidth', 'boxSizing',
-  ]) {
-    const style = mirror.style as unknown as Record<string, string>;
-    const csStyle = cs as unknown as Record<string, string>;
-    style[p] = csStyle[p];
-  }
-
-  Object.assign(mirror.style, {
-    position: 'fixed', top: '0', left: '-9999px',
-    width: `${el.offsetWidth}px`, visibility: 'hidden', overflow: 'hidden',
-    whiteSpace: 'pre-wrap', wordBreak: 'break-word', overflowWrap: 'break-word',
-  });
-
-  const startMark = document.createElement('span');
-  startMark.textContent = el.value[ss] ?? '\u200B';
-  const endMark = document.createElement('span');
-  endMark.textContent = el.value[se - 1] ?? '\u200B';
-  const hasRange = se > ss + 1;
-
-  mirror.appendChild(document.createTextNode(el.value.slice(0, ss)));
-  mirror.appendChild(startMark);
-  if (hasRange) {
-    mirror.appendChild(document.createTextNode(el.value.slice(ss + 1, se - 1)));
-    mirror.appendChild(endMark);
-  }
-  mirror.appendChild(document.createTextNode(el.value.slice(se)));
-  document.body.appendChild(mirror);
-
-  const elRect = el.getBoundingClientRect();
-  const mRect  = mirror.getBoundingClientRect();
-  const sRect  = startMark.getBoundingClientRect();
-  const eRect  = hasRange ? endMark.getBoundingClientRect() : sRect;
-  document.body.removeChild(mirror);
-
-  const top    = elRect.top  + (sRect.top    - mRect.top)  - el.scrollTop;
-  const bottom = elRect.top  + (eRect.bottom - mRect.top)  - el.scrollTop;
-  const startX = elRect.left + (sRect.left   - mRect.left) - el.scrollLeft;
-  const endX   = elRect.left + (eRect.right  - mRect.left) - el.scrollLeft;
-
-  return { top, bottom, centerX: (startX + endX) / 2, above: top > 56 };
-}
-
-// ── Active format detection ──────────────────────────────────────────────────
-
-function detectActiveFormats(value: string, start: number, end: number): Set<FormatKey> {
-  const active = new Set<FormatKey>();
-  const ls = value.lastIndexOf('\n', start - 1) + 1;
-  const le = value.indexOf('\n', start);
-  const line = value.slice(ls, le === -1 ? undefined : le);
-
-  if (/^### /.test(line)) active.add('h3');
-  else if (/^## /.test(line)) active.add('h2');
-  if (/^[-*] /.test(line)) active.add('ul');
-  if (/^\d+\. /.test(line)) active.add('ol');
-  if (/^> /.test(line)) active.add('quote');
-
-  if (start !== end) {
-    const sel = value.slice(start, end);
-    const outerBold = value.slice(Math.max(0, start - 2), start) === '**' && value.slice(end, end + 2) === '**';
-    if (outerBold || (sel.startsWith('**') && sel.endsWith('**') && sel.length > 4)) active.add('bold');
-    const outerItalic = value[start - 1] === '_' && value[end] === '_';
-    if (outerItalic || (sel.startsWith('_') && sel.endsWith('_') && sel.length > 2)) active.add('italic');
-  } else {
-    const before = value.slice(0, start);
-    const after  = value.slice(start);
-    if ((before.split('**').length - 1) % 2 === 1 && after.includes('**')) active.add('bold');
-    if ((before.split('_').length  - 1) % 2 === 1 && after.includes('_'))  active.add('italic');
-  }
-
-  return active;
-}
-
-// ── Component ────────────────────────────────────────────────────────────────
+import {
+  applyBlockFormat,
+  applyInlineFormat,
+  detectActiveFormats,
+  measureSelectionAnchor,
+  FORMATS,
+  FLOAT_H,
+  FLOAT_W,
+  LIST_PREFIX_RE,
+  ORDERED_LIST_RE,
+  type EditorMode,
+  type FloatAnchor,
+  type FormatKey,
+} from './markdown-editor-format';
+import { MarkdownEditToolbar, MarkdownFloatToolbar } from './markdown-editor-toolbar';
 
 type MarkdownEditorProps = Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, 'onChange'> & {
   name: string;
   onChange?: (value: string) => void;
 };
-
-const FLOAT_W = 268;
-const FLOAT_H = 40;
 
 export function MarkdownEditor({ className, defaultValue, maxLength, name, onChange, ...props }: MarkdownEditorProps) {
   const [value, setValue]               = useState<string>(String(defaultValue ?? ''));
@@ -401,79 +265,17 @@ export function MarkdownEditor({ className, defaultValue, maxLength, name, onCha
       }
     : null;
 
-  const floatToolbar = mounted && floatAnchor && floatStyle
-    ? createPortal(
-        <div ref={floatRef} className="markdown-editor-float" style={floatStyle} role="toolbar" aria-label="Форматирование текста">
-          {(['bold', 'italic'] as const).map((key) => {
-            const { icon: Icon, title } = FORMATS[key];
-            return (
-              <button key={key} type="button" className="markdown-editor-float-btn"
-                data-active={activeFormats.has(key) || undefined} title={title}
-                onMouseDown={(e) => { e.preventDefault(); handleFormat(key); }}>
-                <Icon size={14} />
-              </button>
-            );
-          })}
-          <span className="markdown-editor-float-sep" aria-hidden="true" />
-          {(['h2', 'h3'] as const).map((key) => {
-            const { icon: Icon, title } = FORMATS[key];
-            return (
-              <button key={key} type="button" className="markdown-editor-float-btn"
-                data-active={activeFormats.has(key) || undefined} title={title}
-                onMouseDown={(e) => { e.preventDefault(); handleFormat(key); }}>
-                <Icon size={14} />
-              </button>
-            );
-          })}
-          <span className="markdown-editor-float-sep" aria-hidden="true" />
-          <button key="link" type="button" className="markdown-editor-float-btn"
-            data-active={activeFormats.has('link') || undefined} title={FORMATS.link.title}
-            onMouseDown={(e) => { e.preventDefault(); handleLinkClick(); }}>
-            <Link size={14} />
-          </button>
-          <button key="quote" type="button" className="markdown-editor-float-btn"
-            data-active={activeFormats.has('quote') || undefined} title={FORMATS.quote.title}
-            onMouseDown={(e) => { e.preventDefault(); handleFormat('quote'); }}>
-            <Quote size={14} />
-          </button>
-        </div>,
-        document.body,
-      )
-    : null;
-
   return (
     <div className="markdown-editor">
-      <div className="markdown-editor-toolbar">
-        {mode === 'edit' ? (
-          <>
-            <button type="button" className="markdown-editor-toolbar-btn" data-active={activeFormats.has('bold') || undefined} title={FORMATS.bold.title} onClick={() => handleFormat('bold')}><Bold size={15} /></button>
-            <button type="button" className="markdown-editor-toolbar-btn" data-active={activeFormats.has('italic') || undefined} title={FORMATS.italic.title} onClick={() => handleFormat('italic')}><Italic size={15} /></button>
-            <span className="markdown-editor-toolbar-sep" aria-hidden="true" />
-            <button type="button" className="markdown-editor-toolbar-btn" data-active={activeFormats.has('h2') || undefined} title={FORMATS.h2.title} onClick={() => handleFormat('h2')}><Heading2 size={15} /></button>
-            <button type="button" className="markdown-editor-toolbar-btn" data-active={activeFormats.has('h3') || undefined} title={FORMATS.h3.title} onClick={() => handleFormat('h3')}><Heading3 size={15} /></button>
-            <span className="markdown-editor-toolbar-sep" aria-hidden="true" />
-            <button type="button" className="markdown-editor-toolbar-btn" data-active={activeFormats.has('ul') || undefined} title={FORMATS.ul.title} onClick={() => handleFormat('ul')}><List size={15} /></button>
-            <button type="button" className="markdown-editor-toolbar-btn" data-active={activeFormats.has('ol') || undefined} title={FORMATS.ol.title} onClick={() => handleFormat('ol')}><ListOrdered size={15} /></button>
-            <span className="markdown-editor-toolbar-sep" aria-hidden="true" />
-            <button type="button" className="markdown-editor-toolbar-btn" data-active={activeFormats.has('link') || undefined} title={FORMATS.link.title} onClick={handleLinkClick}><Link size={15} /></button>
-            <button type="button" className="markdown-editor-toolbar-btn" data-active={activeFormats.has('quote') || undefined} title={FORMATS.quote.title} onClick={() => handleFormat('quote')}><Quote size={15} /></button>
-            <button type="button" className="markdown-editor-toolbar-btn" title={FORMATS.hr.title} onClick={() => handleFormat('hr')}><Minus size={15} /></button>
-            <span className="markdown-editor-toolbar-sep" aria-hidden="true" />
-            <button type="button" className="markdown-editor-toolbar-btn" title="Отменить (Ctrl+Z)" onMouseDown={handleUndo}><Undo2 size={15} /></button>
-            <button type="button" className="markdown-editor-toolbar-btn" title="Вернуть (Ctrl+Shift+Z)" onMouseDown={handleRedo}><Redo2 size={15} /></button>
-          </>
-        ) : null}
-        <div className="markdown-editor-tabs">
-          <button type="button" className={cn('markdown-editor-tab', mode === 'edit' && 'markdown-editor-tab--active')} onClick={() => setMode('edit')}>
-            <Pen size={13} />
-            Редактировать
-          </button>
-          <button type="button" className={cn('markdown-editor-tab', mode === 'preview' && 'markdown-editor-tab--active')} onClick={() => setMode('preview')}>
-            <Eye size={13} />
-            Просмотр
-          </button>
-        </div>
-      </div>
+      <MarkdownEditToolbar
+        activeFormats={activeFormats}
+        mode={mode}
+        onFormat={handleFormat}
+        onLink={handleLinkClick}
+        onModeChange={setMode}
+        onRedo={handleRedo}
+        onUndo={handleUndo}
+      />
 
       {linkInputVisible && (
         <div className="markdown-editor-link-bar">
@@ -531,7 +333,15 @@ export function MarkdownEditor({ className, defaultValue, maxLength, name, onCha
         </span>
       </div>
 
-      {floatToolbar}
+      {mounted && floatAnchor && floatStyle ? (
+        <MarkdownFloatToolbar
+          activeFormats={activeFormats}
+          floatRef={floatRef}
+          onFormat={handleFormat}
+          onLink={handleLinkClick}
+          style={floatStyle}
+        />
+      ) : null}
     </div>
   );
 }

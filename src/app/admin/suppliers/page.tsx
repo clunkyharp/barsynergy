@@ -1,4 +1,4 @@
-import { CategoryType, ContentStatus, type Prisma } from '@/modules/admin/queries';
+import { ContentStatus } from '@/modules/admin/queries';
 import { BadgeCheck, TriangleAlert } from 'lucide-react';
 import { deleteSupplierDraft, updateSupplierStatus } from '@/app/admin/suppliers/actions';
 import {
@@ -39,7 +39,7 @@ import {
   type AdminContentSearchParams
 } from '@/lib/admin/content-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
-import { getSupplierList, getSupplierStatusCounts, getActiveCategories, getActiveCities } from '@/lib/admin/admin-queries';
+import { listAdminSuppliers } from '@/modules/admin/suppliers/queries';
 
 export const dynamic = 'force-dynamic';
 
@@ -68,37 +68,15 @@ export default async function AdminSuppliersPage({ searchParams }: AdminSupplier
   const quickFilter = getAdminStringFilter(params, 'filter');
   const isNoCityFilter = quickFilter === 'no-city';
   const isVerified = getAdminBooleanFilter(params, 'verified');
-  const searchWhere: Prisma.SupplierWhereInput = q
-    ? {
-        OR: [
-          { title: { contains: q, mode: 'insensitive' } },
-          { summary: { contains: q, mode: 'insensitive' } },
-          { slug: { contains: q, mode: 'insensitive' } },
-          { companyName: { contains: q, mode: 'insensitive' } },
-          { serviceArea: { contains: q, mode: 'insensitive' } }
-        ]
-      }
-    : {};
-  const noCityWhere: Prisma.SupplierWhereInput = isNoCityFilter
-    ? {
-        OR: [{ cityId: null }, { cityId: '' }]
-      }
-    : {};
-  const andWhere = [searchWhere, noCityWhere].filter((item) => Object.keys(item).length > 0);
-  const where: Prisma.SupplierWhereInput = {
+  const { suppliers, total, statusCounts: supplierStatusCounts, categories, cities } = await listAdminSuppliers({
+    page,
+    q,
     status,
     categoryId,
-    cityId: isNoCityFilter ? undefined : cityId,
+    cityId,
     isVerified,
-    ...(andWhere.length > 0 ? { AND: andWhere } : {})
-  };
-
-  const [[suppliers, total], supplierStatusCounts, categories, cities] = await Promise.all([
-    getSupplierList(where, (page - 1) * ADMIN_CONTENT_PAGE_SIZE, ADMIN_CONTENT_PAGE_SIZE),
-    getSupplierStatusCounts(searchWhere),
-    getActiveCategories(CategoryType.SUPPLIER),
-    getActiveCities()
-  ]);
+    isNoCityFilter
+  });
   const totalPages = getAdminTotalPages(total);
   const supplierCountByStatus = new Map(supplierStatusCounts.map((item) => [item.status, item._count.id] as const));
   const hasActiveFilters = Boolean(q || status || categoryId || cityId || verifiedFilter || isNoCityFilter);

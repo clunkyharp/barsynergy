@@ -23,7 +23,8 @@ async function readCalculatorComponentSources() {
     '../src/components/public/cost-calculator/ingredient-editor-internal.tsx',
     '../src/components/public/cost-calculator/result-rail.tsx',
     '../src/components/public/cost-calculator/use-cost-calculator-state.ts',
-    '../src/components/public/cost-calculator/format.ts'
+    '../src/components/public/cost-calculator/format.ts',
+    '../src/components/public/cost-calculator-sections.tsx'
   ];
 
   return Promise.all(files.map((file) => readFile(new URL(file, import.meta.url), 'utf8'))).then((sources) => sources.join('\n'));
