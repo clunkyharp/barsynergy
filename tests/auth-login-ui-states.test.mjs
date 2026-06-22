@@ -38,7 +38,7 @@ test('public login has mobile, loading, error and request-sent state hooks', () 
   assert.match(layoutSource, /auth-login-screen/);
   assert.match(layoutSource, /w-\[176px\] theme-logo-light md:w-\[198px\]/);
   assert.match(layoutSource, /ArrowLeft/);
-  assert.match(layoutSource, /Вернуться на сайт/);
+  assert.match(layoutSource, /На сайт/);
   assert.match(formSource, /auth-login-submit/);
   assert.match(formSource, /pendingText="Входим…"/);
   assert.match(pageSource, /InlineAlert/);

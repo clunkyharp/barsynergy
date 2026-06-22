@@ -4,7 +4,7 @@ import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { UserRole, UserStatus } from '@prisma/client';
 import { z } from 'zod';
-import { getString, optionalString } from '@/lib/admin/content-utils';
+import { getString, optionalString } from '@/lib/forms/form-data';
 import { resolveServerActionError } from '@/lib/actions/server-action-errors';
 import { AuthRateLimitError, assertAuthAttemptAllowed } from '@/lib/auth/auth-rate-limit';
 import { verifyPassword, verifyPasswordAgainstDummyHash } from '@/lib/auth/password';

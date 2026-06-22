@@ -1,8 +1,10 @@
 import type { Metadata } from 'next';
-import { ArrowUpRight, Check } from 'lucide-react';
+
 import { GeneralSponsorCard } from '@/components/public/general-sponsor-card';
 import { PageHero } from '@/components/public/page-hero';
 import { PlacementExample } from '@/components/public/placement-example';
+import { SponsorPackageCard } from '@/components/public/sponsor-package-card';
+import { SponsorPlacementMock } from '@/components/public/sponsor-placement-mock';
 import { PublicEyebrow } from '@/components/public/public-primitives';
 import { JsonLd } from '@/components/seo/json-ld';
 import { Button } from '@/components/ui/button';
@@ -12,7 +14,11 @@ import { displayFont } from '@/lib/fonts';
 import { getPublishedGeneralSponsors } from '@/lib/public/general-sponsors';
 import { buildPublicPageMetadata } from '@/lib/public/metadata';
 import { buildStaticPageBreadcrumbJsonLd } from '@/lib/public/structured-data';
-import { cn } from '@/lib/utils';
+import {
+  sponsorBenefits,
+  packageLevels,
+  tickerItems
+} from '@/lib/public/general-sponsors-page-data';
 
 export const metadata: Metadata = buildPublicPageMetadata({
   title: 'Спонсорство',
@@ -22,123 +28,8 @@ export const metadata: Metadata = buildPublicPageMetadata({
 
 export const dynamic = 'force-dynamic';
 
-const sponsorBenefits = [
-  {
-    benefit: 'Аудитория',
-    brandVisibility: 'Сайт, события, материалы и прямые переходы к контакту бренда.',
-    result: 'Бармены, владельцы, менеджеры и поставщики СКФО видят бренд рядом с профессиональным контекстом.'
-  },
-  {
-    benefit: 'Размещения',
-    brandVisibility: 'Страницы событий, анонсы, социальные сети, рассылка и материалы площадки.',
-    result: 'Пакет можно собрать под отдельную встречу, сезонную серию или генеральную позицию на период.'
-  },
-  {
-    benefit: 'Материалы и события',
-    brandVisibility: 'Интервью, приветственное слово, совместная тема, образовательная встреча или кейс.',
-    result: 'Карточка или материал показывает, чем бренд полезен специалистам, заведениям и партнёрам.'
-  },
-  {
-    benefit: 'Следующий шаг',
-    brandVisibility: 'Итоговый разбор, следующий формат, контакт с командой и планирование нового периода.',
-    result: 'Подходит брендам, которым нужен план на период, а не разовый логотип.'
-  }
-] as const;
-
-const packageLevels = [
-  {
-    packageName: 'Партнёр события',
-    scope: 'Поддержка отдельной встречи или проекта.',
-    periodLabel: 'Разовый запуск',
-    placements: [
-      'Логотип на странице события',
-      'Упоминание в анонсах',
-      'Пост в социальных сетях',
-      'Материалы на площадке'
-    ],
-    requiredAssets: 'Логотип, короткое описание, ссылка, материалы для площадки.',
-    recommended: false
-  },
-  {
-    packageName: 'Генеральный спонсор',
-    scope: 'Главная партнёрская позиция на сезон.',
-    periodLabel: 'Сезон / по договорённости',
-    placements: [
-      'Карточка бренда на сайте',
-      'Логотип на площадках',
-      'Приветственное слово или интервью',
-      'Совместные события и материалы'
-    ],
-    requiredAssets: 'Логотип, бренд-гайд, контакты, тема размещения и материалы.',
-    recommended: true
-  },
-  {
-    packageName: 'Сезонный партнёр',
-    scope: 'Участие в серии событий сезона.',
-    periodLabel: 'Сезонная серия',
-    placements: [
-      'Всё из пакета события',
-      'Логотип на событиях сезона',
-      '2 публикации в соцсетях',
-      'Упоминание в email-рассылке'
-    ],
-    requiredAssets: 'Логотип, описание бренда, сезонная тема, материалы для анонсов.',
-    recommended: false
-  }
-] as const;
-
-const tickerItems = [
-  'ПАРТНЁР СОБЫТИЯ',
-  'СЕЗОННЫЙ ПАРТНЁР',
-  'ГЕНЕРАЛЬНЫЙ СПОНСОР',
-  'BARSYNERGY',
-  'БАРНАЯ ИНДУСТРИЯ',
-  'СКФО'
-];
-
-function SponsorPlacementMock() {
+function SponsorsMediaSlot() {
   return (
-    <div aria-hidden="true" className="grid gap-4 rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--surface)] p-4 md:p-5">
-      <div className="flex items-start justify-between gap-3">
-        <div className="grid h-14 w-28 place-items-center rounded-[var(--radius-md)] border border-dashed border-[var(--border-default)] bg-[var(--surface-wash)] text-[10px] font-bold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--muted)]">
-          Лого
-        </div>
-        <span className="rounded-full border border-[var(--accent)]/40 bg-[var(--accent-soft)] px-3 py-1 text-[10px] font-semibold uppercase tracking-[var(--tracking-eyebrow-sm)] text-[var(--text)]">
-          Генеральный спонсор
-        </span>
-      </div>
-
-      <div>
-        <p className={`${displayFont.className} text-[1.5rem] font-semibold leading-none text-[var(--text)]`}>Кофейный бренд</p>
-        <p className="mt-2 text-[13px] leading-[1.5] text-[var(--muted)]">Поставки, оборудование и продукты для баров и кофеен региона.</p>
-      </div>
-
-      <div className="flex flex-wrap gap-1.5">
-        {['Кофе', 'Оборудование', 'Упаковка', 'Сервис'].map((chip) => (
-          <span
-            className="rounded-[var(--radius-sm)] border border-[var(--border-default)] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[var(--tracking-eyebrow-sm)] text-[var(--text)]"
-            key={chip}
-          >
-            {chip}
-          </span>
-        ))}
-      </div>
-
-      <div className="flex items-center justify-between gap-3 rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--surface-wash)] px-4 py-2.5">
-        <span className="text-[12px] font-semibold text-[var(--text)]">Связаться со спонсором</span>
-        <span className="inline-flex items-center gap-1 text-[12px] font-semibold text-[var(--accent)]">
-          Telegram
-          <ArrowUpRight size={14} strokeWidth={1.8} />
-        </span>
-      </div>
-    </div>
-  );
-}
-
-export default async function GeneralSponsorsPage() {
-  const generalSponsors = await getPublishedGeneralSponsors();
-
-  const sponsorMedia = (
     <div className="relative hidden w-80 lg:block">
       <div
         aria-hidden="true"
@@ -150,6 +41,43 @@ export default async function GeneralSponsorsPage() {
       </div>
     </div>
   );
+}
+
+function TickerMarquee() {
+  return (
+    <div className="overflow-hidden border-b border-[var(--line)] bg-[var(--editorial-dark-surface)] py-3.5">
+      <style>{`
+        @keyframes sponsors-ticker {
+          from { transform: translateX(0); }
+          to   { transform: translateX(-50%); }
+        }
+        .sponsors-ticker-track {
+          display: flex;
+          width: max-content;
+          animation: sponsors-ticker 26s linear infinite;
+        }
+        .sponsors-ticker-track:hover {
+          animation-play-state: paused;
+        }
+      `}</style>
+      <div className="sponsors-ticker-track" aria-hidden="true">
+        {[0, 1].map((pass) => (
+          <div className="flex shrink-0 items-center" key={pass}>
+            {tickerItems.map((item) => (
+              <span className="flex items-center" key={item}>
+                <span className="px-7 text-[11px] font-bold uppercase tracking-[0.22em] text-[rgb(245_247_251_/_0.65)]">{item}</span>
+                <span className="text-[var(--accent)] opacity-60">/</span>
+              </span>
+            ))}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export default async function GeneralSponsorsPage() {
+  const generalSponsors = await getPublishedGeneralSponsors();
 
   return (
     <>
@@ -165,40 +93,11 @@ export default async function GeneralSponsorsPage() {
           { label: 'Запросить условия сотрудничества', href: '/contacts?topic=sponsorship#contact-form', kind: 'primary' },
           { label: 'Получить презентацию', href: '/contacts?topic=sponsorship-presentation#contact-form', kind: 'secondary' }
         ]}
-        media={{ kind: 'slot' as const, children: sponsorMedia }}
+        media={{ kind: 'slot', children: <SponsorsMediaSlot /> }}
       />
 
-      {/* ── Marquee ticker ── */}
-      <div className="overflow-hidden border-b border-[var(--line)] bg-[var(--editorial-dark-surface)] py-3.5">
-        <style>{`
-          @keyframes sponsors-ticker {
-            from { transform: translateX(0); }
-            to   { transform: translateX(-50%); }
-          }
-          .sponsors-ticker-track {
-            display: flex;
-            width: max-content;
-            animation: sponsors-ticker 26s linear infinite;
-          }
-          .sponsors-ticker-track:hover {
-            animation-play-state: paused;
-          }
-        `}</style>
-        <div className="sponsors-ticker-track" aria-hidden="true">
-          {[0, 1].map((pass) => (
-            <div className="flex shrink-0 items-center" key={pass}>
-              {tickerItems.map((item) => (
-                <span className="flex items-center" key={item}>
-                  <span className="px-7 text-[11px] font-bold uppercase tracking-[0.22em] text-[rgb(245_247_251_/_0.65)]">{item}</span>
-                  <span className="text-[var(--accent)] opacity-60">/</span>
-                </span>
-              ))}
-            </div>
-          ))}
-        </div>
-      </div>
+      <TickerMarquee />
 
-      {/* ── Dark pitch section ── */}
       <section className="background-zone background-zone-sponsor border-b border-[var(--line)] py-14 md:py-20">
         <div className="container">
           <div className="grid items-center gap-10 md:grid-cols-[minmax(0,1fr)_minmax(0,0.56fr)]">
@@ -214,7 +113,6 @@ export default async function GeneralSponsorsPage() {
                 href="/contacts?topic=sponsorship#contact-form"
               >
                 Обсудить размещение
-                <ArrowUpRight size={16} strokeWidth={1.8} />
               </AppLink>
             </div>
           </div>
@@ -237,7 +135,6 @@ export default async function GeneralSponsorsPage() {
         </div>
       </section>
 
-      {/* ── Benefits ── */}
       <section className="background-zone background-zone-beige border-b border-[var(--line)] py-12 md:py-20">
         <div className="container">
           <div className="grid gap-10 lg:grid-cols-[minmax(0,0.42fr)_minmax(0,1fr)] lg:gap-16">
@@ -249,10 +146,7 @@ export default async function GeneralSponsorsPage() {
             </div>
             <div className="divide-y divide-[var(--line)]">
               {sponsorBenefits.map((item, index) => (
-                <div
-                  className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-6 gap-y-0 py-8 md:py-10"
-                  key={index}
-                >
+                <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-6 gap-y-0 py-8 md:py-10" key={index}>
                   <span className={`${displayFont.className} select-none text-[2.6rem] font-semibold leading-none text-[var(--line)] md:text-[3.2rem]`}>
                     {index + 1}.
                   </span>
@@ -270,7 +164,6 @@ export default async function GeneralSponsorsPage() {
         </div>
       </section>
 
-      {/* ── Packages ── */}
       <section className="background-zone background-zone-ivory border-b border-[var(--line)] py-12 md:py-20">
         <div className="container">
           <div className="mb-12 text-center">
@@ -285,78 +178,11 @@ export default async function GeneralSponsorsPage() {
 
           <div className="grid items-stretch gap-4 md:grid-cols-3">
             {packageLevels.map((pkg, index) => (
-              <article
-                className={cn(
-                  'relative flex flex-col rounded-[var(--radius-lg)] border',
-                  pkg.recommended
-                    ? 'z-10 border-[var(--accent)] bg-[var(--accent-soft)] p-6 pt-9 shadow-[0_18px_50px_-12px_var(--accent)] md:-my-4 md:p-8 md:pt-10'
-                    : 'border-[var(--border-default)] bg-[var(--surface-card)] p-6 shadow-[var(--shadow-card)] transition-[border-color,box-shadow] duration-[var(--motion-duration-base)] hover:border-[var(--accent)]/20 hover:shadow-[var(--shadow-panel)] md:p-7'
-                )}
-                key={index}
-              >
-                {pkg.recommended ? (
-                  <span className="absolute -top-3 left-1/2 inline-flex -translate-x-1/2 items-center whitespace-nowrap rounded-full border border-[var(--accent)] bg-[var(--accent)] px-3.5 py-1 text-[11px] font-bold uppercase tracking-[0.1em] text-[var(--accent-contrast)] shadow-sm">
-                    Главный формат
-                  </span>
-                ) : null}
-
-                <div>
-                  <h3 className={`${displayFont.className} text-[2rem] font-semibold leading-none text-[var(--text)] md:text-[2.2rem]`}>
-                    {pkg.packageName}
-                  </h3>
-                  <p className="mt-2.5 text-sm leading-6 text-[var(--muted)]">{pkg.scope}</p>
-                </div>
-
-                <div className="my-5 border-t border-[var(--line)]" />
-
-                <div>
-                  <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-[var(--muted)]">Период</p>
-                  <p className={`${displayFont.className} mt-1.5 text-[1.6rem] font-semibold leading-[1.1] text-[var(--text)]`}>
-                    {pkg.periodLabel}
-                  </p>
-                </div>
-
-                <div className="mt-6">
-                  <Button
-                    className={cn(
-                      'w-full rounded-[var(--radius-md)]',
-                      !pkg.recommended &&
-                        'border-[var(--border-strong)] bg-transparent text-[var(--text)] hover:border-[var(--accent)]/30 hover:bg-[var(--surface-wash)]'
-                    )}
-                    href={`/contacts?topic=sponsorship&partnerType=${encodeURIComponent(pkg.packageName)}#contact-form`}
-                    variant={pkg.recommended ? 'primary' : 'secondary'}
-                  >
-                    Запросить условия
-                  </Button>
-                </div>
-
-                <div className="my-5 border-t border-[var(--line)]" />
-
-                <ul className="grid flex-1 gap-3">
-                  {pkg.placements.map((item) => (
-                    <li className="flex items-center gap-2.5 text-sm leading-[1.5] text-[var(--text)]" key={item}>
-                      <span
-                        aria-hidden="true"
-                        className={cn(
-                          'grid size-5 shrink-0 place-items-center rounded-full',
-                          pkg.recommended
-                            ? 'bg-[var(--accent)] text-[var(--accent-contrast)]'
-                            : 'bg-[var(--accent-soft)] text-[var(--accent)]'
-                        )}
-                      >
-                        <Check size={12} strokeWidth={3} />
-                      </span>
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </article>
+              <SponsorPackageCard key={index} pkg={pkg} index={index} />
             ))}
           </div>
         </div>
       </section>
-
-      {/* ── General sponsors ── */}
       <section className="background-zone background-zone-sponsor border-b border-[var(--line)] py-12 md:py-20">
         <div className="container">
           <PublicEyebrow>Генеральный спонсор сезона</PublicEyebrow>
@@ -383,8 +209,6 @@ export default async function GeneralSponsorsPage() {
           </div>
         </div>
       </section>
-
-      {/* ── Placement example with callouts ── */}
       <PlacementExample
         eyebrow="Пример размещения"
         title="Как бренд выглядит на платформе"
@@ -397,8 +221,6 @@ export default async function GeneralSponsorsPage() {
           { title: 'Где показывается', description: 'Главная, каталог, материалы и Telegram-канал индустрии СКФО.' }
         ]}
       />
-
-      {/* ── Dark CTA ── */}
       <section className="background-zone background-zone-cta border-b border-[var(--line)] py-16 md:py-24">
         <div className="container">
           <div className="mx-auto max-w-3xl text-center">

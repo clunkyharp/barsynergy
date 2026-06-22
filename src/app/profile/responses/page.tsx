@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import { Mail, Search } from 'lucide-react';
 import { redirect } from 'next/navigation';
-import type { Prisma } from '@/modules/admin/queries';
 import { AppLink } from '@/components/ui/app-link';
 import { Button } from '@/components/ui/button';
 import { ConversationListTabs } from '@/components/messaging/conversation-list-tabs';
@@ -15,16 +14,13 @@ import {
   applicationStatusBadgeVariants,
   applicationStatusLabels
 } from '@/modules/content/shared/labels';
-import { firstParam } from '@/lib/admin/content-utils';
+import { firstParam } from '@/lib/admin/content-ui';
 import { getCurrentUser } from '@/lib/auth/current-user';
 import { getUnreadMessageCounts } from '@/lib/messaging/get-conversation';
 import { sortConversationsByUnread } from '@/lib/messaging/sort-conversations-by-unread';
-import { getConversationStatusFilter, parseConversationStatusGroup } from '@/lib/messaging/conversation-status-groups';
+import { parseConversationStatusGroup } from '@/lib/messaging/conversation-status-groups';
 import { buildPrivatePageMetadata } from '@/lib/public/metadata';
-import {
-  getUserResponses,
-  profileResponseType
-} from '@/modules/profile/queries';
+import { listUserResponses } from '@/modules/profile/queries';
 
 const PAGE_SIZE = 20;
 
@@ -50,20 +46,14 @@ export default async function ProfileResponsesPage({ searchParams }: ProfileResp
   const sort = firstParam(params.sort) ?? 'desc';
   const page = Math.max(1, Number(firstParam(params.page)) || 1);
 
-  const where: Prisma.ApplicationWhereInput = {
+  const [responses, totalCount] = await listUserResponses({
     userId: user.id,
-    type: profileResponseType,
-    status: getConversationStatusFilter(statusGroup)
-  };
-
-  if (q) {
-    where.OR = [
-      { subject: { contains: q, mode: 'insensitive' } },
-      { message: { contains: q, mode: 'insensitive' } }
-    ];
-  }
-
-  const [responses, totalCount] = await getUserResponses(where, sort, page, PAGE_SIZE);
+    statusGroup,
+    q,
+    sort,
+    page,
+    pageSize: PAGE_SIZE
+  });
 
   const responseIds = responses.map((r) => r.id);
   const unreadCounts = await getUnreadMessageCounts(responseIds, 'user');

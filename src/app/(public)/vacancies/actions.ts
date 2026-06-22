@@ -2,7 +2,7 @@
 
 import { ApplicationType, ContentStatus, UserRole } from '@prisma/client';
 import { z } from 'zod';
-import { deleteUploadedFileIfUnused } from '@/lib/admin/content-utils';
+import { deleteUploadedFileIfUnused } from '@/lib/admin/content-uploads';
 import { buildApplicationPayload } from '@/lib/applications/application-payloads';
 import { submitPublicApplicationAction } from '@/lib/applications/submit-public-application-action';
 import {

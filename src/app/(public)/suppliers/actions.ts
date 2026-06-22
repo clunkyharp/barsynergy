@@ -113,10 +113,7 @@ export async function submitSupplierLead(
       return { type: 'success', message: 'Заявка поставщика отправлена. Команда BARSYNERGY свяжется с вами.' };
     }
 
-    const turnstileToken = getString(formData, 'turnstileToken');
-    if (turnstileToken) {
-      await assertTurnstilePassed(turnstileToken);
-    }
+    await assertTurnstilePassed(getString(formData, 'turnstileToken'));
     await assertPublicApplicationSubmissionAllowed(ApplicationType.SUPPLIER_SUBMISSION);
 
     const parsed = supplierLeadSchema.parse({

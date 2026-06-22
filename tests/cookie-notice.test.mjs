@@ -16,8 +16,8 @@ test('cookie notice stores a six-month localStorage choice and stays bottom-righ
   assert.match(source, /COOKIE_NOTICE_TTL_MS = 183 \* 24 \* 60 \* 60 \* 1000/);
   assert.match(source, /expiresAt: now \+ COOKIE_NOTICE_TTL_MS/);
   assert.match(source, /isCookieNoticeChoiceValid/);
-  assert.match(source, /window\.localStorage\.setItem\(COOKIE_NOTICE_STORAGE_KEY, buildCookieNoticeChoice\(\)\)/);
-  assert.match(source, /COOKIE_NOTICE_STORAGE_KEY = 'barsynergy_cookie_consent'/);
+  assert.match(source, /window\.localStorage\.setItem\(\s*COOKIE_NOTICE_STORAGE_KEY,\s*buildCookieNoticeChoice\(\),?\s*\)/);
+  assert.match(source, /COOKIE_NOTICE_STORAGE_KEY = ['"]barsynergy_cookie_consent['"]/);
   assert.match(source, /LEGACY_COOKIE_NOTICE_STORAGE_KEY/);
   assert.match(source, /bottom-\[calc\(0\.75rem\+env\(safe-area-inset-bottom\)\)\] left-3 right-3 z-50 sm:bottom-\[calc\(1\.5rem\+env\(safe-area-inset-bottom\)\)\] sm:left-auto sm:right-6 sm:max-w-\[360px\]/);
   assert.doesNotMatch(source, /md:left-1\/2/);

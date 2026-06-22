@@ -5,6 +5,20 @@ import { useFormStatus } from 'react-dom';
 import { CheckCircle2, FileLock2, Loader2, TriangleAlert, Upload } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
+function uploadFileState(error: string | undefined, isUploading: boolean, fileName: string) {
+  if (error) return 'error';
+  if (isUploading) return 'uploading';
+  if (fileName) return 'success';
+  return undefined;
+}
+
+function uploadDescription(error: string | undefined, isUploading: boolean, fileName: string, effectiveSuccess: string | undefined, uploadPendingText: string | undefined, description: string | undefined) {
+  if (error) return error;
+  if (isUploading) return uploadPendingText;
+  if (fileName) return effectiveSuccess ?? 'Файл выбран. Его можно заменить перед отправкой.';
+  return description;
+}
+
 type FileUploadProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'type'> & {
   description?: string;
   error?: string;
@@ -55,7 +69,7 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(function
   const privacyId = `${fieldId}-privacy`;
   const isUploading = pending && Boolean(fileName);
   const effectiveSuccess = fileName ? success : undefined;
-  const state = error ? 'error' : isUploading ? 'uploading' : effectiveSuccess || fileName ? 'success' : undefined;
+  const state = uploadFileState(error, isUploading, fileName);
   const describedBy =
     [
       ariaDescribedBy,
@@ -129,7 +143,7 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(function
         <span className="min-w-0">
           <span className="file-upload-title">{fileName || title}</span>
           <span className="file-upload-description">
-            {error ? error : isUploading ? uploadPendingText : fileName ? effectiveSuccess ?? 'Файл выбран. Его можно заменить перед отправкой.' : description}
+            {uploadDescription(error, isUploading, fileName, effectiveSuccess, uploadPendingText, description)}
           </span>
           {meta ? <span className="file-upload-meta">{meta}</span> : null}
           {privacy ? (

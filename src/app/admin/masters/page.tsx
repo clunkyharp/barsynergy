@@ -1,4 +1,4 @@
-import { CategoryType, ContentStatus, MasterEntityType, type Prisma } from '@/modules/admin/queries';
+import { ContentStatus } from '@/modules/admin/queries';
 import { BadgeCheck, TriangleAlert } from 'lucide-react';
 import { deleteMasterDraft, updateMasterStatus } from '@/app/admin/masters/actions';
 import {
@@ -39,7 +39,7 @@ import {
   type AdminContentSearchParams
 } from '@/lib/admin/content-utils';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
-import { getMasterList, getMasterStatusCounts, getActiveCategories, getActiveCities } from '@/lib/admin/admin-queries';
+import { listAdminMasters } from '@/modules/admin/masters/queries';
 
 export const dynamic = 'force-dynamic';
 
@@ -73,38 +73,16 @@ export default async function AdminMastersPage({ searchParams }: AdminMastersPag
   const isVerified = getAdminBooleanFilter(params, 'verified');
   const quickFilter = getAdminStringFilter(params, 'filter');
   const isNoCityFilter = quickFilter === 'no-city';
-  const searchWhere: Prisma.MasterWhereInput = q
-    ? {
-        OR: [
-          { title: { contains: q, mode: 'insensitive' } },
-          { summary: { contains: q, mode: 'insensitive' } },
-          { fullName: { contains: q, mode: 'insensitive' } },
-          { companyName: { contains: q, mode: 'insensitive' } },
-          { serviceArea: { contains: q, mode: 'insensitive' } }
-        ]
-      }
-    : {};
-  const noCityWhere: Prisma.MasterWhereInput = isNoCityFilter
-    ? {
-        OR: [{ cityId: null }, { cityId: '' }]
-      }
-    : {};
-  const andWhere = [searchWhere, noCityWhere].filter((item) => Object.keys(item).length > 0);
-  const where: Prisma.MasterWhereInput = {
+  const { masters, total, statusCounts: masterStatusCounts, categories, cities } = await listAdminMasters({
+    page,
+    q,
     status,
     categoryId,
-    cityId: isNoCityFilter ? undefined : cityId,
-    entityType: entityType as MasterEntityType | undefined,
+    cityId,
+    entityType,
     isVerified,
-    ...(andWhere.length > 0 ? { AND: andWhere } : {})
-  };
-
-  const [[masters, total], masterStatusCounts, categories, cities] = await Promise.all([
-    getMasterList(where, (page - 1) * ADMIN_CONTENT_PAGE_SIZE, ADMIN_CONTENT_PAGE_SIZE),
-    getMasterStatusCounts(searchWhere),
-    getActiveCategories(CategoryType.MASTER),
-    getActiveCities()
-  ]);
+    isNoCityFilter
+  });
   const totalPages = getAdminTotalPages(total);
   const masterCountByStatus = new Map(masterStatusCounts.map((item) => [item.status, item._count.id] as const));
   const hasActiveFilters = Boolean(q || status || categoryId || cityId || entityType || isVerified != null || isNoCityFilter);

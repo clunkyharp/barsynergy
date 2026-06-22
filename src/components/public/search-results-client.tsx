@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { AppLink } from '@/components/ui/app-link';
 import type { PublishedContentItem } from '@/lib/public/content';
 
 export type ContentType = 'article' | 'vacancy' | 'supplier' | 'course' | 'event' | 'partner';
@@ -67,7 +68,7 @@ function SearchResultRow({
   const hasThumb = isFirst && Boolean(item.imageUrl);
   return (
     <li className="border-t border-[var(--line)] first:border-t-0">
-      <a
+      <AppLink
         className={[
           'group flex items-start gap-4 py-5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)]',
           hasThumb
@@ -112,7 +113,7 @@ function SearchResultRow({
             src={item.imageUrl}
           />
         )}
-      </a>
+      </AppLink>
     </li>
   );
 }

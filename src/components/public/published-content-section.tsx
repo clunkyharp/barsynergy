@@ -9,6 +9,7 @@ function pluralRu(n: number, [one, few, many]: [string, string, string]): string
 }
 import { ArrowUpRight } from 'lucide-react';
 import { PublicDisplayTitle } from '@/components/public/public-primitives';
+import { AppLink } from '@/components/ui/app-link';
 import { Button } from '@/components/ui/button';
 import { Panel } from '@/components/ui/panel';
 import { PublicEmptyState } from '@/components/public/public-empty-state';
@@ -120,12 +121,12 @@ function PublishedContentSectionLayout({
           <span className="text-xs text-[var(--muted)]">↓ {sortLabel}</span>
         ) : null}
         {activeParamCount > 0 ? (
-          <a
+          <AppLink
             className="text-xs font-semibold text-[var(--accent)] transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] hover:text-[var(--accent-strong)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
             href={resetBase}
           >
             Сбросить
-          </a>
+          </AppLink>
         ) : null}
         {listAction ? (
           <Button className="gap-2 px-4 text-sm tracking-normal" href={listAction.href} size="sm" variant={listAction.variant ?? 'link'}>

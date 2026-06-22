@@ -185,6 +185,32 @@ export async function getUserResponses(
   ]);
 }
 
+export async function listUserResponses(filters: {
+  userId: string;
+  statusGroup: ConversationStatusGroup;
+  q?: string;
+  sort: string;
+  page: number;
+  pageSize: number;
+}) {
+  const { userId, statusGroup, q, sort, page, pageSize } = filters;
+
+  const where: Prisma.ApplicationWhereInput = {
+    userId,
+    type: profileResponseType,
+    status: getConversationStatusFilter(statusGroup)
+  };
+
+  if (q) {
+    where.OR = [
+      { subject: { contains: q, mode: 'insensitive' } },
+      { message: { contains: q, mode: 'insensitive' } }
+    ];
+  }
+
+  return getUserResponses(where, sort, page, pageSize);
+}
+
 export const inquiryResponseType = ApplicationType.SUPPLIER_INQUIRY;
 
 export const inquiryResponseStatusValues: readonly ApplicationStatus[] = [

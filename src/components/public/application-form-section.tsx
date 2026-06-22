@@ -2,6 +2,7 @@ import { PublicBodyText, PublicDisplayTitle, PublicEyebrow } from '@/components/
 import { PublicFormValidation } from '@/components/public/public-form-validation';
 import { PublicFormResultDialog } from '@/components/public/public-form-result-dialog';
 import { RequestDisclosure } from '@/components/public/request-disclosure';
+import { AppLink } from '@/components/ui/app-link';
 import { Button } from '@/components/ui/button';
 import { EditorialShell } from '@/components/ui/editorial-shell';
 import { FormField, FormSection } from '@/components/ui/form-field';
@@ -126,9 +127,9 @@ export function PublicSubmissionFeedback({
         <p className="mt-2 text-xs leading-5 opacity-85">
           Номер заявки: <span className="font-mono">{result.applicationId}</span>
           <span className="block mt-1">
-            <a className="font-semibold underline underline-offset-2 hover:no-underline" href="/auth/register/user">
+            <AppLink className="font-semibold underline underline-offset-2 hover:no-underline" href="/auth/register/user">
               Зарегистрируйтесь
-            </a>,
+            </AppLink>,
             чтобы отслеживать статус заявки в личном кабинете.
           </span>
         </p>

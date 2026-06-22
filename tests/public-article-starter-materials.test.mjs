@@ -52,7 +52,8 @@ test('latest articles use the shared published content section', () => {
   assert.match(articleGridSection, /ArticleFeaturedCard/);
   assert.match(articleGridSection, /ArticleCard/);
   assert.match(articleGridSection, /ArticleListItem/);
-  assert.match(articleGridSection, /Показать ещё/);
+  // Redesign: paginated list via numbered ListPagination instead of a load-more button.
+  assert.match(articleGridSection, /function ListPagination/);
   assert.doesNotMatch(articlesPage, /PublishedContentSection/);
   assert.doesNotMatch(articleGridSection, /function ArticleEmptyResults/);
   assert.doesNotMatch(articleGridSection, /md:min-h-\[220px\]/);

@@ -66,6 +66,8 @@ export async function disableUserSubscriptionByEndpoint(userId: string, endpoint
   });
 }
 
+const USER_PREF_CHUNK_SIZE = 1_000;
+
 export async function getUserIdsWithEnabledTopic(topic: string) {
   const subs = await prisma.webPushSubscription.findMany({
     where: { disabledAt: null },
@@ -76,16 +78,22 @@ export async function getUserIdsWithEnabledTopic(topic: string) {
   if (subs.length === 0) return [];
 
   const userIds = subs.map((s) => s.userId);
+  const disabledUserIds = new Set<string>();
 
-  const disabledPrefs = await prisma.userNotificationPreference.findMany({
-    where: {
-      userId: { in: userIds },
-      topic: topic as never,
-      enabled: false,
-    },
-    select: { userId: true },
-  });
+  // Look up disabled prefs in bounded chunks so the IN() clause and the
+  // intermediate array stay capped regardless of subscriber count.
+  for (let i = 0; i < userIds.length; i += USER_PREF_CHUNK_SIZE) {
+    const chunk = userIds.slice(i, i + USER_PREF_CHUNK_SIZE);
+    const disabledPrefs = await prisma.userNotificationPreference.findMany({
+      where: {
+        userId: { in: chunk },
+        topic: topic as never,
+        enabled: false,
+      },
+      select: { userId: true },
+    });
+    for (const pref of disabledPrefs) disabledUserIds.add(pref.userId);
+  }
 
-  const disabledUserIds = new Set(disabledPrefs.map((p) => p.userId));
   return userIds.filter((id) => !disabledUserIds.has(id));
 }

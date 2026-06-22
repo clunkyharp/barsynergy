@@ -363,7 +363,7 @@ test('global search route still aggregates all 6 content types', () => {
 /* ───── Static analysis: admin application search ───── */
 
 test('admin application search covers businessAccount and payload fields', () => {
-  const source = readProjectFile('src/app/admin/applications/page.tsx');
+  const source = readProjectFile('src/lib/admin/application-page-helpers.ts');
 
   assert.match(source, /businessAccount/);
   assert.match(source, /companyName/);
@@ -372,7 +372,7 @@ test('admin application search covers businessAccount and payload fields', () =>
 });
 
 test('admin application search still covers basic fields', () => {
-  const source = readProjectFile('src/app/admin/applications/page.tsx');
+  const source = readProjectFile('src/lib/admin/application-page-helpers.ts');
 
   assert.match(source, /subject/);
   assert.match(source, /name/);
@@ -393,7 +393,7 @@ test('events page uses hasActivePublicContentParams for active search detection'
 /* ───── Static analysis: public filters content ───── */
 
 test('public filters always show active chip even for invalid/removed values', () => {
-  const source = readProjectFile('src/components/public/public-filters-content.tsx');
+  const source = readProjectFile('src/components/public/public-filters-active.ts');
 
   assert.match(source, /category\?\.name \?\? currentCategory/);
   assert.match(source, /city\?\.name \?\? currentCity/);

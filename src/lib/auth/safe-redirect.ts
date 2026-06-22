@@ -7,8 +7,27 @@ export function isSafeReturnTo(value: string): boolean {
     return false;
   }
 
+  // Reject protocol-relative ("//host", "/\host") and backslash variants before
+  // parsing: new URL() would treat them as absolute and strip the host into
+  // pathname, letting an external origin pass the path checks below.
+  const lowered = value.toLowerCase();
+  if (
+    value.startsWith('//') ||
+    value.startsWith('/\\') ||
+    lowered.startsWith('/%2f') ||
+    lowered.startsWith('/%5c')
+  ) {
+    return false;
+  }
+
   try {
     const url = new URL(value, 'http://localhost');
+
+    // A safe relative path must keep our placeholder origin after parsing.
+    if (url.origin !== 'http://localhost') {
+      return false;
+    }
+
     const pathname = url.pathname;
 
     if (pathname.startsWith('//')) {

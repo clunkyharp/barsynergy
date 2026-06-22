@@ -62,9 +62,10 @@ test('main public pages expose consistent breadcrumbs in their hero sections', (
   assert.match(primitiveSource, /label: 'Главная'/);
   assert.match(editorialSource, /<PublicBreadcrumbs current=\{breadcrumbLabel \?\? eyebrow\}/);
 
+  // About page uses a bespoke landing hero (no PageHero/breadcrumbs) after the
+  // Open Design redesign, so it is intentionally excluded here.
   const standalonePages = [
-    ['src/app/(public)/general-sponsors/page.tsx', /<PageHero[\s\S]*breadcrumbs=\{\[\{ label: 'Спонсорство' \}\]\}/],
-    ['src/app/(public)/about/page.tsx', /<PageHero[\s\S]*breadcrumbs=\{\[\{ label: 'О проекте' \}\]\}/]
+    ['src/app/(public)/general-sponsors/page.tsx', /<PageHero[\s\S]*breadcrumbs=\{\[\{ label: 'Спонсорство' \}\]\}/]
   ];
 
   for (const [file, pattern] of standalonePages) {
@@ -72,6 +73,6 @@ test('main public pages expose consistent breadcrumbs in their hero sections', (
   }
 
   assert.match(readProjectFile('src/components/public/events-page-header.tsx'), /<PublicBreadcrumbs current="События" \/>/);
-  assert.match(readProjectFile('src/app/(public)/vacancies/page.tsx'), /<PageHero[\s\S]*title="Вакансии и специалисты"/);
+  assert.match(readProjectFile('src/app/(public)/vacancies/page.tsx'), /<PageHero[\s\S]*title="Вакансии"/);
   assert.match(readProjectFile('src/app/(public)/tools/cost-calculator/page.tsx'), /<PageHero[\s\S]*breadcrumbs=\{\[/);
 });

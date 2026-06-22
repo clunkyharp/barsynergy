@@ -1,7 +1,7 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { ContentStatus } from '@prisma/client';
+import { CONTENT_STATUS, type ContentStatusValue } from '@/lib/admin/content-status';
 import { Button } from '@/components/ui/button';
 import {
   AdminActionMenu,
@@ -31,7 +31,7 @@ function AdminContentStatusForm({
   currentPath: string;
   idName: string;
   idValue: string;
-  status: ContentStatus;
+  status: ContentStatusValue;
   updateStatusAction: (formData: FormData) => Promise<void>;
 }) {
   return (
@@ -52,8 +52,8 @@ export function AdminContentVisibilityPanel({
   status,
   updateStatusAction
 }: AdminContentVisibilityPanelProps) {
-  const isPublished = status === ContentStatus.PUBLISHED;
-  const isArchived = status === ContentStatus.ARCHIVED;
+  const isPublished = status === CONTENT_STATUS.PUBLISHED;
+  const isArchived = status === CONTENT_STATUS.ARCHIVED;
 
   return (
     <section className="admin-visibility-panel admin-surface-shell rounded-[var(--radius-md)] border border-[var(--line)] border-l-[3px] border-l-[var(--admin-structure-accent)] bg-[var(--surface)] p-4">
@@ -73,7 +73,7 @@ export function AdminContentVisibilityPanel({
               currentPath={currentPath}
               idName={idName}
               idValue={idValue}
-              status={ContentStatus.ARCHIVED}
+              status={CONTENT_STATUS.ARCHIVED}
               updateStatusAction={updateStatusAction}
             >
               <ConfirmSubmitButton
@@ -93,7 +93,7 @@ export function AdminContentVisibilityPanel({
               currentPath={currentPath}
               idName={idName}
               idValue={idValue}
-              status={ContentStatus.PUBLISHED}
+              status={CONTENT_STATUS.PUBLISHED}
               updateStatusAction={updateStatusAction}
             >
               <ConfirmSubmitButton
@@ -113,7 +113,7 @@ export function AdminContentVisibilityPanel({
               currentPath={currentPath}
               idName={idName}
               idValue={idValue}
-              status={ContentStatus.DRAFT}
+              status={CONTENT_STATUS.DRAFT}
               updateStatusAction={updateStatusAction}
             >
               <ConfirmSubmitButton
@@ -145,11 +145,11 @@ export function AdminContentRowActions({
   status,
   updateStatusAction
 }: AdminContentRowActionsProps) {
-  const isPublished = status === ContentStatus.PUBLISHED;
-  const isArchived = status === ContentStatus.ARCHIVED;
+  const isPublished = status === CONTENT_STATUS.PUBLISHED;
+  const isArchived = status === CONTENT_STATUS.ARCHIVED;
   const canPublish = !isPublished;
   const canArchive = !isArchived && !isPublished;
-  const canDelete = status === ContentStatus.DRAFT;
+  const canDelete = status === CONTENT_STATUS.DRAFT;
 
   return (
     <AdminRowActions>
@@ -158,7 +158,7 @@ export function AdminContentRowActions({
           currentPath={currentPath}
           idName={idName}
           idValue={idValue}
-          status={ContentStatus.PUBLISHED}
+          status={CONTENT_STATUS.PUBLISHED}
           updateStatusAction={updateStatusAction}
         >
           <ConfirmSubmitButton
@@ -176,7 +176,7 @@ export function AdminContentRowActions({
           currentPath={currentPath}
           idName={idName}
           idValue={idValue}
-          status={ContentStatus.ARCHIVED}
+          status={CONTENT_STATUS.ARCHIVED}
           updateStatusAction={updateStatusAction}
         >
           <ConfirmSubmitButton
@@ -206,7 +206,7 @@ export function AdminContentRowActions({
             <form action={updateStatusAction}>
               <HiddenRedirect value={currentPath} />
               <input name={idName} type="hidden" value={idValue} />
-              <input name="status" type="hidden" value={ContentStatus.DRAFT} />
+              <input name="status" type="hidden" value={CONTENT_STATUS.DRAFT} />
               <AdminActionMenuButton
                 confirmActionLabel="Восстановить"
                 confirmText="Запись вернётся в черновики."
@@ -220,7 +220,7 @@ export function AdminContentRowActions({
             <form action={updateStatusAction}>
               <HiddenRedirect value={currentPath} />
               <input name={idName} type="hidden" value={idValue} />
-              <input name="status" type="hidden" value={ContentStatus.ARCHIVED} />
+              <input name="status" type="hidden" value={CONTENT_STATUS.ARCHIVED} />
               <AdminActionMenuButton
                 confirmActionLabel="В архив"
                 confirmText={isPublished ? 'Она пропадёт с публичной страницы.' : undefined}

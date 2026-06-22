@@ -1,5 +1,6 @@
 import type { TocItem } from '@/lib/public/content/articles';
 import type { PublishedContentItem } from '@/lib/public/content';
+import { AppLink } from '@/components/ui/app-link';
 import { Panel } from '@/components/ui/panel';
 import { ContentSubscribeForm } from '@/components/public/content-subscribe-form';
 import { getArticleFallbackImage } from '@/components/public/article-grid-card';
@@ -61,7 +62,7 @@ function ArticleRelatedBlock({
       <h2 className={headingClassName}>Похожие статьи</h2>
       <div className="mt-3">
         {related.map((item) => (
-          <a
+          <AppLink
             className="group flex gap-3.5 border-b border-[var(--border-subtle)] py-3 transition-opacity duration-[var(--motion-duration-fast)] first:pt-0 last:border-b-0 last:pb-0 hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
             href={`${basePath}/${item.slug}`}
             key={item.id}
@@ -81,7 +82,7 @@ function ArticleRelatedBlock({
                 {item.title}
               </span>
             </span>
-          </a>
+          </AppLink>
         ))}
       </div>
     </Panel>

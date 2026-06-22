@@ -96,7 +96,6 @@ export default async function VacanciesPage({ searchParams }: VacanciesPageProps
           title="Специалисты"
           subtitle="Резюме, услуги и анкеты специалистов для кофеен, баров и ресторанов."
           tone="graphite"
-          density="compact"
           media={{ kind: 'slot', children: <VacanciesHeroActions /> }}
         >
           <VacanciesHeroStats
@@ -147,12 +146,11 @@ export default async function VacanciesPage({ searchParams }: VacanciesPageProps
     <div className="vacancies-directory-page">
       <JsonLd data={buildStaticPageBreadcrumbJsonLd('/vacancies', 'Вакансии')} />
       <PageHero
-        breadcrumbs={[{ label: 'Вакансии' }]}
+        breadcrumbs={[{ href: '/', label: 'Главная' }, { label: 'Вакансии' }]}
         eyebrow="Работа в кофейной индустрии"
         title="Вакансии"
         subtitle="Работа в кофейнях, барах, обжарках и сервисных командах СКФО."
         tone="graphite"
-        density="compact"
         media={{ kind: 'slot', children: <VacanciesHeroActions /> }}
       >
         <VacanciesHeroStats

@@ -1,4 +1,4 @@
-import { formatAdminActionError, redirectWithAdminActionResult, safeAdminRedirectPath } from '@/lib/admin/content-utils';
+import { formatAdminActionError, redirectWithAdminActionResult, safeAdminRedirectPath } from '@/lib/admin/content-redirect';
 import { isRedirectError } from '@/lib/actions/server-action-errors';
 import { requireAdminSectionAccess } from '@/lib/auth/require-admin-section';
 import type { AdminSection } from '@/lib/auth/permissions';

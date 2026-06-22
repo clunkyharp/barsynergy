@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { JobSearchStatus } from '@prisma/client';
 import { z } from 'zod';
-import { getString, getArray, optionalString } from '@/lib/admin/content-utils';
+import { getString, getArray, optionalString } from '@/lib/forms/form-data';
 import { resolveServerActionError } from '@/lib/actions/server-action-errors';
 import { getCurrentUser } from '@/lib/auth/current-user';
 import { prisma } from '@/lib/db/prisma';

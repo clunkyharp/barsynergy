@@ -23,8 +23,8 @@ test('homepage featured card keeps metadata only in the top badge row', () => {
   assert.match(source, /function supportMetaText\(card: HomepageLiveCard\)/);
   assert.match(featuredCardSource, /const footerMeta = buildFeaturedFooterMeta\(card\)/);
   assert.match(featuredCardSource, /editorial-featured/);
-  assert.match(featuredCardSource, /editorial-featured-footer/);
-  assert.match(featuredCardSource, /editorial-featured-cta/);
+  assert.match(featuredCardSource, /\{card\.actionLabel\}/);
+  assert.match(featuredCardSource, /ArrowUpRight/);
   assert.match(featuredCardSource, /\{footerMeta\}/);
   assert.doesNotMatch(featuredCardSource, /const footerMeta = compactMeta\(card\)/);
   assert.doesNotMatch(featuredCardSource, /featured-now-footnote/);
@@ -47,8 +47,8 @@ test('homepage hero explains the product with one primary action and no search',
 
   assert.match(heroSource, /accentFont\.className/);
   assert.match(heroSource, /BARSYNERGY/);
-  assert.match(heroSource, /max-w-\[96rem\]/);
-  assert.match(heroSource, /leading-\[0\.96\]/);
+  assert.match(heroSource, /max-w-\[52rem\]/);
+  assert.match(heroSource, /leading-\[1\.08\]/);
   assert.match(heroSource, /Люди, события, вакансии, поставщики, обучение и материалы/);
   assert.match(heroSource, /BARSYNERGY \/ Кофейная индустрия СКФО/);
   assert.match(heroSource, /Смотреть вакансии/);
@@ -107,7 +107,7 @@ test('homepage mobile rules keep the first screen and scannable cards phone-nati
   const menuSource = readProjectFile('src/components/layout/mobile-site-menu.tsx');
   const css = readGlobalStyles();
 
-  assert.match(heroSource, /max-md:items-start md:items-center/);
+  assert.match(heroSource, /flex items-center justify-center/);
   assert.match(heroSource, /md:min-h-\[720px\] lg:min-h-\[760px\]/);
   assert.match(source, /editorial-current-section scroll-mt-28 border-b border-white\/8 py-12 md:py-20/);
   assert.match(source, /editorial-current-support-row grid grid-cols-1 gap-4 sm:grid-cols-3 md:gap-5/);
@@ -127,8 +127,8 @@ test('homepage section badges and inline icons use the filled square accent trea
   const source = readProjectFile('src/components/public/homepage-client.tsx');
 
   assert.match(source, /<EditorialSupportCard/);
-  assert.match(source, /actionLabel=\{card\.actionLabel\}/);
-  assert.match(source, /label=\{card\.eyebrow\}/);
+  assert.match(source, /actionLabel=\{/);
+  assert.match(source, /label="Вакансии"/);
   assert.doesNotMatch(source, /rounded-full bg-\[var\(--accent-soft\)\] text-\[var\(--accent\)\]/);
 });
 

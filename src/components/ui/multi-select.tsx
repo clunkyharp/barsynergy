@@ -1,6 +1,7 @@
 'use client';
 
 import {
+  useCallback,
   useEffect,
   useId,
   useMemo,
@@ -165,10 +166,10 @@ export function MultiSelect({
     }
   }
 
-  function removeValue(value: string, e: React.MouseEvent) {
+  const removeValue = useCallback((value: string, e: React.MouseEvent | React.KeyboardEvent) => {
     e.stopPropagation();
     onChange(selectedValues.filter((v) => v !== value));
-  }
+  }, [onChange, selectedValues]);
 
   return (
     <div className="custom-select" onBlur={handleRootBlur} ref={rootRef}>
@@ -201,17 +202,16 @@ export function MultiSelect({
               >
                 {chip.label}
                 <span
-                  aria-label={`Убрать ${chip.label}`}
+                  aria-label={`Удалить ${chip.label}`}
                   className="inline-flex cursor-pointer text-white/30 transition-colors hover:text-white/70"
                   onClick={(e) => removeValue(chip.value, e)}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault();
-                      removeValue(chip.value, e as unknown as React.MouseEvent);
+                      removeValue(chip.value, e);
                     }
                   }}
                   role="button"
-                  tabIndex={0}
+                  tabIndex={-1}
                 >
                   <X size={12} strokeWidth={1.8} />
                 </span>

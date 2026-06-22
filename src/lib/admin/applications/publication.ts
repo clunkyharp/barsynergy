@@ -116,187 +116,71 @@ export async function publishContentFromApplicationId({
       }
     });
 
-    if (target === 'vacancy') {
-      const fields = getVacancyPublicationFieldsFromApplication(application);
-      const slug = slugify(`${fields.position}-${fields.companyName}`);
-
-      if (!slug) {
-        throw new Error('vacancy publication requires slug');
-      }
-
-      const vacancy = await persistWithUniqueSlugRetry({
-        baseSlug: slug,
-        exists: async (candidate) =>
-          Boolean(
-            await tx.vacancy.findFirst({
-              where: { slug: candidate },
-              select: { id: true }
+    switch (target) {
+      case 'vacancy': {
+        const fields = getVacancyPublicationFieldsFromApplication(application);
+        const slug = slugify(`${fields.position}-${fields.companyName}`);
+        if (!slug) throw new Error('vacancy publication requires slug');
+        const vacancy = await persistWithUniqueSlugRetry({
+          baseSlug: slug,
+          exists: async (candidate) => Boolean(await tx.vacancy.findFirst({ where: { slug: candidate }, select: { id: true } })),
+          persist: (uniqueSlug) =>
+            tx.vacancy.create({
+              data: { ...fields, slug: uniqueSlug, publishedAt: now, archivedAt: null, createdById: userId, updatedById: userId, businessAccountId: application.businessAccountId },
+              select: { id: true, title: true, slug: true }
             })
-          ),
-        persist: (uniqueSlug) =>
-          tx.vacancy.create({
-            data: {
-              ...fields,
-              slug: uniqueSlug,
-              publishedAt: now,
-              archivedAt: null,
-              createdById: userId,
-              updatedById: userId,
-              businessAccountId: application.businessAccountId
-            },
-            select: { id: true, title: true, slug: true }
-          })
-      });
-
-      await tx.application.update({
-        where: { id: applicationId },
-        data: {
-          vacancyId: vacancy.id,
-          status: ApplicationStatus.APPROVED,
-          internalNotes: appendApplicationInternalNote(
-            application.internalNotes,
-            `Опубликована вакансия: ${vacancy.title} (${vacancy.slug}).`
-          )
-        }
-      });
-
-      return { target, title: vacancy.title };
-    }
-
-    if (target === 'supplier') {
-      const fields = getSupplierPublicationFieldsFromApplication(application);
-      const slug = slugify(fields.title);
-
-      if (!slug) {
-        throw new Error('supplier publication requires slug');
+        });
+        await tx.application.update({ where: { id: applicationId }, data: { vacancyId: vacancy.id, status: ApplicationStatus.APPROVED, internalNotes: appendApplicationInternalNote(application.internalNotes, `Опубликована вакансия: ${vacancy.title} (${vacancy.slug}).`) } });
+        return { target, title: vacancy.title };
       }
-
-      const supplier = await persistWithUniqueSlugRetry({
-        baseSlug: slug,
-        exists: async (candidate) =>
-          Boolean(
-            await tx.supplier.findFirst({
-              where: { slug: candidate },
-              select: { id: true }
+      case 'supplier': {
+        const fields = getSupplierPublicationFieldsFromApplication(application);
+        const slug = slugify(fields.title);
+        if (!slug) throw new Error('supplier publication requires slug');
+        const supplier = await persistWithUniqueSlugRetry({
+          baseSlug: slug,
+          exists: async (candidate) => Boolean(await tx.supplier.findFirst({ where: { slug: candidate }, select: { id: true } })),
+          persist: (uniqueSlug) =>
+            tx.supplier.create({
+              data: { ...fields, slug: uniqueSlug, publishedAt: now, archivedAt: null, createdById: userId, updatedById: userId },
+              select: { id: true, title: true, slug: true }
             })
-          ),
-        persist: (uniqueSlug) =>
-          tx.supplier.create({
-            data: {
-              ...fields,
-              slug: uniqueSlug,
-              publishedAt: now,
-              archivedAt: null,
-              createdById: userId,
-              updatedById: userId
-            },
-            select: { id: true, title: true, slug: true }
-          })
-      });
-
-      await tx.application.update({
-        where: { id: applicationId },
-        data: {
-          supplierId: supplier.id,
-          status: ApplicationStatus.APPROVED,
-          internalNotes: appendApplicationInternalNote(
-            application.internalNotes,
-            `Опубликован поставщик: ${supplier.title} (${supplier.slug}).`
-          )
-        }
-      });
-
-      return { target, title: supplier.title };
-    }
-
-    if (target === 'master') {
-      const fields = getMasterPublicationFieldsFromApplication(application);
-      const slug = slugify(fields.title);
-
-      if (!slug) {
-        throw new Error('master publication requires slug');
+        });
+        await tx.application.update({ where: { id: applicationId }, data: { supplierId: supplier.id, status: ApplicationStatus.APPROVED, internalNotes: appendApplicationInternalNote(application.internalNotes, `Опубликован поставщик: ${supplier.title} (${supplier.slug}).`) } });
+        return { target, title: supplier.title };
       }
-
-      const master = await persistWithUniqueSlugRetry({
-        baseSlug: slug,
-        exists: async (candidate) =>
-          Boolean(
-            await tx.master.findFirst({
-              where: { slug: candidate },
-              select: { id: true }
+      case 'master': {
+        const fields = getMasterPublicationFieldsFromApplication(application);
+        const slug = slugify(fields.title);
+        if (!slug) throw new Error('master publication requires slug');
+        const master = await persistWithUniqueSlugRetry({
+          baseSlug: slug,
+          exists: async (candidate) => Boolean(await tx.master.findFirst({ where: { slug: candidate }, select: { id: true } })),
+          persist: (uniqueSlug) =>
+            tx.master.create({
+              data: { ...fields, slug: uniqueSlug, publishedAt: now, archivedAt: null, createdById: userId, updatedById: userId },
+              select: { id: true, title: true, slug: true }
             })
-          ),
-        persist: (uniqueSlug) =>
-          tx.master.create({
-            data: {
-              ...fields,
-              slug: uniqueSlug,
-              publishedAt: now,
-              archivedAt: null,
-              createdById: userId,
-              updatedById: userId
-            },
-            select: { id: true, title: true, slug: true }
-          })
-      });
-
-      await tx.application.update({
-        where: { id: applicationId },
-        data: {
-          masterId: master.id,
-          status: ApplicationStatus.APPROVED,
-          internalNotes: appendApplicationInternalNote(
-            application.internalNotes,
-            `Опубликован мастер: ${master.title} (${master.slug}).`
-          )
-        }
-      });
-
-      return { target, title: master.title };
-    }
-
-    const fields = getPartnerPublicationFieldsFromApplication(application);
-    const slug = slugify(fields.title);
-
-    if (!slug) {
-      throw new Error('partner publication requires slug');
-    }
-
-    const partner = await persistWithUniqueSlugRetry({
-      baseSlug: slug,
-      exists: async (candidate) =>
-        Boolean(
-          await tx.partner.findFirst({
-            where: { slug: candidate },
-            select: { id: true }
-          })
-        ),
-      persist: (uniqueSlug) =>
-        tx.partner.create({
-          data: {
-            ...fields,
-            slug: uniqueSlug,
-            publishedAt: now,
-            archivedAt: null,
-            createdById: userId,
-            updatedById: userId
-          },
-          select: { id: true, title: true, slug: true }
-        })
-    });
-
-    await tx.application.update({
-      where: { id: applicationId },
-      data: {
-        partnerId: partner.id,
-        status: ApplicationStatus.APPROVED,
-        internalNotes: appendApplicationInternalNote(
-          application.internalNotes,
-          `Опубликован партнёр: ${partner.title} (${partner.slug}).`
-        )
+        });
+        await tx.application.update({ where: { id: applicationId }, data: { masterId: master.id, status: ApplicationStatus.APPROVED, internalNotes: appendApplicationInternalNote(application.internalNotes, `Опубликован мастер: ${master.title} (${master.slug}).`) } });
+        return { target, title: master.title };
       }
-    });
-
-    return { target, title: partner.title };
+      default: {
+        const fields = getPartnerPublicationFieldsFromApplication(application);
+        const slug = slugify(fields.title);
+        if (!slug) throw new Error('partner publication requires slug');
+        const partner = await persistWithUniqueSlugRetry({
+          baseSlug: slug,
+          exists: async (candidate) => Boolean(await tx.partner.findFirst({ where: { slug: candidate }, select: { id: true } })),
+          persist: (uniqueSlug) =>
+            tx.partner.create({
+              data: { ...fields, slug: uniqueSlug, publishedAt: now, archivedAt: null, createdById: userId, updatedById: userId },
+              select: { id: true, title: true, slug: true }
+            })
+        });
+        await tx.application.update({ where: { id: applicationId }, data: { partnerId: partner.id, status: ApplicationStatus.APPROVED, internalNotes: appendApplicationInternalNote(application.internalNotes, `Опубликован партнёр: ${partner.title} (${partner.slug}).`) } });
+        return { target, title: partner.title };
+      }
+    }
   });
 }

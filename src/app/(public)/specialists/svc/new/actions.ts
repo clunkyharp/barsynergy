@@ -2,7 +2,7 @@
 
 import { ApplicationType } from '@prisma/client';
 import { z } from 'zod';
-import { getString, optionalString } from '@/lib/admin/content-utils';
+import { getString, optionalString } from '@/lib/forms/form-data';
 import { submitPublicApplicationAction } from '@/lib/applications/submit-public-application-action';
 import { buildApplicationPayload } from '@/lib/applications/application-payloads';
 

@@ -7,6 +7,7 @@ import { sendPushNotification } from './send';
 const MAX_ATTEMPTS = 5;
 const RETRY_BASE_DELAY_MS = 60_000;
 const RETRY_MAX_DELAY_MS = 60 * 60 * 1000;
+const GONE_ENDPOINT_FLUSH_SIZE = 100;
 
 type OutboxRecord = {
   id: string;
@@ -100,7 +101,7 @@ export async function processContentNotificationQueue(
 
       let totalAttempts = 0;
       let totalFailures = 0;
-      const goneEndpoints: string[] = [];
+      let goneEndpoints: string[] = [];
 
       for (const userId of userIds) {
         const subscriptions = await getActiveSubscriptions(userId);
@@ -119,6 +120,12 @@ export async function processContentNotificationQueue(
             totalFailures++;
             if (isSubscriptionGone(error)) {
               goneEndpoints.push(sub.endpoint);
+              // Flush in chunks so dead-endpoint strings don't accumulate
+              // across a large fan-out before the single end-of-run update.
+              if (goneEndpoints.length >= GONE_ENDPOINT_FLUSH_SIZE) {
+                await disableSubscriptionsByEndpoints(goneEndpoints);
+                goneEndpoints = [];
+              }
             }
           }
         }

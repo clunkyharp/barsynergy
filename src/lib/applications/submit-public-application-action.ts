@@ -41,10 +41,7 @@ export async function submitPublicApplicationAction<TParsed>({
       return { type: 'success', message: successMessage };
     }
 
-    const turnstileToken = getString(formData, 'turnstileToken');
-    if (turnstileToken) {
-      await assertTurnstilePassed(turnstileToken);
-    }
+    await assertTurnstilePassed(getString(formData, 'turnstileToken'));
 
     const parsed = await parse(formData);
     await assertPublicApplicationSubmissionAllowed(applicationType);

@@ -381,10 +381,12 @@ test('supplier directory rows use compact logo marks with explicit contact and p
   const directoryRowSource = readProjectFile('src/components/public/published-content-row-directory.tsx');
 
   assert.match(directoryRowSource, /actionLabel = 'Связаться'/);
-  assert.match(directoryRowSource, /profileLabel = 'Профиль'/);
-  assert.match(directoryRowSource, /public-list-row-actions/);
-  assert.match(directoryRowSource, /public-list-row-primary-action/);
-  assert.match(directoryRowSource, /titleInitials\(item\.subtitle \?\? item\.title\)/);
+  // Redesign: media-header card with a single primary action and a full-card
+  // link to the profile, instead of a separate logo mark + profile button.
+  assert.match(directoryRowSource, /<Button/);
+  assert.match(directoryRowSource, /href=\{primaryHref\}/);
+  assert.match(directoryRowSource, /detailHref\(basePath, item\.slug\)/);
+  assert.match(directoryRowSource, /after:absolute after:inset-0/);
   assert.doesNotMatch(directoryRowSource, />Без логотипа</);
 });
 
@@ -533,20 +535,21 @@ test('public contact CTAs map to form topics and defaults', () => {
   assert.match(vacancyDetailSource, /submitVacancyResponseApplication/);
   assert.doesNotMatch(vacancyDetailSource, /topic=vacancy-response&position=/);
   assert.doesNotMatch(vacancyDetailSource, /topic=vacancy#/);
-  assert.match(platformEventSource, /#event-request/);
+  assert.match(platformEventSource, /topic=event#contact-form/);
 });
 
 test('vacancy list rows separate facts from company and description', () => {
   const rowSource = readProjectFile('src/components/public/published-content-row-opportunity.tsx');
 
-  assert.match(rowSource, /function vacancyLead/);
+  assert.match(rowSource, /function vacancySalary/);
   assert.match(rowSource, /\['Опыт', 'Формат', 'График'\]/);
   assert.match(rowSource, /metaGroupValue\(item, 'Оплата'\) \?\? 'по договорённости'/);
   assert.doesNotMatch(rowSource, /Компания \/ город/);
-  assert.match(rowSource, /public-list-row-company/);
+  assert.match(rowSource, /public-list-row-shell-vacancy/);
   assert.doesNotMatch(rowSource, />О нас<\/p>/);
-  assert.match(rowSource, /public-list-row-actions/);
-  assert.match(rowSource, /public-list-row-primary-action/);
+  // Redesign: whole row is a link via the title AppLink + inset overlay.
+  assert.match(rowSource, /after:absolute after:inset-0/);
+  assert.match(rowSource, /detailHref\(basePath, item\.slug\)/);
 });
 
 test('vacancy detail page renders the real vacancy response form', () => {
