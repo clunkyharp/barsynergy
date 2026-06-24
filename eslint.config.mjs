@@ -4,7 +4,10 @@ import tseslint from 'typescript-eslint';
 export default tseslint.config(
   {
     ignores: [
+      '.agents/**',
       '.astro/**',
+      '.claude/**',
+      '.github/**',
       '.next/**',
       'dist/**',
       'node_modules/**',

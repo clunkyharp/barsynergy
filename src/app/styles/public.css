@@ -105,6 +105,11 @@
   color: var(--status-badge-accent-text);
 }
 
+.homepage-surface :where(.uppercase) {
+  letter-spacing: 0;
+  text-transform: none;
+}
+
 /* ── About page ────────────────────────────────────── */
 
 .about-page .container {
@@ -120,7 +125,7 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: var(--tracking-eyebrow-md);
-  color: var(--accent);
+  color: var(--accent-ink);
   margin-bottom: 12px;
 }
 
@@ -554,11 +559,11 @@
   border: 1px solid var(--accent);
   border-radius: var(--radius-pill);
   color: var(--accent);
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
+  font-size: 0.76rem;
+  font-weight: 650;
+  letter-spacing: 0;
   line-height: 1.15;
-  text-transform: uppercase;
+  text-transform: none;
 }
 
 .editorial-support-body {

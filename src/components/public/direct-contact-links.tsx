@@ -88,7 +88,7 @@ export function DirectContactLinks({ telegram, phone, email, whatsapp }: DirectC
     <div className="space-y-2">
       {links.map((link) => (
         <AppLink
-          className="flex items-center gap-2 rounded-[var(--radius-sm)] border border-[var(--accent)]/30 bg-[var(--accent-soft)] px-4 py-2.5 text-sm font-medium text-[var(--accent)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--accent-contrast)]"
+          className="flex items-center gap-2 rounded-[var(--radius-sm)] border border-[var(--accent)]/30 bg-[var(--accent-soft)] px-4 py-2.5 text-sm font-medium text-[var(--accent-ink)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--accent-contrast)]"
           href={link.href}
           key={link.href}
           target="_blank"

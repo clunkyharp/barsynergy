@@ -7,5 +7,5 @@ type InlineLinkProps = Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> & {
 };
 
 export function InlineLink({ className, ...props }: InlineLinkProps) {
-  return <AppLink className={cn('font-semibold text-[var(--accent)] underline-offset-4 hover:underline', className)} {...props} />;
+  return <AppLink className={cn('font-semibold text-[var(--accent-ink)] underline-offset-4 hover:underline', className)} {...props} />;
 }

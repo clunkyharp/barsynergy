@@ -76,8 +76,8 @@ export default async function ActivateBusinessAccessPage({ searchParams }: Activ
               Вернуться на сайт
             </Button>
           </div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Бизнес-аккаунт</p>
-          <span className="mt-6 grid size-14 place-items-center rounded-[var(--radius-pill)] border border-[var(--accent)]/35 bg-[var(--accent-soft)] text-[var(--accent)]">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent-ink)]">Бизнес-аккаунт</p>
+          <span className="mt-6 grid size-14 place-items-center rounded-[var(--radius-pill)] border border-[var(--accent)]/35 bg-[var(--accent-soft)] text-[var(--accent-ink)]">
             <ShieldCheck aria-hidden size={26} strokeWidth={1.7} />
           </span>
           <h1 className="display-tight mt-4 text-[40px] font-semibold leading-[1.20] text-balance tracking-normal md:text-[54px]">Завершить подключение</h1>
@@ -97,7 +97,7 @@ export default async function ActivateBusinessAccessPage({ searchParams }: Activ
 
         <section className="editorial-form-shell overflow-hidden">
           <div className="border-b border-black/10 bg-[var(--surface-wash)] px-5 py-5 md:px-6 md:py-6">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Активация</p>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent-ink)]">Активация</p>
             <h2 className="mt-3 text-[2rem] font-semibold leading-tight tracking-normal">Создайте пароль</h2>
             <p className="mt-3 max-w-xl text-sm leading-7 text-[var(--muted)]">
               После активации вы попадёте в кабинет и сможете работать с заявками компании.

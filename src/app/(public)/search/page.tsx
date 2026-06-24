@@ -187,12 +187,12 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         bottom={hasQuery ? { kind: 'stats' as const, items: [{ value: String(totalResults), label: 'результатов' }] } : undefined}
       />
 
-      <section className="background-zone background-zone-ivory border-b border-[var(--line)] py-8 md:py-12">
+      <section className="background-zone background-zone-ivory border-b border-[var(--line)] py-4 md:py-6">
         <div className="container">
           <form
             action="/search"
             aria-label="Глобальный поиск по платформе"
-            className="grid gap-3 rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--surface-card)] p-4 shadow-[var(--shadow-card)] md:grid-cols-[minmax(0,1fr)_auto]"
+            className="grid gap-3 md:grid-cols-[minmax(0,1fr)_auto]"
             method="get"
             role="search"
           >

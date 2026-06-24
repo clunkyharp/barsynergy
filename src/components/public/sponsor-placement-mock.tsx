@@ -31,7 +31,7 @@ export function SponsorPlacementMock() {
 
       <div className="flex items-center justify-between gap-3 rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--surface-wash)] px-4 py-2.5">
         <span className="text-[12px] font-semibold text-[var(--text)]">Связаться со спонсором</span>
-        <span className="inline-flex items-center gap-1 text-[12px] font-semibold text-[var(--accent)]">
+        <span className="inline-flex items-center gap-1 text-[12px] font-semibold text-[var(--accent-ink)]">
           Telegram
           <ArrowUpRight size={14} strokeWidth={1.8} />
         </span>

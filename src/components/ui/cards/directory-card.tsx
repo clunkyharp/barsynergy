@@ -103,7 +103,7 @@ export function DirectoryCard({
       <div className="grid min-w-0 gap-6">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="inline-flex items-center rounded-[var(--radius-pill)] border border-[var(--accent)]/25 bg-[var(--accent-soft)] px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-[var(--tracking-eyebrow-sm)] text-[var(--accent)]">
+            <span className="inline-flex items-center rounded-[var(--radius-pill)] border border-[var(--accent)]/25 bg-[var(--accent-soft)] px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-[var(--tracking-eyebrow-sm)] text-[var(--accent-ink)]">
               {label}
             </span>
             {statusLabel ? (

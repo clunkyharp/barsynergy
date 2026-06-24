@@ -38,7 +38,7 @@ export function HomepageClient({ data, isAuthenticated = false }: HomepageClient
   ];
 
   return (
-    <div className="overflow-x-hidden">
+    <div className="homepage-surface overflow-x-hidden">
       <HomeHeroRouter stats={data.stats} />
 
 

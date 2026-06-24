@@ -35,8 +35,8 @@ export function BusinessSidebar({ logoutAction }: BusinessSidebarProps) {
             <AppLink
               aria-current={isActive ? 'page' : undefined}
               className={cn(
-                'flex min-h-10 items-center gap-3 rounded-[var(--radius-md)] border-l-2 border-l-transparent px-3 py-2 font-semibold text-[var(--text)] transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)]',
-                isActive ? 'border-l-[var(--accent)] bg-[var(--surface-wash)]' : 'hover:bg-[var(--surface-muted)]'
+                'flex min-h-11 items-center gap-3 rounded-[var(--radius-md)] px-3 py-2 font-semibold text-[var(--text)] transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)]',
+                isActive ? 'bg-[var(--surface-wash)] text-[var(--accent-ink)]' : 'hover:bg-[var(--surface-muted)]'
               )}
               href={link.href}
               key={link.href}

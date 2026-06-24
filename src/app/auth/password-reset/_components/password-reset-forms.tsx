@@ -65,7 +65,7 @@ export function PasswordResetRequestForm() {
         </form>
       )}
       <p className="mt-4 text-center text-sm leading-6 text-[var(--muted)]">
-        <AppLink className="text-[var(--accent)] transition-colors hover:text-[var(--accent-strong)]" href="/auth/login">
+        <AppLink className="text-[var(--accent-ink)] transition-colors hover:text-[var(--accent-strong)]" href="/auth/login">
           Вспомнили пароль? Войти
         </AppLink>
       </p>

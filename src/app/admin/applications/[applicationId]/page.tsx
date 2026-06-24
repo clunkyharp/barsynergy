@@ -106,7 +106,6 @@ export default async function AdminApplicationDetailPage({ params, searchParams 
         composePlaceholder="Напишите ответ от имени платформы..."
         contextLabel={contextLabel}
         currentUserId={null}
-        currentUserRole="admin"
         interlocutorName={interlocutorName}
         messageCount={messages.length}
         messages={messages}

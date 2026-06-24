@@ -173,10 +173,10 @@ export function HomeEventsStrip({ event }: { event: HomepageLiveCard }) {
             className="home-event-card block rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--surface-card)] p-4 text-[var(--text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] md:p-5"
             href={event.href}
           >
-            <span className="block text-[11px] font-semibold uppercase tracking-[var(--tracking-eyebrow-sm)] text-[var(--accent)]">{event.eyebrow}</span>
+            <span className="block text-[11px] font-semibold uppercase tracking-[var(--tracking-eyebrow-sm)] text-[var(--accent-ink)]">{event.eyebrow}</span>
             <span className={`${displayFont.className} mt-3 block text-[1.35rem] font-semibold leading-none text-[var(--text)] md:mt-4 md:text-[1.7rem]`}>{event.title}</span>
             <span className="mt-2 block text-sm leading-6 text-[var(--muted)] md:mt-3">{event.summary}</span>
-            <span className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-[var(--accent)] md:mt-5">
+            <span className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-[var(--accent-ink)] md:mt-5">
               {event.actionLabel}
               <ArrowUpRight size={15} strokeWidth={1.8} />
             </span>

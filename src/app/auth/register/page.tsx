@@ -34,7 +34,7 @@ export default function RegisterPage() {
       <div className="mt-10 grid gap-5 md:grid-cols-2">
         <article className="flex flex-col rounded-[var(--radius-xl)] border border-[var(--border-default)] bg-[var(--surface-card)] p-6 transition-shadow hover:shadow-[var(--shadow-card)] md:p-8">
           <div className="flex size-12 items-center justify-center rounded-full bg-[var(--accent-soft)]">
-            <UserRound className="text-[var(--accent)]" size={22} strokeWidth={1.8} />
+            <UserRound className="text-[var(--accent-ink)]" size={22} strokeWidth={1.8} />
           </div>
           <h2 className="mt-5 text-xl font-semibold leading-tight text-[var(--text)]">Я специалист</h2>
           <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
@@ -72,7 +72,7 @@ export default function RegisterPage() {
 
       <p className="mt-10 text-center text-sm text-[var(--muted)]">
         Есть вопросы? Напишите в{' '}
-        <a className="font-semibold text-[var(--accent)] hover:text-[var(--accent-strong)]" href="https://t.me/barsynergy">
+        <a className="font-semibold text-[var(--accent-ink)] hover:text-[var(--accent-strong)]" href="https://t.me/barsynergy">
           Telegram
         </a>
       </p>

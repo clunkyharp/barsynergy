@@ -86,7 +86,6 @@ export default async function InquiryDetailPage({ params }: InquiryDetailPagePro
         composePlaceholder="Напишите уточнение..."
         contextLabel={contextLabel}
         currentUserId={currentUser.id}
-        currentUserRole="user"
         interlocutorName={interlocutorName}
         messageCount={messages.length}
         messages={messages}

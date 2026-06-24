@@ -1,0 +1,2193 @@
+{
+  "/": {
+    "contrast": [
+      {
+        "text": "Обучение",
+        "color": "rgb(245, 247, 251)",
+        "bg": "rgb(255, 255, 255)",
+        "fontSize": 11,
+        "fontWeight": 600,
+        "ratio": 1.07,
+        "need": 4.5,
+        "sel": "relative inline-flex min-h-11 shrink-0 i"
+      },
+      {
+        "text": "Войти",
+        "color": "rgb(245, 247, 251)",
+        "bg": "rgb(255, 255, 255)",
+        "fontSize": 12,
+        "fontWeight": 600,
+        "ratio": 1.07,
+        "need": 4.5,
+        "sel": "inline-flex min-h-10 shrink-0 items-cent"
+      },
+      {
+        "text": "BARSYNERGY / Кофейная индустри",
+        "color": "rgb(232, 176, 0)",
+        "bg": "rgba(232, 176, 0, 0.16)",
+        "fontSize": 12.48,
+        "fontWeight": 600,
+        "ratio": 1,
+        "need": 4.5,
+        "sel": "font-body inline-flex items-center gap-1"
+      },
+      {
+        "text": "Редакция BARSYNERGYНастройки п",
+        "color": "rgb(28, 28, 30)",
+        "bg": "rgb(27, 30, 37)",
+        "fontSize": 16,
+        "fontWeight": 400,
+        "ratio": 1.02,
+        "need": 4.5,
+        "sel": "editorial-featured group flex flex-col o"
+      },
+      {
+        "text": "ВакансииБариста в утреннюю сме",
+        "color": "rgb(28, 28, 30)",
+        "bg": "rgb(35, 39, 49)",
+        "fontSize": 16,
+        "fontWeight": 400,
+        "ratio": 1.14,
+        "need": 4.5,
+        "sel": "editorial-support-card group flex flex-c"
+      },
+      {
+        "text": "Вся афиша",
+        "color": "rgb(232, 176, 0)",
+        "bg": "rgb(255, 255, 255)",
+        "fontSize": 15,
+        "fontWeight": 700,
+        "ratio": 1.97,
+        "need": 4.5,
+        "sel": "inline-flex items-center justify-center "
+      },
+      {
+        "text": "Ближайшее событие",
+        "color": "rgb(232, 176, 0)",
+        "bg": "rgba(255, 255, 255, 0.94)",
+        "fontSize": 11,
+        "fontWeight": 600,
+        "ratio": 1.97,
+        "need": 4.5,
+        "sel": "block text-[11px] font-semibold uppercas"
+      },
+      {
+        "text": "Выбрать событие",
+        "color": "rgb(232, 176, 0)",
+        "bg": "rgba(255, 255, 255, 0.94)",
+        "fontSize": 14,
+        "fontWeight": 600,
+        "ratio": 1.97,
+        "need": 4.5,
+        "sel": "mt-4 inline-flex items-center gap-2 text"
+      },
+      {
+        "text": "Генеральные спонсоры сезона",
+        "color": "rgb(255, 208, 47)",
+        "bg": "rgb(255, 255, 255)",
+        "fontSize": 10,
+        "fontWeight": 700,
+        "ratio": 1.47,
+        "need": 4.5,
+        "sel": "font-body text-center text-[10px] font-b"
+      },
+      {
+        "text": "Кофе, какао, концентрированные",
+        "color": "rgb(212, 214, 222)",
+        "bg": "rgba(255, 255, 255, 0.035)",
+        "fontSize": 14,
+        "fontWeight": 400,
+        "ratio": 1.45,
+        "need": 4.5,
+        "sel": "mx-auto mt-2 max-w-[24rem] text-sm leadi"
+      },
+      {
+        "text": "Смотреть профиль →",
+        "color": "rgb(255, 208, 47)",
+        "bg": "rgba(255, 255, 255, 0.035)",
+        "fontSize": 14,
+        "fontWeight": 600,
+        "ratio": 1.47,
+        "need": 4.5,
+        "sel": "mt-3 inline-flex text-sm font-semibold t"
+      },
+      {
+        "text": "Канал",
+        "color": "color(srgb 0.960784 0.968627 0.984314 / 0.5)",
+        "bg": "rgb(35, 39, 49)",
+        "fontSize": 10,
+        "fontWeight": 600,
+        "ratio": 1.4,
+        "need": 4.5,
+        "sel": "block text-[10px] font-semibold uppercas"
+      }
+    ],
+    "smallTargets": [
+      {
+        "t": "Поиск",
+        "w": 40,
+        "h": 40
+      },
+      {
+        "t": "Войти",
+        "w": 85,
+        "h": 40
+      },
+      {
+        "t": "Регистрация",
+        "w": 105,
+        "h": 40
+      },
+      {
+        "t": "Смотреть всё",
+        "w": 117,
+        "h": 20
+      },
+      {
+        "t": "Смотреть профиль →",
+        "w": 150,
+        "h": 20
+      },
+      {
+        "t": "политику обработки персо",
+        "w": 377,
+        "h": 35
+      },
+      {
+        "t": "Материалы",
+        "w": 77,
+        "h": 40
+      },
+      {
+        "t": "Обучение",
+        "w": 67,
+        "h": 40
+      },
+      {
+        "t": "События",
+        "w": 59,
+        "h": 40
+      },
+      {
+        "t": "Вакансии",
+        "w": 65,
+        "h": 40
+      },
+      {
+        "t": "Специалисты",
+        "w": 91,
+        "h": 40
+      },
+      {
+        "t": "Мастера",
+        "w": 58,
+        "h": 40
+      }
+    ],
+    "overflow": {
+      "doc": 360,
+      "win": 360,
+      "overflow": false
+    },
+    "headings": [
+      "H1:Платформа, которая объединяет людей инду",
+      "H2:Актуальное",
+      "H3:Настройки приготовления эспрессо в speci",
+      "H3:Бариста в утреннюю смену — Coffee Point",
+      "H3:Как считать себестоимость напитка",
+      "H3:Кофе, сиропы и расходники для ежедневной",
+      "H2:Ближайшее событие",
+      "H2:Разделы для работы",
+      "H2:Генеральные спонсоры сезона",
+      "H3:Hustle Brew",
+      "H3:Gelabo",
+      "H2:Готовы начать?",
+      "H2:Напишите командеBARSYNERGY",
+      "H2:Связаться с командой BARSYNERGY"
+    ],
+    "focusVisible": {
+      "outline": true,
+      "outlineWidth": "2px",
+      "ring": false
+    },
+    "modal": null,
+    "viewport": "1440"
+  },
+  "/suppliers": {
+    "contrast": [
+      {
+        "text": "Поставщики",
+        "color": "rgb(232, 176, 0)",
+        "bg": "rgba(255, 255, 255, 0.96)",
+        "fontSize": 11,
+        "fontWeight": 600,
+        "ratio": 1.97,
+        "need": 4.5,
+        "sel": "relative inline-flex min-h-11 shrink-0 i"
+      },
+      {
+        "text": "Главная›",
+        "color": "rgb(212, 214, 222)",
+        "bg": "rgb(255, 255, 255)",
+        "fontSize": 14,
+        "fontWeight": 400,
+        "ratio": 1.45,
+        "need": 4.5,
+        "sel": "inline-flex min-w-0 items-center gap-2"
+      },
+      {
+        "text": "Каталог для заведений",
+        "color": "rgb(255, 208, 47)",
+        "bg": "rgb(255, 255, 255)",
+        "fontSize": 11,
+        "fontWeight": 700,
+        "ratio": 1.47,
+        "need": 4.5,
+        "sel": "text-[11px] font-bold uppercase tracking"
+      },
+      {
+        "text": "Проверенные поставщики кофе, о",
+        "color": "rgb(212, 214, 222)",
+        "bg": "rgb(255, 255, 255)",
+        "fontSize": 16,
+        "fontWeight": 400,
+        "ratio": 1.45,
+        "need": 4.5,
+        "sel": "text-base leading-7 mt-3 max-w-xl text-["
+      },
+      {
+        "text": "4 в базе",
+        "color": "rgb(85, 90, 106)",
+        "bg": "oklab(0.978498 -0.000216823 -0.00270976 / 0.968235)",
+        "fontSize": 14,
+        "fontWeight": 400,
+        "ratio": 3.05,
+        "need": 4.5,
+        "sel": "text-sm text-[var(--muted)]"
+      },
+      {
+        "text": "Telegram-канал",
+        "color": "rgb(28, 28, 30)",
+        "bg": "rgba(35, 39, 49, 0.74)",
+        "fontSize": 16,
+        "fontWeight": 400,
+        "ratio": 1.14,
+        "need": 4.5,
+        "sel": ""
+      }
+    ],
+    "smallTargets": [
+      {
+        "t": "Поиск",
+        "w": 40,
+        "h": 40
+      },
+      {
+        "t": "Войти",
+        "w": 85,
+        "h": 40
+      },
+      {
+        "t": "Регистрация",
+        "w": 105,
+        "h": 40
+      },
+      {
+        "t": "Главная",
+        "w": 53,
+        "h": 24
+      },
+      {
+        "t": "Как стать поставщиком?",
+        "w": 208,
+        "h": 25
+      },
+      {
+        "t": "Показать параметры",
+        "w": 262,
+        "h": 39
+      },
+      {
+        "t": "Aroma Trade South",
+        "w": 162,
+        "h": 22
+      },
+      {
+        "t": "Hustle Brew",
+        "w": 102,
+        "h": 22
+      },
+      {
+        "t": "Linea Service",
+        "w": 113,
+        "h": 22
+      },
+      {
+        "t": "Gelabo",
+        "w": 59,
+        "h": 22
+      },
+      {
+        "t": "политику обработки персо",
+        "w": 377,
+        "h": 35
+      },
+      {
+        "t": "Материалы",
+        "w": 77,
+        "h": 40
+      }
+    ],
+    "overflow": {
+      "doc": 360,
+      "win": 360,
+      "overflow": false
+    },
+    "headings": [
+      "H1:Поставщики",
+      "H3:Aroma Trade South",
+      "H3:Hustle Brew",
+      "H3:Linea Service",
+      "H3:Gelabo",
+      "H2:Поставщики кофе и расходников для кофеен",
+      "H2:Добавьте компанию в профильный каталог",
+      "H3:Платформа",
+      "H3:Для бизнеса",
+      "H3:BARSYNERGY"
+    ],
+    "focusVisible": {
+      "outline": true,
+      "outlineWidth": "2px",
+      "ring": false
+    },
+    "modal": null,
+    "viewport": "1440"
+  },
+  "/vacancies": {
+    "contrast": [
+      {
+        "text": "Вакансии",
+        "color": "rgb(232, 176, 0)",
+        "bg": "rgba(255, 255, 255, 0.96)",
+        "fontSize": 11,
+        "fontWeight": 600,
+        "ratio": 1.97,
+        "need": 4.5,
+        "sel": "relative inline-flex min-h-11 shrink-0 i"
+      },
+      {
+        "text": "Главная›",
+        "color": "rgb(212, 214, 222)",
+        "bg": "rgb(255, 255, 255)",
+        "fontSize": 14,
+        "fontWeight": 400,
+        "ratio": 1.45,
+        "need": 4.5,
+        "sel": "inline-flex min-w-0 items-center gap-2"
+      },
+      {
+        "text": "Работа в кофейной индустрии",
+        "color": "rgb(255, 208, 47)",
+        "bg": "rgb(255, 255, 255)",
+        "fontSize": 11,
+        "fontWeight": 700,
+        "ratio": 1.47,
+        "need": 4.5,
+        "sel": "text-[11px] font-bold uppercase tracking"
+      },
+      {
+        "text": "Работа в кофейнях, барах, обжа",
+        "color": "rgb(245, 247, 251)",
+        "bg": "rgb(255, 255, 255)",
+        "fontSize": 16,
+        "fontWeight": 400,
+        "ratio": 1.07,
+        "need": 4.5,
+        "sel": "text-base leading-7 mt-3 max-w-xl text-["
+      },
+      {
+        "text": "3",
+        "color": "rgb(255, 208, 47)",
+        "bg": "rgb(255, 255, 255)",
+        "fontSize": 32,
+        "fontWeight": 700,
+        "ratio": 1.47,
+        "need": 3,
+        "sel": "unbounded_cbf45d37-module__8qhfWq__class"
+      },
+      {
+        "text": "актуальных вакансий",
+        "color": "rgb(212, 214, 222)",
+        "bg": "rgb(255, 255, 255)",
+        "fontSize": 15,
+        "fontWeight": 400,
+        "ratio": 1.45,
+        "need": 4.5,
+        "sel": "text-[0.9375rem] text-[var(--muted)]"
+      },
+      {
+        "text": "3",
+        "color": "rgb(28, 28, 30)",
+        "bg": "rgba(28, 28, 30, 0.14)",
+        "fontSize": 11,
+        "fontWeight": 700,
+        "ratio": 1,
+        "need": 4.5,
+        "sel": "vacancy-directory-tab-count"
+      },
+      {
+        "text": "10",
+        "color": "rgb(212, 214, 222)",
+        "bg": "rgba(224, 226, 232, 0.08)",
+        "fontSize": 11,
+        "fontWeight": 700,
+        "ratio": 1.12,
+        "need": 4.5,
+        "sel": "vacancy-directory-tab-count"
+      },
+      {
+        "text": "от 75 000 ₽ + бонусы",
+        "color": "rgb(232, 176, 0)",
+        "bg": "rgba(255, 255, 255, 0.94)",
+        "fontSize": 20.8,
+        "fontWeight": 600,
+        "ratio": 1.97,
+        "need": 4.5,
+        "sel": "tabular-nums text-[1.3rem] font-semibold"
+      },
+      {
+        "text": "Telegram-канал",
+        "color": "rgb(28, 28, 30)",
+        "bg": "rgba(35, 39, 49, 0.74)",
+        "fontSize": 16,
+        "fontWeight": 400,
+        "ratio": 1.14,
+        "need": 4.5,
+        "sel": ""
+      }
+    ],
+    "smallTargets": [
+      {
+        "t": "Поиск",
+        "w": 40,
+        "h": 40
+      },
+      {
+        "t": "Войти",
+        "w": 85,
+        "h": 40
+      },
+      {
+        "t": "Регистрация",
+        "w": 105,
+        "h": 40
+      },
+      {
+        "t": "Главная",
+        "w": 53,
+        "h": 24
+      },
+      {
+        "t": "Показать параметры",
+        "w": 262,
+        "h": 39
+      },
+      {
+        "t": "Старший бариста в дневну",
+        "w": 361,
+        "h": 24
+      },
+      {
+        "t": "политику обработки персо",
+        "w": 377,
+        "h": 35
+      },
+      {
+        "t": "Материалы",
+        "w": 77,
+        "h": 40
+      },
+      {
+        "t": "Обучение",
+        "w": 67,
+        "h": 40
+      },
+      {
+        "t": "События",
+        "w": 59,
+        "h": 40
+      },
+      {
+        "t": "Вакансии",
+        "w": 65,
+        "h": 40
+      },
+      {
+        "t": "Специалисты",
+        "w": 91,
+        "h": 40
+      }
+    ],
+    "overflow": {
+      "doc": 360,
+      "win": 360,
+      "overflow": false
+    },
+    "headings": [
+      "H1:Вакансии",
+      "H3:Бариста в утреннюю смену — Coffee Point",
+      "H3:Старший бариста в дневную смену",
+      "H3:Бар-менеджер для вечернего проекта",
+      "H2:Вакансии кофейной индустрии в СКФО",
+      "H2:Нужно разместить вакансию для команды?",
+      "H3:Платформа",
+      "H3:Для бизнеса",
+      "H3:BARSYNERGY"
+    ],
+    "focusVisible": {
+      "outline": true,
+      "outlineWidth": "2px",
+      "ring": false
+    },
+    "modal": null,
+    "viewport": "1440"
+  },
+  "/masters": {
+    "contrast": [
+      {
+        "text": "Мастера",
+        "color": "rgb(232, 176, 0)",
+        "bg": "rgba(255, 255, 255, 0.96)",
+        "fontSize": 11,
+        "fontWeight": 600,
+        "ratio": 1.97,
+        "need": 4.5,
+        "sel": "relative inline-flex min-h-11 shrink-0 i"
+      },
+      {
+        "text": "Главная›",
+        "color": "rgb(212, 214, 222)",
+        "bg": "rgb(255, 255, 255)",
+        "fontSize": 14,
+        "fontWeight": 400,
+        "ratio": 1.45,
+        "need": 4.5,
+        "sel": "inline-flex min-w-0 items-center gap-2"
+      },
+      {
+        "text": "Частные специалисты и сервисны",
+        "color": "rgb(212, 214, 222)",
+        "bg": "rgb(255, 255, 255)",
+        "fontSize": 16,
+        "fontWeight": 400,
+        "ratio": 1.45,
+        "need": 4.5,
+        "sel": "text-base leading-7 mt-3 max-w-xl text-["
+      },
+      {
+        "text": "7 в базе",
+        "color": "rgb(85, 90, 106)",
+        "bg": "oklab(0.978498 -0.000216823 -0.00270976 / 0.968235)",
+        "fontSize": 14,
+        "fontWeight": 400,
+        "ratio": 3.05,
+        "need": 4.5,
+        "sel": "text-sm text-[var(--muted)]"
+      },
+      {
+        "text": "Telegram-канал",
+        "color": "rgb(28, 28, 30)",
+        "bg": "rgba(35, 39, 49, 0.74)",
+        "fontSize": 16,
+        "fontWeight": 400,
+        "ratio": 1.14,
+        "need": 4.5,
+        "sel": ""
+      }
+    ],
+    "smallTargets": [
+      {
+        "t": "Поиск",
+        "w": 40,
+        "h": 40
+      },
+      {
+        "t": "Войти",
+        "w": 85,
+        "h": 40
+      },
+      {
+        "t": "Регистрация",
+        "w": 105,
+        "h": 40
+      },
+      {
+        "t": "Главная",
+        "w": 53,
+        "h": 24
+      },
+      {
+        "t": "Как это работает?",
+        "w": 158,
+        "h": 25
+      },
+      {
+        "t": "Показать параметры",
+        "w": 262,
+        "h": 39
+      },
+      {
+        "t": "Амина Расулова",
+        "w": 167,
+        "h": 22
+      },
+      {
+        "t": "Atelier 12",
+        "w": 101,
+        "h": 22
+      },
+      {
+        "t": "Linea Service",
+        "w": 135,
+        "h": 22
+      },
+      {
+        "t": "Тимур Керимов",
+        "w": 161,
+        "h": 22
+      },
+      {
+        "t": "Елена Попова",
+        "w": 144,
+        "h": 22
+      },
+      {
+        "t": "Ибрагим Магомедов",
+        "w": 205,
+        "h": 22
+      }
+    ],
+    "overflow": {
+      "doc": 360,
+      "win": 360,
+      "overflow": false
+    },
+    "headings": [
+      "H1:Мастера",
+      "H3:Амина Расулова",
+      "H3:Atelier 12",
+      "H3:Linea Service",
+      "H3:Тимур Керимов",
+      "H3:Елена Попова",
+      "H3:Ибрагим Магомедов",
+      "H3:Aster Roasters",
+      "H2:Мастера и сервисные команды для кофеен С",
+      "H2:Покажите услугу профильной аудитории",
+      "H3:Платформа",
+      "H3:Для бизнеса",
+      "H3:BARSYNERGY"
+    ],
+    "focusVisible": {
+      "outline": true,
+      "outlineWidth": "2px",
+      "ring": false
+    },
+    "modal": null,
+    "viewport": "1440"
+  },
+  "/specialists": {
+    "contrast": [
+      {
+        "text": "Вакансии",
+        "color": "rgb(232, 176, 0)",
+        "bg": "rgba(255, 255, 255, 0.96)",
+        "fontSize": 11,
+        "fontWeight": 600,
+        "ratio": 1.97,
+        "need": 4.5,
+        "sel": "relative inline-flex min-h-11 shrink-0 i"
+      },
+      {
+        "text": "Главная›",
+        "color": "rgb(212, 214, 222)",
+        "bg": "rgb(255, 255, 255)",
+        "fontSize": 14,
+        "fontWeight": 400,
+        "ratio": 1.45,
+        "need": 4.5,
+        "sel": "inline-flex min-w-0 items-center gap-2"
+      },
+      {
+        "text": "Работа в кофейной индустрии",
+        "color": "rgb(255, 208, 47)",
+        "bg": "rgb(255, 255, 255)",
+        "fontSize": 11,
+        "fontWeight": 700,
+        "ratio": 1.47,
+        "need": 4.5,
+        "sel": "text-[11px] font-bold uppercase tracking"
+      },
+      {
+        "text": "Резюме, услуги и анкеты специа",
+        "color": "rgb(245, 247, 251)",
+        "bg": "rgb(255, 255, 255)",
+        "fontSize": 16,
+        "fontWeight": 400,
+        "ratio": 1.07,
+        "need": 4.5,
+        "sel": "text-base leading-7 mt-3 max-w-xl text-["
+      },
+      {
+        "text": "10",
+        "color": "rgb(255, 208, 47)",
+        "bg": "rgb(255, 255, 255)",
+        "fontSize": 32,
+        "fontWeight": 700,
+        "ratio": 1.47,
+        "need": 3,
+        "sel": "unbounded_cbf45d37-module__8qhfWq__class"
+      },
+      {
+        "text": "специалистов в каталоге",
+        "color": "rgb(212, 214, 222)",
+        "bg": "rgb(255, 255, 255)",
+        "fontSize": 15,
+        "fontWeight": 400,
+        "ratio": 1.45,
+        "need": 4.5,
+        "sel": "text-[0.9375rem] text-[var(--muted)]"
+      },
+      {
+        "text": "3",
+        "color": "rgb(212, 214, 222)",
+        "bg": "rgba(224, 226, 232, 0.08)",
+        "fontSize": 11,
+        "fontWeight": 700,
+        "ratio": 1.12,
+        "need": 4.5,
+        "sel": "vacancy-directory-tab-count"
+      },
+      {
+        "text": "10",
+        "color": "rgb(28, 28, 30)",
+        "bg": "rgba(28, 28, 30, 0.14)",
+        "fontSize": 11,
+        "fontWeight": 700,
+        "ratio": 1,
+        "need": 4.5,
+        "sel": "vacancy-directory-tab-count"
+      },
+      {
+        "text": "Ищу работу●",
+        "color": "rgb(245, 247, 251)",
+        "bg": "rgba(255, 208, 47, 0.18)",
+        "fontSize": 14.4,
+        "fontWeight": 600,
+        "ratio": 1.37,
+        "need": 4.5,
+        "sel": "specialist-mode-link specialist-mode-lin"
+      },
+      {
+        "text": "●",
+        "color": "rgb(255, 208, 47)",
+        "bg": "rgba(255, 208, 47, 0.18)",
+        "fontSize": 11.2,
+        "fontWeight": 600,
+        "ratio": 1,
+        "need": 4.5,
+        "sel": ""
+      },
+      {
+        "text": "Новое",
+        "color": "rgb(255, 255, 255)",
+        "bg": "rgb(18, 183, 106)",
+        "fontSize": 12.48,
+        "fontWeight": 700,
+        "ratio": 2.62,
+        "need": 4.5,
+        "sel": "specialist-directory-new"
+      }
+    ],
+    "smallTargets": [
+      {
+        "t": "Поиск",
+        "w": 40,
+        "h": 40
+      },
+      {
+        "t": "Войти",
+        "w": 85,
+        "h": 40
+      },
+      {
+        "t": "Регистрация",
+        "w": 105,
+        "h": 40
+      },
+      {
+        "t": "Главная",
+        "w": 53,
+        "h": 24
+      },
+      {
+        "t": "политику обработки персо",
+        "w": 377,
+        "h": 35
+      },
+      {
+        "t": "Материалы",
+        "w": 77,
+        "h": 40
+      },
+      {
+        "t": "Обучение",
+        "w": 67,
+        "h": 40
+      },
+      {
+        "t": "События",
+        "w": 59,
+        "h": 40
+      },
+      {
+        "t": "Вакансии",
+        "w": 65,
+        "h": 40
+      },
+      {
+        "t": "Специалисты",
+        "w": 91,
+        "h": 40
+      },
+      {
+        "t": "Мастера",
+        "w": 58,
+        "h": 40
+      },
+      {
+        "t": "Поставщики",
+        "w": 84,
+        "h": 40
+      }
+    ],
+    "overflow": {
+      "doc": 360,
+      "win": 360,
+      "overflow": false
+    },
+    "headings": [
+      "H1:Специалисты",
+      "H3:Елена Соколова",
+      "H3:Амина Расулова — запуск бара и сервис",
+      "H3:Никита Власов",
+      "H3:Atelier 12 — консалтинг по запуску баров",
+      "H3:Linea Service — сервис кофейного оборудо",
+      "H3:Тимур Керимов — коктейльный консультант",
+      "H3:Елена Попова — обучение и сервис кофейно",
+      "H3:Amir Omarov",
+      "H3:Ибрагим Магомедов — шеф-бармен и запуск ",
+      "H3:Aster Roasters — обучение и консалтинг д",
+      "H2:Нужно разместить вакансию для команды?",
+      "H3:Платформа",
+      "H3:Для бизнеса"
+    ],
+    "focusVisible": {
+      "outline": true,
+      "outlineWidth": "2px",
+      "ring": false
+    },
+    "modal": null,
+    "viewport": "1440"
+  },
+  "/about": {
+    "contrast": [
+      {
+        "text": "О проекте",
+        "color": "rgb(200, 154, 0)",
+        "bg": "rgb(255, 244, 196)",
+        "fontSize": 13,
+        "fontWeight": 600,
+        "ratio": 2.35,
+        "need": 4.5,
+        "sel": "flex min-h-11 items-center rounded-[var("
+      },
+      {
+        "text": "История",
+        "color": "rgb(232, 176, 0)",
+        "bg": "rgb(255, 255, 255)",
+        "fontSize": 12,
+        "fontWeight": 600,
+        "ratio": 1.97,
+        "need": 4.5,
+        "sel": "section-label"
+      },
+      {
+        "text": "Возможности",
+        "color": "rgb(232, 176, 0)",
+        "bg": "rgb(247, 248, 250)",
+        "fontSize": 12,
+        "fontWeight": 600,
+        "ratio": 1.86,
+        "need": 4.5,
+        "sel": "section-label"
+      },
+      {
+        "text": "Предложить событие",
+        "color": "oklab(0.999994 0.0000455677 0.0000200868 / 0.7)",
+        "bg": "rgb(27, 30, 37)",
+        "fontSize": 16,
+        "fontWeight": 500,
+        "ratio": 1.26,
+        "need": 4.5,
+        "sel": "inline-flex items-center gap-1.5 font-me"
+      },
+      {
+        "text": "·",
+        "color": "oklab(0.999994 0.0000455678 0.0000200868 / 0.3)",
+        "bg": "rgb(27, 30, 37)",
+        "fontSize": 16,
+        "fontWeight": 400,
+        "ratio": 1.26,
+        "need": 4.5,
+        "sel": "text-white/30"
+      }
+    ],
+    "smallTargets": [
+      {
+        "t": "Поиск",
+        "w": 40,
+        "h": 40
+      },
+      {
+        "t": "Войти",
+        "w": 85,
+        "h": 40
+      },
+      {
+        "t": "Регистрация",
+        "w": 105,
+        "h": 40
+      },
+      {
+        "t": "Предложить событие",
+        "w": 168,
+        "h": 25
+      },
+      {
+        "t": "Стать партнёром",
+        "w": 133,
+        "h": 25
+      },
+      {
+        "t": "политику обработки персо",
+        "w": 377,
+        "h": 35
+      },
+      {
+        "t": "Материалы",
+        "w": 77,
+        "h": 40
+      },
+      {
+        "t": "Обучение",
+        "w": 67,
+        "h": 40
+      },
+      {
+        "t": "События",
+        "w": 59,
+        "h": 40
+      },
+      {
+        "t": "Вакансии",
+        "w": 65,
+        "h": 40
+      },
+      {
+        "t": "Специалисты",
+        "w": 91,
+        "h": 40
+      },
+      {
+        "t": "Мастера",
+        "w": 58,
+        "h": 40
+      }
+    ],
+    "overflow": {
+      "doc": 360,
+      "win": 360,
+      "overflow": false
+    },
+    "headings": [
+      "H1:BARSYNERGY — платформа для барной индуст",
+      "H2:Почему мы запустили BARSYNERGY",
+      "H2:Как развивается платформа",
+      "H2:Что внутри платформы",
+      "H3:Вакансии",
+      "H3:Обучение",
+      "H3:События",
+      "H3:Поставщики",
+      "H3:Мастера",
+      "H3:Калькулятор",
+      "H2:Хотите добавить событие, компанию, вакан",
+      "H2:Расскажите о своей компании на BARSYNERG",
+      "H3:Платформа",
+      "H3:Для бизнеса"
+    ],
+    "focusVisible": {
+      "outline": true,
+      "outlineWidth": "2px",
+      "ring": false
+    },
+    "modal": null,
+    "viewport": "1440"
+  },
+  "/business": {
+    "contrast": [
+      {
+        "text": "Для бизнеса",
+        "color": "rgb(200, 154, 0)",
+        "bg": "rgb(255, 244, 196)",
+        "fontSize": 13,
+        "fontWeight": 600,
+        "ratio": 2.35,
+        "need": 4.5,
+        "sel": "flex min-h-11 items-center rounded-[var("
+      },
+      {
+        "text": "Главная›",
+        "color": "rgb(212, 214, 222)",
+        "bg": "rgb(255, 255, 255)",
+        "fontSize": 14,
+        "fontWeight": 400,
+        "ratio": 1.45,
+        "need": 4.5,
+        "sel": "inline-flex min-w-0 items-center gap-2"
+      },
+      {
+        "text": "Размещение заведения",
+        "color": "rgb(255, 208, 47)",
+        "bg": "rgb(255, 255, 255)",
+        "fontSize": 11,
+        "fontWeight": 700,
+        "ratio": 1.47,
+        "need": 4.5,
+        "sel": "text-[11px] font-bold uppercase tracking"
+      },
+      {
+        "text": "Смотреть поставщиков",
+        "color": "rgb(212, 214, 222)",
+        "bg": "rgb(255, 255, 255)",
+        "fontSize": 15,
+        "fontWeight": 700,
+        "ratio": 1.45,
+        "need": 4.5,
+        "sel": "inline-flex items-center justify-center "
+      },
+      {
+        "text": "Кому подходит",
+        "color": "rgb(232, 176, 0)",
+        "bg": "rgb(255, 255, 255)",
+        "fontSize": 11,
+        "fontWeight": 700,
+        "ratio": 1.97,
+        "need": 4.5,
+        "sel": "text-[11px] font-bold uppercase tracking"
+      },
+      {
+        "text": "Кофейня",
+        "color": "rgb(232, 176, 0)",
+        "bg": "rgb(247, 248, 250)",
+        "fontSize": 11,
+        "fontWeight": 600,
+        "ratio": 1.86,
+        "need": 4.5,
+        "sel": "text-[11px] font-semibold uppercase trac"
+      },
+      {
+        "text": "Telegram",
+        "color": "rgb(232, 176, 0)",
+        "bg": "rgba(255, 255, 255, 0.72)",
+        "fontSize": 12,
+        "fontWeight": 600,
+        "ratio": 1.97,
+        "need": 4.5,
+        "sel": "inline-flex items-center gap-1 text-[12p"
+      },
+      {
+        "text": "Укажите данные, по которым ком",
+        "color": "oklab(0.999994 0.0000455678 0.0000200868 / 0.85)",
+        "bg": "rgb(27, 30, 37)",
+        "fontSize": 14,
+        "fontWeight": 400,
+        "ratio": 1.26,
+        "need": 4.5,
+        "sel": "text-sm leading-7 text-white/85 mt-4 max"
+      },
+      {
+        "text": "Название заведения *",
+        "color": "rgb(85, 90, 106)",
+        "bg": "oklab(0.978926 -0.000227749 -0.00283253 / 0.92)",
+        "fontSize": 11,
+        "fontWeight": 600,
+        "ratio": 3.05,
+        "need": 4.5,
+        "sel": "field-label inline-flex items-center gap"
+      },
+      {
+        "text": "Укажите email, телефон или Tel",
+        "color": "rgb(85, 90, 106)",
+        "bg": "oklab(0.978926 -0.000227749 -0.00283253 / 0.92)",
+        "fontSize": 14.4,
+        "fontWeight": 400,
+        "ratio": 3.05,
+        "need": 4.5,
+        "sel": "form-section-description"
+      },
+      {
+        "text": "Выберите город",
+        "color": "rgb(28, 28, 30)",
+        "bg": "oklab(0.999994 0.0000455678 0.0000200868 / 0.84549)",
+        "fontSize": 14,
+        "fontWeight": 600,
+        "ratio": 1.23,
+        "need": 4.5,
+        "sel": "field-base custom-select-trigger px-4 py"
+      },
+      {
+        "text": "Выберите город",
+        "color": "rgba(85, 90, 106, 0.76)",
+        "bg": "oklab(0.999994 0.0000455678 0.0000200868 / 0.84549)",
+        "fontSize": 14,
+        "fontWeight": 600,
+        "ratio": 3.05,
+        "need": 4.5,
+        "sel": "min-w-0 flex-1 truncate"
+      },
+      {
+        "text": "Укажите сайт или соцсети, особ",
+        "color": "rgb(107, 111, 126)",
+        "bg": "oklab(0.978926 -0.000227749 -0.00283253 / 0.92)",
+        "fontSize": 12,
+        "fontWeight": 400,
+        "ratio": 4.19,
+        "need": 4.5,
+        "sel": "field-hint"
+      },
+      {
+        "text": "политикой обработки персональн",
+        "color": "rgb(232, 176, 0)",
+        "bg": "rgba(255, 253, 249, 0.76)",
+        "fontSize": 14.4,
+        "fontWeight": 600,
+        "ratio": 1.94,
+        "need": 4.5,
+        "sel": "font-semibold text-[var(--accent)] under"
+      },
+      {
+        "text": "После отправки свяжемся в тече",
+        "color": "rgb(85, 90, 106)",
+        "bg": "oklab(0.978926 -0.000227749 -0.00283253 / 0.92)",
+        "fontSize": 12,
+        "fontWeight": 400,
+        "ratio": 3.05,
+        "need": 4.5,
+        "sel": "max-w-md text-xs leading-6 text-[var(--m"
+      }
+    ],
+    "smallTargets": [
+      {
+        "t": "Поиск",
+        "w": 40,
+        "h": 40
+      },
+      {
+        "t": "Войти",
+        "w": 85,
+        "h": 40
+      },
+      {
+        "t": "Регистрация",
+        "w": 105,
+        "h": 40
+      },
+      {
+        "t": "Главная",
+        "w": 53,
+        "h": 24
+      },
+      {
+        "t": "INPUT",
+        "w": 20,
+        "h": 20
+      },
+      {
+        "t": "политикой обработки перс",
+        "w": 324,
+        "h": 17
+      },
+      {
+        "t": "согласие на обработку пе",
+        "w": 619,
+        "h": 41
+      },
+      {
+        "t": "политику обработки персо",
+        "w": 377,
+        "h": 35
+      },
+      {
+        "t": "Материалы",
+        "w": 77,
+        "h": 40
+      },
+      {
+        "t": "Обучение",
+        "w": 67,
+        "h": 40
+      },
+      {
+        "t": "События",
+        "w": 59,
+        "h": 40
+      },
+      {
+        "t": "Вакансии",
+        "w": 65,
+        "h": 40
+      }
+    ],
+    "overflow": {
+      "doc": 360,
+      "win": 360,
+      "overflow": false
+    },
+    "headings": [
+      "H1:Добавить заведение в каталог",
+      "H2:Для кого этот каталог",
+      "H3:Кофейни",
+      "H3:Кофейные бары",
+      "H3:Обжарочные",
+      "H3:Поставщики",
+      "H2:Три шага до карточки",
+      "H3:Оставьте заявку",
+      "H3:Уточним карточку",
+      "H3:Разместим в каталоге",
+      "H2:Что получите",
+      "H3:Вас находят те, кому нужно",
+      "H3:Рядом с индустрией",
+      "H3:Карточку собираем вместе"
+    ],
+    "focusVisible": {
+      "outline": true,
+      "outlineWidth": "2px",
+      "ring": false
+    },
+    "modal": null,
+    "viewport": "1440"
+  },
+  "/contacts": {
+    "contrast": [
+      {
+        "text": "Контакты",
+        "color": "rgb(200, 154, 0)",
+        "bg": "rgb(255, 244, 196)",
+        "fontSize": 13,
+        "fontWeight": 600,
+        "ratio": 2.35,
+        "need": 4.5,
+        "sel": "flex min-h-11 items-center rounded-[var("
+      },
+      {
+        "text": "Главная›",
+        "color": "rgb(212, 214, 222)",
+        "bg": "rgb(255, 255, 255)",
+        "fontSize": 14,
+        "fontWeight": 400,
+        "ratio": 1.45,
+        "need": 4.5,
+        "sel": "inline-flex min-w-0 items-center gap-2"
+      },
+      {
+        "text": "Контакты",
+        "color": "rgb(255, 208, 47)",
+        "bg": "rgb(255, 255, 255)",
+        "fontSize": 11,
+        "fontWeight": 700,
+        "ratio": 1.47,
+        "need": 4.5,
+        "sel": "text-[11px] font-bold uppercase tracking"
+      },
+      {
+        "text": "Выберите канал — каждый удобен",
+        "color": "color(srgb 0.960784 0.968627 0.984314 / 0.6)",
+        "bg": "rgb(27, 30, 37)",
+        "fontSize": 14,
+        "fontWeight": 400,
+        "ratio": 1.25,
+        "need": 4.5,
+        "sel": "max-w-md text-sm leading-6 text-[color-m"
+      },
+      {
+        "text": "Telegram",
+        "color": "color(srgb 0.960784 0.968627 0.984314 / 0.5)",
+        "bg": "rgb(35, 39, 49)",
+        "fontSize": 10,
+        "fontWeight": 600,
+        "ratio": 1.4,
+        "need": 4.5,
+        "sel": "block text-[10px] font-semibold uppercas"
+      },
+      {
+        "text": "Новости, анонсы и обновления п",
+        "color": "color(srgb 0.960784 0.968627 0.984314 / 0.6)",
+        "bg": "rgb(35, 39, 49)",
+        "fontSize": 14,
+        "fontWeight": 400,
+        "ratio": 1.4,
+        "need": 4.5,
+        "sel": "text-sm leading-6 text-[color-mix(in_srg"
+      },
+      {
+        "text": "Публикуем первыми",
+        "color": "color(srgb 0.960784 0.968627 0.984314 / 0.5)",
+        "bg": "rgb(35, 39, 49)",
+        "fontSize": 11,
+        "fontWeight": 600,
+        "ratio": 1.4,
+        "need": 4.5,
+        "sel": "text-[11px] font-semibold uppercase lead"
+      },
+      {
+        "text": "Быстрые разделы",
+        "color": "rgb(232, 176, 0)",
+        "bg": "rgb(238, 240, 244)",
+        "fontSize": 11,
+        "fontWeight": 600,
+        "ratio": 1.73,
+        "need": 4.5,
+        "sel": "text-[11px] font-semibold uppercase trac"
+      },
+      {
+        "text": "Разместить вакансию",
+        "color": "rgb(232, 176, 0)",
+        "bg": "rgb(247, 248, 250)",
+        "fontSize": 14,
+        "fontWeight": 600,
+        "ratio": 1.86,
+        "need": 4.5,
+        "sel": "mt-auto inline-flex items-center gap-2 p"
+      }
+    ],
+    "smallTargets": [
+      {
+        "t": "Поиск",
+        "w": 40,
+        "h": 40
+      },
+      {
+        "t": "Войти",
+        "w": 85,
+        "h": 40
+      },
+      {
+        "t": "Регистрация",
+        "w": 105,
+        "h": 40
+      },
+      {
+        "t": "Главная",
+        "w": 53,
+        "h": 24
+      },
+      {
+        "t": "политику обработки персо",
+        "w": 377,
+        "h": 35
+      },
+      {
+        "t": "Материалы",
+        "w": 77,
+        "h": 40
+      },
+      {
+        "t": "Обучение",
+        "w": 67,
+        "h": 40
+      },
+      {
+        "t": "События",
+        "w": 59,
+        "h": 40
+      },
+      {
+        "t": "Вакансии",
+        "w": 65,
+        "h": 40
+      },
+      {
+        "t": "Специалисты",
+        "w": 91,
+        "h": 40
+      },
+      {
+        "t": "Мастера",
+        "w": 58,
+        "h": 40
+      },
+      {
+        "t": "Поставщики",
+        "w": 84,
+        "h": 40
+      }
+    ],
+    "overflow": {
+      "doc": 360,
+      "win": 360,
+      "overflow": false
+    },
+    "headings": [
+      "H1:Связь с командой BARSYNERGY",
+      "H2:Где написать напрямую",
+      "H2:Напишите нам",
+      "H2:Опишите задачу — соберём формат под неё",
+      "H2:Не нашли свой случай?",
+      "H3:Хочу разместить вакансию",
+      "H3:Хочу попасть в каталог поставщиков",
+      "H3:Хочу подписаться на материалы",
+      "H3:Платформа",
+      "H3:Для бизнеса",
+      "H3:BARSYNERGY"
+    ],
+    "focusVisible": {
+      "outline": true,
+      "outlineWidth": "2px",
+      "ring": false
+    },
+    "modal": null,
+    "viewport": "1440"
+  },
+  "/tools/cost-calculator": {
+    "contrast": [
+      {
+        "text": "Калькулятор",
+        "color": "rgb(200, 154, 0)",
+        "bg": "rgb(255, 244, 196)",
+        "fontSize": 13,
+        "fontWeight": 600,
+        "ratio": 2.35,
+        "need": 4.5,
+        "sel": "flex min-h-11 items-center rounded-[var("
+      },
+      {
+        "text": "Инструменты",
+        "color": "rgb(232, 176, 0)",
+        "bg": "rgb(255, 255, 255)",
+        "fontSize": 11,
+        "fontWeight": 700,
+        "ratio": 1.97,
+        "need": 4.5,
+        "sel": "text-[11px] font-bold uppercase tracking"
+      },
+      {
+        "text": "1",
+        "color": "rgb(232, 176, 0)",
+        "bg": "rgba(255, 255, 255, 0.72)",
+        "fontSize": 13,
+        "fontWeight": 600,
+        "ratio": 1.97,
+        "need": 4.5,
+        "sel": "flex h-8 w-8 shrink-0 items-center justi"
+      },
+      {
+        "text": "+",
+        "color": "rgb(232, 176, 0)",
+        "bg": "rgba(255, 255, 255, 0.94)",
+        "fontSize": 14.4,
+        "fontWeight": 600,
+        "ratio": 1.97,
+        "need": 4.5,
+        "sel": "calculator-formula-help-icon"
+      }
+    ],
+    "smallTargets": [
+      {
+        "t": "Поиск",
+        "w": 40,
+        "h": 40
+      },
+      {
+        "t": "Войти",
+        "w": 85,
+        "h": 40
+      },
+      {
+        "t": "Регистрация",
+        "w": 105,
+        "h": 40
+      },
+      {
+        "t": "Главная",
+        "w": 53,
+        "h": 24
+      },
+      {
+        "t": "Заполнить примером",
+        "w": 191,
+        "h": 40
+      },
+      {
+        "t": "Новый расчёт",
+        "w": 156,
+        "h": 40
+      },
+      {
+        "t": "Поделиться ссылкой",
+        "w": 210,
+        "h": 40
+      },
+      {
+        "t": "Дублировать",
+        "w": 40,
+        "h": 40
+      },
+      {
+        "t": "Удалить",
+        "w": 40,
+        "h": 40
+      },
+      {
+        "t": "Добавить расход",
+        "w": 180,
+        "h": 40
+      },
+      {
+        "t": "Удалить расход: Аренда и",
+        "w": 32,
+        "h": 36
+      },
+      {
+        "t": "Удалить расход: Зарплата",
+        "w": 32,
+        "h": 36
+      }
+    ],
+    "overflow": {
+      "doc": 360,
+      "win": 360,
+      "overflow": false
+    },
+    "headings": [
+      "H1:Калькулятор себестоимости",
+      "H2:Как это работает",
+      "H3:Выберите напиток",
+      "H3:Добавьте ингредиенты",
+      "H3:Рассчитайте себестоимость",
+      "H3:Установите продажную цену",
+      "H3:Режим",
+      "H3:Параметры",
+      "H3:Ингредиенты",
+      "H3:Дополнительные расходы",
+      "H3:Параметры напитка",
+      "H3:Наценка и цена",
+      "H3:Структура затрат",
+      "H3:Ориентиры по напиткам"
+    ],
+    "focusVisible": {
+      "outline": true,
+      "outlineWidth": "2px",
+      "ring": false
+    },
+    "modal": null,
+    "viewport": "1440"
+  },
+  "/auth/login": {
+    "contrast": [
+      {
+        "text": "На сайт",
+        "color": "rgb(232, 176, 0)",
+        "bg": "rgb(255, 255, 255)",
+        "fontSize": 14,
+        "fontWeight": 600,
+        "ratio": 1.97,
+        "need": 4.5,
+        "sel": "inline-flex items-center gap-2 text-sm f"
+      },
+      {
+        "text": "*",
+        "color": "rgb(232, 176, 0)",
+        "bg": "rgb(255, 255, 255)",
+        "fontSize": 13,
+        "fontWeight": 500,
+        "ratio": 1.97,
+        "need": 4.5,
+        "sel": "text-[var(--accent)]"
+      },
+      {
+        "text": "Написать команде",
+        "color": "rgb(232, 176, 0)",
+        "bg": "rgb(255, 255, 255)",
+        "fontSize": 12,
+        "fontWeight": 400,
+        "ratio": 1.97,
+        "need": 4.5,
+        "sel": "text-[var(--accent)] transition-colors h"
+      }
+    ],
+    "smallTargets": [
+      {
+        "t": "На сайт",
+        "w": 77,
+        "h": 20
+      },
+      {
+        "t": "Забыли пароль?",
+        "w": 115,
+        "h": 20
+      },
+      {
+        "t": "Написать команде",
+        "w": 110,
+        "h": 15
+      },
+      {
+        "t": "Зарегистрироваться как у",
+        "w": 242,
+        "h": 20
+      },
+      {
+        "t": "Запросить бизнес-доступ",
+        "w": 184,
+        "h": 20
+      }
+    ],
+    "overflow": {
+      "doc": 360,
+      "win": 360,
+      "overflow": false
+    },
+    "headings": [
+      "H1:Вход в кабинет"
+    ],
+    "focusVisible": {
+      "outline": true,
+      "outlineWidth": "2px",
+      "ring": false
+    },
+    "modal": null,
+    "viewport": "1440"
+  },
+  "/auth/register": {
+    "contrast": [
+      {
+        "text": "Вернуться на сайт",
+        "color": "rgb(232, 176, 0)",
+        "bg": "rgb(255, 255, 255)",
+        "fontSize": 15,
+        "fontWeight": 700,
+        "ratio": 1.97,
+        "need": 4.5,
+        "sel": "inline-flex items-center justify-center "
+      },
+      {
+        "text": "Telegram",
+        "color": "rgb(232, 176, 0)",
+        "bg": "rgb(255, 255, 255)",
+        "fontSize": 14,
+        "fontWeight": 600,
+        "ratio": 1.97,
+        "need": 4.5,
+        "sel": "font-semibold text-[var(--accent)] hover"
+      }
+    ],
+    "smallTargets": [
+      {
+        "t": "Вернуться на сайт",
+        "w": 198,
+        "h": 36
+      },
+      {
+        "t": "Telegram",
+        "w": 63,
+        "h": 17
+      }
+    ],
+    "overflow": {
+      "doc": 360,
+      "win": 360,
+      "overflow": false
+    },
+    "headings": [
+      "H1:Выберите свою роль",
+      "H2:Я специалист",
+      "H2:У меня компания"
+    ],
+    "focusVisible": {
+      "outline": true,
+      "outlineWidth": "2px",
+      "ring": false
+    },
+    "modal": null,
+    "viewport": "1440"
+  },
+  "/events": {
+    "contrast": [
+      {
+        "text": "События",
+        "color": "rgb(232, 176, 0)",
+        "bg": "rgba(255, 255, 255, 0.96)",
+        "fontSize": 11,
+        "fontWeight": 600,
+        "ratio": 1.97,
+        "need": 4.5,
+        "sel": "relative inline-flex min-h-11 shrink-0 i"
+      },
+      {
+        "text": "Главная›",
+        "color": "rgb(212, 214, 222)",
+        "bg": "rgb(255, 255, 255)",
+        "fontSize": 14,
+        "fontWeight": 400,
+        "ratio": 1.45,
+        "need": 4.5,
+        "sel": "inline-flex min-w-0 items-center gap-2"
+      },
+      {
+        "text": "Каппинги, чемпионаты, лекции, ",
+        "color": "rgb(212, 214, 222)",
+        "bg": "rgb(255, 255, 255)",
+        "fontSize": 16,
+        "fontWeight": 400,
+        "ratio": 1.45,
+        "need": 4.5,
+        "sel": "text-base leading-7 mt-3 max-w-xl text-["
+      },
+      {
+        "text": "Формат",
+        "color": "rgb(245, 247, 251)",
+        "bg": "rgba(255, 255, 255, 0.96)",
+        "fontSize": 16,
+        "fontWeight": 400,
+        "ratio": 1.07,
+        "need": 4.5,
+        "sel": "field-base custom-select-trigger px-4 py"
+      },
+      {
+        "text": "1",
+        "color": "rgb(255, 208, 47)",
+        "bg": "rgba(255, 208, 47, 0.18)",
+        "fontSize": 13,
+        "fontWeight": 500,
+        "ratio": 1,
+        "need": 4.5,
+        "sel": "inline-flex min-h-[2.125rem] items-cente"
+      },
+      {
+        "text": "Telegram-канал",
+        "color": "rgb(28, 28, 30)",
+        "bg": "rgba(35, 39, 49, 0.74)",
+        "fontSize": 16,
+        "fontWeight": 400,
+        "ratio": 1.14,
+        "need": 4.5,
+        "sel": ""
+      }
+    ],
+    "smallTargets": [
+      {
+        "t": "Поиск",
+        "w": 40,
+        "h": 40
+      },
+      {
+        "t": "Войти",
+        "w": 85,
+        "h": 40
+      },
+      {
+        "t": "Регистрация",
+        "w": 105,
+        "h": 40
+      },
+      {
+        "t": "Главная",
+        "w": 53,
+        "h": 24
+      },
+      {
+        "t": "Как это работает?",
+        "w": 158,
+        "h": 25
+      },
+      {
+        "t": "Все города",
+        "w": 108,
+        "h": 40
+      },
+      {
+        "t": "Москва",
+        "w": 84,
+        "h": 40
+      },
+      {
+        "t": "Махачкала",
+        "w": 106,
+        "h": 40
+      },
+      {
+        "t": "Каспийск",
+        "w": 97,
+        "h": 40
+      },
+      {
+        "t": "Дербент",
+        "w": 91,
+        "h": 40
+      },
+      {
+        "t": "Подробнее",
+        "w": 97,
+        "h": 20
+      },
+      {
+        "t": "политику обработки персо",
+        "w": 377,
+        "h": 35
+      }
+    ],
+    "overflow": {
+      "doc": 360,
+      "win": 360,
+      "overflow": false
+    },
+    "headings": [
+      "H1:События",
+      "H2:Ближайшие события",
+      "H2:Тестовое событие: встреча барного сообще",
+      "H2:Кофейные события, мастер-классы и дегуст",
+      "H2:Есть событие для барного сообщества?",
+      "H3:Платформа",
+      "H3:Для бизнеса",
+      "H3:BARSYNERGY"
+    ],
+    "focusVisible": {
+      "outline": true,
+      "outlineWidth": "2px",
+      "ring": false
+    },
+    "modal": null,
+    "viewport": "1440"
+  },
+  "/education": {
+    "contrast": [
+      {
+        "text": "Обучение",
+        "color": "rgb(232, 176, 0)",
+        "bg": "rgba(255, 255, 255, 0.96)",
+        "fontSize": 11,
+        "fontWeight": 600,
+        "ratio": 1.97,
+        "need": 4.5,
+        "sel": "relative inline-flex min-h-11 shrink-0 i"
+      },
+      {
+        "text": "Главная›",
+        "color": "rgb(212, 214, 222)",
+        "bg": "rgb(255, 255, 255)",
+        "fontSize": 14,
+        "fontWeight": 400,
+        "ratio": 1.45,
+        "need": 4.5,
+        "sel": "inline-flex min-w-0 items-center gap-2"
+      },
+      {
+        "text": "Курсы, мастер-классы и практич",
+        "color": "rgb(212, 214, 222)",
+        "bg": "rgb(255, 255, 255)",
+        "fontSize": 16,
+        "fontWeight": 400,
+        "ratio": 1.45,
+        "need": 4.5,
+        "sel": "text-base leading-7 mt-3 max-w-xl text-["
+      },
+      {
+        "text": "Смотреть все",
+        "color": "rgb(232, 176, 0)",
+        "bg": "rgb(247, 248, 250)",
+        "fontSize": 14,
+        "fontWeight": 600,
+        "ratio": 1.86,
+        "need": 4.5,
+        "sel": "flex items-center gap-1 text-sm font-sem"
+      },
+      {
+        "text": "Практическое обучение",
+        "color": "rgb(232, 176, 0)",
+        "bg": "rgba(255, 255, 255, 0.94)",
+        "fontSize": 11,
+        "fontWeight": 600,
+        "ratio": 1.97,
+        "need": 4.5,
+        "sel": "text-[11px] font-semibold uppercase trac"
+      }
+    ],
+    "smallTargets": [
+      {
+        "t": "Поиск",
+        "w": 40,
+        "h": 40
+      },
+      {
+        "t": "Войти",
+        "w": 85,
+        "h": 40
+      },
+      {
+        "t": "Регистрация",
+        "w": 105,
+        "h": 40
+      },
+      {
+        "t": "Главная",
+        "w": 53,
+        "h": 24
+      },
+      {
+        "t": "Форматы обучения",
+        "w": 168,
+        "h": 25
+      },
+      {
+        "t": "Все",
+        "w": 54,
+        "h": 34
+      },
+      {
+        "t": "Практическое обучение",
+        "w": 190,
+        "h": 34
+      },
+      {
+        "t": "Смотреть все",
+        "w": 116,
+        "h": 20
+      },
+      {
+        "t": "политику обработки персо",
+        "w": 377,
+        "h": 35
+      },
+      {
+        "t": "Материалы",
+        "w": 77,
+        "h": 40
+      },
+      {
+        "t": "Обучение",
+        "w": 67,
+        "h": 40
+      },
+      {
+        "t": "События",
+        "w": 59,
+        "h": 40
+      }
+    ],
+    "overflow": {
+      "doc": 360,
+      "win": 360,
+      "overflow": false
+    },
+    "headings": [
+      "H1:Обучение",
+      "H2:Рекомендуем",
+      "H3:Тестовое обучение: сервис за баром",
+      "H2:Программы",
+      "H3:Больше программ скоро",
+      "H2:Нужна программа обучения или запуск курс",
+      "H3:Платформа",
+      "H3:Для бизнеса",
+      "H3:BARSYNERGY"
+    ],
+    "focusVisible": {
+      "outline": true,
+      "outlineWidth": "2px",
+      "ring": false
+    },
+    "modal": null,
+    "viewport": "1440"
+  },
+  "/articles": {
+    "contrast": [
+      {
+        "text": "Материалы",
+        "color": "rgb(232, 176, 0)",
+        "bg": "rgba(255, 255, 255, 0.96)",
+        "fontSize": 11,
+        "fontWeight": 600,
+        "ratio": 1.97,
+        "need": 4.5,
+        "sel": "relative inline-flex min-h-11 shrink-0 i"
+      },
+      {
+        "text": "Главная›",
+        "color": "rgb(212, 214, 222)",
+        "bg": "rgb(255, 255, 255)",
+        "fontSize": 14,
+        "fontWeight": 400,
+        "ratio": 1.45,
+        "need": 4.5,
+        "sel": "inline-flex min-w-0 items-center gap-2"
+      },
+      {
+        "text": "Редакционные материалы, интерв",
+        "color": "rgb(212, 214, 222)",
+        "bg": "rgb(255, 255, 255)",
+        "fontSize": 16,
+        "fontWeight": 400,
+        "ratio": 1.45,
+        "need": 4.5,
+        "sel": "text-base leading-7 mt-3 max-w-xl text-["
+      },
+      {
+        "text": "Рубрики",
+        "color": "rgb(232, 176, 0)",
+        "bg": "rgb(255, 255, 255)",
+        "fontSize": 11,
+        "fontWeight": 600,
+        "ratio": 1.97,
+        "need": 4.5,
+        "sel": "text-[11px] font-semibold uppercase trac"
+      },
+      {
+        "text": "Все материалы",
+        "color": "rgb(232, 176, 0)",
+        "bg": "rgb(255, 255, 255)",
+        "fontSize": 14,
+        "fontWeight": 600,
+        "ratio": 1.97,
+        "need": 4.5,
+        "sel": "inline-flex items-center text-sm font-se"
+      },
+      {
+        "text": "Telegram-канал",
+        "color": "rgb(28, 28, 30)",
+        "bg": "rgba(35, 39, 49, 0.74)",
+        "fontSize": 16,
+        "fontWeight": 400,
+        "ratio": 1.14,
+        "need": 4.5,
+        "sel": ""
+      }
+    ],
+    "smallTargets": [
+      {
+        "t": "Поиск",
+        "w": 40,
+        "h": 40
+      },
+      {
+        "t": "Войти",
+        "w": 85,
+        "h": 40
+      },
+      {
+        "t": "Регистрация",
+        "w": 105,
+        "h": 40
+      },
+      {
+        "t": "Главная",
+        "w": 53,
+        "h": 24
+      },
+      {
+        "t": "Все",
+        "w": 58,
+        "h": 40
+      },
+      {
+        "t": "Меню",
+        "w": 72,
+        "h": 40
+      },
+      {
+        "t": "Команда",
+        "w": 92,
+        "h": 40
+      },
+      {
+        "t": "Поставщики",
+        "w": 116,
+        "h": 40
+      },
+      {
+        "t": "События",
+        "w": 92,
+        "h": 40
+      },
+      {
+        "t": "Индустрия региона",
+        "w": 163,
+        "h": 40
+      },
+      {
+        "t": "Бизнес",
+        "w": 81,
+        "h": 40
+      },
+      {
+        "t": "Оборудование",
+        "w": 131,
+        "h": 40
+      }
+    ],
+    "overflow": {
+      "doc": 360,
+      "win": 360,
+      "overflow": false
+    },
+    "headings": [
+      "H1:Материалы",
+      "H2:Настройки приготовления эспрессо в speci",
+      "H2:Читать по темам",
+      "H3:Оборудование",
+      "H3:Как выбрать эспрессо-машину для кофейни:",
+      "H3:Эспрессо-гаджеты: что реально помогает, ",
+      "H3:Бизнес",
+      "H3:Что меняется в specialty coffee и как ко",
+      "H3:Почему кофе дорожает и как кофейне перес",
+      "H3:Меню",
+      "H3:Как считать себестоимость напитка",
+      "H3:Холодный кофе как отдельная категория ме",
+      "H2:Все материалы",
+      "H3:Как считать себестоимость напитка"
+    ],
+    "focusVisible": {
+      "outline": true,
+      "outlineWidth": "2px",
+      "ring": false
+    },
+    "modal": null,
+    "viewport": "1440"
+  },
+  "__modal__": {
+    "opened": true,
+    "hasDialogRole": true,
+    "escCloses": true,
+    "focusMoved": true
+  },
+  "__form_contacts": {
+    "hasForm": true,
+    "inlineErrors": 2,
+    "ariaInvalid": 0,
+    "native": true
+  },
+  "__form_login": {
+    "hasForm": true,
+    "inlineErrors": 4,
+    "ariaInvalid": 2,
+    "native": true
+  }
+}

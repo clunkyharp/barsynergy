@@ -22,7 +22,7 @@ function opportunityMeta(item: PublishedContentItem) {
 
 function vacancySalary(item: PublishedContentItem) {
   const value = metaGroupValue(item, 'Оплата') ?? 'по договорённости';
-  return <span className="tabular-nums text-[1.3rem] font-semibold text-[var(--accent)]">{value}</span>;
+  return <span className="tabular-nums text-[1.3rem] font-semibold text-[var(--accent-ink)]">{value}</span>;
 }
 
 export function OpportunityListRow({

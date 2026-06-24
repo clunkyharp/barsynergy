@@ -97,7 +97,7 @@ function VenuePlacementMock() {
     <div aria-hidden="true" className="grid gap-4 rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--surface)] p-4 md:p-5">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <span className="text-[11px] font-semibold uppercase tracking-[var(--tracking-eyebrow-sm)] text-[var(--accent)]">Кофейня</span>
+          <span className="text-[11px] font-semibold uppercase tracking-[var(--tracking-eyebrow-sm)] text-[var(--accent-ink)]">Кофейня</span>
           <p className={`${displayFont.className} mt-2 text-[1.5rem] font-semibold leading-none text-[var(--text)]`}>Заведение «Пример»</p>
         </div>
         <span className="inline-flex items-center gap-1 rounded-full border border-[var(--accent)]/40 bg-[var(--accent-soft)] px-3 py-1 text-[10px] font-semibold uppercase tracking-[var(--tracking-eyebrow-sm)] text-[var(--text)]">
@@ -120,7 +120,7 @@ function VenuePlacementMock() {
 
       <div className="flex items-center justify-between gap-3 rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--surface-wash)] px-4 py-2.5">
         <span className="text-[12px] font-semibold text-[var(--text)]">Связаться с заведением</span>
-        <span className="inline-flex items-center gap-1 text-[12px] font-semibold text-[var(--accent)]">
+        <span className="inline-flex items-center gap-1 text-[12px] font-semibold text-[var(--accent-ink)]">
           Telegram
           <ArrowUpRight size={14} strokeWidth={1.8} />
         </span>

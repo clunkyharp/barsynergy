@@ -60,7 +60,7 @@ export default async function RegisterBusinessPage({ searchParams }: RegisterBus
               Вернуться на сайт
             </Button>
           </div>
-          <p className="mt-10 text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Бизнес-доступ</p>
+          <p className="mt-10 text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent-ink)]">Бизнес-доступ</p>
           <h1 className="auth-register-title display-tight mt-8 max-w-[15ch] text-[clamp(2rem,9vw,2.375rem)] font-semibold leading-[1.20] text-balance tracking-normal md:text-[52px]">
             Заявка на бизнес-доступ
           </h1>
@@ -90,7 +90,7 @@ export default async function RegisterBusinessPage({ searchParams }: RegisterBus
                 <h2 className="mt-4 text-3xl font-semibold leading-tight md:text-4xl">Форма заявок сейчас недоступна</h2>
                 <p className="mt-4 max-w-2xl text-sm leading-7 text-[var(--muted)]">
                   Новые заявки через эту форму сейчас не принимаются. Если доступ нужен уже сейчас, напишите в{' '}
-                  <a className="font-semibold text-[var(--accent)] hover:text-[var(--accent-strong)]" href={PUBLIC_CONTACT_TELEGRAM}>
+                  <a className="font-semibold text-[var(--accent-ink)] hover:text-[var(--accent-strong)]" href={PUBLIC_CONTACT_TELEGRAM}>
                     Telegram
                   </a>
                   .
@@ -116,7 +116,7 @@ export default async function RegisterBusinessPage({ searchParams }: RegisterBus
           ) : (
             <>
               <div className="border-b border-black/10 bg-[var(--surface-wash)] px-5 py-5 md:px-6 md:py-6">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Бизнес-доступ</p>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--accent-ink)]">Бизнес-доступ</p>
                 <h2 className="auth-register-form-title mt-3 text-[clamp(1.55rem,7vw,2rem)] font-semibold leading-tight tracking-normal md:text-[2rem]">Данные компании</h2>
                 <p className="mt-3 max-w-xl text-sm leading-7 text-[var(--muted)]">
                   Укажите данные компании — кабинет откроется сразу после отправки. На email придёт ссылка для установки пароля.

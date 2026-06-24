@@ -32,7 +32,7 @@ export function AuthSplitLayout({ children }: AuthSplitLayoutProps) {
               width={360}
             />
           </AppLink>
-          <AppLink className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--accent)]" href="/">
+          <AppLink className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--accent-ink)]" href="/">
             <ArrowLeft aria-hidden size={15} strokeWidth={1.8} />
             На сайт
           </AppLink>

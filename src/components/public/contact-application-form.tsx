@@ -16,6 +16,7 @@ import { EditorialShell } from '@/components/ui/editorial-shell';
 import { FormField, FormSection } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
 import { InlineLink } from '@/components/ui/inline-link';
+import { PublicFormValidation } from '@/components/public/public-form-validation';
 import { Select } from '@/components/ui/select';
 import { SubmissionResultDialog } from '@/components/ui/submission-result-dialog';
 import { SubmitButton } from '@/components/ui/submit-button';
@@ -50,7 +51,8 @@ export function ContactApplicationForm({ enabled, utm, cities, defaultTopic, def
   const topicDetailsHint = getContactTopicDetailsHint(topic);
 
   const form = enabled ? (
-    <form action={formAction} className="editorial-form-shell public-form-shell">
+    <form action={formAction} className="editorial-form-shell public-form-shell" noValidate>
+      <PublicFormValidation />
       <HiddenUtmFields utm={utm} />
       <HoneypotField id="contact-message-website" />
       <PublicFormShellHeader

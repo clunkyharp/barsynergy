@@ -71,7 +71,7 @@ export function EditorialCard({
 
       <div className={cn('flex flex-1 flex-col', density === 'comfortable' ? 'p-4 md:p-5' : 'p-3')}>
         {eyebrow ? (
-          <p className={cardEyebrowClass()}>{eyebrow}</p>
+          <p className={cardEyebrowClass(isDark)}>{eyebrow}</p>
         ) : null}
 
         <h3 className={cn(

@@ -175,7 +175,6 @@
     margin-top: 1rem;
     border: 1px solid
         color-mix(in oklab, var(--accent) 32%, var(--border-default));
-    border-left-width: 3px;
     border-radius: var(--radius-md);
     background: color-mix(in oklab, var(--surface) 94%, transparent);
     padding: 0.8rem 0.9rem;
@@ -227,7 +226,7 @@
     justify-content: center;
     width: 1.25rem;
     height: 1.25rem;
-    color: var(--accent);
+    color: var(--accent-ink);
     font-size: 0.9rem;
     line-height: 1;
     transition: transform var(--motion-duration-fast) var(--motion-ease-standard);

@@ -144,7 +144,7 @@ export function SiteHeader({ user, logoutAction }: SiteHeaderProps) {
                   className={cn(
                     'relative inline-flex min-h-11 shrink-0 items-center whitespace-nowrap rounded-[var(--radius-sm)] px-1 opacity-85 transition-[color,opacity] duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] after:absolute after:inset-x-1 after:bottom-1 after:h-px after:origin-left after:scale-x-0 after:bg-[var(--accent)] after:transition-transform after:duration-[var(--motion-duration-base)] after:ease-[var(--motion-ease-move)] hover:opacity-100 hover:after:scale-x-100 motion-reduce:transition-none motion-reduce:after:transition-none 2xl:px-2 2xl:after:inset-x-1.5',
                     focusClassName,
-                    isActive && 'text-[var(--accent)] opacity-100 after:scale-x-100'
+                    isActive && 'text-[var(--accent-ink)] opacity-100 after:scale-x-100'
                   )}
                   key={item.href}
                   href={item.href}
@@ -177,7 +177,7 @@ export function SiteHeader({ user, logoutAction }: SiteHeaderProps) {
                   aria-expanded={isMoreNavOpen}
                   className={cn(
                     'relative inline-flex min-h-11 shrink-0 cursor-pointer list-none items-center gap-1.5 whitespace-nowrap rounded-[var(--radius-sm)] px-1 opacity-85 transition-[color,opacity] duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] after:absolute after:inset-x-1 after:bottom-1 after:h-px after:origin-left after:scale-x-0 after:bg-[var(--accent)] after:transition-transform after:duration-[var(--motion-duration-base)] after:ease-[var(--motion-ease-move)] hover:opacity-100 hover:after:scale-x-100 group-open:after:scale-x-0 motion-reduce:transition-none motion-reduce:after:transition-none [&::-webkit-details-marker]:hidden 2xl:px-2 2xl:after:inset-x-1.5',
-                    effectiveDesktopMoreGroups.some((g) => g.items.some((item) => pathname && isActiveItem(pathname, item.href))) && 'text-[var(--accent)] opacity-100 after:scale-x-100',
+                    effectiveDesktopMoreGroups.some((g) => g.items.some((item) => pathname && isActiveItem(pathname, item.href))) && 'text-[var(--accent-ink)] opacity-100 after:scale-x-100',
                     focusClassName
                   )}
                 >
@@ -199,7 +199,7 @@ export function SiteHeader({ user, logoutAction }: SiteHeaderProps) {
                               <AppLink
                                 className={cn(
                                   'flex min-h-11 items-center rounded-[var(--radius-sm)] px-3 py-2 text-[13px] font-semibold text-[var(--text)] transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] hover:bg-[var(--surface-muted)] hover:text-[var(--accent-strong)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] motion-reduce:transition-none',
-                                  isActive && 'bg-[var(--accent-soft)] text-[var(--accent-strong)]'
+                                  isActive && 'bg-[var(--accent-soft)] text-[var(--accent-ink)]'
                                 )}
                                 href={item.href}
                                 key={item.href}
@@ -221,7 +221,7 @@ export function SiteHeader({ user, logoutAction }: SiteHeaderProps) {
             <AppLink
               aria-label="Поиск"
               className={cn(
-                'inline-flex min-h-10 w-10 shrink-0 items-center justify-center rounded-[var(--radius-md)] text-inherit transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] hover:bg-[rgba(255,253,249,0.12)] motion-reduce:transition-none',
+                'inline-flex min-h-11 w-11 shrink-0 items-center justify-center rounded-[var(--radius-md)] text-inherit transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] hover:bg-[rgba(255,253,249,0.12)] motion-reduce:transition-none',
                 focusClassName
               )}
               href="/search"
@@ -231,7 +231,7 @@ export function SiteHeader({ user, logoutAction }: SiteHeaderProps) {
             {user?.role === 'BUSINESS' ? (
               <AppLink
                 className={cn(
-                  'hidden min-h-10 shrink-0 items-center justify-center whitespace-nowrap rounded-[var(--radius-sm)] border-[1.5px] border-[var(--accent)] bg-[var(--accent-soft)] px-3 text-[11px] font-bold uppercase tracking-[0.1em] text-[var(--accent)] transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] hover:bg-[var(--accent)] hover:text-[var(--accent-contrast)] motion-reduce:transition-none lg:inline-flex lg:px-4',
+                  'hidden min-h-11 shrink-0 items-center justify-center whitespace-nowrap rounded-[var(--radius-sm)] border-[1.5px] border-[var(--accent)] bg-[var(--accent-soft)] px-3 text-[11px] font-bold uppercase tracking-[0.1em] text-[var(--accent-ink)] transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] hover:bg-[var(--accent)] hover:text-[var(--accent-contrast)] motion-reduce:transition-none lg:inline-flex lg:px-4',
                   focusClassName
                 )}
                 href="/business/cabinet"
@@ -241,7 +241,7 @@ export function SiteHeader({ user, logoutAction }: SiteHeaderProps) {
             ) : user?.role === 'USER' ? (
               <AppLink
                 className={cn(
-                  'hidden min-h-10 shrink-0 items-center justify-center whitespace-nowrap rounded-[var(--radius-sm)] border-[1.5px] px-3 text-[11px] font-bold uppercase tracking-[0.1em] transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] motion-reduce:transition-none lg:inline-flex lg:px-4',
+                  'hidden min-h-11 shrink-0 items-center justify-center whitespace-nowrap rounded-[var(--radius-sm)] border-[1.5px] px-3 text-[11px] font-bold uppercase tracking-[0.1em] transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] motion-reduce:transition-none lg:inline-flex lg:px-4',
                   isHomeTop
                     ? 'border-white/20 bg-white/10 text-[var(--editorial-dark-text)] hover:bg-white/18 hover:text-white'
                     : 'border-[var(--border-strong)] bg-[var(--surface-elevated)] text-[var(--text)] hover:border-[var(--accent)] hover:bg-[var(--surface-wash)] hover:text-[var(--accent-strong)]',
@@ -259,7 +259,7 @@ export function SiteHeader({ user, logoutAction }: SiteHeaderProps) {
                 <AppLink
                   aria-label="Войти в кабинет"
                   className={cn(
-                    'inline-flex min-h-10 shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-[var(--radius-md)] px-3 text-[12px] font-semibold text-inherit transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] hover:bg-[rgba(255,253,249,0.12)] motion-reduce:transition-none',
+                    'inline-flex min-h-11 shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-[var(--radius-md)] px-3 text-[12px] font-semibold text-inherit transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] hover:bg-[rgba(255,253,249,0.12)] motion-reduce:transition-none',
                     focusClassName
                   )}
                   href="/auth/login"
@@ -269,7 +269,7 @@ export function SiteHeader({ user, logoutAction }: SiteHeaderProps) {
                 </AppLink>
                 <AppLink
                   className={cn(
-                    'inline-flex min-h-10 shrink-0 items-center justify-center whitespace-nowrap rounded-[var(--radius-md)] border px-3 text-[12px] font-semibold transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] motion-reduce:transition-none',
+                    'inline-flex min-h-11 shrink-0 items-center justify-center whitespace-nowrap rounded-[var(--radius-md)] border px-3 text-[12px] font-semibold transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] motion-reduce:transition-none',
                     isHomeTop
                       ? 'border-white/16 bg-white/8 text-[var(--editorial-dark-text)] hover:bg-white/14'
                       : 'border-[var(--border-default)] bg-[var(--surface-elevated)] text-[var(--text)] hover:border-[var(--accent)] hover:text-[var(--accent-strong)]',

@@ -21,9 +21,11 @@ import { getEnv } from '@/lib/validation/env';
 const env = getEnv();
 const themeInitScript = `
   try {
-    document.documentElement.dataset.theme = 'dark';
-    document.documentElement.style.colorScheme = 'dark';
-    window.localStorage.setItem('barsynergy-theme', 'dark');
+    var storedTheme = window.localStorage.getItem('barsynergy-theme');
+    var preferredTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    var theme = storedTheme === 'dark' || storedTheme === 'light' ? storedTheme : preferredTheme;
+    document.documentElement.dataset.theme = theme;
+    document.documentElement.style.colorScheme = theme;
   } catch (_) {}
 `;
 
@@ -54,7 +56,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   const nonce = (await headers()).get('x-nonce') ?? undefined;
 
   return (
-    <html data-scroll-behavior="smooth" data-theme="dark" lang="ru" suppressHydrationWarning>
+    <html data-scroll-behavior="smooth" data-theme="light" lang="ru" suppressHydrationWarning>
       <body className={bodyFont.className}>
         <ServerInsertedScript
           html={themeInitScript}

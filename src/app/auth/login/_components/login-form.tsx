@@ -55,7 +55,7 @@ export function LoginForm({ returnTo }: { returnTo?: string }) {
           required
         />
       </FormField>
-      <AppLink className="-mt-1 justify-self-end text-sm font-semibold leading-5 text-[var(--accent)] transition-colors hover:text-[var(--accent-strong)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]" href="/auth/password-reset">
+      <AppLink className="-mt-1 justify-self-end text-sm font-semibold leading-5 text-[var(--accent-ink)] transition-colors hover:text-[var(--accent-strong)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]" href="/auth/password-reset">
         Забыли пароль?
       </AppLink>
       <SubmitButton className="auth-login-submit mt-2 w-full" pendingText="Входим…">
@@ -63,7 +63,7 @@ export function LoginForm({ returnTo }: { returnTo?: string }) {
       </SubmitButton>
       <p className="mt-1 text-center text-xs text-[var(--muted)]">
         Проблемы с доступом?{' '}
-        <AppLink className="text-[var(--accent)] transition-colors hover:text-[var(--accent-strong)]" href="/contacts?topic=other#contact-form">
+        <AppLink className="text-[var(--accent-ink)] transition-colors hover:text-[var(--accent-strong)]" href="/contacts?topic=other#contact-form">
           Написать команде
         </AppLink>
       </p>
@@ -72,10 +72,10 @@ export function LoginForm({ returnTo }: { returnTo?: string }) {
           Ещё нет аккаунта?
         </p>
         <div className="flex flex-col items-center gap-2">
-          <AppLink className="text-sm font-semibold leading-5 text-[var(--accent)] transition-colors hover:text-[var(--accent-strong)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]" href="/auth/register/user">
+          <AppLink className="text-sm font-semibold leading-5 text-[var(--accent-ink)] transition-colors hover:text-[var(--accent-strong)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]" href="/auth/register/user">
             Зарегистрироваться как участник
           </AppLink>
-          <AppLink className="text-sm font-semibold leading-5 text-[var(--accent)] transition-colors hover:text-[var(--accent-strong)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]" href="/auth/register/business">
+          <AppLink className="text-sm font-semibold leading-5 text-[var(--accent-ink)] transition-colors hover:text-[var(--accent-strong)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]" href="/auth/register/business">
             Запросить бизнес-доступ
           </AppLink>
         </div>

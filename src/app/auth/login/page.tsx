@@ -37,7 +37,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
     <AuthSplitLayout>
       {isVerified ? (
         <div className="mb-6 flex items-center gap-3 rounded-[var(--radius-lg)] border border-[var(--accent)]/30 bg-[var(--accent-soft)] px-4 py-3">
-          <CheckCircle2 aria-hidden className="shrink-0 text-[var(--accent)]" size={22} strokeWidth={1.8} />
+          <CheckCircle2 aria-hidden className="shrink-0 text-[var(--accent-ink)]" size={22} strokeWidth={1.8} />
           <div>
             <p className={`text-[14px] font-semibold leading-5 text-[var(--text)] ${displayFont.className}`}>
               Email подтверждён!

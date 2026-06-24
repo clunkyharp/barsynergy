@@ -62,21 +62,21 @@ const alternativeRoutes = [
     description: 'Заполните карточку вакансии — она появится в каталоге и попадёт в подборку для специалистов.',
     href: '/contacts?topic=vacancy-placement',
     actionLabel: 'Разместить вакансию',
-    accent: 'var(--accent)'
+    accent: 'var(--accent-ink)'
   },
   {
     title: 'Хочу попасть в каталог поставщиков',
     description: 'Карточка компании с продуктами, географией и контактами появляется в каталоге BARSYNERGY.',
     href: '/suppliers?action=join',
     actionLabel: 'Разместить компанию',
-    accent: 'var(--accent)'
+    accent: 'var(--accent-ink)'
   },
   {
     title: 'Хочу подписаться на материалы',
     description: 'Подписка на еженедельную рассылку: события, обучение, кейсы и обновления каталога.',
     href: '/articles',
     actionLabel: 'Перейти в материалы',
-    accent: 'var(--accent)'
+    accent: 'var(--accent-ink)'
   }
 ] as const;
 
@@ -142,7 +142,7 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
           <div className="mx-auto max-w-5xl">
             <div className="flex flex-wrap items-end justify-between gap-4">
               <div>
-                <p className="text-[11px] font-semibold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--accent)]">
+                <p className="text-[11px] font-semibold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--accent-ink)]">
                   Быстрые разделы
                 </p>
                 <h2 className={`${displayFont.className} mt-2 text-[1.7rem] font-semibold leading-[1.1] text-[var(--text)] md:text-[2.1rem]`}>

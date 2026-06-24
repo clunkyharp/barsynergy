@@ -48,7 +48,7 @@ export function ArticleDetailBody({
 
             {sourceReferences ? (
               <Panel className="mt-12 border-[var(--border-default)] bg-[var(--surface-wash-strong)]" padding="lg">
-                <h2 className="text-[11px] font-semibold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--accent)]">
+                <h2 className="text-[11px] font-semibold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--accent-ink)]">
                   Источники и дополнительные данные 
                 </h2>
                 <div className="article-body mt-5">
