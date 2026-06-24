@@ -10,9 +10,44 @@ type MarkReadResult =
   | { type: 'success' }
   | { type: 'error'; message: string };
 
+type DerivedRole = 'user' | 'business' | 'admin';
+
+function deriveReaderRole(currentUser: { id: string; role: string }, application: {
+  userId: string | null;
+  vacancy: {
+    createdById: string | null;
+    businessAccount: { ownerId: string } | null;
+  } | null;
+  businessAccount: { ownerId: string } | null;
+}): DerivedRole | null {
+  if (currentUser.role === 'ADMIN' || currentUser.role === 'MODERATOR') {
+    return 'admin';
+  }
+  if (application.userId === currentUser.id) {
+    return 'user';
+  }
+  if (
+    application.vacancy?.createdById === currentUser.id ||
+    application.vacancy?.businessAccount?.ownerId === currentUser.id ||
+    application.businessAccount?.ownerId === currentUser.id
+  ) {
+    return 'business';
+  }
+  return null;
+}
+
+function businessOwnershipWhere(userId: string) {
+  return {
+    OR: [
+      { vacancy: { createdById: userId } },
+      { vacancy: { businessAccount: { ownerId: userId } } },
+      { businessAccount: { ownerId: userId } }
+    ]
+  };
+}
+
 export async function markConversationMessagesRead(
-  applicationId: string,
-  readerRole: 'user' | 'business' | 'admin'
+  applicationId: string
 ): Promise<MarkReadResult> {
   try {
     await assertSameOriginServerAction();
@@ -27,7 +62,13 @@ export async function markConversationMessagesRead(
       select: {
         id: true,
         userId: true,
-        vacancy: { select: { createdById: true } }
+        businessAccount: { select: { ownerId: true } },
+        vacancy: {
+          select: {
+            createdById: true,
+            businessAccount: { select: { ownerId: true } }
+          }
+        }
       }
     });
 
@@ -35,17 +76,13 @@ export async function markConversationMessagesRead(
       return { type: 'error', message: 'Заявка не найдена.' };
     }
 
-    const isAdmin = currentUser.role === 'ADMIN' || currentUser.role === 'MODERATOR';
+    const readerRole = deriveReaderRole(currentUser, application);
 
-    if (readerRole === 'user' && !isAdmin) {
-      if (application.userId !== currentUser.id) {
-        return { type: 'error', message: 'Нет доступа к этому диалогу.' };
-      }
-    } else if (readerRole === 'business' && !isAdmin) {
-      if (application.vacancy?.createdById !== currentUser.id) {
-        return { type: 'error', message: 'Нет доступа к этому диалогу.' };
-      }
+    if (!readerRole) {
+      return { type: 'error', message: 'Нет доступа к этому диалогу.' };
     }
+
+    const isAdmin = readerRole === 'admin';
 
     await prisma.$transaction(async (tx) => {
       if (readerRole === 'user' || isAdmin) {
@@ -58,10 +95,17 @@ export async function markConversationMessagesRead(
           data: { isReadByUser: true }
         });
 
-        await tx.application.update({
-          where: { id: applicationId },
+        const result = await tx.application.updateMany({
+          where: {
+            id: applicationId,
+            ...(readerRole === 'user' ? { userId: currentUser.id } : {})
+          },
           data: { hasUnreadForUser: false }
         });
+
+        if (result.count === 0 && !isAdmin) {
+          throw new Error('ownership check failed');
+        }
       }
 
       if (readerRole === 'business' || isAdmin) {
@@ -74,10 +118,17 @@ export async function markConversationMessagesRead(
           data: { isReadByBusiness: true }
         });
 
-        await tx.application.update({
-          where: { id: applicationId },
+        const result = await tx.application.updateMany({
+          where: {
+            id: applicationId,
+            ...(readerRole === 'business' ? businessOwnershipWhere(currentUser.id) : {})
+          },
           data: { hasUnreadForBusiness: false }
         });
+
+        if (result.count === 0 && !isAdmin) {
+          throw new Error('ownership check failed');
+        }
       }
     });
 

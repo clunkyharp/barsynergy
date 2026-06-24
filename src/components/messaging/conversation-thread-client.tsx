@@ -10,7 +10,6 @@ const POLL_INTERVAL_MS = 5000;
 
 type ConversationThreadClientProps = {
   applicationId: string;
-  currentUserRole: 'user' | 'business' | 'admin';
   senderRole: ConversationSender;
   disabled?: boolean;
   disabledReason?: string;
@@ -19,7 +18,6 @@ type ConversationThreadClientProps = {
 
 export function ConversationThreadClient({
   applicationId,
-  currentUserRole,
   senderRole,
   disabled,
   disabledReason,
@@ -32,8 +30,8 @@ export function ConversationThreadClient({
     if (markedRef.current) return;
     markedRef.current = true;
 
-    void markConversationMessagesRead(applicationId, currentUserRole);
-  }, [applicationId, currentUserRole]);
+    void markConversationMessagesRead(applicationId);
+  }, [applicationId]);
 
   useEffect(() => {
     let interval: ReturnType<typeof setInterval>;
@@ -69,7 +67,7 @@ export function ConversationThreadClient({
       disabled={disabled}
       disabledReason={disabledReason}
       onMessageSent={() => {
-        void markConversationMessagesRead(applicationId, currentUserRole);
+        void markConversationMessagesRead(applicationId);
       }}
       placeholder={placeholder}
       senderRole={senderRole}

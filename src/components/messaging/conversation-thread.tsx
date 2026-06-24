@@ -12,7 +12,6 @@ type ConversationThreadProps = {
   status: ApplicationStatus;
   messageCount: number;
   currentUserId: string | null;
-  currentUserRole: 'user' | 'business' | 'admin';
   senderRole: ConversationSender;
   composeDisabled?: boolean;
   composeDisabledReason?: string;
@@ -33,7 +32,6 @@ export function ConversationThread({
   status,
   messageCount,
   currentUserId,
-  currentUserRole,
   senderRole,
   composeDisabled,
   composeDisabledReason,
@@ -75,7 +73,6 @@ export function ConversationThread({
 
       <ConversationThreadClient
         applicationId={applicationId}
-        currentUserRole={currentUserRole}
         disabled={disabled}
         disabledReason={disabledReason}
         placeholder={composePlaceholder}

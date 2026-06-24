@@ -128,7 +128,6 @@ export default async function BusinessResponseDetailPage({ params }: BusinessRes
         composePlaceholder={isSupplierInquiry ? 'Ответьте на запрос...' : 'Ответьте кандидату...'}
         contextLabel={contextLabel}
         currentUserId={user.id}
-        currentUserRole="business"
         interlocutorName={interlocutorName}
         messageCount={messages.length}
         messages={messages}

@@ -112,7 +112,6 @@ export default async function ResponseDetailPage({ params }: ResponseDetailPageP
           composePlaceholder="Напишите сообщение..."
           contextLabel={contextLabel}
           currentUserId={currentUser.id}
-          currentUserRole="user"
           interlocutorName={interlocutorName}
           messageCount={messages.length}
           messages={messages}

@@ -168,14 +168,30 @@ export async function sendConversationMessage(input: {
       const unreadUpdate = buildUnreadFlags(input.senderRole);
       const statusUpdate = buildMessageStatusUpdate(application.status, input.senderRole);
 
-      await tx.application.update({
-        where: { id: application.id },
+      const ownershipScope = input.senderRole === ConversationSender.USER
+        ? { userId: currentUser.id }
+        : input.senderRole === ConversationSender.BUSINESS
+          ? {
+              OR: [
+                { vacancy: { createdById: currentUser.id } },
+                { vacancy: { businessAccount: { ownerId: currentUser.id } } },
+                { businessAccount: { ownerId: currentUser.id } }
+              ]
+            }
+          : {};
+
+      const updateResult = await tx.application.updateMany({
+        where: { id: application.id, ...ownershipScope },
         data: {
           ...unreadUpdate,
           lastMessageAt: new Date(),
           ...statusUpdate
         }
       });
+
+      if (updateResult.count === 0) {
+        throw new Error('Application ownership mismatch');
+      }
 
       await queueMessageNotifications(tx, buildMessageNotificationJobs({
         application,
