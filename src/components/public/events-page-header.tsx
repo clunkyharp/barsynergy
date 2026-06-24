@@ -29,20 +29,15 @@ export function EventCityTabs({ cities, selectedCity, preserve }: EventCityTabsP
   };
 
   return (
-    <nav
-      aria-label="Города"
-      className="background-zone background-zone-graphite border-b border-[var(--line)] py-4"
-    >
-      <div className="container">
-        <ChipFilterRow aria-label="Города">
-          <CategoryPill active={!selectedCity} href={buildHref()}>Все города</CategoryPill>
-          {cities.map((city) => (
-            <CategoryPill active={selectedCity === city.slug} href={buildHref(city.slug)} key={city.id}>
-              {city.name}
-            </CategoryPill>
-          ))}
-        </ChipFilterRow>
-      </div>
+    <nav aria-label="Города" className="container py-3">
+      <ChipFilterRow aria-label="Города">
+        <CategoryPill active={!selectedCity} href={buildHref()}>Все города</CategoryPill>
+        {cities.map((city) => (
+          <CategoryPill active={selectedCity === city.slug} href={buildHref(city.slug)} key={city.id}>
+            {city.name}
+          </CategoryPill>
+        ))}
+      </ChipFilterRow>
     </nav>
   );
 }
@@ -87,49 +82,72 @@ type EventsSearchBarProps = {
 
 export function EventsSearchBar({ formats, selectedQ, selectedCity, selectedFormat }: EventsSearchBarProps) {
   return (
-    <section className="background-zone background-zone-graphite border-b border-[var(--line)] py-4">
-      <div className="container">
-        <form action="/events" className="flex flex-col gap-3 sm:flex-row sm:items-center" method="GET">
-          <div className="relative flex-1">
-            <Search
-              aria-hidden="true"
-              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted)]"
-              size={16}
-              strokeWidth={1.8}
-            />
-            <input
-              aria-label="Поиск событий"
-              autoComplete="off"
-              className="field-base min-h-[2.75rem] w-full pl-10 text-sm"
-              defaultValue={selectedQ}
-              name="q"
-              placeholder="Найти событие"
-              spellCheck={false}
-              type="text"
-            />
-          </div>
+    <div className="container py-4">
+      <form action="/events" className="flex flex-col gap-3 sm:flex-row sm:items-center" method="GET">
+        <div className="relative flex-1">
+          <Search
+            aria-hidden="true"
+            className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted)]"
+            size={16}
+            strokeWidth={1.8}
+          />
+          <input
+            aria-label="Поиск событий"
+            autoComplete="off"
+            className="field-base min-h-[2.75rem] w-full pl-10 text-sm"
+            defaultValue={selectedQ}
+            name="q"
+            placeholder="Найти событие"
+            spellCheck={false}
+            type="text"
+          />
+        </div>
 
-          <input defaultValue={selectedCity ?? ''} name="city" type="hidden" />
+        <input defaultValue={selectedCity ?? ''} name="city" type="hidden" />
 
-          <div className="sm:min-w-[9rem]">
-            <Select
-              aria-label="Формат"
-              className="min-h-[2.75rem] text-sm"
-              defaultValue={selectedFormat ?? ''}
-              name="format"
-            >
-              <option value="">Формат</option>
-              {formats.map((fmt) => (
-                <option key={fmt.value} value={fmt.value}>{fmt.label}</option>
-              ))}
-            </Select>
-          </div>
+        <div className="sm:min-w-[9rem]">
+          <Select
+            aria-label="Формат"
+            className="min-h-[2.75rem] text-sm"
+            defaultValue={selectedFormat ?? ''}
+            name="format"
+          >
+            <option value="">Формат</option>
+            {formats.map((fmt) => (
+              <option key={fmt.value} value={fmt.value}>{fmt.label}</option>
+            ))}
+          </Select>
+        </div>
 
-          <Button className="min-h-[2.75rem] shrink-0 px-6 whitespace-nowrap" type="submit">
-            Найти
-          </Button>
-        </form>
-      </div>
+        <Button className="min-h-[2.75rem] shrink-0 px-6 whitespace-nowrap" type="submit">
+          Найти
+        </Button>
+      </form>
+    </div>
+  );
+}
+
+export function EventsFilterBar({
+  cities,
+  selectedCity,
+  preserve,
+  formats,
+  selectedQ,
+  selectedFormat,
+  selectedPeriod,
+}: EventCityTabsProps & EventsSearchBarProps) {
+  return (
+    <section className="background-zone background-zone-graphite border-b border-[var(--line)]">
+      <EventsSearchBar
+        formats={formats}
+        selectedCity={selectedCity}
+        selectedFormat={selectedFormat}
+        selectedPeriod={selectedPeriod}
+        selectedQ={selectedQ}
+      />
+      {cities.length > 0 ? (
+        <EventCityTabs cities={cities} selectedCity={selectedCity} preserve={preserve} />
+      ) : null}
     </section>
   );
 }

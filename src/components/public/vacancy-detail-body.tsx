@@ -40,7 +40,7 @@ export function VacancyDetailBody({
             >
               <EditorialShell className="overflow-hidden">
                 <div className="border-b border-[var(--line)] px-5 pb-4 pt-5">
-                  <p className="text-[11px] font-bold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--accent)]">
+                  <p className="text-[11px] font-bold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--accent-ink)]">
                     {hasDirectContact ? 'Связаться напрямую' : 'Откликнуться'}
                   </p>
                 </div>

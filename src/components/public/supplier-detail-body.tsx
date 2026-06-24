@@ -133,7 +133,7 @@ export function SupplierDetailBody({
 
             {infoFacts.length > 0 ? (
               <div className="mt-10 max-w-[70ch]">
-                <h2 className="text-[11px] font-semibold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--accent)]">
+                <h2 className="text-[11px] font-semibold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--accent-ink)]">
                   Информация о компании
                 </h2>
                 <dl className="mt-4 grid gap-4 sm:grid-cols-2">
@@ -158,7 +158,7 @@ export function SupplierDetailBody({
               <EditorialShell className="overflow-hidden">
                 {hasDirectContacts ? (
                   <div className="border-b border-[var(--line)] px-5 pb-5 pt-5">
-                    <p className="text-[11px] font-bold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--accent)]">
+                    <p className="text-[11px] font-bold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--accent-ink)]">
                       Контакты поставщика
                     </p>
                     {contactLabel ? (
@@ -172,7 +172,7 @@ export function SupplierDetailBody({
                   </div>
                 ) : null}
                 <div className="border-b border-[var(--line)] px-5 pb-4 pt-5">
-                  <p className="text-[11px] font-bold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--accent)]">
+                  <p className="text-[11px] font-bold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--accent-ink)]">
                     Запрос поставщику
                   </p>
                 </div>
@@ -180,7 +180,7 @@ export function SupplierDetailBody({
                 {hasDirectContacts ? (
                   <div className="border-t border-[var(--line)] px-5 py-4">
                     <a
-                      className="inline-flex min-h-10 w-full items-center justify-center rounded-[var(--radius-sm)] border border-[var(--accent)]/40 bg-[var(--accent-soft)] px-4 text-sm font-semibold text-[var(--accent)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--accent-contrast)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
+                      className="inline-flex min-h-10 w-full items-center justify-center rounded-[var(--radius-sm)] border border-[var(--accent)]/40 bg-[var(--accent-soft)] px-4 text-sm font-semibold text-[var(--accent-ink)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--accent-contrast)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
                       href="#supplier-contact-rail"
                     >
                       Запросить условия

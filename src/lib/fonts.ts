@@ -1,10 +1,8 @@
-import { Manrope, Unbounded } from 'next/font/google';
+import { Unbounded } from 'next/font/google';
 
-export const bodyFont = Manrope({
-  subsets: ['latin', 'cyrillic'],
-  weight: ['400', '500', '600', '700', '800'],
-  display: 'swap'
-});
+export const bodyFont = {
+  className: 'font-body'
+};
 
 export const displayFont = Unbounded({
   subsets: ['latin', 'cyrillic'],
@@ -13,8 +11,4 @@ export const displayFont = Unbounded({
   variable: '--font-display'
 });
 
-export const accentFont = Manrope({
-  subsets: ['latin', 'cyrillic'],
-  weight: ['500', '600', '700', '800'],
-  display: 'swap'
-});
+export const accentFont = bodyFont;

@@ -48,7 +48,7 @@ export function PopularDrinks() {
               </div>
               <div>
                 <dt className="text-[10px] font-semibold uppercase tracking-[var(--tracking-eyebrow-sm)] text-[var(--muted)]">Food cost</dt>
-                <dd className="mt-1 text-[13px] font-bold tabular-nums text-[var(--accent)]">{drink.foodCostRange}</dd>
+                <dd className="mt-1 text-[13px] font-bold tabular-nums text-[var(--accent-ink)]">{drink.foodCostRange}</dd>
               </div>
             </dl>
           </div>

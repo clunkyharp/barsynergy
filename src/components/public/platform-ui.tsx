@@ -53,7 +53,7 @@ export function PlatformActionCard({
           <ol className="mt-4 grid gap-0">
             {steps.map((step, index) => (
               <li className="grid min-h-[3.7rem] grid-cols-[2rem_minmax(0,1fr)] gap-3" key={step}>
-                <span className="flex h-8 w-8 items-center justify-center rounded-full border border-[var(--accent)]/20 bg-[var(--accent)]/8 text-[11px] font-semibold tabular-nums text-[var(--accent)]">
+                <span className="flex h-8 w-8 items-center justify-center rounded-full border border-[var(--accent)]/20 bg-[var(--accent)]/8 text-[11px] font-semibold tabular-nums text-[var(--accent-ink)]">
                   {index + 1}
                 </span>
                 <span className="pt-1 text-sm leading-6 text-[var(--text)]">{step}</span>

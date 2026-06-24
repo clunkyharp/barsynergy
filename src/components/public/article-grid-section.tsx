@@ -213,7 +213,7 @@ export function ArticleGridSection({
               <div className="mt-12 space-y-8" aria-label="Рубрики">
                 <div className="flex flex-wrap items-end justify-between gap-3">
                   <div>
-                    <p className="text-[11px] font-semibold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--accent)]">
+                    <p className="text-[11px] font-semibold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--accent-ink)]">
                       Рубрики
                     </p>
                     <h2 className="mt-1 text-xl font-semibold text-[var(--text)]">
@@ -221,7 +221,7 @@ export function ArticleGridSection({
                     </h2>
                   </div>
                   <AppLink
-                    className="inline-flex items-center text-sm font-semibold text-[var(--accent)] transition-colors hover:text-[var(--accent-strong)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
+                    className="inline-flex items-center text-sm font-semibold text-[var(--accent-ink)] transition-colors hover:text-[var(--accent-strong)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
                     href={basePath}
                   >
                     Все материалы
@@ -232,7 +232,7 @@ export function ArticleGridSection({
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <h3 className="text-[1.05rem] font-semibold text-[var(--text)]">{section.categoryName}</h3>
                       <AppLink
-                        className="inline-flex items-center text-sm font-semibold text-[var(--accent)] transition-colors hover:text-[var(--accent-strong)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
+                        className="inline-flex items-center text-sm font-semibold text-[var(--accent-ink)] transition-colors hover:text-[var(--accent-strong)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
                         href={listingHref(content, basePath, { category: section.categorySlug })}
                       >
                         Все в рубрике

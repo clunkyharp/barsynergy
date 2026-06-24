@@ -51,7 +51,7 @@ export default async function VerifyEmailPage({ searchParams }: VerifyEmailPageP
 
   return (
     <AuthSplitLayout>
-      <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-[var(--accent-soft)] text-[var(--accent)]">
+      <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-[var(--accent-soft)] text-[var(--accent-ink)]">
         <MailCheck aria-hidden size={30} strokeWidth={1.6} />
       </div>
       <h1 className={`text-[28px] font-bold leading-[1.20] text-balance tracking-normal text-[var(--text)] ${displayFont.className}`}>

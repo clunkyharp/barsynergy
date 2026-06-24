@@ -42,6 +42,7 @@ body {
   min-height: 100vh;
   background: var(--background);
   color: var(--text);
+  font-family: var(--font-body);
   line-height: 1.55;
   background-image:
     radial-gradient(circle at 18% -8%, var(--background-accent-glow), transparent 34rem),
@@ -49,6 +50,10 @@ body {
     linear-gradient(180deg, var(--background-cream-strong) 0%, var(--background) 42%, var(--background-band-soft) 100%);
   background-position: center top;
   overflow-x: hidden;
+}
+
+.font-body {
+  font-family: var(--font-body);
 }
 
 @media (max-width: 640px) {
@@ -62,6 +67,14 @@ body {
     radial-gradient(circle at 18% -8%, var(--background-accent-glow), transparent 34rem),
     radial-gradient(circle at 92% 8%, var(--background-support-glow), transparent 32rem),
     linear-gradient(180deg, var(--background-graphite-band) 0%, var(--background) 46%, var(--background-band) 100%);
+}
+
+/* Any dark-surfaced context (root dark theme or a nested data-theme="dark"
+   section) gets the bright accent for text/links; the darker --accent-ink in
+   :root is only for accent text on light surfaces, where raw --accent fails
+   contrast. This keeps a global text-[var(--accent-ink)] swap theme-safe. */
+[data-theme="dark"] {
+  --accent-ink: #ffd02f;
 }
 
 .theme-logo-light {
@@ -90,6 +103,14 @@ body {
 .site-header-home-dark .theme-logo-dark,
 .site-header-menu-open .theme-logo-dark {
   display: block !important;
+}
+
+/* When the header sits over the dark home hero, accent text/links use the
+   bright accent (not the dark-on-light --accent-ink used on light pages). */
+.site-header-home-top,
+.site-header-home-dark,
+.site-header-menu-open {
+  --accent-ink: #ffd02f;
 }
 
 .site-header-home-top [aria-label="Открыть меню"],
@@ -384,6 +405,7 @@ h1, h2, h3, h4, h5, h6 {
   --muted: var(--editorial-dark-muted);
   --accent: #ffd02f;
   --accent-strong: #fcb900;
+  --accent-ink: #ffd02f;
   --accent-contrast: #1c1c1e;
   --accent-soft: rgb(255 208 47 / 0.18);
   --focus-ring: rgb(255 208 47 / 0.22);

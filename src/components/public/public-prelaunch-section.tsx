@@ -151,7 +151,7 @@ export function PublicPrelaunchSection({
             return (
               <li key={card.title}>
                 <article className="group relative grid gap-3 rounded-[var(--radius-md)] border border-transparent bg-[var(--surface-card)] p-4 transition-colors hover:border-[var(--accent)]/24 md:grid-cols-[auto_minmax(0,1fr)_auto] md:items-start md:gap-4 md:p-5">
-                  <span aria-hidden="true" className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[var(--accent)]/30 bg-[var(--surface-wash)] text-[13px] font-semibold tracking-[var(--tracking-eyebrow-sm)] text-[var(--accent)] tabular-nums">
+                  <span aria-hidden="true" className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[var(--accent)]/30 bg-[var(--surface-wash)] text-[13px] font-semibold tracking-[var(--tracking-eyebrow-sm)] text-[var(--accent-ink)] tabular-nums">
                     {idx + 1}
                   </span>
                   <div className="min-w-0">{textBlock}</div>

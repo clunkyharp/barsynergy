@@ -160,7 +160,7 @@ export function PublicContentDetailPage({
                 <div className="public-detail-section-grid mt-9 grid gap-4">
                   {sections.map((section) => (
                     <Panel className="public-detail-section-card border-[var(--border-default)] bg-[var(--surface-wash-strong)]" key={section.title} padding="lg">
-                      <h2 className="text-[11px] font-semibold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--accent)]">{section.title}</h2>
+                      <h2 className="text-[11px] font-semibold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--accent-ink)]">{section.title}</h2>
                       <ul className="mt-5 grid gap-3">
                         {section.items.map((item) => (
                           <li className="grid grid-cols-[0.7rem_minmax(0,1fr)] gap-3 text-sm leading-7 text-[var(--text)]" key={item}>
@@ -176,7 +176,7 @@ export function PublicContentDetailPage({
 
               {sourceReferences ? (
                 <Panel className="mt-9 border-[var(--border-default)] bg-[var(--surface-wash-strong)]" padding="lg">
-                  <h2 className="text-[11px] font-semibold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--accent)]">Источники и дополнительное чтение</h2>
+                  <h2 className="text-[11px] font-semibold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--accent-ink)]">Источники и дополнительное чтение</h2>
                   <div className="mt-5">
                     <RichTextContent markdown={sourceReferences} />
                   </div>

@@ -33,7 +33,7 @@ export function MasterDetailBody({ body, facts, contactLabel, contactTelegram, c
 
             {infoFacts.length > 0 ? (
               <div className="mt-10 max-w-[70ch]">
-                <h2 className="text-[11px] font-semibold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--accent)]">
+                <h2 className="text-[11px] font-semibold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--accent-ink)]">
                   Информация о мастере
                 </h2>
                 <dl className="mt-4 grid gap-4 sm:grid-cols-2">
@@ -55,7 +55,7 @@ export function MasterDetailBody({ body, facts, contactLabel, contactTelegram, c
               <EditorialShell className="overflow-hidden">
                 {hasDirectContacts ? (
                   <div className="border-b border-[var(--line)] px-5 pb-5 pt-5">
-                    <p className="text-[11px] font-bold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--accent)]">
+                    <p className="text-[11px] font-bold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--accent-ink)]">
                       Контакты мастера
                     </p>
                     {contactLabel ? (
@@ -75,7 +75,7 @@ export function MasterDetailBody({ body, facts, contactLabel, contactTelegram, c
                 {contactRail ? (
                   <>
                     <div className="border-b border-[var(--line)] px-5 pb-4 pt-5">
-                      <p className="text-[11px] font-bold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--accent)]">
+                      <p className="text-[11px] font-bold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--accent-ink)]">
                         Запрос мастеру
                       </p>
                     </div>

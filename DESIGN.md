@@ -32,15 +32,15 @@ Rules:
 
 BARSYNERGY keeps one visual identity across the product:
 
-- warm near-black and raised graphite surfaces;
+- neutral white and light-gray surfaces in light theme; deep blue-gray page and panel surfaces in dark theme;
 - high-contrast serif public and auth headings;
 - near-white typography on dark surfaces;
-- yellow primary actions, links and active marks;
+- yellow primary actions and active marks; yellow text/links only at the darker `--accent-ink` value on light surfaces (raw `--accent` fails contrast as text);
 - pastel atmospheric backgrounds and glow;
 - thin dividers;
 - editorial structure on public surfaces;
 - low-opacity paper grain without square or dotted patterns;
-- section zones for hero, graphite, muted warm surfaces, sponsor, social, tool and CTA areas;
+- section zones for hero, graphite, muted neutral surfaces, sponsor, social, tool and CTA areas;
 - compact, readable product density for admin and business flows;
 - small card/button radius instead of large rounded cards.
 

@@ -75,7 +75,7 @@ function EducationFeaturedSection({
             Рекомендуем
           </h2>
           <AppLink
-            className="flex items-center gap-1 text-sm font-semibold text-[var(--accent)] transition-colors duration-[var(--motion-duration-fast)] hover:text-[var(--accent-strong)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] motion-reduce:transition-none"
+            className="flex items-center gap-1 text-sm font-semibold text-[var(--accent-ink)] transition-colors duration-[var(--motion-duration-fast)] hover:text-[var(--accent-strong)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] motion-reduce:transition-none"
             href={basePath}
           >
             Смотреть все

@@ -1077,28 +1077,6 @@ form[data-public-validation="true"] .grid-cols-2 .form-field {
     padding: 0.25rem 1rem;
 }
 
-.events-directory-page nav[aria-label="Города"],
-.events-directory-page nav[aria-label="Города"] + section {
-    background: var(--background);
-}
-
-.events-directory-page nav[aria-label="Города"] {
-    padding-top: 1.5rem;
-    padding-bottom: 0.75rem;
-}
-
-.events-directory-page nav[aria-label="Города"] + section {
-    padding-top: 0.75rem;
-    padding-bottom: 1.5rem;
-}
-
-.events-directory-page nav[aria-label="Города"] + section form {
-    border: 1px solid var(--border-default);
-    border-radius: var(--radius-lg);
-    background: var(--surface);
-    padding: 1rem;
-}
-
 .events-directory-page #events-list {
     background: var(--background);
     padding-top: clamp(2rem, 4vw, 3.5rem);
@@ -1179,9 +1157,6 @@ form[data-public-validation="true"] .grid-cols-2 .form-field {
     }
 }
 
-.vacancies-directory-page section[aria-labelledby="page-hero-title"] {
-    padding-top: 72px;
-}
 
 .vacancies-directory-page section[aria-labelledby="page-hero-title"] h1 {
     font-size: clamp(2rem, 5vw, 3.25rem);

@@ -60,7 +60,7 @@ export function PublicEyebrow({
     <p
       className={cn(
         'text-[11px] font-bold uppercase tracking-[var(--tracking-eyebrow-md)]',
-        tone === 'accent' && 'text-[var(--accent)]',
+        tone === 'accent' && 'text-[var(--accent-ink)]',
         tone === 'muted' && 'text-[var(--muted)]',
         tone === 'inverse' && 'text-[var(--editorial-dark-label)]',
         className

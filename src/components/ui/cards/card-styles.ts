@@ -14,8 +14,8 @@ export function rootCardClass(className?: string, opts?: CardStyleOptions) {
   );
 }
 
-export function cardEyebrowClass() {
-  return 'text-[11px] font-semibold uppercase tracking-[var(--tracking-eyebrow-md)] text-[var(--accent)]';
+export function cardEyebrowClass(isDark = false) {
+  return `text-[11px] font-semibold uppercase tracking-[var(--tracking-eyebrow-md)] ${isDark ? 'text-[var(--editorial-dark-label)]' : 'text-[var(--accent-ink)]'}`;
 }
 
 export function cardTitleClass(density: 'comfortable' | 'compact' = 'comfortable') {

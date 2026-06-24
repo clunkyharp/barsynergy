@@ -4,7 +4,7 @@ import { EventAgendaSection } from '@/components/public/platform-ui';
 import { PageHero } from '@/components/public/page-hero';
 import { PageInfoSection } from '@/components/public/page-info-section';
 import { PublicPrelaunchSection } from '@/components/public/public-prelaunch-section';
-import { EventCityTabs, EventsSearchBar } from '@/components/public/events-page-header';
+import { EventsFilterBar } from '@/components/public/events-page-header';
 import { EventsHeroActions } from '@/app/(public)/events/events-hero-actions';
 import { ContentSubscribeForm } from '@/components/public/content-subscribe-form';
 import { JsonLd } from '@/components/seo/json-ld';
@@ -77,14 +77,11 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
         />
       ) : null}
 
-      <EventCityTabs
+      <EventsFilterBar
         cities={filterCities}
         selectedCity={selectedCity}
         preserve={{ q: selectedQ, format: selectedFormat, period: selectedPeriod }}
-      />
-      <EventsSearchBar
         formats={filterOptions.formats}
-        selectedCity={selectedCity}
         selectedFormat={selectedFormat}
         selectedPeriod={selectedPeriod}
         selectedQ={selectedQ}

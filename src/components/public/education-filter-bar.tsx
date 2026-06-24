@@ -93,7 +93,7 @@ function EducationFilterBarContent({
     <div className="border-b border-[var(--line)] bg-[var(--surface)]">
       <div className="container py-4">
         {/* Bordered panel that groups all filter controls — matches reference */}
-        <div className="overflow-hidden rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--surface-card)] p-2 shadow-[var(--shadow-sm)] sm:p-2.5">
+        <div className="overflow-hidden p-2 sm:p-2.5">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
             {/* Search input */}
             <div className="relative min-w-0 flex-1">

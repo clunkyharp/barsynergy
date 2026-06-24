@@ -57,7 +57,7 @@ function RegisterSuccessOnboarding() {
       {/* Hero */}
       <div className="flex flex-col items-center gap-3 text-center">
         <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[var(--accent-soft)]">
-          <CheckCircle aria-hidden className="text-[var(--accent)]" size={36} strokeWidth={1.5} />
+          <CheckCircle aria-hidden className="text-[var(--accent-ink)]" size={36} strokeWidth={1.5} />
         </div>
         <div>
           <h2 className={cn(displayFont.className, 'text-[1.75rem] font-semibold leading-tight text-[var(--text)]')}>
@@ -106,7 +106,7 @@ function RegisterSuccessOnboarding() {
                   step.done
                     ? 'bg-[var(--accent)] text-[var(--accent-contrast)]'
                     : step.active
-                    ? 'border-2 border-[var(--accent)] bg-transparent text-[var(--accent)]'
+                    ? 'border-2 border-[var(--accent)] bg-transparent text-[var(--accent-ink)]'
                     : 'border-2 border-[var(--border-default)] bg-transparent text-[var(--muted)]'
                 )}
               >
@@ -130,7 +130,7 @@ function RegisterSuccessOnboarding() {
               href={item.href}
               key={item.href}
             >
-              <item.icon aria-hidden className="text-[var(--muted)] transition-colors group-hover:text-[var(--accent)]" size={20} strokeWidth={1.5} />
+              <item.icon aria-hidden className="text-[var(--muted)] transition-colors group-hover:text-[var(--accent-ink)]" size={20} strokeWidth={1.5} />
               <span className="text-[11px] font-semibold leading-4 text-[var(--text)]">{item.title}</span>
             </AppLink>
           ))}
@@ -174,15 +174,15 @@ export default async function RegisterUserPage({ searchParams }: RegisterUserPag
               <div className="mb-4 rounded-[var(--radius-md)] border border-[var(--accent)]/30 bg-[var(--accent-soft)] p-4 text-sm leading-6 text-[var(--text)]">
                 Письмо для подтверждения отправлено повторно, если регистрация уже начиналась.
                 <span className="mt-2 flex flex-wrap gap-3">
-                  <AppLink className="font-semibold text-[var(--accent)]" href="/auth/login">Попробовать вход</AppLink>
-                  <AppLink className="font-semibold text-[var(--accent)]" href="/auth/password-reset">Восстановить доступ</AppLink>
+                  <AppLink className="font-semibold text-[var(--accent-ink)]" href="/auth/login">Попробовать вход</AppLink>
+                  <AppLink className="font-semibold text-[var(--accent-ink)]" href="/auth/password-reset">Восстановить доступ</AppLink>
                 </span>
               </div>
             ) : null}
             <RegisterUserForm action={registerUserAction} defaults={storedDefaults ?? undefined} />
             <p className="mt-5 text-center text-sm text-[var(--muted)]">
               Уже есть аккаунт?{' '}
-              <AppLink className="font-semibold text-[var(--accent)] transition-colors hover:text-[var(--accent-strong)]" href="/auth/login">
+              <AppLink className="font-semibold text-[var(--accent-ink)] transition-colors hover:text-[var(--accent-strong)]" href="/auth/login">
                 Войти
               </AppLink>
             </p>
