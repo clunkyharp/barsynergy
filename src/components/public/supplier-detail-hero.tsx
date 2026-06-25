@@ -44,7 +44,7 @@ export function SupplierDetailHero({
 
           <div className="min-w-0">
             <PublicBreadcrumbs
-              current={title}
+              current={companyName ?? title}
               items={[
                 { href: '/', label: 'Главная' },
                 { href: '/suppliers', label: 'Поставщики' }
@@ -54,11 +54,11 @@ export function SupplierDetailHero({
             <h1
               className={`${displayFont.className} supplier-detail-title mt-4 max-w-[22ch] text-pretty font-semibold text-balance tracking-normal text-[var(--text)] [overflow-wrap:normal] [text-wrap:pretty] [word-break:normal] max-[480px]:max-w-full`}
             >
-              {title}
+              {companyName ?? title}
             </h1>
 
-            {companyName && companyName !== title ? (
-              <p className="mt-1 text-base leading-6 text-[var(--muted)]">{companyName}</p>
+            {title && title !== companyName ? (
+              <p className="mt-3 max-w-2xl text-[15px] leading-7 text-[var(--muted)] md:text-base">{title}</p>
             ) : null}
 
             {label || cityName || serviceArea ? (

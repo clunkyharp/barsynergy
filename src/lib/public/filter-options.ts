@@ -1,4 +1,4 @@
-import { CategoryType, ContentStatus, MasterEntityType } from '@prisma/client';
+import { CategoryType, ContentStatus, JobSearchStatus, MasterEntityType } from '@prisma/client';
 import { prisma } from '@/lib/db/prisma';
 import {
   courseFormatOptions,
@@ -168,15 +168,13 @@ export async function getSpecialistFilterOptions() {
   ]);
 
   return {
-    mode: [
-      { value: 'seeking', label: 'Ищу работу' },
-      { value: 'offering', label: 'Предлагаю услуги' },
-    ],
     cities,
     categories: masterCategories.map((c) => ({ value: c.slug, label: c.name })),
     professions: uniqueTextOptions(seekingProfessions.map((p) => p.profession)),
     employmentTypes: Object.entries(employmentTypeLabels).map(([value, label]) => ({ value, label })),
-    jobSearchStatuses: Object.entries(jobSearchStatusLabels).map(([value, label]) => ({ value, label })),
+    jobSearchStatuses: Object.entries(jobSearchStatusLabels)
+      .filter(([value]) => value !== JobSearchStatus.NOT_LOOKING)
+      .map(([value, label]) => ({ value, label })),
     entityTypes: [
       { value: 'individual', label: 'Частные специалисты' },
       { value: 'business', label: 'Компании' },

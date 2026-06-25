@@ -72,7 +72,7 @@ export default async function SupplierDetailPage({ params, searchParams }: Suppl
           buildBreadcrumbJsonLd([
             { name: 'Главная', path: '/' },
             { name: 'Поставщики', path: '/suppliers' },
-            { name: supplier.title, path: detailPath }
+            { name: supplier.companyName ?? supplier.title, path: detailPath }
           ]),
           buildPublicContentJsonLd({ detail: supplier, path: detailPath, kind: 'organization' })
         ]}

@@ -87,37 +87,37 @@ export function SiteFooter({ userRole, userEmail, newsletterDisabled = false, le
 
     if (pathname.startsWith('/vacancies')) {
       return {
-        eyebrow: 'Для работодателей',
-        title: 'Нужно разместить вакансию для команды?',
-        description: 'Оставьте заявку, чтобы команда помогла собрать вакансию и показать её профильной аудитории BARSYNERGY.',
-        primaryLabel: 'Разместить вакансию',
-        primaryAction: () => openLeadModal('vacancy'),
+        eyebrow: 'Не нашли вакансию?',
+        title: 'Оставьте резюме — работодатели найдут вас',
+        description: 'Опубликуйте профиль специалиста: команды баров и кофеен видят кандидатов в каталоге и пишут напрямую.',
+        primaryHref: '/auth/register/user',
+        primaryLabel: 'Создать профиль специалиста',
         secondaryHref: '/business',
-        secondaryLabel: 'Каталог для компаний'
+        secondaryLabel: 'Разместить вакансию'
       };
     }
 
     if (pathname.startsWith('/suppliers')) {
       return {
-        eyebrow: 'Для компаний',
-        title: 'Добавьте компанию в профильный каталог',
-        description: 'Если вы представляете заведение, поставщика или сервис, оставьте заявку и мы подскажем, какой формат карточки подойдёт.',
-        primaryHref: businessHref,
-        primaryLabel: businessLinkLabel,
-        secondaryHref: '/contacts?topic=partnership#contact-form',
-        secondaryLabel: 'Связаться с нами'
+        eyebrow: 'Не нашли поставщика?',
+        title: 'Подберём поставщика под вашу задачу',
+        description: 'Опишите, что ищете — продукты, оборудование или сервис. Подскажем компании из каталога и проверенных партнёров.',
+        primaryHref: '/contacts?topic=supplier#contact-form',
+        primaryLabel: 'Описать задачу',
+        secondaryHref: businessHref,
+        secondaryLabel: businessLinkLabel
       };
     }
 
     if (pathname.startsWith('/masters')) {
       return {
-        eyebrow: 'Для мастеров',
-        title: 'Покажите услугу профильной аудитории',
-        description: 'Добавьте специалиста или услугу компании в каталог мастеров, чтобы команды баров могли быстро найти помощь.',
-        primaryHref: '/masters#master-submission',
-        primaryLabel: 'Стать мастером',
-        secondaryHref: businessHref,
-        secondaryLabel: businessLinkLabel
+        eyebrow: 'Не нашли мастера?',
+        title: 'Подскажем исполнителя под задачу',
+        description: 'Опишите задачу — настройка бара, сервис оборудования или консалтинг. Поможем найти мастера из каталога.',
+        primaryHref: '/contacts?topic=consulting#contact-form',
+        primaryLabel: 'Описать задачу',
+        secondaryHref: '/masters#master-submission',
+        secondaryLabel: 'Стать мастером'
       };
     }
 

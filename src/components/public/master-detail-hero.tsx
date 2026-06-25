@@ -28,11 +28,18 @@ export function MasterDetailHero({
   isVerified,
   entityLabel
 }: MasterDetailHeroProps) {
+  const heading = displayName ?? title;
+  // title often embeds the name ("Имя — услуга"); strip the name prefix so the
+  // subtitle reads only the service and doesn't repeat the H1.
+  const taglineRaw = displayName && title.startsWith(displayName)
+    ? title.slice(displayName.length).replace(/^\s*[—–-]\s*/, '').trim()
+    : title;
+  const tagline = taglineRaw && taglineRaw !== heading ? taglineRaw : null;
   return (
     <section className="background-zone background-zone-graphite relative overflow-hidden border-b border-[var(--line)] py-7 md:py-9">
       <div className="container">
         <PublicBreadcrumbs
-          current={title}
+          current={displayName ?? title}
           items={[
             { href: '/', label: 'Главная' },
             { href: '/masters', label: 'Мастера' }
@@ -49,11 +56,11 @@ export function MasterDetailHero({
             ) : null}
 
             <h1 className={`${displayFont.className} mt-4 max-w-[22ch] text-pretty text-[clamp(1.8rem,3.2vw,3rem)] font-semibold leading-[1.20] text-balance tracking-normal text-[var(--text)] [overflow-wrap:normal] [text-wrap:pretty] [word-break:normal] max-[480px]:max-w-full`}>
-              {title}
+              {heading}
             </h1>
 
-            {displayName && displayName !== title ? (
-              <p className="mt-1 text-base leading-6 text-[var(--muted)]">{displayName}</p>
+            {tagline ? (
+              <p className="mt-3 max-w-2xl text-[15px] leading-7 text-[var(--muted)] md:text-base">{tagline}</p>
             ) : null}
 
             <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-sm leading-6 text-[var(--muted)]">

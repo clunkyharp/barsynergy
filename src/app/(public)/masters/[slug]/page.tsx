@@ -82,7 +82,7 @@ export default async function MasterDetailPage({ params, searchParams }: MasterD
           buildBreadcrumbJsonLd([
             { name: 'Главная', path: '/' },
             { name: 'Мастера', path: '/masters' },
-            { name: master.title, path: detailPath }
+            { name: displayName, path: detailPath }
           ]),
           buildMasterJsonLd(master, detailPath)
         ]}

@@ -97,7 +97,7 @@ export function SpecialistCard({ item, rowActionLabel }: SpecialistCardProps) {
 
         {rate ? (
           <div>
-            <p className="whitespace-nowrap text-lg font-semibold leading-6 text-[var(--text)] tabular-nums">{rate}</p>
+            <p className="text-lg font-semibold leading-6 text-[var(--text)] tabular-nums [overflow-wrap:anywhere]">{rate}</p>
           </div>
         ) : null}
 

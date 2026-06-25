@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/db/prisma';
-import { ContentStatus, MasterEntityType } from '@prisma/client';
+import { ContentStatus, JobSearchStatus, MasterEntityType } from '@prisma/client';
 import type { PublicContentSearchParams } from './shared';
 import { getPage, getPageSize, publicImageUrl } from './shared';
 import type { PublishedContentItem } from './shared';
@@ -40,6 +40,9 @@ function getSeekingWhere(params: PublicContentSearchParams) {
   const where: Record<string, unknown> = {
     isPublic: true,
     publicHandle: { not: null },
+    // Being listed in the specialists catalog implies looking for work, so
+    // never surface profiles explicitly marked "Не ищу".
+    NOT: { jobSearchStatus: JobSearchStatus.NOT_LOOKING },
   };
 
   if (q) {
@@ -220,7 +223,7 @@ function offeringToCard(master: Awaited<ReturnType<typeof fetchOffering>>[number
       ? Date.now() - master.publishedAt.getTime() < 7 * 24 * 60 * 60 * 1000
       : false,
     mode: 'offering' as const,
-    detailUrl: `/specialists/svc/${master.slug}`,
+    detailUrl: `/masters/${master.slug}`,
     citySlug: master.city?.slug,
   };
 }

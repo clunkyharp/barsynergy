@@ -802,7 +802,6 @@ form[data-public-validation="true"] .grid-cols-2 .form-field {
 }
 
 .public-catalog-toolbar {
-    border-bottom: 1px solid var(--line);
     background: color-mix(
         in oklab,
         var(--surface-muted) 46%,
@@ -1275,13 +1274,6 @@ form[data-public-validation="true"] .grid-cols-2 .form-field {
     width: 100%;
 }
 
-.vacancies-directory-page .specialist-mode-panel {
-    border-color: var(--border-default);
-    border-radius: var(--radius-lg);
-    background: var(--surface);
-    box-shadow: none;
-}
-
 .vacancies-directory-page .public-catalog-list-wrapper > .sticky {
     position: static;
     border: 0;
@@ -1344,12 +1336,6 @@ form[data-public-validation="true"] .grid-cols-2 .form-field {
     width: 100%;
 }
 
-.vacancies-directory-page .specialist-mode-panel {
-    display: grid;
-    gap: 1rem;
-    padding: 1rem;
-}
-
 .vacancies-directory-page .specialist-directory-card {
     min-height: 100%;
     grid-column: 1 / -1;
@@ -1407,118 +1393,6 @@ form[data-public-validation="true"] .grid-cols-2 .form-field {
         max-height: calc(100dvh - 5rem);
         overflow-y: auto;
     }
-}
-
-.specialist-mode-bar {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.75rem;
-    border: 1px solid var(--line);
-    border-radius: var(--radius-lg);
-    background: color-mix(in oklab, var(--surface-card) 72%, transparent);
-    padding: 0.75rem 1rem;
-}
-
-.specialist-mode-bar-links {
-    display: flex;
-    gap: 0.25rem;
-    border: 1px solid var(--line);
-    border-radius: var(--radius-md);
-    background: color-mix(in oklab, var(--surface-card) 68%, transparent);
-    padding: 0.2rem;
-}
-
-.specialist-mode-bar-link {
-    display: inline-flex;
-    min-height: 2.25rem;
-    align-items: center;
-    justify-content: center;
-    border-radius: var(--radius-sm);
-    padding: 0.35rem 0.85rem;
-    font-size: 0.85rem;
-    font-weight: 700;
-    line-height: 1.2;
-    text-align: center;
-    transition:
-        background-color var(--motion-duration-fast) var(--motion-ease-standard),
-        color var(--motion-duration-fast) var(--motion-ease-standard);
-}
-
-.specialist-mode-bar-link-active {
-    border: 1px solid color-mix(in oklab, var(--accent) 36%, var(--line));
-    background: var(--surface-card);
-    color: var(--text);
-}
-
-.specialist-mode-bar-link-idle {
-    color: var(--muted);
-}
-
-.specialist-mode-bar-link-idle:hover,
-.specialist-mode-bar-link-idle:focus-visible {
-    background: var(--surface-wash);
-    color: var(--text);
-}
-
-/* Specialist mode panel (sidebar radio-style selector) */
-.specialist-mode-panel {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    border: 1px solid var(--border-default);
-    border-radius: var(--radius-lg);
-    background: var(--surface-card);
-    padding: 1.25rem;
-}
-
-.specialist-mode-link {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.75rem;
-    min-height: 2.75rem;
-    border: 1px solid var(--border-default);
-    border-radius: var(--radius-md);
-    padding: 0.625rem 0.875rem;
-    font-size: 0.9rem;
-    font-weight: 600;
-    line-height: 1.2;
-    color: var(--muted);
-    transition:
-        background-color var(--motion-duration-fast) var(--motion-ease-standard),
-        border-color var(--motion-duration-fast) var(--motion-ease-standard),
-        color var(--motion-duration-fast) var(--motion-ease-standard);
-}
-
-.specialist-mode-link span:last-child {
-    font-size: 0.7rem;
-    line-height: 1;
-}
-
-.specialist-mode-link-active {
-    border-color: color-mix(in oklab, var(--accent) 48%, var(--border-default));
-    background: var(--accent-soft);
-    color: var(--text);
-}
-
-.specialist-mode-link-active span:last-child {
-    color: var(--accent);
-}
-
-.specialist-mode-link-idle:hover,
-.specialist-mode-link-idle:focus-visible {
-    border-color: var(--border-strong);
-    background: var(--surface-wash);
-    color: var(--text);
-}
-
-.specialist-mode-note {
-    border-top: 1px solid var(--line);
-    padding-top: 0.875rem;
-    font-size: 0.8rem;
-    line-height: 1.5;
-    color: var(--muted);
 }
 
 .specialist-directory-summary {
@@ -1823,13 +1697,13 @@ form[data-public-validation="true"] .grid-cols-2 .form-field {
 
 @media (min-width: 768px) {
     .specialist-directory-card {
-        grid-template-columns: minmax(0, 1fr) auto;
+        grid-template-columns: minmax(0, 1fr) minmax(11rem, 14rem);
     }
 
     .specialist-directory-offer {
         border-left: 1px solid var(--line);
         padding-left: 1.5rem;
-        max-width: 14rem;
+        min-width: 0;
     }
 
     .master-profile-summary-main {
@@ -1846,7 +1720,6 @@ form[data-public-validation="true"] .grid-cols-2 .form-field {
 }
 
 @media (max-width: 767px) {
-    .specialist-mode-panel,
     .specialist-directory-summary,
     .specialist-directory-card,
     .master-profile-summary.inset-panel,

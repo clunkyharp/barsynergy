@@ -46,15 +46,14 @@ function getVacancySortLabel(sort?: string) {
 }
 
 async function getDirectoryCounts() {
-  const [vacancies, seekingSpecialists, offeringSpecialists] = await Promise.all([
+  const [vacancies, seekingSpecialists] = await Promise.all([
     getPublishedVacancies({ pageSize: '1' }),
-    getPublishedSpecialists({ mode: 'seeking', pageSize: '1' }),
-    getPublishedSpecialists({ mode: 'offering', pageSize: '1' })
+    getPublishedSpecialists({ mode: 'seeking', pageSize: '1' })
   ]);
 
   return {
     vacancies: vacancies.total,
-    specialists: seekingSpecialists.total + offeringSpecialists.total
+    specialists: seekingSpecialists.total
   };
 }
 
@@ -82,7 +81,7 @@ export default async function VacanciesPage({ searchParams }: VacanciesPageProps
   if (view === 'specialists') {
     const contentParams = stripPublicApplicationResultParams(params);
     const [content, filterOptions, directoryCounts] = await Promise.all([
-      getPublishedSpecialists(contentParams),
+      getPublishedSpecialists({ ...contentParams, mode: 'seeking' }),
       getSpecialistFilterOptions(),
       directoryCountsPromise
     ]);
@@ -94,7 +93,7 @@ export default async function VacanciesPage({ searchParams }: VacanciesPageProps
           breadcrumbs={[{ href: '/', label: 'Главная' }, { label: 'Вакансии' }]}
           eyebrow="Работа в кофейной индустрии"
           title="Специалисты"
-          subtitle="Резюме, услуги и анкеты специалистов для кофеен, баров и ресторанов."
+          subtitle="Резюме и анкеты специалистов, которые ищут работу в кофейнях, барах и ресторанах. Услуги и сервисные команды — в разделе «Мастера»."
           tone="graphite"
           media={{ kind: 'slot', children: <VacanciesHeroActions /> }}
         >
@@ -120,9 +119,9 @@ export default async function VacanciesPage({ searchParams }: VacanciesPageProps
           sectionId="specialist-list"
           emptyIcon="user"
           emptyTitle="Специалистов пока нет"
-          emptyDescription="Когда появятся первые резюме и предложения услуг, они будут здесь."
+          emptyDescription="Когда специалисты опубликуют резюме, они появятся здесь."
           emptyActions={[
-            { href: '/specialists/svc/new', label: 'Опубликовать резюме', variant: 'primary' },
+            { href: '/auth/register/user', label: 'Создать профиль специалиста', variant: 'primary' },
             { href: 'https://t.me/barsynergy', label: 'Следить в Telegram' }
           ]}
           showSidebarTitle={false}
