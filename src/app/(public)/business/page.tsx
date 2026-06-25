@@ -187,7 +187,7 @@ export default async function BusinessPage({ searchParams }: BusinessPageProps) 
           </div>
           <ol className="grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-5">
             {processSteps.map((step, index) => {
-              const stepLabel = String(index + 1).padStart(2, '0');
+              const stepLabel = String(index + 1);
 
               return (
               <li
