@@ -1017,43 +1017,6 @@ form[data-public-validation="true"] .grid-cols-2 .form-field {
     padding: 1.25rem;
 }
 
-.suppliers-directory-page .public-list-row-shell-hh,
-.masters-directory-page .public-list-row-shell-hh {
-    min-height: 100%;
-    border-radius: var(--radius-lg);
-    padding: 1.5rem;
-}
-
-.suppliers-directory-page .public-list-row-shell-hh > div,
-.masters-directory-page .public-list-row-shell-hh > div {
-    width: 100%;
-}
-
-.suppliers-directory-page .public-list-row-title,
-.masters-directory-page .public-list-row-title {
-    font-family: var(--font-display), var(--font-body, system-ui), system-ui, sans-serif;
-    font-size: 1.125rem;
-    line-height: 1.3;
-}
-
-.suppliers-directory-page .public-list-row-actions .button,
-.suppliers-directory-page .public-list-row-actions a,
-.masters-directory-page .public-list-row-actions .button,
-.masters-directory-page .public-list-row-actions a {
-    width: 100%;
-}
-
-.suppliers-directory-page .public-list-row-company,
-.masters-directory-page .public-list-row-company {
-    display: flex;
-    min-height: 8rem;
-}
-
-.suppliers-directory-page .public-list-row-company > div,
-.masters-directory-page .public-list-row-company > div {
-    width: 100%;
-}
-
 .articles-directory-page #articles-list {
     background: var(--background);
     padding-top: clamp(1.5rem, 3vw, 2.5rem);

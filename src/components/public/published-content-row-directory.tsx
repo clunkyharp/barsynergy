@@ -61,34 +61,38 @@ export function DirectoryListRow({
 
   return (
     <article className="group relative flex h-full flex-col overflow-hidden rounded-[var(--radius-lg)] border border-[var(--border-subtle)] bg-[var(--surface-card)] transition-colors duration-[var(--motion-duration-base)] ease-[var(--motion-ease-standard)] hover:border-[var(--border-strong)] focus-within:border-[var(--border-strong)]">
-      <div className="relative flex h-[124px] items-center justify-center overflow-hidden bg-[var(--surface-muted)]">
-        {item.imageUrl ? (
-          <>
-            <span
-              aria-hidden="true"
-              className="absolute inset-0 bg-cover bg-center transition-transform duration-[var(--motion-duration-media)] ease-[var(--motion-ease-move)] group-hover:scale-[1.04] motion-reduce:transition-none"
-              style={{ backgroundImage: `url("${item.imageUrl}")` }}
-            />
-            <span aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" />
-          </>
-        ) : category ? (
-          <span className={`${displayFont.className} relative px-6 py-4 text-center text-[1.05rem] font-semibold uppercase leading-tight tracking-[var(--tracking-eyebrow-sm)] text-[var(--muted)] opacity-60`}>
-            {category}
-          </span>
-        ) : null}
-        {item.imageUrl && category ? (
-          <span className="absolute left-3 top-3 inline-flex items-center rounded-[var(--radius-pill)] border border-white/20 bg-black/30 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[var(--tracking-eyebrow-sm)] text-white backdrop-blur-sm">
-            {category}
-          </span>
-        ) : null}
-        {item.statusLabel ? (
-          <span className="absolute right-3 top-3">
-            <HighlightChip variant="fresh">{item.statusLabel}</HighlightChip>
-          </span>
-        ) : null}
-      </div>
+      {item.imageUrl ? (
+        <div className="relative flex h-[124px] items-center justify-center overflow-hidden bg-[var(--surface-muted)]">
+          <span
+            aria-hidden="true"
+            className="absolute inset-0 bg-cover bg-center transition-transform duration-[var(--motion-duration-media)] ease-[var(--motion-ease-move)] group-hover:scale-[1.04] motion-reduce:transition-none"
+            style={{ backgroundImage: `url("${item.imageUrl}")` }}
+          />
+          <span aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" />
+          {category ? (
+            <span className="absolute left-3 top-3 inline-flex items-center rounded-[var(--radius-pill)] border border-white/20 bg-black/30 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[var(--tracking-eyebrow-sm)] text-white backdrop-blur-sm">
+              {category}
+            </span>
+          ) : null}
+          {item.statusLabel ? (
+            <span className="absolute right-3 top-3">
+              <HighlightChip variant="fresh">{item.statusLabel}</HighlightChip>
+            </span>
+          ) : null}
+        </div>
+      ) : null}
 
       <div className="flex flex-1 flex-col gap-3 p-5">
+        {!item.imageUrl && (category || item.statusLabel) ? (
+          <div className="flex items-center justify-between gap-3">
+            {category ? (
+              <span className={`${displayFont.className} text-[11px] font-semibold uppercase leading-tight tracking-[var(--tracking-eyebrow-sm)] text-[var(--muted)]`}>
+                {category}
+              </span>
+            ) : <span />}
+            {item.statusLabel ? <HighlightChip variant="fresh">{item.statusLabel}</HighlightChip> : null}
+          </div>
+        ) : null}
         <div className="min-w-0">
           <h3 className="text-[1.1rem] font-bold leading-[1.25] text-[var(--text)]">
             <AppLink
