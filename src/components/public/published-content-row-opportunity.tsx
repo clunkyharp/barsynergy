@@ -82,7 +82,7 @@ export function OpportunityListRow({
       </h3>
 
       <div>{vacancySalary(item)}</div>
-      <div className="mt-auto">{opportunityMeta(item)}</div>
+      <div>{opportunityMeta(item)}</div>
     </article>
   );
 }

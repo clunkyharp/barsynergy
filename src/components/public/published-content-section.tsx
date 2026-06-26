@@ -1,4 +1,4 @@
-import { Fragment, type ReactNode } from 'react';
+import { Fragment, cloneElement, isValidElement, type ReactElement, type ReactNode } from 'react';
 
 function pluralRu(n: number, [one, few, many]: [string, string, string]): string {
   const mod10 = n % 10;
@@ -71,6 +71,7 @@ type PublishedContentSectionProps = {
   ignoredParamKeys?: string[];
   backgroundZone?: 'ivory' | 'graphite';
   emptyIcon?: SectionIconType;
+  toolbarPlacement?: 'header' | 'inline';
 };
 
 function PublishedContentSectionLayout({
@@ -98,6 +99,7 @@ function PublishedContentSectionLayout({
   ignoredParamKeys,
   backgroundZone = 'ivory',
   emptyIcon,
+  toolbarPlacement = 'inline',
   renderRow,
   listClassName
 }: PublishedContentSectionProps & { renderRow: (item: PublishedContentList['items'][number]) => ReactNode; listClassName?: string }) {
@@ -113,6 +115,12 @@ function PublishedContentSectionLayout({
     : emptyDescription;
   const emptyStateActions = buildEmptyActions(resetBase, hasActiveFilters, resolvedEmptyActions);
   const resolvedCountLabel = countForms ? pluralRu(content.total, countForms) : countLabel.toLowerCase();
+  const toolbarInHeader = toolbarPlacement === 'header';
+  const countNode = `${content.total} ${resolvedCountLabel}`;
+  const filtersNode =
+    toolbarInHeader && isValidElement(filters)
+      ? cloneElement(filters as ReactElement<{ titleMeta?: ReactNode }>, { titleMeta: countNode })
+      : filters;
   const listToolbar = (
     <div className="public-catalog-toolbar flex flex-wrap items-center justify-between gap-3">
       <span className="text-sm text-[var(--muted)]">{content.total} {resolvedCountLabel}</span>
@@ -157,7 +165,7 @@ function PublishedContentSectionLayout({
       <div className="public-catalog-layout container grid gap-6 md:gap-8 xl:grid-cols-[minmax(16rem,0.48fr)_minmax(0,1.52fr)] xl:items-start xl:gap-8">
         <aside className="public-catalog-sidebar min-w-0 xl:self-stretch">
           <div className="xl:sticky xl:top-14 xl:max-h-[calc(100dvh-5rem)] xl:overflow-y-auto">
-            {filters}
+            {filtersNode}
           </div>
         </aside>
 
@@ -183,11 +191,13 @@ function PublishedContentSectionLayout({
           />
         ) : (
           <div className="public-catalog-list-wrapper min-w-0">
-            <div className="sticky top-14 lg:top-16 z-20 rounded-t-[var(--radius-md)] border-l border-r border-t border-[var(--border-default)] bg-[var(--surface-card)] px-5 py-3">
-              {listToolbar}
-            </div>
-            <Panel className="public-catalog-list-panel min-w-0 overflow-hidden rounded-t-none border-t-0 border-[var(--border-default)] bg-[var(--surface-card)]" padding="none">
-              <div className={cn('public-catalog-list-rows pt-8', listClassName ?? 'divide-y divide-[var(--line)] border-y border-[var(--line)] md:flex md:flex-col md:gap-4 md:divide-y-0 md:border-y-0')}>
+            {toolbarInHeader ? null : (
+              <div className="sticky top-14 lg:top-16 z-20 rounded-t-[var(--radius-md)] border-l border-r border-t border-[var(--border-default)] bg-[var(--surface-card)] px-5 py-3">
+                {listToolbar}
+              </div>
+            )}
+            <Panel className={cn('public-catalog-list-panel min-w-0 overflow-hidden border-[var(--border-default)] bg-[var(--surface-card)]', toolbarInHeader ? '' : 'rounded-t-none border-t-0')} padding="none">
+              <div className={cn('public-catalog-list-rows', toolbarInHeader ? '' : 'pt-8', listClassName ?? 'divide-y divide-[var(--line)] border-y border-[var(--line)] md:flex md:flex-col md:gap-4 md:divide-y-0 md:border-y-0')}>
                 {visibleItems.map((item) => <Fragment key={item.id}>{renderRow(item)}</Fragment>)}
               </div>
 
@@ -231,6 +241,7 @@ export function PublishedContentSectionOpportunity(props: PublishedContentSectio
   return (
     <PublishedContentSectionLayout
       {...props}
+      toolbarPlacement="header"
       listClassName="grid gap-3 md:flex md:flex-col md:gap-4"
       renderRow={(item) => (
         <OpportunityListRow
@@ -247,6 +258,7 @@ export function PublishedContentSectionDirectory(props: PublishedContentSectionP
   return (
     <PublishedContentSectionLayout
       {...props}
+      toolbarPlacement="header"
       listClassName="grid gap-3 md:flex md:flex-col md:gap-4"
       renderRow={(item) => (
         <DirectoryListRow
@@ -263,6 +275,7 @@ export function PublishedContentSectionMaster(props: PublishedContentSectionProp
   return (
     <PublishedContentSectionLayout
       {...props}
+      toolbarPlacement="header"
       listClassName="grid gap-3 md:flex md:flex-col md:gap-4"
       renderRow={(item) => (
         <DirectoryListRow
@@ -295,6 +308,7 @@ export function PublishedContentSectionSpecialist(props: PublishedContentSection
   return (
     <PublishedContentSectionLayout
       {...props}
+      toolbarPlacement="header"
       listClassName="flex flex-col gap-3 md:gap-4"
       renderRow={(item) => (
         <SpecialistCard

@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils';
 
 type Props = {
   title: string;
+  titleMeta?: ReactNode;
   embedded: boolean;
   filterStatusId: string;
   liveStatusText: string;
@@ -38,6 +39,7 @@ type Props = {
 
 export function PublicFiltersSidebarVariant({
   title,
+  titleMeta,
   embedded,
   filterStatusId,
   liveStatusText,
@@ -70,7 +72,10 @@ export function PublicFiltersSidebarVariant({
         {liveStatusText}
       </p>
       <Panel className={cn('public-filter-panel public-filter-sidebar-panel', panelSurfaceClass)} padding={panelPadding}>
-        <p className={filterTitleClassName}>{title}</p>
+        <div className="flex items-baseline justify-between gap-3">
+          <p className={filterTitleClassName}>{title}</p>
+          {titleMeta ? <span className="shrink-0 text-[13px] font-medium text-[var(--muted)]">{titleMeta}</span> : null}
+        </div>
         {shouldShowFilterIntro ? <p className="mt-1.5 text-sm leading-6 text-[var(--muted)]">{description}</p> : null}
 
         <div className="mt-3">{searchField}</div>

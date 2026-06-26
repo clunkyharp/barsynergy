@@ -36,6 +36,7 @@ export function PublicFiltersContent({
   placeholder = 'Поиск по названию или теме…',
   description = 'Город, категория и формат.',
   title = 'Фильтры',
+  titleMeta,
   tone = 'default',
   variant
 }: PublicFiltersProps) {
@@ -312,7 +313,7 @@ export function PublicFiltersContent({
       onClearFilter={clearSingleFilter}
       onToggleSidebarFields={() => setAreSidebarFieldsCollapsed((value) => !value)}
       panelPadding={panelPadding} panelSurfaceClass={panelSurfaceClass}
-      searchField={searchField} shouldShowFilterIntro={shouldShowFilterIntro} title={title}
+      searchField={searchField} shouldShowFilterIntro={shouldShowFilterIntro} title={title} titleMeta={titleMeta}
     />;
   }
 
