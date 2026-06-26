@@ -1,12 +1,14 @@
+import type { ReactNode } from 'react';
 import { PublicFilters } from '@/components/public/public-filters';
 import type { PublicContentSearchParams } from '@/lib/public/content';
 
 type SpecialistFiltersProps = {
   filterOptions: Awaited<ReturnType<typeof import('@/lib/public/filter-options').getSpecialistFilterOptions>>;
   params: PublicContentSearchParams;
+  titleMeta?: ReactNode;
 };
 
-export function SpecialistFilters({ filterOptions }: SpecialistFiltersProps) {
+export function SpecialistFilters({ filterOptions, titleMeta }: SpecialistFiltersProps) {
   return (
     <PublicFilters
       activeSummaryLabel="Параметры каталога"
@@ -23,6 +25,7 @@ export function SpecialistFilters({ filterOptions }: SpecialistFiltersProps) {
       ]}
       placeholder="Имя, профессия или навык…"
       title="Фильтры"
+      titleMeta={titleMeta}
       tone="directory"
       variant="sidebar"
     />

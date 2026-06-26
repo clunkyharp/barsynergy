@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react';
+
 export type CategoryOption = {
   id: string;
   name: string;
@@ -45,6 +47,7 @@ export type PublicFiltersProps = {
   placeholder?: string;
   description?: string;
   title?: string;
+  titleMeta?: ReactNode;
   tone?: 'default' | 'directory';
   variant?: 'stacked' | 'toolbar' | 'sidebar';
 };
