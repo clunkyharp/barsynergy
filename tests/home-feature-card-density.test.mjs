@@ -51,7 +51,7 @@ test('homepage hero explains the product with one primary action and no search',
   assert.match(heroSource, /leading-\[1\.08\]/);
   assert.match(heroSource, /Люди, события, вакансии, поставщики, обучение и материалы/);
   assert.match(heroSource, /BARSYNERGY \/ Кофейная индустрия СКФО/);
-  assert.match(heroSource, /Смотреть вакансии/);
+  assert.match(heroSource, /Изучить платформу/);
   assert.match(heroSource, /Для бизнеса/);
   assert.doesNotMatch(heroSource, /home-hero-search/);
   assert.doesNotMatch(heroSource, /action="\/search"/);

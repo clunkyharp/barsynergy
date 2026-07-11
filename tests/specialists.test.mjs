@@ -10,20 +10,25 @@ function readProjectFile(path) {
   return readFileSync(join(repoRoot, path), 'utf8');
 }
 
-test('GET /vacancies?view=specialists — page renders specialist list section', () => {
+test('GET /specialists — renders unified specialist page with mode tabs', () => {
+  const source = readProjectFile('src/app/(public)/specialists/page.tsx');
+
+  assert.match(source, /import.*SpecialistModeTabs/);
+  assert.match(source, /mode.*job.*services.*teams/);
+  assert.match(source, /getPublishedSpecialists/);
+  assert.match(source, /mode.*seeking/);
+  assert.match(source, /mode.*offering/);
+  assert.match(source, /entityType.*INDIVIDUAL/);
+  assert.match(source, /entityType.*BUSINESS/);
+  assert.match(source, /PublishedContentSectionSpecialist/);
+  assert.doesNotMatch(source, /redirect\('\/vacancies/);
+});
+
+test('GET /vacancies?view=specialists — redirects to /specialists?mode=job', () => {
   const source = readProjectFile('src/app/(public)/vacancies/page.tsx');
 
   assert.match(source, /view === 'specialists'/);
-  assert.match(source, /getPublishedSpecialists\(contentParams\)/);
-  assert.match(source, /PublishedContentSectionSpecialist/);
-  assert.doesNotMatch(source, /notFound\(\)/);
-});
-
-test('GET /specialists — redirects 301 to /vacancies?view=specialists', () => {
-  const source = readProjectFile('src/app/(public)/specialists/page.tsx');
-
-  assert.match(source, /import.*redirect.*from 'next\/navigation'/);
-  assert.match(source, /redirect\('\/vacancies\?view=specialists'\)/);
+  assert.match(source, /redirect\('\/specialists\?mode=job'\)/);
 });
 
 test('GET /specialists/cv/[handle] — returns 200 for published profile and 404 for missing', () => {
@@ -35,13 +40,11 @@ test('GET /specialists/cv/[handle] — returns 200 for published profile and 404
   assert.match(source, /notFound\(\)/);
 });
 
-test('GET /specialists/svc/[slug] — returns 200 for published master and 404 for missing', () => {
+test('GET /specialists/svc/[slug] — permanent redirects to /masters/[slug]', () => {
   const source = readProjectFile('src/app/(public)/specialists/svc/[slug]/page.tsx');
 
-  assert.match(source, /import.*notFound.*from 'next\/navigation'/);
-  assert.match(source, /getPublishedMasterDetail\(slug\)/);
-  assert.match(source, /if\s*\(!master\)/);
-  assert.match(source, /notFound\(\)/);
+  assert.match(source, /import.*permanentRedirect.*from 'next\/navigation'/);
+  assert.match(source, /permanentRedirect\(`\/masters\/\$\{slug\}`\)/);
 });
 
 test('getPublishedSpecialists returns unified results with mode field', () => {
@@ -53,7 +56,7 @@ test('getPublishedSpecialists returns unified results with mode field', () => {
   assert.match(specialistsSource, /...offeringProfiles\.map\(offeringToCard\)/);
   assert.match(specialistsSource, /SpecialistCardItem/);
   assert.match(specialistsSource, /detailUrl: `\/specialists\/cv\/\$\{profile\.publicHandle!\}`/);
-  assert.match(specialistsSource, /detailUrl: `\/specialists\/svc\/\$\{master\.slug\}`/);
+  assert.match(specialistsSource, /detailUrl: `\/masters\/\$\{master\.slug\}`/);
 
   const cardType = /mode: SpecialistMode;/;
   assert.match(specialistsSource, cardType);

@@ -8,37 +8,8 @@
 .admin-shell {
   --admin-hairline: var(--border-default);
   --admin-card-radius: 14px;
-  --admin-surface: #ffffff;
-  --admin-table-header: #f4f5f7;
-  --admin-table-row-hover: #f7f8fa;
-  --background: #f7f8fa;
-  --surface: #ffffff;
-  --surface-muted: #eef0f4;
-  --surface-wash: #fbfbfc;
-  --surface-wash-strong: #ffffff;
-  --text: #1c1c1e;
-  --muted: #6b6f7e;
-  --line: #e0e2e8;
-  --border-default: #e0e2e8;
-  --border-strong: #c7cad5;
-  --admin-secondary-bg: #ffffff;
-  --admin-secondary-border: #e0e2e8;
-  --admin-secondary-text: #1c1c1e;
-  --admin-secondary-bg-hover: #f7f8fa;
-  --admin-secondary-border-hover: #c7cad5;
-  --admin-secondary-text-hover: #1c1c1e;
-  --admin-confirm-bg: var(--accent);
-  --admin-confirm-border: var(--accent);
-  --admin-confirm-text: var(--accent-contrast);
-  --admin-confirm-bg-hover: var(--accent-strong);
-  --admin-action-bg: #ffffff;
-  --admin-action-border: #e0e2e8;
-  --admin-action-text: #1c1c1e;
-  --admin-action-bg-hover: #f7f8fa;
-  --admin-action-border-hover: #c7cad5;
-  --admin-action-text-hover: #1c1c1e;
   min-height: 100vh;
-  background: #f7f8fa;
+  background: var(--background);
 }
 
 .admin-layout-grid {

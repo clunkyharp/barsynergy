@@ -30,26 +30,32 @@ test('public desktop header navigation is readable and keeps overlap guards', ()
   assert.match(source, /lg:gap-x-6/);
   assert.match(source, /xl:min-w-\[176px\]/);
   const typesSource = readProjectFile('src/components/layout/site-header-types.ts');
-  assert.match(typesSource, /export const desktopPrimaryNavItems = getNavItems\(\['\/education', '\/events', '\/vacancies', '\/suppliers', '\/masters', '\/articles'\]\)/);
+  assert.match(typesSource, /export const desktopPrimaryNavItems/);
+  assert.match(typesSource, /export const desktopDropdownGroups/);
   assert.match(typesSource, /export const desktopMoreGroups/);
+  assert.match(typesSource, /'\/articles'/);
+  assert.match(typesSource, /'\/vacancies'/);
+  assert.match(typesSource, /'\/specialists'/);
   assert.match(source, /lg:inline-flex/);
   assert.doesNotMatch(source, /href="\/vacancies#vacancy-form"/);
   assert.match(typesSource, /href: '\/contacts'/);
 });
 
-test('public desktop more menu opens by click and closes predictably', () => {
+test('public desktop dropdown menus open by click and close predictably', () => {
   const source = readProjectFile('src/components/layout/site-header.tsx');
-  const detailsStart = source.indexOf('<details');
-  const detailsEnd = source.indexOf('</details>');
-  const detailsSource = source.slice(detailsStart, detailsEnd);
 
-  assert.match(source, /const \[isMoreNavOpen, setIsMoreNavOpen\] = useState\(false\)/);
-  assert.match(source, /setIsMoreNavOpen\(false\);/);
-  assert.doesNotMatch(detailsSource, /onMouseEnter/);
-  assert.doesNotMatch(detailsSource, /onMouseLeave/);
-  assert.match(detailsSource, /onToggle=\{\(event\) => setIsMoreNavOpen\(event\.currentTarget\.open\)\}/);
-  assert.match(detailsSource, /open=\{isMoreNavOpen\}/);
-  assert.match(detailsSource, /event\.key === 'Escape'/);
+  assert.match(source, /function NavDropdown/);
+  assert.match(source, /aria-controls=\{id\}/);
+  assert.match(source, /aria-expanded=\{isOpen\}/);
+  assert.match(source, /role="menu"/);
+  assert.match(source, /role="menuitem"/);
+  assert.match(source, /onToggle=\{\(event\) => onToggle\(event\.currentTarget\.open\)\}/);
+  assert.match(source, /open=\{isOpen\}/);
+  assert.match(source, /event\.key === 'Escape'/);
+  assert.match(source, /summaryRef\.current\?\.focus/);
+  assert.match(source, /ArrowDown/);
+  assert.doesNotMatch(source, /onMouseEnter/);
+  assert.doesNotMatch(source, /onMouseLeave/);
 });
 
 test('main public pages expose consistent breadcrumbs in their hero sections', () => {

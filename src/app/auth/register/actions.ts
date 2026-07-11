@@ -83,7 +83,9 @@ async function sendUserVerificationEmail(input: { email: string; userId: string 
   const env = getEnv();
   const verificationUrl = `${env.APP_URL}/auth/verify-email?token=${rawToken}`;
   const { sendVerificationEmail } = await import('@/lib/notifications/auth-email');
-  sendVerificationEmail({ to: input.email, verificationUrl }).catch(() => {});
+  sendVerificationEmail({ to: input.email, verificationUrl }).catch((error: unknown) => {
+    console.error('Failed to send verification email:', error instanceof Error ? error.message : error);
+  });
 }
 
 async function redirectForExistingUserRegistration(email: string, fullName?: string): Promise<RegisterUserActionResult> {
@@ -245,7 +247,9 @@ export async function createBusinessAccountRequestAction(formData: FormData) {
       companyName: businessRequest.companyName,
       setPasswordUrl: outcome.status === 'created' ? outcome.setPasswordUrl : ''
     });
-  })().catch(() => {});
+  })().catch((error: unknown) => {
+    console.error('Failed to send business welcome email:', error instanceof Error ? error.message : error);
+  });
 
   redirect('/business/cabinet?welcome=1');
 }

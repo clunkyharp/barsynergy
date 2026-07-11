@@ -1,14 +1,7 @@
-import { prisma } from '@/lib/db/prisma';
+import { getActiveCityOptions, type CityOption } from '@/lib/shared/city-options';
 
-export type ApplicationCityOption = {
-  id: string;
-  name: string;
-};
+export type ApplicationCityOption = CityOption;
 
 export async function getApplicationCityOptions(): Promise<ApplicationCityOption[]> {
-  return prisma.city.findMany({
-    where: { isActive: true },
-    orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
-    select: { id: true, name: true }
-  });
+  return getActiveCityOptions();
 }

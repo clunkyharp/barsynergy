@@ -55,11 +55,8 @@ export async function getActiveCategories(type?: CategoryType) {
 }
 
 export async function getActiveCities() {
-  return prisma.city.findMany({
-    where: { isActive: true },
-    orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
-    select: { id: true, name: true }
-  });
+  const { getActiveCityOptions } = await import('@/lib/shared/city-options');
+  return getActiveCityOptions();
 }
 
 export async function getActiveTags(type?: CategoryType) {

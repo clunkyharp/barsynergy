@@ -77,7 +77,6 @@ const consultingDirectionCards: {
   code: string;
   description: string;
   icon: SectionIconType;
-  imagePath: string;
   result: string;
   tags: string[];
   title: string;
@@ -91,7 +90,6 @@ const consultingDirectionCards: {
     description: directionDescriptions.venue_opening,
     result: directionMeta.venue_opening.result,
     tags: ['Запуск', 'Процессы'],
-    imagePath: '/images/home/hero-bar-counter-bundo.jpg',
     tone: 'consulting-launch',
     icon: 'espresso'
   },
@@ -102,7 +100,6 @@ const consultingDirectionCards: {
     description: directionDescriptions.bar_menu,
     result: directionMeta.bar_menu.result,
     tags: ['Меню', 'Подача'],
-    imagePath: '/images/generated/program-intensive.jpg',
     tone: 'consulting-menu',
     icon: 'dripper'
   },
@@ -113,7 +110,6 @@ const consultingDirectionCards: {
     description: directionDescriptions.team_training,
     result: directionMeta.team_training.result,
     tags: ['Сервис', 'Навыки'],
-    imagePath: '/images/home/professional-education.webp',
     tone: 'consulting-team',
     icon: 'education'
   },
@@ -124,7 +120,6 @@ const consultingDirectionCards: {
     description: directionDescriptions.cost_pricing,
     result: directionMeta.cost_pricing.result,
     tags: ['Экономика', 'Маржа'],
-    imagePath: '/images/generated/content-guide.jpg',
     tone: 'consulting-cost',
     icon: 'calculator'
   },
@@ -135,7 +130,6 @@ const consultingDirectionCards: {
     description: directionDescriptions.suppliers_procurement,
     result: directionMeta.suppliers_procurement.result,
     tags: ['Закупки', 'Контроль'],
-    imagePath: '/images/generated/sponsorship-coffee-bar.jpg',
     tone: 'consulting-procurement',
     icon: 'suppliers'
   },
@@ -146,7 +140,6 @@ const consultingDirectionCards: {
     description: directionDescriptions.operational_audit,
     result: directionMeta.operational_audit.result,
     tags: ['Смены', 'Аудит'],
-    imagePath: '/images/home/audience-venues-coffee-bar.jpg',
     tone: 'consulting-audit',
     icon: 'chart'
   }
@@ -336,27 +329,6 @@ export default async function ConsultingPage({ searchParams }: ConsultingPagePro
             </PublicBodyText>
           </div>
           <ConsultingDirectionCards />
-        </div>
-      </section>
-
-      <section className="background-zone background-zone-cta border-b border-[var(--line)] py-10 md:py-14">
-        <div className="container">
-          <div className="rounded-[var(--radius-xl)] border border-[var(--editorial-dark-border)] bg-[var(--editorial-dark-surface)] p-6 shadow-[0_24px_72px_rgba(0,0,0,0.22)] md:grid md:grid-cols-[minmax(0,1fr)_auto] md:items-center md:gap-5 md:p-8" data-theme="dark">
-            <div>
-              <PublicEyebrow tone="inverse">Финальный шаг</PublicEyebrow>
-              <PublicDisplayTitle className="mt-3 max-w-3xl text-[var(--editorial-dark-text)]">
-                Есть задача для команды BARSYNERGY?
-              </PublicDisplayTitle>
-            </div>
-            <div className="mt-4 flex flex-col gap-3 sm:flex-row md:mt-0">
-              <Button className="rounded-[var(--radius-md)]" href="#consulting-request">
-                Описать задачу
-              </Button>
-              <Button className="rounded-[var(--radius-md)]" href="/business" variant="secondary">
-                Посмотреть каталог заведений
-              </Button>
-            </div>
-          </div>
         </div>
       </section>
 

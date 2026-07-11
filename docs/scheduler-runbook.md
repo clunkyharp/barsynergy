@@ -14,7 +14,7 @@ This runbook covers:
 - stale auth attempt throttle cleanup;
 - stale public application throttle cleanup;
 - stale business-access invite cleanup.
-- failed public application notification retry.
+- notification queue processing (email-content, application, web-push-content) via `/api/cron/notify`.
 
 Out of scope:
 
@@ -31,8 +31,9 @@ npm run session:cleanup:expired
 npm run auth:cleanup:throttles
 npm run application:cleanup:throttles
 npm run business-access:cleanup:invites
-npm run notifications:retry
 ```
+
+Notification queue processing is handled by the HTTP cron endpoint `/api/cron/notify`, which processes all three queues (email-content, application, web-push-content) in a single request. It requires `CRON_SECRET` in the environment. See the Notification Cron section below.
 
 Production host command pattern for a Compose-managed app container:
 
@@ -82,7 +83,6 @@ docker compose --env-file .env.production -f docker-compose.production.yml exec 
 docker compose --env-file .env.production -f docker-compose.production.yml exec -T app npm run auth:cleanup:throttles
 docker compose --env-file .env.production -f docker-compose.production.yml exec -T app npm run application:cleanup:throttles
 docker compose --env-file .env.production -f docker-compose.production.yml exec -T app npm run business-access:cleanup:invites
-docker compose --env-file .env.production -f docker-compose.production.yml exec -T app npm run notifications:retry
 ```
 
 Example host-side shell block for the current verified `systemd` checkout mode:
@@ -101,13 +101,21 @@ if node -e "const p=require('./package.json'); process.exit(p.scripts && p.scrip
 else
   echo "Skipping business-access:cleanup:invites: script is not present in the deployed revision"
 fi
-
-if node -e "const p=require('./package.json'); process.exit(p.scripts && p.scripts['notifications:retry'] ? 0 : 1)"; then
-  npm run notifications:retry
-else
-  echo "Skipping notifications:retry: script is not present in the deployed revision"
-fi
 ```
+
+## Notification Cron
+
+Notification queue processing (email-content, application, web-push-content) runs as a separate HTTP cron, not as part of the cleanup batch. The endpoint `/api/cron/notify` processes all three queues in a single request and requires `CRON_SECRET` in `.env.production`.
+
+Host-checkout crontab example (every 10 minutes):
+
+```cron
+*/10 * * * * /usr/bin/curl -fsS -X POST -H "Authorization: Bearer $CRON_SECRET" https://barsynergy.ru/api/cron/notify >> /var/log/barsynergy-notify.log 2>&1
+```
+
+The `$CRON_SECRET` value must be loaded from `.env.production` or a root-only secrets file. Do not hardcode it in the crontab.
+
+Alternatively, a systemd timer can call the same endpoint via a oneshot service that reads `CRON_SECRET` from the environment file.
 
 ## Recommended Frequency
 
@@ -119,10 +127,11 @@ Reasoning:
 
 - expired sessions are harmless after expiry but should not accumulate for long;
 - throttle cleanup has a long retention window, but is cheap to run together with session cleanup;
-- business-access invite cleanup should remove expired or long-used tokens without relying on manual maintenance;
-- notification retry should resend failed application notifications without relying on manual admin checks.
+- business-access invite cleanup should remove expired or long-used tokens without relying on manual maintenance.
 
-If the first production host has very limited resources, every 6 hours is an acceptable fallback. Do not go lower than daily only after explicit owner approval.
+Notification queue processing runs on a separate schedule (every 10 minutes) via the HTTP cron endpoint, not as part of the hourly cleanup batch.
+
+If the first production host has very limited resources, every 6 hours is an acceptable fallback for cleanup. Do not go lower than daily only after explicit owner approval.
 
 ## Systemd Timer Example
 
@@ -137,7 +146,7 @@ Description=BARSYNERGY scheduled cleanup
 [Service]
 Type=oneshot
 WorkingDirectory=/opt/barsynergy
-ExecStart=/bin/bash -lc 'set -euo pipefail; docker compose --env-file .env.production -f docker-compose.production.yml exec -T app npm run session:cleanup:expired && docker compose --env-file .env.production -f docker-compose.production.yml exec -T app npm run auth:cleanup:throttles && docker compose --env-file .env.production -f docker-compose.production.yml exec -T app npm run application:cleanup:throttles && docker compose --env-file .env.production -f docker-compose.production.yml exec -T app npm run business-access:cleanup:invites && docker compose --env-file .env.production -f docker-compose.production.yml exec -T app npm run notifications:retry'
+ExecStart=/bin/bash -lc 'set -euo pipefail; docker compose --env-file .env.production -f docker-compose.production.yml exec -T app npm run session:cleanup:expired && docker compose --env-file .env.production -f docker-compose.production.yml exec -T app npm run auth:cleanup:throttles && docker compose --env-file .env.production -f docker-compose.production.yml exec -T app npm run application:cleanup:throttles && docker compose --env-file .env.production -f docker-compose.production.yml exec -T app npm run business-access:cleanup:invites'
 ```
 
 Timer unit example:
@@ -177,7 +186,7 @@ ExecStart=/usr/local/bin/barsynergy-cleanup.sh
 Fallback if systemd timers are not available:
 
 ```cron
-0 * * * * cd /opt/barsynergy && docker compose --env-file .env.production -f docker-compose.production.yml exec -T app npm run session:cleanup:expired && docker compose --env-file .env.production -f docker-compose.production.yml exec -T app npm run auth:cleanup:throttles && docker compose --env-file .env.production -f docker-compose.production.yml exec -T app npm run application:cleanup:throttles && docker compose --env-file .env.production -f docker-compose.production.yml exec -T app npm run business-access:cleanup:invites && docker compose --env-file .env.production -f docker-compose.production.yml exec -T app npm run notifications:retry >> /var/log/barsynergy-cleanup.log 2>&1
+0 * * * * cd /opt/barsynergy && docker compose --env-file .env.production -f docker-compose.production.yml exec -T app npm run session:cleanup:expired && docker compose --env-file .env.production -f docker-compose.production.yml exec -T app npm run auth:cleanup:throttles && docker compose --env-file .env.production -f docker-compose.production.yml exec -T app npm run application:cleanup:throttles && docker compose --env-file .env.production -f docker-compose.production.yml exec -T app npm run business-access:cleanup:invites >> /var/log/barsynergy-cleanup.log 2>&1
 ```
 
 ## Preconditions

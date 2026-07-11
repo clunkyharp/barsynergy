@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { ChevronDown, Search, UserRound } from 'lucide-react';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
@@ -8,9 +8,11 @@ import { AccountMenu } from '@/components/layout/account-menu';
 import { MobileSiteMenu } from '@/components/layout/mobile-site-menu';
 import {
   type SiteHeaderProps,
+  type NavItem,
   type NavGroup,
   guestNavItems,
   desktopPrimaryNavItems,
+  desktopDropdownGroups,
   desktopMoreGroups,
   isWorkspacePath,
   isActiveItem
@@ -18,22 +20,156 @@ import {
 import { AppLink } from '@/components/ui/app-link';
 import { cn } from '@/lib/utils';
 
+const FOCUS_CLASS = 'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]';
+
+const LINK_BASE_CLASS = 'relative inline-flex min-h-11 shrink-0 items-center whitespace-nowrap rounded-[var(--radius-sm)] px-1 opacity-85 transition-[color,opacity] duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] after:absolute after:inset-x-1 after:bottom-1 after:h-px after:origin-left after:scale-x-0 after:bg-[var(--accent)] after:transition-transform after:duration-[var(--motion-duration-base)] after:ease-[var(--motion-ease-move)] hover:opacity-100 hover:after:scale-x-100 motion-reduce:transition-none motion-reduce:after:transition-none 2xl:px-2 2xl:after:inset-x-1.5';
+
+const TRIGGER_BASE_CLASS = cn(
+  LINK_BASE_CLASS,
+  'cursor-pointer list-none gap-1.5 group-open:after:scale-x-0 [&::-webkit-details-marker]:hidden'
+);
+
+const PANEL_CLASS = 'absolute left-1/2 top-[calc(100%+0.35rem)] z-20 flex min-w-[12rem] -translate-x-1/2 flex-col gap-1 rounded-[var(--radius-md)] border border-[var(--card-border)] bg-[var(--surface-elevated)] p-2 shadow-[var(--shadow-panel)]';
+
+const MENU_ITEM_CLASS = 'flex min-h-11 items-center rounded-[var(--radius-sm)] px-3 py-2 text-[13px] font-semibold text-[var(--text)] transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] hover:bg-[var(--surface-muted)] hover:text-[var(--accent-strong)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] motion-reduce:transition-none';
+
+type DropdownId = string | null;
+
+function NavDropdown({
+  id,
+  label,
+  items,
+  isActive,
+  isOpen,
+  onToggle,
+  onClose,
+  align = 'center'
+}: {
+  id: string;
+  label: string;
+  items: NavItem[];
+  isActive: boolean;
+  isOpen: boolean;
+  onToggle: (open: boolean) => void;
+  onClose: () => void;
+  align?: 'center' | 'right';
+}) {
+  const ref = useRef<HTMLDetailsElement>(null);
+  const summaryRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    function closeOnOutsidePointer(event: PointerEvent) {
+      const target = event.target as Node | null;
+      if (target && ref.current?.contains(target)) return;
+      onClose();
+    }
+
+    document.addEventListener('pointerdown', closeOnOutsidePointer);
+    return () => document.removeEventListener('pointerdown', closeOnOutsidePointer);
+  }, [isOpen, onClose]);
+
+  function handleKeyDown(event: React.KeyboardEvent<HTMLDetailsElement>) {
+    if (event.key === 'Escape') {
+      onClose();
+      summaryRef.current?.focus();
+      return;
+    }
+
+    if (event.key === 'ArrowDown' && isOpen) {
+      const firstLink = ref.current?.querySelector<HTMLAnchorElement>('[role="menuitem"]');
+      if (firstLink) {
+        event.preventDefault();
+        firstLink.focus();
+      }
+    }
+  }
+
+  const panelClassName = align === 'right'
+    ? cn(PANEL_CLASS, 'left-auto right-0 translate-x-0')
+    : PANEL_CLASS;
+
+  return (
+    <details
+      className="group relative shrink-0"
+      ref={ref}
+      onBlur={(event) => {
+        const nextTarget = event.relatedTarget as Node | null;
+        if (!nextTarget || !event.currentTarget.contains(nextTarget)) {
+          onClose();
+        }
+      }}
+      onKeyDown={handleKeyDown}
+      onToggle={(event) => onToggle(event.currentTarget.open)}
+      open={isOpen}
+    >
+      <summary
+        aria-controls={id}
+        aria-expanded={isOpen}
+        className={cn(
+          TRIGGER_BASE_CLASS,
+          isActive && 'text-[var(--accent-ink)] opacity-100 after:scale-x-100',
+          FOCUS_CLASS
+        )}
+        ref={summaryRef}
+      >
+        {label}
+        <ChevronDown aria-hidden="true" className="transition-transform duration-[var(--motion-duration-base)] ease-[var(--motion-ease-standard)] group-open:rotate-180 motion-reduce:transition-none" size={14} strokeWidth={1.8} />
+      </summary>
+      <div className={panelClassName} id={id} role="menu">
+        {items.map((item) => {
+          const itemActive = typeof window !== 'undefined'
+            ? false
+            : false;
+          return (
+            <AppLink
+              aria-label={undefined}
+              className={cn(
+                MENU_ITEM_CLASS,
+                itemActive && 'bg-[var(--accent-soft)] text-[var(--accent-ink)]'
+              )}
+              href={item.href}
+              key={item.href}
+              onClick={() => onClose()}
+              role="menuitem"
+            >
+              {item.label}
+            </AppLink>
+          );
+        })}
+      </div>
+    </details>
+  );
+}
+
+function useDropdownState() {
+  const [openId, setOpenId] = useState<DropdownId>(null);
+
+  function toggle(id: string, open: boolean) {
+    setOpenId(open ? id : (prev) => (prev === id ? null : prev));
+  }
+
+  function close() {
+    setOpenId(null);
+  }
+
+  return { openId, toggle, close };
+}
+
 export function SiteHeader({ user, logoutAction }: SiteHeaderProps) {
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isMoreNavOpen, setIsMoreNavOpen] = useState(false);
   const [hasScrolled, setHasScrolled] = useState(false);
-  const moreNavRef = useRef<HTMLDetailsElement>(null);
+  const { openId, toggle, close: closeAllDropdowns } = useDropdownState();
   const isFixedMobileHeader = isMobileMenuOpen;
-  const focusClassName = 'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]';
-  const activeMoreItem = desktopMoreGroups.flatMap((g) => g.items).find((item) => pathname && isActiveItem(pathname, item.href));
-  const moreLabel = activeMoreItem?.label ?? 'Ещё';
   const isHomePath = pathname === '/';
   const isHomeTop = isHomePath && !hasScrolled && !isMobileMenuOpen;
+  const morePanelId = useId();
 
   useEffect(() => {
     setIsMobileMenuOpen(false);
-    setIsMoreNavOpen(false);
+    closeAllDropdowns();
   }, [pathname]);
 
   useEffect(() => {
@@ -50,32 +186,17 @@ export function SiteHeader({ user, logoutAction }: SiteHeaderProps) {
     return () => window.removeEventListener('scroll', updateHeaderState);
   }, [isHomePath]);
 
-  useEffect(() => {
-    if (!isMoreNavOpen) {
-      return;
-    }
-
-    function closeOnOutsidePointer(event: PointerEvent) {
-      const target = event.target as Node | null;
-
-      if (target && moreNavRef.current?.contains(target)) {
-        return;
-      }
-
-      setIsMoreNavOpen(false);
-    }
-
-    document.addEventListener('pointerdown', closeOnOutsidePointer);
-
-    return () => document.removeEventListener('pointerdown', closeOnOutsidePointer);
-  }, [isMoreNavOpen]);
-
   if (isWorkspacePath(pathname)) {
     return null;
   }
 
   const businessHref = user?.role === 'BUSINESS' ? '/business/cabinet' : '/business';
-  const effectiveDesktopPrimaryNavItems = desktopPrimaryNavItems;
+  const effectiveDesktopDropdownGroups: NavGroup[] = desktopDropdownGroups.map((group) => ({
+    ...group,
+    items: group.items.map((item) =>
+      item.href === '/business' ? { ...item, href: businessHref } : item
+    )
+  }));
   const effectiveDesktopMoreGroups: NavGroup[] = desktopMoreGroups.map((group) => ({
     ...group,
     items: group.items.map((item) =>
@@ -85,6 +206,9 @@ export function SiteHeader({ user, logoutAction }: SiteHeaderProps) {
   const effectiveGuestNavItems = guestNavItems.map((item) =>
     item.href === '/business' ? { ...item, href: businessHref } : item
   );
+
+  const moreItems = effectiveDesktopMoreGroups.flatMap((g) => g.items);
+  const moreActive = moreItems.some((item) => pathname && isActiveItem(pathname, item.href));
 
   return (
     <header
@@ -110,7 +234,7 @@ export function SiteHeader({ user, logoutAction }: SiteHeaderProps) {
             className={cn(
               'flex min-h-12 shrink-0 items-center rounded-[var(--radius-md)] pr-1 xl:w-full xl:min-w-[176px] xl:pr-0 2xl:min-w-[220px]',
               isMobileMenuOpen && 'sm:pl-3',
-              focusClassName
+              FOCUS_CLASS
             )}
             href="/"
             onClick={() => setIsMobileMenuOpen(false)}
@@ -136,14 +260,14 @@ export function SiteHeader({ user, logoutAction }: SiteHeaderProps) {
             />
           </AppLink>
           <nav className="hidden min-w-0 items-center justify-center gap-1 px-0 text-[11px] font-semibold uppercase tracking-[0.06em] text-inherit lg:flex lg:justify-self-start 2xl:gap-2 2xl:text-[12px] 2xl:tracking-[0.08em]">
-            {effectiveDesktopPrimaryNavItems.map((item) => {
+            {desktopPrimaryNavItems.map((item) => {
               const isActive = pathname ? isActiveItem(pathname, item.href) : false;
 
               return (
                 <AppLink
                   className={cn(
-                    'relative inline-flex min-h-11 shrink-0 items-center whitespace-nowrap rounded-[var(--radius-sm)] px-1 opacity-85 transition-[color,opacity] duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] after:absolute after:inset-x-1 after:bottom-1 after:h-px after:origin-left after:scale-x-0 after:bg-[var(--accent)] after:transition-transform after:duration-[var(--motion-duration-base)] after:ease-[var(--motion-ease-move)] hover:opacity-100 hover:after:scale-x-100 motion-reduce:transition-none motion-reduce:after:transition-none 2xl:px-2 2xl:after:inset-x-1.5',
-                    focusClassName,
+                    LINK_BASE_CLASS,
+                    FOCUS_CLASS,
                     isActive && 'text-[var(--accent-ink)] opacity-100 after:scale-x-100'
                   )}
                   key={item.href}
@@ -154,67 +278,34 @@ export function SiteHeader({ user, logoutAction }: SiteHeaderProps) {
                 </AppLink>
               );
             })}
-            {effectiveDesktopMoreGroups.some((g) => g.items.length > 0) ? (
-              <details
-                className="group relative shrink-0"
-                ref={moreNavRef}
-                onBlur={(event) => {
-                  const nextTarget = event.relatedTarget as Node | null;
+            {effectiveDesktopDropdownGroups.map((group) => {
+              const groupId = `nav-${group.label}`;
+              const groupActive = group.items.some((item) => pathname && isActiveItem(pathname, item.href));
 
-                  if (!nextTarget || !event.currentTarget.contains(nextTarget)) {
-                    setIsMoreNavOpen(false);
-                  }
-                }}
-                onKeyDown={(event) => {
-                  if (event.key === 'Escape') {
-                    setIsMoreNavOpen(false);
-                  }
-                }}
-                onToggle={(event) => setIsMoreNavOpen(event.currentTarget.open)}
-                open={isMoreNavOpen}
-              >
-                <summary
-                  aria-expanded={isMoreNavOpen}
-                  className={cn(
-                    'relative inline-flex min-h-11 shrink-0 cursor-pointer list-none items-center gap-1.5 whitespace-nowrap rounded-[var(--radius-sm)] px-1 opacity-85 transition-[color,opacity] duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] after:absolute after:inset-x-1 after:bottom-1 after:h-px after:origin-left after:scale-x-0 after:bg-[var(--accent)] after:transition-transform after:duration-[var(--motion-duration-base)] after:ease-[var(--motion-ease-move)] hover:opacity-100 hover:after:scale-x-100 group-open:after:scale-x-0 motion-reduce:transition-none motion-reduce:after:transition-none [&::-webkit-details-marker]:hidden 2xl:px-2 2xl:after:inset-x-1.5',
-                    effectiveDesktopMoreGroups.some((g) => g.items.some((item) => pathname && isActiveItem(pathname, item.href))) && 'text-[var(--accent-ink)] opacity-100 after:scale-x-100',
-                    focusClassName
-                  )}
-                >
-                  {moreLabel}
-                  <ChevronDown aria-hidden="true" className="transition-transform duration-[var(--motion-duration-base)] ease-[var(--motion-ease-standard)] group-open:rotate-180 motion-reduce:transition-none" size={14} strokeWidth={1.8} />
-                </summary>
-                <div className="absolute right-0 top-[calc(100%+0.35rem)] z-20 flex min-w-[14rem] flex-col gap-4 rounded-[var(--radius-md)] border border-[var(--card-border)] bg-[var(--surface-elevated)] p-3 shadow-[var(--shadow-panel)]">
-                  {effectiveDesktopMoreGroups.map((group) => (
-                    <div key={group.label}>
-                      {group.items.length > 0 ? (
-                        <>
-                          <p className="px-3 pb-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--muted)]">
-                            {group.label}
-                          </p>
-                          {group.items.map((item) => {
-                            const isActive = pathname ? isActiveItem(pathname, item.href) : false;
-
-                            return (
-                              <AppLink
-                                className={cn(
-                                  'flex min-h-11 items-center rounded-[var(--radius-sm)] px-3 py-2 text-[13px] font-semibold text-[var(--text)] transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] hover:bg-[var(--surface-muted)] hover:text-[var(--accent-strong)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] motion-reduce:transition-none',
-                                  isActive && 'bg-[var(--accent-soft)] text-[var(--accent-ink)]'
-                                )}
-                                href={item.href}
-                                key={item.href}
-                                aria-current={isActive ? 'page' : undefined}
-                              >
-                                {item.label}
-                              </AppLink>
-                            );
-                          })}
-                        </>
-                      ) : null}
-                    </div>
-                  ))}
-                </div>
-              </details>
+              return (
+                <NavDropdown
+                  id={groupId}
+                  isActive={groupActive}
+                  isOpen={openId === groupId}
+                  items={group.items}
+                  key={group.label}
+                  label={group.label}
+                  onClose={closeAllDropdowns}
+                  onToggle={(open) => toggle(groupId, open)}
+                />
+              );
+            })}
+            {moreItems.length > 0 ? (
+              <NavDropdown
+                id={morePanelId}
+                isActive={moreActive}
+                isOpen={openId === morePanelId}
+                items={moreItems}
+                label="Ещё"
+                onClose={closeAllDropdowns}
+                onToggle={(open) => toggle(morePanelId, open)}
+                align="right"
+              />
             ) : null}
           </nav>
           <div className="hidden shrink-0 items-center justify-end gap-2 lg:flex lg:w-full">
@@ -222,36 +313,21 @@ export function SiteHeader({ user, logoutAction }: SiteHeaderProps) {
               aria-label="Поиск"
               className={cn(
                 'inline-flex min-h-11 w-11 shrink-0 items-center justify-center rounded-[var(--radius-md)] text-inherit transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] hover:bg-[rgba(255,253,249,0.12)] motion-reduce:transition-none',
-                focusClassName
+                FOCUS_CLASS
               )}
               href="/search"
             >
               <Search aria-hidden="true" size={17} strokeWidth={1.8} />
             </AppLink>
-            {user?.role === 'BUSINESS' ? (
-              <AppLink
-                className={cn(
-                  'hidden min-h-11 shrink-0 items-center justify-center whitespace-nowrap rounded-[var(--radius-sm)] border-[1.5px] border-[var(--accent)] bg-[var(--accent-soft)] px-3 text-[11px] font-bold uppercase tracking-[0.1em] text-[var(--accent-ink)] transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] hover:bg-[var(--accent)] hover:text-[var(--accent-contrast)] motion-reduce:transition-none lg:inline-flex lg:px-4',
-                  focusClassName
-                )}
-                href="/business/cabinet"
-              >
-                Разместить вакансию
-              </AppLink>
-            ) : user?.role === 'USER' ? (
-              <AppLink
-                className={cn(
-                  'hidden min-h-11 shrink-0 items-center justify-center whitespace-nowrap rounded-[var(--radius-sm)] border-[1.5px] px-3 text-[11px] font-bold uppercase tracking-[0.1em] transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] motion-reduce:transition-none lg:inline-flex lg:px-4',
-                  isHomeTop
-                    ? 'border-white/20 bg-white/10 text-[var(--editorial-dark-text)] hover:bg-white/18 hover:text-white'
-                    : 'border-[var(--border-strong)] bg-[var(--surface-elevated)] text-[var(--text)] hover:border-[var(--accent)] hover:bg-[var(--surface-wash)] hover:text-[var(--accent-strong)]',
-                  focusClassName
-                )}
-                href="/vacancies"
-              >
-                Найти вакансии
-              </AppLink>
-            ) : null}
+            <AppLink
+              className={cn(
+                'hidden min-h-11 shrink-0 items-center justify-center whitespace-nowrap rounded-[var(--radius-sm)] border-[1.5px] border-[var(--accent)] bg-[var(--accent-soft)] px-3 text-[11px] font-bold uppercase tracking-[0.1em] text-[var(--accent-ink)] transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] hover:bg-[var(--accent)] hover:text-[var(--accent-contrast)] motion-reduce:transition-none lg:inline-flex lg:px-4',
+                FOCUS_CLASS
+              )}
+              href={businessHref}
+            >
+              Для бизнеса
+            </AppLink>
             {user ? (
               <AccountMenu logoutAction={logoutAction!} user={user} />
             ) : (
@@ -260,7 +336,7 @@ export function SiteHeader({ user, logoutAction }: SiteHeaderProps) {
                   aria-label="Войти в кабинет"
                   className={cn(
                     'inline-flex min-h-11 shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-[var(--radius-md)] px-3 text-[12px] font-semibold text-inherit transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] hover:bg-[rgba(255,253,249,0.12)] motion-reduce:transition-none',
-                    focusClassName
+                    FOCUS_CLASS
                   )}
                   href="/auth/login"
                 >
@@ -273,7 +349,7 @@ export function SiteHeader({ user, logoutAction }: SiteHeaderProps) {
                     isHomeTop
                       ? 'border-white/16 bg-white/8 text-[var(--editorial-dark-text)] hover:bg-white/14'
                       : 'border-[var(--border-default)] bg-[var(--surface-elevated)] text-[var(--text)] hover:border-[var(--accent)] hover:text-[var(--accent-strong)]',
-                    focusClassName
+                    FOCUS_CLASS
                   )}
                   href="/auth/register/user"
                 >
@@ -288,7 +364,7 @@ export function SiteHeader({ user, logoutAction }: SiteHeaderProps) {
               aria-label="Поиск"
               className={cn(
                 'inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-[var(--radius-sm)] border border-[var(--border-default)] bg-[var(--surface-elevated)] text-[var(--text)] shadow-[var(--shadow-card)] backdrop-blur-[12px] transition-[background-color,border-color,color] duration-[var(--motion-duration-base)] ease-[var(--motion-ease-standard)] hover:border-[var(--accent)]/30 hover:bg-[var(--surface)] motion-reduce:transition-none',
-                focusClassName
+                FOCUS_CLASS
               )}
               href="/search"
             >

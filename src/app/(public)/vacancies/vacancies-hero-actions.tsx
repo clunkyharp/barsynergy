@@ -1,6 +1,5 @@
 'use client';
 
-import { useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { displayFont } from '@/lib/fonts';
 import { openLeadModal } from '@/lib/public/lead-modal-bus';
@@ -21,20 +20,7 @@ function HeroStat({ value, label }: { value: number; label: string }) {
   );
 }
 
-export function VacanciesHeroStats({ vacanciesCount, specialistsCount }: VacanciesHeroActionsProps) {
-  const searchParams = useSearchParams();
-  const view = searchParams.get('view') ?? 'vacancies';
-
-  if (view === 'specialists') {
-    return (
-      <div className="vacancies-hero-stats">
-        {typeof specialistsCount === 'number' ? (
-          <HeroStat label="специалистов в каталоге" value={specialistsCount} />
-        ) : null}
-      </div>
-    );
-  }
-
+export function VacanciesHeroStats({ vacanciesCount }: VacanciesHeroActionsProps) {
   return (
     <div className="vacancies-hero-stats">
       {typeof vacanciesCount === 'number' ? (
@@ -45,18 +31,6 @@ export function VacanciesHeroStats({ vacanciesCount, specialistsCount }: Vacanci
 }
 
 export function VacanciesHeroActions() {
-  const searchParams = useSearchParams();
-  const view = searchParams.get('view') ?? 'vacancies';
-
-  if (view === 'specialists') {
-    return (
-      <div className="vacancies-hero-actions">
-        <Button href="/profile/settings/career#publish">Опубликовать резюме</Button>
-        <Button href="/specialists/svc/new" variant="secondary">Предложить услуги</Button>
-      </div>
-    );
-  }
-
   return (
     <div className="vacancies-hero-actions">
       <Button onClick={() => openLeadModal('vacancy')} type="button">Разместить вакансию</Button>

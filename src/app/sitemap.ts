@@ -28,6 +28,7 @@ const staticRoutes: Array<{
   { path: '/events', changeFrequency: 'weekly', priority: 0.8 },
   { path: '/articles', changeFrequency: 'weekly', priority: 0.8 },
   { path: '/vacancies', changeFrequency: 'weekly', priority: 0.8 },
+  { path: '/specialists', changeFrequency: 'weekly', priority: 0.8 },
   { path: '/masters', changeFrequency: 'weekly', priority: 0.8 },
   { path: '/business', changeFrequency: 'monthly', priority: 0.7 },
   { path: '/consulting', changeFrequency: 'monthly', priority: 0.7 },

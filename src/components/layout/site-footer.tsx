@@ -174,12 +174,11 @@ export function SiteFooter({ userRole, userEmail, newsletterDisabled = false, le
 
   const platformLinks = [
     { href: '/articles', label: 'Материалы' },
-    { href: '/education', label: 'Обучение' },
-    { href: '/events', label: 'События' },
     { href: '/vacancies', label: 'Вакансии' },
-    { href: '/vacancies?view=specialists', label: 'Специалисты' },
-    { href: '/masters', label: 'Мастера' },
+    { href: '/specialists', label: 'Специалисты' },
     { href: '/suppliers', label: 'Поставщики' },
+    { href: '/events', label: 'События' },
+    { href: '/education', label: 'Обучение' },
     { href: '/tools/cost-calculator', label: 'Калькулятор' }
   ] as const;
   const businessLinks = [

@@ -1,6 +1,6 @@
 import { ContentStatus, type Prisma } from '@prisma/client';
 import { prisma } from '@/lib/db/prisma';
-import { queueContentNotification } from './outbox';
+import { dispatchContentNotificationQueue, queueContentNotification } from './outbox';
 
 type ContentInfo = {
   id: string;
@@ -43,7 +43,9 @@ export async function maybeNotifyFirstPublication(
       contentType,
       contentId: content.id,
       title: content.title,
-      contentSlug: content.slug,
+      contentSlug: content.slug
     })
   );
+
+  dispatchContentNotificationQueue();
 }

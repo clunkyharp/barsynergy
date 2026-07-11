@@ -394,8 +394,7 @@ test('S4 public copy removes generic phrasing and duplicate live-card framing', 
   assert.match(heroSource, /Люди, события, вакансии, поставщики, обучение и материалы/);
   assert.doesNotMatch(heroSource, /Платформа для кофейных баров СКФО|всё в одном месте|Открыть путь к заявкам/);
 
-  assert.match(homepageSource, /Что нового/);
-  assert.match(homepageSource, /Разделы для работы/);
+  assert.match(homepageSource, /Платформа для работы/);
   assert.doesNotMatch(homepageSource, /Свежие карточки|Живые карточки из вакансий/);
   assert.doesNotMatch(homepageSource, /Свежее на платформе/);
   assert.doesNotMatch(homepageSource, /всё в одном месте/);
@@ -491,7 +490,7 @@ test('profile KPI tiles use AppLink and homepage fresh block has a distinct angl
   assert.doesNotMatch(profileSource, /<a[\s\S]{0,200}dashboardStats\.activeResponseCount/);
 
   assert.match(homepageSource, /Актуальное/);
-  assert.match(homepageSource, /Разделы для работы/);
+  assert.match(homepageSource, /Платформа для работы/);
   assert.match(homepageSource, /fallbackMeta="Другие материалы"/);
   assert.doesNotMatch(homepageSource, /Свежее на платформе/);
 });

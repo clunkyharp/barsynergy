@@ -6,13 +6,13 @@ import { InfoModal } from '@/components/public/modals/info-modal';
 import { openLeadModal } from '@/lib/public/lead-modal-bus';
 import { displayFont } from '@/lib/fonts';
 
-export function EducationHeroActions() {
+export function EducationHeroActions({ hasPrograms = true }: { hasPrograms?: boolean }) {
   const [formatsOpen, setFormatsOpen] = useState(false);
 
   return (
     <>
       <HeroActions
-        primaryLabel="Записаться на программу"
+        primaryLabel={hasPrograms ? 'Записаться на программу' : 'Добавить программу'}
         secondaryLabel="Форматы обучения"
         onPrimaryClick={() => openLeadModal('education')}
         onSecondaryClick={() => {

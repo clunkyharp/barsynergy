@@ -39,7 +39,26 @@ export function ArticleBodyContent({ markdown }: { markdown: string }) {
       const text = extractText(children);
       const id = slugifyHeading(text);
       return <h3 id={id} {...props}>{children}</h3>;
-    }
+    },
+    h4: ({ children, ...props }) => {
+      const text = extractText(children);
+      const id = slugifyHeading(text);
+      return <h4 id={id} {...props}>{children}</h4>;
+    },
+    table: ({ children }) => (
+      <div className="article-table-wrapper">
+        <table>{children}</table>
+      </div>
+    ),
+    img: ({ src, alt, ...props }) => (
+      <figure className="article-figure">
+        <img src={typeof src === 'string' ? src : undefined} alt={alt ?? ''} loading="lazy" {...props} />
+        {alt ? <figcaption>{alt}</figcaption> : null}
+      </figure>
+    ),
+    blockquote: ({ children }) => (
+      <blockquote>{children}</blockquote>
+    )
   };
 
   return (

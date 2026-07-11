@@ -21,10 +21,19 @@ type BusinessPageProps = {
 };
 
 export const metadata: Metadata = buildPublicPageMetadata({
-  title: 'Разместить заведение в каталоге',
-  description: 'Добавление кофейных баров, кофеен, обжарочных и близких форматов в каталог BARSYNERGY по СКФО.',
+  title: 'Для бизнеса — размещение и решения для заведений',
+  description: 'Инструменты, размещение и профессиональные решения для компаний и заведений кофейной индустрии СКФО.',
   path: '/business'
 });
+
+const BIZ_ACTIONS = [
+  { title: 'Добавить заведение в каталог', description: 'Разместите кофейню, бар или обжарку в каталоге BARSYNERGY.', cta: 'Заполнить заявку', href: '#business-request', icon: 'building' as SectionIconType },
+  { title: 'Разместить вакансию', description: 'Найдите бариста, управляющего или специалиста в регион.', cta: 'Отправить вакансию', href: '/contacts?topic=vacancy#contact-form', icon: 'search' as SectionIconType },
+  { title: 'Добавить событие', description: 'Анонсируйте каппинг, чемпионат или встречу в афише.', cta: 'Предложить событие', href: '/contacts?topic=event#contact-form', icon: 'star' as SectionIconType },
+  { title: 'Разместить обучение', description: 'Добавьте курс, интенсив или мастер-класс в каталог.', cta: 'Предложить программу', href: '/contacts?topic=education#contact-form', icon: 'espresso' as SectionIconType },
+  { title: 'Стать партнёром', description: 'Сотрудничество и отраслевые проекты с платформой.', cta: 'Узнать о партнёрстве', href: '/partners', icon: 'contact' as SectionIconType },
+  { title: 'Получить консультацию', description: 'Экспертная помощь по запуску, меню и экономике.', cta: 'Описать задачу', href: '/consulting', icon: 'location' as SectionIconType }
+];
 
 const processSteps: {
   number: string;
@@ -83,13 +92,6 @@ const benefits: { label: string; title: string; description: string; icon: Secti
   }
 ];
 
-const targetAudiences: { label: string; description: string; icon: SectionIconType }[] = [
-  { label: 'Кофейни', description: 'Specialty, авторские и третья волна', icon: 'coffee' },
-  { label: 'Кофейные бары', description: 'Стойки, концепты, мини-форматы', icon: 'espresso' },
-  { label: 'Обжарочные', description: 'Роастеры с розничными продажами', icon: 'coffee-bean' },
-  { label: 'Поставщики', description: 'Зерно, молоко, расходники, оборудование', icon: 'suppliers' },
-];
-
 const defaultParamKeys = ['projectName', 'contactName', 'cityId', 'solutionType', 'comment'] as const;
 
 function VenuePlacementMock() {
@@ -139,12 +141,12 @@ export default async function BusinessPage({ searchParams }: BusinessPageProps) 
 
   return (
     <>
-      <JsonLd data={buildStaticPageBreadcrumbJsonLd('/business', 'Размещение заведения')} />
+      <JsonLd data={buildStaticPageBreadcrumbJsonLd('/business', 'Для бизнеса')} />
       <PageHero
-        breadcrumbs={[{ label: 'Размещение заведения' }]}
-        eyebrow="Размещение заведения"
-        title="Добавить заведение в каталог"
-        subtitle="Кофейные бары, кофейни, обжарочные и смежные форматы — в каталоге BARSYNERGY."
+        breadcrumbs={[{ label: 'Для бизнеса' }]}
+        eyebrow="Для бизнеса"
+        title="Для бизнеса"
+        subtitle="Инструменты, размещение и профессиональные решения для компаний и заведений индустрии."
         tone="graphite"
         density="compact"
         actions={[
@@ -152,32 +154,33 @@ export default async function BusinessPage({ searchParams }: BusinessPageProps) 
         ]}
       />
 
-      {/* Who it's for */}
       <section className="background-zone background-zone-beige border-b border-[var(--line)] py-12 md:py-16">
         <div className="container">
-          <PublicEyebrow>Кому подходит</PublicEyebrow>
-          <PublicDisplayTitle className="mt-3 max-w-2xl" size="compact">Для кого этот каталог</PublicDisplayTitle>
-          <PublicBodyText className="mt-4 max-w-xl" size="md">
-            Каталог принимает профильные проекты, которым нужен деловой контакт, а не рекламная витрина.
-          </PublicBodyText>
-          <div className="mt-8 grid gap-4 sm:grid-cols-2 md:grid-cols-4">
-            {targetAudiences.map((audience) => (
-              <article
-                className="public-card-shell flex flex-col gap-3 p-5 md:p-6"
-                key={audience.label}
+          <PublicEyebrow>Действия</PublicEyebrow>
+          <PublicDisplayTitle className="mt-3 max-w-2xl" size="compact">Что вы хотите сделать?</PublicDisplayTitle>
+          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {BIZ_ACTIONS.map((action) => (
+              <a
+                className="public-card-shell group flex flex-col gap-3 p-5 transition-[border-color] hover:border-[var(--accent)]/40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] md:p-6"
+                href={action.href}
+                key={action.title}
               >
-                <SectionIcon size={40} type={audience.icon} />
-                <h3 className={`${displayFont.className} text-[1.05rem] font-semibold leading-tight text-[var(--text)]`}>{audience.label}</h3>
-                <p className="text-[13px] leading-[1.6] text-[var(--muted)]">{audience.description}</p>
-              </article>
+                <SectionIcon size={36} type={action.icon} />
+                <h3 className={`${displayFont.className} text-[1.1rem] font-semibold leading-tight text-[var(--text)]`}>{action.title}</h3>
+                <p className="flex-1 text-[13px] leading-[1.6] text-[var(--muted)]">{action.description}</p>
+                <span className="inline-flex items-center gap-1.5 text-[0.85rem] font-semibold text-[var(--accent-ink)]">
+                  {action.cta}
+                  <ArrowUpRight size={14} strokeWidth={2} className="transition-transform duration-[var(--motion-duration-fast)] group-hover:translate-x-0.5" />
+                </span>
+              </a>
             ))}
           </div>
         </div>
       </section>
 
-      {/* How it works */}
       <section className="background-zone background-zone-beige border-b border-[var(--line)] py-10 md:py-14">
         <div className="container">
+          <PublicEyebrow>Разместить заведение в каталоге</PublicEyebrow>
           <div className="mb-8 max-w-2xl">
             <PublicEyebrow>Как это работает</PublicEyebrow>
             <PublicDisplayTitle className="mt-3" size="compact">Три шага до карточки</PublicDisplayTitle>
@@ -214,7 +217,6 @@ export default async function BusinessPage({ searchParams }: BusinessPageProps) 
         </div>
       </section>
 
-      {/* Benefits */}
       <section className="home-services-section background-zone background-zone-beige border-b border-[var(--line)] py-12 md:py-16">
         <div className="container grid gap-8 xl:grid-cols-[minmax(18rem,0.54fr)_minmax(0,1.46fr)]">
           <div className="min-w-0 xl:self-center">
@@ -248,7 +250,6 @@ export default async function BusinessPage({ searchParams }: BusinessPageProps) 
         </div>
       </section>
 
-      {/* Placement example with callouts */}
       <PlacementExample
         eyebrow="Пример размещения"
         title="Как заведение выглядит в каталоге"

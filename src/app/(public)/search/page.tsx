@@ -202,6 +202,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
             <SearchInput
               aria-label="Глобальный поиск по платформе"
               autoComplete="off"
+              autoFocus
               className="public-filter-control min-h-12 rounded-[var(--radius-md)] bg-[var(--surface-wash)] text-base"
               defaultValue={q}
               enterKeyHint="search"

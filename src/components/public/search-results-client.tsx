@@ -144,9 +144,21 @@ export function SearchResultsClient({ items, query }: { items: SearchResultItem[
     );
   }
 
+  function handleTabKeyDown(event: React.KeyboardEvent) {
+    if (event.key !== 'ArrowRight' && event.key !== 'ArrowLeft') return;
+    event.preventDefault();
+    const currentIndex = tabItems.findIndex((tab) => tab.id === activeTab);
+    const direction = event.key === 'ArrowRight' ? 1 : -1;
+    const nextIndex = (currentIndex + direction + tabItems.length) % tabItems.length;
+    setActiveTab(tabItems[nextIndex].id);
+  }
+
   return (
     <div className="grid gap-4">
-      <div className="flex gap-2 overflow-x-auto pb-0.5 [scrollbar-width:none]">
+      <p className="sr-only" aria-live="polite" role="status">
+        {filteredItems.length > 0 ? `Найдено: ${filteredItems.length}` : 'Ничего не найдено'}
+      </p>
+      <div className="flex gap-2 overflow-x-auto pb-0.5 [scrollbar-width:none]" role="tablist" aria-label="Фильтр результатов по типу" onKeyDown={handleTabKeyDown}>
         {tabItems.map((tab) => {
           const isActive = activeTab === tab.id;
           return (
@@ -159,6 +171,9 @@ export function SearchResultsClient({ items, query }: { items: SearchResultItem[
                   : 'border-[var(--line)] bg-transparent text-[var(--muted)] hover:border-[var(--border-default)] hover:text-[var(--text)]',
               ].join(' ')}
               type="button"
+              role="tab"
+              aria-selected={isActive}
+              tabIndex={isActive ? 0 : -1}
               onClick={() => setActiveTab(tab.id)}
             >
               {tab.label}

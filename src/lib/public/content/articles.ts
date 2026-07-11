@@ -35,7 +35,7 @@ function slugifyHeading(text: string): string {
 
 export function parseToc(body: string | null | undefined): TocItem[] {
   if (!body) return [];
-  const headingRegex = /^(#{2,3})\s+(.+)$/gm;
+  const headingRegex = /^(#{2,4})\s+(.+)$/gm;
   const items: TocItem[] = [];
   let match: RegExpExecArray | null;
   while ((match = headingRegex.exec(body)) !== null) {

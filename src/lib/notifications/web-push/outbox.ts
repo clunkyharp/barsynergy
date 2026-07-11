@@ -170,17 +170,17 @@ export async function processContentNotificationQueue(
   });
 }
 
-export function dispatchContentNotificationQueue(input: {
+export function dispatchContentNotificationQueue(input?: {
   logger?: Pick<Console, 'error'>;
 }) {
+  const logger = input?.logger ?? console;
+
   if (process.env.NEXT_RUNTIME === 'edge') {
-    const logger = input.logger ?? console;
     logger.error('Content notification queue dispatch is not supported in edge runtime.');
     return;
   }
 
-  void processContentNotificationQueue({ logger: input.logger }).catch((error: unknown) => {
-    const logger = input.logger ?? console;
+  void processContentNotificationQueue({ logger }).catch((error: unknown) => {
     logger.error('Content notification queue dispatch failed.', error);
   });
 }

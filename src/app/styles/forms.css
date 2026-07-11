@@ -1304,7 +1304,7 @@ form[data-public-validation="true"] .grid-cols-2 .form-field {
     grid-column: 1 / -1;
 }
 
-@media (min-width: 769px) {
+@media (min-width: 768px) {
     .vacancies-directory-page section[aria-labelledby="page-hero-title"] [class*="xl:grid-cols"] {
         align-items: end;
     }

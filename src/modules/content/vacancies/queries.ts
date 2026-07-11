@@ -1,5 +1,6 @@
 import { BusinessAccountStatus, ContentStatus, type Prisma } from '@prisma/client';
 import { prisma } from '@/lib/db/prisma';
+import { getActiveCityOptions } from '@/lib/shared/city-options';
 import {
   vacancyEmploymentTypeOptions,
   vacancyExperienceOptions,
@@ -251,11 +252,7 @@ export async function getPublishedVacancyDetail(slug: string) {
 
 export async function getVacancyApplicationFormOptions(): Promise<VacancyApplicationFormOptions> {
   const [cities, vacancies] = await Promise.all([
-    prisma.city.findMany({
-      where: { isActive: true },
-      orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
-      select: { id: true, name: true }
-    }),
+    getActiveCityOptions(),
     prisma.vacancy.findMany({
       where: { status: ContentStatus.PUBLISHED },
       orderBy: [{ sortOrder: 'asc' }, { publishedAt: 'desc' }, { createdAt: 'desc' }],

@@ -68,10 +68,10 @@ export function HomeHeroRouter({ stats }: { stats: HomepageData["stats"] }) {
           </p>
           <div className="mt-9 flex flex-wrap justify-center gap-3 max-sm:w-full max-sm:flex-col max-sm:items-stretch">
             <AppLink
-              href="/vacancies"
+              href="#home-scenarios"
               className="inline-flex items-center justify-center gap-2 rounded-[var(--radius-lg)] bg-[var(--accent)] px-6 py-3 text-sm font-semibold text-[var(--accent-contrast)] shadow-[var(--shadow-action)] transition-colors hover:bg-[var(--accent-strong)]"
             >
-              Смотреть вакансии
+              Изучить платформу
               <ArrowUpRight size={15} strokeWidth={2} />
             </AppLink>
             <AppLink
@@ -79,6 +79,12 @@ export function HomeHeroRouter({ stats }: { stats: HomepageData["stats"] }) {
               className="inline-flex items-center justify-center gap-2 rounded-[var(--radius-lg)] border border-white/30 px-6 py-3 text-sm font-semibold text-[var(--editorial-dark-text)] transition-colors hover:border-white/60 hover:bg-white/10"
             >
               Для бизнеса
+            </AppLink>
+            <AppLink
+              href="/tools/cost-calculator"
+              className="inline-flex items-center justify-center gap-2 rounded-[var(--radius-lg)] border border-white/20 px-6 py-3 text-sm font-semibold text-[var(--editorial-dark-muted)] transition-colors hover:border-white/40 hover:bg-white/8 hover:text-[var(--editorial-dark-text)]"
+            >
+              Рассчитать себестоимость
             </AppLink>
           </div>
           {statItems.length >= 2 && (

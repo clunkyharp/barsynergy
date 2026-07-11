@@ -79,7 +79,9 @@ async function resendUserVerificationEmail(email: string): Promise<ResendVerific
     const env = getEnv();
     const verificationUrl = `${env.APP_URL}/auth/verify-email?token=${rawToken}`;
     const { sendVerificationEmail } = await import('@/lib/notifications/auth-email');
-    sendVerificationEmail({ to: email, verificationUrl }).catch(() => {});
+    sendVerificationEmail({ to: email, verificationUrl }).catch((error: unknown) => {
+      console.error('Failed to send verification email:', error instanceof Error ? error.message : error);
+    });
 
     return 'verification-resent';
   } catch (error) {

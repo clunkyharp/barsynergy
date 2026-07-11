@@ -66,8 +66,14 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
         <JsonLd data={buildSiteJsonLd()} />
         <ToastProvider>
           <div className="site-shell overflow-x-clip">
+            <a
+              href="#main-content"
+              className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:rounded-[var(--radius-md)] focus:bg-[var(--accent)] focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-[var(--accent-contrast)]"
+            >
+              Перейти к содержимому
+            </a>
             <SiteHeaderServer logoutAction={logoutAction} />
-            <main className="site-main flex-1 overflow-x-hidden w-full max-w-full">{children}</main>
+            <main id="main-content" className="site-main flex-1 overflow-x-hidden w-full max-w-full">{children}</main>
             <SiteFooterServer
               leadActions={{
                 submitEducationLead,

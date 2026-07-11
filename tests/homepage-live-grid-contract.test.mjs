@@ -15,8 +15,7 @@ test('homepage replaces the platform link grid with live support cards', () => {
 
   assert.match(source, /const materialsCard: HomepageLiveCard/);
   assert.match(source, /<EditorialFeatured card=\{data\.article\}/);
-  assert.match(source, /Что нового/);
-  assert.match(source, /Разделы для работы/);
+  assert.match(source, /Платформа для работы/);
   assert.doesNotMatch(source, /Свежее на платформе/);
   assert.doesNotMatch(source, /Живые карточки из вакансий, поставщиков, событий, обучения и материалов/);
   assert.match(source, /<EditorialSupportCard/);

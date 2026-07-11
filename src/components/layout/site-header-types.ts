@@ -23,11 +23,11 @@ export type NavGroup = {
 
 export const navGroups = [
   {
-    label: 'Платформа',
-    hrefs: ['/education', '/events', '/vacancies', '/masters', '/suppliers', '/articles', '/tools/cost-calculator']
+    label: 'Разделы',
+    hrefs: ['/articles', '/vacancies', '/specialists', '/suppliers', '/events', '/education', '/tools/cost-calculator']
   },
   {
-    label: 'Сотрудничество',
+    label: 'Для бизнеса',
     hrefs: ['/business', '/partners', '/general-sponsors', '/consulting']
   },
   {
@@ -42,6 +42,7 @@ export const guestNavItems: NavItem[] = [
   { label: 'События', href: '/events' },
   { label: 'Материалы', href: '/articles' },
   { label: 'Вакансии', href: '/vacancies' },
+  { label: 'Специалисты', href: '/specialists' },
   { label: 'Мастера', href: '/masters' },
   { label: 'Поставщики', href: '/suppliers' },
   { label: 'Калькулятор', href: '/tools/cost-calculator' },
@@ -59,13 +60,24 @@ function getNavItems(hrefs: string[]) {
     .filter((item): item is NavItem => Boolean(item));
 }
 
-export const desktopPrimaryNavItems = getNavItems(['/education', '/events', '/vacancies', '/suppliers', '/masters', '/articles']);
+export const desktopPrimaryNavItems: NavItem[] = getNavItems(['/articles']);
 
-export const desktopMoreGroups: NavGroup[] = [
+export const desktopDropdownGroups: NavGroup[] = [
+  {
+    label: 'Работа',
+    items: getNavItems(['/vacancies', '/specialists'])
+  },
+  {
+    label: 'Индустрия',
+    items: getNavItems(['/suppliers', '/events', '/education'])
+  },
   {
     label: 'Инструменты',
     items: getNavItems(['/tools/cost-calculator'])
-  },
+  }
+];
+
+export const desktopMoreGroups: NavGroup[] = [
   {
     label: 'Сотрудничество',
     items: getNavItems(['/business', '/partners', '/general-sponsors', '/consulting'])

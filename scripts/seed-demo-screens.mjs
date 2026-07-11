@@ -71,7 +71,7 @@ async function main() {
     eventCategory,
     courseCategory
   ] = await Promise.all([
-    upsertCity({ name: 'Махачкала', slug: 'makhachkala', region: 'Республика Дагестан', sortOrder: 1 }),
+    upsertCity({ name: 'Махачкала', slug: 'makhachkala', region: 'Дагестан', sortOrder: 1 }),
     upsertCity({ name: 'Каспийск', slug: 'kaspiysk', region: 'Республика Дагестан', sortOrder: 2 }),
     upsertCity({ name: 'Дербент', slug: 'derbent', region: 'Республика Дагестан', sortOrder: 3 }),
     upsertCategory({ name: 'Бары', slug: 'bars', type: CategoryType.VACANCY, sortOrder: 1 }),

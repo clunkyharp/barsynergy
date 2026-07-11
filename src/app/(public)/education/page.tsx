@@ -42,7 +42,7 @@ function getEducationSortLabel(sort?: string) {
   return educationSortOptions.find((opt) => opt.value === sort)?.label;
 }
 
-function EducationHero() {
+function EducationHero({ hasPrograms }: { hasPrograms: boolean }) {
   return (
     <>
       <JsonLd data={buildStaticPageBreadcrumbJsonLd('/education', 'Обучение')} />
@@ -52,7 +52,7 @@ function EducationHero() {
         subtitle="Курсы, мастер-классы и практические программы для специалистов кофейной индустрии."
         tone="graphite"
       >
-        <EducationHeroActions />
+        <EducationHeroActions hasPrograms={hasPrograms} />
       </PageHero>
     </>
   );
@@ -145,7 +145,7 @@ export default async function EducationPage({ searchParams }: EducationPageProps
 
   return (
     <div className="education-directory-page">
-      <EducationHero />
+      <EducationHero hasPrograms={!isEmpty} />
 
       {!isPrelaunchEmpty ? (
         <>

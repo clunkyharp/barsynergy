@@ -53,7 +53,9 @@ export async function requestPasswordResetAction(
 
       const env = getEnv();
       const resetUrl = `${env.APP_URL}/auth/password-reset/confirm?token=${rawToken}`;
-      await sendPasswordResetEmail({ to: email, resetUrl }).catch(() => {});
+      await sendPasswordResetEmail({ to: email, resetUrl }).catch((error: unknown) => {
+        console.error('Failed to send password reset email:', error instanceof Error ? error.message : error);
+      });
     }
 
     return { type: 'success', code: 'reset-sent' };

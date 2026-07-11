@@ -13,8 +13,9 @@ function readProjectFile(path) {
 test('homepage hero exposes stats and primary CTAs', () => {
   const source = readProjectFile('src/components/public/homepage-hero.tsx');
 
-  assert.match(source, /Смотреть вакансии/);
+  assert.match(source, /Изучить платформу/);
   assert.match(source, /Для бизнеса/);
+  assert.match(source, /Рассчитать себестоимость/);
   assert.match(source, /export function HomeHeroRouter/);
   assert.match(source, /statItems\.length >= 2/);
 });

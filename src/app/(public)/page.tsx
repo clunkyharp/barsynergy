@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import { HomepageClient } from '@/components/public/homepage-client';
 import { JsonLd } from '@/components/seo/json-ld';
-import { getCurrentUser } from '@/lib/auth/current-user';
 import { getHomepageData } from '@/lib/public/home';
 import { homepageFaqItems } from '@/lib/public/homepage-faq';
 import { buildPublicPageMetadata } from '@/lib/public/metadata';
@@ -16,12 +15,12 @@ export const metadata: Metadata = buildPublicPageMetadata({
 });
 
 export default async function HomePage() {
-  const [data, currentUser] = await Promise.all([getHomepageData(), getCurrentUser()]);
+  const data = await getHomepageData();
 
   return (
     <>
       <JsonLd data={buildFaqPageJsonLd(homepageFaqItems)} />
-      <HomepageClient data={data} isAuthenticated={Boolean(currentUser)} />
+      <HomepageClient data={data} />
     </>
   );
 }

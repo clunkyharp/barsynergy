@@ -2,6 +2,7 @@ import { UserRole, ContentStatus, EmploymentType, JobSearchStatus, ApplicationSt
 import { prisma } from '@/lib/db/prisma';
 import type { ConversationStatusGroup } from '@/lib/messaging/conversation-status-groups';
 import { getConversationStatusFilter } from '@/lib/messaging/conversation-status-groups';
+import { getActiveCityOptions } from '@/lib/shared/city-options';
 
 export { UserRole, ContentStatus, EmploymentType, JobSearchStatus, ApplicationStatus, ApplicationType, ConversationSender };
 
@@ -94,11 +95,7 @@ export async function getProfileSettingsData(userId: string) {
         }
       }
     }),
-    prisma.city.findMany({
-      where: { isActive: true },
-      orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
-      select: { id: true, name: true }
-    }),
+    getActiveCityOptions(),
     prisma.skill.findMany({
       where: { isActive: true },
       orderBy: { name: 'asc' },

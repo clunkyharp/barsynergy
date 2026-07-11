@@ -2,6 +2,7 @@ import { ApplicationStatus, ApplicationType, ConversationSender } from '@prisma/
 import { prisma } from '@/lib/db/prisma';
 import type { ConversationStatusGroup } from '@/lib/messaging/conversation-status-groups';
 import { getConversationStatusFilter } from '@/lib/messaging/conversation-status-groups';
+import { getActiveCityOptions } from '@/lib/shared/city-options';
 
 export { ApplicationStatus, ApplicationType, ConversationSender };
 
@@ -17,11 +18,7 @@ export async function getActiveRequestCount(businessAccountId: string) {
 }
 
 export async function getActiveCities() {
-  return prisma.city.findMany({
-    where: { isActive: true },
-    orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
-    select: { id: true, name: true }
-  });
+  return getActiveCityOptions();
 }
 
 export type CitySelect = Awaited<ReturnType<typeof getActiveCities>>[number];

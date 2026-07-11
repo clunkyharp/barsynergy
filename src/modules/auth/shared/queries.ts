@@ -1,9 +1,5 @@
-import { prisma } from '@/lib/db/prisma';
+import { getActiveCityOptions } from '@/lib/shared/city-options';
 
 export async function getActiveCities() {
-  return prisma.city.findMany({
-    where: { isActive: true },
-    orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
-    select: { id: true, name: true }
-  });
+  return getActiveCityOptions();
 }

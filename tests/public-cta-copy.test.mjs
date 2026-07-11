@@ -90,7 +90,7 @@ test('public contact actions use shared direct wording', () => {
   const source = publicContactActionSourceFiles.map(readProjectFile).join('\n');
   const mobileMenuSource = readProjectFile('src/components/layout/mobile-site-menu.tsx');
 
-  assert.match(source, /Связаться с нами/);
+  assert.match(source, /Связаться с командой|Связаться с нами/);
   assert.match(source, /Написать команде/);
   assert.match(mobileMenuSource, /registerUserItem/);
   assert.match(mobileMenuSource, /group\.label/);

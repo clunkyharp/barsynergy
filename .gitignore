@@ -48,3 +48,12 @@ ssh.md
 
 # local audit scratch (screenshots, dev log, findings)
 .audit/
+
+# Local design prototypes, mockups & agent scratch artifacts.
+# Only code needed to run the service belongs in git — visual prototypes,
+# throwaway HTML, research dumps and spikes live here and never ship.
+/_prototypes/
+/.scratch/
+/_artifacts/
+# In-app preview/scratch routes (rendered prototypes, never ship)
+/src/app/(public)/contacts-preview/
